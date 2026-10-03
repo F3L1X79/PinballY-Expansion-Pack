@@ -7,7 +7,7 @@
 // session in whole minutes as Achievement Progress.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements.js";
+import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements.js";
 import lang from "../common/i18n.js";
 import { getProfileStore } from "../common/profile_store.js";
 import {
@@ -44,6 +44,8 @@ export function buildSessionMilestoneAchievements() {
     achievements.push(standaloneAchievement({
         id: "rageQuit",
         family: ACHIEVEMENT_FAMILY.SESSIONS,
+        // It happens in a moment, often by accident.
+        rank: ACHIEVEMENT_RANK.BRONZE,
         getTitle: () => TEXT.rageQuitTitle(),
         getDescription: () => TEXT.rageQuitDescription(RAGE_QUIT_MIN_SECONDS, RAGE_QUIT_MAX_SECONDS),
         getHint: () => TEXT.rageQuitHint(),
@@ -53,6 +55,8 @@ export function buildSessionMilestoneAchievements() {
     achievements.push(standaloneAchievement({
         id: "grandReturn",
         family: ACHIEVEMENT_FAMILY.SESSIONS,
+        // It takes patience, no skill.
+        rank: ACHIEVEMENT_RANK.SILVER,
         getTitle: () => TEXT.grandReturnTitle(),
         getDescription: () => TEXT.grandReturnDescription(GRAND_RETURN_THRESHOLD_DAYS),
         getHint: () => TEXT.grandReturnHint(),

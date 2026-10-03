@@ -1,9 +1,8 @@
 // ============================================================
 // Achievement Rank of every Achievement, through main.js on the fake
 // PinballY globals: a ladder's steps go from Bronze to Platinum, a
-// standalone Achievement is Gold unless it states its rank (a Period
-// Table's first play is Bronze), and a group completion takes its rank
-// from the size of its group.
+// standalone Achievement is Gold unless it states its rank, and a group
+// completion takes its rank from the size of its group.
 // ============================================================
 
 import { test } from "node:test";
@@ -71,7 +70,8 @@ test("every Achievement has an Achievement Rank deduced from its ladder or group
     assert.deepEqual(ranksOf(["tableOfTheWeekStreak:4", "tableOfTheWeekStreak:12"]), [BRONZE, PLATINUM]);
     assert.deepEqual(ranksOf(["challengesCompleted:1", "challengesCompleted:100"]), [BRONZE, PLATINUM]);
 
-    assert.deepEqual(ranksOf(["rageQuit", "grandReturn"]), [GOLD, GOLD]);
+    // Secret Achievements take the rank of how hard they are, like any other.
+    assert.deepEqual(ranksOf(["rageQuit", "grandReturn", "worldTour"]), [BRONZE, SILVER, SILVER]);
     // A Period Table's first play is the easiest step of its family.
     assert.deepEqual(ranksOf(["tableOfTheDayFirstPlay", "tableOfTheWeekFirstPlay"]), [BRONZE, BRONZE]);
 

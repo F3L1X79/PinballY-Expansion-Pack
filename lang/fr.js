@@ -182,9 +182,9 @@ export default {
 
     ratingPrompt: {
         message: (tableTitle, minutes) =>
-            `Eh beh mon chocho ! T'as totalisé plus de ${minutes} minutes de jeu sur la table "${tableTitle}" ! Est-ce que ce serait pas le moment de lui mettre une petite note ?`,
+            `Eh beh ! Tu as totalisé plus de ${minutes} minutes de jeu sur la table "${tableTitle}" ! Est-ce que ce serait pas le moment de lui mettre une petite note ?`,
         rateNow: "Allez, go !",
-        notNow: "Nan, flemme...",
+        notNow: "Plus tard...",
     },
 
     startupPrompt: {
@@ -221,7 +221,7 @@ export default {
         tablesAvailable: "[Filter.Count] tables sont disponibles !",
         launchHint: "Bouton noir pour lancer une table.",
         browseHint: "Flippers droite/gauche pour passer les tables.",
-        signOff: "Amuse-toi bien mon coco ;)",
+        signOff: "Et surtout, amuse-toi bien ;)",
     },
 
     // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js and hall_of_fame.js).

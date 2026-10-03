@@ -37,7 +37,7 @@ test("the upper status line welcomes the active Profile after the player's messa
         "[Filter.Count] tables sont disponibles !",
         "Bouton noir pour lancer une table.",
         "Flippers droite/gauche pour passer les tables.",
-        "Amuse-toi bien mon coco ;)",
+        "Et surtout, amuse-toi bien ;)",
     ];
     assert.deepEqual(fake.upperStatusLine(), [...PLAYER_MESSAGES, ...projectMessages("Bienvenue, Invité !")],
         "the player's messages first, then Guest welcomed by its translated name");

@@ -8,7 +8,7 @@
 // side effects.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, standaloneAchievement } from "../common/achievements.js";
+import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, standaloneAchievement } from "../common/achievements.js";
 import lang from "../common/i18n.js";
 import { getProfileStore } from "../common/profile_store.js";
 
@@ -18,6 +18,8 @@ export function buildWorldTourAchievements() {
     return [standaloneAchievement({
         id: "worldTour",
         family: ACHIEVEMENT_FAMILY.COLLECTION,
+        // Long and tedious, but no skill needed.
+        rank: ACHIEVEMENT_RANK.SILVER,
         getTitle: () => TEXT.worldTourTitle(),
         getDescription: () => TEXT.worldTourDescription(),
         getHint: () => TEXT.worldTourHint(),

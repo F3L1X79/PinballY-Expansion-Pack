@@ -17,9 +17,9 @@ import config from "../common/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
-// Only the muted gold emblem has its image: the others are drawn, so the
-// header's per-rank recap can be read from its colours.
-const MUTED_GOLD_EMBLEM = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\rank_gold_missing.png";
+// Only the muted bronze and silver emblems have their image: the others are
+// drawn, so the header's per-rank recap can be read from its colours.
+const mutedEmblem = rank => `C:\\PinballY\\Scripts\\ExpansionPack\\assets\\rank_${rank}_missing.png`;
 const avatarOf = name => `${PROFILES}\\${name}\\avatar.png`;
 // Longer than an Achievement Toast's whole life (rise, hold, fade).
 const TOAST_MS = 6000;
@@ -52,7 +52,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
         fake.addFile(`${PROFILES}\\${name}\\profile.json`, JSON.stringify({ version: 1, notified }));
         fake.addFile(avatarOf(name), "PNG");
     }
-    fake.addFile(MUTED_GOLD_EMBLEM, "PNG");
+    for (const rank of ["bronze", "silver"]) fake.addFile(mutedEmblem(rank), "PNG");
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) {
@@ -75,13 +75,13 @@ test("a Secret Achievement keeps its title and description out of sight until Un
         return readRows(fake, LIST_TEXT);
     }
 
-    // Whether the header's total counts every row and its Gold count every
-    // Unlocked Gold row (in Gold's colour), Secret Achievements included.
+    // Whether the header's total counts every row and its Bronze count every
+    // Unlocked Bronze row (in Bronze's colour), Secret Achievements included.
     function headerCountsEvery(rows) {
         const unlocked = rows.filter(row => row.unlocked).length;
-        const unlockedGold = rows.filter(row => row.unlocked && row.fills.includes(RANK_COLORS.gold)).length;
+        const unlockedBronze = rows.filter(row => row.unlocked && row.fills.includes(RANK_COLORS.bronze)).length;
         return chromeTexts(fake).includes(LIST_TEXT.totalLine(unlocked, rows.length, Math.round(100 * unlocked / rows.length)))
-            && headerRankCounts(fake).gold === String(unlockedGold);
+            && headerRankCounts(fake).bronze === String(unlockedBronze);
     }
 
     // Missing: "???" and the hint, never the real texts.
@@ -93,10 +93,9 @@ test("a Secret Achievement keeps its title and description out of sight until Un
         assert.ok(!shownTexts.includes(text), `"${text}" stays out of sight`);
     }
     const [rageQuitRow, , grandReturnRow] = secretRows;
-    for (const row of secretRows) {
-        assert.equal(row.unlocked, false);
-        assert.equal(row.emblem, MUTED_GOLD_EMBLEM, "its muted Gold emblem");
-    }
+    for (const row of secretRows) assert.equal(row.unlocked, false);
+    // Its own rank's muted emblem: Bronze for the Rage Quit, Silver for the others.
+    assert.deepEqual(secretRows.map(row => row.emblem), ["bronze", "silver", "silver"].map(mutedEmblem));
     assert.deepEqual(rageQuitRow.owners.avatars, [avatarOf("Bob")], "the Avatars of the Profiles that have it");
     assert.deepEqual(grandReturnRow.owners.avatars, []);
 
@@ -127,7 +126,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     assert.ok(toast.includes(rageQuit.description), toast.join(" | "));
     assert.ok(!toast.includes(LIST_TEXT.secretTitle) && !toast.includes(TEXT.rageQuitHint()), toast.join(" | "));
 
-    // Unlocked: its row shows the real texts, and it counts as Unlocked Gold.
+    // Unlocked: its row shows the real texts, and it counts as Unlocked Bronze.
     const rowsAfter = openList();
     const unlockedRageQuit = rowsAfter.find(row => row.title === rageQuit.title);
     assert.ok(unlockedRageQuit, "its row shows its real title");
