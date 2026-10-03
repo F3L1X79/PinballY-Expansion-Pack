@@ -234,7 +234,7 @@
   <!-- ===== Queue ===== -->
   <section>
     <p class="eyebrow">File d'attente <span class="count" id="queue-count"></span></p>
-    <p class="lede"><strong>Pourquoi cet ordre :</strong> finir ce qui est en cours, lancer tôt ce qui accumule des données, préparer l'arrivée de nouveaux joueurs, enchaîner les petits chantiers (les nouveaux Secret Achievements tant que le mécanisme est frais), puis les records par Profile et leurs rivalités (tôt, car l'auteur d'un record ne se retrouve pas après coup), l'écran d'accueil dessiné (le premier écran vu), la fiche joueur et ce qui s'appuie dessus. Traductions et Distribution à la fin, quand les textes et les fonctionnalités sont stables.</p>
+    <p class="lede"><strong>Pourquoi cet ordre :</strong> finir ce qui est en cours, lancer tôt ce qui accumule des données, préparer l'arrivée de nouveaux joueurs, enchaîner les petits chantiers (les nouveaux Secret Achievements tant que le mécanisme est frais), puis l'écran d'accueil dessiné (le premier écran vu) et la fiche joueur, qui partagent la même surface, avant les records par Profile, leurs rivalités et ce qui s'appuie sur la fiche joueur. Le Year in Pinball passe avant les Challenges adaptés, qui attendent des mois de Play Log. Traductions et Distribution à la fin, quand les textes et les fonctionnalités sont stables.</p>
     <p class="lede">Glisse une ligne, ou utilise ▲ ▼ (ou <kbd>ALT</kbd> + flèches sur la ligne surlignée), pour changer la priorité. Ton ordre reste dans ce navigateur : copie-le et colle-le-moi pour que je l'écrive dans le fichier.</p>
 
     <div class="toolbar">
@@ -267,54 +267,6 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Reporté pendant le grilling du Tour du monde (01/10/2026) : la première version ne rend secrets que des Achievements existants.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="profile-records" data-track="play" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Records par Profile : qui a fait les high scores</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Après une Play, relire les high scores de la table (<code>getHighScores()</code> / <code>highscoresready</code>, encore inutilisés) et attribuer au Profile actif tout record qui vient d'apparaître. De là, des Achievements (premier record, record sur 10 tables, battre le record d'un autre Profile) et les records de chacun dans les Profile Stats.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/research</code> (quelles tables de la borne donnent leurs scores, et sous quelle forme) → <code>/grill-with-docs</code> → <code>/prototype</code> (lecture des scores sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant les <a href="#profile-rivalries">rivalités (n° <span data-ref="profile-rivalries"></span>)</a></div>
-          <details>
-            <summary>Questions ouvertes (5)</summary>
-            <ul>
-              <li>Couverture : PINemHi ne lit que les tables à ROM VPinMAME et Future Pinball. Les tables VPX originales et les électromécaniques n'ont rien, sauf un fichier <code>.pinballyHighScores</code> écrit par leur script. Combien de tables de la borne sont concernées ?</li>
-              <li>Seul le tableau des meilleurs scores existe (4 ou 5 lignes et le Grand Champion), jamais le score de chaque partie : une partie moyenne ne laisse aucune trace. Est-ce assez pour en faire une fonctionnalité ?</li>
-              <li>Les lignes sont du texte prévu pour le DMD, au format propre à chaque ROM : comment en extraire les scores de façon fiable ?</li>
-              <li>Attribution : un nouveau score après la Play revient au Profile actif, quelles que soient les initiales tapées. Et les scores déjà présents à l'installation : à personne ?</li>
-              <li>Quand lire : PinballY vide le cache des scores au lancement et les redemande quand la table est resélectionnée, au retour sur la roue. Faut-il attendre ce <code>highscoresready</code> ou appeler <code>getHighScores()</code> dès <code>gameover</code> ?</li>
-            </ul>
-            <p class="ctx">Proposé le 01/10/2026. À lancer tôt : l'auteur d'un record ne se retrouve pas après coup, chaque record battu avant reste anonyme.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rivalries" data-track="profiles" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Rivalités : « Bob t'a pris ton record »</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Quand un Profile bat le record d'un autre, celui-ci l'apprend à son prochain passage, dans sa Profile Greeting : « Bob t'a pris le record de Medieval Madness ». De quoi donner envie d'y retourner.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur les <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a></div>
-          <details>
-            <summary>Questions ouvertes (3)</summary>
-            <ul>
-              <li>Où l'annoncer : dans la Profile Greeting seulement, ou aussi en toast non bloquant quand la table repasse sur la roue ?</li>
-              <li>Plusieurs records perdus d'un coup : un seul message qui les résume, ou un par table ?</li>
-              <li>Child Profile et Guest : participent-ils aux rivalités ? Guest n'a ni Avatar ni vrai joueur derrière.</li>
-            </ul>
-            <p class="ctx">Proposé le 01/10/2026, avec les records par Profile.</p>
           </details>
         </div>
       </li>
@@ -368,6 +320,54 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="profile-records" data-track="play" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Records par Profile : qui a fait les high scores</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Après une Play, relire les high scores de la table (<code>getHighScores()</code> / <code>highscoresready</code>, encore inutilisés) et attribuer au Profile actif tout record qui vient d'apparaître. De là, des Achievements (premier record, record sur 10 tables, battre le record d'un autre Profile) et les records de chacun dans les Profile Stats.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/research</code> (quelles tables de la borne donnent leurs scores, et sous quelle forme) → <code>/grill-with-docs</code> → <code>/prototype</code> (lecture des scores sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant les <a href="#profile-rivalries">rivalités (n° <span data-ref="profile-rivalries"></span>)</a></div>
+          <details>
+            <summary>Questions ouvertes (5)</summary>
+            <ul>
+              <li>Couverture : PINemHi ne lit que les tables à ROM VPinMAME et Future Pinball. Les tables VPX originales et les électromécaniques n'ont rien, sauf un fichier <code>.pinballyHighScores</code> écrit par leur script. Combien de tables de la borne sont concernées ?</li>
+              <li>Seul le tableau des meilleurs scores existe (4 ou 5 lignes et le Grand Champion), jamais le score de chaque partie : une partie moyenne ne laisse aucune trace. Est-ce assez pour en faire une fonctionnalité ?</li>
+              <li>Les lignes sont du texte prévu pour le DMD, au format propre à chaque ROM : comment en extraire les scores de façon fiable ?</li>
+              <li>Attribution : un nouveau score après la Play revient au Profile actif, quelles que soient les initiales tapées. Et les scores déjà présents à l'installation : à personne ?</li>
+              <li>Quand lire : PinballY vide le cache des scores au lancement et les redemande quand la table est resélectionnée, au retour sur la roue. Faut-il attendre ce <code>highscoresready</code> ou appeler <code>getHighScores()</code> dès <code>gameover</code> ?</li>
+            </ul>
+            <p class="ctx">Proposé le 01/10/2026. À lancer tôt : l'auteur d'un record ne se retrouve pas après coup, chaque record battu avant reste anonyme.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rivalries" data-track="profiles" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Rivalités : « Bob t'a pris ton record »</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Quand un Profile bat le record d'un autre, celui-ci l'apprend à son prochain passage, dans sa Profile Greeting : « Bob t'a pris le record de Medieval Madness ». De quoi donner envie d'y retourner.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur les <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a></div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Où l'annoncer : dans la Profile Greeting seulement, ou aussi en toast non bloquant quand la table repasse sur la roue ?</li>
+              <li>Plusieurs records perdus d'un coup : un seul message qui les résume, ou un par table ?</li>
+              <li>Child Profile et Guest : participent-ils aux rivalités ? Guest n'a ni Avatar ni vrai joueur derrière.</li>
+            </ul>
+            <p class="ctx">Proposé le 01/10/2026, avec les records par Profile.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="stats" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -382,6 +382,23 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Reporté pendant le grilling des Profile Stats : la première version ne montre que le Profile actif. Les données de chaque Profile sont déjà dans son <code>profile.json</code>. Un classement des Challenges réussis pourrait s'y ajouter. L'Unlock Rate (Avatars des autres Profiles sur chaque Achievement) est déjà dans l'Achievement List dessinée.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="ratings" data-track="profiles" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Notes et favoris par Profile</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Chaque Profile a ses propres notes et favoris (aujourd'hui communs dans PinballY), avec ensuite une note moyenne de la maison par table.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Les notes et favoris natifs sont des colonnes globales de <code>GameStats.csv</code> : l'invite de notation et les filtres de favoris devront lire les données du Profile.</p>
           </details>
         </div>
       </li>
@@ -405,59 +422,6 @@
               <li>Changement immédiat, qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage, ou appliqué au prochain lancement de PinballY ?</li>
               <li>Le menu liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
             </ul>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="ratings" data-track="profiles" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Notes et favoris par Profile</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Chaque Profile a ses propres notes et favoris (aujourd'hui communs dans PinballY), avec ensuite une note moyenne de la maison par table.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Les notes et favoris natifs sont des colonnes globales de <code>GameStats.csv</code> : l'invite de notation et les filtres de favoris devront lire les données du Profile.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Passe de traduction : allemand, espagnol, italien, portugais</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Distribution : installation et mises à jour</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Réécrit la section Install des README</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/rank_*.png</code>) des emblèmes de League of Legends.</p>
           </details>
         </div>
       </li>
@@ -509,6 +473,42 @@
         </div>
       </li>
 
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Passe de traduction : allemand, espagnol, italien, portugais</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Distribution : installation et mises à jour</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Réécrit la section Install des README</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/rank_*.png</code>) des emblèmes de League of Legends.</p>
+          </details>
+        </div>
+      </li>
     </ol>
   </section>
 
@@ -518,8 +518,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>03/10 <span class="count">(4)</span></summary>
+          <summary>03/10 <span class="count">(5)</span></summary>
           <ol>
+            <li><strong>Écran d'accueil et fiche joueur avant les records</strong>
+              <span>Nouvel ordre choisi par Félix : les deux écrans dessinés d'abord, qui partagent surface et palette, puis records et rivalités ; le Year in Pinball avant les Challenges adaptés.</span></li>
             <li><strong>Des noms de niveau, finalement, épicènes</strong>
               <span>Le nom du niveau remplace « Maîtrise » en tête de la Mastery Bar et figure dans le Mastery Toast. Des noms qui valent pour une joueuse comme pour un joueur, de Novice à Mage du flipper (Pinball Wizard).</span></li>
             <li><strong>Mastery Bar : un bandeau « Maîtrise », une barre couleur du niveau, un halo autour du carré</strong>
