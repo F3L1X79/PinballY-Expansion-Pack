@@ -37,7 +37,7 @@ The picture that stands for a Profile.
 _Avoid_: profile picture, photo
 
 **Profile Greeting**:
-The short greeting, with the Avatar and the Profile's name, shown when a Profile is picked and when PinballY starts, so the player knows whose plays will count. At startup it gives way to the startup prompt, which greets the Profile by name itself.
+The short greeting, with the Avatar and the Profile's name, shown when a Profile is picked and when PinballY starts, so the player knows whose plays will count. It gives way to the Welcome Screen whenever that screen shows, since it greets the Profile itself.
 _Avoid_: welcome toast, login message
 
 **Play**:
@@ -71,6 +71,10 @@ The Period Table whose Period is a day; prefers tables never played, otherwise t
 
 **Table of the Week**:
 The Period Table whose Period is a week; picked purely at random.
+
+**Welcome Screen**:
+The screen shown over the dimmed wheel when PinballY starts, and again after Change Player picked another Profile, that greets the active Profile by its Avatar and name, shows the Table of the Day and the Table of the Week with what they mean for that Profile, and offers to stay on the Last Played Table, to change player or to launch a Period Table or a Random Game. While it is open, toasts and Confetti Showers wait for it to close. Shown as "Écran d'accueil" in French.
+_Avoid_: startup prompt, splash screen, dialog (it does more than ask a question)
 
 **Last Played Table**:
 The table of the active Profile's most recent Play, across the whole collection, however it was launched.
@@ -126,6 +130,14 @@ _Avoid_: XP, table level, experience
 The step of Table Mastery a Profile has reached on a table, from 1 at its first Play up to 10, each step taking longer to reach than the one before. Shown as a number with a name that suits any player, from Novice (Rookie) at 1 to Mage du flipper (Pinball Wizard) at 10, both more and more brilliant from one level to the next.
 _Avoid_: level (alone: the player's level is another thing), rank (an Achievement Rank is how hard an Achievement is), tier
 
+**Collection Mastery**:
+How far a Profile has taken its tables, tier by tier: its Collection Tier is the highest Mastery Level that ten of the tables it can see have reached, starting at 0, and its progress is how many tables, out of ten, have reached the next one. A Profile that can see fewer than ten tables needs all of them. Ten tables at Mastery Level 10 is the end. A tier reached is lost only by a Profile Reset. Shown as "Maîtrise de la collection" in French.
+_Avoid_: global mastery, player level (the player's level comes from Achievement Ranks), completion (a completion Achievement covers a group of tables)
+
+**Collection Tier**:
+The step of Collection Mastery, from 0 to 10: tier N means ten tables at Mastery Level N or above. Shown as "palier" in French.
+_Avoid_: level (a Mastery Level belongs to one table), stage, rank (an Achievement Rank is how hard an Achievement is)
+
 **Mastery Bar**:
 The small panel at the top right of the wheel screen, under the Challenge Card or in its place when there is none, that keeps in view the active Profile's Table Mastery of the selected table: its bar fills toward the next Mastery Level in the colour of the level reached, whose name heads the panel and whose number sits in a square at the bar's end. For a table never played it stays empty, with no number, under "À découvrir" ("To discover"). It lights up once when a Play has moved it forward, and is hidden while a game runs.
 _Avoid_: level bar, progress bar (alone), mastery widget, Mastery Card
@@ -141,7 +153,7 @@ A milestone the player reaches through play, announced once with an Achievement 
 _Avoid_: trophy, badge, success
 
 **Achievement Toast**:
-A small card in the bottom-right corner of the playfield screen that announces one Achievement: it rises from the bottom edge, stays a few seconds, then fades away on its own. It never waits for the player nor takes their input, and shows over everything, menus included. Several toasts stack, the newest at the bottom pushing the older ones up.
+A small card in the bottom-right corner of the playfield screen that announces one Achievement: it rises from the bottom edge, stays a few seconds, then fades away on its own. It never waits for the player nor takes their input, and shows over everything, menus included, except the Welcome Screen, which it waits for. Several toasts stack, the newest at the bottom pushing the older ones up.
 _Avoid_: popup, notification, dialog (a dialog waits for the player)
 
 **Unlocked**:
@@ -165,7 +177,7 @@ How hard an Achievement is: Bronze, Silver, Gold or Platinum. Every Achievement 
 _Avoid_: tier, level, difficulty, grade
 
 **Confetti Shower**:
-A shower of coloured confetti released all at once from above the wheel screen, falling down across all of it, in front of everything, toasts and menus included, to celebrate along with the toast of a completed Challenge, of a Platinum Achievement or of Mastery Level 10; one shower only when the same return to the wheel brings several. It never waits for the player nor takes their input, and vanishes at once when a table launches or attract mode starts. Shown as "Pluie de confettis" in French.
+A shower of coloured confetti released all at once from above the wheel screen, falling down across all of it, in front of everything, toasts and menus included (it waits for the Welcome Screen to close), to celebrate along with the toast of a completed Challenge, of a Platinum Achievement, of Mastery Level 10 or of a Collection Tier completed; one shower only when the same return to the wheel brings several. It never waits for the player nor takes their input, and vanishes at once when a table launches or attract mode starts. Shown as "Pluie de confettis" in French.
 _Avoid_: celebration, party, fireworks
 
 **Unlock Rate**:

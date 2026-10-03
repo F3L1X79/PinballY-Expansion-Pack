@@ -189,7 +189,7 @@ export default {
             10: "Why Not?",
             25: "Heads or Tails",
             50: "Dice Roller",
-            100: "I Looooove Chance",
+            100: "Poker face",
         },
         randomGamesDescription: (count) => `Play ${count} Random Games.`,
         challengesCompletedTitles: {

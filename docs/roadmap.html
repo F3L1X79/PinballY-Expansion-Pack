@@ -284,16 +284,26 @@
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Écran d'accueil dessiné, à la place du startup prompt natif</h3>
+            <h3>Welcome Screen : l'écran d'accueil dessiné, avec la Collection Mastery</h3>
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
-          <p>Le startup prompt est le premier écran vu, et le seul écran important encore en menu natif : il paraît austère à côté de l'Achievement List, du Toast et de la Challenge Card. Il deviendrait un écran dessiné en Steamball sur la roue assombrie : en haut, l'Avatar, un salut selon l'heure (« Bonsoir, Alex ! ») et le nom ; au milieu, la Table of the Day et la Table of the Week avec leur logo de roue, leur Streak (« joue-la pour garder ta série ! ») et une coche si elle est déjà jouée ; en bas, les choix actuels (rester sur la dernière table, nommée, Change Player, jour, semaine, au hasard), parcourus aux flippers comme le Profile picker, Exit valant « rester ».</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (mise en page et temps de dessin sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que la <a href="#stats-drawn">fiche joueur (n° <span data-ref="stats-drawn"></span>)</a></div>
+          <p>Le startup prompt natif devient un écran dessiné en Steamball sur la roue assombrie : un salut selon l'heure, l'Avatar en haut à droite pour changer de joueur, la Collection Mastery, un bloc par Period Table (Table Mastery, Streak ou coche), et quatre icônes en bas (Rester, jour, semaine, boîte « ? »), parcourues aux flippers avec une étiquette dorée.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Grillé le 03/10/2026 (ADR 0011). Flow Matt : <code>/prototype</code> (mise en page, icônes et temps d'apparition sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que la <a href="#stats-drawn">fiche joueur (n° <span data-ref="stats-drawn"></span>)</a></div>
           <details>
-            <summary>Questions ouvertes (6)</summary>
+            <summary>Décisions</summary>
             <ul>
-              <li>Coût du dessin : c'est le premier écran, rien n'a pu être dessiné d'avance, et chaque dessin bloque la borne 20 à 45 ms. Apparition par morceaux (fond, Avatar, tables) ?</li>
+              <li>Au démarrage, et de nouveau après un Change Player, redessiné pour le nouveau Profile ; il remplace alors la Profile Greeting. Pas de repli natif : une borne trop lente désactive l'Add-on.</li>
+              <li>En haut : salut selon l'heure (5–12, 12–18, 18–0, 0–5), sans emojis ni phrase générique ; l'Avatar en haut à droite ; la Collection Mastery sous le salut. Picker désactivé : ni Avatar ni nom.</li>
+              <li>Au milieu, un bloc par Period Table : logo, Table Mastery du Profile sur cette table, puis une ligne de Streak incitative (Streak d'au moins 1, table pas encore jouée sur la Period) ou une coche. Pas de Challenge : la Challenge Card l'affiche.</li>
+              <li>En bas, quatre icônes carrées dessinées : Rester (nommant la Last Played Table, ou « Rester sur la roue »), soleil, calendrier, boîte « ? ». Flippers en boucle Rester → Jour → Semaine → Hasard → Avatar, étiquette dorée sur le choix, Exit vaut Rester. Pour un Child Profile, une Period Table qui est une Adult Table perd son bloc et son icône.</li>
+              <li>Apparition par morceaux en fondu, via le dessin d'avance. Un dialogue « dessiné » de <code>wheel_dialog.js</code> avec la priorité du startup prompt (ADR 0011) ; toasts et Confetti Showers attendent sa fermeture.</li>
+              <li>Collection Mastery : le palier N veut dire 10 tables au Mastery Level N (toutes, s'il y en a moins de 10), de 0 à 10 ; 120 h au minimum pour le palier 10. Progression affichée « 7 / 10 tables » avec une barre. Seule une Profile Reset fait perdre un palier.</li>
+              <li>Un palier atteint s'annonce par un toast et une Confetti Shower : un ticket à part dans la même spec.</li>
+            </ul>
+          </details>
+        </div>
+      </li>
               <li>File des dialogues : <code>wheel_dialog.js</code> ne connaît que les menus natifs. Lui apprendre un dialogue « dessiné » qui garde la priorité <code>STARTUP_PROMPT</code>, ou une règle à part ? À consigner dans une ADR, comme la 0003.</li>
               <li>Remplace-t-il aussi la Profile Greeting du démarrage, qui s'efface déjà devant le startup prompt ?</li>
               <li>Streak : celle du jour seulement, et rien (ou un encouragement) quand elle vaut 0 ? Ton du rappel : neutre ou incitatif ?</li>
@@ -549,8 +559,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>03/10 <span class="count">(7)</span></summary>
+          <summary>03/10 <span class="count">(8)</span></summary>
           <ol>
+            <li><strong>Un Welcome Screen dessiné, avec la Collection Mastery</strong>
+              <span>Le premier écran vu passe en Steamball : Avatar, salut, Period Tables avec leur Table Mastery et leur Streak, quatre icônes aux flippers. Un palier de collection par niveau atteint sur 10 tables, finissable en 120 h environ.</span></li>
             <li><strong>Le Rank dans l'Achievement Toast, pour plus tard</strong>
               <span>Logique avec l'Achievement List, et les emblèmes existent déjà ; ajouté en fin de file, à griller (emblème à la place du trophée ou à côté, couleur d'accent).</span></li>
             <li><strong>Huit Secret Achievements dans une famille Surprises</strong>
@@ -674,7 +686,7 @@
           <div class="cell sweet">
           </div>
           <div class="cell">
-            <a class="chip tr-profiles" href="#startup-screen"><b></b>Écran d'accueil</a>
+            <a class="chip tr-profiles" href="#startup-screen"><b></b>Welcome Screen</a>
           </div>
           <div class="cell">
             <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
