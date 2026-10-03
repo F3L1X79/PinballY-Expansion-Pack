@@ -153,7 +153,7 @@ The screen, opened by the player, that shows every Achievement in one scrolling 
 _Avoid_: My Achievements, trophy room
 
 **Achievement Family**:
-A kind of Achievement, absent as a whole when the Add-on it depends on is turned off: Collection, Play Time, Period Tables, Sessions, Random Game, Manufacturers, Decades, Categories, Challenges. Period Tables gathers every Achievement about playing the Table of the Day or the Table of the Week (first play, total Periods played, Streaks).
+A kind of Achievement, absent as a whole when the Add-on it depends on is turned off: Collection, Play Time, Period Tables, Sessions, Random Game, Manufacturers, Decades, Categories, Challenges, Surprises. Surprises gathers Secret Achievements that hang on no Add-on but the Achievements themselves, such as a Play started at an unusual hour. Period Tables gathers every Achievement about playing the Table of the Day or the Table of the Week (first play, total Periods played, Streaks).
 _Avoid_: group (a group is the set of tables a completion Achievement covers, such as one manufacturer's tables), category (a PinballY table category)
 
 **Notified**:
