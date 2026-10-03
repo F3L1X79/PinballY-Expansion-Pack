@@ -289,7 +289,7 @@
           </div>
           <p>Le startup prompt natif devient un écran dessiné en Steamball sur la roue assombrie : un salut selon l'heure, l'Avatar en haut à droite pour changer de joueur, la Collection Mastery, un bloc par Period Table (Table Mastery, Streak ou coche), et quatre icônes en bas (Rester, jour, semaine, boîte « ? »), parcourues aux flippers avec une étiquette dorée.</p>
           <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Grillé le 03/10/2026 (ADR 0011). Flow Matt : <code>/prototype</code> (mise en page, icônes et temps d'apparition sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que la <a href="#stats-drawn">fiche joueur (n° <span data-ref="stats-drawn"></span>)</a></div>
+          <div class="links">Grillé le 03/10/2026 (ADR 0011). Prototype sur la branche <code>prototype/welcome-screen</code>, à essayer sur la borne. Flow Matt : <code>/prototype</code> (verdict : variante, icônes, temps d'apparition) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que la <a href="#stats-drawn">fiche joueur (n° <span data-ref="stats-drawn"></span>)</a></div>
           <details>
             <summary>Décisions</summary>
             <ul>
@@ -301,16 +301,6 @@
               <li>Collection Mastery : le palier N veut dire 10 tables au Mastery Level N (toutes, s'il y en a moins de 10), de 0 à 10 ; 120 h au minimum pour le palier 10. Progression affichée « 7 / 10 tables » avec une barre. Seule une Profile Reset fait perdre un palier.</li>
               <li>Un palier atteint s'annonce par un toast et une Confetti Shower : un ticket à part dans la même spec.</li>
             </ul>
-          </details>
-        </div>
-      </li>
-              <li>File des dialogues : <code>wheel_dialog.js</code> ne connaît que les menus natifs. Lui apprendre un dialogue « dessiné » qui garde la priorité <code>STARTUP_PROMPT</code>, ou une règle à part ? À consigner dans une ADR, comme la 0003.</li>
-              <li>Remplace-t-il aussi la Profile Greeting du démarrage, qui s'efface déjà devant le startup prompt ?</li>
-              <li>Streak : celle du jour seulement, et rien (ou un encouragement) quand elle vaut 0 ? Ton du rappel : neutre ou incitatif ?</li>
-              <li>Le Challenge : rien, puisque la Challenge Card l'affiche déjà, ou une ligne seulement quand il y a du nouveau (verdict, « plus qu'une table ! ») ?</li>
-              <li>Child Profile : quand la Period Table est une Adult Table, son bloc disparaît, comme ses boutons aujourd'hui.</li>
-            </ul>
-            <p class="ctx">Mini-brainstorming du 01/10/2026, parti d'une maquette « arcade » (salut, Avatar, Streak, Challenge, table du jour, bouton Play). Écarté de la maquette : un seul bouton Play, qui ferait perdre Change Player et les autres choix ; la barre en %, qui ne convient pas à tous les Challenges ; les emojis, peu sûrs dans le rendu de PinballY. Repli possible, sans écran dessiné : enrichir seulement les textes du dialogue natif (salut selon l'heure, Streak, coche, dernière table nommée, phrase générique retirée).</p>
           </details>
         </div>
       </li>
