@@ -306,10 +306,10 @@ export default {
         grandReturnHint: () => "Les vieux amis sont toujours contents de vous revoir...",
         worldTourHint: () => "Certains voyages se font sans jamais appuyer sur Start...",
         randomGamesTitles: {
-            10: "Et pourquoi pas ?",
+            10: "Pifomètre",
             25: "Pile ou face",
             50: "Joueur de dés",
-            100: "J'adooooore le hasard !!",
+            100: "Poker face",
         },
         randomGamesDescription: (count) => `Jouer ${count} tables au hasard.`,
         challengesCompletedTitles: {
