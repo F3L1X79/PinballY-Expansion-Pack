@@ -288,14 +288,16 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>Le toast montre le Rank de l'Achievement qu'il annonce, comme l'Achievement List : on sait tout de suite si c'est un Bronze ou un Platinum.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span class="skip">spec</span><i>›</i><span class="skip">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/implement</code> (petit chantier, une seule séance). Les emblèmes existent déjà dans <code>assets</code>, ceux de l'Achievement List</div>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="skip">spec</span><i>›</i><span class="skip">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Grillé le 04/10/2026. Flow Matt : <code>/implement</code> directement (petit chantier, une seule séance, sans spec ni tickets). Les emblèmes existent déjà dans <code>assets</code>, ceux de l'Achievement List</div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Décisions</summary>
             <ul>
-              <li>L'emblème remplace-t-il le trophée dans la tuile, ou s'ajoute-t-il à côté ? Et la barre d'accent prend-elle la couleur du Rank, comme le Mastery Toast prend le métal du niveau ?</li>
-              <li>Le Challenge Toast et le Mastery Toast, qui ne sont pas des Achievements, gardent-ils leur icône ?</li>
-              <li>Les toasts s'empilent jusqu'à cinq : l'emblème reste-t-il lisible à la taille de la tuile et à l'échelle réglée par le joueur ?</li>
+              <li>L'emblème du Rank (<code>rank_&lt;rank&gt;.png</code>, la variante des Achievements débloqués de la liste) remplace le trophée dans la tuile. S'il manque, retour au trophée et une ligne dans <code>logfile.log</code>.</li>
+              <li>La barre d'accent, le cadre et le halo de la tuile et l'en-tête prennent la couleur du Rank (<code>RANK_COLORS</code>), comme le Mastery Toast prend le métal du niveau.</li>
+              <li>L'en-tête reste « SUCCÈS DÉBLOQUÉ » : aucune nouvelle clé de traduction.</li>
+              <li>Le Challenge Toast et le Mastery Toast ne changent pas : ils n'ont pas de Rank.</li>
+              <li>Pas de prototype : la lisibilité se vérifie sur la borne pendant l'<code>/implement</code>, aux échelles 0,5, 1 et 2 ; si l'emblème est illisible à 0,5, réduire <code>iconInset</code> pour les emblèmes.</li>
             </ul>
             <p class="ctx">Repéré pendant la revue du ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/139">#139</a> (03/10/2026) : le ticket parlait du Rank dans le toast, qui n'en montre aucun.</p>
           </details>

@@ -153,7 +153,7 @@ A milestone the player reaches through play, announced once with an Achievement 
 _Avoid_: trophy, badge, success
 
 **Achievement Toast**:
-A small card in the bottom-right corner of the playfield screen that announces one Achievement: it rises from the bottom edge, stays a few seconds, then fades away on its own. It never waits for the player nor takes their input, and shows over everything, menus included, except the Welcome Screen, which it waits for. Several toasts stack, the newest at the bottom pushing the older ones up.
+A small card in the bottom-right corner of the playfield screen that announces one Achievement, shown in the colour of its Achievement Rank with that Rank's emblem: it rises from the bottom edge, stays a few seconds, then fades away on its own. It never waits for the player nor takes their input, and shows over everything, menus included, except the Welcome Screen, which it waits for. Several toasts stack, the newest at the bottom pushing the older ones up.
 _Avoid_: popup, notification, dialog (a dialog waits for the player)
 
 **Unlocked**:
