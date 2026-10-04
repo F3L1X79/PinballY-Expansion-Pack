@@ -3,8 +3,8 @@
 // Achievements themselves. Each one is unlocked by what the Surprises
 // tracker (common/surprises.js) recorded in the active Profile's
 // "surprises" part: a flag, or for Four Seasons every season seen. Night
-// Owl is absent for a Child Profile, whatever its flag says. No
-// Achievement Progress. Called by achievements_engine.js at
+// Owl and Full Moon Night are absent for a Child Profile, whatever their
+// flags say. No Achievement Progress. Called by achievements_engine.js at
 // each check; no side effects.
 // ============================================================
 
@@ -12,7 +12,8 @@ import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, standaloneAchievement } from "../
 import lang from "../common/i18n.js";
 import { getProfileStore } from "../common/profile_store.js";
 import {
-    NIGHT_OWL_FIRST_HOUR, NIGHT_OWL_LAST_HOUR, LUNCH_BREAK_FIRST_HOUR, LUNCH_BREAK_LAST_HOUR, SEASON_COUNT, surprisesOf,
+    NIGHT_OWL_FIRST_HOUR, NIGHT_OWL_LAST_HOUR, FULL_MOON_NIGHT_FIRST_HOUR, FULL_MOON_NIGHT_LAST_HOUR, FULL_MOON_MIN_LIT_PERCENT,
+    LUNCH_BREAK_FIRST_HOUR, LUNCH_BREAK_LAST_HOUR, SEASON_COUNT, surprisesOf,
 } from "../common/surprises.js";
 
 // "03:00" for 3.
@@ -36,6 +37,15 @@ export function buildSurprisesAchievements() {
             getDescription: () => TEXT.nightOwlDescription(hourStart(NIGHT_OWL_FIRST_HOUR), hourEnd(NIGHT_OWL_LAST_HOUR)),
             getHint: () => TEXT.nightOwlHint(),
             checkUnlocked: () => activeSurprises().nightOwl === true,
+        }), standaloneAchievement({
+            id: "fullMoonNight",
+            family: ACHIEVEMENT_FAMILY.SURPRISES,
+            rank: ACHIEVEMENT_RANK.GOLD,
+            getTitle: () => TEXT.fullMoonNightTitle(),
+            getDescription: () => TEXT.fullMoonNightDescription(
+                hourStart(FULL_MOON_NIGHT_FIRST_HOUR), hourEnd(FULL_MOON_NIGHT_LAST_HOUR), FULL_MOON_MIN_LIT_PERCENT),
+            getHint: () => TEXT.fullMoonNightHint(),
+            checkUnlocked: () => activeSurprises().fullMoonNight === true,
         }));
     }
 

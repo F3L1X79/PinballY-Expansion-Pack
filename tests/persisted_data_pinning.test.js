@@ -477,15 +477,17 @@ test("the Surprises part keeps its key in profile.json, its flags, seasons and A
         fake.gameOver(TABLES[0]);
     };
     playAt(new Date(2026, 10, 13, 1, 1, 0));
-    // Monday 14 December 2026, 12:30, then a Play in spring and one in summer.
+    // Monday 14 December 2026, 12:30, then Wednesday 23 December at 22:00
+    // under a full moon, a Play in spring and one in summer.
     playAt(new Date(2026, 11, 14, 12, 30, 0));
+    playAt(new Date(2026, 11, 23, 22, 0, 0));
     playAt(new Date(2027, 3, 1, 10, 0, 0));
     playAt(new Date(2027, 6, 1, 10, 0, 0));
 
     assert.deepEqual(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).surprises, {
-        nightOwl: true, fridayThe13th: true, mirrorHour: true, lunchBreak: true,
+        nightOwl: true, fridayThe13th: true, mirrorHour: true, lunchBreak: true, fullMoonNight: true,
         seasons: ["autumn", "winter", "spring", "summer"],
     });
     assert.deepEqual(buildSurprisesAchievements().map(achievement => achievement.id),
-        ["nightOwl", "fridayThe13th", "fourSeasons", "lunchBreak", "mirrorHour"]);
+        ["nightOwl", "fullMoonNight", "fridayThe13th", "fourSeasons", "lunchBreak", "mirrorHour"]);
 });

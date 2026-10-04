@@ -65,7 +65,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     const { RAGE_QUIT_MIN_SECONDS, RAGE_QUIT_MAX_SECONDS, GRAND_RETURN_THRESHOLD_DAYS } = await import("../addons/session_stats_tracker.js");
     const TEXT = lang.achievements;
     const LIST_TEXT = lang.achievementList;
-    const SURPRISES_HINTS = [TEXT.nightOwlHint(), TEXT.fridayThe13thHint(), TEXT.fourSeasonsHint(), TEXT.lunchBreakHint(), TEXT.mirrorHourHint()];
+    const SURPRISES_HINTS = [TEXT.nightOwlHint(), TEXT.fullMoonNightHint(), TEXT.fridayThe13thHint(), TEXT.fourSeasonsHint(), TEXT.lunchBreakHint(), TEXT.mirrorHourHint()];
     const rageQuit = { title: TEXT.rageQuitTitle(), description: TEXT.rageQuitDescription(RAGE_QUIT_MIN_SECONDS, RAGE_QUIT_MAX_SECONDS) };
     const grandReturn = { title: TEXT.grandReturnTitle(), description: TEXT.grandReturnDescription(GRAND_RETURN_THRESHOLD_DAYS) };
     await import("../main.js");
@@ -99,7 +99,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     // Its own rank's muted emblem: Bronze for the Rage Quit, Silver for the
     // World Tour and the Grand Return, then the Surprises' own ranks.
     assert.deepEqual(secretRows.map(row => row.emblem),
-        ["bronze", "silver", "silver", "gold", "platinum", "gold", "silver", "silver"].map(mutedEmblem));
+        ["bronze", "silver", "silver", "gold", "gold", "platinum", "gold", "silver", "silver"].map(mutedEmblem));
     assert.deepEqual(rageQuitRow.owners.avatars, [avatarOf("Bob")], "the Avatars of the Profiles that have it");
     assert.deepEqual(grandReturnRow.owners.avatars, []);
 
