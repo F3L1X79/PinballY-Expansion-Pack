@@ -279,6 +279,29 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="toast-rank" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>L'emblème du Rank dans l'Achievement Toast</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Le toast montre le Rank de l'Achievement qu'il annonce, comme l'Achievement List : on sait tout de suite si c'est un Bronze ou un Platinum.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span class="skip">spec</span><i>›</i><span class="skip">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/implement</code> (petit chantier, une seule séance). Les emblèmes existent déjà dans <code>assets</code>, ceux de l'Achievement List</div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>L'emblème remplace-t-il le trophée dans la tuile, ou s'ajoute-t-il à côté ? Et la barre d'accent prend-elle la couleur du Rank, comme le Mastery Toast prend le métal du niveau ?</li>
+              <li>Le Challenge Toast et le Mastery Toast, qui ne sont pas des Achievements, gardent-ils leur icône ?</li>
+              <li>Les toasts s'empilent jusqu'à cinq : l'emblème reste-t-il lisible à la taille de la tuile et à l'échelle réglée par le joueur ?</li>
+            </ul>
+            <p class="ctx">Repéré pendant la revue du ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/139">#139</a> (03/10/2026) : le ticket parlait du Rank dans le toast, qui n'en montre aucun.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="stats-drawn" data-track="profiles" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -488,29 +511,6 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/rank_*.png</code>) des emblèmes de League of Legends.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="toast-rank" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>L'emblème du Rank dans l'Achievement Toast</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Le toast montre le Rank de l'Achievement qu'il annonce, comme l'Achievement List : on sait tout de suite si c'est un Bronze ou un Platinum.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span class="skip">spec</span><i>›</i><span class="skip">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/implement</code> (petit chantier, une seule séance). Les emblèmes existent déjà dans <code>assets</code>, ceux de l'Achievement List</div>
-          <details>
-            <summary>Questions ouvertes (3)</summary>
-            <ul>
-              <li>L'emblème remplace-t-il le trophée dans la tuile, ou s'ajoute-t-il à côté ? Et la barre d'accent prend-elle la couleur du Rank, comme le Mastery Toast prend le métal du niveau ?</li>
-              <li>Le Challenge Toast et le Mastery Toast, qui ne sont pas des Achievements, gardent-ils leur icône ?</li>
-              <li>Les toasts s'empilent jusqu'à cinq : l'emblème reste-t-il lisible à la taille de la tuile et à l'échelle réglée par le joueur ?</li>
-            </ul>
-            <p class="ctx">Repéré pendant la revue du ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/139">#139</a> (03/10/2026) : le ticket parlait du Rank dans le toast, qui n'en montre aucun.</p>
           </details>
         </div>
       </li>
