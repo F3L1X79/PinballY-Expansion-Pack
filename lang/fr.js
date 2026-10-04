@@ -305,6 +305,9 @@ export default {
         rageQuitHint: () => "Il y a des jours où une table ne vous réussit pas...",
         grandReturnHint: () => "Les vieux amis sont toujours contents de vous revoir...",
         worldTourHint: () => "Certains voyages se font sans jamais appuyer sur Start...",
+        nightOwlTitle: () => "Oiseau de nuit",
+        nightOwlDescription: (from, to) => `Lancer une partie entre ${from} et ${to}.`,
+        nightOwlHint: () => "Le flipper ne dort jamais...",
         randomGamesTitles: {
             10: "Pifomètre",
             25: "Pile ou face",

@@ -18,7 +18,7 @@
 // ============================================================
 
 // The kind of an Achievement; the Challenges one exists only while its
-// Add-on is enabled.
+// Add-on is enabled, Surprises whenever the Achievements do.
 export const ACHIEVEMENT_FAMILY = Object.freeze({
     COLLECTION: "collection",
     PLAY_TIME: "playTime",
@@ -29,6 +29,7 @@ export const ACHIEVEMENT_FAMILY = Object.freeze({
     DECADES: "decades",
     CATEGORIES: "categories",
     CHALLENGES: "challenges",
+    SURPRISES: "surprises",
 });
 
 // What an Achievement Progress counts; each one has its texts in the

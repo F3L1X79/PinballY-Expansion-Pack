@@ -435,7 +435,7 @@ export function createProfileStore(host) {
         getNotifiedOf: (profileName) => profileWithData(profileName).data.notified,
         updateProfileData,
         // Erases the named Profile's plays, Streaks, session stats, Random
-        // Games, Challenge progress, World Tour and Notified Achievements.
+        // Games, Challenge progress, World Tour, Surprises and Notified Achievements.
         resetProfile,
         // Whether the named Profile (the active one by default) is an Admin Profile.
         isAdmin,

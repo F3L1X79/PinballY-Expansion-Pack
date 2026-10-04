@@ -301,6 +301,10 @@ export default {
         rageQuitHint: () => "Hay días en que una mesa simplemente no sale...",
         grandReturnHint: () => "Los viejos amigos siempre se alegran de un reencuentro...",
         worldTourHint: () => "Algunos viajes se hacen sin pulsar nunca Start...",
+        // TODO: translation pass
+        nightOwlTitle: () => "Night Owl",
+        nightOwlDescription: (from, to) => `Start a game between ${from} and ${to}.`,
+        nightOwlHint: () => "Pinball never sleeps...",
         randomGamesTitles: {
             10: "¿Y por qué no?",
             25: "Cara o cruz",

@@ -185,6 +185,9 @@ export default {
         rageQuitHint: () => "Some tables just aren't your day...",
         grandReturnHint: () => "Old friends are always glad to see you again...",
         worldTourHint: () => "Some journeys are made without ever pressing Start...",
+        nightOwlTitle: () => "Night Owl",
+        nightOwlDescription: (from, to) => `Start a game between ${from} and ${to}.`,
+        nightOwlHint: () => "Pinball never sleeps...",
         randomGamesTitles: {
             10: "Why Not?",
             25: "Heads or Tails",

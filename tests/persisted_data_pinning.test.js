@@ -12,7 +12,8 @@
 // profile.json, and the template ids. A third locks a verdict on the
 // previous Challenge in a Profile's history, another the Challenges
 // Achievement IDs, one the Play Log's year file name and keys, and one the
-// World Tour's key in profile.json and its Achievement ID. These
+// World Tour's key in profile.json and its Achievement ID, and one the
+// Surprises part's key, Night Owl's flag and its Achievement ID. These
 // strings are players' saved progress: this test must keep passing unchanged.
 // ============================================================
 
@@ -27,6 +28,8 @@ import { createChallenges, CHALLENGE_TEMPLATE_IDS } from "../common/challenge.js
 import { buildChallengeAchievements } from "../achievements/challenges.js";
 import { buildWorldTourAchievements } from "../achievements/world_tour.js";
 import { createWorldTour } from "../common/world_tour.js";
+import { buildSurprisesAchievements } from "../achievements/surprises.js";
+import { createSurprises } from "../common/surprises.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -458,4 +461,18 @@ test("the World Tour keeps its key in profile.json and its Achievement ID", () =
 
     assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).worldTour, true);
     assert.deepEqual(buildWorldTourAchievements().map(achievement => achievement.id), ["worldTour"]);
+});
+
+test("the Surprises part keeps its key in profile.json, and Night Owl its flag and Achievement ID", () => {
+    const fake = createFakePinballYHost({ now: new Date(2026, 8, 24, 1, 0, 0), tables: TABLES });
+    // Never uninstalled: buildSurprisesAchievements reads the shared Profile store.
+    fake.installGlobals();
+    const store = createProfileStore(fake);
+    createSurprises(store);
+    fake.gameStarted(TABLES[0]);
+    fake.advanceTime(5 * 60 * 1000);
+    fake.gameOver(TABLES[0]);
+
+    assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).surprises.nightOwl, true);
+    assert.deepEqual(buildSurprisesAchievements().map(achievement => achievement.id), ["nightOwl"]);
 });

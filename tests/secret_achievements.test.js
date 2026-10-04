@@ -1,5 +1,6 @@
 // ============================================================
-// Secret Achievements (the Rage Quit, the World Tour and the Grand Return), started
+// Secret Achievements (the Rage Quit, the World Tour, the Grand Return and
+// Night Owl), started
 // through main.js on the fake PinballY globals: while missing, their rows
 // show "???" and their hint, never their real title or description, with
 // their muted rank emblem and the Avatars of the other Profiles that have
@@ -17,8 +18,8 @@ import config from "../common/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
-// Only the muted bronze and silver emblems have their image: the others are
-// drawn, so the header's per-rank recap can be read from its colours.
+// Only the muted bronze, silver and gold emblems have their image: the
+// others are drawn, so the header's per-rank recap can be read from its colours.
 const mutedEmblem = rank => `C:\\PinballY\\Scripts\\ExpansionPack\\assets\\rank_${rank}_missing.png`;
 const avatarOf = name => `${PROFILES}\\${name}\\avatar.png`;
 // Longer than an Achievement Toast's whole life (rise, hold, fade).
@@ -52,7 +53,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
         fake.addFile(`${PROFILES}\\${name}\\profile.json`, JSON.stringify({ version: 1, notified }));
         fake.addFile(avatarOf(name), "PNG");
     }
-    for (const rank of ["bronze", "silver"]) fake.addFile(mutedEmblem(rank), "PNG");
+    for (const rank of ["bronze", "silver", "gold"]) fake.addFile(mutedEmblem(rank), "PNG");
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) {
@@ -87,15 +88,16 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     // Missing: "???" and the hint, never the real texts.
     const rows = openList();
     const secretRows = rows.filter(row => row.title === LIST_TEXT.secretTitle);
-    assert.deepEqual(secretRows.map(row => row.description), [TEXT.rageQuitHint(), TEXT.worldTourHint(), TEXT.grandReturnHint()]);
+    assert.deepEqual(secretRows.map(row => row.description), [TEXT.rageQuitHint(), TEXT.worldTourHint(), TEXT.grandReturnHint(), TEXT.nightOwlHint()]);
     const shownTexts = rows.flatMap(row => [row.title, row.description]);
     for (const text of [rageQuit.title, rageQuit.description, grandReturn.title, grandReturn.description]) {
         assert.ok(!shownTexts.includes(text), `"${text}" stays out of sight`);
     }
     const [rageQuitRow, , grandReturnRow] = secretRows;
     for (const row of secretRows) assert.equal(row.unlocked, false);
-    // Its own rank's muted emblem: Bronze for the Rage Quit, Silver for the others.
-    assert.deepEqual(secretRows.map(row => row.emblem), ["bronze", "silver", "silver"].map(mutedEmblem));
+    // Its own rank's muted emblem: Bronze for the Rage Quit, Silver for the
+    // World Tour and the Grand Return, Gold for Night Owl.
+    assert.deepEqual(secretRows.map(row => row.emblem), ["bronze", "silver", "silver", "gold"].map(mutedEmblem));
     assert.deepEqual(rageQuitRow.owners.avatars, [avatarOf("Bob")], "the Avatars of the Profiles that have it");
     assert.deepEqual(grandReturnRow.owners.avatars, []);
 
@@ -132,7 +134,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     assert.ok(unlockedRageQuit, "its row shows its real title");
     assert.equal(unlockedRageQuit.description, rageQuit.description);
     assert.equal(unlockedRageQuit.unlocked, true);
-    assert.deepEqual(rowsAfter.filter(row => row.title === LIST_TEXT.secretTitle).map(row => row.description), [TEXT.worldTourHint(), TEXT.grandReturnHint()]);
+    assert.deepEqual(rowsAfter.filter(row => row.title === LIST_TEXT.secretTitle).map(row => row.description), [TEXT.worldTourHint(), TEXT.grandReturnHint(), TEXT.nightOwlHint()]);
     assert.ok(headerCountsEvery(rowsAfter));
 
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);

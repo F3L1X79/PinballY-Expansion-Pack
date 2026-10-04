@@ -10,7 +10,8 @@
 // Also adds the Achievement List entry to the main menu, right after "Play",
 // and the Profile Stats entry right after it. The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
-// Challenges Add-on is enabled.
+// Challenges Add-on is enabled. Also starts the Surprises tracker, which
+// records each Play for the Surprises family.
 // ============================================================
 
 import { evaluateAchievements, markNotified, ACHIEVEMENT_RANK } from "../common/achievements.js";
@@ -26,6 +27,8 @@ import { buildRandomGameFanAchievements } from "../achievements/random_game_fans
 import { buildChallengeAchievements } from "../achievements/challenges.js";
 import { buildWorldTourAchievements } from "../achievements/world_tour.js";
 import { createWorldTour } from "../common/world_tour.js";
+import { buildSurprisesAchievements } from "../achievements/surprises.js";
+import { createSurprises } from "../common/surprises.js";
 import { getAchievementToasts } from "../common/achievement_toast.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
 import { createAchievementList } from "../common/achievement_list.js";
@@ -61,6 +64,7 @@ export function getAllAchievements() {
         ...buildSessionMilestoneAchievements(),
         ...buildRandomGameFanAchievements(),
         ...(challenges ? buildChallengeAchievements(challenges) : []),
+        ...buildSurprisesAchievements(),
     ];
 }
 
@@ -154,6 +158,9 @@ export default function init() {
     // Checked right after the flag is set, so the World Tour's toast shows
     // on the wheel the moment the last table is selected.
     createWorldTour(createPinballYHost(), profileStore, { onCompleted: checkForNewAchievements });
+    // Its Play listener runs inside the "gameover" handlers, so the deferred
+    // check above reads what it recorded.
+    createSurprises(profileStore);
 
     // Startup check: its toasts show alongside the startup prompt.
     checkForNewAchievements();
