@@ -213,11 +213,11 @@ export function createAchievementToasts(host, {
     // False for ARRIVAL_GAP_MS after a card arrives, so a batch arrives staggered.
     let arrivalOpen = true;
 
-    // The emblem with its halo: the list's rows use the plain one, too
-    // small for a halo, while the toast's tile frames it like the trophy.
+    // The plain emblem cropped like the trophy, so it fills the tile as much;
+    // the list keeps the uncropped one, framed like its muted twin.
     function rankEmblemOf(rank) {
         if (!rankEmblems.has(rank)) {
-            const path = `${projectFolder}\\assets\\rank_${rank}.png`;
+            const path = `${projectFolder}\\assets\\rank_${rank}_tile.png`;
             const exists = host.files.fileExists(path);
             if (!exists) host.log(`[${SCRIPT_NAME}] Rank emblem not found, drawing the trophy instead: ${path}`);
             rankEmblems.set(rank, exists ? path : null);

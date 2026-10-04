@@ -35,7 +35,7 @@ const TABLES = [
     },
 ];
 
-const emblemOf = rank => `C:\\PinballY\\Scripts\\ExpansionPack\\assets\\rank_${rank}.png`;
+const emblemOf = rank => `C:\\PinballY\\Scripts\\ExpansionPack\\assets\\rank_${rank}_tile.png`;
 const GUEST_PROFILE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles\\guest\\profile.json";
 // Guest played both tables.
 const GUEST_PLAYS = {

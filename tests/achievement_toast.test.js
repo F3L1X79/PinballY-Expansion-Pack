@@ -26,7 +26,7 @@ const SOUND_FILE = "C:\\Sounds\\achievement.wav";
 const SETTLE_MS = 1000;
 const ASSETS = "C:\\PinballY\\Scripts\\ExpansionPack\\assets";
 const TROPHY = `${ASSETS}\\achievement_trophy.png`;
-const emblemOf = rank => `${ASSETS}\\rank_${rank}.png`;
+const emblemOf = rank => `${ASSETS}\\rank_${rank}_tile.png`;
 
 // Titles of the cards on screen, oldest (highest) first.
 function cardsOnScreen(fake) {
