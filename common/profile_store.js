@@ -423,6 +423,8 @@ export function createProfileStore(host) {
         getActiveProfile: () => ({ ...publicProfile(activeProfile), data: activeData }),
         switchTo,
         getProfileData: () => activeData,
+        // The named Profile's data, to read only: change it with updateProfileData.
+        getProfileDataOf: (profileName) => profileWithData(profileName).data,
         // The active Profile's play record of a table, all zero when never played.
         getPlay: (configId) => activeData.plays[configId] || NO_PLAY,
         hasPlayed: (configId) => (activeData.plays[configId] || NO_PLAY).count > 0,

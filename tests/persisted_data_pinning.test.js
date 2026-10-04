@@ -13,7 +13,7 @@
 // previous Challenge in a Profile's history, another the Challenges
 // Achievement IDs, one the Play Log's year file name and keys, and one the
 // World Tour's key in profile.json and its Achievement ID, and one the
-// Surprises part's key, Night Owl's flag and its Achievement ID. These
+// Surprises part's key, its flags, seasons and Achievement IDs. These
 // strings are players' saved progress: this test must keep passing unchanged.
 // ============================================================
 
@@ -237,7 +237,7 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
         expectedPlays[game.configId] = { count: play.count + 1, seconds: play.seconds + seconds, lastPlayed };
     }
     const guestProfile = JSON.parse(fake.readFile(GUEST_PROFILE_FILE));
-    assert.deepEqual(Object.keys(guestProfile), ["version", "plays", "streaks", "randomGames", "sessions", "notified"]);
+    assert.deepEqual(Object.keys(guestProfile), ["version", "plays", "streaks", "randomGames", "sessions", "notified", "surprises"]);
     assert.equal(guestProfile.version, 1);
     assert.deepEqual(guestProfile.plays, expectedPlays);
     // Both Period Tables played in the Period right after their last one.
@@ -463,16 +463,29 @@ test("the World Tour keeps its key in profile.json and its Achievement ID", () =
     assert.deepEqual(buildWorldTourAchievements().map(achievement => achievement.id), ["worldTour"]);
 });
 
-test("the Surprises part keeps its key in profile.json, and Night Owl its flag and Achievement ID", () => {
-    const fake = createFakePinballYHost({ now: new Date(2026, 8, 24, 1, 0, 0), tables: TABLES });
+test("the Surprises part keeps its key in profile.json, its flags, seasons and Achievement IDs", () => {
+    // Friday 13 November 2026, 01:01: Night Owl, Friday the 13th and Mirror Hour at once.
+    const fake = createFakePinballYHost({ now: new Date(2026, 10, 13, 1, 1, 0), tables: TABLES });
     // Never uninstalled: buildSurprisesAchievements reads the shared Profile store.
     fake.installGlobals();
     const store = createProfileStore(fake);
     createSurprises(store);
-    fake.gameStarted(TABLES[0]);
-    fake.advanceTime(5 * 60 * 1000);
-    fake.gameOver(TABLES[0]);
+    const playAt = (date) => {
+        fake.setNow(date);
+        fake.gameStarted(TABLES[0]);
+        fake.advanceTime(5 * 60 * 1000);
+        fake.gameOver(TABLES[0]);
+    };
+    playAt(new Date(2026, 10, 13, 1, 1, 0));
+    // Monday 14 December 2026, 12:30, then a Play in spring and one in summer.
+    playAt(new Date(2026, 11, 14, 12, 30, 0));
+    playAt(new Date(2027, 3, 1, 10, 0, 0));
+    playAt(new Date(2027, 6, 1, 10, 0, 0));
 
-    assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).surprises.nightOwl, true);
-    assert.deepEqual(buildSurprisesAchievements().map(achievement => achievement.id), ["nightOwl"]);
+    assert.deepEqual(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).surprises, {
+        nightOwl: true, fridayThe13th: true, mirrorHour: true, lunchBreak: true,
+        seasons: ["autumn", "winter", "spring", "summer"],
+    });
+    assert.deepEqual(buildSurprisesAchievements().map(achievement => achievement.id),
+        ["nightOwl", "fridayThe13th", "fourSeasons", "lunchBreak", "mirrorHour"]);
 });

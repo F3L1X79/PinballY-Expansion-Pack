@@ -72,7 +72,8 @@ test("every Achievement has an Achievement Rank deduced from its ladder or group
 
     // Secret Achievements take the rank of how hard they are, like any other.
     assert.deepEqual(ranksOf(["rageQuit", "grandReturn", "worldTour"]), [BRONZE, SILVER, SILVER]);
-    assert.deepEqual(ranksOf(["nightOwl"]), [GOLD]);
+    assert.deepEqual(ranksOf(["nightOwl", "fridayThe13th", "fourSeasons", "lunchBreak", "mirrorHour"]),
+        [GOLD, PLATINUM, GOLD, SILVER, SILVER]);
     // A Period Table's first play is the easiest step of its family.
     assert.deepEqual(ranksOf(["tableOfTheDayFirstPlay", "tableOfTheWeekFirstPlay"]), [BRONZE, BRONZE]);
 
