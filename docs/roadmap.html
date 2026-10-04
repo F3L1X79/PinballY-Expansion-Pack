@@ -514,29 +514,6 @@
           </details>
         </div>
       </li>
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="guest-setup" data-track="profiles" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Menus de configuration quand Guest est seul</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">petit</span></div>
-          </div>
-          <p>Guest n'est jamais un Admin Profile. Sur une borne où il est le seul joueur, un nouveau venu doit pourtant garder l'accès aux menus de configuration (« Table Setup », Operator Menu). Aujourd'hui, tant qu'aucun Profile n'est marqué Admin, tout le monde voit ces entrées, Guest compris. Mais dès qu'un Profile est marqué <code>isAdmin</code> (à la main, dans son <code>profile.json</code>), Guest les perd.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span class="skip">spec</span><i>›</i><span class="skip">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/implement</code> (petit chantier, une seule séance). Code concerné : <code>showsSetupEntries</code> dans <code>addons/custom_menu_commands.js</code></div>
-          <details>
-            <summary>Questions ouvertes (3)</summary>
-            <ul>
-              <li>Le blocage vu sur la borne vient-il d'un Profile marqué Admin, ou d'autre chose (Menu Cleanup, un autre Add-on) ?</li>
-              <li>Guest peut-il devenir Admin Profile quand il est le seul Profile, au risque d'ouvrir la Profile Reset à tous les visiteurs ?</li>
-              <li>Quels menus de configuration doivent rester accessibles à Guest : « Table Setup », l'Operator Menu, tout ce que voit un Admin Profile ?</li>
-            </ul>
-            <p class="ctx">Idée de Félix (04/10/2026), pendant la reprise du prototype du Welcome Screen.</p>
-          </details>
-        </div>
-      </li>
     </ol>
   </section>
 
