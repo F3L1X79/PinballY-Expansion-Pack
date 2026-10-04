@@ -1,10 +1,10 @@
 // ============================================================
 // Surprises tests' scenario: main.js on the fake globals with the session
 // stats and the Achievements only, two tables without a manufacturer or a
-// year, Guest active, Alice and Bob (a Child Profile) beside it. Moves the
-// clock to a given moment, plays one of the tables and reads the toasts it
-// brought, opens the Achievement List and reads its rows. Never loaded by
-// PinballY.
+// year (or the test's own tables), Guest active, Alice and Bob (a Child
+// Profile) beside it. Moves the clock to a given moment, plays one of the
+// tables and reads the toasts it brought, opens the Achievement List and
+// reads its rows. Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
@@ -20,10 +20,11 @@ export const SHORT_GAME_MS = 20 * 1000;
 // Longer than an Achievement Toast's whole life (rise, hold, fade).
 const TOAST_MS = 6000;
 
-function table(id, title) {
+// A table without a manufacturer, and without a year unless given one.
+export function table(id, title, { year = 0, categories = [], isHidden = false } = {}) {
     return {
-        id, configId: title, title, manufacturer: "", year: 0, categories: [],
-        playCount: 0, playTime: 0, lastPlayed: null, rating: -1, isHidden: false,
+        id, configId: title, title, manufacturer: "", year, categories,
+        playCount: 0, playTime: 0, lastPlayed: null, rating: -1, isHidden,
     };
 }
 
@@ -31,9 +32,10 @@ export const TABLE = table(1, "Homebrew Table");
 export const PERIOD_TABLE = table(2, "Period Table");
 
 // now: the clock at startup; files: { path: content } kept from an
-// earlier run, written over the default Profiles.
-export async function startSurprisesScenario({ now, files = {} }) {
-    const fake = createFakePinballYHost({ now, tables: [TABLE, PERIOD_TABLE] });
+// earlier run, written over the default Profiles; tables: the cabinet's
+// tables, TABLE and PERIOD_TABLE by default.
+export async function startSurprisesScenario({ now, files = {}, tables = [TABLE, PERIOD_TABLE] }) {
+    const fake = createFakePinballYHost({ now, tables });
     const defaultFiles = {
         [`${PROFILES}\\cabinet.json`]: JSON.stringify({ version: 1, activeProfile: "guest" }),
         [profileFile("Alice")]: JSON.stringify({ version: 1 }),

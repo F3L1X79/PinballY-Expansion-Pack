@@ -160,7 +160,7 @@ export default function init() {
     createWorldTour(createPinballYHost(), profileStore, { onCompleted: checkForNewAchievements });
     // Its Play listener runs inside the "gameover" handlers, so the deferred
     // check above reads what it recorded.
-    createSurprises(profileStore);
+    createSurprises(createPinballYHost(), profileStore);
 
     // Startup check: its toasts show alongside the startup prompt.
     checkForNewAchievements();

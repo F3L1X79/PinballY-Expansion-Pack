@@ -1,14 +1,15 @@
 // ============================================================
 // Surprises tracker: records, in each Profile's profile.json "surprises"
 // part, what the Surprises family's Secret Achievements need: flags, the
-// seasons seen and the current One More Game! run. Listens to
-// the Profile store's Play announcement (ADR 0008) and writes for the
+// seasons seen and the current One More Game! and Time Travel runs. Listens
+// to the Profile store's Play announcement (ADR 0008) and writes for the
 // Profile active when the Play started; only Plays made since the update
 // count, the Play Log is never replayed. A missing "surprises" part reads
 // as empty; a Profile Reset erases it with the rest.
 // ============================================================
 
 import { safeHandler } from "./safe_handler.js";
+import { getDecadeStartYear } from "./decade.js";
 
 const SCRIPT_NAME = "Surprises";
 
@@ -46,6 +47,10 @@ export const SEASON_COUNT = new Set(SEASON_OF_MONTH).size;
 // ONE_MORE_GAME_PLAYS Plays in a row on the same table earn One More Game!.
 // Only a Play on another table breaks the run.
 export const ONE_MORE_GAME_PLAYS = 5;
+// TIME_TRAVEL_PLAYS Plays in a row, each on a table from a strictly older
+// decade than the one before, earn Time Travel; the secret exists only
+// when the active Profile's tables cover that many decades.
+export const TIME_TRAVEL_PLAYS = 3;
 
 export const surprisesOf = data => data.surprises || {};
 
@@ -77,23 +82,39 @@ function momentFlags(start) {
     return flags;
 }
 
-export function createSurprises(profileStore) {
+// The One More Game! run after a Play on that table: one more on the same
+// table, otherwise started over there.
+function nextOneMoreGameRun(previousRun, configId) {
+    const isSameTable = previousRun && previousRun.configId === configId;
+    return { configId, count: isSameTable ? previousRun.count + 1 : 1 };
+}
+
+// The Time Travel run after a Play on a table of that decade (null when it
+// has no year): one more when it is strictly older than the run's last
+// decade, otherwise started over from that Play.
+function nextTimeTravelRun(previousRun, decade) {
+    if (decade === null) return { decade, count: 0 };
+    const goesBack = previousRun && previousRun.count > 0 && decade < previousRun.decade;
+    return { decade, count: goesBack ? previousRun.count + 1 : 1 };
+}
+
+export function createSurprises(host, profileStore) {
     // Fires after each Play is saved. Writes every time, since every Play
-    // moves the One More Game! run.
+    // moves the runs.
     profileStore.onPlay(safeHandler(SCRIPT_NAME, ({ profileName, configId, start }) => {
         const flags = momentFlags(start);
         const season = SEASON_OF_MONTH[start.getMonth()];
         const surprises = surprisesOf(profileStore.getProfileDataOf(profileName));
         const seasons = surprises.seasons || [];
         const isNewSeason = !seasons.includes(season);
-        const previousRun = surprises.oneMoreGameRun;
-        const oneMoreGameRun = previousRun && previousRun.configId === configId
-            ? { configId, count: previousRun.count + 1 }
-            : { configId, count: 1 };
+        const oneMoreGameRun = nextOneMoreGameRun(surprises.oneMoreGameRun, configId);
         if (oneMoreGameRun.count >= ONE_MORE_GAME_PLAYS) flags.oneMoreGame = true;
+        const table = host.getGameInfo(configId);
+        const timeTravelRun = nextTimeTravelRun(surprises.timeTravelRun, table ? getDecadeStartYear(table.year) : null);
+        if (timeTravelRun.count >= TIME_TRAVEL_PLAYS) flags.timeTravel = true;
         profileStore.updateProfileData(data => {
             data.surprises = {
-                ...surprisesOf(data), ...flags, seasons: isNewSeason ? [...seasons, season] : seasons, oneMoreGameRun,
+                ...surprisesOf(data), ...flags, seasons: isNewSeason ? [...seasons, season] : seasons, oneMoreGameRun, timeTravelRun,
             };
         }, profileName);
     }));

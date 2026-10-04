@@ -323,6 +323,9 @@ export default {
         oneMoreGameTitle: () => "One More Game!",
         oneMoreGameDescription: (count) => `Play the same table ${count} times in a row.`,
         oneMoreGameHint: () => "When you love, you don't count...",
+        timeTravelTitle: () => "Time Travel",
+        timeTravelDescription: (count) => `Play ${count} games in a row, each on a table from an older decade than the one before.`,
+        timeTravelHint: () => "What if we went back in time...",
         randomGamesTitles: {
             10: "¿Y por qué no?",
             25: "Cara o cruz",

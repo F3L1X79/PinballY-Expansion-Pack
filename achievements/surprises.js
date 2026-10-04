@@ -4,16 +4,20 @@
 // tracker (common/surprises.js) recorded in the active Profile's
 // "surprises" part: a flag, or for Four Seasons every season seen. Night
 // Owl and Full Moon Night are absent for a Child Profile, whatever their
-// flags say. No Achievement Progress. Called by achievements_engine.js at
-// each check; no side effects.
+// flags say; Time Travel is absent while the active Profile's tables cover
+// fewer decades than its run needs. No Achievement Progress. Called by
+// achievements_engine.js at each check; no side effects.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, standaloneAchievement } from "../common/achievements.js";
 import lang from "../common/i18n.js";
 import { getProfileStore } from "../common/profile_store.js";
+import { getActiveProfileTables } from "../common/visible_tables.js";
+import { getDecadeStartYear } from "../common/decade.js";
 import {
     NIGHT_OWL_FIRST_HOUR, NIGHT_OWL_LAST_HOUR, FULL_MOON_NIGHT_FIRST_HOUR, FULL_MOON_NIGHT_LAST_HOUR, FULL_MOON_MIN_LIT_PERCENT,
-    LUNCH_BREAK_FIRST_HOUR, LUNCH_BREAK_LAST_HOUR, SEASON_COUNT, ONE_MORE_GAME_PLAYS, surprisesOf,
+    LUNCH_BREAK_FIRST_HOUR, LUNCH_BREAK_LAST_HOUR, SEASON_COUNT, ONE_MORE_GAME_PLAYS, TIME_TRAVEL_PLAYS,
+    surprisesOf,
 } from "../common/surprises.js";
 
 // "03:00" for 3.
@@ -96,6 +100,21 @@ export function buildSurprisesAchievements() {
             checkUnlocked: () => activeSurprises().mirrorHour === true,
         }),
     );
+
+    // Like the Decades family: never an impossible Achievement.
+    const decades = new Set(getActiveProfileTables().map(game => getDecadeStartYear(game.year)));
+    decades.delete(null);
+    if (decades.size >= TIME_TRAVEL_PLAYS) {
+        achievements.push(standaloneAchievement({
+            id: "timeTravel",
+            family: ACHIEVEMENT_FAMILY.SURPRISES,
+            rank: ACHIEVEMENT_RANK.SILVER,
+            getTitle: () => TEXT.timeTravelTitle(),
+            getDescription: () => TEXT.timeTravelDescription(TIME_TRAVEL_PLAYS),
+            getHint: () => TEXT.timeTravelHint(),
+            checkUnlocked: () => activeSurprises().timeTravel === true,
+        }));
+    }
 
     return achievements;
 }

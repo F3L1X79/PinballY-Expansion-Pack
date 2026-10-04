@@ -326,6 +326,9 @@ export default {
         oneMoreGameTitle: () => "Encore une !",
         oneMoreGameDescription: (count) => `Jouer ${count} parties d'affilée sur la même table.`,
         oneMoreGameHint: () => "Quand on aime, on ne compte pas...",
+        timeTravelTitle: () => "Voyage dans le temps",
+        timeTravelDescription: (count) => `Jouer ${count} parties d'affilée, chacune sur une table d'une décennie plus ancienne que la précédente.`,
+        timeTravelHint: () => "Et si on remontait le temps...",
         randomGamesTitles: {
             10: "Pifomètre",
             25: "Pile ou face",
