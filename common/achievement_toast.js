@@ -51,6 +51,8 @@ const BASE_LOOK = Object.freeze({
     tileGap: 20,
     tileFrame: 3,
     iconInset: 10,
+    // A Rank emblem's image is cropped to its edges: it nearly meets the frame.
+    emblemInset: 5,
     // One-pixel frames, so the glow widens with the tile.
     glowRings: 10,
     smallFont: 11,
@@ -118,9 +120,9 @@ const scaleLook = scale => Object.freeze(Object.fromEntries(
     Object.entries(BASE_LOOK).map(([name, size]) => [name, Math.round(size * scale)])));
 
 // Dark tile with an accent frame, a soft accent glow made of fading
-// frames, and the icon, or else the number in the accent.
-function drawTile(host, dc, look, x, y, accent, { iconPath, number }) {
-    const { tileSize, glowRings, iconInset } = look;
+// frames, and the icon inset by iconInset, or else the number in the accent.
+function drawTile(host, dc, look, x, y, accent, { iconPath, iconInset, number }) {
+    const { tileSize, glowRings } = look;
     const accentRgb = accent & 0xFFFFFF;
     for (let ring = glowRings; ring >= 1; ring--) {
         const alpha = Math.round(GLOW_MAX_ALPHA * (1 - ring / (glowRings + 1)));
@@ -145,8 +147,8 @@ function drawTile(host, dc, look, x, y, accent, { iconPath, number }) {
 // (rotation-aware) and returns its height and the layout height.
 // Backgrounds use fillRect and frameRect: a StyledText holding only a
 // space draws no background.
-// iconPathOf(toast, iconFile): the absolute path of the tile's icon.
-function drawCard(host, dc, look, toast, iconPathOf) {
+// iconOf(toast, iconFile): the tile's icon, { path, isEmblem }.
+function drawCard(host, dc, look, toast, iconOf) {
     const { cardWidth, edgeMargin, accentBarWidth, tileSize, tileGap, smallFont } = look;
     const kindLook = KIND_LOOKS[toast.kind || TOAST_KIND.ACHIEVEMENT];
     const accent = toast.accent || RANK_COLORS[toast.rank] || kindLook.accent;
@@ -165,8 +167,9 @@ function drawCard(host, dc, look, toast, iconPathOf) {
     fillGradient(dc, x, y, cardWidth, height, COLORS.gradientTop, COLORS.gradientBottom);
     dc.frameRect(x, y, cardWidth, height, look.border, COLORS.border);
     dc.fillRect(x, y, accentBarWidth, height, accent);
-    drawTile(host, dc, look, x + accentBarWidth + tileGap, y + (height - tileSize) / 2, accent, kindLook.iconFile
-        ? { iconPath: iconPathOf(toast, kindLook.iconFile) }
+    const icon = kindLook.iconFile ? iconOf(toast, kindLook.iconFile) : null;
+    drawTile(host, dc, look, x + accentBarWidth + tileGap, y + (height - tileSize) / 2, accent, icon
+        ? { iconPath: icon.path, iconInset: icon.isEmblem ? look.emblemInset : look.iconInset }
         : { number: toast.tileNumber });
     text.draw(dc, { x: x + textLeft, y: y + (height - textHeight) / 2, width: textWidth, height: textHeight });
     return { height, layoutHeight: size.height };
@@ -213,8 +216,8 @@ export function createAchievementToasts(host, {
     // False for ARRIVAL_GAP_MS after a card arrives, so a batch arrives staggered.
     let arrivalOpen = true;
 
-    // The plain emblem cropped like the trophy, so it fills the tile as much;
-    // the list keeps the uncropped one, framed like its muted twin.
+    // The plain emblem cropped to its edges, so it fills the tile; the list
+    // keeps the uncropped one, framed like its muted twin.
     function rankEmblemOf(rank) {
         if (!rankEmblems.has(rank)) {
             const path = `${projectFolder}\\assets\\rank_${rank}_tile.png`;
@@ -226,8 +229,9 @@ export function createAchievementToasts(host, {
     }
 
     // An Achievement Toast's Rank emblem, else the kind's icon.
-    function iconPathOf(toast, iconFile) {
-        return (toast.rank && rankEmblemOf(toast.rank)) || `${projectFolder}\\${iconFile}`;
+    function iconOf(toast, iconFile) {
+        const emblem = toast.rank ? rankEmblemOf(toast.rank) : null;
+        return emblem ? { path: emblem, isEmblem: true } : { path: `${projectFolder}\\${iconFile}`, isEmblem: false };
     }
 
     function placeLayer(card) {
@@ -297,7 +301,7 @@ export function createAchievementToasts(host, {
         const toast = waiting.shift();
         const layer = freeLayers.pop() || host.createDrawingLayer(ACHIEVEMENT_TOAST_Z_INDEX);
         let drawn = null;
-        layer.draw(dc => { drawn = drawCard(host, dc, look, toast, iconPathOf); });
+        layer.draw(dc => { drawn = drawCard(host, dc, look, toast, iconOf); });
         // Starts just below the bottom edge, then rises into place.
         const card = {
             layer, height: drawn.height, layoutHeight: drawn.layoutHeight,
