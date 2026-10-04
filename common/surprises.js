@@ -21,11 +21,11 @@ export const LUNCH_BREAK_LAST_HOUR = 13;
 // A Play started from FULL_MOON_NIGHT_FIRST_HOUR:00 to
 // FULL_MOON_NIGHT_LAST_HOUR:59 the next morning, while the moon is at least
 // FULL_MOON_MIN_LIT_PERCENT lit, earns Full Moon Night. That much light
-// lasts about two and a half days around the full moon, so it covers its
-// night and sometimes the one before or after.
+// lasts about two days around the full moon, so it covers its night and
+// sometimes the one before or after: about 24 nights a year.
 export const FULL_MOON_NIGHT_FIRST_HOUR = 22;
 export const FULL_MOON_NIGHT_LAST_HOUR = 5;
-export const FULL_MOON_MIN_LIT_PERCENT = 98;
+export const FULL_MOON_MIN_LIT_PERCENT = 99;
 // The mean moon, worked out on the cabinet with no network: its age in the
 // synodic month since a known new moon (6 January 2000, 18:14 UTC). The
 // true moon drifts from it by some hours, well inside that window.

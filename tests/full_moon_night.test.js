@@ -1,7 +1,7 @@
 // ============================================================
 // Full Moon Night, a secret of the Surprises family, started through
 // main.js on the fake PinballY globals: only a Play started from 22:00 to
-// 05:59 on a night when the moon is at least 98% lit unlocks it, the moon
+// 05:59 on a night when the moon is at least 99% lit unlocks it, the moon
 // being computed on the cabinet. 21:59 or 06:00 that night, a new-moon
 // night, a full-moon afternoon or a game under a minute do not. While
 // missing, its row shows "???" and its hint; a Child Profile never sees it.
@@ -14,10 +14,10 @@ import { startSurprisesScenario, showsMissing, showsUnlocked, SHORT_GAME_MS } fr
 test("only a Play started from 22:00 to 05:59 under a full moon unlocks Full Moon Night, never for a Child Profile", async () => {
     // Sunday 25 October 2026; the moon is full on the night of 25 to 26 October.
     const { fake, store, TEXT, LIST_TEXT, waitUntil, play, listRows, switchTo } = await startSurprisesScenario({ now: new Date(2026, 9, 25, 9, 0, 0) });
-    const description = TEXT.fullMoonNightDescription("22:00", "05:59", 98);
+    const description = TEXT.fullMoonNightDescription("22:00", "05:59", 99);
     assert.match(description, /22:00/);
     assert.match(description, /05:59/);
-    assert.match(description, /98/);
+    assert.match(description, /99/);
     const secret = { title: TEXT.fullMoonNightTitle(), description, hint: TEXT.fullMoonNightHint() };
 
     assert.ok(showsMissing(listRows(), secret, LIST_TEXT.secretTitle));
