@@ -13,7 +13,7 @@
 // previous Challenge in a Profile's history, another the Challenges
 // Achievement IDs, one the Play Log's year file name and keys, and one the
 // World Tour's key in profile.json and its Achievement ID, and one the
-// Surprises part's key, its flags, seasons and Achievement IDs. These
+// Surprises part's key, its flags, seasons, runs and Achievement IDs. These
 // strings are players' saved progress: this test must keep passing unchanged.
 // ============================================================
 
@@ -463,7 +463,7 @@ test("the World Tour keeps its key in profile.json and its Achievement ID", () =
     assert.deepEqual(buildWorldTourAchievements().map(achievement => achievement.id), ["worldTour"]);
 });
 
-test("the Surprises part keeps its key in profile.json, its flags, seasons and Achievement IDs", () => {
+test("the Surprises part keeps its key in profile.json, its flags, seasons, runs and Achievement IDs", () => {
     // Friday 13 November 2026, 01:01: Night Owl, Friday the 13th and Mirror Hour at once.
     const fake = createFakePinballYHost({ now: new Date(2026, 10, 13, 1, 1, 0), tables: TABLES });
     // Never uninstalled: buildSurprisesAchievements reads the shared Profile store.
@@ -478,7 +478,8 @@ test("the Surprises part keeps its key in profile.json, its flags, seasons and A
     };
     playAt(new Date(2026, 10, 13, 1, 1, 0));
     // Monday 14 December 2026, 12:30, then Wednesday 23 December at 22:00
-    // under a full moon, a Play in spring and one in summer.
+    // under a full moon, a Play in spring and one in summer: five Plays in
+    // a row on one table, so One More Game! too.
     playAt(new Date(2026, 11, 14, 12, 30, 0));
     playAt(new Date(2026, 11, 23, 22, 0, 0));
     playAt(new Date(2027, 3, 1, 10, 0, 0));
@@ -487,7 +488,8 @@ test("the Surprises part keeps its key in profile.json, its flags, seasons and A
     assert.deepEqual(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).surprises, {
         nightOwl: true, fridayThe13th: true, mirrorHour: true, lunchBreak: true, fullMoonNight: true,
         seasons: ["autumn", "winter", "spring", "summer"],
+        oneMoreGame: true, oneMoreGameRun: { configId: TABLES[0].configId, count: 5 },
     });
     assert.deepEqual(buildSurprisesAchievements().map(achievement => achievement.id),
-        ["nightOwl", "fullMoonNight", "fridayThe13th", "fourSeasons", "lunchBreak", "mirrorHour"]);
+        ["nightOwl", "fullMoonNight", "fridayThe13th", "fourSeasons", "oneMoreGame", "lunchBreak", "mirrorHour"]);
 });

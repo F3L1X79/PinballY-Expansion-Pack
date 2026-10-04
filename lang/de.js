@@ -320,6 +320,9 @@ export default {
         fourSeasonsTitle: () => "Four Seasons",
         fourSeasonsDescription: (count) => `Play at least once in each of the ${count} seasons.`,
         fourSeasonsHint: () => "Pinball is all year round...",
+        oneMoreGameTitle: () => "One More Game!",
+        oneMoreGameDescription: (count) => `Play the same table ${count} times in a row.`,
+        oneMoreGameHint: () => "When you love, you don't count...",
         randomGamesTitles: {
             10: "Warum nicht?",
             25: "Kopf oder Zahl",

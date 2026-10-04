@@ -1,6 +1,7 @@
 // ============================================================
 // Surprises tracker: records, in each Profile's profile.json "surprises"
-// part, what the Surprises family's Secret Achievements need. Listens to
+// part, what the Surprises family's Secret Achievements need: flags, the
+// seasons seen and the current One More Game! run. Listens to
 // the Profile store's Play announcement (ADR 0008) and writes for the
 // Profile active when the Play started; only Plays made since the update
 // count, the Play Log is never replayed. A missing "surprises" part reads
@@ -42,6 +43,9 @@ const SEASON_OF_MONTH = [
     "summer", "summer", "autumn", "autumn", "autumn", "winter",
 ];
 export const SEASON_COUNT = new Set(SEASON_OF_MONTH).size;
+// ONE_MORE_GAME_PLAYS Plays in a row on the same table earn One More Game!.
+// Only a Play on another table breaks the run.
+export const ONE_MORE_GAME_PLAYS = 5;
 
 export const surprisesOf = data => data.surprises || {};
 
@@ -74,17 +78,23 @@ function momentFlags(start) {
 }
 
 export function createSurprises(profileStore) {
-    // Fires after each Play is saved.
-    profileStore.onPlay(safeHandler(SCRIPT_NAME, ({ profileName, start }) => {
+    // Fires after each Play is saved. Writes every time, since every Play
+    // moves the One More Game! run.
+    profileStore.onPlay(safeHandler(SCRIPT_NAME, ({ profileName, configId, start }) => {
         const flags = momentFlags(start);
         const season = SEASON_OF_MONTH[start.getMonth()];
         const surprises = surprisesOf(profileStore.getProfileDataOf(profileName));
         const seasons = surprises.seasons || [];
         const isNewSeason = !seasons.includes(season);
-        const isNewFlag = Object.keys(flags).some(flag => surprises[flag] !== true);
-        if (!isNewSeason && !isNewFlag) return;
+        const previousRun = surprises.oneMoreGameRun;
+        const oneMoreGameRun = previousRun && previousRun.configId === configId
+            ? { configId, count: previousRun.count + 1 }
+            : { configId, count: 1 };
+        if (oneMoreGameRun.count >= ONE_MORE_GAME_PLAYS) flags.oneMoreGame = true;
         profileStore.updateProfileData(data => {
-            data.surprises = { ...surprisesOf(data), ...flags, seasons: isNewSeason ? [...seasons, season] : seasons };
+            data.surprises = {
+                ...surprisesOf(data), ...flags, seasons: isNewSeason ? [...seasons, season] : seasons, oneMoreGameRun,
+            };
         }, profileName);
     }));
 }

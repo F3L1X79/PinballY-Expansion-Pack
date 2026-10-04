@@ -323,6 +323,9 @@ export default {
         fourSeasonsTitle: () => "Quatre saisons",
         fourSeasonsDescription: (count) => `Jouer au moins une fois dans chacune des ${count} saisons.`,
         fourSeasonsHint: () => "Le flipper, c'est toute l'année...",
+        oneMoreGameTitle: () => "Encore une !",
+        oneMoreGameDescription: (count) => `Jouer ${count} parties d'affilée sur la même table.`,
+        oneMoreGameHint: () => "Quand on aime, on ne compte pas...",
         randomGamesTitles: {
             10: "Pifomètre",
             25: "Pile ou face",

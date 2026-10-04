@@ -2,8 +2,9 @@
 // Surprises tests' scenario: main.js on the fake globals with the session
 // stats and the Achievements only, two tables without a manufacturer or a
 // year, Guest active, Alice and Bob (a Child Profile) beside it. Moves the
-// clock to a given moment, plays a table and reads the toasts it brought,
-// opens the Achievement List and reads its rows. Never loaded by PinballY.
+// clock to a given moment, plays one of the tables and reads the toasts it
+// brought, opens the Achievement List and reads its rows. Never loaded by
+// PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
@@ -27,7 +28,7 @@ function table(id, title) {
 }
 
 export const TABLE = table(1, "Homebrew Table");
-const PERIOD_TABLE = table(2, "Period Table");
+export const PERIOD_TABLE = table(2, "Period Table");
 
 // now: the clock at startup; files: { path: content } kept from an
 // earlier run, written over the default Profiles.
@@ -61,13 +62,13 @@ export async function startSurprisesScenario({ now, files = {} }) {
         fake.advanceTime(target - fake.now());
     }
 
-    // Plays a game and returns the titles its toasts showed.
-    async function play(gameMs = PLAY_MS) {
+    // Plays a game on that table and returns the titles its toasts showed.
+    async function play(gameMs = PLAY_MS, table = TABLE) {
         const before = toastDrawings(fake).length;
-        fake.gameStarted(TABLE);
+        fake.gameStarted(table);
         await settle();
         fake.advanceTime(gameMs);
-        fake.gameOver(TABLE);
+        fake.gameOver(table);
         await settle();
         // Toasts show one after the other: let every toast of this game show.
         for (let guard = 0; guard < 100; guard++) {

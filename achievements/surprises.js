@@ -13,7 +13,7 @@ import lang from "../common/i18n.js";
 import { getProfileStore } from "../common/profile_store.js";
 import {
     NIGHT_OWL_FIRST_HOUR, NIGHT_OWL_LAST_HOUR, FULL_MOON_NIGHT_FIRST_HOUR, FULL_MOON_NIGHT_LAST_HOUR, FULL_MOON_MIN_LIT_PERCENT,
-    LUNCH_BREAK_FIRST_HOUR, LUNCH_BREAK_LAST_HOUR, SEASON_COUNT, surprisesOf,
+    LUNCH_BREAK_FIRST_HOUR, LUNCH_BREAK_LAST_HOUR, SEASON_COUNT, ONE_MORE_GAME_PLAYS, surprisesOf,
 } from "../common/surprises.js";
 
 // "03:00" for 3.
@@ -67,6 +67,15 @@ export function buildSurprisesAchievements() {
             getDescription: () => TEXT.fourSeasonsDescription(SEASON_COUNT),
             getHint: () => TEXT.fourSeasonsHint(),
             checkUnlocked: () => new Set(activeSurprises().seasons || []).size >= SEASON_COUNT,
+        }),
+        standaloneAchievement({
+            id: "oneMoreGame",
+            family: ACHIEVEMENT_FAMILY.SURPRISES,
+            rank: ACHIEVEMENT_RANK.BRONZE,
+            getTitle: () => TEXT.oneMoreGameTitle(),
+            getDescription: () => TEXT.oneMoreGameDescription(ONE_MORE_GAME_PLAYS),
+            getHint: () => TEXT.oneMoreGameHint(),
+            checkUnlocked: () => activeSurprises().oneMoreGame === true,
         }),
         standaloneAchievement({
             id: "lunchBreak",
