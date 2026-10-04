@@ -119,6 +119,7 @@ export default function init() {
             achievementToasts.submit({
                 title: achievement.getTitle(),
                 description: achievement.getDescription(),
+                rank: achievement.rank,
                 celebrate: achievement.rank === ACHIEVEMENT_RANK.PLATINUM,
                 onShown: () => markNotified(profileStore, profileName, achievement.id),
                 isStale: () => resetCountOf(profileKey) !== resetCount,

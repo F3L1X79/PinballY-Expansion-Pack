@@ -2,8 +2,9 @@
 // The Achievements add-on, started through main.js on the fake PinballY
 // globals, announces its unlocks with Achievement Toasts: never while a
 // game runs, staggered, over an open menu without taking it
-// over, each one Notified when it starts, and a toast still waiting when a
-// table launches is announced after that game.
+// over, each one Notified when it starts, with its Achievement Rank's
+// emblem, and a toast still waiting when a table launches is announced
+// after that game.
 // ============================================================
 
 import { test } from "node:test";
@@ -11,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
 import config from "../common/config.js";
+import { ACHIEVEMENT_RANK } from "../common/achievements.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SECONDS_PER_HOUR = 3600;
@@ -33,6 +35,7 @@ const TABLES = [
     },
 ];
 
+const emblemOf = rank => `C:\\PinballY\\Scripts\\ExpansionPack\\assets\\rank_${rank}.png`;
 const GUEST_PROFILE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles\\guest\\profile.json";
 // Guest played both tables.
 const GUEST_PLAYS = {
@@ -51,6 +54,7 @@ function toasts(fake) {
 test("Achievement Toasts wait for the end of the game, arrive staggered and never take over a menu", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
     fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({ version: 1, plays: GUEST_PLAYS, notified: [] }));
+    for (const rank of Object.values(ACHIEVEMENT_RANK)) fake.addFile(emblemOf(rank), "PNG");
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) {
@@ -104,6 +108,11 @@ test("Achievement Toasts wait for the end of the game, arrive staggered and neve
     assert.ok(shownCount >= 4, `expected several Achievements, got ${shownCount}`);
     assert.equal(notifiedCount(fake), shownCount, "each toast Notified its Achievement");
     assert.equal(new Set(toasts(fake)).size, shownCount, "each Achievement announced once");
+    const { getAllAchievements } = await import("../addons/achievements_engine.js");
+    const rankByTitle = new Map(getAllAchievements().map(achievement => [achievement.getTitle(), achievement.rank]));
+    for (const drawing of toastDrawings(fake)) {
+        assert.deepEqual(drawing.images, [emblemOf(rankByTitle.get(drawing.texts[1]))], `${drawing.texts[1]} shows its Rank's emblem`);
+    }
     assert.deepEqual(fake.soundsPlayed(), [], "no sound by default");
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

@@ -8,8 +8,10 @@
 // the oldest leaves first. Toasts wait while a game starts, runs or exits;
 // waiting ones start on "wheelmode". The hold duration and an optional
 // sound played with each card and the card's scale come from the player
-// settings. A Challenge Toast shares the queue and the card, with its own
-// accent colour, header and target icon instead of the trophy; a Mastery
+// settings. An Achievement Toast shows its Achievement Rank's emblem in
+// the Rank's colour, or the trophy when that emblem's file is missing
+// (logged once). A Challenge Toast shares the queue and the card, with its
+// own accent colour, header and target icon instead of the trophy; a Mastery
 // Toast its own header, the reached level's metal as its accent and the
 // level's number drawn in its tile. A celebrated toast starts the
 // Confetti Shower when it starts.
@@ -19,7 +21,7 @@ import lang from "./i18n.js";
 import { safeHandler } from "./safe_handler.js";
 import { createPinballYHost } from "./pinbally_host.js";
 import config from "./config.js";
-import { STEAMBALL_COLORS, STEAMBALL_FONTS } from "./steamball_palette.js";
+import { STEAMBALL_COLORS, STEAMBALL_FONTS, RANK_COLORS } from "./steamball_palette.js";
 import { getConfettiShower } from "./confetti_shower.js";
 
 const SCRIPT_NAME = "AchievementToast";
@@ -143,10 +145,11 @@ function drawTile(host, dc, look, x, y, accent, { iconPath, number }) {
 // (rotation-aware) and returns its height and the layout height.
 // Backgrounds use fillRect and frameRect: a StyledText holding only a
 // space draws no background.
-function drawCard(host, dc, look, toast, projectFolder) {
+// iconPathOf(toast, iconFile): the absolute path of the tile's icon.
+function drawCard(host, dc, look, toast, iconPathOf) {
     const { cardWidth, edgeMargin, accentBarWidth, tileSize, tileGap, smallFont } = look;
     const kindLook = KIND_LOOKS[toast.kind || TOAST_KIND.ACHIEVEMENT];
-    const accent = toast.accent || kindLook.accent;
+    const accent = toast.accent || RANK_COLORS[toast.rank] || kindLook.accent;
     const size = dc.getSize();
     const textLeft = accentBarWidth + tileGap + tileSize + tileGap;
     const textWidth = cardWidth - textLeft - look.paddingRight;
@@ -163,7 +166,7 @@ function drawCard(host, dc, look, toast, projectFolder) {
     dc.frameRect(x, y, cardWidth, height, look.border, COLORS.border);
     dc.fillRect(x, y, accentBarWidth, height, accent);
     drawTile(host, dc, look, x + accentBarWidth + tileGap, y + (height - tileSize) / 2, accent, kindLook.iconFile
-        ? { iconPath: `${projectFolder}\\${kindLook.iconFile}` }
+        ? { iconPath: iconPathOf(toast, kindLook.iconFile) }
         : { number: toast.tileNumber });
     text.draw(dc, { x: x + textLeft, y: y + (height - textHeight) / 2, width: textWidth, height: textHeight });
     return { height, layoutHeight: size.height };
@@ -198,6 +201,8 @@ export function createAchievementToasts(host, {
     const celebrate = safeHandler(SCRIPT_NAME, () => confettiShower.start());
     const waiting = [];
     const projectFolder = host.getProjectFolder();
+    // Each Rank's emblem path, or null when its file is missing: checked once.
+    const rankEmblems = new Map();
     // Cards on screen, oldest first. Each one: its layer, its height, the
     // layout height, its lift above the bottom slot (layout pixels, up is
     // positive), its alpha and whether it is leaving.
@@ -207,6 +212,23 @@ export function createAchievementToasts(host, {
     let frameTimer = null;
     // False for ARRIVAL_GAP_MS after a card arrives, so a batch arrives staggered.
     let arrivalOpen = true;
+
+    // The emblem with its halo: the list's rows use the plain one, too
+    // small for a halo, while the toast's tile frames it like the trophy.
+    function rankEmblemOf(rank) {
+        if (!rankEmblems.has(rank)) {
+            const path = `${projectFolder}\\assets\\rank_${rank}.png`;
+            const exists = host.files.fileExists(path);
+            if (!exists) host.log(`[${SCRIPT_NAME}] Rank emblem not found, drawing the trophy instead: ${path}`);
+            rankEmblems.set(rank, exists ? path : null);
+        }
+        return rankEmblems.get(rank);
+    }
+
+    // An Achievement Toast's Rank emblem, else the kind's icon.
+    function iconPathOf(toast, iconFile) {
+        return (toast.rank && rankEmblemOf(toast.rank)) || `${projectFolder}\\${iconFile}`;
+    }
 
     function placeLayer(card) {
         card.layer.alpha = card.alpha;
@@ -275,7 +297,7 @@ export function createAchievementToasts(host, {
         const toast = waiting.shift();
         const layer = freeLayers.pop() || host.createDrawingLayer(ACHIEVEMENT_TOAST_Z_INDEX);
         let drawn = null;
-        layer.draw(dc => { drawn = drawCard(host, dc, look, toast, projectFolder); });
+        layer.draw(dc => { drawn = drawCard(host, dc, look, toast, iconPathOf); });
         // Starts just below the bottom edge, then rises into place.
         const card = {
             layer, height: drawn.height, layoutHeight: drawn.layoutHeight,
@@ -300,8 +322,9 @@ export function createAchievementToasts(host, {
     host.on("wheelmode", safeShowNext);
 
     // toast: { kind, title, description, onShown, isStale, celebrate,
-    // accent, tileNumber }, kind a TOAST_KIND (an Achievement when
-    // missing), onShown running when the toast starts, isStale (optional)
+    // rank, accent, tileNumber }, kind a TOAST_KIND (an Achievement when
+    // missing), rank (optional) the Achievement Rank of an Achievement
+    // Toast, onShown running when the toast starts, isStale (optional)
     // dropping it unshown when it returns true at its turn, celebrate
     // (optional) starting the Confetti Shower with it; a Mastery Toast
     // gives its accent and the number its tile shows.

@@ -279,31 +279,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="toast-rank" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>L'emblème du Rank dans l'Achievement Toast</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Le toast montre le Rank de l'Achievement qu'il annonce, comme l'Achievement List : on sait tout de suite si c'est un Bronze ou un Platinum.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="skip">spec</span><i>›</i><span class="skip">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Grillé le 04/10/2026. Flow Matt : <code>/implement</code> directement (petit chantier, une seule séance, sans spec ni tickets). Les emblèmes existent déjà dans <code>assets</code>, ceux de l'Achievement List</div>
-          <details>
-            <summary>Décisions</summary>
-            <ul>
-              <li>L'emblème du Rank (<code>rank_&lt;rank&gt;.png</code>, la variante des Achievements débloqués de la liste) remplace le trophée dans la tuile. S'il manque, retour au trophée et une ligne dans <code>logfile.log</code>.</li>
-              <li>La barre d'accent, le cadre et le halo de la tuile et l'en-tête prennent la couleur du Rank (<code>RANK_COLORS</code>), comme le Mastery Toast prend le métal du niveau.</li>
-              <li>L'en-tête reste « SUCCÈS DÉBLOQUÉ » : aucune nouvelle clé de traduction.</li>
-              <li>Le Challenge Toast et le Mastery Toast ne changent pas : ils n'ont pas de Rank.</li>
-              <li>Pas de prototype : la lisibilité se vérifie sur la borne pendant l'<code>/implement</code>, aux échelles 0,5, 1 et 2 ; si l'emblème est illisible à 0,5, réduire <code>iconInset</code> pour les emblèmes.</li>
-            </ul>
-            <p class="ctx">Repéré pendant la revue du ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/139">#139</a> (03/10/2026) : le ticket parlait du Rank dans le toast, qui n'en montre aucun.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-profiles" id="stats-drawn" data-track="profiles" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -660,7 +635,6 @@
 
           <div class="ax row">Moyen</div>
           <div class="cell sweet">
-            <a class="chip tr-play" href="#toast-rank"><b></b>Rank dans le toast</a>
           </div>
           <div class="cell">
             <a class="chip tr-profiles" href="#stats"><b></b>Stats des autres</a>

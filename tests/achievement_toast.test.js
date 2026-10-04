@@ -7,6 +7,8 @@
 // and the configured sound plays once per card, a failing one only logged.
 // A Challenge Toast shares the queue, with its own header and target icon.
 // A celebrated toast starts the Confetti Shower, unless it went stale.
+// An Achievement Toast shows its Achievement Rank's emblem in the Rank's
+// colour, the trophy when that emblem's file is missing (logged once).
 // ============================================================
 
 import { test } from "node:test";
@@ -14,12 +16,17 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "./fake_pinbally_host.js";
 import { createAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
 import lang from "../common/i18n.js";
+import { ACHIEVEMENT_RANK } from "../common/achievements.js";
+import { RANK_COLORS, STEAMBALL_COLORS } from "../common/steamball_palette.js";
 
 const ARRIVAL_GAP_MS = 350;
 const MAX_CARDS = 5;
 const SOUND_FILE = "C:\\Sounds\\achievement.wav";
 // Enough for a card to rise into place, shorter than any hold.
 const SETTLE_MS = 1000;
+const ASSETS = "C:\\PinballY\\Scripts\\ExpansionPack\\assets";
+const TROPHY = `${ASSETS}\\achievement_trophy.png`;
+const emblemOf = rank => `${ASSETS}\\rank_${rank}.png`;
 
 // Titles of the cards on screen, oldest (highest) first.
 function cardsOnScreen(fake) {
@@ -132,7 +139,7 @@ test("a Challenge Toast shares the queue with the Achievement Toasts, with its o
     assert.equal(byTitle("challenge").texts()[0], lang.challenges.toastHeader.toLocaleUpperCase());
     const [trophy] = byTitle("achievement").images();
     const [target] = byTitle("challenge").images();
-    assert.equal(trophy, "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\achievement_trophy.png");
+    assert.equal(trophy, TROPHY);
     assert.equal(target, "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\challenge_target.png");
 });
 
@@ -149,4 +156,38 @@ test("a celebrated toast starts the Confetti Shower when it starts, never when i
     fake.advanceTime(SETTLE_MS);
     assert.deepEqual(cardsOnScreen(fake), ["plain", "celebrated"]);
     assert.deepEqual(starts, [fake.now().getTime() - SETTLE_MS + ARRIVAL_GAP_MS], "once, when its card arrives");
+});
+
+test("an Achievement Toast shows its Rank's emblem in its Rank's colour", () => {
+    const fake = createFakePinballYHost();
+    fake.installGlobals();
+    for (const rank of Object.values(ACHIEVEMENT_RANK)) fake.addFile(emblemOf(rank), "PNG");
+    const toasts = createAchievementToasts(fake);
+    for (const rank of Object.values(ACHIEVEMENT_RANK)) toasts.submit({ title: rank, description: "", rank, onShown() {} });
+    fake.advanceTime(SETTLE_MS + 4 * ARRIVAL_GAP_MS);
+
+    for (const rank of Object.values(ACHIEVEMENT_RANK)) {
+        const layer = fake.drawingLayers().find(candidate => candidate.texts()[1] === rank);
+        assert.deepEqual(layer.images(), [emblemOf(rank)], `${rank} shows its emblem, not the trophy`);
+        assert.ok(layer.fills().includes(RANK_COLORS[rank]), `${rank} takes its Rank's colour`);
+        assert.ok(!layer.fills().includes(STEAMBALL_COLORS.gold), `${rank} drops the default gold`);
+    }
+    assert.deepEqual(fake.logLines(), []);
+});
+
+test("a missing Rank emblem falls back to the trophy, logged once", () => {
+    const fake = createFakePinballYHost();
+    fake.installGlobals();
+    const toasts = createAchievementToasts(fake);
+    const { SILVER } = ACHIEVEMENT_RANK;
+    toasts.submit({ title: "first", description: "", rank: SILVER, onShown() {} });
+    toasts.submit({ title: "second", description: "", rank: SILVER, onShown() {} });
+    fake.advanceTime(SETTLE_MS);
+
+    for (const title of ["first", "second"]) {
+        const layer = fake.drawingLayers().find(candidate => candidate.texts()[1] === title);
+        assert.deepEqual(layer.images(), [TROPHY]);
+        assert.ok(layer.fills().includes(RANK_COLORS[SILVER]), "still in its Rank's colour");
+    }
+    assert.equal(fake.logLines().filter(line => line.includes(emblemOf(SILVER))).length, 1);
 });
