@@ -1,7 +1,7 @@
 // ============================================================
 // Profile picker turned off in addOns, through main.js on the fake
-// PinballY globals: neither the main menu nor the startup prompt has a
-// "Change player" entry, and cabinet.json is not rewritten when Guest is
+// PinballY globals: neither the main menu nor the Welcome Screen has a
+// "Change player" choice, and cabinet.json is not rewritten when Guest is
 // already active.
 // ============================================================
 
@@ -9,10 +9,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
+import { WELCOME_SCREEN_OPEN_MS, press, readChoices } from "./welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 
-test("turning the Profile picker off removes its main-menu and startup prompt entries", async () => {
+test("turning the Profile picker off removes its main-menu entry and Welcome Screen choice", async () => {
     const fake = createFakePinballYHost();
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "guest" }));
     // Never uninstalled: node --test runs each test file in its own process.
@@ -26,9 +27,11 @@ test("turning the Profile picker off removes its main-menu and startup prompt en
     await import("../main.js");
     await settle();
 
-    assert.equal(fake.currentMenu().id, "startupChoicePrompt");
-    const promptTitles = fake.currentMenu().items.map(item => item.title);
-    assert.ok(!promptTitles.includes(lang.profiles.menuEntry));
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    const choices = readChoices(fake);
+    assert.ok(choices.includes(lang.welcomeScreen.closeTooltip), "the Welcome Screen is open");
+    assert.ok(!choices.includes(lang.profiles.menuEntry));
+    press(fake, "Exit");
 
     fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
     const titles = fake.currentMenu().items.map(item => item.title);

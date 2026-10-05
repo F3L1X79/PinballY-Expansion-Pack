@@ -2,8 +2,8 @@
 // The Child Profile's wheel, started through main.js on the fake PinballY
 // globals: while a Profile marked isChild in its profile.json is active,
 // no Adult Table (category "NSFW") is on the wheel, under any filter, nor
-// drawn by the Random Game, and the startup prompt never leaves the child
-// on one. Switching Profiles brings them back or moves the wheel off them
+// drawn by the Random Game, and the Welcome Screen's stay choice never
+// leaves the child on one. Switching Profiles brings them back or moves the wheel off them
 // at once. A mark on Guest is logged and ignored.
 // ============================================================
 
@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
+import { WELCOME_SCREEN_OPEN_MS, choose } from "./welcome_screen_reader.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -61,9 +62,9 @@ test("a Child Profile never sees an Adult Table on the wheel, in the Random Game
     const store = getProfileStore();
     const { gameList } = globalThis;
 
-    assert.equal(fake.currentMenu().id, "startupChoicePrompt");
-    fake.selectMenuItem(lang.startupPrompt.stayOnLastPlayed);
-    assert.deepEqual(wheel(fake), [MEDIEVAL, MARS], "the startup prompt leaves the child on the next table");
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    choose(fake, lang.welcomeScreen.stayOnWheel);
+    assert.deepEqual(wheel(fake), [MEDIEVAL, MARS], "the Welcome Screen leaves the child on the next table");
 
     gameList.setCurFilter("All");
     assert.deepEqual(adultOnWheel(fake), [], "All Tables");

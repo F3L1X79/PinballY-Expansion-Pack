@@ -171,6 +171,7 @@ export function createPinballYHost() {
         // The game list's own events, such as "gameselect" or "filterselect".
         onGameListEvent: (eventName, handler) => { gameList.on(eventName, handler); },
         createDrawingLayer: (zIndex) => mainWindow.createDrawingLayer(zIndex),
+        removeDrawingLayer: (layer) => { mainWindow.removeDrawingLayer(layer); },
         createStyledText: (options) => new StyledText(options),
 
         allocateCommand: (name) => command.allocate(name),

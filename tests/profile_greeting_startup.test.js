@@ -1,14 +1,15 @@
 // ============================================================
 // Startup Profile Greeting, through main.js on the fake PinballY globals,
-// with the startup prompt turned off: the restored active Profile is
-// greeted once, on the wheel, after a short pause, then the greeting fades
-// out.
+// with the Welcome Screen turned off: it never shows, and the restored
+// active Profile is greeted once, on the wheel, after a short pause, then
+// the greeting fades out.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
+import { isWelcomeScreenOpen } from "./welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const PICKER_Z = 6500;
@@ -19,7 +20,7 @@ const pickerTexts = fake => fake.drawingLayers()
     .filter(layer => layer.zIndex === PICKER_Z && layer.alpha > 0)
     .flatMap(layer => layer.texts());
 
-test("without the startup prompt, the active Profile is greeted once at startup", async () => {
+test("without the Welcome Screen, the active Profile is greeted once at startup", async () => {
     const fake = createFakePinballYHost();
     fake.addFolder(`${PROFILES_FOLDER}\\Alice`);
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Alice" }));
@@ -36,6 +37,7 @@ test("without the startup prompt, the active Profile is greeted once at startup"
 
     fake.advanceTime(PAUSE_OVER_MS);
     assert.ok(pickerTexts(fake).includes(lang.profiles.greeting("Alice")), "greets the restored Profile");
+    assert.equal(isWelcomeScreenOpen(fake), false, "no Welcome Screen");
     fake.advanceTime(GREETING_OVER_MS);
     assert.deepEqual(pickerTexts(fake), [], "then fades out");
 

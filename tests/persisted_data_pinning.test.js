@@ -30,6 +30,7 @@ import { buildWorldTourAchievements } from "../achievements/world_tour.js";
 import { createWorldTour } from "../common/world_tour.js";
 import { buildSurprisesAchievements } from "../achievements/surprises.js";
 import { createSurprises } from "../common/surprises.js";
+import { WELCOME_SCREEN_PAUSE_MS, press } from "./welcome_screen_reader.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -189,9 +190,13 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
     await import("../main.js");
     await settle();
 
-    // Startup prompt: launch the Table of the Day, play a long session, and
-    // close every dialog (the rating prompt).
-    fake.selectMenuItem(lang.startupPrompt.tableOfTheDay);
+    // Welcome Screen closed as soon as drawn (the pinned times keep their
+    // second), main menu: launch the Table of the Day, play a long session,
+    // and close every dialog (the rating prompt).
+    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS);
+    press(fake, "Exit");
+    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
+    fake.selectMenuItem(lang.customMenuLabels.tableOfTheDay);
     await settle();
     const dayTable = await playLastLaunch(fake, 61 * 60);
     await closeEveryDialog(fake);

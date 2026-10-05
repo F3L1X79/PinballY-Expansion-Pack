@@ -52,6 +52,7 @@ const DEFAULTS = {
     addOns: {
         uiTranslation: true,
         statusLineInfo: true,
+        // The Welcome Screen, under the startup prompt's former key.
         startupChoicePrompt: true,
         forceBackglass: true,
         customMenuCommands: true,

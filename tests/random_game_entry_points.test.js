@@ -1,5 +1,5 @@
 ﻿// ============================================================
-// The startup prompt's random choice and the "Start Random Game" main menu
+// The Welcome Screen's random choice and the "Start Random Game" main menu
 // entry, started through main.js on the fake PinballY globals, never launch
 // the active Profile's Last Played Table when the wheel selection holds
 // another table, and every one played a minute counts in the Random Games
@@ -12,6 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
+import { WELCOME_SCREEN_OPEN_MS, choose } from "./welcome_screen_reader.js";
 import { getRandomGame } from "../common/random_game.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -35,7 +36,7 @@ function playAndReturnToWheel(fake, game) {
     fake.gameOver(game);
 }
 
-test("the startup prompt and the main menu never launch the Last Played Table, and each Random Game counts", async () => {
+test("the Welcome Screen and the main menu never launch the Last Played Table, and each Random Game counts", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
     fake.setWheelTables([LAST_PLAYED_CONFIG_ID, "Medieval Madness (Williams 1997)", "Attack from Mars (Bally 1995)"]);
     fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({
@@ -54,7 +55,8 @@ test("the startup prompt and the main menu never launch the Last Played Table, a
     await import("../main.js");
     await settle();
 
-    fake.selectMenuItem(lang.startupPrompt.randomTable);
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    choose(fake, lang.welcomeScreen.randomTable);
     await settle();
     const [promptLaunch] = fake.launches();
     playAndReturnToWheel(fake, promptLaunch);

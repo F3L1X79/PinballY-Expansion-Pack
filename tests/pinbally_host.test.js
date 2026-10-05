@@ -273,6 +273,14 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             assert.equal(recorded.alpha, 0.5);
         });
 
+        test("removes a drawing layer, leaving the others", () => {
+            const kept = host.createDrawingLayer(6100);
+            const removed = host.createDrawingLayer(6101);
+            host.removeDrawingLayer(removed);
+
+            assert.deepEqual(fake.drawingLayers().map(layer => layer.zIndex), [kept.zIndex]);
+        });
+
         test("reports the run mode while a game starts, runs and exits", () => {
             const runModes = [];
             host.on("gameover", () => runModes.push(host.getFullUIMode().runMode));

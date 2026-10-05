@@ -187,21 +187,15 @@ export default {
         notNow: "Plus tard...",
     },
 
-    startupPrompt: {
-        introWithPicks: (playerName, dayTitle, weekTitle) => {
-            const lines = [`Salut à toi, ${playerName} !`];
-            lines.push('');
-            lines.push('Choisis une option parmi celles-ci pour pouvoir démarrer ton pèlerinage de Geek.');
-            if (dayTitle) lines.push('---');
-            if (dayTitle) lines.push(`Table du jour : ${dayTitle}`);
-            if (weekTitle) lines.push('---');
-            if (weekTitle) lines.push(`Table de la semaine : ${weekTitle}`);
-            return lines.join("\n");
-        },
-        stayOnLastPlayed: "Rester sur la dernière table jouée",
-        tableOfTheDay: "Lancer la table du jour",
-        tableOfTheWeek: "Lancer la table de la semaine",
-        randomTable: "Lancer une table au pif !",
+    // The Welcome Screen, at startup (see addons/welcome_screen.js).
+    welcomeScreen: {
+        greetings: { morning: "Bonjour", afternoon: "Bon après-midi", evening: "Bonsoir", night: "Bien le bonsoir" },
+        greetingWithName: (greeting, name) => [`${greeting}, `, name, " !"],
+        greetingAlone: (greeting) => `${greeting} !`,
+        closeTooltip: "Fermer",
+        stayOn: (tableTitle) => `Rester sur ${tableTitle}`,
+        stayOnWheel: "Rester sur la roue",
+        randomTable: "Lancer une table au hasard",
     },
 
     // Lower status line text for the currently selected table.

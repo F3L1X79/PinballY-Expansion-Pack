@@ -1,14 +1,14 @@
 // ============================================================
-// Startup prompt with the Profile picker on, through main.js on the fake
-// PinballY globals: "Change Player" is its second choice, right under
-// "Stay", and opens the carousel on the active Profile; picking a Profile
-// there switches to it.
+// Welcome Screen with the Profile picker on, through main.js on the fake
+// PinballY globals: Select on the Avatar closes the screen and opens the
+// carousel on the active Profile; picking a Profile there switches to it.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
+import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose } from "./welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The carousel's background, its Avatars, then the gold frame and names.
@@ -18,9 +18,8 @@ const GLIDE_OVER_MS = 500;
 const pickerTexts = fake => fake.drawingLayers()
     .filter(layer => layer.zIndex >= PICKER_Z_RANGE[0] && layer.zIndex <= PICKER_Z_RANGE[1] && layer.alpha > 0)
     .flatMap(layer => layer.texts());
-const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { command: buttonCommand, repeat: false });
 
-test("the startup prompt offers Change Player second, which opens the carousel", async () => {
+test("Select on the Welcome Screen's Avatar opens the carousel", async () => {
     const fake = createFakePinballYHost();
     for (const name of ["Alice", "Bob"]) fake.addFolder(`${PROFILES_FOLDER}\\${name}`);
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Bob" }));
@@ -35,14 +34,11 @@ test("the startup prompt offers Change Player second, which opens the carousel",
     const { getProfileStore } = await import("../common/profile_store.js");
     await import("../main.js");
     await settle();
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
 
-    const prompt = fake.currentMenu();
-    assert.equal(prompt.id, "startupChoicePrompt");
-    const choices = prompt.items.filter(item => item.cmd !== -1).map(item => item.title);
-    assert.deepEqual(choices.slice(0, 2), [lang.startupPrompt.stayOnLastPlayed, lang.profiles.menuEntry]);
-
-    fake.selectMenuItem(lang.profiles.menuEntry);
+    choose(fake, lang.profiles.menuEntry);
     await settle();
+    assert.equal(isWelcomeScreenOpen(fake), false);
     assert.ok(pickerTexts(fake).includes("Bob"), "the carousel opens on the active Profile");
 
     press(fake, "Prev");

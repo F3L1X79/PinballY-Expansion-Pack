@@ -137,7 +137,7 @@ async function animateWheelThenPause(tables, index) {
 let sharedRandomGame = null;
 
 // One instance for every add-on, so a Random Game requested from the menu
-// while the startup prompt's one is animating is ignored.
+// while the Welcome Screen's one is animating is ignored.
 export function getRandomGame() {
     if (!sharedRandomGame) {
         sharedRandomGame = createRandomGame(createPinballYHost(), getProfileStore(), { animateTo: animateWheelThenPause });

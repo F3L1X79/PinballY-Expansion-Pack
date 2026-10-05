@@ -625,6 +625,7 @@ export function createFakePinballYHost({
         onGameListEvent: on,
         onSettingsEvent: on,
         createDrawingLayer,
+        removeDrawingLayer,
         createStyledText: (options) => new FakeStyledText(options, (text) => { logLines.push(text); }),
         allocateCommand,
         getBuiltInCommand,

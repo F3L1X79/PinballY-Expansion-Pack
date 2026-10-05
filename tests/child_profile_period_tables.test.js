@@ -1,8 +1,7 @@
 // ============================================================
 // Adult Period Tables for a Child Profile, through main.js on the fake
 // PinballY globals: while the Table of the Day is an Adult Table, the
-// child's startup prompt and main menu leave it out and an adult Profile
-// keeps it; the child's Streak goes on across that Period without counting
+// child's main menu leaves it out and an adult Profile keeps it; the child's Streak goes on across that Period without counting
 // it (Profile Stats and Achievement Progress agree) and still breaks on an
 // ordinary missed Period, while an adult's Streak breaks as before.
 // cabinet.json keeps those Periods next to the Table of the Day's lock,
@@ -14,6 +13,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, press } from "./welcome_screen_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CABINET = `${PROFILES}\\cabinet.json`;
@@ -58,18 +58,12 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     await import("../main.js");
     await settle();
     const store = getProfileStore();
-    const PROMPT = lang.startupPrompt;
     const LABELS = lang.customMenuLabels;
     const ACHIEVEMENTS = lang.achievements;
     const STATS = lang.profileStats;
 
-    const prompt = fake.currentMenu();
-    assert.equal(prompt.id, "startupChoicePrompt");
-    const promptTitles = prompt.items.map(item => item.title);
-    assert.equal(promptTitles[0], PROMPT.introWithPicks("Alice", null, MEDIEVAL.title), "the message leaves out the Table of the Day");
-    assert.ok(!promptTitles.includes(PROMPT.tableOfTheDay), "no Table of the Day choice for the child");
-    assert.ok(promptTitles.includes(PROMPT.tableOfTheWeek));
-    fake.selectMenuItem(PROMPT.stayOnLastPlayed);
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    press(fake, "Exit");
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     function mainMenuOffers() {

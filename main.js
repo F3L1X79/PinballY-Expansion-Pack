@@ -31,7 +31,7 @@ import * as achievementsEngine from "./addons/achievements_engine.js";
 import * as challenges from "./addons/challenges.js";
 import * as tableMastery from "./addons/table_mastery.js";
 import * as ratingPrompt from "./addons/rating_prompt.js";
-import * as startupChoicePrompt from "./addons/startup_choice_prompt.js";
+import * as welcomeScreen from "./addons/welcome_screen.js";
 
 // Scripts are initialized in this order, which is also the order their event
 // listeners are registered in, and listeners for the same event run in that
@@ -42,12 +42,12 @@ import * as startupChoicePrompt from "./addons/startup_choice_prompt.js";
 //   achievement checks after a game are deferred by one tick, so the stats
 //   are recorded first either way (the startup check needs no stats from
 //   this session).
-// - profilePicker must come before startupChoicePrompt, which offers
+// - profilePicker must come before the Welcome Screen, which offers
 //   "Change Player" only when the picker registered itself at init.
 // The other scripts don't depend on each other's order. In particular, the
-// startup prompt and rating dialogs go through the wheel dialog module,
+// Welcome Screen and the rating prompt go through the wheel dialog module,
 // which shows them in a fixed priority order, and Achievements are announced
-// by non-blocking toasts.
+// by non-blocking toasts, which wait for the Welcome Screen.
 const SCRIPTS = [
     // Interface: translations, status line, menus, filters, menu cleanup,
     // Profile picker, clock, launch overlay.
@@ -71,8 +71,9 @@ const SCRIPTS = [
     { key: "tableMastery", module: tableMastery },
     { key: "ratingPrompt", module: ratingPrompt },
 
-    // Startup dialog.
-    { key: "startupChoicePrompt", module: startupChoicePrompt },
+    // Welcome Screen, under the startup prompt's former key, which owners'
+    // env.local overrides still use.
+    { key: "startupChoicePrompt", module: welcomeScreen },
 ];
 
 const ENABLED_SCRIPTS = config.addOns;

@@ -187,17 +187,15 @@ export default {
         notNow: "Più tardi",
     },
 
-    startupPrompt: {
-        introWithPicks: (playerName, dayTitle, weekTitle) => {
-            const lines = [`Ciao, ${playerName}! Come vuoi iniziare?`];
-            if (dayTitle) lines.push(`Tavolo del giorno: ${dayTitle}`);
-            if (weekTitle) lines.push(`Tavolo della settimana: ${weekTitle}`);
-            return lines.join("\n");
-        },
-        stayOnLastPlayed: "Resta sull'ultimo tavolo giocato",
-        tableOfTheDay: "Avvia il tavolo del giorno",
-        tableOfTheWeek: "Avvia il tavolo della settimana",
-        randomTable: "Avvia un tavolo casuale",
+    // TODO: translation pass
+    welcomeScreen: {
+        greetings: { morning: "Good morning", afternoon: "Good afternoon", evening: "Good evening", night: "Still up" },
+        greetingWithName: (greeting, name) => [`${greeting}, `, name, "!"],
+        greetingAlone: (greeting) => `${greeting}!`,
+        closeTooltip: "Close",
+        stayOn: (tableTitle) => `Stay on ${tableTitle}`,
+        stayOnWheel: "Stay on the wheel",
+        randomTable: "Launch a random table",
     },
     // Lower status line text for the currently selected table.
     // [Filter.Count], [Game.Year], etc. are PinballY placeholders — keep them as-is.

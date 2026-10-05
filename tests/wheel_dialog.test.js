@@ -324,11 +324,28 @@ test("isIdle is false while a drawn dialog is open, true once it closed and noth
     dialogs.submit(drawn);
     await settle();
     assert.equal(dialogs.isIdle(), false);
-    assert.equal(dialogs.isDrawnDialogOpen(), true);
+    assert.equal(dialogs.hasDrawnDialog(), true);
 
     drawn.close();
     assert.equal(dialogs.isIdle(), true);
-    assert.equal(dialogs.isDrawnDialogOpen(), false);
+    assert.equal(dialogs.hasDrawnDialog(), false);
+});
+
+test("a drawn dialog counts from its submission, before its turn comes", async () => {
+    const { fake, dialogs } = setUp();
+    dialogs.submit(ratingDialog("A"));
+    await settle();
+    assert.equal(dialogs.hasDrawnDialog(), false, "a native dialog is no drawn one");
+
+    const drawn = drawnDialog(DIALOG_PRIORITY.RATING_PROMPT);
+    dialogs.submit(drawn);
+    assert.equal(dialogs.hasDrawnDialog(), true, "waiting behind the native one");
+
+    fake.closeMenu();
+    await settle();
+    assert.equal(drawn.opened, 1);
+    drawn.close();
+    assert.equal(dialogs.hasDrawnDialog(), false);
 });
 
 test("a native dialog submitted while a drawn one is open waits for it", async () => {

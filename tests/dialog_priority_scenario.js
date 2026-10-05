@@ -1,18 +1,22 @@
 ﻿// ============================================================
-// Shared scenario for the dialog priority tests: starts the startup
-// prompt, Achievements and rating prompt add-ons on the fake PinballY
+// Shared scenario for the dialog priority tests: starts the Welcome
+// Screen, Achievements and rating prompt add-ons on the fake PinballY
 // globals in a given init order (as main.js would), then checks that the
-// startup and rating prompts are the only dialogs, with the Achievements
-// announced by toasts alongside them.
+// Welcome Screen comes first, the Achievements unlocked at startup waiting
+// for it to close before their toasts show, and that the rating prompt is
+// the only native dialog, the Achievements going on with toasts alongside it.
 // ============================================================
 
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen, choose } from "./welcome_screen_reader.js";
 import config from "../common/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SECONDS_PER_HOUR = 3600;
+// Enough for the first toast to start.
+const TOAST_RISE_MS = 1000;
 
 // Guest's plays of the first table unlock Achievements at startup; the
 // second, never played nor rated, crosses the rating threshold in a
@@ -39,7 +43,7 @@ const MODULE_PATHS = {
     sessionStatsTracker: "../addons/session_stats_tracker.js",
     achievements: "../addons/achievements_engine.js",
     ratingPrompt: "../addons/rating_prompt.js",
-    startupChoicePrompt: "../addons/startup_choice_prompt.js",
+    startupChoicePrompt: "../addons/welcome_screen.js",
 };
 
 export async function runDialogPriorityScenario(initOrder) {
@@ -51,22 +55,26 @@ export async function runDialogPriorityScenario(initOrder) {
     config.askToRateAfterMinutesPlayed = 60;
 
     const { default: lang } = await import("../common/i18n.js");
-    for (const key of initOrder) {
-        const module = await import(MODULE_PATHS[key]);
-        module.default();
-    }
+    // All imported first, then started in one go, as main.js does: no tick
+    // runs between two inits.
+    const modules = await Promise.all(initOrder.map(key => import(MODULE_PATHS[key])));
+    for (const module of modules) module.default();
     await settle();
 
     const shownIds = () => fake.shownMenus().map(menu => menu.id);
 
     const toastCount = () => toastDrawings(fake).length;
 
-    // Startup: the prompt is the only dialog; the Achievements unlocked at
-    // startup are announced by toasts over it.
-    assert.deepEqual(shownIds(), ["startupChoicePrompt"], "the startup prompt is the only dialog");
-    assert.ok(toastCount() > 0, "an Achievement unlocked at startup is announced over the prompt");
-    fake.selectMenuItem(lang.startupPrompt.stayOnLastPlayed);
+    // Startup: the Welcome Screen first, no native dialog; the Achievements
+    // unlocked at startup wait for it to close.
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    assert.equal(isWelcomeScreenOpen(fake), true);
+    assert.deepEqual(shownIds(), [], "no native dialog over the Welcome Screen");
+    assert.equal(toastCount(), 0, "no toast over the Welcome Screen");
+    choose(fake, lang.welcomeScreen.stayOn("Medieval Madness"));
     await settle();
+    fake.advanceTime(TOAST_RISE_MS);
+    assert.ok(toastCount() > 0, "an Achievement unlocked at startup is announced once it closed");
 
     // Session: the rating prompt is the only dialog; the Achievements go on
     // with toasts.

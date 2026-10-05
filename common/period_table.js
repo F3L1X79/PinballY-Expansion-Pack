@@ -225,7 +225,7 @@ let sharedTableOfTheDay = null;
 let sharedTableOfTheWeek = null;
 
 // One instance of each for every add-on, so the Streak is recorded once per
-// play and the startup prompt, the main menu and the achievements agree.
+// play and the main menu and the achievements agree.
 // The first call starts listening for plays, so the Streak is only recorded
 // while at least one of those add-ons is enabled.
 export function getTableOfTheDay() {

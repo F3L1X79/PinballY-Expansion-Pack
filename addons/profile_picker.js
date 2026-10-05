@@ -1,6 +1,6 @@
 // ============================================================
 // Profile picker: a "Change Player" entry, right after "Play" in the main
-// menu and right after "Quit" in the exit menu (and in the startup prompt,
+// menu and right after "Quit" in the exit menu (and on the Welcome Screen,
 // through common/change_player.js), opens a drawn carousel of
 // the Profiles' Avatars above the menus, starting on the active Profile.
 // The flipper buttons move through it and wrap, with PinballY's navigation
@@ -20,7 +20,7 @@
 // A Profile Greeting (the Avatar growing slightly, a greeting below, then
 // a fade-out, with the optional profileGreetingSoundFile) follows every
 // pick after a short pause, the carousel staying still meanwhile. When the
-// startup prompt Add-on is off, it also greets the restored Profile once
+// Welcome Screen Add-on is off, it also greets the restored Profile once
 // at startup, after the same pause, as soon as the wheel is free of menus
 // and dialogs; a game or the carousel started first cancels it.
 // ============================================================
@@ -140,7 +140,7 @@ export default function init() {
     // The pause before the greeting and its animation frames; null when idle.
     let greetingDelayTimer = null;
     let greetingTimer = null;
-    // The startup prompt already greets the Profile by name: a second
+    // The Welcome Screen already greets the Profile by name: a second
     // greeting right after it would be too much.
     let startupGreetingPending = config.addOns.startupChoicePrompt === false;
     // A sound that cannot play is logged and never stops the greeting.
@@ -537,7 +537,7 @@ export default function init() {
     }));
 
     // The badge and the greeting must never cover a game; a player who
-    // started one from the startup prompt was greeted by it already.
+    // started one from the Welcome Screen was greeted by it already.
     host.on("gamestarted", safeHandler(SCRIPT_NAME, () => {
         badgeLayer.alpha = 0;
         startupGreetingPending = false;
@@ -553,7 +553,7 @@ export default function init() {
     // the carousel must not stay drawn over attract mode or keep the buttons.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
 
-    // Last, so the startup prompt never opens a carousel whose listeners are missing.
+    // Last, so the Welcome Screen never opens a carousel whose listeners are missing.
     registerChangePlayer(open);
     drawBadge();
     // One tick after the inits, so the dialogs every Add-on submits at

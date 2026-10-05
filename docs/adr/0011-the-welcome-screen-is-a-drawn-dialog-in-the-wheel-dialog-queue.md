@@ -9,5 +9,5 @@ The startup prompt was a native PinballY menu submitted to `common/wheel_dialog.
 ## Consequences
 
 - One queue still orders everything that waits for the player, native menu or drawn screen, by `DIALOG_PRIORITY`.
-- While the Welcome Screen is open, toasts and Confetti Showers wait for it to close, as they wait for a game: they do not show over it, an exception to their "over everything" rule (ADR 0003).
+- While the Welcome Screen is open, or waiting its turn in the queue, toasts and Confetti Showers wait for it to close, as they wait for a game: they do not show over it, an exception to their "over everything" rule (ADR 0003). Waiting from its submission keeps the Achievements checked at startup from slipping in during the tick before it opens.
 - The screen is the first one drawn, so nothing could be drawn ahead. It is drawn at once (about 70 ms on the cabinet) then faded in as a whole: handed to the drawing-ahead module piece by piece, it stayed empty at startup (prototype, 04/10/2026). At startup it waits 500 ms after the wheel is up, as the window is not laid out before.

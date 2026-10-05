@@ -67,19 +67,17 @@ export default {
         notNow: "Not Now",
     },
 
-    startupPrompt: {
-        introWithPicks: (playerName, dayTitle, weekTitle) => {
-            const lines = [`Hi, ${playerName}! How would you like to start?`];
-            if (dayTitle) lines.push('---');
-            if (dayTitle) lines.push(`Table of the Day: ${dayTitle}`);
-            if (weekTitle) lines.push('---');
-            if (weekTitle) lines.push(`Table of the Week: ${weekTitle}`);
-            return lines.join("\n");
-        },
-        stayOnLastPlayed: "Stay on Last Played Table",
-        tableOfTheDay: "Launch Table of the Day",
-        tableOfTheWeek: "Launch Table of the Week",
-        randomTable: "Launch a Random Table",
+    // The Welcome Screen, at startup (see addons/welcome_screen.js).
+    welcomeScreen: {
+        // By the hour: 5-12 h, 12-18 h, 18-22 h, 22-5 h.
+        greetings: { morning: "Good morning", afternoon: "Good afternoon", evening: "Good evening", night: "Still up" },
+        // The greeting's runs, the Profile's name (shown in gold) apart.
+        greetingWithName: (greeting, name) => [`${greeting}, `, name, "!"],
+        greetingAlone: (greeting) => `${greeting}!`,
+        closeTooltip: "Close",
+        stayOn: (tableTitle) => `Stay on ${tableTitle}`,
+        stayOnWheel: "Stay on the wheel",
+        randomTable: "Launch a random table",
     },
 
     // Lower status line text for the currently selected table.

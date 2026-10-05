@@ -199,7 +199,7 @@ function toScale(scale) {
 // for; the tests may leave it out.
 export function createAchievementToasts(host, {
     toastSeconds = DEFAULT_TOAST_SECONDS, soundFile = "", scale = DEFAULT_TOAST_SCALE, confettiShower = { start() {} },
-    wheelDialogs = { isDrawnDialogOpen: () => false, onDrawnDialogClosed() {} },
+    wheelDialogs = { hasDrawnDialog: () => false, onDrawnDialogClosed() {} },
 } = {}) {
     const holdMs = toHoldMs(toastSeconds);
     const look = scaleLook(toScale(scale));
@@ -304,7 +304,7 @@ export function createAchievementToasts(host, {
         if (host.getFullUIMode().runMode !== undefined) return;
         // A drawn dialog is the one exception to "over everything": the
         // toast, and the confetti it may start, would hide what it asks.
-        if (wheelDialogs.isDrawnDialogOpen()) return;
+        if (wheelDialogs.hasDrawnDialog()) return;
 
         const toast = waiting.shift();
         const layer = freeLayers.pop() || host.createDrawingLayer(ACHIEVEMENT_TOAST_Z_INDEX);

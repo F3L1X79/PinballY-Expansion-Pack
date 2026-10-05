@@ -8,7 +8,7 @@
 // dismissed; tells whether any dialog is on screen or waiting. A drawn
 // dialog (see docs/adr/0011) draws itself when its turn comes and holds the
 // queue until it reports closed; listeners hear it close, so toasts can
-// wait for it. Listens to "command", "menuclose" and "wheelmode".
+// wait for it from its submission on. Listens to "command", "menuclose" and "wheelmode".
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";
@@ -130,16 +130,17 @@ export function createWheelDialogs(host) {
     // the wheel knows it would not cover one.
     const isIdle = () => !shown && queue.length === 0;
 
-    // True while a drawn dialog is on screen: toasts and Confetti Showers
-    // wait for it to close instead of drawing over it.
-    const isDrawnDialogOpen = () => Boolean(shown && shown.drawn);
+    // True while a drawn dialog is on screen or waiting its turn: toasts
+    // and Confetti Showers wait for it to close instead of drawing over it,
+    // and must not start in the tick before it opens.
+    const hasDrawnDialog = () => Boolean(shown && shown.drawn) || queue.some(dialog => dialog.open);
 
     // listener: runs, guarded, each time a drawn dialog closes.
     function onDrawnDialogClosed(listener) {
         drawnClosedListeners.push(safeHandler(SCRIPT_NAME, listener));
     }
 
-    return { submit, isIdle, isDrawnDialogOpen, onDrawnDialogClosed };
+    return { submit, isIdle, hasDrawnDialog, onDrawnDialogClosed };
 }
 
 let sharedWheelDialogs = null;

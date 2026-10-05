@@ -163,6 +163,8 @@ export default function init() {
     // check above reads what it recorded.
     createSurprises(createPinballYHost(), profileStore);
 
-    // Startup check: its toasts show alongside the startup prompt.
-    checkForNewAchievements();
+    // Startup check, one tick after the inits, so a Welcome Screen submitted
+    // at startup is already waiting whatever the order in main.js, and its
+    // toasts wait for it.
+    setTimeout(safeCheckForNewAchievements, 0);
 }

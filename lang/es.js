@@ -187,17 +187,15 @@ export default {
         notNow: "Más tarde",
     },
 
-    startupPrompt: {
-        introWithPicks: (playerName, dayTitle, weekTitle) => {
-            const lines = [`¡Hola, ${playerName}! ¿Cómo quieres empezar?`];
-            if (dayTitle) lines.push(`Mesa del día: ${dayTitle}`);
-            if (weekTitle) lines.push(`Mesa de la semana: ${weekTitle}`);
-            return lines.join("\n");
-        },
-        stayOnLastPlayed: "Quedarme en la última mesa jugada",
-        tableOfTheDay: "Iniciar la mesa del día",
-        tableOfTheWeek: "Iniciar la mesa de la semana",
-        randomTable: "Iniciar una mesa al azar",
+    // TODO: translation pass
+    welcomeScreen: {
+        greetings: { morning: "Good morning", afternoon: "Good afternoon", evening: "Good evening", night: "Still up" },
+        greetingWithName: (greeting, name) => [`${greeting}, `, name, "!"],
+        greetingAlone: (greeting) => `${greeting}!`,
+        closeTooltip: "Close",
+        stayOn: (tableTitle) => `Stay on ${tableTitle}`,
+        stayOnWheel: "Stay on the wheel",
+        randomTable: "Launch a random table",
     },
 
     // Lower status line text for the currently selected table.
