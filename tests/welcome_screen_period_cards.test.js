@@ -60,10 +60,10 @@ test("the Welcome Screen shows a card per Period Table and launches the day's", 
     assert.equal(isWelcomeScreenOpen(fake), true);
 
     assert.deepEqual(periodCards(fake), [
-        { period: CARDS.day.period, name: "Medieval Madness", mastery: lang.tableMastery.levelNames[1], line: CARDS.day.streak(3) },
+        { period: CARDS.day.period, name: "Medieval Madness", mastery: lang.tableMastery.levelNames[1], line: `3 ${CARDS.day.streak}` },
         { period: CARDS.week.period, name: "Attack from Mars Special", mastery: lang.tableMastery.toDiscover, line: CARDS.week.played },
     ]);
-    assert.equal(CARDS.day.streak(3), "3 days in a row on the Table of the Day: keep it going!");
+    assert.equal(CARDS.day.streak, "days in a row on the Table of the Day: keep it going!", "the count is in the square before it");
     assert.deepEqual(periodCardLogos(fake), [MEDIEVAL_LOGO, "Attack from Mars Special"], "the title stands in for a missing logo");
 
     assert.deepEqual(readChoices(fake), [

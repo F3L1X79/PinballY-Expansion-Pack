@@ -90,7 +90,7 @@ export default function init() {
     function greyLineOf(periodTable, texts) {
         if (periodTable.isPlayedThisPeriod()) return { played: true, streak: 0, text: texts.played };
         const streak = periodTable.getStreak();
-        return streak >= 2 ? { played: false, streak, text: texts.streak(streak) } : null;
+        return streak >= 2 ? { played: false, streak, text: texts.streak } : null;
     }
 
     // A card per Period Table offered to the active Profile; reading it

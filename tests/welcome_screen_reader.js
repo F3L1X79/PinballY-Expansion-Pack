@@ -45,13 +45,13 @@ export const bottomRowLabels = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.
 const topToBottom = layers => [...layers].sort((a, b) => b.position().y - a.position().y);
 
 // Each Period Table card, top to bottom: { period, name, mastery (the
-// Mastery card's head), line (the grey line, null when there is none) }.
+// Mastery card's head), line (the grey line, its square's Streak count
+// first, as in "3 days in a row…"; null when there is none) }.
 export const periodCards = fake => topToBottom(shownLayers(fake, WELCOME_SCREEN_Z_INDEX.cards)).map(layer => {
     const [period, name, mastery, ...rest] = layer.texts();
-    // Between the head and the button's label: the level's number in its
-    // square, the Streak's in its own, and the grey line.
-    const line = rest.slice(0, -1).find(text => !/^\d+$/.test(text)) || null;
-    return { period, name, mastery, line };
+    // Between the level's number in its square and the button's label.
+    const lineTexts = rest.slice(1, -1);
+    return { period, name, mastery, line: lineTexts.length > 0 ? lineTexts.join(" ") : null };
 });
 
 // Each card's logo, top to bottom: its wheel image's path, or the title
