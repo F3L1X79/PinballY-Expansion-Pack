@@ -275,6 +275,20 @@ test("the card keeps its size and sits under the Profile badge", () => {
     assert.equal(Object.keys(card(fake).scale()).length, 1, "only one span set: it keeps its proportions");
 });
 
+test("a title that wraps makes the card one line taller, with the same proportions", () => {
+    const short = setUp({ randoms: [0, 0, 0.99] });
+    const shortCard = card(short.fake);
+    const manufacturer = "Very Long Manufacturer Name Amusements";
+    const long = setUp({ saved: { cabinet: { current: { week: WEEK, template: "manufacturerTables", param: manufacturer, target: 2 }, previous: null } } });
+    const longCard = card(long.fake);
+    assert.ok(cardShows(long.fake, TEXT.titles.manufacturerTables(2, manufacturer)));
+
+    assert.ok(longCard.canvasSize().height > shortCard.canvasSize().height);
+    assert.equal(longCard.canvasSize().width, shortCard.canvasSize().width);
+    const proportion = layer => layer.scale().ySpan / layer.canvasSize().height;
+    assert.ok(Math.abs(proportion(longCard) - proportion(shortCard)) < 1e-12);
+});
+
 test("without a Profile badge, the card sits in the top right corner, whatever the Profile", () => {
     const { fake, store } = setUp({ underBadge: false, randoms: [0, 0, 0.99] });
     assert.deepEqual(card(fake).position(), { x: 0, y: 0, align: "top right" });

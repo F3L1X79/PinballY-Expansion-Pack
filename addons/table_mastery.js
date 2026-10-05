@@ -18,7 +18,7 @@ import { createPinballYHost } from "../common/pinbally_host.js";
 import { getProfileStore } from "../common/profile_store.js";
 import { getDrawingAhead } from "../common/drawing_ahead.js";
 import { getChallenges } from "../common/challenge.js";
-import { BADGE_HEIGHT, CHALLENGE_CARD_CANVAS_HEIGHT } from "../common/challenge_card.js";
+import { BADGE_HEIGHT, challengeCardCanvasHeight } from "../common/challenge_card.js";
 import { createMasteryBar } from "../common/mastery_bar.js";
 import {
     masteryOf, movedByPlay, levelReachedByPlay, metalOf, collectionMasteryOfProfile, MAX_MASTERY_LEVEL,
@@ -39,8 +39,11 @@ export default function init() {
 
     // What the Challenge Card draws from: the card has already followed the
     // same events, since the Challenges Add-on starts before this one.
-    const cardShown = () => withChallenges && getChallenges().getActiveView() !== null;
-    const topOf = () => (underBadge ? BADGE_HEIGHT : 0) + (cardShown() ? CHALLENGE_CARD_CANVAS_HEIGHT : 0);
+    function cardHeight() {
+        const view = withChallenges && getChallenges().getActiveView();
+        return view ? challengeCardCanvasHeight(host, view.challenge) : 0;
+    }
+    const topOf = () => (underBadge ? BADGE_HEIGHT : 0) + cardHeight();
     const bar = createMasteryBar(host, getDrawingAhead(), { topOf });
     // Got at startup, so the Confetti Shower its toasts start is drawn
     // ahead by then.

@@ -3,8 +3,8 @@
 // (title, bar, value / target, days left), always in view at the top
 // right of the wheel screen, under the Profile badge or, with no badge
 // (Profile picker off), right in the corner, on its own drawing layer
-// (see docs/adr/0003). Always the same size; hidden when there is
-// no Challenge and while a game runs. When there is something new
+// (see docs/adr/0003). One title line high, one line higher when the
+// title wraps; hidden when there is no Challenge and while a game runs. When there is something new
 // (a Challenge to follow, a Profile switch, progress after a game) its
 // content changes in place and it lights up once. Once the Challenge is
 // completed, it says so until the end of the week. The first time a
@@ -27,10 +27,11 @@ export const CHALLENGE_CARD_Z_INDEX = 4500;
 // of shape. Sizes are on the cabinet's 1920 px high playfield; the card's
 // right edge lines up with the badge's Avatar, and the canvas leaves room
 // for the glow. The Mastery Bar lines up under it with the same sizes.
+// Heights are for a one-line title: everything under the title moves down
+// by the extra lines of a title that wraps.
 export const CARD_REFERENCE_HEIGHT = 1920;
 export const BADGE_HEIGHT = 170;
 const CANVAS = Object.freeze({ width: 400, height: 124 });
-export const CHALLENGE_CARD_CANVAS_HEIGHT = CANVAS.height;
 const CARD = Object.freeze({ x: 10, y: 8, width: 360, height: 106, padding: 14, border: 1, accentHeight: 3 });
 const HEADER = Object.freeze({ y: 14, size: 11 });
 const TITLE = Object.freeze({ y: 34, size: 16 });
@@ -51,19 +52,40 @@ const COLORS = Object.freeze({
     transparent: STEAMBALL_COLORS.transparent,
 });
 
-function drawText(host, dc, text, { y, size, weight = 400, color }) {
+const TEXT_WIDTH = CARD.width - 2 * CARD.padding;
+
+function styledText(host, text, { size, weight = 400, color }) {
     const styled = host.createStyledText({ textStyle: { font: FONT, size, weight, color } });
     styled.add(text);
-    const width = CARD.width - 2 * CARD.padding;
-    styled.draw(dc, { x: CARD.x + CARD.padding, y: CARD.y + y, width, height: styled.measure(width).height });
+    return styled;
+}
+
+function drawText(host, dc, text, { y, ...style }) {
+    const styled = styledText(host, text, style);
+    styled.draw(dc, { x: CARD.x + CARD.padding, y: CARD.y + y, width: TEXT_WIDTH, height: styled.measure(TEXT_WIDTH).height });
+}
+
+const titleOf = challenge => lang.challenges.titles[challenge.template](challenge.target, challenge.param);
+
+// How much taller than one line the challenge's title is once wrapped.
+function titleExtraHeight(host, challenge) {
+    const style = { size: TITLE.size, weight: 600 };
+    const oneLine = styledText(host, "X", style).measure(TEXT_WIDTH).height;
+    return Math.max(0, styledText(host, titleOf(challenge), style).measure(TEXT_WIDTH).height - oneLine);
+}
+
+// The card's canvas height for this Challenge, in reference px: the Mastery
+// Bar sits right under it.
+export function challengeCardCanvasHeight(host, challenge) {
+    return CANVAS.height + titleExtraHeight(host, challenge);
 }
 
 // Fading one-pixel frames around the card, widening outwards.
-function drawGlow(dc) {
+function drawGlow(dc, cardHeight) {
     const accentRgb = COLORS.accent & 0xFFFFFF;
     for (let ring = HIGHLIGHT.glowRings; ring >= 1; ring--) {
         const alpha = Math.round(HIGHLIGHT.glowMaxAlpha * (1 - ring / (HIGHLIGHT.glowRings + 1)));
-        dc.frameRect(CARD.x - ring, CARD.y - ring, CARD.width + 2 * ring, CARD.height + 2 * ring, 1, alpha * 2 ** 24 + accentRgb);
+        dc.frameRect(CARD.x - ring, CARD.y - ring, CARD.width + 2 * ring, cardHeight + 2 * ring, 1, alpha * 2 ** 24 + accentRgb);
     }
 }
 
@@ -85,31 +107,31 @@ function verdictFace({ challenge, reached, completed }) {
     };
 }
 
-function drawCard(host, dc, face, lit) {
+// extra: how much taller than one title line the card is drawn.
+function drawCard(host, dc, face, lit, extra) {
     const { header, challenge, value, completed, status } = face;
-    if (lit) drawGlow(dc);
-    dc.fillRect(CARD.x, CARD.y, CARD.width, CARD.height, COLORS.background);
-    dc.frameRect(CARD.x, CARD.y, CARD.width, CARD.height, CARD.border, COLORS.border);
+    const cardHeight = CARD.height + extra;
+    if (lit) drawGlow(dc, cardHeight);
+    dc.fillRect(CARD.x, CARD.y, CARD.width, cardHeight, COLORS.background);
+    dc.frameRect(CARD.x, CARD.y, CARD.width, cardHeight, CARD.border, COLORS.border);
     dc.fillRect(CARD.x, CARD.y, CARD.width, CARD.accentHeight, COLORS.accent);
 
     drawText(host, dc, header.toLocaleUpperCase(), { ...HEADER, weight: 600, color: COLORS.accent });
-    drawText(host, dc, lang.challenges.titles[challenge.template](challenge.target, challenge.param),
-        { ...TITLE, weight: 600, color: COLORS.title });
+    drawText(host, dc, titleOf(challenge), { ...TITLE, weight: 600, color: COLORS.title });
 
     const barX = CARD.x + CARD.padding;
-    const barWidth = CARD.width - 2 * CARD.padding;
-    dc.fillRect(barX, CARD.y + BAR.y, barWidth, BAR.height, COLORS.barTrack);
-    const filled = Math.round(barWidth * value / challenge.target);
-    if (filled > 0) dc.fillRect(barX, CARD.y + BAR.y, filled, BAR.height, lit ? COLORS.accentLit : COLORS.accent);
+    const barY = CARD.y + BAR.y + extra;
+    dc.fillRect(barX, barY, TEXT_WIDTH, BAR.height, COLORS.barTrack);
+    const filled = Math.round(TEXT_WIDTH * value / challenge.target);
+    if (filled > 0) dc.fillRect(barX, barY, filled, BAR.height, lit ? COLORS.accentLit : COLORS.accent);
 
     drawText(host, dc, status,
-        { ...PROGRESS, weight: completed ? 600 : 400, color: completed ? COLORS.accent : COLORS.text });
+        { ...PROGRESS, y: PROGRESS.y + extra, weight: completed ? 600 : 400, color: completed ? COLORS.accent : COLORS.text });
 }
 
 // underBadge: false when there is no Profile badge to leave room for.
 export function createChallengeCard(host, challenges, profileStore, { underBadge = true } = {}) {
     const layer = host.createDrawingLayer(CHALLENGE_CARD_Z_INDEX);
-    layer.setScale({ ySpan: CANVAS.height / CARD_REFERENCE_HEIGHT });
     layer.setPos(0, underBadge ? -BADGE_HEIGHT / CARD_REFERENCE_HEIGHT : 0, "top right");
     let timer = null;
 
@@ -133,7 +155,13 @@ export function createChallengeCard(host, challenges, profileStore, { underBadge
             return;
         }
         layer.alpha = 1;
-        layer.draw(dc => drawCard(host, dc, face, lit), CANVAS.width, CANVAS.height);
+        // At least as tall as the week's Challenge needs, the Mastery Bar's
+        // place under it, while the previous one's verdict shows.
+        const view = challenges.getActiveView();
+        const extra = Math.max(titleExtraHeight(host, face.challenge), view ? titleExtraHeight(host, view.challenge) : 0);
+        // The span follows the canvas height, so a taller card keeps its proportions.
+        layer.setScale({ ySpan: (CANVAS.height + extra) / CARD_REFERENCE_HEIGHT });
+        layer.draw(dc => drawCard(host, dc, face, lit, extra), CANVAS.width, CANVAS.height + extra);
     }
 
     const drawCurrent = lit => {
