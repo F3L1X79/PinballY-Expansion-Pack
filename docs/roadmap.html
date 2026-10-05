@@ -238,39 +238,9 @@
     </div>
   </section>
 
-  <!-- ===== To try on the cabinet ===== -->
-  <section>
-    <p class="eyebrow">À essayer sur la borne <span class="count">(11)</span></p>
-    <div class="panel">
-      <ul class="totry">
-        <li><strong>Profiles marqués</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/97">#97</a></span><span class="what">Admin Profile, Child Profile, « Réinitialiser un profil » dans le menu Exit</span></li>
-        <li><strong>Menus allégés</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/103">#103</a></span><span class="what">sections du menu principal, nouveaux noms, Menu Cleanup</span></li>
-        <li><strong>Play Log</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/110">#110</a></span><span class="what">chaque Play dans <code>play-log-&lt;année&gt;.json</code>, mis de côté par la Profile Reset</span></li>
-        <li><strong>Règle d'une minute</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/113">#113</a></span><span class="what">seules les Plays comptent, sauf pour le Rage Quit</span></li>
-        <li><strong>Challenges rééquilibrés</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/119">#119</a></span><span class="what">chaque modèle tire son objectif dans sa propre plage</span></li>
-        <li><strong>Tour du monde et secrets</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/124">#124</a></span><span class="what">tour d'une traite de « Toutes les tables », secrets en « ??? » avec indice</span></li>
-        <li><strong>Profile Reset avec message</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/128">#128</a> <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/129">#129</a></span><span class="what">message « OK », et « Tous les profils » d'un coup</span></li>
-        <li><strong>Barre de défilement</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/130">#130</a></span><span class="what">barre dorée de l'Achievement List, à juger</span></li>
-        <li><strong>Confetti Shower</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/131">#131</a></span><span class="what">avec un Challenge réussi ou un Achievement Platinum, <code>CONFETTI_SOUND_FILE</code></span></li>
-        <li><strong>Maîtrise des tables</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/134">#134</a></span><span class="what">Mastery Bar qui s'allume, Mastery Toast, confettis au niveau 10</span></li>
-        <li><strong>Nouveaux Secret Achievements</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/138">#138</a></span><span class="what">huit surprises (Oiseau de nuit, Vendredi 13…), trois secrets re-classés</span></li>
-      </ul>
-    </div>
-  </section>
-
   <!-- ===== Queue ===== -->
   <section>
     <p class="eyebrow">File d'attente <span class="count" id="queue-count"></span></p>
-    <div class="lede"><strong>Pourquoi cet ordre :</strong>
-      <ul class="why">
-        <li>finir ce qui est en cours ;</li>
-        <li>lancer tôt ce qui accumule des données ;</li>
-        <li>préparer l'arrivée de nouveaux joueurs ;</li>
-        <li>écran d'accueil puis fiche joueur (même surface), avant les records par Profile et leurs rivalités ;</li>
-        <li>Year in Pinball avant les Challenges adaptés (qui attendent des mois de Play Log) ;</li>
-        <li>traductions et distribution à la fin, quand tout est stable.</li>
-      </ul>
-    </div>
     <p class="lede">Glisse une ligne, ou utilise ▲ ▼ (ou <kbd>ALT</kbd> + flèches sur la ligne surlignée), pour changer la priorité. Ton ordre reste dans ce navigateur : copie-le et colle-le-moi pour que je l'écrive dans le fichier.</p>
 
     <div class="toolbar">
@@ -315,6 +285,24 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="stats" data-track="profiles" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Profile Stats des autres Profiles et comparaison</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Consulter les Profile Stats d'un autre Profile que l'actif, puis comparer tous les Profiles de la maison.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Avant la <a href="#stats-drawn">fiche joueur dessinée (n° <span data-ref="stats-drawn"></span>)</a>, qui reprendra la comparaison</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Reporté pendant le grilling des Profile Stats : la première version ne montre que le Profile actif. Les données de chaque Profile sont déjà dans son <code>profile.json</code>. Un classement des Challenges réussis pourrait s'y ajouter. L'Unlock Rate (Avatars des autres Profiles sur chaque Achievement) est déjà dans l'Achievement List dessinée.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="stats-drawn" data-track="profiles" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -325,7 +313,7 @@
           </div>
           <p>Passer les Profile Stats et leur liste de tables des menus natifs à une vraie fiche joueur dessinée, avec la palette commune. Elle gagne un <strong>Player Level</strong>, calculé à partir des Achievement Ranks des succès Notified et annoncé par un Level Toast, et de nouvelles stats : durée moyenne d'une partie, table préférée, première table jouée.</p>
           <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Grillé le 05/10/2026. Flow Matt : <code>/prototype</code> (disposition, deux ou trois variantes sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que le Welcome Screen ; avant les <a href="#stats">Stats des autres (n° <span data-ref="stats"></span>)</a></div>
+          <div class="links">Grillé le 05/10/2026. Flow Matt : <code>/prototype</code> (disposition, deux ou trois variantes sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que le Welcome Screen ; après les <a href="#stats">Stats des autres (n° <span data-ref="stats"></span>)</a></div>
           <details>
             <summary>Décisions</summary>
             <ul>
@@ -384,24 +372,6 @@
               <li>Child Profile et Guest : participent-ils aux rivalités ? Guest n'a ni Avatar ni vrai joueur derrière.</li>
             </ul>
             <p class="ctx">Proposé le 01/10/2026, avec les records par Profile.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="stats" data-track="profiles" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Profile Stats des autres Profiles et comparaison</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Consulter les Profile Stats d'un autre Profile que l'actif, puis comparer tous les Profiles de la maison.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Sur l'écran des <a href="#stats-drawn">Profile Stats dessinées (n° <span data-ref="stats-drawn"></span>)</a></div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Reporté pendant le grilling des Profile Stats : la première version ne montre que le Profile actif. Les données de chaque Profile sont déjà dans son <code>profile.json</code>. Un classement des Challenges réussis pourrait s'y ajouter. L'Unlock Rate (Avatars des autres Profiles sur chaque Achievement) est déjà dans l'Achievement List dessinée.</p>
           </details>
         </div>
       </li>
@@ -559,8 +529,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>05/10 <span class="count">(1)</span></summary>
+          <summary>05/10 <span class="count">(2)</span></summary>
           <ol>
+            <li><strong>La comparaison des Profile Stats passe en tête de file</strong>
+              <span>Choix de Félix : consulter et comparer les Profiles de la maison vient juste après le Welcome Screen, avant la fiche joueur dessinée.</span></li>
             <li><strong>Welcome Screen : la Streak dite comme un rendez-vous</strong>
               <span>La table du jour change chaque jour : la série compte les jours d'affilée sur la table du jour, pas sur une table. La ligne le dit (« 5 jours d'affilée sur la table du jour : continue ! ») et n'apparaît qu'à partir de 2. Celle de la semaine reste. Une série globale de jours sur la borne est mise en fin de file.</span></li>
           </ol>
@@ -738,6 +710,26 @@
         <li><code>.claude/reference/pinbally-examples.md</code> : idiomes des exemples officiels.</li>
         <li><code>docs/pinbally/Help/*.html</code> : aide complète (169 pages).</li>
         <li><code>docs/research/system-scripts.md</code> : ce que font vraiment <code>SystemClasses.js</code> et <code>CParser.js</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== To try on the cabinet ===== -->
+  <section>
+    <p class="eyebrow">À essayer sur la borne <span class="count">(11)</span></p>
+    <div class="panel">
+      <ul class="totry">
+        <li><strong>Profiles marqués</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/97">#97</a></span><span class="what">Admin Profile, Child Profile, « Réinitialiser un profil » dans le menu Exit</span></li>
+        <li><strong>Menus allégés</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/103">#103</a></span><span class="what">sections du menu principal, nouveaux noms, Menu Cleanup</span></li>
+        <li><strong>Play Log</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/110">#110</a></span><span class="what">chaque Play dans <code>play-log-&lt;année&gt;.json</code>, mis de côté par la Profile Reset</span></li>
+        <li><strong>Règle d'une minute</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/113">#113</a></span><span class="what">seules les Plays comptent, sauf pour le Rage Quit</span></li>
+        <li><strong>Challenges rééquilibrés</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/119">#119</a></span><span class="what">chaque modèle tire son objectif dans sa propre plage</span></li>
+        <li><strong>Tour du monde et secrets</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/124">#124</a></span><span class="what">tour d'une traite de « Toutes les tables », secrets en « ??? » avec indice</span></li>
+        <li><strong>Profile Reset avec message</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/128">#128</a> <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/129">#129</a></span><span class="what">message « OK », et « Tous les profils » d'un coup</span></li>
+        <li><strong>Barre de défilement</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/130">#130</a></span><span class="what">barre dorée de l'Achievement List, à juger</span></li>
+        <li><strong>Confetti Shower</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/131">#131</a></span><span class="what">avec un Challenge réussi ou un Achievement Platinum, <code>CONFETTI_SOUND_FILE</code></span></li>
+        <li><strong>Maîtrise des tables</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/134">#134</a></span><span class="what">Mastery Bar qui s'allume, Mastery Toast, confettis au niveau 10</span></li>
+        <li><strong>Nouveaux Secret Achievements</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/138">#138</a></span><span class="what">huit surprises (Oiseau de nuit, Vendredi 13…), trois secrets re-classés</span></li>
       </ul>
     </div>
   </section>
