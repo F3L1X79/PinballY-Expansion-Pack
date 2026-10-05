@@ -189,7 +189,7 @@ export default {
 
     // The Welcome Screen, at startup (see addons/welcome_screen.js).
     welcomeScreen: {
-        greetings: { morning: "Bonjour", afternoon: "Bon après-midi", evening: "Bonsoir", night: "Bien le bonsoir" },
+        greetings: { morning: "Bien le bonjour", afternoon: "Hey salut", evening: "Bien le bonsoir", night: "Salut nocturne" },
         greetingWithName: (greeting, name) => [`${greeting}, `, name, " !"],
         greetingAlone: (greeting) => `${greeting} !`,
         closeTooltip: "Fermer",

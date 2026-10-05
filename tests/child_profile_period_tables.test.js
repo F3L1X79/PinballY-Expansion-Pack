@@ -67,7 +67,7 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     const CARDS = lang.welcomeScreen.periodCards;
     assert.deepEqual(periodCards(fake).map(card => card.period), [CARDS.week.period], "no Table of the Day card for the child");
     assert.deepEqual(readChoices(fake), [
-        lang.profiles.menuEntry, lang.welcomeScreen.closeTooltip, CARDS.week.period, lang.welcomeScreen.stayOnWheel, lang.welcomeScreen.randomTable,
+        lang.profiles.menuEntry, lang.welcomeScreen.closeTooltip, CARDS.week.period, lang.welcomeScreen.stayOn("Medieval Madness"), lang.welcomeScreen.randomTable,
     ], "the selection skips it");
     press(fake, "Exit");
 

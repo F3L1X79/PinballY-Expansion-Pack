@@ -7,7 +7,7 @@
 // it) and offers to close, to play the Table of the Day or of the Week
 // (one card each, with its Table Mastery and the active Profile's Streak;
 // reading them picks and locks this Period's tables, and Select launches
-// one), to stay on the Last Played Table or to launch a Random Game. It
+// one), to stay on the table selected on the wheel or to launch a Random Game. It
 // is a drawn dialog of the wheel dialog module (docs/adr/0011), submitted
 // at init with the startup priority, so it comes before any other dialog and the
 // toasts wait for it. It opens 500 ms after its turn comes, drawn at once
@@ -79,18 +79,6 @@ export default function init() {
     // The screen on show: its layers, choices and selection; null when closed.
     let shown = null;
 
-    // The active Profile's most recent Play, across the whole collection.
-    function lastPlayedTitle() {
-        let last = null;
-        for (const [configId, play] of Object.entries(store.getProfileData().plays)) {
-            if (!play.lastPlayed || (last && play.lastPlayed <= last.lastPlayed)) continue;
-            // A table removed from PinballY since is skipped.
-            const game = host.getGameInfo(configId);
-            if (game) last = { title: game.title, lastPlayed: play.lastPlayed };
-        }
-        return last ? cleanTitle(last.title) : null;
-    }
-
     // The grey line: played this Period, or else a Streak of at least 2.
     function greyLineOf(periodTable, texts) {
         if (periodTable.isPlayedThisPeriod()) return { played: true, streak: 0, text: texts.played };
@@ -136,7 +124,9 @@ export default function init() {
         const profile = store.getActiveProfile();
         const picker = getChangePlayer() !== null;
         const greeting = TEXT.greetings[partOfDay(host.now().getHours())];
-        const stay = lastPlayedTitle();
+        // What the wheel shows behind the screen: staying keeps it.
+        const current = host.getCurrentTable();
+        const stay = current ? cleanTitle(current.title) : null;
         const cards = readCards();
         return {
             picker,

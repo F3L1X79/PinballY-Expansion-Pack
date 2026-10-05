@@ -63,7 +63,7 @@ test("a Child Profile never sees an Adult Table on the wheel, in the Random Game
     const { gameList } = globalThis;
 
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
-    choose(fake, lang.welcomeScreen.stayOnWheel);
+    choose(fake, lang.welcomeScreen.stayOn("Medieval Madness"));
     assert.deepEqual(wheel(fake), [MEDIEVAL, MARS], "the Welcome Screen leaves the child on the next table");
 
     gameList.setCurFilter("All");

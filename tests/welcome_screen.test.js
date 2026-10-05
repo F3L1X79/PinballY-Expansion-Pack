@@ -4,8 +4,8 @@
 // before, greets the active Profile by the hour with its Avatar, selects
 // the Avatar (its tooltip showing only while selected, like the cross's),
 // loops through its choices with Next / Prev and the navigation sound,
-// names the Last Played Table across the whole collection, title cleaned,
-// swallows every button while open so the wheel never moves, and closes
+// names the table selected on the wheel (title cleaned), not the Last
+// Played Table, swallows every button while open so the wheel never moves, and closes
 // on Select on Stay.
 // ============================================================
 
@@ -32,14 +32,14 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     fake.addFile(`${PROFILES}\\Alice\\profile.json`, JSON.stringify({
         version: 1, notified: [],
         plays: {
-            [MEDIEVAL.configId]: { count: 3, seconds: 900, lastPlayed: "2026-09-20T21:00:00" },
-            [MARS.configId]: { count: 1, seconds: 120, lastPlayed: "2026-09-22T21:00:00" },
+            [MEDIEVAL.configId]: { count: 3, seconds: 900, lastPlayed: "2026-09-22T21:00:00" },
+            [MARS.configId]: { count: 1, seconds: 120, lastPlayed: "2026-09-20T21:00:00" },
         },
     }));
     fake.addFile(`${PROFILES}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Alice" }));
     fake.addFile(NAVIGATION_SOUND);
-    // The Last Played Table is not in the current wheel selection.
-    fake.setWheelTables([MEDIEVAL.configId]);
+    // The wheel is not on the Last Played Table (Medieval Madness).
+    fake.setWheelTables([MARS.configId, MEDIEVAL.configId]);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
@@ -74,7 +74,7 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     for (const button of ["Next", "Prev", "Launch", "Info", "Coin"]) {
         assert.equal(press(fake, button).defaultPrevented, true, `${button} is swallowed`);
     }
-    assert.equal(fake.getCurrentTable().configId, MEDIEVAL.configId, "the wheel never moved");
+    assert.equal(fake.getCurrentTable().configId, MARS.configId, "the wheel never moved");
 
     choose(fake, TEXT.stayOn("Attack from Mars Special"));
     assert.equal(isWelcomeScreenOpen(fake), false);

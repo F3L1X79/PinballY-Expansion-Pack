@@ -73,7 +73,7 @@ The Period Table whose Period is a day; prefers tables never played, otherwise t
 The Period Table whose Period is a week; picked purely at random.
 
 **Welcome Screen**:
-The screen shown over the dimmed wheel when PinballY starts, and again after Change Player picked another Profile, that greets the active Profile by its Avatar and name, shows the Table of the Day and the Table of the Week with what they mean for that Profile, and offers to stay on the Last Played Table, to change player or to launch a Period Table or a Random Game. While it is open, toasts and Confetti Showers wait for it to close. Shown as "Écran d'accueil" in French.
+The screen shown over the dimmed wheel when PinballY starts, and again after Change Player picked another Profile, that greets the active Profile by its Avatar and name, shows the Table of the Day and the Table of the Week with what they mean for that Profile, and offers to stay on the table selected on the wheel, to change player or to launch a Period Table or a Random Game. While it is open, toasts and Confetti Showers wait for it to close. Shown as "Écran d'accueil" in French.
 _Avoid_: startup prompt, splash screen, dialog (it does more than ask a question)
 
 **Last Played Table**:

@@ -2,8 +2,8 @@
 // Welcome Screen in French, through main.js on the fake PinballY globals,
 // at 18 h: a menu opened before the startup pause ends keeps it closed
 // until the menu closes and another pause ends; it greets the Profile by
-// its name ("Bonsoir"), offers to stay on the wheel to a Profile without
-// any Play, shows the Avatar's tooltip in French, and Exit closes it.
+// its name with the evening greeting, offers to stay on the wheel when
+// no table is selected, shows the Avatar's tooltip in French, and Exit closes it.
 // ============================================================
 
 import { test } from "node:test";
@@ -23,6 +23,7 @@ test("the Welcome Screen waits for a menu to close, greets in the evening and cl
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
     config.language = "fr";
 
+    const { default: lang } = await import("../common/i18n.js");
     await import("../main.js");
     await settle();
 
@@ -35,7 +36,7 @@ test("the Welcome Screen waits for a menu to close, greets in the evening and cl
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
 
-    assert.equal(greeting(fake), "Bonsoir, Chloé !");
+    assert.equal(greeting(fake), `${lang.welcomeScreen.greetings.evening}, Chloé !`);
     assert.deepEqual(bottomRowLabels(fake), ["Rester sur la roue", "Lancer une table au hasard"]);
     assert.deepEqual(highlighted(fake), { label: null, tooltip: "Changer de joueur" });
 
