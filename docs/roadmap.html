@@ -233,8 +233,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong><a href="#startup-screen">Welcome Screen</a></strong> (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/145">#145</a>)</p>
-      <span class="next">Ensuite : vérification visuelle sur la borne (#152, ticket humain)</span>
+      <p><strong><a href="#stats-drawn">Fiche joueur dessinée</a></strong> (grillée le 05/10)</p>
+      <span class="next">Ensuite : <code>/prototype</code> de la disposition sur la borne</span>
     </div>
   </section>
 
@@ -259,28 +259,27 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="startup-screen" data-track="profiles" data-rank="gold">
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="stats-drawn" data-track="profiles" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Welcome Screen : l'écran d'accueil dessiné, avec la Collection Mastery</h3>
+            <h3>Fiche joueur : Profile Stats en écran dessiné, avec un niveau</h3>
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
-          <p>Le startup prompt natif devient un panneau Steamball centré sur la roue assombrie : l'Avatar en haut à gauche pour changer de joueur, une croix en haut à droite, un salut selon l'heure, la Collection Mastery, une carte par Period Table (Table Mastery, Streak ou coche, bouton « Y aller »), puis « Rester » et « Lancer une table au hasard », parcourus aux flippers avec un halo doré.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Grillé le 03/10/2026 (ADR 0011). Prototype validé sur la borne le 04/10/2026 (branche <code>prototype/welcome-screen</code>, verdict dans son dernier commit). Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/145">#145</a>, tickets #146 à #152 publiés le 04/10/2026. Tickets #146 à #151 implémentés le 05/10/2026 ; reste la vérification visuelle sur la borne (#152, ticket humain). Même surface et même palette que la <a href="#stats-drawn">fiche joueur (n° <span data-ref="stats-drawn"></span>)</a></div>
+          <p>Passer les Profile Stats et leur liste de tables des menus natifs à une vraie fiche joueur dessinée, avec la palette commune. Elle gagne un <strong>Player Level</strong>, calculé à partir des Achievement Ranks des succès Notified et annoncé par un Level Toast, et de nouvelles stats : durée moyenne d'une partie, table préférée, première table jouée.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Grillé le 05/10/2026. Flow Matt : <code>/prototype</code> (disposition, deux ou trois variantes sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que le Welcome Screen ; avant les <a href="#stats">Stats des autres (n° <span data-ref="stats"></span>)</a></div>
           <details>
             <summary>Décisions</summary>
             <ul>
-              <li>Au démarrage, et de nouveau après un Change Player, redessiné pour le nouveau Profile ; il remplace alors la Profile Greeting. Pas de repli natif : une borne trop lente désactive l'Add-on.</li>
-              <li>En haut : l'Avatar à gauche (focus par défaut, bulle noire « Changer de joueur » à sa droite), la croix à droite (bulle « Fermer » à sa gauche), le salut dessous (Bonjour 5–12, Bon après-midi 12–18, Bonsoir 18–22, « Bien le bonsoir » 22–5), sans emojis ni phrase générique, puis la Collection Mastery sur la carte de la Mastery Bar, alignée sur les détails des tables : « Objectif : 10 tables &lt;niveau suivant&gt; » à gauche, « Actuel : 7/10 » à droite, barre et carré dans le métal du palier. Picker désactivé : ni Avatar ni nom.</li>
-              <li>Au milieu, une carte par Period Table : logo, « TABLE DU JOUR / DE LA SEMAINE », nom sur une ligne (réduit jusqu'à 18, puis « … »), la carte de Table Mastery et un bouton « Y aller » à droite, centré sur elle. Une ligne grise seulement s'il y a lieu : la coche dans un petit carré et « Jouée aujourd'hui / cette semaine », ou, à partir de 2, le compte de la Streak dans le carré et « jours d'affilée sur la table du jour : continue ! » (« semaines d'affilée sur la table de la semaine » pour l'autre carte) : la série suit le rendez-vous, pas la table. Chaque carte s'ajuste à son contenu. Pas de Challenge : la Challenge Card l'affiche.</li>
-              <li>En bas, côte à côte : « Rester sur &lt;Last Played Table&gt; » (ou « Rester sur la roue ») avec une flèche de retour dans un carré, et « Lancer une table au hasard » avec la boîte « ? ». Flippers en boucle Avatar → croix → jour → semaine → Rester → Hasard, halo doré sur le choix, aucun liseré doré au repos, Exit ferme. Pour un Child Profile, une Period Table qui est une Adult Table perd sa carte.</li>
-              <li>Tout dessiné d'un coup (~70 ms sur la borne) puis un seul fondu : le dessin d'avance laissait l'écran vide au démarrage. Au démarrage, ouvert 500 ms après l'arrivée sur la roue (la fenêtre n'est pas encore mise en page avant). Une fenêtre portrait a une colonne de logo plus étroite. Un dialogue « dessiné » de <code>wheel_dialog.js</code> avec la priorité du startup prompt (ADR 0011) ; toasts et Confetti Showers attendent sa fermeture.</li>
-              <li>Collection Mastery : le palier N veut dire 10 tables au Mastery Level N (toutes, s'il y en a moins de 10), de 0 à 10 ; 120 h au minimum pour le palier 10. Progression affichée « Actuel : 7/10 » avec une barre. Seule une Profile Reset fait perdre un palier.</li>
-              <li>Un palier atteint s'annonce par un toast et une Confetti Shower : un ticket à part dans la même spec.</li>
+              <li>Player Level, affiché « Niveau 7 » avec une barre et « Actuel : 805 / 875 », sans nom de niveau. Points des succès Notified : Bronze 10, Silver 25, Gold 50, Platinum 100. Niveau 2 à 50 points, puis chaque niveau coûte 25 de plus (sur 120 tables : niveau 2 la première semaine, 7 après trois mois, 16 tout débloqué), sans plafond.</li>
+              <li>Niveau recalculé à chaque fois : il peut baisser si un groupe rétrécit (Rank plus bas) ou si un Add-on est désactivé ; un succès qui n'est plus Unlocked garde ses points. Guest a le sien.</li>
+              <li>Level Toast (couleur propre, ni trophée ni confettis) après les Achievement Toasts, un seul par retour sur la roue ; toute montée après une Play s'annonce, même vers un niveau déjà eu. Rien pour le niveau déjà acquis au démarrage ni à l'installation. Ni dans le Welcome Screen ni sur le picker.</li>
+              <li>Panneau fixe dessiné d'un coup comme le Welcome Screen, ouvert directement depuis le menu principal. En tête : Avatar, nom, Player Level, Collection Mastery. Puis parties, temps total, durée moyenne, collection, succès (ouvre l'Achievement List), Challenges, Streaks, « Constructeur favori » (sans VPX Community), « Décennie favorite », « Table préférée » (le plus de temps), première table jouée (première entrée du Play Log). Pas de dernière table jouée.</li>
+              <li>Les listes natives deviennent deux boutons qui mettent la roue sur une sélection : le Hall of Fame et la nouvelle sélection Tables to Discover (« Tables à découvrir »), aussi dans le menu principal ; tables visibles du Profile, ni cachées ni non configurées.</li>
             </ul>
+            <p class="ctx">Reporté pendant le grilling de l'Achievement List dessinée (27/09/2026). Le niveau remplace l'idée externe d'un système d'XP (30/09/2026) : aucune donnée nouvelle, aucun barème d'activités à équilibrer.</p>
           </details>
         </div>
       </li>
@@ -295,35 +294,10 @@
           </div>
           <p>Consulter les Profile Stats d'un autre Profile que l'actif, puis comparer tous les Profiles de la maison.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Avant la <a href="#stats-drawn">fiche joueur dessinée (n° <span data-ref="stats-drawn"></span>)</a>, qui reprendra la comparaison</div>
+          <div class="links">Sur l'écran des <a href="#stats-drawn">Profile Stats dessinées (n° <span data-ref="stats-drawn"></span>)</a></div>
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Reporté pendant le grilling des Profile Stats : la première version ne montre que le Profile actif. Les données de chaque Profile sont déjà dans son <code>profile.json</code>. Un classement des Challenges réussis pourrait s'y ajouter. L'Unlock Rate (Avatars des autres Profiles sur chaque Achievement) est déjà dans l'Achievement List dessinée.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="stats-drawn" data-track="profiles" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Fiche joueur : Profile Stats en écran dessiné, avec un niveau</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
-          </div>
-          <p>Passer les Profile Stats et leur liste de tables des menus natifs à une vraie fiche joueur dessinée, avec la palette commune. Elle gagne un <strong>Player Level</strong>, calculé à partir des Achievement Ranks des succès Notified et annoncé par un Level Toast, et de nouvelles stats : durée moyenne d'une partie, table préférée, première table jouée.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Grillé le 05/10/2026. Flow Matt : <code>/prototype</code> (disposition, deux ou trois variantes sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que le Welcome Screen ; après les <a href="#stats">Stats des autres (n° <span data-ref="stats"></span>)</a></div>
-          <details>
-            <summary>Décisions</summary>
-            <ul>
-              <li>Player Level, affiché « Niveau 7 » avec une barre et « Actuel : 805 / 875 », sans nom de niveau. Points des succès Notified : Bronze 10, Silver 25, Gold 50, Platinum 100. Niveau 2 à 50 points, puis chaque niveau coûte 25 de plus (sur 120 tables : niveau 2 la première semaine, 7 après trois mois, 16 tout débloqué), sans plafond.</li>
-              <li>Niveau recalculé à chaque fois : il peut baisser si un groupe rétrécit (Rank plus bas) ou si un Add-on est désactivé ; un succès qui n'est plus Unlocked garde ses points. Guest a le sien.</li>
-              <li>Level Toast (couleur propre, ni trophée ni confettis) après les Achievement Toasts, un seul par retour sur la roue ; toute montée après une Play s'annonce, même vers un niveau déjà eu. Rien pour le niveau déjà acquis au démarrage ni à l'installation. Ni dans le Welcome Screen ni sur le picker.</li>
-              <li>Panneau fixe dessiné d'un coup comme le Welcome Screen, ouvert directement depuis le menu principal. En tête : Avatar, nom, Player Level, Collection Mastery. Puis parties, temps total, durée moyenne, collection, succès (ouvre l'Achievement List), Challenges, Streaks, « Constructeur favori » (sans VPX Community), « Décennie favorite », « Table préférée » (le plus de temps), première table jouée (première entrée du Play Log). Pas de dernière table jouée.</li>
-              <li>Les listes natives deviennent deux boutons qui mettent la roue sur une sélection : le Hall of Fame et la nouvelle sélection Tables to Discover (« Tables à découvrir »), aussi dans le menu principal ; tables visibles du Profile, ni cachées ni non configurées.</li>
-            </ul>
-            <p class="ctx">Reporté pendant le grilling de l'Achievement List dessinée (27/09/2026). Le niveau remplace l'idée externe d'un système d'XP (30/09/2026) : aucune donnée nouvelle, aucun barème d'activités à équilibrer.</p>
           </details>
         </div>
       </li>
@@ -531,8 +505,8 @@
         <details open>
           <summary>05/10 <span class="count">(2)</span></summary>
           <ol>
-            <li><strong>La comparaison des Profile Stats passe en tête de file</strong>
-              <span>Choix de Félix : consulter et comparer les Profiles de la maison vient juste après le Welcome Screen, avant la fiche joueur dessinée.</span></li>
+            <li><strong>La comparaison des Profile Stats juste après la fiche joueur</strong>
+              <span>Choix de Félix : consulter et comparer les Profiles de la maison passe en n° 2, avant les records par Profile et leurs rivalités.</span></li>
             <li><strong>Welcome Screen : la Streak dite comme un rendez-vous</strong>
               <span>La table du jour change chaque jour : la série compte les jours d'affilée sur la table du jour, pas sur une table. La ligne le dit (« 5 jours d'affilée sur la table du jour : continue ! ») et n'apparaît qu'à partir de 2. Celle de la semaine reste. Une série globale de jours sur la borne est mise en fin de file.</span></li>
           </ol>
@@ -665,7 +639,6 @@
           <div class="cell sweet">
           </div>
           <div class="cell">
-            <a class="chip tr-profiles" href="#startup-screen"><b></b>Welcome Screen</a>
           </div>
           <div class="cell">
             <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
