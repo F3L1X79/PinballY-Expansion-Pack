@@ -511,7 +511,7 @@ export default {
     // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js).
     tableMastery: {
         levelNames: ["Novice", "Élève", "Adepte", "Disciple", "Spécialiste", "As", "Virtuose", "Prodige", "Légende", "Mage du flipper"],
-        toDiscover: "À découvrir",
+        toDiscover: "Table à découvrir",
         toastHeader: "Maîtrise",
         toastTitle: (name, level) => `${name} (${level})`,
         collectionToastHeader: "Maîtrise de la collection",

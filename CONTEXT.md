@@ -49,7 +49,7 @@ The dated list of a Profile's Plays: when each started, which table, and how lon
 _Avoid_: Game Log, play history, journal
 
 **Profile Stats**:
-The screen, opened by the player from the main menu, that sums up the active Profile's own plays: games played, total time, favourite manufacturer and decade, most played and never played tables, collection completion, Achievements Unlocked, and Streaks. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
+The screen, opened by the player from the main menu, that sums up the active Profile's own plays: games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
 _Avoid_: Pinball Profile, player card, profile screen (a Profile is the identity, not the screen)
 
 ### Choosing what to play
@@ -82,6 +82,10 @@ The table of the active Profile's most recent Play, across the whole collection,
 **Random Game**:
 A table drawn at random from the current wheel selection and launched right away; never the Last Played Table, unless it is the only one in the selection.
 _Avoid_: random table, lucky pick
+
+**Tables to Discover**:
+The tables the active Profile can see that it has never played, offered as a wheel selection from the main menu and from the Profile Stats. Shown as "Tables à découvrir" in French.
+_Avoid_: never played tables, unplayed tables, new tables
 
 **Hall of Fame**:
 The ten tables the active Profile can see that it has spent the most time on, ranked from the most played, offered as a wheel selection from the main menu. Shown as "Most Played Tables" ("Tables les plus jouées" in French), like the same tables in the Profile Stats.
@@ -175,6 +179,14 @@ _Avoid_: acknowledged, seen, unlocked (an Achievement can be unlocked but not ye
 **Achievement Rank**:
 How hard an Achievement is: Bronze, Silver, Gold or Platinum. Every Achievement has one, whether Unlocked or missing.
 _Avoid_: tier, level, difficulty, grade
+
+**Player Level**:
+How far a Profile has come as a player, earned through the Achievement Ranks of its Notified Achievements, each Rank worth more than the one below; each level takes more to reach than the one before, with no last level, so a bigger collection, which has more Achievements, lets a Profile climb higher. Levels have no names, only a number. It is worked out afresh from the Notified Achievements each time: an Achievement no longer Unlocked keeps its points, but a level can drop when a Notified Achievement is worth less (a smaller group lowers a group completion's Rank) or is gone (its Add-on turned off), and a Profile Reset starts it over. Shown as "Niveau" in French.
+_Avoid_: XP, player rank (an Achievement Rank is how hard an Achievement is), level (alone: a Mastery Level belongs to one table), Collection Tier
+
+**Level Toast**:
+A toast like the Achievement Toast, but with its own colour and no trophy, that announces the Player Level the active Profile has just reached, after the Achievement Toasts that brought it; one only per return to the wheel, for the highest level reached. Any rise after a Play is announced, even back to a level reached before and lost; a level a Profile already had when PinballY started, or when the Player Level first appeared, is not.
+_Avoid_: level-up popup, rank-up
 
 **Confetti Shower**:
 A shower of coloured confetti released all at once from above the wheel screen, falling down across all of it, in front of everything, toasts and menus included (it waits for the Welcome Screen to close), to celebrate along with the toast of a completed Challenge, of a Platinum Achievement, of Mastery Level 10 or of a Collection Tier completed; one shower only when the same return to the wheel brings several. It never waits for the player nor takes their input, and vanishes at once when a table launches or attract mode starts. Shown as "Pluie de confettis" in French.

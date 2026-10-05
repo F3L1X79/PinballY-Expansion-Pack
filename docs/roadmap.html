@@ -323,15 +323,17 @@
             <h3>Fiche joueur : Profile Stats en écran dessiné, avec un niveau</h3>
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
-          <p>Passer les Profile Stats et leur liste de tables des menus natifs à une vraie fiche joueur dessinée, avec la palette commune. Elle gagne un <strong>niveau du joueur</strong>, calculé à partir des Achievement Ranks débloqués, et de nouvelles stats : durée moyenne d'une partie, meilleure Streak, tables découvertes, première et dernière table jouée.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Reprend la surface et la palette de l'Achievement List, et le détail par table de la Maîtrise des tables (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/134">#134</a>) ; avant les <a href="#stats">Stats des autres (n° <span data-ref="stats"></span>)</a></div>
+          <p>Passer les Profile Stats et leur liste de tables des menus natifs à une vraie fiche joueur dessinée, avec la palette commune. Elle gagne un <strong>Player Level</strong>, calculé à partir des Achievement Ranks des succès Notified et annoncé par un Level Toast, et de nouvelles stats : durée moyenne d'une partie, table préférée, première table jouée.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Grillé le 05/10/2026. Flow Matt : <code>/prototype</code> (disposition, deux ou trois variantes sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Même surface et même palette que le Welcome Screen ; avant les <a href="#stats">Stats des autres (n° <span data-ref="stats"></span>)</a></div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Décisions</summary>
             <ul>
-              <li>Barème du niveau : combien de points par Rank (Bronze, Silver, Gold, Platinum), et combien de points par niveau ?</li>
-              <li>Le niveau apparaît-il aussi ailleurs : dans le Profile Greeting, sur le carrousel du picker ?</li>
-              <li>« Première table jouée » n'existe que depuis le journal des parties : l'afficher seulement quand il la connaît ?</li>
+              <li>Player Level, affiché « Niveau 7 » avec une barre et « Actuel : 805 / 875 », sans nom de niveau. Points des succès Notified : Bronze 10, Silver 25, Gold 50, Platinum 100. Niveau 2 à 50 points, puis chaque niveau coûte 25 de plus (sur 120 tables : niveau 2 la première semaine, 7 après trois mois, 16 tout débloqué), sans plafond.</li>
+              <li>Niveau recalculé à chaque fois : il peut baisser si un groupe rétrécit (Rank plus bas) ou si un Add-on est désactivé ; un succès qui n'est plus Unlocked garde ses points. Guest a le sien.</li>
+              <li>Level Toast (couleur propre, ni trophée ni confettis) après les Achievement Toasts, un seul par retour sur la roue ; toute montée après une Play s'annonce, même vers un niveau déjà eu. Rien pour le niveau déjà acquis au démarrage ni à l'installation. Ni dans le Welcome Screen ni sur le picker.</li>
+              <li>Panneau fixe dessiné d'un coup comme le Welcome Screen, ouvert directement depuis le menu principal. En tête : Avatar, nom, Player Level, Collection Mastery. Puis parties, temps total, durée moyenne, collection, succès (ouvre l'Achievement List), Challenges, Streaks, « Constructeur favori » (sans VPX Community), « Décennie favorite », « Table préférée » (le plus de temps), première table jouée (première entrée du Play Log). Pas de dernière table jouée.</li>
+              <li>Les listes natives deviennent deux boutons qui mettent la roue sur une sélection : le Hall of Fame et la nouvelle sélection Tables to Discover (« Tables à découvrir »), aussi dans le menu principal ; tables visibles du Profile, ni cachées ni non configurées.</li>
             </ul>
             <p class="ctx">Reporté pendant le grilling de l'Achievement List dessinée (27/09/2026). Le niveau remplace l'idée externe d'un système d'XP (30/09/2026) : aucune donnée nouvelle, aucun barème d'activités à équilibrer.</p>
           </details>
