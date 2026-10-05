@@ -8,6 +8,10 @@
 // table's bar forward (onPlay, ADR 0008), lights it up once on the return
 // to the wheel; after one that reached a new Mastery Level, submits a
 // Mastery Toast for the highest one, with the Confetti Shower at level 10.
+// After one that raised the Collection Tier above the one kept in the
+// Profile's profile.json ("collectionTier"), keeps the new tier there and
+// submits its Mastery Toast, with the Confetti Shower unless a level 10
+// toast of the same Play brings it.
 // ============================================================
 
 import { createPinballYHost } from "../common/pinbally_host.js";
@@ -16,7 +20,10 @@ import { getDrawingAhead } from "../common/drawing_ahead.js";
 import { getChallenges } from "../common/challenge.js";
 import { BADGE_HEIGHT, CHALLENGE_CARD_CANVAS_HEIGHT } from "../common/challenge_card.js";
 import { createMasteryBar } from "../common/mastery_bar.js";
-import { masteryOf, movedByPlay, levelReachedByPlay, metalOf, MAX_MASTERY_LEVEL } from "../common/table_mastery.js";
+import {
+    masteryOf, movedByPlay, levelReachedByPlay, metalOf, levelsOf, collectionMasteryOf, MAX_MASTERY_LEVEL,
+} from "../common/table_mastery.js";
+import { tablesVisibleTo } from "../common/visible_tables.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
 import lang from "../common/i18n.js";
 import { safeHandler } from "../common/safe_handler.js";
@@ -35,7 +42,7 @@ export default function init() {
     const cardShown = () => withChallenges && getChallenges().getActiveView() !== null;
     const topOf = () => (underBadge ? BADGE_HEIGHT : 0) + (cardShown() ? CHALLENGE_CARD_CANVAS_HEIGHT : 0);
     const bar = createMasteryBar(host, getDrawingAhead(), { topOf });
-    // Got at startup, so the Confetti Shower it starts at level 10 is drawn
+    // Got at startup, so the Confetti Shower its toasts start is drawn
     // ahead by then.
     const toasts = getAchievementToasts();
     let gameRunning = false;
@@ -76,22 +83,55 @@ export default function init() {
         if (isReset) resetCounts.set(profileName.toLowerCase(), resetCountOf(profileName.toLowerCase()) + 1);
     }));
 
-    function announce(profileName, configId, level) {
+    // toast: what a Mastery Toast shows, submitted for the named Profile and
+    // dropped when that Profile is reset or no longer active at its turn.
+    function submitFor(profileName, toast) {
         const profileKey = profileName.toLowerCase();
         const resetCount = resetCountOf(profileKey);
-        const table = host.getGameInfo(configId);
-        const TEXT = lang.tableMastery;
         toasts.submit({
             kind: TOAST_KIND.MASTERY,
+            ...toast,
+            onShown() {},
+            isStale: () => resetCountOf(profileKey) !== resetCount
+                || store.getActiveProfile().name.toLowerCase() !== profileKey,
+        });
+    }
+
+    function announceLevel(profileName, configId, level) {
+        const table = host.getGameInfo(configId);
+        const TEXT = lang.tableMastery;
+        submitFor(profileName, {
             accent: metalOf(level),
             tileNumber: level,
             title: TEXT.toastTitle(TEXT.levelNames[level - 1], level),
             description: table ? table.title : configId,
             celebrate: level === MAX_MASTERY_LEVEL,
-            onShown() {},
-            isStale: () => resetCountOf(profileKey) !== resetCount
-                || store.getActiveProfile().name.toLowerCase() !== profileKey,
         });
+    }
+
+    // celebrate is false when a Mastery Level 10 toast of the same Play
+    // already brings the Confetti Shower: one shower per return to the wheel.
+    function announceTier(profileName, tier, needed, celebrate) {
+        const TEXT = lang.tableMastery;
+        const levelName = TEXT.levelNames[tier - 1];
+        submitFor(profileName, {
+            header: TEXT.collectionToastHeader,
+            accent: metalOf(tier),
+            tileNumber: tier,
+            title: TEXT.collectionToastTitle(tier, levelName),
+            description: TEXT.collectionToastDescription(needed, levelName),
+            celebrate,
+        });
+    }
+
+    // Kept only once a tier is reached: a Profile Reset drops the key.
+    function raiseCollectionTier(profileName, celebrate) {
+        const tables = tablesVisibleTo(host.getVisibleTables(), store, profileName);
+        const keptTier = store.getProfileDataOf(profileName).collectionTier || 0;
+        const { tier, needed } = collectionMasteryOf(levelsOf(tables, store.getPlaysOf(profileName)), keptTier);
+        if (tier <= keptTier) return;
+        store.updateProfileData(data => { data.collectionTier = tier; }, profileName);
+        announceTier(profileName, tier, needed, celebrate);
     }
 
     // The totals already count the Play when it is announced.
@@ -99,7 +139,8 @@ export default function init() {
         const play = store.getPlaysOf(profileName)[configId];
         if (movedByPlay(play, seconds)) movedTable = { profileName, configId };
         const level = levelReachedByPlay(play, seconds);
-        if (level !== null) announce(profileName, configId, level);
+        if (level !== null) announceLevel(profileName, configId, level);
+        raiseCollectionTier(profileName, level !== MAX_MASTERY_LEVEL);
     }));
 
     // Fires on every wheel move, the player's and attract mode's alike.

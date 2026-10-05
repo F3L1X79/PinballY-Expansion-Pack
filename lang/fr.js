@@ -497,5 +497,8 @@ export default {
         toDiscover: "À découvrir",
         toastHeader: "Maîtrise",
         toastTitle: (name, level) => `${name} (${level})`,
+        collectionToastHeader: "Maîtrise de la collection",
+        collectionToastTitle: (tier, name) => `Palier ${tier} : ${name}`,
+        collectionToastDescription: (count, name) => `${count} ${count === 1 ? "table" : "tables"} au niveau ${name} ou plus`,
     },
 };

@@ -382,5 +382,9 @@ export default {
         // The Mastery Toast, when a Play reaches a new Mastery Level.
         toastHeader: "Table Mastery",
         toastTitle: (name, level) => `${name} (${level})`,
+        // The Mastery Toast of a new Collection Tier.
+        collectionToastHeader: "Collection Mastery",
+        collectionToastTitle: (tier, name) => `Tier ${tier}: ${name}`,
+        collectionToastDescription: (count, name) => `${count} ${count === 1 ? "table" : "tables"} at ${name} or above`,
     },
 };

@@ -13,7 +13,7 @@
 // the Rank's colour, or the trophy when that emblem's file is missing
 // (logged once). A Challenge Toast shares the queue and the card, with its
 // own accent colour, header and target icon instead of the trophy; a Mastery
-// Toast its own header, the reached level's metal as its accent and the
+// Toast its own header (Collection Mastery's for a Collection Tier), the reached level's metal as its accent and the
 // level's number drawn in its tile. A celebrated toast starts the
 // Confetti Shower when it starts.
 // ============================================================
@@ -158,7 +158,7 @@ function drawCard(host, dc, look, toast, iconOf) {
     const textLeft = accentBarWidth + tileGap + tileSize + tileGap;
     const textWidth = cardWidth - textLeft - look.paddingRight;
     const text = host.createStyledText({ textStyle: { font: FONT, size: smallFont, color: COLORS.description } });
-    text.add({ size: smallFont, weight: 600, color: accent, text: kindLook.header().toLocaleUpperCase() + "\n" });
+    text.add({ size: smallFont, weight: 600, color: accent, text: (toast.header || kindLook.header()).toLocaleUpperCase() + "\n" });
     text.add({ size: look.titleFont, weight: 600, color: COLORS.title, text: toast.title + "\n" });
     text.add(toast.description);
     const textHeight = text.measure(textWidth).height;
@@ -335,12 +335,13 @@ export function createAchievementToasts(host, {
     wheelDialogs.onDrawnDialogClosed(safeShowNext);
 
     // toast: { kind, title, description, onShown, isStale, celebrate,
-    // rank, accent, tileNumber }, kind a TOAST_KIND (an Achievement when
+    // rank, accent, tileNumber, header }, kind a TOAST_KIND (an Achievement when
     // missing), rank (optional) the Achievement Rank of an Achievement
     // Toast, onShown running when the toast starts, isStale (optional)
     // dropping it unshown when it returns true at its turn, celebrate
     // (optional) starting the Confetti Shower with it; a Mastery Toast
-    // gives its accent and the number its tile shows.
+    // gives its accent and the number its tile shows, and header (optional)
+    // replaces the kind's.
     function submit(toast) {
         waiting.push(toast);
         safeShowNext();

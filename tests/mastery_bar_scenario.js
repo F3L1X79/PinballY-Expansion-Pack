@@ -3,8 +3,8 @@
 // the chosen Add-ons and Profiles, each Profile's earlier Plays seeded in
 // its profile.json. Reads what the Mastery Bar shows: its visible layers'
 // texts (the level's name, its number, "To discover"), how full its bar
-// is, whether it is lit and where it sits; and the Mastery Toasts and
-// Confetti Shower starts. Never loaded by PinballY.
+// is, whether it is lit and where it sits; the Mastery Toasts, the
+// Collection Tier kept in profile.json and the Confetti Shower starts. Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
@@ -36,15 +36,17 @@ export const TABLES = [
 // A Profile's earlier Plays on a table, as its profile.json keeps them.
 export const playedFor = seconds => ({ count: 1, seconds, lastPlayed: "2026-09-01T20:00:00" });
 
-// addOns: the Add-ons on; profiles: { name: { plays, isChild } }, Guest's
+// addOns: the Add-ons on; profiles: { name: { plays, isChild, collectionTier } }, Guest's
 // under "guest"; active: the Profile in cabinet.json; challenge: the week's
 // lock in cabinet.json (undefined lets the Challenges draw one).
 export async function startScenario({
     addOns = ["tableMastery"], profiles = {}, active = "guest", challenge, tables = TABLES, language = "en",
 } = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
-    for (const [name, { plays = {}, isChild = false }] of Object.entries(profiles)) {
-        fake.addFile(profileFile(name), JSON.stringify({ version: 1, plays, notified: [], ...(isChild ? { isChild } : {}) }));
+    for (const [name, { plays = {}, isChild = false, collectionTier }] of Object.entries(profiles)) {
+        fake.addFile(profileFile(name), JSON.stringify({
+            version: 1, plays, notified: [], ...(isChild ? { isChild } : {}), ...(collectionTier ? { collectionTier } : {}),
+        }));
     }
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({
         version: 1, activeProfile: active, ...(challenge ? { challenge: { current: challenge, previous: null } } : {}),
@@ -96,6 +98,12 @@ export function shownTop(fake) {
 export const masteryToasts = fake => toastDrawings(fake)
     .map(drawing => drawing.texts.join(" | "))
     .filter(texts => texts.includes("TABLE MASTERY"));
+// Every Collection Tier's Mastery Toast drawn so far, its texts joined the same way.
+export const collectionToasts = fake => toastDrawings(fake)
+    .map(drawing => drawing.texts.join(" | "))
+    .filter(texts => texts.includes("COLLECTION MASTERY"));
+// What the named Profile's profile.json keeps of its Collection Tier, undefined when nothing.
+export const savedCollectionTier = (fake, name) => JSON.parse(fake.readFile(profileFile(name))).collectionTier;
 export const showerStarts = fake => fake.logLines().filter(line => line.startsWith("[ConfettiShower] Started")).length;
 // Longer than a toast's whole life (rise, hold, fade).
 export const ONE_TOAST_MS = 6000;

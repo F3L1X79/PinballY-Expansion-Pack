@@ -2,8 +2,9 @@
 // Table Mastery: the Mastery Level a Profile has reached on a table,
 // computed from that Profile's table totals (the time and number of its
 // Plays, ADR 0008), what a Play changed (a step further, a new level),
-// and the metal each level shows in. No data of its own
-// and no side effect: a Profile Reset starts mastery over with the totals.
+// and the metal each level shows in; and Collection Mastery, from the
+// levels of the tables a Profile can see. No data of its own and no side
+// effect: the caller keeps the Collection Tier reached.
 // ============================================================
 
 import { ACHIEVEMENT_RANK } from "./achievements.js";
@@ -15,6 +16,8 @@ export const MASTERY_STEPS = 20;
 const LEVEL_SECONDS = [0, 1800, 3600, 6300, 9000, 12600, 18000, 23400, 32400, 43200];
 export const MAX_MASTERY_LEVEL = LEVEL_SECONDS.length;
 const LEVELS_PER_TIER = 3;
+// A Collection Tier needs this many tables at its level, all of them when fewer.
+const TABLES_PER_COLLECTION_TIER = 10;
 const TIERS = [ACHIEVEMENT_RANK.BRONZE, ACHIEVEMENT_RANK.SILVER, ACHIEVEMENT_RANK.GOLD, ACHIEVEMENT_RANK.PLATINUM];
 export const METAL_TIER_COUNT = TIERS.length;
 export const WHITE = 0xFFFFFFFF;
@@ -29,6 +32,29 @@ export function masteryOf(play) {
     const from = LEVEL_SECONDS[level - 1];
     const to = LEVEL_SECONDS[level];
     return { level, step: Math.floor(MASTERY_STEPS * (play.seconds - from) / (to - from)) };
+}
+
+// The Mastery Level of each table, 0 for one never played.
+export function levelsOf(tables, plays) {
+    return tables.map(game => {
+        const mastery = masteryOf(plays[game.configId]);
+        return mastery ? mastery.level : 0;
+    });
+}
+
+// { tier, reached, needed } from the levels of the tables a Profile can
+// see. Tier N: enough tables at Mastery Level N or above; reached counts
+// the tables at the next one. keptTier, the highest
+// tier reached before, still counts when the tables no longer reach it.
+export function collectionMasteryOf(levels, keptTier = 0) {
+    // With no table at all, the goal still reads "0/10".
+    const needed = levels.length > 0 ? Math.min(TABLES_PER_COLLECTION_TIER, levels.length) : TABLES_PER_COLLECTION_TIER;
+    const atLeast = level => levels.filter(reachedLevel => reachedLevel >= level).length;
+    let tier = 0;
+    while (tier < MAX_MASTERY_LEVEL && levels.length > 0 && atLeast(tier + 1) >= needed) tier++;
+    tier = Math.max(tier, keptTier);
+    const reached = tier >= MAX_MASTERY_LEVEL ? needed : atLeast(tier + 1);
+    return { tier, reached, needed };
 }
 
 // The mastery before a Play of these seconds, already in the table's totals.

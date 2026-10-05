@@ -496,5 +496,9 @@ export default {
         toDiscover: "To discover",
         toastHeader: "Table Mastery",
         toastTitle: (name, level) => `${name} (${level})`,
+        // TODO: translation pass
+        collectionToastHeader: "Collection Mastery",
+        collectionToastTitle: (tier, name) => `Tier ${tier}: ${name}`,
+        collectionToastDescription: (count, name) => `${count} ${count === 1 ? "table" : "tables"} at ${name} or above`,
     },
 };
