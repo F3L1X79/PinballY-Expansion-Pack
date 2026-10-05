@@ -1,10 +1,10 @@
 // ============================================================
 // Reads the drawn Welcome Screen the way the player sees it, on the fake
-// PinballY host: whether it is open, its greeting, its Period Table cards
-// (period, name, Mastery head, grey line, logo), its bottom row's labels,
-// the highlighted choice (the label under the gold halo, the period of the
-// card whose button it surrounds, or the tooltip of the Avatar or the
-// cross), and picks a choice with Next and Select as a player would.
+// PinballY host: whether it is open, its greeting, its Collection Mastery
+// card, its Period Table cards (period, name, Mastery head, grey line,
+// logo), its bottom row's labels, the highlighted choice (the label under
+// the gold halo, the period of the card whose button it surrounds, or the
+// tooltip of the Avatar or the cross), and picks a choice with Next and Select as a player would.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -34,6 +34,17 @@ export function greeting(fake) {
 
 // Whether the header shows the active Profile's Avatar.
 export const headerImages = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.header).flatMap(layer => layer.images());
+
+// The Collection Mastery card: { goal (its head), current (the count on
+// its right, null at the last tier), tier (the number in its square) };
+// null when the screen is closed.
+export function collectionCard(fake) {
+    const [layer] = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.collection);
+    if (!layer) return null;
+    const texts = layer.texts();
+    const tier = Number(texts[texts.length - 1]);
+    return { goal: texts[0], current: texts.length > 2 ? texts[1] : null, tier };
+}
 
 // The bottom row's labels, from left to right, without the mystery box
 // icon's "?".

@@ -21,7 +21,7 @@ import { getChallenges } from "../common/challenge.js";
 import { BADGE_HEIGHT, CHALLENGE_CARD_CANVAS_HEIGHT } from "../common/challenge_card.js";
 import { createMasteryBar } from "../common/mastery_bar.js";
 import {
-    masteryOf, movedByPlay, levelReachedByPlay, metalOf, levelsOf, collectionMasteryOf, MAX_MASTERY_LEVEL,
+    masteryOf, movedByPlay, levelReachedByPlay, metalOf, collectionMasteryOfProfile, MAX_MASTERY_LEVEL,
 } from "../common/table_mastery.js";
 import { tablesVisibleTo } from "../common/visible_tables.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
@@ -127,8 +127,9 @@ export default function init() {
     // Kept only once a tier is reached: a Profile Reset drops the key.
     function raiseCollectionTier(profileName, celebrate) {
         const tables = tablesVisibleTo(host.getVisibleTables(), store, profileName);
-        const keptTier = store.getProfileDataOf(profileName).collectionTier || 0;
-        const { tier, needed } = collectionMasteryOf(levelsOf(tables, store.getPlaysOf(profileName)), keptTier);
+        const data = store.getProfileDataOf(profileName);
+        const keptTier = data.collectionTier || 0;
+        const { tier, needed } = collectionMasteryOfProfile(tables, data);
         if (tier <= keptTier) return;
         store.updateProfileData(data => { data.collectionTier = tier; }, profileName);
         announceTier(profileName, tier, needed, celebrate);

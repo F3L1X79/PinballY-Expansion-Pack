@@ -212,6 +212,13 @@ export default {
             },
             go: "Y aller",
         },
+        // Collection Mastery: the goal toward the next Collection Tier, how
+        // many tables already reach it, or, at the last tier, that all did.
+        collection: {
+            goal: (count, levelName) => `Objectif : ${count} ${count === 1 ? "table" : "tables"} ${levelName}`,
+            current: (reached, needed) => `Actuel : ${reached}/${needed}`,
+            allTables: (levelName) => `Toutes tes tables : ${levelName}`,
+        },
     },
 
     // Lower status line text for the currently selected table.

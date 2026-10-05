@@ -57,6 +57,10 @@ export function collectionMasteryOf(levels, keptTier = 0) {
     return { tier, reached, needed };
 }
 
+// A Profile's Collection Mastery over the tables it can see, from its
+// profile.json data: its Plays, and the tier it kept ("collectionTier").
+export const collectionMasteryOfProfile = (tables, data) => collectionMasteryOf(levelsOf(tables, data.plays), data.collectionTier || 0);
+
 // The mastery before a Play of these seconds, already in the table's totals.
 const beforePlay = (play, seconds) => masteryOf({ count: play.count - 1, seconds: play.seconds - seconds });
 

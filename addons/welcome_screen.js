@@ -1,13 +1,14 @@
 ﻿// ============================================================
 // Welcome Screen: at startup, a centred Steamball panel drawn over the
 // dimmed wheel greets the active Profile by the hour (its Avatar and its
-// name in gold when the Profile picker is on) and offers to close, to
-// play the Table of the Day or of the Week (one card each, with its Table
-// Mastery and the active Profile's Streak; reading them picks and locks
-// this Period's tables, and Select launches one), to stay on the Last
-// Played Table or to launch a Random Game. It is a drawn
-// dialog of the wheel dialog module (docs/adr/0011), submitted at init
-// with the startup priority, so it comes before any other dialog and the
+// name in gold when the Profile picker is on), shows its Collection
+// Mastery (the tier kept in profile.json when the tables no longer reach
+// it) and offers to close, to play the Table of the Day or of the Week
+// (one card each, with its Table Mastery and the active Profile's Streak;
+// reading them picks and locks this Period's tables, and Select launches
+// one), to stay on the Last Played Table or to launch a Random Game. It
+// is a drawn dialog of the wheel dialog module (docs/adr/0011), submitted
+// at init with the startup priority, so it comes before any other dialog and the
 // toasts wait for it. It opens 500 ms after its turn comes, drawn at once
 // on all its layers, then faded in as a whole. While it is open it
 // swallows every button through "commandbuttondown": Next / Prev move a
@@ -26,7 +27,8 @@ import { displayNameOf } from "../common/profile_name.js";
 import { getChangePlayer } from "../common/change_player.js";
 import { getRandomGame } from "../common/random_game.js";
 import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
-import { masteryOf } from "../common/table_mastery.js";
+import { masteryOf, collectionMasteryOfProfile, MAX_MASTERY_LEVEL } from "../common/table_mastery.js";
+import { tablesVisibleTo } from "../common/visible_tables.js";
 import { masteryHeadOf } from "../common/mastery_bar.js";
 import { createNavigationSound } from "../common/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/steamball_palette.js";
@@ -117,6 +119,16 @@ export default function init() {
         return cards;
     }
 
+    // Over the tables the active Profile can see; a tier it reached stays.
+    function readCollection() {
+        const collection = collectionMasteryOfProfile(tablesVisibleTo(host.getVisibleTables(), store), store.getProfileData());
+        const { tier, reached, needed } = collection;
+        const levelNames = lang.tableMastery.levelNames;
+        return tier >= MAX_MASTERY_LEVEL
+            ? { ...collection, goal: TEXT.collection.allTables(levelNames[tier - 1]), current: null }
+            : { ...collection, goal: TEXT.collection.goal(needed, levelNames[tier]), current: TEXT.collection.current(reached, needed) };
+    }
+
     function readScreen() {
         const profile = store.getActiveProfile();
         const picker = getChangePlayer() !== null;
@@ -130,8 +142,9 @@ export default function init() {
             greeting: picker
                 ? TEXT.greetingWithName(greeting, displayNameOf(profile)).map((part, index) => [part, index === 1])
                 : [[TEXT.greetingAlone(greeting), false]],
-            // The flippers' loop; the first one is selected on opening.
+            collection: readCollection(),
             cards,
+            // The flippers' loop; the first one is selected on opening.
             choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, ...cards.map(card => card.choice), CHOICE.STAY, CHOICE.RANDOM],
             labels: {
                 [CHOICE.AVATAR]: lang.profiles.menuEntry,

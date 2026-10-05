@@ -3,21 +3,21 @@
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // from the prototype validated on the cabinet: the dimmed backdrop with
 // the centred Steamball panel, the header (Avatar, close cross, greeting
-// with the Profile's name in gold), one card per Period Table (logo,
-// period, name on one line, Table Mastery card around the Mastery Bar's
-// square, grey line, "Go" button),
+// with the Profile's name in gold, Collection Mastery on the Mastery Bar's
+// card), one card per Period Table (logo, period, name on one line, Table
+// Mastery card around the Mastery Bar's square, grey line, "Go" button),
 // the bottom row ("stay" and "random") and one highlight per choice (a
 // gold halo, with a tooltip for the Avatar and the cross). Only drawing:
 // no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
-import { mix, withAlpha, tierMetalOf, tierOf, MASTERY_STEPS, WHITE } from "./table_mastery.js";
+import { mix, withAlpha, metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL, WHITE } from "./table_mastery.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
 // Above the Achievement List (6000 to 6006), under the toasts and the
 // Profile picker. Exported for the tests' reader.
-export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, highlights: 6110 });
+export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, highlights: 6110 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -29,7 +29,7 @@ const TOOLTIP = Object.freeze({ color: 0xFF0C0C0E, size: 22, weight: 400, height
 const LOOK = Object.freeze({
     pad: 40, gap: 26,
     avatar: 120, cross: 56,
-    greetingSize: 34, greetingGap: 36, greetingBottom: 44,
+    greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
     rowH: 90, rowSize: 21, rowIcon: 60,
     // A Period Table card, from its top: period, name, Mastery card (the
     // Mastery Bar's, scaled by cardK), then the grey line, if any.
@@ -45,6 +45,8 @@ const LOOK = Object.freeze({
     // Room around a highlighted element for its halo, and beside the
     // Avatar and the cross for their tooltip.
     haloMargin: 20, avatarTooltipRoom: 380, crossTooltipRoom: 240,
+    // Room around the Collection Mastery card for its square's halo.
+    squareHaloMargin: 24,
 });
 
 // ---------- Small drawing helpers ----------
@@ -159,29 +161,52 @@ function drawGreyLine(host, dc, line, x, y, w) {
     oneLine(host, dc, line.text, { x: x + tile + 12, y: top, width: w - tile - 12, height: tile, size: LOOK.lineSize, minSize: LOOK.minLineSize, color: COLORS.description });
 }
 
-// ---------- Mastery card ----------
+// ---------- Mastery cards ----------
 
 // The wheel's Mastery Bar card, w wide, its heights and type scaled by
-// cardK: translucent panel, head in the level's metal, bar, and the
-// Mastery Bar's own square at the bar's end, whose halo spills out of the
-// panel. mastery: masteryOf()'s { level, step }, null for a table never
-// played; head: { text, color }.
-function drawTableMasteryCard(host, dc, mastery, head, x, y, w) {
+// cardK: translucent panel, head, an optional count on its right, bar
+// filled to share (0 to 1), and the Mastery Bar's own square at the bar's
+// end, whose halo spills out of the panel; the square shows level, in
+// lookLevel's metal.
+function drawMasteryCard(host, dc, x, y, w, { head, headColor, count = null, share, fillColor, level, lookLevel = level }) {
     const scaled = value => Math.round(value * LOOK.cardK);
     const cardH = scaled(LOOK.masteryCardH);
-    const level = mastery ? mastery.level : 0;
     dc.fillRect(x, y, w, cardH, COLORS.panelTranslucent);
     dc.frameRect(x, y, w, cardH, 1, COLORS.border);
     const size = masterySquareSize(LOOK.cardK);
     const squareX = x + w - scaled(14) - size;
     const barX = x + scaled(18);
     const barW = squareX - scaled(26) - barX;
-    text(host, dc, head.text, { x: barX, y: y + scaled(13), width: barW, size: scaled(13), weight: 600, color: head.color });
+    text(host, dc, head, { x: barX, y: y + scaled(13), width: barW, size: scaled(13), weight: 600, color: headColor });
+    // Right-aligned with the bar's end.
+    if (count !== null) text(host, dc, count, { x: barX, y: y + scaled(13), width: barW, size: scaled(13), weight: 600, color: COLORS.description, align: "right" });
     dc.fillRect(barX, y + scaled(46), barW, scaled(10), COLORS.track);
-    if (mastery && mastery.step > 0) {
-        dc.fillRect(barX, y + scaled(46), Math.round(barW * mastery.step / MASTERY_STEPS), scaled(10), tierMetalOf(tierOf(level)));
-    }
-    drawMasterySquare(host, dc, level, squareX, y + Math.round((cardH - size) / 2), LOOK.cardK);
+    const filled = Math.round(barW * Math.min(1, share));
+    if (filled > 0) dc.fillRect(barX, y + scaled(46), filled, scaled(10), fillColor);
+    drawMasterySquare(host, dc, level, squareX, y + Math.round((cardH - size) / 2), LOOK.cardK, lookLevel);
+}
+
+// mastery: masteryOf()'s { level, step }, null for a table never played;
+// head: { text, color }.
+function drawTableMasteryCard(host, dc, mastery, head, x, y, w) {
+    const level = mastery ? mastery.level : 0;
+    drawMasteryCard(host, dc, x, y, w, {
+        head: head.text, headColor: head.color, share: mastery ? mastery.step / MASTERY_STEPS : 0,
+        fillColor: tierMetalOf(tierOf(Math.max(1, level))), level,
+    });
+}
+
+// collection: { tier, reached, needed, goal, current }, current null at
+// the last tier, whose bar is full. At tier 0 the bar and square take
+// level 1's metal, so the card is never dull.
+function drawCollectionCard(host, dc, collection, x, y, w) {
+    const { tier, reached, needed } = collection;
+    const lookLevel = Math.max(1, tier);
+    drawMasteryCard(host, dc, x, y, w, {
+        head: collection.goal, headColor: tier > 0 ? metalOf(tier) : COLORS.description, count: collection.current,
+        share: tier >= MAX_MASTERY_LEVEL ? 1 : reached / needed,
+        fillColor: tierMetalOf(tierOf(lookLevel)), level: tier, lookLevel,
+    });
 }
 
 // ---------- Bottom row icons, drawn in a size x size box ----------
@@ -270,16 +295,20 @@ function geometry(referenceWidth, screen) {
     const inner = { x: Math.round((referenceWidth - w) / 2) + LOOK.pad, w: w - 2 * LOOK.pad };
     // Under the Avatar; without one, on the top line, beside the cross.
     const greetingY = screen.picker ? LOOK.avatar + LOOK.greetingGap : 0;
-    const headerH = greetingY + Math.round(LOOK.greetingSize * 1.4) + LOOK.greetingBottom;
+    const collectionY = greetingY + Math.round(LOOK.greetingSize * 1.4) + LOOK.greetingBottom;
+    const masteryCardH = Math.round(LOOK.masteryCardH * LOOK.cardK);
+    const headerH = collectionY + masteryCardH + LOOK.headerBottom;
     // Each card ends under its Mastery card, or under its grey line.
-    const masteryBottom = LOOK.masteryY + Math.round(LOOK.masteryCardH * LOOK.cardK);
+    const masteryBottom = LOOK.masteryY + masteryCardH;
     const lineY = masteryBottom + LOOK.lineGap;
     const cardHs = screen.cards.map(card => (card.line ? lineY + LOOK.lineH : masteryBottom) + LOOK.cardBottom);
     const cardsH = cardHs.reduce((sum, cardH) => sum + cardH + LOOK.gap, 0);
     const logoW = inner.w < LOOK.narrowBelow ? Math.round(inner.w * LOOK.narrowLogoShare) : LOOK.logoW;
+    // Where a card's details start, which Collection Mastery lines up with.
+    const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
     const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + LOOK.pad;
     const panel = { x: inner.x - LOOK.pad, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
-    return { panel, inner, headerH, greetingY, cardHs, cardsH, lineY, logoW };
+    return { panel, inner, headerH, greetingY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
 }
 
 // The backdrop: the dimmed wheel and the panel, drawn on a window-sized
@@ -296,11 +325,10 @@ export function drawBackdrop(dc, { width, height }, referenceWidth, screen) {
 
 // The Period Table cards, top to bottom, each with the highlight of its
 // "Go" button.
-function layoutCards(host, screen, { inner, cardHs, lineY, logoW }, cardsTop, haloAround) {
+function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, masteryCardH }, cardsTop, haloAround) {
     const { button } = LOOK;
     // Centred on the Mastery card's height.
-    const buttonRect = { ...button, x: inner.w - LOOK.logoInset - button.w, y: LOOK.masteryY + Math.round((LOOK.masteryCardH * LOOK.cardK - button.h) / 2) };
-    const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
+    const buttonRect = { ...button, x: inner.w - LOOK.logoInset - button.w, y: LOOK.masteryY + Math.round((masteryCardH - button.h) / 2) };
     const detailsW = Math.min(buttonRect.x - LOOK.detailsGap - detailsX, LOOK.detailsMaxW);
     const pieces = [];
     const highlights = {};
@@ -335,7 +363,8 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW }, cardsTop, ha
     return { pieces, highlights };
 }
 
-// screen: { picker, avatarPath, greeting (runs of [text, gold?]), cards
+// screen: { picker, avatarPath, greeting (runs of [text, gold?]),
+// collection ({ tier, reached, needed, goal, current }), cards
 // (each { choice, period, title, logoPath, mastery, masteryHead ({ text,
 // color }, as the Mastery Bar's), line
 // (null, or { played, streak, text }), goLabel }), choices, labels (by
@@ -343,7 +372,7 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW }, cardsTop, ha
 // its rect's own coordinates, and the highlight of each choice.
 export function layoutWelcomeScreen(host, screen, referenceWidth) {
     const layout = geometry(referenceWidth, screen);
-    const { inner, headerH, greetingY, panel, cardsH } = layout;
+    const { inner, headerH, greetingY, collectionY, masteryCardH, detailsX, panel, cardsH } = layout;
     const top = panel.y + LOOK.pad;
     const pieces = [{
         zIndex: WELCOME_SCREEN_Z_INDEX.header,
@@ -355,6 +384,15 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
             runs(host, dc, parts, { x: 0, y: greetingY, width: inner.w - LOOK.cross - 40, size: LOOK.greetingSize });
         },
     }];
+    // From the card details' left edge to the right edge, on a layer of its
+    // own with room for its square's halo.
+    const squareRoom = LOOK.squareHaloMargin;
+    const collectionW = inner.w - detailsX;
+    pieces.push({
+        zIndex: WELCOME_SCREEN_Z_INDEX.collection,
+        rect: { x: inner.x + detailsX - squareRoom, y: top + collectionY - squareRoom, w: collectionW + 2 * squareRoom, h: masteryCardH + 2 * squareRoom },
+        draw: dc => drawCollectionCard(host, dc, screen.collection, squareRoom, squareRoom, collectionW),
+    });
 
     const M = LOOK.haloMargin;
     const highlightPiece = (rect, draw) => ({ zIndex: WELCOME_SCREEN_Z_INDEX.highlights, rect, draw });

@@ -94,6 +94,14 @@ export default {
             },
             go: "Go",
         },
+        // Collection Mastery: the goal toward the next Collection Tier
+        // (that many tables at the level of that name), how many tables
+        // already reach it, or, at the last tier, that all of them did.
+        collection: {
+            goal: (count, levelName) => `Goal: ${count} ${count === 1 ? "table" : "tables"} at ${levelName}`,
+            current: (reached, needed) => `Current: ${reached}/${needed}`,
+            allTables: (levelName) => `All your tables: ${levelName}`,
+        },
     },
 
     // Lower status line text for the currently selected table.

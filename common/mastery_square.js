@@ -2,7 +2,8 @@
 // Mastery square: the Mastery Level's number in a square in its metal,
 // with a see-through halo wider and stronger from one level to the next,
 // or a dim "0" for a table never played. Drawn at the end of the wheel's
-// Mastery Bar and of the Welcome Screen's Mastery cards. Only drawing: no
+// Mastery Bar and of the Welcome Screen's Mastery cards, where it also
+// shows the Collection Tier, in level 1's metal at tier 0. Only drawing: no
 // text from the language files, no layer, no side effect.
 // ============================================================
 
@@ -28,15 +29,16 @@ function drawHalo(dc, level, metal, x, y, size, k) {
 // The square's side at scale k.
 export const masterySquareSize = (k = 1) => Math.round(SQUARE.size * k);
 
-// The level's square with its top-left corner at (x, y), scaled by k.
-export function drawMasterySquare(host, dc, level, x, y, k = 1) {
+// The level's square with its top-left corner at (x, y), scaled by k,
+// looking like lookLevel's (its metal, halo and border) when given.
+export function drawMasterySquare(host, dc, level, x, y, k = 1, lookLevel = level) {
     const size = masterySquareSize(k);
-    const metal = level === NEVER_PLAYED ? STEAMBALL_COLORS.dim : metalOf(level);
-    if (level !== NEVER_PLAYED) drawHalo(dc, level, metal, x, y, size, k);
+    const metal = lookLevel === NEVER_PLAYED ? STEAMBALL_COLORS.dim : metalOf(lookLevel);
+    if (lookLevel !== NEVER_PLAYED) drawHalo(dc, lookLevel, metal, x, y, size, k);
     dc.fillRect(x, y, size, size, STEAMBALL_COLORS.tile);
     // A lighter band on top, like polished metal.
-    if (level !== NEVER_PLAYED) dc.fillRect(x, y, size, Math.round(size * SQUARE.bandShare), withAlpha(metal, 0x18 + level * 4));
-    dc.frameRect(x, y, size, size, Math.round((SQUARE.border + (level >= SQUARE.thickBorderFrom ? 1 : 0)) * k), metal);
+    if (lookLevel !== NEVER_PLAYED) dc.fillRect(x, y, size, Math.round(size * SQUARE.bandShare), withAlpha(metal, 0x18 + lookLevel * 4));
+    dc.frameRect(x, y, size, size, Math.round((SQUARE.border + (lookLevel >= SQUARE.thickBorderFrom ? 1 : 0)) * k), metal);
     const styled = host.createStyledText({
         textAlign: "center",
         textStyle: { font: STEAMBALL_FONTS.display, size: Math.round(size * SQUARE.numberShare), weight: 700, color: metal },
