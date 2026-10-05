@@ -12,8 +12,10 @@ import { createPinballYHost } from "../common/pinbally_host.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
+const MEDIEVAL_LOGO = "C:\\PinballY\\Media\\Visual Pinball X\\Wheel Images\\Medieval Madness (Williams 1997).png";
+
 const TABLES = [
-    { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", isHidden: false },
+    { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", isHidden: false, wheelImage: MEDIEVAL_LOGO },
     { id: 2, configId: "Attack from Mars (Bally 1995)", title: "Attack from Mars", isHidden: false },
     { id: 3, configId: "Hidden Table (Gottlieb 1978)", title: "Hidden Table", isHidden: true },
 ];
@@ -271,6 +273,13 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             assert.deepEqual(recorded.texts(), ["Achievement unlocked", "Play 5 tables in one day."]);
             assert.deepEqual(recorded.position(), { x: 0, y: 0.25 });
             assert.equal(recorded.alpha, 0.5);
+        });
+
+        test("finds a table's wheel logo, and none for a table without one", () => {
+            fake.addFile(MEDIEVAL_LOGO);
+
+            assert.equal(host.getWheelImage(host.getGameInfo("Medieval Madness (Williams 1997)")), MEDIEVAL_LOGO);
+            assert.equal(host.getWheelImage(host.getGameInfo("Attack from Mars (Bally 1995)")), null);
         });
 
         test("removes a drawing layer, leaving the others", () => {

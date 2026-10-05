@@ -196,6 +196,21 @@ export default {
         stayOn: (tableTitle) => `Rester sur ${tableTitle}`,
         stayOnWheel: "Rester sur la roue",
         randomTable: "Lancer une table au hasard",
+        // One card per Period Table; its grey line says it was played this
+        // Period, or else the Streak of the daily or weekly rendezvous.
+        periodCards: {
+            day: {
+                period: "TABLE DU JOUR",
+                played: "Jouée aujourd'hui",
+                streak: (count) => `${count} jours d'affilée sur la table du jour : continue !`,
+            },
+            week: {
+                period: "TABLE DE LA SEMAINE",
+                played: "Jouée cette semaine",
+                streak: (count) => `${count} semaines d'affilée sur la table de la semaine : continue !`,
+            },
+            go: "Y aller",
+        },
     },
 
     // Lower status line text for the currently selected table.

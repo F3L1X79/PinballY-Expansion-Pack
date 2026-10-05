@@ -14,6 +14,7 @@ import lang from "./i18n.js";
 import { STEAMBALL_COLORS, STEAMBALL_FONTS } from "./steamball_palette.js";
 import { CHALLENGE_CARD_Z_INDEX, CARD_REFERENCE_HEIGHT } from "./challenge_card.js";
 import { MASTERY_STEPS, MAX_MASTERY_LEVEL, METAL_TIER_COUNT, tierOf, metalOf, tierMetalOf, withAlpha, mix, WHITE } from "./table_mastery.js";
+import { drawMasterySquare } from "./mastery_square.js";
 import { safeHandler } from "./safe_handler.js";
 
 const SCRIPT_NAME = "MasteryBar";
@@ -33,9 +34,8 @@ const CANVAS = Object.freeze({ width: 400, height: 96 });
 const PANEL = Object.freeze({ x: 10, y: 14, width: 360, height: 64, border: 1 });
 const HEAD = Object.freeze({ y: 24, size: 13, weight: 600 });
 const BAR = Object.freeze({ x: 24, y: 48, width: 262, height: 10 });
-const SQUARE = Object.freeze({ x: 312, y: 22, size: 48, border: 2, thickBorderFrom: 7, bandShare: 0.45, numberShare: 0.55 });
-// From level 1 to 10: 6 to 18 rings, peak alpha 0x60 to 0xF0.
-const HALO = Object.freeze({ minRings: 6, extraRings: 12, minPeak: 0x60, extraPeak: 0x90 });
+// Where the square sits; its look is common/mastery_square.js's.
+const SQUARE = Object.freeze({ x: 312, y: 22 });
 // Like the Challenge Card's highlight.
 const LIT = Object.freeze({ ms: 1200, glowRings: 8, glowMaxAlpha: 0x60, fillLightening: 0.5 });
 const NEVER_PLAYED = 0;
@@ -54,13 +54,19 @@ function drawText(host, dc, text, { x, y, width, size, weight, color, font = STE
     styled.draw(dc, { x, y: top, width, height: measured });
 }
 
+// The head's text and colour: the level's name in its metal, or "to discover".
+export function masteryHeadOf(level) {
+    const TEXT = lang.tableMastery;
+    return level === NEVER_PLAYED
+        ? { text: TEXT.toDiscover, color: STEAMBALL_COLORS.dim }
+        : { text: TEXT.levelNames[level - 1], color: metalOf(level) };
+}
+
 function drawPanel(host, dc, level) {
     dc.fillRect(PANEL.x, PANEL.y, PANEL.width, PANEL.height, STEAMBALL_COLORS.panelTranslucent);
     dc.frameRect(PANEL.x, PANEL.y, PANEL.width, PANEL.height, PANEL.border, STEAMBALL_COLORS.border);
-    const TEXT = lang.tableMastery;
-    const head = level === NEVER_PLAYED ? TEXT.toDiscover : TEXT.levelNames[level - 1];
-    const color = level === NEVER_PLAYED ? STEAMBALL_COLORS.dim : metalOf(level);
-    drawText(host, dc, head, { ...HEAD, x: BAR.x, width: SQUARE.x - BAR.x, color });
+    const head = masteryHeadOf(level);
+    drawText(host, dc, head.text, { ...HEAD, x: BAR.x, width: SQUARE.x - BAR.x, color: head.color });
 }
 
 // tier: null for the empty bar.
@@ -80,39 +86,14 @@ function drawPanelGlow(dc, color) {
     }
 }
 
+const drawSquare = (host, dc, level) => drawMasterySquare(host, dc, level, SQUARE.x, SQUARE.y);
+
 // The whole bar lit up, in place of the resting one.
 function drawLit(host, dc, { level, step }) {
     drawPanelGlow(dc, metalOf(level));
     drawPanel(host, dc, level);
     drawBar(dc, tierOf(level), step, true);
     drawSquare(host, dc, level);
-}
-
-// A see-through halo in the metal, fading outwards, wider and stronger
-// from one level to the next.
-function drawHalo(dc, level, metal) {
-    const glow = (level - 1) / (MAX_MASTERY_LEVEL - 1);
-    const rings = HALO.minRings + Math.round(HALO.extraRings * glow);
-    const peak = HALO.minPeak + Math.round(HALO.extraPeak * glow);
-    for (let ring = rings; ring >= 1; ring--) {
-        const fade = 1 - (ring - 1) / rings;
-        dc.frameRect(SQUARE.x - ring, SQUARE.y - ring, SQUARE.size + 2 * ring, SQUARE.size + 2 * ring, 1,
-            withAlpha(metal, Math.round(peak * fade)));
-    }
-}
-
-function drawSquare(host, dc, level) {
-    const metal = metalOf(level);
-    const { x, y, size } = SQUARE;
-    drawHalo(dc, level, metal);
-    dc.fillRect(x, y, size, size, STEAMBALL_COLORS.tile);
-    // A lighter band on top, like polished metal.
-    dc.fillRect(x, y, size, Math.round(size * SQUARE.bandShare), withAlpha(metal, 0x18 + level * 4));
-    dc.frameRect(x, y, size, size, SQUARE.border + (level >= SQUARE.thickBorderFrom ? 1 : 0), metal);
-    drawText(host, dc, String(level), {
-        x, y, width: size, height: size, size: Math.round(size * SQUARE.numberShare), weight: 700, color: metal,
-        font: STEAMBALL_FONTS.display, textAlign: "center",
-    });
 }
 
 // Every state, in the order the drawing ahead draws them: the panels,

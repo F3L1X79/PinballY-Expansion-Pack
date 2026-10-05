@@ -1,9 +1,10 @@
 // ============================================================
 // Reads the drawn Welcome Screen the way the player sees it, on the fake
-// PinballY host: whether it is open, its greeting, its bottom row's
-// labels, the highlighted choice (the label under the gold halo, or the
-// tooltip of the Avatar or the cross), and picks a choice with Next and
-// Select as a player would.
+// PinballY host: whether it is open, its greeting, its Period Table cards
+// (period, name, Mastery head, grey line, logo), its bottom row's labels,
+// the highlighted choice (the label under the gold halo, the period of the
+// card whose button it surrounds, or the tooltip of the Avatar or the
+// cross), and picks a choice with Next and Select as a player would.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -40,6 +41,24 @@ export const bottomRowLabels = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.
     .flatMap(layer => layer.texts())
     .filter(text => text !== "?");
 
+// Top to bottom: a layer's position is measured upward.
+const topToBottom = layers => [...layers].sort((a, b) => b.position().y - a.position().y);
+
+// Each Period Table card, top to bottom: { period, name, mastery (the
+// Mastery card's head), line (the grey line, null when there is none) }.
+export const periodCards = fake => topToBottom(shownLayers(fake, WELCOME_SCREEN_Z_INDEX.cards)).map(layer => {
+    const [period, name, mastery, ...rest] = layer.texts();
+    // Between the head and the button's label: the level's number in its
+    // square, the Streak's in its own, and the grey line.
+    const line = rest.slice(0, -1).find(text => !/^\d+$/.test(text)) || null;
+    return { period, name, mastery, line };
+});
+
+// Each card's logo, top to bottom: its wheel image's path, or the title
+// drawn in its place.
+export const periodCardLogos = fake => topToBottom(shownLayers(fake, WELCOME_SCREEN_Z_INDEX.logos))
+    .map(layer => layer.images()[0] || layer.texts().join(""));
+
 // A point of a layer's canvas, in window pixels: PinballY scales the
 // canvas to ySpan of the window's height, keeping its aspect, centred on
 // its position (-0.5 to 0.5 across, upward).
@@ -50,38 +69,57 @@ function toWindow(layer, window, x, y) {
     return { x: center.x + (x - canvas.width / 2) * factor, y: center.y + (y - canvas.height / 2) * factor };
 }
 
-// The text drawn under that window point, on the screen's other layers.
+// The text drawn under that window point, on the screen's other layers,
+// with its layer; null when there is none.
 function textAt(fake, window, point) {
-    for (const zIndex of [WELCOME_SCREEN_Z_INDEX.header, WELCOME_SCREEN_Z_INDEX.rows]) {
+    const zIndexes = [WELCOME_SCREEN_Z_INDEX.header, WELCOME_SCREEN_Z_INDEX.cards, WELCOME_SCREEN_Z_INDEX.rows];
+    for (const zIndex of zIndexes) {
         for (const layer of shownLayers(fake, zIndex)) {
             for (const { text, rect } of layer.strokes().filter(stroke => "text" in stroke)) {
                 const from = toWindow(layer, window, rect.x, rect.y);
                 const to = toWindow(layer, window, rect.x + rect.width, rect.y + rect.height);
-                if (point.x >= from.x && point.x <= to.x && point.y >= from.y && point.y <= to.y) return text;
+                if (point.x >= from.x && point.x <= to.x && point.y >= from.y && point.y <= to.y) return { text, layer };
             }
         }
     }
     return null;
 }
 
-// The highlighted choice: { label, tooltip }, label being the text under
-// the halo (null for the Avatar and the cross, which show a tooltip).
-export function highlighted(fake) {
+function haloLayer(fake) {
     const lit = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.highlights);
     assert.equal(lit.length, 1, "exactly one choice is highlighted");
-    const [layer] = lit;
-    const tooltip = layer.texts()[0] || null;
-    if (tooltip) return { label: null, tooltip };
+    return lit[0];
+}
+
+// The text under the halo's centre, with its layer.
+function underHalo(fake) {
+    const layer = haloLayer(fake);
     const [backdrop] = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.backdrop);
     const window = backdrop.canvasSize();
     const canvas = layer.canvasSize();
-    return { label: textAt(fake, window, toWindow(layer, window, canvas.width / 2, canvas.height / 2)), tooltip: null };
+    return textAt(fake, window, toWindow(layer, window, canvas.width / 2, canvas.height / 2));
 }
 
-// The label or tooltip of the highlighted choice.
+// The highlighted choice: { label, tooltip }, label being the text under
+// the halo (null for the Avatar and the cross, which show a tooltip).
+export function highlighted(fake) {
+    const tooltip = haloLayer(fake).texts()[0] || null;
+    if (tooltip) return { label: null, tooltip };
+    const found = underHalo(fake);
+    return { label: found ? found.text : null, tooltip: null };
+}
+
+// The period of the card whose button is highlighted, null for any other choice.
+export function highlightedCard(fake) {
+    if (haloLayer(fake).texts().length > 0) return null;
+    const found = underHalo(fake);
+    return found && found.layer.zIndex === WELCOME_SCREEN_Z_INDEX.cards ? found.layer.texts()[0] : null;
+}
+
+// The highlighted card's period, else the label or tooltip of the highlighted choice.
 const highlightedName = fake => {
     const { label, tooltip } = highlighted(fake);
-    return label || tooltip;
+    return highlightedCard(fake) || label || tooltip;
 };
 
 // The names of every choice, in the order Next walks them from the
@@ -97,8 +135,8 @@ export function readChoices(fake) {
     throw new Error("The highlight never came back to where it was.");
 }
 
-// Moves the highlight with Next to the choice with this label or tooltip,
-// then presses Select.
+// Moves the highlight with Next to the choice with this label, card
+// period or tooltip, then presses Select.
 export function choose(fake, name) {
     for (let guard = 0; guard < 20 && highlightedName(fake) !== name; guard++) press(fake, "Next");
     assert.equal(highlightedName(fake), name, `the Welcome Screen offers "${name}"`);

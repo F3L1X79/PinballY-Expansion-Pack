@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import {
-    WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, greeting, headerImages, bottomRowLabels, highlighted, readChoices, choose,
+    WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, greeting, periodCards, headerImages, bottomRowLabels, highlighted, readChoices, choose,
     welcomeScreenLayerCount,
 } from "./welcome_screen_reader.js";
 
@@ -62,8 +62,12 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     assert.deepEqual(bottomRowLabels(fake), [TEXT.stayOn("Attack from Mars Special"), TEXT.randomTable]);
     assert.deepEqual(highlighted(fake), { label: null, tooltip: lang.profiles.menuEntry }, "the Avatar is selected on opening");
 
-    assert.deepEqual(readChoices(fake), [lang.profiles.menuEntry, TEXT.closeTooltip, TEXT.stayOn("Attack from Mars Special"), TEXT.randomTable]);
-    assert.deepEqual(fake.soundsPlayed(), Array(4).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
+    const CARDS = TEXT.periodCards;
+    assert.deepEqual(periodCards(fake).map(card => card.line), [null, null], "no grey line without a Streak, nor a Play this Period");
+    assert.deepEqual(readChoices(fake), [
+        lang.profiles.menuEntry, TEXT.closeTooltip, CARDS.day.period, CARDS.week.period, TEXT.stayOn("Attack from Mars Special"), TEXT.randomTable,
+    ]);
+    assert.deepEqual(fake.soundsPlayed(), Array(6).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
     press(fake, "Prev");
     assert.deepEqual(highlighted(fake), { label: TEXT.randomTable, tooltip: null }, "Prev loops back to the last choice");
 

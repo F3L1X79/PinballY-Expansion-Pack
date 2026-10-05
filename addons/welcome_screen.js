@@ -2,7 +2,10 @@
 // Welcome Screen: at startup, a centred Steamball panel drawn over the
 // dimmed wheel greets the active Profile by the hour (its Avatar and its
 // name in gold when the Profile picker is on) and offers to close, to
-// stay on the Last Played Table or to launch a Random Game. It is a drawn
+// play the Table of the Day or of the Week (one card each, with its Table
+// Mastery and the active Profile's Streak; reading them picks and locks
+// this Period's tables, and Select launches one), to stay on the Last
+// Played Table or to launch a Random Game. It is a drawn
 // dialog of the wheel dialog module (docs/adr/0011), submitted at init
 // with the startup priority, so it comes before any other dialog and the
 // toasts wait for it. It opens 500 ms after its turn comes, drawn at once
@@ -22,6 +25,9 @@ import { getProfileStore } from "../common/profile_store.js";
 import { displayNameOf } from "../common/profile_name.js";
 import { getChangePlayer } from "../common/change_player.js";
 import { getRandomGame } from "../common/random_game.js";
+import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
+import { masteryOf } from "../common/table_mastery.js";
+import { masteryHeadOf } from "../common/mastery_bar.js";
 import { createNavigationSound } from "../common/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/steamball_palette.js";
 import {
@@ -56,6 +62,7 @@ export default function init() {
     const host = createPinballYHost();
     const store = getProfileStore();
     const randomGame = getRandomGame();
+    const periodTables = { [CHOICE.DAY]: getTableOfTheDay(), [CHOICE.WEEK]: getTableOfTheWeek() };
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
 
@@ -79,11 +86,43 @@ export default function init() {
         return last ? cleanTitle(last.title) : null;
     }
 
+    // The grey line: played this Period, or else a Streak of at least 2.
+    function greyLineOf(periodTable, texts) {
+        if (periodTable.isPlayedThisPeriod()) return { played: true, streak: 0, text: texts.played };
+        const streak = periodTable.getStreak();
+        return streak >= 2 ? { played: false, streak, text: texts.streak(streak) } : null;
+    }
+
+    // A card per Period Table offered to the active Profile; reading it
+    // picks and locks this Period's table when nobody did yet.
+    function readCards() {
+        const cards = [];
+        for (const choice of [CHOICE.DAY, CHOICE.WEEK]) {
+            const periodTable = periodTables[choice];
+            const game = periodTable.getOfferedTable();
+            if (!game) continue;
+            const texts = TEXT.periodCards[choice];
+            const mastery = masteryOf(store.getPlay(game.configId));
+            cards.push({
+                choice,
+                period: texts.period,
+                title: cleanTitle(game.title),
+                logoPath: host.getWheelImage(game),
+                mastery,
+                masteryHead: masteryHeadOf(mastery ? mastery.level : 0),
+                line: greyLineOf(periodTable, texts),
+                goLabel: TEXT.periodCards.go,
+            });
+        }
+        return cards;
+    }
+
     function readScreen() {
         const profile = store.getActiveProfile();
         const picker = getChangePlayer() !== null;
         const greeting = TEXT.greetings[partOfDay(host.now().getHours())];
         const stay = lastPlayedTitle();
+        const cards = readCards();
         return {
             picker,
             avatarPath: profile.avatarPath,
@@ -92,7 +131,8 @@ export default function init() {
                 ? TEXT.greetingWithName(greeting, displayNameOf(profile)).map((part, index) => [part, index === 1])
                 : [[TEXT.greetingAlone(greeting), false]],
             // The flippers' loop; the first one is selected on opening.
-            choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, CHOICE.STAY, CHOICE.RANDOM],
+            cards,
+            choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, ...cards.map(card => card.choice), CHOICE.STAY, CHOICE.RANDOM],
             labels: {
                 [CHOICE.AVATAR]: lang.profiles.menuEntry,
                 [CHOICE.CLOSE]: TEXT.closeTooltip,
@@ -213,6 +253,12 @@ export default function init() {
         close();
         if (choice === CHOICE.RANDOM) return randomGame.launch();
         if (choice === CHOICE.AVATAR) getChangePlayer()();
+        // Locked when the screen was read; a new Period since may have
+        // picked an Adult Table, never launched for a Child Profile.
+        if (choice in periodTables) {
+            if (periodTables[choice].isOffered()) periodTables[choice].launch();
+            else log(`The ${choice} table is no longer offered to the active Profile.`);
+        }
         // Close and Stay: closing is all they do.
         return undefined;
     }

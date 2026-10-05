@@ -1,7 +1,8 @@
 // ============================================================
 // Adult Period Tables for a Child Profile, through main.js on the fake
 // PinballY globals: while the Table of the Day is an Adult Table, the
-// child's main menu leaves it out and an adult Profile keeps it; the child's Streak goes on across that Period without counting
+// child's Welcome Screen and main menu leave it out and an adult Profile
+// keeps it; the child's Streak goes on across that Period without counting
 // it (Profile Stats and Achievement Progress agree) and still breaks on an
 // ordinary missed Period, while an adult's Streak breaks as before.
 // cabinet.json keeps those Periods next to the Table of the Day's lock,
@@ -13,7 +14,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
-import { WELCOME_SCREEN_OPEN_MS, press } from "./welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, press, periodCards, readChoices } from "./welcome_screen_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CABINET = `${PROFILES}\\cabinet.json`;
@@ -63,6 +64,11 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     const STATS = lang.profileStats;
 
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    const CARDS = lang.welcomeScreen.periodCards;
+    assert.deepEqual(periodCards(fake).map(card => card.period), [CARDS.week.period], "no Table of the Day card for the child");
+    assert.deepEqual(readChoices(fake), [
+        lang.profiles.menuEntry, lang.welcomeScreen.closeTooltip, CARDS.week.period, lang.welcomeScreen.stayOnWheel, lang.welcomeScreen.randomTable,
+    ], "the selection skips it");
     press(fake, "Exit");
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);

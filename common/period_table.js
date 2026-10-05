@@ -165,6 +165,8 @@ export function createPeriodTable(host, definition, profileStore) {
         if (game) host.playGame(game);
     }
 
+    // Whether the active Profile already played this Period's table.
+    const isPlayedThisPeriod = () => getStreakRecord().lastPeriod === getPeriodKey(host.now());
     const getLongestStreak = () => getStreakRecord().longest;
     const getPeriodsPlayed = () => getStreakRecord().periodsPlayed;
 
@@ -218,7 +220,7 @@ export function createPeriodTable(host, definition, profileStore) {
         if (playedPeriod !== undefined) recordPeriodPlayed(playedPeriod, profileName);
     }));
 
-    return { getTable, isOffered, getOfferedTable, launch, getStreak, getLongestStreak, getPeriodsPlayed };
+    return { getTable, isOffered, getOfferedTable, launch, getStreak, isPlayedThisPeriod, getLongestStreak, getPeriodsPlayed };
 }
 
 let sharedTableOfTheDay = null;

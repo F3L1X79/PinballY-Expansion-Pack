@@ -142,7 +142,17 @@ export function createFakePinballYHost({
     // Pending timers, run in due order by advanceTime(): { id, dueMs, callback, intervalMs }.
     let timers = [];
     let nextTimerId = 1;
-    let allTables = tables.map(table => ({ ...table }));
+    // A table's wheel logo is its "wheelImage" path, when that file exists.
+    // PinballY's resolveMedia is left out of the table's own keys, so tests
+    // still compare tables with their plain description.
+    const wheelImageOf = game => (game.wheelImage && files.has(game.wheelImage) ? game.wheelImage : null);
+    const withMedia = table => Object.defineProperty({ ...table }, "resolveMedia", {
+        value: (type) => {
+            const found = type === "wheel image" ? wheelImageOf(table) : null;
+            return found ? [found] : [];
+        },
+    });
+    let allTables = tables.map(withMedia);
     // null = the wheel shows every visible table, in collection order.
     let wheelConfigIds = null;
     // Script filters by full id ("User.<id>"), and the id of the one shown.
@@ -612,6 +622,7 @@ export function createFakePinballYHost({
             .map(getGameInfo),
         getCurrentTable: () => host.getWheelTables()[0] || null,
         getGameInfo,
+        getWheelImage: wheelImageOf,
         setCurrentFilter,
         createFilter,
         getCurrentFilterId: () => currentFilterId,
@@ -681,7 +692,7 @@ export function createFakePinballYHost({
         readFile: (filePath) => files.get(filePath),
         fileOperations: () => fileOperationList.map(operation => ({ ...operation })),
         fileReads: () => [...fileReadList],
-        setTables(newTables) { allTables = newTables.map(table => ({ ...table })); },
+        setTables(newTables) { allTables = newTables.map(withMedia); },
         // The current wheel selection, in wheel order (index 0 is the current
         // table), optionally under a filter id such as "Favorites".
         setWheelTables(configIds, { filterId = currentFilterId } = {}) {
