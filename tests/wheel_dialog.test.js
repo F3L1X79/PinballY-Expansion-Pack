@@ -286,3 +286,115 @@ test("a failing button action is logged and the queue still advances", async () 
         uninstallGlobals();
     }
 });
+
+// A drawn dialog that records when the module opens it and closes on demand.
+function drawnDialog(priority = DIALOG_PRIORITY.STARTUP_PROMPT) {
+    const drawn = { opened: 0, close: null, priority };
+    drawn.open = close => {
+        drawn.opened++;
+        drawn.close = close;
+    };
+    return drawn;
+}
+
+test("a drawn dialog with a higher priority opens first and holds the native one until it reports closed", async () => {
+    const { fake, dialogs } = setUp();
+    const drawn = drawnDialog();
+
+    dialogs.submit(ratingDialog("A"));
+    dialogs.submit(drawn);
+    await settle();
+    assert.equal(drawn.opened, 1);
+    assert.equal(fake.currentMenu(), null, "no native menu over the drawn dialog");
+
+    fake.fire("wheelmode");
+    await settle();
+    assert.equal(fake.currentMenu(), null, "a return to the wheel does not release the queue");
+
+    drawn.close();
+    await settle();
+    assert.deepEqual(shownMessages(fake), ["Rate A"]);
+    assert.equal(drawn.opened, 1);
+});
+
+test("isIdle is false while a drawn dialog is open, true once it closed and nothing waits", async () => {
+    const { dialogs } = setUp();
+    const drawn = drawnDialog();
+
+    dialogs.submit(drawn);
+    await settle();
+    assert.equal(dialogs.isIdle(), false);
+    assert.equal(dialogs.isDrawnDialogOpen(), true);
+
+    drawn.close();
+    assert.equal(dialogs.isIdle(), true);
+    assert.equal(dialogs.isDrawnDialogOpen(), false);
+});
+
+test("a native dialog submitted while a drawn one is open waits for it", async () => {
+    const { fake, dialogs } = setUp();
+    const drawn = drawnDialog(DIALOG_PRIORITY.RATING_PROMPT);
+
+    dialogs.submit(drawn);
+    await settle();
+    dialogs.submit({ id: "startup", message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
+    await settle();
+    assert.equal(fake.currentMenu(), null);
+
+    drawn.close();
+    await settle();
+    assert.deepEqual(shownMessages(fake), ["Startup"]);
+});
+
+test("a drawn dialog waits for a free wheel, and closing it twice advances the queue once", async () => {
+    const { fake, dialogs } = setUp();
+    const drawn = drawnDialog();
+
+    fake.playGame(GAME);
+    dialogs.submit(drawn);
+    dialogs.submit(ratingDialog("A"));
+    dialogs.submit(ratingDialog("B"));
+    await settle();
+    assert.equal(drawn.opened, 0, "not over a game");
+
+    fake.gameOver(GAME);
+    await settle();
+    assert.equal(drawn.opened, 1);
+
+    drawn.close();
+    drawn.close();
+    await settle();
+    assert.deepEqual(shownMessages(fake), ["Rate A"]);
+});
+
+test("closed listeners hear each drawn dialog close, never a native one", async () => {
+    const { fake, dialogs } = setUp();
+    const drawn = drawnDialog();
+    let heard = 0;
+    dialogs.onDrawnDialogClosed(() => { heard++; });
+
+    dialogs.submit(drawn);
+    dialogs.submit(ratingDialog("A"));
+    await settle();
+    drawn.close();
+    await settle();
+    fake.closeMenu();
+    await settle();
+    assert.equal(heard, 1);
+});
+
+test("a drawn dialog that fails to open is logged and the queue advances", async () => {
+    const { fake, dialogs } = setUp();
+    const uninstallGlobals = fake.installGlobals();
+    try {
+        dialogs.submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open() { throw new Error("boom"); } });
+        dialogs.submit(ratingDialog("A"));
+        await settle();
+        await settle();
+
+        assert.deepEqual(shownMessages(fake), ["Rate A"]);
+        assert.equal(fake.logLines().filter(line => line.includes("[WheelDialog] ERROR") && line.includes("boom")).length, 1);
+    } finally {
+        uninstallGlobals();
+    }
+});

@@ -5,11 +5,13 @@
 // add-on order in main.js never decides which dialog comes first. It owns
 // the dialog layout, the button commands and their dispatch, and advances
 // the queue on "menuclose", whether the dialog was acknowledged or
-// dismissed; tells whether any dialog is on screen or waiting. Listens to
-// "command", "menuclose" and "wheelmode".
+// dismissed; tells whether any dialog is on screen or waiting. A drawn
+// dialog (see docs/adr/0011) draws itself when its turn comes and holds the
+// queue until it reports closed; listeners hear it close, so toasts can
+// wait for it. Listens to "command", "menuclose" and "wheelmode".
 // ============================================================
 
-import { safeHandler } from "./safe_handler.js";
+import { safeHandler, logHandlerError } from "./safe_handler.js";
 import { createPinballYHost } from "./pinbally_host.js";
 
 const SCRIPT_NAME = "WheelDialog";
@@ -29,6 +31,7 @@ export function createWheelDialogs(host) {
     // from dialog to dialog; the pool only grows when a dialog needs more
     // buttons than any before it, since command IDs are finite.
     const buttonCommands = [];
+    const drawnClosedListeners = [];
 
     function getButtonCommand(index) {
         while (buttonCommands.length <= index) {
@@ -47,6 +50,10 @@ export function createWheelDialogs(host) {
         if (host.getUIMode() !== "wheel") return;
 
         const dialog = queue.shift();
+        if (dialog.open) {
+            openDrawn(dialog);
+            return;
+        }
         const buttons = dialog.buttons.map((button, index) => ({ ...button, cmd: getButtonCommand(index) }));
         shown = { dialog, buttons };
 
@@ -62,6 +69,25 @@ export function createWheelDialogs(host) {
         if (dialog.onShown) dialog.onShown();
     }
 
+    function openDrawn(dialog) {
+        const current = { dialog, drawn: true };
+        shown = current;
+        // Ignores a second call, and a call from a dialog no longer on screen.
+        const close = () => {
+            if (shown !== current) return;
+            shown = null;
+            for (const listener of drawnClosedListeners) listener();
+            scheduleShowNext();
+        };
+        try {
+            dialog.open(close);
+        } catch (error) {
+            // A dialog that cannot open must not hold the queue forever.
+            logHandlerError(SCRIPT_NAME, error);
+            close();
+        }
+    }
+
     // Shows the next dialog one tick later, so every dialog submitted in the
     // meantime competes on priority, such as those of all the add-ons' init
     // at startup.
@@ -71,6 +97,9 @@ export function createWheelDialogs(host) {
         setTimeout(safeHandler(SCRIPT_NAME, showNext), 0);
     }
 
+    // dialog: either a native one { id, message, buttons, priority, onShown },
+    // or a drawn one { priority, open(close) }, open drawing it and close
+    // to be called once it is gone.
     function submit(dialog) {
         const insertAt = queue.findIndex(queued => queued.priority > dialog.priority);
         if (insertAt === -1) queue.push(dialog);
@@ -82,14 +111,14 @@ export function createWheelDialogs(host) {
     // so the queue advances on "menuclose", not here. Async because an
     // action may animate the wheel, so its rejections are logged too.
     host.on("command", safeHandler(SCRIPT_NAME, async ev => {
-        if (!shown) return;
+        if (!shown || shown.drawn) return;
         const button = shown.buttons.find(item => item.cmd === ev.id);
         if (button && button.action) await button.action();
     }));
 
     // Fires after any menu closes; the button and Escape both close the dialog.
     host.on("menuclose", safeHandler(SCRIPT_NAME, ev => {
-        if (!shown || ev.id !== shown.dialog.id) return;
+        if (!shown || shown.drawn || ev.id !== shown.dialog.id) return;
         shown = null;
         scheduleShowNext();
     }));
@@ -101,7 +130,16 @@ export function createWheelDialogs(host) {
     // the wheel knows it would not cover one.
     const isIdle = () => !shown && queue.length === 0;
 
-    return { submit, isIdle };
+    // True while a drawn dialog is on screen: toasts and Confetti Showers
+    // wait for it to close instead of drawing over it.
+    const isDrawnDialogOpen = () => Boolean(shown && shown.drawn);
+
+    // listener: runs, guarded, each time a drawn dialog closes.
+    function onDrawnDialogClosed(listener) {
+        drawnClosedListeners.push(safeHandler(SCRIPT_NAME, listener));
+    }
+
+    return { submit, isIdle, isDrawnDialogOpen, onDrawnDialogClosed };
 }
 
 let sharedWheelDialogs = null;

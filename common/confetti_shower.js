@@ -1,6 +1,7 @@
 // ============================================================
 // Confetti Shower: about 8 s of confetti across the wheel screen, on
-// main-window layers above toasts and menus, started with a celebrated toast.
+// main-window layers above toasts and menus, started with a celebrated toast;
+// it does not check for a drawn dialog itself: the toast waits for one.
 // Each confetto (front and back) is drawn ahead, then only moved, stretched
 // and shown or hidden. An optional sound plays once as a shower starts.
 // Vanishes on "prelaunch", "gamestarted" and "attractmodestart".

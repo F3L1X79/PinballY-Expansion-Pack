@@ -5,10 +5,11 @@
 // docs/adr/0003). It takes no input and leaves on its own: it rises from
 // the bottom edge, holds a few seconds, then fades out. Cards stack, the
 // newest at the bottom, arrive staggered, at most five on screen, and
-// the oldest leaves first. Toasts wait while a game starts, runs or exits;
-// waiting ones start on "wheelmode". The hold duration and an optional
-// sound played with each card and the card's scale come from the player
-// settings. An Achievement Toast shows its Achievement Rank's emblem in
+// the oldest leaves first. Toasts wait while a game starts, runs or exits,
+// and while a drawn dialog such as the Welcome Screen is open (docs/adr/0011);
+// waiting ones start on "wheelmode" or when that dialog closes. The hold
+// duration and an optional sound played with each card and the card's
+// scale come from the player settings. An Achievement Toast shows its Achievement Rank's emblem in
 // the Rank's colour, or the trophy when that emblem's file is missing
 // (logged once). A Challenge Toast shares the queue and the card, with its
 // own accent colour, header and target icon instead of the trophy; a Mastery
@@ -23,6 +24,7 @@ import { createPinballYHost } from "./pinbally_host.js";
 import config from "./config.js";
 import { STEAMBALL_COLORS, STEAMBALL_FONTS, RANK_COLORS } from "./steamball_palette.js";
 import { getConfettiShower } from "./confetti_shower.js";
+import { getWheelDialogs } from "./wheel_dialog.js";
 
 const SCRIPT_NAME = "AchievementToast";
 
@@ -193,8 +195,11 @@ function toScale(scale) {
 
 // soundFile: absolute path played at the start of each card, empty for none.
 // confettiShower: started by a celebrated toast; the tests may leave it out.
+// wheelDialogs: the wheel dialog module, whose drawn dialogs toasts wait
+// for; the tests may leave it out.
 export function createAchievementToasts(host, {
     toastSeconds = DEFAULT_TOAST_SECONDS, soundFile = "", scale = DEFAULT_TOAST_SCALE, confettiShower = { start() {} },
+    wheelDialogs = { isDrawnDialogOpen: () => false, onDrawnDialogClosed() {} },
 } = {}) {
     const holdMs = toHoldMs(toastSeconds);
     const look = scaleLook(toScale(scale));
@@ -297,6 +302,9 @@ export function createAchievementToasts(host, {
         // PinballY stops redrawing its window while a game starts, runs or
         // exits, and the game covers it.
         if (host.getFullUIMode().runMode !== undefined) return;
+        // A drawn dialog is the one exception to "over everything": the
+        // toast, and the confetti it may start, would hide what it asks.
+        if (wheelDialogs.isDrawnDialogOpen()) return;
 
         const toast = waiting.shift();
         const layer = freeLayers.pop() || host.createDrawingLayer(ACHIEVEMENT_TOAST_Z_INDEX);
@@ -324,6 +332,7 @@ export function createAchievementToasts(host, {
 
     // Fires on every return to the wheel: starts the toasts that waited for a game.
     host.on("wheelmode", safeShowNext);
+    wheelDialogs.onDrawnDialogClosed(safeShowNext);
 
     // toast: { kind, title, description, onShown, isStale, celebrate,
     // rank, accent, tileNumber }, kind a TOAST_KIND (an Achievement when
@@ -349,6 +358,7 @@ export function getAchievementToasts() {
             soundFile: config.achievementSoundFile,
             scale: config.achievementToastScale,
             confettiShower: getConfettiShower(),
+            wheelDialogs: getWheelDialogs(),
         });
     }
     return sharedAchievementToasts;
