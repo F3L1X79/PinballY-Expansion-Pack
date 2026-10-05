@@ -107,6 +107,14 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
         await settle();
         return game;
     }
+    // Each switch brings the Welcome Screen back, closed right away.
+    async function switchTo(name) {
+        store.switchTo(name);
+        await settle();
+        fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+        press(fake, "Exit");
+        await settle();
+    }
     async function goToDay(day) {
         fake.setNow(new Date(2026, 9, day, 20, 0, 0));
         // Somebody opens PinballY's menu that day, which picks its table.
@@ -118,11 +126,9 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     assert.equal(dayStreakShown(), STATS.tableOfTheDayStreak(3, 3), "the child's Streak goes on across the adult day");
     assert.deepEqual(dayStreakProgress(), progressOf(3, 3));
 
-    store.switchTo("Bob");
-    await settle();
+    await switchTo("Bob");
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek], "an adult Profile keeps it");
-    store.switchTo("Alice");
-    await settle();
+    await switchTo("Alice");
 
     // Thursday 1 October: back to an ordinary table, which extends the Streak.
     await goToDay(1);
@@ -132,11 +138,9 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     assert.equal(dayStreakShown(), STATS.tableOfTheDayStreak(4, 4));
     assert.deepEqual(dayStreakProgress(), progressOf(4, 4), "the adult day is not counted");
 
-    store.switchTo("Bob");
-    await settle();
+    await switchTo("Bob");
     assert.equal(dayStreakShown(), STATS.tableOfTheDayStreak(0, 1), "an adult Profile's Streak broke on the adult day");
-    store.switchTo("Alice");
-    await settle();
+    await switchTo("Alice");
 
     // 2 October is an adult day, 3 October an ordinary day the child misses.
     await goToDay(2);

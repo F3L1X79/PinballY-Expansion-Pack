@@ -1,5 +1,6 @@
 ﻿// ============================================================
-// Welcome Screen: at startup, a centred Steamball panel drawn over the
+// Welcome Screen: at startup, and again whenever Change Player switches
+// to another Profile, a centred Steamball panel drawn over the
 // dimmed wheel greets the active Profile by the hour (its Avatar and its
 // name in gold when the Profile picker is on), shows its Collection
 // Mastery (the tier kept in profile.json when the tables no longer reach
@@ -68,6 +69,8 @@ export default function init() {
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
 
+    // Queued, waiting its turn in the wheel dialog module.
+    let isSubmitted = false;
     // The wheel dialog module's close, from its turn until the screen closes.
     let closeDialog = null;
     let pauseTimer = null;
@@ -234,6 +237,7 @@ export default function init() {
 
     // Its turn in the wheel dialog module: the wheel is free.
     function open(close) {
+        isSubmitted = false;
         closeDialog = close;
         startPause();
     }
@@ -276,7 +280,19 @@ export default function init() {
         return undefined;
     }
 
-    getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open });
+    function submit() {
+        isSubmitted = true;
+        getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open });
+    }
+
+    submit();
+
+    // Fires on every switch, which the Profile picker makes only to another
+    // Profile: the new player is welcomed too, read again when the screen
+    // opens. Once only when the screen is still waiting or open.
+    store.onSwitch(safeHandler(SCRIPT_NAME, () => {
+        if (!isSubmitted && !closeDialog) submit();
+    }));
 
     // Fires on every mapped button press; drives the screen while it is
     // open. Async because the Random Game animates the wheel, so its

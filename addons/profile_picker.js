@@ -17,10 +17,12 @@
 // A badge at the top right of the wheel screen shows the active Profile's
 // Avatar and name; it is redrawn on every switch, hidden on "gamestarted"
 // and shown again on "wheelmode".
-// A Profile Greeting (the Avatar growing slightly, a greeting below, then
-// a fade-out, with the optional profileGreetingSoundFile) follows every
-// pick after a short pause, the carousel staying still meanwhile. When the
-// Welcome Screen Add-on is off, it also greets the restored Profile once
+// When the Welcome Screen Add-on is on, a pick closes the carousel and the
+// screen welcomes the new Profile (picking the active one changes nothing).
+// When it is off, a Profile Greeting (the Avatar growing slightly, a
+// greeting below, then a fade-out, with the optional
+// profileGreetingSoundFile) follows every pick after a short pause, the
+// carousel staying still meanwhile, and greets the restored Profile once
 // at startup, after the same pause, as soon as the wheel is free of menus
 // and dialogs; a game or the carousel started first cancels it.
 // ============================================================
@@ -140,9 +142,10 @@ export default function init() {
     // The pause before the greeting and its animation frames; null when idle.
     let greetingDelayTimer = null;
     let greetingTimer = null;
-    // The Welcome Screen already greets the Profile by name: a second
-    // greeting right after it would be too much.
-    let startupGreetingPending = config.addOns.startupChoicePrompt === false;
+    // The Welcome Screen already greets the Profile by name, at startup and
+    // after a switch: a second greeting right after it would be too much.
+    const isWelcomeScreenOn = config.addOns.startupChoicePrompt !== false;
+    let startupGreetingPending = !isWelcomeScreenOn;
     // A sound that cannot play is logged and never stops the greeting.
     const playGreetingSound = safeHandler(SCRIPT_NAME, () => {
         if (config.profileGreetingSoundFile) host.playSound(config.profileGreetingSoundFile);
@@ -519,12 +522,19 @@ export default function init() {
             move(ev.command === "Next" ? 1 : -1);
         } else if (ev.command === "Select" || ev.command === "Launch") {
             const chosen = profiles[highlighted];
-            // The carousel stays drawn, at rest, until the greeting replaces it.
-            stopGlide();
-            placeCarousel();
-            profiles = null;
-            profileStore.switchTo(chosen.name);
-            greetAfterPause();
+            if (isWelcomeScreenOn) {
+                // The Welcome Screen welcomes a new Profile itself, on the
+                // switch; a Profile kept is welcomed by nothing.
+                close();
+                if (chosen.name !== profileStore.getActiveProfile().name) profileStore.switchTo(chosen.name);
+            } else {
+                // The carousel stays drawn, at rest, until the greeting replaces it.
+                stopGlide();
+                placeCarousel();
+                profiles = null;
+                profileStore.switchTo(chosen.name);
+                greetAfterPause();
+            }
         } else if (ev.command === "Exit") {
             close();
         }
