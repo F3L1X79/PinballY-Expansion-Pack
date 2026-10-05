@@ -269,7 +269,7 @@
             <ul>
               <li>Au démarrage, et de nouveau après un Change Player, redessiné pour le nouveau Profile ; il remplace alors la Profile Greeting. Pas de repli natif : une borne trop lente désactive l'Add-on.</li>
               <li>En haut : l'Avatar à gauche (focus par défaut, bulle noire « Changer de joueur » à sa droite), la croix à droite (bulle « Fermer » à sa gauche), le salut dessous (Bonjour 5–12, Bon après-midi 12–18, Bonsoir 18–22, « Bien le bonsoir » 22–5), sans emojis ni phrase générique, puis la Collection Mastery sur la carte de la Mastery Bar, alignée sur les détails des tables : « Objectif : 10 tables &lt;niveau suivant&gt; » à gauche, « Actuel : 7/10 » à droite, barre et carré dans le métal du palier. Picker désactivé : ni Avatar ni nom.</li>
-              <li>Au milieu, une carte par Period Table : logo, « TABLE DU JOUR / DE LA SEMAINE », nom sur une ligne (réduit jusqu'à 18, puis « … »), la carte de Table Mastery et un bouton « Y aller » à droite, centré sur elle. Une ligne grise seulement s'il y a lieu : la coche dans un petit carré et « Jouée aujourd'hui / cette semaine », ou le compte de la Streak dans le carré et « jours de série : garde-la ! ». Chaque carte s'ajuste à son contenu. Pas de Challenge : la Challenge Card l'affiche.</li>
+              <li>Au milieu, une carte par Period Table : logo, « TABLE DU JOUR / DE LA SEMAINE », nom sur une ligne (réduit jusqu'à 18, puis « … »), la carte de Table Mastery et un bouton « Y aller » à droite, centré sur elle. Une ligne grise seulement s'il y a lieu : la coche dans un petit carré et « Jouée aujourd'hui / cette semaine », ou, à partir de 2, le compte de la Streak dans le carré et « jours d'affilée sur la table du jour : continue ! » (« semaines d'affilée sur la table de la semaine » pour l'autre carte) : la série suit le rendez-vous, pas la table. Chaque carte s'ajuste à son contenu. Pas de Challenge : la Challenge Card l'affiche.</li>
               <li>En bas, côte à côte : « Rester sur &lt;Last Played Table&gt; » (ou « Rester sur la roue ») avec une flèche de retour dans un carré, et « Lancer une table au hasard » avec la boîte « ? ». Flippers en boucle Avatar → croix → jour → semaine → Rester → Hasard, halo doré sur le choix, aucun liseré doré au repos, Exit ferme. Pour un Child Profile, une Period Table qui est une Adult Table perd sa carte.</li>
               <li>Tout dessiné d'un coup (~70 ms sur la borne) puis un seul fondu : le dessin d'avance laissait l'écran vide au démarrage. Au démarrage, ouvert 500 ms après l'arrivée sur la roue (la fenêtre n'est pas encore mise en page avant). Une fenêtre portrait a une colonne de logo plus étroite. Un dialogue « dessiné » de <code>wheel_dialog.js</code> avec la priorité du startup prompt (ADR 0011) ; toasts et Confetti Showers attendent sa fermeture.</li>
               <li>Collection Mastery : le palier N veut dire 10 tables au Mastery Level N (toutes, s'il y en a moins de 10), de 0 à 10 ; 120 h au minimum pour le palier 10. Progression affichée « Actuel : 7/10 » avec une barre. Seule une Profile Reset fait perdre un palier.</li>
@@ -491,6 +491,27 @@
           </details>
         </div>
       </li>
+      <li draggable="true" tabindex="0" class="item tr-play" id="visit-streak" data-track="play" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Une série globale : les jours d'affilée passés sur la borne</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit-moyen</span></div>
+          </div>
+          <p>À côté des Streaks des Period Tables, une série qui compte les jours consécutifs où le Profile vient jouer, quelle que soit la table. Idée née en relisant la spec du Welcome Screen.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code></div>
+          <details>
+            <summary>Questions ouvertes</summary>
+            <ul>
+              <li>Qu'est-ce qui compte : ouvrir PinballY, ou faire au moins une Play ? Une Play de quelques secondes suffit-elle ?</li>
+              <li>Un nouveau terme du glossaire, distinct de la Streak d'une Period Table : lequel ? La famille Sessions la couvre-t-elle déjà en partie ?</li>
+              <li>Où l'afficher : Welcome Screen, Profile Stats ? Avec des succès à paliers ?</li>
+            </ul>
+          </details>
+        </div>
+      </li>
     </ol>
   </section>
 
@@ -500,6 +521,13 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>05/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>Welcome Screen : la Streak dite comme un rendez-vous</strong>
+              <span>La table du jour change chaque jour : la série compte les jours d'affilée sur la table du jour, pas sur une table. La ligne le dit (« 5 jours d'affilée sur la table du jour : continue ! ») et n'apparaît qu'à partir de 2. Celle de la semaine reste. Une série globale de jours sur la borne est mise en fin de file.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>03/10 <span class="count">(8)</span></summary>
           <ol>
             <li><strong>Un Welcome Screen dessiné, avec la Collection Mastery</strong>
