@@ -83,6 +83,13 @@
   .now p { margin: 0; max-width: 64ch; }
   .now .next { font-family: var(--cond); font-size: 1rem; color: var(--muted); }
   .now .next code { color: var(--gold); }
+  .totry { list-style: none; margin: 0; padding: 4px 0; }
+  .totry li { display: grid; grid-template-columns: minmax(0, 15em) 5.5em minmax(0, 1fr); gap: 4px 14px; padding: 7px 18px; border-top: 1px solid var(--border); font-size: .92rem; align-items: baseline; }
+  .totry li:first-child { border-top: 0; }
+  .totry .ref { font-family: var(--cond); color: var(--faint); white-space: nowrap; }
+  .totry .what { color: var(--muted); }
+  @media (max-width: 640px) { .totry li { grid-template-columns: 1fr auto; } .totry .what { grid-column: 1 / -1; } }
+  .why { margin: 4px 0 0; padding-left: 1.2em; }
 
   /* ===== Decisions + matrix ===== */
   .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: start; }
@@ -218,23 +225,52 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 04.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 05.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
   <!-- ===== In progress ===== -->
   <section>
-    <p class="eyebrow">En cours <span class="count">(1)</span></p>
+    <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>Profiles marqués</strong> livrés (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/97">#97</a>) : Admin Profile, Child Profile et « Réinitialiser un profil » dans le menu Exit, à essayer sur la borne. <strong>Menus allégés</strong> livrés (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/103">#103</a>) : sections du menu principal, nouveaux noms et Add-on Menu Cleanup, à essayer sur la borne. <strong>Play Log</strong> livré (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/110">#110</a>) : chaque Play dans <code>play-log-&lt;année&gt;.json</code>, mis de côté par la Profile Reset, à essayer sur la borne. <strong>Règle d'une minute</strong> livrée (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/113">#113</a>) : seules les Plays comptent (cumuls, Period Tables, Random Games, session stats, Challenges), le Rage Quit mis à part, à essayer sur la borne. <strong>Challenges rééquilibrés</strong> (ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/119">#119</a>) : chaque modèle tire son objectif dans sa propre plage, à essayer sur la borne. <strong>Installation non invasive</strong> livrée (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/120">#120</a>) : le pack vit dans <code>Scripts\ExpansionPack</code> et s'installe par une ligne d'import, borne basculée. <strong>Tour du monde et Secret Achievements</strong> livrés (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/124">#124</a>) : le tour d'une traite de « Toutes les tables », Rage Quit, Grand Return et Tour du monde en « ??? » avec leur indice, à essayer sur la borne. <strong>Profile Reset avec message</strong> livrée (tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/128">#128</a> et <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/129">#129</a>) : un message avec « OK » dit si c'est fait, et « Tous les profils » les remet tous à zéro d'un coup, à essayer sur la borne. <strong>Barre de défilement de l'Achievement List</strong> livrée (ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/130">#130</a>) : une barre fine et dorée dans la marge droite, qui glisse avec les lignes, à juger sur la borne. <strong>Confetti Shower</strong> livrée (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/131">#131</a>) : une pluie de confettis avec le toast d'un Challenge réussi ou d'un Achievement Platinum, son au choix (<code>CONFETTI_SOUND_FILE</code>), à essayer sur la borne. <strong>Maîtrise des tables</strong> livrée (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/134">#134</a>) : la Mastery Bar sous la Challenge Card, qui s'allume après une Play qui l'a fait avancer, et un Mastery Toast à chaque niveau atteint, avec une Confetti Shower au niveau 10, à essayer sur la borne. <strong>Nouveaux Secret Achievements</strong> livrés (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/138">#138</a>) : huit surprises dans la famille Surprises (Oiseau de nuit, Nuit de pleine lune, Vendredi 13, Encore une !, Quatre saisons, Pause déjeuner, Heure miroir, Voyage dans le temps) et les trois secrets existants re-classés, à essayer sur la borne.</p>
-      <span class="next">Ensuite : <code>/implement</code> #146 puis #147, <a href="#startup-screen">Welcome Screen</a></span>
+      <p><strong><a href="#startup-screen">Welcome Screen</a></strong> (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/145">#145</a>)</p>
+      <span class="next">Ensuite : <code>/implement</code> #146 puis #147</span>
+    </div>
+  </section>
+
+  <!-- ===== To try on the cabinet ===== -->
+  <section>
+    <p class="eyebrow">À essayer sur la borne <span class="count">(11)</span></p>
+    <div class="panel">
+      <ul class="totry">
+        <li><strong>Profiles marqués</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/97">#97</a></span><span class="what">Admin Profile, Child Profile, « Réinitialiser un profil » dans le menu Exit</span></li>
+        <li><strong>Menus allégés</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/103">#103</a></span><span class="what">sections du menu principal, nouveaux noms, Menu Cleanup</span></li>
+        <li><strong>Play Log</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/110">#110</a></span><span class="what">chaque Play dans <code>play-log-&lt;année&gt;.json</code>, mis de côté par la Profile Reset</span></li>
+        <li><strong>Règle d'une minute</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/113">#113</a></span><span class="what">seules les Plays comptent, sauf pour le Rage Quit</span></li>
+        <li><strong>Challenges rééquilibrés</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/119">#119</a></span><span class="what">chaque modèle tire son objectif dans sa propre plage</span></li>
+        <li><strong>Tour du monde et secrets</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/124">#124</a></span><span class="what">tour d'une traite de « Toutes les tables », secrets en « ??? » avec indice</span></li>
+        <li><strong>Profile Reset avec message</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/128">#128</a> <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/129">#129</a></span><span class="what">message « OK », et « Tous les profils » d'un coup</span></li>
+        <li><strong>Barre de défilement</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/130">#130</a></span><span class="what">barre dorée de l'Achievement List, à juger</span></li>
+        <li><strong>Confetti Shower</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/131">#131</a></span><span class="what">avec un Challenge réussi ou un Achievement Platinum, <code>CONFETTI_SOUND_FILE</code></span></li>
+        <li><strong>Maîtrise des tables</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/134">#134</a></span><span class="what">Mastery Bar qui s'allume, Mastery Toast, confettis au niveau 10</span></li>
+        <li><strong>Nouveaux Secret Achievements</strong> <span class="ref"><a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/138">#138</a></span><span class="what">huit surprises (Oiseau de nuit, Vendredi 13…), trois secrets re-classés</span></li>
+      </ul>
     </div>
   </section>
 
   <!-- ===== Queue ===== -->
   <section>
     <p class="eyebrow">File d'attente <span class="count" id="queue-count"></span></p>
-    <p class="lede"><strong>Pourquoi cet ordre :</strong> finir ce qui est en cours, lancer tôt ce qui accumule des données, préparer l'arrivée de nouveaux joueurs, puis l'écran d'accueil dessiné (le premier écran vu) et la fiche joueur, qui partagent la même surface, avant les records par Profile, leurs rivalités et ce qui s'appuie sur la fiche joueur. Le Year in Pinball passe avant les Challenges adaptés, qui attendent des mois de Play Log. Traductions et Distribution à la fin, quand les textes et les fonctionnalités sont stables.</p>
+    <div class="lede"><strong>Pourquoi cet ordre :</strong>
+      <ul class="why">
+        <li>finir ce qui est en cours ;</li>
+        <li>lancer tôt ce qui accumule des données ;</li>
+        <li>préparer l'arrivée de nouveaux joueurs ;</li>
+        <li>écran d'accueil puis fiche joueur (même surface), avant les records par Profile et leurs rivalités ;</li>
+        <li>Year in Pinball avant les Challenges adaptés (qui attendent des mois de Play Log) ;</li>
+        <li>traductions et distribution à la fin, quand tout est stable.</li>
+      </ul>
+    </div>
     <p class="lede">Glisse une ligne, ou utilise ▲ ▼ (ou <kbd>ALT</kbd> + flèches sur la ligne surlignée), pour changer la priorité. Ton ordre reste dans ce navigateur : copie-le et colle-le-moi pour que je l'écrive dans le fichier.</p>
 
     <div class="toolbar">
