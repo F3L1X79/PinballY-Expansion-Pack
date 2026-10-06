@@ -284,6 +284,32 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="level-extras" data-track="play" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Player Level : enfants à égalité, feu d'artifice, niveau sur l'Avatar</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Trois idées du 06/10/2026 autour du Player Level de la <a href="#stats-drawn">fiche joueur (n° <span data-ref="stats-drawn"></span>)</a> : booster le niveau d'un Child Profile pour qu'il suive celui d'un adulte (il n'a ni <code>nightOwl</code> ni les groupes d'Adult Tables) ; un feu d'artifice à chaque montée de niveau ; le niveau affiché discrètement dans un coin de l'Avatar.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la fiche joueur, qui crée le Player Level et le Level Toast</div>
+          <details>
+            <summary>Questions ouvertes (premier round posé, pistes recommandées)</summary>
+            <ul>
+              <li>Boost enfant : multiplicateur calculé (points de l'enfant × points accessibles à un adulte ÷ points accessibles à l'enfant), multiplicateur fixe, courbe de niveaux moins chère, ou succès de remplacement ? Piste : le multiplicateur calculé, même courbe pour tous.</li>
+              <li>Un Secret Achievement Gold propre aux enfants à la place de <code>nightOwl</code> (un « lève-tôt » le matin) ? Piste : oui.</li>
+              <li>Feu d'artifice : nouvel effet distinct de la Confetti Shower (fusées et gerbes, même mécanique non bloquante), ou la Confetti Shower elle-même ? Revient sur « ni confettis » du Level Toast. Piste : nouvel effet.</li>
+              <li>À chaque Level Toast (niveaux regagnés compris), seulement un niveau jamais atteint, ou certains paliers ? Piste : chaque Level Toast.</li>
+              <li>Niveau sur l'Avatar : badge du Profile seul, badge et picker, ou partout ? Piste : badge et picker.</li>
+              <li>Forme : pastille ronde dans le coin bas-droit, nombre seul avec ombre, ou bandeau « Niv. 7 » ? Piste : pastille ronde.</li>
+              <li>Plus tard : le réglage <code>CONFETTI=false</code> coupe-t-il aussi le feu d'artifice ? Que se passe-t-il quand un même retour sur la roue amène confettis et feu d'artifice ? Le niveau sur le badge change-t-il tout de suite ou avec le Level Toast ?</li>
+            </ul>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="stats" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -515,31 +541,6 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
-          </details>
-        </div>
-      </li>
-      <li draggable="true" tabindex="0" class="item tr-play" id="level-extras" data-track="play" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Player Level : enfants à égalité, feu d'artifice, niveau sur l'Avatar</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Trois idées du 06/10/2026 autour du Player Level de la <a href="#stats-drawn">fiche joueur (n° <span data-ref="stats-drawn"></span>)</a> : booster le niveau d'un Child Profile pour qu'il suive celui d'un adulte (il n'a ni <code>nightOwl</code> ni les groupes d'Adult Tables) ; un feu d'artifice à chaque montée de niveau ; le niveau affiché discrètement dans un coin de l'Avatar.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la fiche joueur, qui crée le Player Level et le Level Toast</div>
-          <details>
-            <summary>Questions ouvertes (premier round posé, pistes recommandées)</summary>
-            <ul>
-              <li>Boost enfant : multiplicateur calculé (points de l'enfant × points accessibles à un adulte ÷ points accessibles à l'enfant), multiplicateur fixe, courbe de niveaux moins chère, ou succès de remplacement ? Piste : le multiplicateur calculé, même courbe pour tous.</li>
-              <li>Un Secret Achievement Gold propre aux enfants à la place de <code>nightOwl</code> (un « lève-tôt » le matin) ? Piste : oui.</li>
-              <li>Feu d'artifice : nouvel effet distinct de la Confetti Shower (fusées et gerbes, même mécanique non bloquante), ou la Confetti Shower elle-même ? Revient sur « ni confettis » du Level Toast. Piste : nouvel effet.</li>
-              <li>À chaque Level Toast (niveaux regagnés compris), seulement un niveau jamais atteint, ou certains paliers ? Piste : chaque Level Toast.</li>
-              <li>Niveau sur l'Avatar : badge du Profile seul, badge et picker, ou partout ? Piste : badge et picker.</li>
-              <li>Forme : pastille ronde dans le coin bas-droit, nombre seul avec ombre, ou bandeau « Niv. 7 » ? Piste : pastille ronde.</li>
-              <li>Plus tard : le réglage <code>CONFETTI=false</code> coupe-t-il aussi le feu d'artifice ? Que se passe-t-il quand un même retour sur la roue amène confettis et feu d'artifice ? Le niveau sur le badge change-t-il tout de suite ou avec le Level Toast ?</li>
-            </ul>
           </details>
         </div>
       </li>
