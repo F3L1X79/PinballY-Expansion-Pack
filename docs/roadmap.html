@@ -310,6 +310,28 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="visit-streak" data-track="play" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Une série globale : les jours d'affilée passés sur la borne</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit-moyen</span></div>
+          </div>
+          <p>À côté des Streaks des Period Tables, une série qui compte les jours consécutifs où le Profile vient jouer, quelle que soit la table. Idée née en relisant la spec du Welcome Screen.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code></div>
+          <details>
+            <summary>Questions ouvertes</summary>
+            <ul>
+              <li>Qu'est-ce qui compte : ouvrir PinballY, ou faire au moins une Play ? Une Play de quelques secondes suffit-elle ?</li>
+              <li>Un nouveau terme du glossaire, distinct de la Streak d'une Period Table : lequel ? La famille Sessions la couvre-t-elle déjà en partie ?</li>
+              <li>Où l'afficher : Welcome Screen, Profile Stats ? Avec des succès à paliers ?</li>
+            </ul>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="stats" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -393,29 +415,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="language-menu" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Choix de la langue dans un menu</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Choisir la langue de l'interface depuis un menu du cabinet, sans éditer <code>.env.local</code> ni <code>common/config.js</code>. Aujourd'hui, <code>common/i18n.js</code> fige la langue au chargement, à partir de <code>config.language</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Questions ouvertes (4)</summary>
-            <ul>
-              <li>Où placer l'entrée : menu principal via <code>getMainMenu().add(...)</code>, ou le menu Exit, réservé à l'Admin Profile comme « Réinitialiser un profil » (livré le 01/10) ?</li>
-              <li>Où l'enregistrer : dans <code>optionSettings</code> (sans <code>save()</code>), ou dans <code>profile.json</code>, ce qui donne une langue par Profile ?</li>
-              <li>Changement immédiat, qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage, ou appliqué au prochain lancement de PinballY ?</li>
-              <li>Le menu liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
-            </ul>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-profiles" id="year-in-pinball" data-track="profiles" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -463,6 +462,28 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-share" id="language-menu" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Choix de la langue dans un menu</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Choisir la langue de l'interface depuis un menu du cabinet, sans éditer <code>.env.local</code> ni <code>common/config.js</code>. Aujourd'hui, <code>common/i18n.js</code> fige la langue au chargement, à partir de <code>config.language</code>.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Où placer l'entrée : menu principal via <code>getMainMenu().add(...)</code>, ou le menu Exit, réservé à l'Admin Profile comme « Réinitialiser un profil » (livré le 01/10) ?</li>
+              <li>Où l'enregistrer : dans <code>optionSettings</code> (sans <code>save()</code>), ou dans <code>profile.json</code>, ce qui donne une langue par Profile ?</li>
+              <li>Changement immédiat, qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage, ou appliqué au prochain lancement de PinballY ?</li>
+              <li>Le menu liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
+            </ul>
+          </details>
+        </div>
+      </li>
 
       <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -478,45 +499,6 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Distribution : installation et mises à jour</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Réécrit la section Install des README</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/rank_*.png</code>) des emblèmes de League of Legends.</p>
-          </details>
-        </div>
-      </li>
-      <li draggable="true" tabindex="0" class="item tr-play" id="visit-streak" data-track="play" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Une série globale : les jours d'affilée passés sur la borne</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit-moyen</span></div>
-          </div>
-          <p>À côté des Streaks des Period Tables, une série qui compte les jours consécutifs où le Profile vient jouer, quelle que soit la table. Idée née en relisant la spec du Welcome Screen.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code></div>
-          <details>
-            <summary>Questions ouvertes</summary>
-            <ul>
-              <li>Qu'est-ce qui compte : ouvrir PinballY, ou faire au moins une Play ? Une Play de quelques secondes suffit-elle ?</li>
-              <li>Un nouveau terme du glossaire, distinct de la Streak d'une Period Table : lequel ? La famille Sessions la couvre-t-elle déjà en partie ?</li>
-              <li>Où l'afficher : Welcome Screen, Profile Stats ? Avec des succès à paliers ?</li>
-            </ul>
           </details>
         </div>
       </li>
@@ -541,6 +523,24 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Distribution : installation et mises à jour</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Réécrit la section Install des README</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/rank_*.png</code>) des emblèmes de League of Legends.</p>
           </details>
         </div>
       </li>
