@@ -14,7 +14,8 @@
 // (logged once). A Challenge Toast shares the queue and the card, with its
 // own accent colour, header and target icon instead of the trophy; a Mastery
 // Toast its own header (Collection Mastery's for a Collection Tier), the reached level's metal as its accent and the
-// level's number drawn in its tile. A celebrated toast starts the
+// level's number drawn in its tile; a Level Toast the Player Level's colour
+// and the reached level's number in its tile. A celebrated toast starts the
 // Confetti Shower when it starts.
 // ============================================================
 
@@ -79,7 +80,7 @@ const COLORS = Object.freeze({
     transparent: STEAMBALL_COLORS.transparent,
 });
 
-export const TOAST_KIND = Object.freeze({ ACHIEVEMENT: "achievement", CHALLENGE: "challenge", MASTERY: "mastery" });
+export const TOAST_KIND = Object.freeze({ ACHIEVEMENT: "achievement", CHALLENGE: "challenge", MASTERY: "mastery", LEVEL: "level" });
 
 // Icons in the pack's assets folder, drawn by absolute path: drawImage
 // resolves relative paths from the PinballY folder, not the pack's.
@@ -98,6 +99,11 @@ const KIND_LOOKS = Object.freeze({
     // No icon: each toast brings its accent and the number its tile shows.
     [TOAST_KIND.MASTERY]: {
         header: () => lang.tableMastery.toastHeader,
+    },
+    // No icon either: the reached level's number fills the tile.
+    [TOAST_KIND.LEVEL]: {
+        accent: STEAMBALL_COLORS.playerLevel,
+        header: () => lang.playerLevel.toastHeader,
     },
 });
 
@@ -340,7 +346,8 @@ export function createAchievementToasts(host, {
     // Toast, onShown running when the toast starts, isStale (optional)
     // dropping it unshown when it returns true at its turn, celebrate
     // (optional) starting the Confetti Shower with it; a Mastery Toast
-    // gives its accent and the number its tile shows, and header (optional)
+    // gives its accent and the number its tile shows, a Level Toast that
+    // number only, and header (optional)
     // replaces the kind's.
     function submit(toast) {
         waiting.push(toast);

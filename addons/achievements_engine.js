@@ -6,7 +6,10 @@
 // module, which announces it with a card in the bottom-right corner once no
 // game is running, with a Confetti Shower for a Platinum; an Achievement
 // becomes Notified, for the Profile that unlocked it, when its toast starts. A Profile Reset forgets what was
-// announced to that Profile and drops its toasts still waiting.
+// announced to that Profile and drops its toasts still waiting. When the
+// toasts of a check bring a higher Player Level, one Level Toast for the
+// highest level follows them; the level at startup, at a Profile switch
+// and after a Profile Reset is the baseline, kept in memory, never announced.
 // Also adds the Achievement List entry to the main menu, right after "Play",
 // and the Profile Stats entry right after it. The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
@@ -29,7 +32,8 @@ import { buildWorldTourAchievements } from "../achievements/world_tour.js";
 import { createWorldTour } from "../common/world_tour.js";
 import { buildSurprisesAchievements } from "../achievements/surprises.js";
 import { createSurprises } from "../common/surprises.js";
-import { getAchievementToasts } from "../common/achievement_toast.js";
+import { getAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
+import { getPlayerLevel } from "../common/player_level.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
 import { createAchievementList } from "../common/achievement_list.js";
 import { createProfileStats } from "../common/profile_stats.js";
@@ -104,8 +108,31 @@ export default function init() {
     // before its Profile's reset is stale.
     const resetCountByProfile = new Map();
     const resetCountOf = profileKey => resetCountByProfile.get(profileKey) || 0;
+    // The Player Level each Profile is known to have, by Profile name in
+    // lower case: announced, or the baseline.
+    const knownLevelByProfile = new Map();
 
-    function checkForNewAchievements() {
+    // The level once every toast submitted so far has started.
+    function levelOnceShown(achievements, submittedIds) {
+        const ids = [...profileStore.getProfileData().notified, ...submittedIds];
+        return getPlayerLevel(ids, achievements).level;
+    }
+
+    function submitLevelToast(profileKey, level, resetCount) {
+        const TEXT = lang.playerLevel;
+        achievementToasts.submit({
+            kind: TOAST_KIND.LEVEL,
+            tileNumber: level,
+            title: TEXT.toastTitle(level),
+            description: TEXT.toastDescription,
+            onShown() {},
+            isStale: () => resetCountOf(profileKey) !== resetCount,
+        });
+    }
+
+    // isBaseline: the check at startup or at a Profile switch, whose level,
+    // toasts included, is never announced.
+    function checkForNewAchievements({ isBaseline = false } = {}) {
         // A toast may start after a switch: it is credited to the Profile
         // active when it was unlocked.
         const profileName = profileStore.getActiveProfile().name;
@@ -113,7 +140,12 @@ export default function init() {
         if (!submittedIdsByProfile.has(profileKey)) submittedIdsByProfile.set(profileKey, new Set());
         const submittedIds = submittedIdsByProfile.get(profileKey);
         const resetCount = resetCountOf(profileKey);
-        evaluateAchievements(getAllAchievements(), profileStore, (achievement) => {
+        const achievements = getAllAchievements();
+        // Follows a drop (a gone Achievement, a lowered Rank), so a level
+        // lost then won back is announced again.
+        const levelBefore = levelOnceShown(achievements, submittedIds);
+        const knownLevel = Math.min(knownLevelByProfile.get(profileKey) ?? levelBefore, levelBefore);
+        evaluateAchievements(achievements, profileStore, (achievement) => {
             if (submittedIds.has(achievement.id)) return;
             submittedIds.add(achievement.id);
             achievementToasts.submit({
@@ -125,11 +157,15 @@ export default function init() {
                 isStale: () => resetCountOf(profileKey) !== resetCount,
             });
         });
+        const levelAfter = levelOnceShown(achievements, submittedIds);
+        if (levelAfter > knownLevel && !isBaseline) submitLevelToast(profileKey, levelAfter, resetCount);
+        knownLevelByProfile.set(profileKey, Math.max(knownLevel, levelAfter));
     }
 
     // The timer callback runs outside the event handler's call stack, so it
     // needs its own guard.
-    const safeCheckForNewAchievements = safeHandler(SCRIPT_NAME, checkForNewAchievements);
+    const safeCheckForNewAchievements = safeHandler(SCRIPT_NAME, () => checkForNewAchievements());
+    const safeCheckBaseline = safeHandler(SCRIPT_NAME, () => checkForNewAchievements({ isBaseline: true }));
 
     // Fire on table launch and exit (the launch check catches the "grand
     // return" flag set at launch). Deferred by one tick so the stats trackers'
@@ -149,16 +185,18 @@ export default function init() {
         if (!isReset) return;
         const profileKey = profileName.toLowerCase();
         submittedIdsByProfile.delete(profileKey);
+        knownLevelByProfile.delete(profileKey);
         resetCountByProfile.set(profileKey, resetCountOf(profileKey) + 1);
     }));
 
     // Fires on every Profile switch: announces what the new Profile has
-    // unlocked but was never announced (for example after an update).
-    profileStore.onSwitch(safeCheckForNewAchievements);
+    // unlocked but was never announced (for example after an update); its
+    // level, those toasts included, is the baseline.
+    profileStore.onSwitch(safeCheckBaseline);
 
     // Checked right after the flag is set, so the World Tour's toast shows
     // on the wheel the moment the last table is selected.
-    createWorldTour(createPinballYHost(), profileStore, { onCompleted: checkForNewAchievements });
+    createWorldTour(createPinballYHost(), profileStore, { onCompleted: () => checkForNewAchievements() });
     // Its Play listener runs inside the "gameover" handlers, so the deferred
     // check above reads what it recorded.
     createSurprises(createPinballYHost(), profileStore);
@@ -166,5 +204,5 @@ export default function init() {
     // Startup check, one tick after the inits, so a Welcome Screen submitted
     // at startup is already waiting whatever the order in main.js, and its
     // toasts wait for it.
-    setTimeout(safeCheckForNewAchievements, 0);
+    setTimeout(safeCheckBaseline, 0);
 }

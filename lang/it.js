@@ -523,4 +523,10 @@ export default {
         collectionToastTitle: (tier, name) => `Tier ${tier}: ${name}`,
         collectionToastDescription: (count, name) => `${count} ${count === 1 ? "table" : "tables"} at ${name} or above`,
     },
+    // TODO: translation pass
+    playerLevel: {
+        toastHeader: "Player Level",
+        toastTitle: (level) => `Level ${level}`,
+        toastDescription: "Your Achievements took you to a new level.",
+    },
 };

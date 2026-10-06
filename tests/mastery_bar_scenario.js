@@ -3,7 +3,7 @@
 // the chosen Add-ons and Profiles, each Profile's earlier Plays seeded in
 // its profile.json. Reads what the Mastery Bar shows: its visible layers'
 // texts (the level's name, its number, "To discover"), how full its bar
-// is, whether it is lit and where it sits; the Mastery Toasts, the
+// is, whether it is lit and where it sits; the Mastery Toasts, the Level Toasts, the
 // Collection Tier kept in profile.json and the Confetti Shower starts. Never loaded by PinballY.
 // ============================================================
 
@@ -36,16 +36,16 @@ export const TABLES = [
 // A Profile's earlier Plays on a table, as its profile.json keeps them.
 export const playedFor = seconds => ({ count: 1, seconds, lastPlayed: "2026-09-01T20:00:00" });
 
-// addOns: the Add-ons on; profiles: { name: { plays, isChild, collectionTier } }, Guest's
+// addOns: the Add-ons on; profiles: { name: { plays, isChild, collectionTier, notified } }, Guest's
 // under "guest"; active: the Profile in cabinet.json; challenge: the week's
 // lock in cabinet.json (undefined lets the Challenges draw one).
 export async function startScenario({
     addOns = ["tableMastery"], profiles = {}, active = "guest", challenge, tables = TABLES, language = "en",
 } = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
-    for (const [name, { plays = {}, isChild = false, collectionTier }] of Object.entries(profiles)) {
+    for (const [name, { plays = {}, isChild = false, collectionTier, notified = [] }] of Object.entries(profiles)) {
         fake.addFile(profileFile(name), JSON.stringify({
-            version: 1, plays, notified: [], ...(isChild ? { isChild } : {}), ...(collectionTier ? { collectionTier } : {}),
+            version: 1, plays, notified, ...(isChild ? { isChild } : {}), ...(collectionTier ? { collectionTier } : {}),
         }));
     }
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({
@@ -98,6 +98,17 @@ export function shownTop(fake) {
 export const masteryToasts = fake => toastDrawings(fake)
     .map(drawing => drawing.texts.join(" | "))
     .filter(texts => texts.includes("TABLE MASTERY"));
+// Every Level Toast drawn so far, its texts joined the same way.
+export const levelToasts = fake => toastDrawings(fake)
+    .map(drawing => drawing.texts.join(" | "))
+    .filter(texts => texts.includes("PLAYER LEVEL"));
+// The Level Toast of this level, its texts joined the same way.
+export const levelToastOf = level => `${level} | PLAYER LEVEL | Level ${level} | Your Achievements took you to a new level.`;
+// The Table of the Day and of the Week fall on Twilight Zone, the last
+// table, so a test that never plays it never earns their Achievements.
+export const pickLastTables = () => { Math.random = () => 0.999; };
+// Every toast drawn so far, of any kind, its texts joined the same way.
+export const allToasts = fake => toastDrawings(fake).map(drawing => drawing.texts.join(" | "));
 // Every Collection Tier's Mastery Toast drawn so far, its texts joined the same way.
 export const collectionToasts = fake => toastDrawings(fake)
     .map(drawing => drawing.texts.join(" | "))
@@ -107,6 +118,8 @@ export const savedCollectionTier = (fake, name) => JSON.parse(fake.readFile(prof
 export const showerStarts = fake => fake.logLines().filter(line => line.startsWith("[ConfettiShower] Started")).length;
 // Longer than a toast's whole life (rise, hold, fade).
 export const ONE_TOAST_MS = 6000;
+// Long enough for every toast of a Play, shown five at a time.
+export const ALL_TOASTS_MS = 3 * ONE_TOAST_MS;
 
 export const errorLines = fake => fake.logLines().filter(line => line.includes("ERROR"));
 

@@ -4,7 +4,7 @@
 // completion and play-time Achievements, each Profile is announced an
 // Achievement once even if another one already had it, a toast waiting
 // at a switch is Notified for the Profile that unlocked it, a switch
-// announces what the new Profile has newly unlocked, and the Achievement
+// announces what the new Profile has newly unlocked (but no Player Level), and the Achievement
 // List shows the active Profile's Achievements.
 // ============================================================
 
@@ -115,8 +115,10 @@ test("each Profile unlocks and is announced its own Achievements", async () => {
         "playTimeMilestone:1h",
     ];
     assert.deepEqual(notifiedOf(fake, "Bob"), bobIds, "Bob is announced what Alice already had, and his own");
-    assert.equal(toastDrawings(fake).length, allNotifiedOf(fake, "Alice").length + allNotifiedOf(fake, "Bob").length,
-        "one toast per Achievement and Profile");
+    const isLevelToast = drawing => drawing.texts.includes("PLAYER LEVEL");
+    assert.equal(toastDrawings(fake).filter(drawing => !isLevelToast(drawing)).length,
+        allNotifiedOf(fake, "Alice").length + allNotifiedOf(fake, "Bob").length, "one toast per Achievement and Profile");
+    assert.equal(toastDrawings(fake).filter(isLevelToast).length, 1, "Alice's Play only: a switch announces no level");
     assert.deepEqual(notifiedOf(fake, "guest"), []);
 
     // The Achievement List shows Bob's Achievements.

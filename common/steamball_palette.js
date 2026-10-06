@@ -24,6 +24,9 @@ export const STEAMBALL_COLORS = Object.freeze({
     dim: 0xFF6E7887,
     challengeAccent: 0xFF4FD1B0,
     challengeAccentLit: 0xFFB8FFF0,
+    // Provisional, the prototype's lavender: apart from gold (selection)
+    // and the metals (Table Mastery).
+    playerLevel: 0xFF8C9BFF,
     // Provisional, the border's colour until the Achievement List's key caps
     // and pills are checked on the cabinet.
     // StyledText ignores a semi-transparent backgroundColor.
