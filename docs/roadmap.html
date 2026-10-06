@@ -225,7 +225,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 05.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 06.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -491,6 +491,24 @@
               <li>Un nouveau terme du glossaire, distinct de la Streak d'une Period Table : lequel ? La famille Sessions la couvre-t-elle déjà en partie ?</li>
               <li>Où l'afficher : Welcome Screen, Profile Stats ? Avec des succès à paliers ?</li>
             </ul>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Configuration : des sections lisibles et les liens entre Add-ons au grand jour</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+          </div>
+          <p><code>.env.example</code> découpé en sections commentées (Profils, Progression, Présentation, Menus…), avec une ligne par lien entre Add-ons (« sans <code>ADD_ON_PROFILE_PICKER</code>, les Challenges… »). Dans le code, un seul point d'accès du genre <code>isAddOnOn("challenges")</code> remplace les <code>config.addOns.X !== false</code> éparpillés, pour retrouver chaque lien d'un <code>grep</code>.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par point) puis <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code></div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Né d'une critique du 06/10/2026 qui proposait des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances. Écarté : les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé), donc rien à valider ; les groupes ne suivent pas l'usage (on coupe un Add-on précis) ; un format imbriqué obligerait les joueurs à éditer du JS ou du JSON et casserait les clés déjà présentes dans leurs <code>.env.local</code>. On garde le format plat ; on n'y revient que si une vraie dépendance dure apparaît.</p>
           </details>
         </div>
       </li>
