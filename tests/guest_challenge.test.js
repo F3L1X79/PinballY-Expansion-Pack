@@ -1,8 +1,8 @@
 // ============================================================
 // Guest follows the weekly Challenge like any other Profile, through
 // main.js on the fake PinballY globals: the Challenge Card, the counted
-// games, the Challenge Toast, the Challenge Tables, the Profile Stats line,
-// the Challenges Achievements and the verdict on the previous week. Guest
+// games, the Challenge Toast, the Challenge Tables, the Challenges
+// Achievements and the verdict on the previous week. Guest
 // still never shows in the Unlock Rate, and each Profile keeps its own
 // progress across switches.
 // ============================================================
@@ -55,7 +55,6 @@ test("Guest follows the week's Challenge, completes it and earns its record, apa
     await settle();
     const TEXT = lang.challenges;
     const LIST = lang.achievementList;
-    const STATS = lang.profileStats;
     const ACHIEVEMENT = lang.achievements;
     const title = TEXT.titles.manufacturerTables(2, "Bally");
 
@@ -69,13 +68,6 @@ test("Guest follows the week's Challenge, completes it and earns its record, apa
         fake.setCurrentFilter(`User.${filter.id}`);
         fake.fire("wheelmode");
         return fake.getWheelTables().map(game => game.title);
-    }
-    function statsLines() {
-        openMainMenu();
-        fake.selectMenuItem(STATS.menuEntry);
-        const lines = fake.currentMenu().items.map(item => item.title);
-        fake.selectMenuItem(STATS.back);
-        return lines;
     }
     function achievementRows() {
         openMainMenu();
@@ -114,7 +106,6 @@ test("Guest follows the week's Challenge, completes it and earns its record, apa
     assert.ok(guestRow && guestRow.unlocked, "Guest unlocked the first Challenges Achievement");
     const progressRow = guestRows.find(row => row.title === ACHIEVEMENT.challengesCompletedTitles[5]);
     assert.equal(progressRow.progress, LIST.progressUnits.challenges.short(1, 5));
-    assert.ok(statsLines().includes(STATS.challengesCompleted(1, 1)));
 
     // Alice starts from zero and never sees Guest in the Unlock Rate.
     getProfileStore().switchTo("Alice");

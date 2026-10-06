@@ -127,7 +127,7 @@ test("a launch, a filter change, a Profile switch, attract mode and a wheel chan
     pressAndGlide(fake, "Exit");
     fake.openMainMenu();
     fake.selectMenuItem(lang.profileStats.menuEntry);
-    fake.closeMenu();
+    pressAndGlide(fake, "Exit");
     assert.equal(fake.getUIMode(), "wheel");
     select(TITLES.find(title => title !== missing));
     assert.equal(worldTourToasts().length, 0);

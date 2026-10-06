@@ -4,7 +4,7 @@
 // launch section and a separator, and opens the drawn list of the real
 // Achievements (the Unlocked ones first, the missing ones in natural order
 // with their Achievement Progress). Exit reopens the main menu on the entry; opened
-// from the Profile Stats, Exit shows the Profile Stats again.
+// from the Profile Stats' Achievements button, Exit shows the Profile Stats again.
 // ============================================================
 
 import { test } from "node:test";
@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows, isListOpen } from "./achievement_list_reader.js";
+import { openProfileStats, buttons, choose, isProfileStatsOpen } from "./profile_stats_reader.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SECONDS_PER_HOUR = 3600;
@@ -122,15 +123,14 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
     openMainMenu();
     assert.deepEqual(fake.currentMenu().items.filter(item => item.selected), [], "only once");
 
-    // From the Profile Stats' Achievements line, Exit shows them again.
-    fake.selectMenuItem(lang.profileStats.menuEntry);
-    const achievementsLine = fake.currentMenu().items.find(item => item.title === lang.profileStats.achievements(
-        unlocked.length, rows.length)).title;
-    fake.selectMenuItem(achievementsLine);
+    // From the Profile Stats' Achievements button, Exit shows them again.
+    openProfileStats(fake, lang);
+    assert.equal(buttons(fake)[0].count, lang.profileStats.achievementsCount(unlocked.length, rows.length));
+    choose(fake, lang.profileStats.buttons.achievements);
     assert.ok(isListOpen(fake));
     pressAndGlide(fake, "Exit");
     assert.equal(isListOpen(fake), false);
-    assert.equal(fake.currentMenu().items[0].title, lang.profileStats.title(lang.profiles.guestName));
+    assert.equal(isProfileStatsOpen(fake), true);
 
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

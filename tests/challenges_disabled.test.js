@@ -1,7 +1,7 @@
 // ============================================================
 // With the Challenges Add-on turned off in addOns, main.js draws no
-// Challenge (nothing in cabinet.json) and no Challenge Card, and neither
-// the Challenges Achievements nor the Profile Stats line exist.
+// Challenge (nothing in cabinet.json) and no Challenge Card, the
+// Challenges Achievements do not exist, and the Profile Stats still open.
 // ============================================================
 
 import { test } from "node:test";
@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
+import { openProfileStats, isProfileStatsOpen } from "./profile_stats_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
@@ -16,7 +17,7 @@ const TABLES = [
     { id: 2, configId: "Attack from Mars", title: "Attack from Mars", manufacturer: "Bally", year: 1995 },
 ];
 
-test("no Challenge, Challenge Card, Challenges Achievements or Profile Stats line when the Challenges Add-on is off", async () => {
+test("no Challenge, Challenge Card or Challenges Achievements when the Challenges Add-on is off", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables: TABLES });
     fake.addFolder(`${PROFILES_FOLDER}\\Alice`);
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Alice" }));
@@ -45,10 +46,7 @@ test("no Challenge, Challenge Card, Challenges Achievements or Profile Stats lin
     assert.deepEqual(titles.filter(title => challengeTitles.includes(title)), []);
     pressAndGlide(fake, "Exit");
 
-    openMainMenu();
-    fake.selectMenuItem(lang.profileStats.menuEntry);
-    const statsLines = fake.currentMenu().items.map(item => item.title);
-    assert.ok(statsLines.length > 2, "the Profile Stats are shown");
-    assert.ok(!statsLines.includes(lang.profileStats.challengesCompleted(0, 0)), statsLines.join(" / "));
+    openProfileStats(fake, lang);
+    assert.ok(isProfileStatsOpen(fake), "the Profile Stats open without the Challenge module");
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

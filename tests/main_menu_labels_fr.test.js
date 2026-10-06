@@ -37,7 +37,7 @@ test("the main menu names the Achievements, the Stats and the Favorite Tables in
         assert.ok(titles.includes(label), `${label} in ${titles.join(" | ")}`);
     }
     assert.equal(lang.achievementList.title, "Succès personnels");
-    assert.equal(lang.profileStats.title("Léa"), "Statistiques de Léa");
+    assert.equal(lang.profileStats.buttons.mostPlayedTables, "Tables les plus jouées");
     const tablesToDiscover = fake.scriptFilters().find(filter => filter.id === "project.TablesToDiscover");
     assert.equal(tablesToDiscover.title, "Tables à découvrir");
 });

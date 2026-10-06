@@ -2,9 +2,8 @@
 // Completed Challenges in the player's record, through main.js on the fake
 // PinballY globals: the Challenges Achievements in the Achievement List
 // unlock on the Profile's completed count and show their Achievement
-// Progress; Profile Stats shows "Challenges completed:
-// X/Y", counting the week's Challenge as soon as it is completed. Guest
-// has its own record, empty here.
+// Progress, counting the week's Challenge as soon as it is completed.
+// Guest has its own record, empty here.
 // ============================================================
 
 import { test } from "node:test";
@@ -48,7 +47,7 @@ const CABINET = {
 
 const ADD_ONS_UNDER_TEST = ["achievements", "challenges", "profilePicker"];
 
-test("completed Challenges unlock the Challenges Achievements and fill the Profile Stats line", async () => {
+test("completed Challenges unlock the Challenges Achievements", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
     fake.addFolder(`${PROFILES_FOLDER}\\Alice`);
     fake.addFile(`${PROFILES_FOLDER}\\Alice\\profile.json`,
@@ -64,7 +63,6 @@ test("completed Challenges unlock the Challenges Achievements and fill the Profi
     await import("../main.js");
     await settle();
     const LIST = lang.achievementList;
-    const STATS = lang.profileStats;
     const ACHIEVEMENT = lang.achievements;
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
@@ -78,13 +76,6 @@ test("completed Challenges unlock the Challenges Achievements and fill the Profi
         const titles = Object.values(ACHIEVEMENT.challengesCompletedTitles);
         return rows.filter(row => titles.includes(row.title))
             .map(row => (row.unlocked ? `✓ ${row.title}` : `${row.title} ${row.progress}`));
-    }
-    function statsLines() {
-        openMainMenu();
-        fake.selectMenuItem(STATS.menuEntry);
-        const lines = fake.currentMenu().items.map(item => item.title);
-        fake.selectMenuItem(STATS.back);
-        return lines;
     }
     const withProgress = (count, current) =>
         `${ACHIEVEMENT.challengesCompletedTitles[count]} ${LIST.progressUnits.challenges.short(current, count)}`;
@@ -102,20 +93,15 @@ test("completed Challenges unlock the Challenges Achievements and fill the Profi
         `✓ ${ACHIEVEMENT.challengesCompletedTitles[1]}`,
         withProgress(5, 4), withProgress(10, 4), withProgress(25, 4), withProgress(50, 4), withProgress(100, 4),
     ]);
-    const before = statsLines();
-    assert.ok(before.includes(STATS.challengesCompleted(4, 5)), before.join(" / "));
 
     // Two different tables complete the week's Challenge: the fifth one.
     await play(TABLES[0]);
-    assert.ok(statsLines().includes(STATS.challengesCompleted(4, 5)), "not completed after one table");
     await play(TABLES[1]);
     assert.deepEqual(challengeRows().slice(0, 3), [
         `✓ ${ACHIEVEMENT.challengesCompletedTitles[5]}`,
         `✓ ${ACHIEVEMENT.challengesCompletedTitles[1]}`,
         withProgress(10, 5),
     ], "the latest one first");
-    const after = statsLines();
-    assert.ok(after.includes(STATS.challengesCompleted(5, 6)), after.join(" / "));
     const { notified } = JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\Alice\\profile.json`));
     assert.deepEqual(notified.filter(id => id.startsWith("challengesCompleted:")), ["challengesCompleted:1", "challengesCompleted:5"]);
 
@@ -124,8 +110,6 @@ test("completed Challenges unlock the Challenges Achievements and fill the Profi
     fake.fire("wheelmode");
     const judged = JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\Alice\\profile.json`)).challenge;
     assert.equal(judged.history.at(-1).completed, true);
-    const nextWeek = statsLines();
-    assert.ok(nextWeek.includes(STATS.challengesCompleted(5, 6)), nextWeek.join(" / "));
 
     // Guest has its own record, Alice's completed Challenges left out.
     getProfileStore().switchTo("guest");
@@ -135,7 +119,6 @@ test("completed Challenges unlock the Challenges Achievements and fill the Profi
         `${ACHIEVEMENT.challengesCompletedTitles[1]} null`,
         ...[5, 10, 25, 50, 100].map(count => withProgress(count, 0)),
     ]);
-    assert.ok(statsLines().includes(STATS.challengesCompleted(0, 0)));
 
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

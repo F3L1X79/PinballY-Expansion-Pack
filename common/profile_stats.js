@@ -1,70 +1,47 @@
 // ============================================================
-// Profile Stats module: the screen the player opens from the main menu to
-// sum up the active Profile's own plays (games played, total time,
-// collection completion, Achievements Unlocked, Period Table Streaks,
-// completed Challenges, favourite manufacturer and decade) in a native
-// PinballY menu named after the Profile, closed by two sub-menus: the most
-// played tables (the Hall of Fame) and the never played tables. Selecting a
-// table there puts the wheel on it, switching to the all-tables filter when
-// the current one hides it.
+// Profile Stats module: the drawn screen the player opens from the main
+// menu to sum up the active Profile's own plays: a centred Steamball
+// panel over the dimmed wheel, laid out by the Profile Stats painter, with
+// the Avatar and the Profile's name on a card whose foot holds the
+// Achievements, Most Played Tables and Tables to Discover buttons, and the
+// GAME section on its right. Every stat is read again on each opening;
+// the screen is drawn at once on all its layers, then faded in.
 // Created from the PinballY host, the Profile store, the Achievement List
-// (its counts, and opening it from the Achievements line, Exit there
-// showing this screen again), the Table of the Day and Table of the Week,
-// and the Challenge module (null when the Challenges Add-on is disabled:
-// no Challenges line). Every number and list
-// is read again each time a menu opens. Listens to "command". Opens its
-// menus directly, not through the wheel dialog module: the player asked for
-// them.
+// (its counts, and opening it from the Achievements button, Exit there
+// showing this screen again on that button) and the full ids of the Hall
+// of Fame and Tables to Discover filters (null when their Add-on is
+// disabled: no button). While open it
+// swallows every button through "commandbuttondown": Next / Prev move a
+// gold halo through the cross and the buttons, looping, with PinballY's
+// navigation sound; Select runs the choice, Exit closes; attract mode
+// closes it too. Opens directly, not through the wheel dialog module: the
+// player asked for it.
 // ============================================================
 
 import lang from "./i18n.js";
 import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
-import { getDecadeStartYear } from "./decade.js";
-import { countPlayedTables, tablesVisibleTo } from "./visible_tables.js";
+import { tablesVisibleTo } from "./visible_tables.js";
 import { getHallOfFame } from "./hall_of_fame.js";
 import { getTablesToDiscover } from "./tables_to_discover.js";
-import { ALL_TABLES_FILTER } from "./pinbally_host.js";
+import { createNavigationSound } from "./navigation_sound.js";
+import { STEAMBALL_COLORS } from "./steamball_palette.js";
+import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
 
 const SCRIPT_NAME = "ProfileStats";
-const MENU_ID = "profileStats";
-const TABLE_LIST_MENU_ID = "profileStatsTables";
 const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
-// PinballY's own filter showing every table.
+const FADE_MS = 220;
+const FRAME_MS = 16;
 
-export function createProfileStats(host, { profileStore, achievementList, tableOfTheDay, tableOfTheWeek, challenges = null }) {
+export function createProfileStats(host, {
+    profileStore, achievementList, hallOfFameFilter = null, tablesToDiscoverFilter = null,
+}) {
     const { profileStats: TEXT } = lang;
-    const achievementsCommand = host.allocateCommand("profileStatsAchievements");
-    const backToStatsCommand = host.allocateCommand("profileStatsBackToStats");
-    // One command per line of a list, by position: a line with cmd -1 can't
-    // be selected, so paging couldn't move through it. The never played list
-    // depends on the collection, so the pool grows on demand instead of
-    // being allocated all at startup.
-    const tableCommands = [];
-    // The list on screen, so Back puts the cursor on its entry, and its
-    // tables, so a line's command finds its table.
-    let shown = { list: null, tables: [] };
-
-    const tableLists = [
-        {
-            command: host.allocateCommand("profileStatsMostPlayed"),
-            label: TEXT.mostPlayedTables,
-            readTables: profileTables => getHallOfFame(profileTables, profileStore.getPlay),
-        },
-        {
-            command: host.allocateCommand("profileStatsNeverPlayed"),
-            label: TEXT.neverPlayedTables,
-            readTables: profileTables => getTablesToDiscover(profileTables, profileStore),
-        },
-    ];
-
-    function getTableCommand(index) {
-        while (tableCommands.length <= index) {
-            tableCommands.push(host.allocateCommand(`profileStatsTable.${tableCommands.length}`));
-        }
-        return tableCommands[index];
-    }
+    const navigationSound = createNavigationSound(host, SCRIPT_NAME);
+    const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
+    // The screen on show: its layers, choices and selection; null when closed.
+    let shown = null;
 
     // Over every table the Profile played, hidden or no longer listed ones
     // included: hiding a table never erases a player's history.
@@ -76,126 +53,158 @@ export function createProfileStats(host, { profileStore, achievementList, tableO
         };
     }
 
-    // The Collection Achievements' rule, so the two never disagree.
-    function readCompletion(profileTables) {
-        const played = countPlayedTables(profileTables, profileStore);
-        const percent = profileTables.length === 0 ? 0 : Math.round(played / profileTables.length * 100);
-        return { played, total: profileTables.length, percent };
+    const hoursAndMinutes = totalMinutes =>
+        TEXT.hoursAndMinutes(Math.floor(totalMinutes / MINUTES_PER_HOUR), totalMinutes % MINUTES_PER_HOUR);
+
+    // Minutes under an hour, else hours and minutes; rounded once, so 59 min
+    // 40 s shows "1 h 00".
+    function averageOf({ count, seconds }) {
+        if (count === 0) return TEXT.none;
+        const minutes = Math.round(seconds / count / SECONDS_PER_MINUTE);
+        return minutes < MINUTES_PER_HOUR ? TEXT.minutes(minutes) : hoursAndMinutes(minutes);
     }
 
-    // The group with the most play seconds over the tables the Profile can see; ties go to
-    // the most games, then to alphabetical order, so the favourite never
-    // changes at random. Tables without a group key are skipped.
-    function findFavourite(profileTables, getKey) {
-        const groups = new Map();
-        for (const game of profileTables) {
-            const key = getKey(game);
-            const play = profileStore.getPlay(game.configId);
-            if (key === null || play.count === 0) continue;
-            const group = groups.get(key) || { key, count: 0, seconds: 0 };
-            group.count += play.count;
-            group.seconds += play.seconds;
-            groups.set(key, group);
-        }
-        const [favourite = null] = [...groups.values()].sort((a, b) =>
-            b.seconds - a.seconds || b.count - a.count || String(a.key).localeCompare(String(b.key)));
-        return favourite;
+    // A selection button, left out when its Add-on is off or it has no table:
+    // the player is never sent to an empty wheel.
+    function selectionButton(choice, label, filterId, tables) {
+        return filterId !== null && tables.length > 0 ? [{ choice, label, count: TEXT.number(tables.length), filterId }] : [];
     }
 
-    function toHoursAndMinutes(seconds) {
-        const totalMinutes = Math.floor(seconds / SECONDS_PER_MINUTE);
-        return [Math.floor(totalMinutes / MINUTES_PER_HOUR), totalMinutes % MINUTES_PER_HOUR];
-    }
-
-    function favouriteLine(favourite, format, noneText) {
-        return favourite === null ? noneText : format(favourite.key, ...toHoursAndMinutes(favourite.seconds));
-    }
-
-    function show(selectedList = null) {
-        const plays = sumPlays();
+    function readScreen() {
+        const profile = profileStore.getActiveProfile();
         const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore);
-        const completion = readCompletion(profileTables);
-        const favouriteManufacturer = findFavourite(profileTables, game => game.manufacturer || null);
-        const favouriteDecade = findFavourite(profileTables, game => getDecadeStartYear(game.year));
+        const plays = sumPlays();
         const achievements = achievementList.countAll();
-        // Without the Challenges Add-on, no Challenges line.
-        const challengeRecord = challenges && challenges.getRecord();
-        const info = title => ({ title, cmd: -1 });
-        // An empty list is left out: the player never opens an empty menu.
-        const listItems = tableLists
-            .map(list => ({ list, count: list.readTables(profileTables).length }))
-            .filter(({ count }) => count > 0)
-            .map(({ list, count }) => ({
-                title: list.label(count),
-                cmd: list.command,
-                ...(list === selectedList ? { selected: true } : {}),
-            }));
-
-        host.showMenu(MENU_ID, [
-            info(TEXT.title(displayNameOf(profileStore.getActiveProfile()))),
-            { cmd: -1 },
-            info(TEXT.gamesPlayed(plays.count)),
-            info(TEXT.totalTime(...toHoursAndMinutes(plays.seconds))),
-            info(TEXT.collection(completion.played, completion.total, completion.percent)),
-            { title: TEXT.achievements(achievements.unlocked, achievements.total), cmd: achievementsCommand },
-            info(TEXT.tableOfTheDayStreak(tableOfTheDay.getStreak(), tableOfTheDay.getLongestStreak())),
-            info(TEXT.tableOfTheWeekStreak(tableOfTheWeek.getStreak(), tableOfTheWeek.getLongestStreak())),
-            ...(challengeRecord ? [info(TEXT.challengesCompleted(challengeRecord.completed, challengeRecord.total))] : []),
-            info(favouriteLine(favouriteManufacturer, TEXT.favouriteManufacturer, TEXT.noFavouriteManufacturer)),
-            info(favouriteLine(favouriteDecade, TEXT.favouriteDecade, TEXT.noFavouriteDecade)),
-            ...(listItems.length > 0 ? [{ cmd: -1 }, ...listItems] : []),
-            { cmd: -1 },
-            { title: TEXT.back, cmd: host.getBuiltInCommand("MenuReturn") },
-        ]);
+        const buttons = [
+            { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.achievementsCount(achievements.unlocked, achievements.total) },
+            ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, getHallOfFame(profileTables, profileStore.getPlay)),
+            ...selectionButton(CHOICE.TO_DISCOVER, TEXT.buttons.tablesToDiscover, tablesToDiscoverFilter, getTablesToDiscover(profileTables, profileStore)),
+        ];
+        return {
+            name: displayNameOf(profile),
+            avatarPath: profile.avatarPath,
+            buttons,
+            sections: [{
+                title: TEXT.sections.game,
+                rows: [[
+                    { label: TEXT.stats.gamesPlayed, value: TEXT.number(plays.count) },
+                    { label: TEXT.stats.totalTime, value: hoursAndMinutes(Math.floor(plays.seconds / SECONDS_PER_MINUTE)) },
+                    { label: TEXT.stats.averageDuration, value: averageOf(plays) },
+                ]],
+            }],
+            closeLabel: TEXT.closeTooltip,
+            // The flippers' loop, the cross first.
+            choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],
+        };
     }
 
-    // Paged like an Achievement Family: the never played list can be longer
-    // than the screen.
-    function showTableList(list) {
-        const tables = list.readTables(tablesVisibleTo(host.getVisibleTables(), profileStore));
-        host.showMenu(TABLE_LIST_MENU_ID, [
-            { cmd: host.getBuiltInCommand("MenuPageUp") },
-            ...tables.map((game, index) => ({ title: game.title, cmd: getTableCommand(index) })),
-            { cmd: host.getBuiltInCommand("MenuPageDown") },
-            { cmd: -1 },
-            { title: TEXT.back, cmd: backToStatsCommand },
-        ]);
-        shown = { list, tables };
+    function place(layer, rect, referenceWidth) {
+        layer.setScale({ ySpan: rect.h / REFERENCE_HEIGHT });
+        layer.setPos((rect.x + rect.w / 2) / referenceWidth - 0.5, 0.5 - (rect.y + rect.h / 2) / REFERENCE_HEIGHT);
     }
 
-    // Instantly, without the Random Game spin: the player then launches it
-    // with Play. The current filter is kept when it shows the table.
-    function putWheelOn(game) {
-        const findOnWheel = () => host.getWheelTables().findIndex(wheelGame => wheelGame.configId === game.configId);
-        let offset = findOnWheel();
-        if (offset < 0) {
-            host.setCurrentFilter(ALL_TABLES_FILTER);
-            offset = findOnWheel();
-        }
-        if (offset < 0) {
-            host.log(`[${SCRIPT_NAME}] "${game.title}" is not on the wheel, even with every table shown.`);
-            return;
-        }
-        host.setWheelGame(offset);
+    function hiddenLayer(zIndex) {
+        const layer = host.createDrawingLayer(zIndex);
+        layer.alpha = 0;
+        layer.clear(STEAMBALL_COLORS.transparent);
+        return layer;
     }
 
-    // Fires on every command: the Achievements line opens the Achievement
-    // List in place of this screen, a list entry opens its tables, a table
-    // puts the wheel on it as the menu closes, Back from a list returns here.
-    host.on("command", safeHandler(SCRIPT_NAME, ev => {
-        const list = tableLists.find(tableList => tableList.command === ev.id);
-        const tableIndex = tableCommands.indexOf(ev.id);
-        if (ev.id === achievementsCommand) {
-            // Exit from the list comes back here.
-            achievementList.open(() => show());
-        } else if (list) {
-            showTableList(list);
-        } else if (tableIndex >= 0 && tableIndex < shown.tables.length) {
-            putWheelOn(shown.tables[tableIndex]);
-        } else if (ev.id === backToStatsCommand) {
-            show(shown.list);
-        }
+    // Draws every layer at once, hidden, then fades them in together, like
+    // the Welcome Screen: it never shows up half drawn.
+    function open(selectedChoice = CHOICE.CLOSE) {
+        if (shown) return;
+        const openedAt = host.now().getTime();
+        const screen = readScreen();
+        const layers = [];
+        // The backdrop first: it measures the window and dims the wheel.
+        const backdrop = hiddenLayer(PROFILE_STATS_Z_INDEX.backdrop);
+        let referenceWidth = 0;
+        backdrop.draw(dc => {
+            const size = dc.getSize();
+            referenceWidth = REFERENCE_HEIGHT * size.width / size.height;
+            drawBackdrop(dc, size, referenceWidth, screen);
+        });
+        layers.push(backdrop);
+        const drawPiece = piece => {
+            const layer = hiddenLayer(piece.zIndex);
+            place(layer, piece.rect, referenceWidth);
+            layer.draw(piece.draw, piece.rect.w, piece.rect.h);
+            layers.push(layer);
+            return layer;
+        };
+        const { pieces, highlights } = layoutProfileStats(host, screen, referenceWidth);
+        pieces.forEach(drawPiece);
+        const highlightLayers = screen.choices.map(choice => drawPiece(highlights[choice]));
+        // Here rather than on the first move, which it would slow down.
+        navigationSound.load();
+        const selected = Math.max(0, screen.choices.indexOf(selectedChoice));
+        shown = { screen, layers, highlightLayers, choices: screen.choices, selected, opacity: 0, fadeTimer: null };
+        fadeIn(shown);
+        log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
+    }
+
+    // Every layer but the unselected highlights, to the same opacity.
+    function setOpacity(screen, opacity) {
+        screen.opacity = opacity;
+        const unselected = screen.highlightLayers.filter((layer, index) => index !== screen.selected);
+        for (const layer of screen.layers) layer.alpha = unselected.includes(layer) ? 0 : opacity;
+    }
+
+    function fadeIn(screen) {
+        const startMs = host.now().getTime();
+        // Timed on the clock: Windows timers fire late.
+        screen.fadeTimer = host.setInterval(safeHandler(SCRIPT_NAME, () => {
+            const opacity = Math.min(1, (host.now().getTime() - startMs) / FADE_MS);
+            setOpacity(screen, opacity);
+            if (opacity >= 1) stopFade(screen);
+        }), FRAME_MS);
+    }
+
+    function stopFade(screen) {
+        host.clearInterval(screen.fadeTimer);
+        screen.fadeTimer = null;
+    }
+
+    function close() {
+        if (!shown) return;
+        stopFade(shown);
+        for (const layer of shown.layers) host.removeDrawingLayer(layer);
+        shown = null;
+    }
+
+    // direction: 1 for Next, -1 for Prev.
+    function move(direction) {
+        navigationSound.play();
+        const count = shown.choices.length;
+        shown.selected = (shown.selected + direction + count) % count;
+        setOpacity(shown, shown.opacity);
+    }
+
+    function choose() {
+        const choice = shown.choices[shown.selected];
+        const entry = shown.screen.buttons.find(button => button.choice === choice);
+        close();
+        // Exit from the list comes back here, on its button.
+        if (choice === CHOICE.ACHIEVEMENTS) achievementList.open(() => open(CHOICE.ACHIEVEMENTS));
+        else if (entry) host.setCurrentFilter(entry.filterId);
+    }
+
+    // Fires on every mapped button press; drives the screen while it is open.
+    host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
+        // Already handled: the Achievement List's Exit reopens this screen
+        // within the same press, which must not close it again.
+        if (!shown || ev.defaultPrevented) return;
+        // Swallowed first, so a failing choice still never reaches the wheel.
+        ev.preventDefault();
+        if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
+        else if (ev.command === "Select") choose();
+        else if (ev.command === "Exit") close();
     }));
 
-    return { open: () => show() };
+    // Fires when the cabinet sits idle: the screen must not stay over
+    // attract mode nor keep the buttons.
+    host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
+
+    return { open: () => open() };
 }

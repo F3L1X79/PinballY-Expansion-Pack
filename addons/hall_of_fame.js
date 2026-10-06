@@ -9,15 +9,12 @@
 // ============================================================
 
 import lang from "../common/i18n.js";
-import { getHallOfFame } from "../common/hall_of_fame.js";
+import { getHallOfFame, HALL_OF_FAME_FILTER_ID, HALL_OF_FAME_FULL_FILTER_ID } from "../common/hall_of_fame.js";
 import { safeHandler } from "../common/safe_handler.js";
 import { getProfileStore } from "../common/profile_store.js";
 import { getActiveProfileTables } from "../common/visible_tables.js";
 
 const SCRIPT_NAME = "HallOfFame";
-const FILTER_ID = "project.HallOfFame";
-// PinballY prefixes a script filter's id.
-const FULL_FILTER_ID = `User.${FILTER_ID}`;
 
 // Tables to Discover has sort key "5500" and PinballY's "Favorites" filter
 // "7000" in the [Top] group.
@@ -32,7 +29,7 @@ export default function init() {
     let ranks = new Map();
 
     gameList.createFilter({
-        id: FILTER_ID,
+        id: HALL_OF_FAME_FILTER_ID,
         title: FILTER_TITLE,
         group: "[Top]",
         sortKey: BEFORE_FAVORITES_SORT_KEY,
@@ -50,7 +47,7 @@ export default function init() {
     // refreshFilter() runs the filter again, so its before() ranks the new
     // Profile's tables.
     const refreshIfOnWheel = () => {
-        if (gameList.getCurFilter().id === FULL_FILTER_ID) gameList.refreshFilter();
+        if (gameList.getCurFilter().id === HALL_OF_FAME_FULL_FILTER_ID) gameList.refreshFilter();
     };
     profileStore.onSwitch(safeHandler(SCRIPT_NAME, refreshIfOnWheel));
     // Fires after any change of a Profile's data: only the active Profile's

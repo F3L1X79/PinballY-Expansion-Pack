@@ -431,24 +431,31 @@ export default {
 
     profileStats: {
         menuEntry: "Statistiken",
-        title: (name) => `Statistiken von ${name}`,
-        gamesPlayed: (count) => `Gespielte Partien: ${count}`,
-        // Minutes on two digits: "42 h 05".
-        totalTime: (hours, minutes) => `Gesamtzeit: ${hours} Std. ${String(minutes).padStart(2, "0")}`,
-        collection: (played, total, percent) => `Sammlung: ${played}/${total} Tische (${percent} %)`,
-        achievements: (unlocked, total) => `Erfolge: ${unlocked}/${total}`,
-        tableOfTheDayStreak: (count, longest) => `Tagesserie: ${count} (Rekord ${longest})`,
-        tableOfTheWeekStreak: (count, longest) => `Wochenserie: ${count} (Rekord ${longest})`,
-        challengesCompleted: (completed, total) => `Herausforderungen geschafft: ${completed}/${total}`,
-        // Most time spent, with that time; "—" before any play.
-        favouriteManufacturer: (name, hours, minutes) => `Hersteller: ${name} (${hours} Std. ${String(minutes).padStart(2, "0")})`,
-        noFavouriteManufacturer: "Hersteller: —",
-        favouriteDecade: (decadeStartYear, hours, minutes) => `Jahrzehnt: ${decadeStartYear}er (${hours} Std. ${String(minutes).padStart(2, "0")})`,
-        noFavouriteDecade: "Jahrzehnt: —",
-        // Sub-menu entries, with how many tables each list holds.
-        mostPlayedTables: (count) => `Meistgespielte Tische (${count})`,
-        neverPlayedTables: (count) => `Nie gespielte Tische (${count})`,
-        back: "Zurück",
+        // TODO: translation pass
+        closeTooltip: "Close",
+        // The buttons at the card's foot.
+        buttons: {
+            achievements: "Achievements",
+            mostPlayedTables: "Most Played Tables",
+            tablesToDiscover: "Tables to Discover",
+        },
+        achievementsCount: (unlocked, total) => `${unlocked}/${total}`,
+        sections: {
+            game: "GAME",
+        },
+        // The stats' labels, over their values.
+        stats: {
+            gamesPlayed: "Games played",
+            totalTime: "Total time",
+            averageDuration: "Average game",
+        },
+        // Thousands separated: "1,206".
+        number: (count) => String(count).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        // Minutes on two digits: "96 h 05".
+        hoursAndMinutes: (hours, minutes) => `${hours} h ${String(minutes).padStart(2, "0")}`,
+        minutes: (minutes) => `${minutes} min`,
+        // A stat without a value, such as the average before any Play.
+        none: "—",
     },
 
     // Profiles. Guest's folder name is never shown: this is its name.

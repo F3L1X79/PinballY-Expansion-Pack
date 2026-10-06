@@ -42,7 +42,7 @@ test("the main menu names the Achievements, the Stats and the Favorite Tables in
         assert.ok(titles.includes(label), `${label} in ${titles.join(" | ")}`);
     }
     assert.equal(lang.achievementList.title, "Achievement List");
-    assert.equal(lang.profileStats.title("Léa"), "Léa's stats");
+    assert.equal(lang.profileStats.buttons.mostPlayedTables, "Most Played Tables");
 });
 
 test("the [Top] filters run All Tables, Challenge Tables, Tables to Discover, the Hall of Fame, then Favorite Tables", () => {

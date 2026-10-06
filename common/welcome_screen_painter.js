@@ -12,7 +12,10 @@
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
-import { mix, withAlpha, metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL, WHITE } from "./table_mastery.js";
+import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "./table_mastery.js";
+import {
+    text, oneLine, fillGradient, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop,
+} from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
 // Above the Achievement List (6000 to 6006), under the toasts and the
@@ -23,8 +26,6 @@ export const REFERENCE_HEIGHT = 1920;
 
 export const CHOICE = Object.freeze({ AVATAR: "avatar", CLOSE: "close", DAY: "day", WEEK: "week", STAY: "stay", RANDOM: "random" });
 
-const OVERLAY = 0xD0080A0E;
-const TOOLTIP = Object.freeze({ color: 0xFF0C0C0E, size: 22, weight: 400, height: 52, padX: 28, radius: 6, arrow: 10 });
 
 const LOOK = Object.freeze({
     pad: 40, gap: 26,
@@ -51,82 +52,12 @@ const LOOK = Object.freeze({
 
 // ---------- Small drawing helpers ----------
 
-function text(host, dc, str, { x, y, width, height, size, weight = 400, color = COLORS.title, font = FONTS.body, align = "left" }) {
-    const styled = host.createStyledText({ textAlign: align, textStyle: { font, size, weight, color } });
-    styled.add(str);
-    const measured = styled.measure(width).height;
-    const top = height === undefined ? y : y + (height - measured) / 2;
-    styled.draw(dc, { x, y: top, width, height: measured });
-}
-
-// One line of text in width: the size goes down to minSize, then the end
-// gives way to "…".
-function oneLine(host, dc, str, { x, y, width, height, size, minSize = size, weight = 600, color = COLORS.title, font = FONTS.body }) {
-    const styledAt = (candidate, fontSize) => {
-        const styled = host.createStyledText({ textAlign: "left", textStyle: { font, size: fontSize, weight, color } });
-        styled.add(candidate);
-        return styled;
-    };
-    // Measured unbounded: within width, it would wrap instead.
-    const fits = styled => styled.measure(100000).width <= width;
-    let fontSize = size;
-    let styled = styledAt(str, fontSize);
-    while (!fits(styled) && fontSize > minSize) styled = styledAt(str, --fontSize);
-    for (let cut = str.length - 1; !fits(styled) && cut > 1; cut--) styled = styledAt(`${str.slice(0, cut).trimEnd()}…`, fontSize);
-    const measured = styled.measure(100000).height;
-    // A little wider than measured, so the line never wraps on rounding.
-    styled.draw(dc, { x, y: height === undefined ? y : y + (height - measured) / 2, width: width + 4, height: measured });
-}
-
 // Several runs on one line, each with its own colour.
 function runs(host, dc, parts, { x, y, width, size, weight = 700, font = FONTS.display }) {
     const styled = host.createStyledText({ textAlign: "left", textStyle: { font, size, weight, color: COLORS.title } });
     for (const [str, color] of parts) styled.add({ font, size, weight, color, text: str });
     const measured = styled.measure(width).height;
     styled.draw(dc, { x, y, width, height: measured });
-}
-
-function fillDisc(dc, cx, cy, r, color) {
-    for (let dy = -r; dy < r; dy++) {
-        const half = Math.round(Math.sqrt(r * r - (dy + 0.5) * (dy + 0.5)));
-        dc.fillRect(Math.round(cx - half), Math.round(cy + dy), 2 * half, 1, color);
-    }
-}
-
-function fillRounded(dc, x, y, w, h, r, color) {
-    dc.fillRect(x + r, y, w - 2 * r, h, color);
-    dc.fillRect(x, y + r, r, h - 2 * r, color);
-    dc.fillRect(x + w - r, y + r, r, h - 2 * r, color);
-    for (const [cx, cy] of [[x + r, y + r], [x + w - r, y + r], [x + r, y + h - r], [x + w - r, y + h - r]]) fillDisc(dc, cx, cy, r, color);
-}
-
-// In 4-pixel bands: the drawing context has no gradient fill.
-function fillGradient(dc, x, y, w, h, top, bottom) {
-    for (let row = 0; row < h; row += 4) dc.fillRect(x, y + row, w, Math.min(4, h - row), mix(top, bottom, row / Math.max(1, h - 1)));
-}
-
-function glow(dc, x, y, w, h, color, rings, peak) {
-    for (let ring = rings; ring >= 1; ring--) {
-        dc.frameRect(x - ring, y - ring, w + 2 * ring, h + 2 * ring, 1, withAlpha(color, Math.round(peak * (1 - ring / (rings + 1)))));
-    }
-}
-
-function drawAvatar(dc, path, x, y, size) {
-    dc.fillRect(x, y, size, size, COLORS.tile);
-    if (path) dc.drawImage(path, x + 3, y + 3, size - 6, size - 6);
-    dc.frameRect(x, y, size, size, 3, COLORS.border);
-}
-
-// The close cross on a small tile.
-function drawCross(dc, x, y, size) {
-    fillGradient(dc, x, y, size, size, COLORS.rowUnlocked, COLORS.tile);
-    dc.frameRect(x, y, size, size, 2, COLORS.border);
-    const inset = Math.round(size * 0.3);
-    const t = Math.max(3, Math.round(size / 14));
-    for (let i = 0; i <= size - 2 * inset; i++) {
-        dc.fillRect(x + inset + i - 1, y + inset + i - 1, t, t, COLORS.description);
-        dc.fillRect(x + size - inset - i - t + 1, y + inset + i - 1, t, t, COLORS.description);
-    }
 }
 
 // A wheel logo fitted in the box, its aspect kept; the title when it has none.
@@ -260,33 +191,6 @@ function iconBox(host, dc, x, y, size) {
     text(host, dc, "?", { x: left, y: top, width: s, height: s, size: Math.round(s * 0.62), weight: 700, color: COLORS.gold, font: FONTS.display, align: "center" });
 }
 
-// ---------- Selection ----------
-
-// A web-style tooltip: a dark rounded label with a small arrow whose tip
-// is at (tipX, tipY), the label on the given side of the tip.
-function tooltip(host, dc, str, tipX, tipY, side) {
-    const { color, size, weight, height, padX, radius, arrow } = TOOLTIP;
-    const styled = host.createStyledText({ textAlign: "center", textStyle: { font: FONTS.body, size, weight, color: WHITE } });
-    styled.add(str);
-    const w = Math.ceil(styled.measure(2000).width) + 2 * padX;
-    const x = side === "left" ? tipX - arrow - w : tipX + arrow;
-    const y = Math.round(tipY - height / 2);
-    fillRounded(dc, x, y, w, height, radius, color);
-    for (let i = 0; i < arrow; i++) {
-        const half = arrow - i;
-        if (side === "left") dc.fillRect(x + w + i, tipY - half, 1, 2 * half, color);
-        else dc.fillRect(x - i - 1, tipY - half, 1, 2 * half, color);
-    }
-    const th = styled.measure(w).height;
-    styled.draw(dc, { x, y: y + (height - th) / 2, width: w, height: th });
-}
-
-// Gold halo and frame around the selected element.
-function selectionHalo(dc, x, y, w, h) {
-    glow(dc, x, y, w, h, COLORS.gold, 12, 0x90);
-    dc.frameRect(x, y, w, h, 4, COLORS.gold);
-}
-
 // ---------- Layout ----------
 
 // The panel and its inner column in a window referenceWidth wide.
@@ -313,14 +217,8 @@ function geometry(referenceWidth, screen) {
 
 // The backdrop: the dimmed wheel and the panel, drawn on a window-sized
 // canvas whose height is REFERENCE_HEIGHT * scale.
-export function drawBackdrop(dc, { width, height }, referenceWidth, screen) {
-    const scale = height / REFERENCE_HEIGHT;
-    dc.fillRect(0, 0, width, height, OVERLAY);
-    const { panel } = geometry(referenceWidth, screen);
-    const [x, y, w, h] = [panel.x, panel.y, panel.w, panel.h].map(value => Math.round(value * scale));
-    glow(dc, x, y, w, h, COLORS.gold, 6, 0x30);
-    fillGradient(dc, x, y, w, h, COLORS.panelTop, COLORS.panel);
-    dc.frameRect(x, y, w, h, 1, COLORS.border);
+export function drawBackdrop(dc, size, referenceWidth, screen) {
+    drawPanelBackdrop(dc, size, REFERENCE_HEIGHT, geometry(referenceWidth, screen).panel);
 }
 
 // The Period Table cards, top to bottom, each with the highlight of its

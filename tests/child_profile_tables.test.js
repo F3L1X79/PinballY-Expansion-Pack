@@ -1,8 +1,8 @@
 // ============================================================
 // The tables a Child Profile can see, everywhere but the wheel, started
 // through main.js on the fake PinballY globals: no Adult Table (category
-// "NSFW") among its Challenge Tables, its Most Played Tables, its never
-// played tables, its collection completion nor its completion
+// "NSFW") among its Challenge Tables, its Most Played Tables, its Tables
+// to Discover (both reached from the Profile Stats) nor its completion
 // Achievements, where a group made only of Adult Tables has no row; a game
 // on an Adult Table never moves its Challenge forward. Switching to an
 // adult Profile brings every one of them back.
@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
+import { openProfileStats, buttons, choose, press } from "./profile_stats_reader.js";
 
 // A Thursday: the week started on Monday 2026-09-28.
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
@@ -65,7 +66,7 @@ test("a Child Profile's Challenge, Profile Stats and Achievements leave out the 
     }));
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
-    const addOnsUnderTest = ["challenges", "profilePicker", "customMenuCommands", "achievements"];
+    const addOnsUnderTest = ["challenges", "profilePicker", "customMenuCommands", "achievements", "hallOfFame", "tablesToDiscover"];
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOnsUnderTest.includes(key);
     config.language = "en";
 
@@ -78,22 +79,18 @@ test("a Child Profile's Challenge, Profile Stats and Achievements leave out the 
     const ACHIEVEMENTS = lang.achievements;
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    function readStats() {
-        openMainMenu();
-        fake.selectMenuItem(STATS.menuEntry);
-        const lines = fake.currentMenu().items.map(item => item.title);
-        // An empty list has no line.
-        const listOf = label => {
-            const line = lines.find(title => TABLES.some((_, count) => title === label(count + 1)));
-            if (!line) return [];
-            fake.selectMenuItem(line);
-            const titles = fake.currentMenu().items.map(item => item.title).filter(title => TABLES.some(game => game.title === title));
-            fake.selectMenuItem(STATS.back);
-            return titles;
-        };
-        const stats = { lines, mostPlayed: listOf(STATS.mostPlayedTables), neverPlayed: listOf(STATS.neverPlayedTables) };
-        fake.closeMenu();
-        return stats;
+    // The wheel's tables after the Profile Stats button with this label;
+    // none when the button is not shown.
+    function selectionOf(label) {
+        openProfileStats(fake, lang);
+        if (!buttons(fake).some(button => button.label === label)) {
+            press(fake, "Exit");
+            return [];
+        }
+        choose(fake, label);
+        const titles = fake.getWheelTables().map(game => game.title);
+        globalThis.gameList.setCurFilter("All");
+        return titles;
     }
     function readAchievementRows() {
         openMainMenu();
@@ -116,10 +113,8 @@ test("a Child Profile's Challenge, Profile Stats and Achievements leave out the 
     fake.fire("wheelmode");
     assert.equal(fake.currentFilterId(), "All", "no Adult Table among the Challenge Tables");
 
-    const childStats = readStats();
-    assert.ok(childStats.lines.includes(STATS.collection(1, 3, 33)), "collection completion without the Adult Tables");
-    assert.deepEqual(childStats.mostPlayed, ["Close Encounters"], "Most Played Tables");
-    assert.deepEqual(childStats.neverPlayed, ["Attack from Mars", "Medieval Madness"], "never played tables");
+    assert.deepEqual(selectionOf(STATS.buttons.mostPlayedTables), ["Close Encounters"], "Most Played Tables");
+    assert.deepEqual(selectionOf(STATS.buttons.tablesToDiscover), ["Attack from Mars", "Medieval Madness"], "Tables to Discover");
 
     const childRows = readAchievementRows();
     assert.deepEqual(ADULT_ONLY_GROUPS.filter(title => titlesOf(childRows).includes(title)), [],
@@ -139,7 +134,8 @@ test("a Child Profile's Challenge, Profile Stats and Achievements leave out the 
     assert.deepEqual(ADULT_ONLY_GROUPS.filter(title => titlesOf(adultRows).includes(title)), ADULT_ONLY_GROUPS,
         "an adult Profile gets every group back");
     assert.equal(classicDescription(adultRows), ACHIEVEMENTS.categoryCompletionDescription("Classic", 2));
-    assert.ok(readStats().lines.includes(STATS.collection(0, 5, 0)));
+    assert.deepEqual(selectionOf(STATS.buttons.mostPlayedTables), [], "nothing played by Bob");
+    assert.equal(selectionOf(STATS.buttons.tablesToDiscover).length, 5, "every table for an adult Profile");
 
     fake.selectFilter("User.project.ChallengeTables");
     assert.deepEqual(fake.getWheelTables().map(game => game.title).sort(), ["Close Encounters", "Playboy"]);
