@@ -412,7 +412,7 @@ export default {
     },
     playerLevel: {
         // The Level Toast, when Achievements bring a higher Player Level.
-        toastHeader: "Player Level",
+        toastHeader: "Level up",
         toastTitle: (level) => `Level ${level}`,
         toastDescription: "Your Achievements took you to a new level.",
     },

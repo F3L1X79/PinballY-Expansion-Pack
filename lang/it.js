@@ -525,7 +525,7 @@ export default {
     },
     // TODO: translation pass
     playerLevel: {
-        toastHeader: "Player Level",
+        toastHeader: "Level up",
         toastTitle: (level) => `Level ${level}`,
         toastDescription: "Your Achievements took you to a new level.",
     },

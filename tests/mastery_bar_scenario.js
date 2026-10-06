@@ -101,9 +101,9 @@ export const masteryToasts = fake => toastDrawings(fake)
 // Every Level Toast drawn so far, its texts joined the same way.
 export const levelToasts = fake => toastDrawings(fake)
     .map(drawing => drawing.texts.join(" | "))
-    .filter(texts => texts.includes("PLAYER LEVEL"));
+    .filter(texts => texts.includes("LEVEL UP"));
 // The Level Toast of this level, its texts joined the same way.
-export const levelToastOf = level => `${level} | PLAYER LEVEL | Level ${level} | Your Achievements took you to a new level.`;
+export const levelToastOf = level => `${level} | LEVEL UP | Level ${level} | Your Achievements took you to a new level.`;
 // The Table of the Day and of the Week fall on Twilight Zone, the last
 // table, so a test that never plays it never earns their Achievements.
 export const pickLastTables = () => { Math.random = () => 0.999; };

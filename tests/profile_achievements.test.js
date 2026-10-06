@@ -115,7 +115,7 @@ test("each Profile unlocks and is announced its own Achievements", async () => {
         "playTimeMilestone:1h",
     ];
     assert.deepEqual(notifiedOf(fake, "Bob"), bobIds, "Bob is announced what Alice already had, and his own");
-    const isLevelToast = drawing => drawing.texts.includes("PLAYER LEVEL");
+    const isLevelToast = drawing => drawing.texts.includes("LEVEL UP");
     assert.equal(toastDrawings(fake).filter(drawing => !isLevelToast(drawing)).length,
         allNotifiedOf(fake, "Alice").length + allNotifiedOf(fake, "Bob").length, "one toast per Achievement and Profile");
     assert.equal(toastDrawings(fake).filter(isLevelToast).length, 1, "Alice's Play only: a switch announces no level");

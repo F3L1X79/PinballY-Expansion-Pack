@@ -520,7 +520,8 @@ export default {
         collectionToastDescription: (count, name) => `${count} ${count === 1 ? "table" : "tables"} au niveau ${name} ou plus`,
     },
     playerLevel: {
-        toastHeader: "Niveau",
+        // Kept in English on purpose: the gamers' phrase.
+        toastHeader: "Level up",
         toastTitle: (level) => `Niveau ${level}`,
         toastDescription: "Vos succès vous font passer au niveau supérieur.",
     },
