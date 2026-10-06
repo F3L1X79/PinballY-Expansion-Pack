@@ -242,10 +242,11 @@ export default {
         signOff: "Divirta-se!",
     },
 
-    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js and hall_of_fame.js).
+    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js, hall_of_fame.js and tables_to_discover.js).
     customMenuLabels: {
         challengeTables: "Mesas do desafio",
         hallOfFameFilter: "Hall of Fame",
+        tablesToDiscoverFilter: "Tables to Discover", // TODO: translation pass
         originalTablesFilter: "Mesas originais",
         randomGame: "Iniciar uma mesa aleatória",
         tableOfTheDay: "Iniciar a mesa do dia",

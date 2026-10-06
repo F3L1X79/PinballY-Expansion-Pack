@@ -47,7 +47,7 @@ Everything stays in one folder, with no change to PinballY itself.
 
 **And also**:
 - a Random Game spun on a wheel of fortune;
-- "Most Played Tables", "Favorite Tables" and "Original Tables" in the menus;
+- "Tables to Discover", "Most Played Tables", "Favorite Tables" and "Original Tables" in the menus;
 - a clock and a richer status line;
 - a reminder to rate a table;
 - launches without a black flash;

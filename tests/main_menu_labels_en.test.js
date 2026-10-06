@@ -2,8 +2,9 @@
 // The main menu in English, through main.js on the fake PinballY globals:
 // the Achievement List and Profile Stats entries read "Your Achievements" and
 // "Your Stats", PinballY's Favorites filter reads "Favorite Tables",
-// and the screens keep their own titles. Among the [Top] filters, the Hall
-// of Fame sits after the Challenge Tables and before the Favorite Tables.
+// and the screens keep their own titles. Among the [Top] filters, the
+// Tables to Discover and the Hall of Fame sit, in that order, after the
+// Challenge Tables and before the Favorite Tables.
 // ============================================================
 
 import { test } from "node:test";
@@ -11,7 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 
-const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "achievements", "hallOfFame", "challenges"];
+const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "achievements", "hallOfFame", "tablesToDiscover", "challenges"];
 // Any command id: only the title is translated.
 const FAVORITES_FILTER_CMD = 7000;
 // PinballY's "All Tables" has sort key "3000" and "Favorites" "7000" in the [Top] group.
@@ -44,11 +45,13 @@ test("the main menu names the Achievements, the Stats and the Favorite Tables in
     assert.equal(lang.profileStats.title("Léa"), "Léa's stats");
 });
 
-test("the [Top] filters run All Tables, Challenge Tables, the Hall of Fame, then Favorite Tables", () => {
+test("the [Top] filters run All Tables, Challenge Tables, Tables to Discover, the Hall of Fame, then Favorite Tables", () => {
     const sortKeyOf = id => fake.scriptFilters().find(filter => filter.id === id).sortKey;
     const challengeTables = sortKeyOf("project.ChallengeTables");
+    const tablesToDiscover = sortKeyOf("project.TablesToDiscover");
     const hallOfFame = sortKeyOf("project.HallOfFame");
 
     assert.ok(ALL_TABLES_SORT_KEY < challengeTables, challengeTables);
-    assert.ok(challengeTables < hallOfFame && hallOfFame < FAVORITES_SORT_KEY, hallOfFame);
+    assert.ok(challengeTables < tablesToDiscover && tablesToDiscover < hallOfFame, tablesToDiscover);
+    assert.ok(hallOfFame < FAVORITES_SORT_KEY, hallOfFame);
 });

@@ -2,7 +2,8 @@
 // The main menu in French, through main.js on the fake PinballY globals:
 // the Achievement List and Profile Stats entries read "Voir vos succès" and
 // "Vos statistiques", PinballY's Favorites filter reads "Tables favorites",
-// and the screens keep their own titles.
+// the screens keep their own titles, and the Tables to Discover filter
+// reads "Tables à découvrir".
 // ============================================================
 
 import { test } from "node:test";
@@ -10,7 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 
-const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "achievements"];
+const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "achievements", "tablesToDiscover"];
 // Any command id: only the title is translated.
 const FAVORITES_FILTER_CMD = 7000;
 
@@ -37,4 +38,6 @@ test("the main menu names the Achievements, the Stats and the Favorite Tables in
     }
     assert.equal(lang.achievementList.title, "Succès personnels");
     assert.equal(lang.profileStats.title("Léa"), "Statistiques de Léa");
+    const tablesToDiscover = fake.scriptFilters().find(filter => filter.id === "project.TablesToDiscover");
+    assert.equal(tablesToDiscover.title, "Tables à découvrir");
 });

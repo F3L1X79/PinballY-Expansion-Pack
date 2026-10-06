@@ -21,8 +21,9 @@ import lang from "./i18n.js";
 import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
 import { getDecadeStartYear } from "./decade.js";
-import { countPlayedTables, getUnplayedTables, tablesVisibleTo } from "./visible_tables.js";
+import { countPlayedTables, tablesVisibleTo } from "./visible_tables.js";
 import { getHallOfFame } from "./hall_of_fame.js";
+import { getTablesToDiscover } from "./tables_to_discover.js";
 import { ALL_TABLES_FILTER } from "./pinbally_host.js";
 
 const SCRIPT_NAME = "ProfileStats";
@@ -54,11 +55,7 @@ export function createProfileStats(host, { profileStore, achievementList, tableO
         {
             command: host.allocateCommand("profileStatsNeverPlayed"),
             label: TEXT.neverPlayedTables,
-            // Unconfigured tables left out, like the Hall of Fame: PinballY's
-            // wheel never shows them, so the jump could not land on them.
-            readTables: profileTables => getUnplayedTables(profileTables, profileStore)
-                .filter(game => game.isConfigured)
-                .sort((a, b) => a.title.localeCompare(b.title)),
+            readTables: profileTables => getTablesToDiscover(profileTables, profileStore),
         },
     ];
 

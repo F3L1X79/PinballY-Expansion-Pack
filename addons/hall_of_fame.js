@@ -1,6 +1,6 @@
 // ============================================================
 // Adds a "Hall of Fame" filter to PinballY's main menu, after the
-// Challenge Tables and right before the Favorite Tables: the wheel then
+// Tables to Discover and right before the Favorite Tables: the wheel then
 // shows the active Profile's Hall of Fame tables, among the tables it can
 // see, in rank order, each table its own Next/Previous Page stop.
 // Registered once at init; the ranking is recomputed each time the filter
@@ -19,7 +19,7 @@ const FILTER_ID = "project.HallOfFame";
 // PinballY prefixes a script filter's id.
 const FULL_FILTER_ID = `User.${FILTER_ID}`;
 
-// Challenge Tables has sort key "5000" and PinballY's "Favorites" filter
+// Tables to Discover has sort key "5500" and PinballY's "Favorites" filter
 // "7000" in the [Top] group.
 const BEFORE_FAVORITES_SORT_KEY = "6000";
 

@@ -124,10 +124,11 @@ export default {
         signOff: "Have fun!",
     },
 
-    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js and hall_of_fame.js).
+    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js, hall_of_fame.js and tables_to_discover.js).
     customMenuLabels: {
         challengeTables: "Challenge Tables",
         hallOfFameFilter: "Most Played Tables",
+        tablesToDiscoverFilter: "Tables to Discover",
         originalTablesFilter: "Original Tables",
         randomGame: "Start Random Game",
         tableOfTheDay: "Launch Table of the Day",

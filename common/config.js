@@ -58,6 +58,7 @@ const DEFAULTS = {
         customMenuCommands: true,
         customFilter: true,
         hallOfFame: true,
+        tablesToDiscover: true,
         sessionStatsTracker: true,
         achievements: true,
         seamlessLaunchOverlay: true,

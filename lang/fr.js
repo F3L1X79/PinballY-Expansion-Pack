@@ -241,10 +241,11 @@ export default {
         signOff: "Et surtout, amuse-toi bien ;)",
     },
 
-    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js and hall_of_fame.js).
+    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js, hall_of_fame.js and tables_to_discover.js).
     customMenuLabels: {
         challengeTables: "Tables du défi",
         hallOfFameFilter: "Tables les plus jouées",
+        tablesToDiscoverFilter: "Tables à découvrir",
         originalTablesFilter: "Tables Originales",
         randomGame: "Lancer une table au hasard",
         tableOfTheDay: "Lancer la table du jour",

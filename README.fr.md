@@ -67,7 +67,7 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 
 **Et aussi** :
 - une table au hasard sur une roue de la fortune ;
-- « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
+- « Tables à découvrir », « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
 - une horloge et une ligne d'état enrichie ;
 - un rappel pour noter une table ;
 - un lancement sans flash noir ;

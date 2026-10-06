@@ -20,6 +20,7 @@ import * as statusLineInfo from "./addons/status_line_info.js";
 import * as customMenuCommands from "./addons/custom_menu_commands.js";
 import * as customFilter from "./addons/custom_filter.js";
 import * as hallOfFame from "./addons/hall_of_fame.js";
+import * as tablesToDiscover from "./addons/tables_to_discover.js";
 import * as menuCleanup from "./addons/menu_cleanup.js";
 import * as profilePicker from "./addons/profile_picker.js";
 import * as clock from "./addons/clock.js";
@@ -56,6 +57,7 @@ const SCRIPTS = [
     { key: "customMenuCommands", module: customMenuCommands },
     { key: "customFilter", module: customFilter },
     { key: "hallOfFame", module: hallOfFame },
+    { key: "tablesToDiscover", module: tablesToDiscover },
     { key: "menuCleanup", module: menuCleanup },
     { key: "profilePicker", module: profilePicker },
     { key: "clock", module: clock },
