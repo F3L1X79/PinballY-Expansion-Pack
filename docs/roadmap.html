@@ -495,20 +495,26 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="bronze">
+      <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Configuration : des sections lisibles et les liens entre Add-ons au grand jour</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+            <h3>Robustesse : configuration lisible, résumé de démarrage, fichiers d'une version future protégés</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
           </div>
-          <p><code>.env.example</code> découpé en sections commentées (Profils, Progression, Présentation, Menus…), avec une ligne par lien entre Add-ons (« sans <code>ADD_ON_PROFILE_PICKER</code>, les Challenges… »). Dans le code, un seul point d'accès du genre <code>isAddOnOn("challenges")</code> remplace les <code>config.addOns.X !== false</code> éparpillés, pour retrouver chaque lien d'un <code>grep</code>.</p>
+          <p>Quatre points, un ticket chacun :</p>
+          <ul>
+            <li><code>.env.example</code> découpé en sections commentées (Profils, Progression, Présentation, Menus…), avec une ligne par lien entre Add-ons (« sans <code>ADD_ON_PROFILE_PICKER</code>, les Challenges… »).</li>
+            <li>Dans le code, un seul point d'accès du genre <code>isAddOnOn("challenges")</code> remplace les <code>config.addOns.X !== false</code> éparpillés, pour retrouver chaque lien d'un <code>grep</code>.</li>
+            <li>Un résumé de démarrage dans <code>logfile.log</code> : version de PinballY (<code>systemInfo.version</code>) comparée au minimum Beta 10, langue, Add-ons désactivés, nombre de Profiles et de tables visibles. Log seulement, rien à l'écran.</li>
+            <li>Le Profile Store relit la <code>version</code> qu'il écrit déjà : un fichier d'une version plus récente que le code (retour à un ancien commit) est mis de côté sous un nom daté et journalisé, jamais lu ni réécrit dans l'ancien format.</li>
+          </ul>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par point) puis <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par point) puis <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code> et facilite les retours en arrière</div>
           <details>
             <summary>Contexte</summary>
-            <p class="ctx">Né d'une critique du 06/10/2026 qui proposait des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances. Écarté : les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé), donc rien à valider ; les groupes ne suivent pas l'usage (on coupe un Add-on précis) ; un format imbriqué obligerait les joueurs à éditer du JS ou du JSON et casserait les clés déjà présentes dans leurs <code>.env.local</code>. On garde le format plat ; on n'y revient que si une vraie dépendance dure apparaît.</p>
+            <p class="ctx">Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
           </details>
         </div>
       </li>
