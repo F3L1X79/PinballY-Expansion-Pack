@@ -34,28 +34,30 @@ export const CHOICE = Object.freeze({ CLOSE: "close", ACHIEVEMENTS: "achievement
 
 
 const LOOK = Object.freeze({
-    pad: 40, cross: 56,
+    pad: 32, cross: 56,
     // The panel's width: a share of the window's, at most maxWidth.
     widthShare: 0.9, maxWidth: 1500,
     // The card: its share of the inner width, its inset, the gap to the column.
-    cardShare: 0.4, cardInset: 28, columnGap: 48,
+    cardShare: 0.4, cardInset: 20, columnGap: 36,
     avatar: 190, avatarGap: 12, nameH: 66, nameSize: 34, minNameSize: 24, buttonsGap: 40,
+    // The name drawn that much higher than its box, closer to the Avatar.
+    nameLift: 12,
     // The card's soft glow, in rings around its frame.
     cardGlow: 6, cardGlowPeak: 0x40,
     // The Player Level block, top down: its title, the digits (their box
     // taller than they are, so the bar sits clear below), the bar, the points.
-    playerLevel: Object.freeze({ titleH: 26, titleSize: 17, digitsH: 130, digitsSize: 96, digitsLift: 16, barH: 14, barGap: 12, pointsH: 58, pointsSize: 19 }),
+    playerLevel: Object.freeze({ titleH: 26, titleSize: 17, digitsH: 130, digitsSize: 96, digitsLift: 30, barH: 14, barGap: 12, pointsH: 58, pointsSize: 19 }),
     // The rule, then the Collection Mastery's title and block, its square
     // scaled by squareK.
     ruleH: 31, // Inside the block: the left inset, the goal's, bar's and count's tops,
     // the gaps to the square and from it to the right edge.
     collection: Object.freeze({
-        titleH: 34, titleSize: 17, h: 124, squareK: 1.1, goalSize: 18, minGoalSize: 15, barH: 10, currentSize: 16,
-        inset: 20, goalY: 18, barY: 64, currentY: 86, barGap: 22, squareInset: 18,
+        titleH: 34, titleSize: 17, h: 124, squareK: 1, goalSize: 16, minGoalSize: 13, barH: 10, currentSize: 16,
+        inset: 16, goalY: 18, barY: 64, currentY: 86, barGap: 16, squareInset: 14,
     }),
     button: Object.freeze({ h: 74, gap: 14, size: 22, minSize: 17, countSize: 22 }),
     // The column: a section title, rows of stats side by side, label over value.
-    titleH: 60, titleSize: 20, ruleY: 34, statGap: 32, labelSize: 20, minLabelSize: 16, valueY: 26, valueSize: 36, minValueSize: 22, rowH: 78,
+    titleH: 56, titleSize: 19, ruleY: 32, statGap: 24, labelSize: 18, minLabelSize: 14, valueY: 26, valueSize: 34, minValueSize: 22, rowH: 78,
     sectionGap: 20, rowGap: 18,
     // A stat's pill: beside its value (gap), or under it (underGap); gold
     // when lit, its background the gold mixed that far into the panel.
@@ -68,8 +70,8 @@ const LOOK = Object.freeze({
     // most logoMaxW, inset from the strip's edges), the label, the name
     // and the pill beside it, from their tops.
     strip: Object.freeze({
-        h: 132, gapAbove: 24, gap: 16, logoShare: 0.36, logoMaxW: 230, logoInsetX: 16, logoInsetY: 12, titleSize: 24, textGap: 24,
-        labelY: 16, labelSize: 18, nameY: 40, nameSize: 23, minNameSize: 17, pillY: 87,
+        h: 132, gapAbove: 24, gap: 16, logoShare: 0.26, logoMaxW: 160, logoInsetX: 16, logoInsetY: 16, titleSize: 22, textGap: 20,
+        labelY: 16, labelSize: 17, nameY: 40, nameSize: 21, minNameSize: 15, pillY: 87,
     }),
     // Room around a highlighted element for its halo, and beside the cross
     // for its tooltip.
@@ -172,7 +174,7 @@ function drawBar(dc, x, y, w, h, share, color) {
 // next level and the points, centred in the card (cardX, cardW), from y.
 function drawPlayerLevel(host, dc, playerLevel, cardX, cardW, contentX, contentW, y) {
     const look = LOOK.playerLevel;
-    text(host, dc, playerLevel.title, { x: cardX, y, width: cardW, size: look.titleSize, weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
+    text(host, dc, playerLevel.title, { x: cardX, y, width: cardW, size: look.titleSize, weight: 700, color: COLORS.playerLevel, font: FONTS.display, align: "center" });
     const digitsY = y + look.titleH;
     text(host, dc, playerLevel.number, { x: cardX, y: digitsY - look.digitsLift, width: cardW, size: look.digitsSize, weight: 700, color: COLORS.playerLevel, font: FONTS.display, align: "center" });
     const barY = digitsY + look.digitsH;
@@ -296,7 +298,7 @@ export function layoutProfileStats(host, screen, referenceWidth) {
             drawAvatar(dc, screen.avatarPath, G + Math.round((cardW - avatar) / 2), y, avatar);
             y += avatar + LOOK.avatarGap;
             oneLine(host, dc, screen.name, {
-                x: contentX, y, width: contentW, height: LOOK.nameH,
+                x: contentX, y: y - LOOK.nameLift, width: contentW, height: LOOK.nameH,
                 size: LOOK.nameSize, minSize: LOOK.minNameSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center",
             });
             y += LOOK.nameH;
