@@ -2,8 +2,9 @@
 // Forces the backglass window visible at startup, hides it while a table is
 // running (VPX renders its own backglass), and shows it again once back at
 // the wheel. Listens to "gamestarted" and "gameover". On a single screen it
-// does nothing: the backglass has no monitor of its own there, and showing
-// it covers the whole playfield.
+// hides the backglass instead at each of these moments: it has no monitor of
+// its own there, PinballY reopens it from its saved setting, and it then
+// covers the whole playfield.
 // ============================================================
 
 import { safeHandler } from "../common/safe_handler.js";
@@ -16,7 +17,7 @@ export default function init() {
     // Checked on every change, since a screen can be plugged in or out
     // while PinballY runs.
     const showBackglass = visible => {
-        if (host.countMonitors() > 1) host.showBackglass(visible);
+        host.showBackglass(host.countMonitors() > 1 && visible);
     };
 
     // Hiding the backglass during play can end up saved as
