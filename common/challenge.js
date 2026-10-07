@@ -332,13 +332,14 @@ export function createChallenges(host, profileStore, { tableOfTheDay, tableOfThe
         };
     }
 
-    // The active Profile's completed Challenges out of every Challenge it
-    // completed or missed. Read from the completed count,
-    // not the verdicts, so it agrees with the Challenges Achievements and
-    // counts this week's Challenge as soon as it is completed.
+    // The active Profile's completed Challenges out of the weeks it took
+    // part in: a missed Challenge counts only with some progress toward it.
+    // Completed ones are read from the completed count, not the verdicts,
+    // so it agrees with the Challenges Achievements and counts this week's
+    // Challenge as soon as it is completed.
     function getRecord() {
         const state = readProfileChallenge(profileStore.getActiveProfile().data);
-        const missed = state.history.filter(verdict => !verdict.completed).length;
+        const missed = state.history.filter(verdict => !verdict.completed && verdict.reached > 0).length;
         return { completed: state.completedCount, total: state.completedCount + missed };
     }
 

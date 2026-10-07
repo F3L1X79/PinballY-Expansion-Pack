@@ -1,7 +1,8 @@
 // ============================================================
 // With the Challenges Add-on turned off in addOns, main.js draws no
 // Challenge (nothing in cabinet.json) and no Challenge Card, the
-// Challenges Achievements do not exist, and the Profile Stats still open.
+// Challenges Achievements do not exist, and the Profile Stats still open,
+// with no completed Challenges: the Collection takes the row alone.
 // ============================================================
 
 import { test } from "node:test";
@@ -9,7 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
-import { openProfileStats, isProfileStatsOpen } from "./profile_stats_reader.js";
+import { openProfileStats, isProfileStatsOpen, section } from "./profile_stats_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
@@ -48,5 +49,8 @@ test("no Challenge, Challenge Card or Challenges Achievements when the Challenge
 
     openProfileStats(fake, lang);
     assert.ok(isProfileStatsOpen(fake), "the Profile Stats open without the Challenge module");
+    const STATS = lang.profileStats;
+    assert.deepEqual(Object.keys(section(fake, STATS.sections.progression, STATS.stats)),
+        [STATS.stats.collection, STATS.stats.dayStreak, STATS.stats.weekStreak], "no completed Challenges");
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

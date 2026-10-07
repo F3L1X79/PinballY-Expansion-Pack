@@ -125,7 +125,7 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
 
     // From the Profile Stats' Achievements button, Exit shows them again.
     openProfileStats(fake, lang);
-    assert.equal(buttons(fake)[0].count, lang.profileStats.achievementsCount(unlocked.length, rows.length));
+    assert.equal(buttons(fake)[0].count, lang.profileStats.fraction(unlocked.length, rows.length));
     choose(fake, lang.profileStats.buttons.achievements);
     assert.ok(isListOpen(fake));
     pressAndGlide(fake, "Exit");

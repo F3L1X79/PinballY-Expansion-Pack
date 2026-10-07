@@ -4,15 +4,17 @@
 // panel over the dimmed wheel, laid out by the Profile Stats painter,
 // with the Avatar, the Profile's name, the Player Level and the
 // Collection Mastery on a card whose foot holds the Achievements, Most
-// Played Tables and Tables to Discover buttons, and the GAME section on
-// its right. Every stat is read again on each opening; the screen is
-// drawn at once on all its layers, then faded in. Created from the
-// PinballY host, the Profile store, a reader of the active Profile's
-// Player Level, the Achievement List (its counts, and opening it from
-// the Achievements button, Exit there showing this screen again on that
-// button) and the full ids of the Hall of Fame and Tables to Discover
-// filters (null when their Add-on is disabled: no button). While open it
-// swallows every button through "commandbuttondown": Next / Prev move a
+// Played Tables and Tables to Discover buttons, and the GAME and
+// PROGRESSION sections on its right. Every stat is read again on each
+// opening; the screen is drawn at once on all its layers, then faded in.
+// Created from the PinballY host, the Profile store, a reader of the
+// active Profile's Player Level, the Achievement List (its counts, and
+// opening it from the Achievements button, Exit there showing this screen
+// again on that button), the Table of the Day and Table of the Week (their
+// Streaks), the Challenge module (null when the Challenges Add-on is
+// disabled: no completed Challenges) and the full ids of the Hall of
+// Fame and Tables to Discover filters (null when their Add-on is
+// disabled: no button). While open it swallows every button through "commandbuttondown": Next / Prev move a
 // gold halo through the cross and the buttons, looping, with PinballY's
 // navigation sound; Select runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
@@ -22,7 +24,7 @@
 import lang from "./i18n.js";
 import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
-import { tablesVisibleTo } from "./visible_tables.js";
+import { countPlayedTables, tablesVisibleTo } from "./visible_tables.js";
 import { collectionMasteryOfProfile } from "./table_mastery.js";
 import { collectionTextsOf } from "./mastery_bar.js";
 import { getHallOfFame } from "./hall_of_fame.js";
@@ -38,7 +40,8 @@ const FADE_MS = 220;
 const FRAME_MS = 16;
 
 export function createProfileStats(host, {
-    profileStore, readPlayerLevel, achievementList, hallOfFameFilter = null, tablesToDiscoverFilter = null,
+    profileStore, readPlayerLevel, achievementList, tableOfTheDay, tableOfTheWeek, challenges = null,
+    hallOfFameFilter = null, tablesToDiscoverFilter = null,
 }) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
@@ -73,6 +76,38 @@ export function createProfileStats(host, {
         return filterId !== null && tables.length > 0 ? [{ choice, label, count: TEXT.number(tables.length), filterId }] : [];
     }
 
+    // The Collection Achievements' rule, so the two never disagree.
+    function collectionStat(profileTables) {
+        const played = countPlayedTables(profileTables, profileStore);
+        const share = profileTables.length === 0 ? 0 : played / profileTables.length;
+        return {
+            label: TEXT.stats.collection,
+            value: TEXT.fraction(played, profileTables.length),
+            pill: { text: TEXT.percent(Math.round(share * 100)), isLit: true },
+            share,
+        };
+    }
+
+    // A Period Table's current Streak, its longest in a pill; a gold "record
+    // in progress" instead while the current one, at least 1, sets it.
+    function streakStat(label, periodTable) {
+        const current = periodTable.getStreak();
+        const longest = periodTable.getLongestStreak();
+        const isRecord = current > 0 && current >= longest;
+        return {
+            label,
+            value: TEXT.number(current),
+            pill: isRecord ? { text: TEXT.recordInProgress, isLit: true } : { text: TEXT.record(TEXT.number(longest)), isLit: false },
+        };
+    }
+
+    // Absent without the Challenges Add-on: Collection then takes the row.
+    function challengesStats() {
+        if (!challenges) return [];
+        const { completed, total } = challenges.getRecord();
+        return [{ label: TEXT.stats.challengesCompleted, value: TEXT.fraction(completed, total) }];
+    }
+
     function readScreen() {
         const profile = profileStore.getActiveProfile();
         const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore);
@@ -80,7 +115,7 @@ export function createProfileStats(host, {
         const achievements = achievementList.countAll();
         const playerLevel = readPlayerLevel();
         const buttons = [
-            { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.achievementsCount(achievements.unlocked, achievements.total) },
+            { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
             ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, getHallOfFame(profileTables, profileStore.getPlay)),
             ...selectionButton(CHOICE.TO_DISCOVER, TEXT.buttons.tablesToDiscover, tablesToDiscoverFilter, getTablesToDiscover(profileTables, profileStore)),
         ];
@@ -104,6 +139,12 @@ export function createProfileStats(host, {
                     { label: TEXT.stats.totalTime, value: hoursAndMinutes(Math.floor(plays.seconds / SECONDS_PER_MINUTE)) },
                     { label: TEXT.stats.averageDuration, value: averageOf(plays) },
                 ]],
+            }, {
+                title: TEXT.sections.progression,
+                rows: [
+                    [collectionStat(profileTables), ...challengesStats()],
+                    [streakStat(TEXT.stats.dayStreak, tableOfTheDay), streakStat(TEXT.stats.weekStreak, tableOfTheWeek)],
+                ],
             }],
             closeLabel: TEXT.closeTooltip,
             // The flippers' loop, the cross first.
@@ -136,7 +177,7 @@ export function createProfileStats(host, {
         backdrop.draw(dc => {
             const size = dc.getSize();
             referenceWidth = REFERENCE_HEIGHT * size.width / size.height;
-            drawBackdrop(dc, size, referenceWidth, screen);
+            drawBackdrop(host, dc, size, referenceWidth, screen);
         });
         layers.push(backdrop);
         const drawPiece = piece => {

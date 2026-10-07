@@ -2,8 +2,10 @@
 // Completed Challenges in the player's record, through main.js on the fake
 // PinballY globals: the Challenges Achievements in the Achievement List
 // unlock on the Profile's completed count and show their Achievement
-// Progress, counting the week's Challenge as soon as it is completed.
-// Guest has its own record, empty here.
+// Progress, counting the week's Challenge as soon as it is completed; the
+// Profile Stats show the completed Challenges over the weeks taken part in,
+// a missed week counting only with some progress toward it. Guest has its
+// own record, empty here.
 // ============================================================
 
 import { test } from "node:test";
@@ -11,6 +13,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
+import { openProfileStats, section, press } from "./profile_stats_reader.js";
 
 // Wednesday 23 September 2026: its week is keyed "2026-09-21".
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -24,15 +27,16 @@ const table = (id, title, manufacturer, year) => ({
 });
 const TABLES = [table(1, "Medieval Madness", "Williams", 1997), table(2, "Attack from Mars", "Bally", 1995)];
 
-const verdict = (week, completed) =>
-    ({ week, template: "differentTables", param: null, target: 3, reached: completed ? 3 : 1, completed });
+const verdict = (week, completed, reached = completed ? 3 : 1) =>
+    ({ week, template: "differentTables", param: null, target: 3, reached, completed });
 
-// Four Challenges completed, one missed; this week's follows, not completed yet.
+// Four Challenges completed, one missed with some progress, one untouched;
+// this week's follows, not completed yet.
 const ALICE_CHALLENGE = {
-    firstWeek: "2026-08-17", week: "2026-09-21", games: [], completed: false, completedCount: 4,
+    firstWeek: "2026-08-10", week: "2026-09-21", games: [], completed: false, completedCount: 4,
     judgedWeek: "2026-09-14",
     history: [
-        verdict("2026-08-17", true), verdict("2026-08-24", true), verdict("2026-08-31", true),
+        verdict("2026-08-10", false, 0), verdict("2026-08-17", true), verdict("2026-08-24", true), verdict("2026-08-31", true),
         verdict("2026-09-07", true), verdict("2026-09-14", false),
     ],
 };
@@ -64,6 +68,7 @@ test("completed Challenges unlock the Challenges Achievements", async () => {
     await settle();
     const LIST = lang.achievementList;
     const ACHIEVEMENT = lang.achievements;
+    const STATS = lang.profileStats;
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     // How the Achievement List shows each Challenges Achievement:
@@ -79,6 +84,12 @@ test("completed Challenges unlock the Challenges Achievements", async () => {
     }
     const withProgress = (count, current) =>
         `${ACHIEVEMENT.challengesCompletedTitles[count]} ${LIST.progressUnits.challenges.short(current, count)}`;
+    function challengesShown() {
+        openProfileStats(fake, lang);
+        const progression = section(fake, STATS.sections.progression, STATS.stats);
+        press(fake, "Exit");
+        return progression[STATS.stats.challengesCompleted];
+    }
     async function play(game) {
         fake.gameStarted(game);
         await settle();
@@ -93,10 +104,13 @@ test("completed Challenges unlock the Challenges Achievements", async () => {
         `✓ ${ACHIEVEMENT.challengesCompletedTitles[1]}`,
         withProgress(5, 4), withProgress(10, 4), withProgress(25, 4), withProgress(50, 4), withProgress(100, 4),
     ]);
+    assert.deepEqual(challengesShown(), ["4/5"], "the untouched week is left out");
 
     // Two different tables complete the week's Challenge: the fifth one.
     await play(TABLES[0]);
+    assert.deepEqual(challengesShown(), ["4/5"], "not completed after one table");
     await play(TABLES[1]);
+    assert.deepEqual(challengesShown(), ["5/6"]);
     assert.deepEqual(challengeRows().slice(0, 3), [
         `✓ ${ACHIEVEMENT.challengesCompletedTitles[5]}`,
         `✓ ${ACHIEVEMENT.challengesCompletedTitles[1]}`,
@@ -110,6 +124,7 @@ test("completed Challenges unlock the Challenges Achievements", async () => {
     fake.fire("wheelmode");
     const judged = JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\Alice\\profile.json`)).challenge;
     assert.equal(judged.history.at(-1).completed, true);
+    assert.deepEqual(challengesShown(), ["5/6"], "counted once");
 
     // Guest has its own record, Alice's completed Challenges left out.
     getProfileStore().switchTo("guest");
@@ -119,6 +134,7 @@ test("completed Challenges unlock the Challenges Achievements", async () => {
         `${ACHIEVEMENT.challengesCompletedTitles[1]} null`,
         ...[5, 10, 25, 50, 100].map(count => withProgress(count, 0)),
     ]);
+    assert.deepEqual(challengesShown(), ["0/0"]);
 
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

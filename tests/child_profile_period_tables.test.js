@@ -3,7 +3,7 @@
 // PinballY globals: while the Table of the Day is an Adult Table, the
 // child's Welcome Screen and main menu leave it out and an adult Profile
 // keeps it; the child's Streak goes on across that Period without counting
-// it (as its Achievement Progress shows) and still breaks on an
+// it (Profile Stats and Achievement Progress agree) and still breaks on an
 // ordinary missed Period, while an adult's Streak breaks as before.
 // cabinet.json keeps those Periods next to the Table of the Day's lock,
 // and drops one whose table is untagged during it.
@@ -15,6 +15,7 @@ import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
 import { WELCOME_SCREEN_OPEN_MS, press, periodCards, readChoices } from "./welcome_screen_reader.js";
+import { openProfileStats, section } from "./profile_stats_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CABINET = `${PROFILES}\\cabinet.json`;
@@ -85,6 +86,14 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
         const titles = [ACHIEVEMENTS.dailyStreakTitles[7], ACHIEVEMENTS.dailyPeriodsPlayedTitles[10]];
         return titles.map(title => rows.find(row => row.title === title).progress);
     }
+    // The day Streak in the Profile Stats: its value, then its pill.
+    const STATS = lang.profileStats;
+    function dayStreakShown() {
+        openProfileStats(fake, lang);
+        const progression = section(fake, STATS.sections.progression, STATS.stats);
+        press(fake, "Exit");
+        return progression[STATS.stats.dayStreak];
+    }
     const PROGRESS = lang.achievementList.progressUnits;
     const progressOf = (streak, periodsPlayed) => [PROGRESS.daysInARow.short(streak, 7), PROGRESS.daysPlayed.short(periodsPlayed, 10)];
     async function playTableOfTheDay() {
@@ -115,6 +124,7 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     }
 
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheWeek], "no Table of the Day entry for the child");
+    assert.deepEqual(dayStreakShown(), ["3", STATS.recordInProgress], "the child's Streak goes on across the adult day");
     assert.deepEqual(dayStreakProgress(), progressOf(3, 3));
 
     await switchTo("Bob");
@@ -124,10 +134,13 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     // Thursday 1 October: back to an ordinary table, which extends the Streak.
     await goToDay(1);
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek]);
+    assert.deepEqual(dayStreakShown(), ["3", STATS.recordInProgress], "today can still extend the Streak");
     assert.equal((await playTableOfTheDay()).configId, MEDIEVAL.configId);
+    assert.deepEqual(dayStreakShown(), ["4", STATS.recordInProgress]);
     assert.deepEqual(dayStreakProgress(), progressOf(4, 4), "the adult day is not counted");
 
     await switchTo("Bob");
+    assert.deepEqual(dayStreakShown(), ["0", STATS.record(1)], "an adult Profile's Streak broke on the adult day");
     await switchTo("Alice");
 
     // 2 October is an adult day, 3 October an ordinary day the child misses.
@@ -136,6 +149,7 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek]);
     await goToDay(4);
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheWeek]);
+    assert.deepEqual(dayStreakShown(), ["0", STATS.record(4)], "an ordinary missed day breaks the Streak");
     assert.deepEqual(dayStreakProgress(), progressOf(0, 4));
 
     assert.deepEqual(JSON.parse(fake.readFile(CABINET)).tableOfTheDay, {

@@ -1,7 +1,8 @@
 // ============================================================
 // The drawn Profile Stats in French, through main.js on the fake PinballY
 // globals, with the Tables to Discover Add-on off: a Profile with no Play
-// shows "—" for its average and no Most Played Tables button, and no
+// shows "—" for its average, no Most Played Tables button and its
+// PROGRESSION at zero, without "Record en cours !" at Streak 0, and no
 // Tables to Discover button ever shows; another Profile's games of over an
 // hour show their average in hours, its totals thousands separated, and an
 // average just under an hour rounds up to "1 h 00".
@@ -51,6 +52,11 @@ test("no Play shows a dash and no selection button; long games show hours", asyn
         "Temps total": ["0 h 00"],
         "Durée moyenne": ["—"],
     });
+    assert.deepEqual(section(fake, "PROGRESSION", TEXT.stats), {
+        "Collection": ["0/1", "0 %"],
+        "Série du jour": ["0", "Record : 0"],
+        "Série de la semaine": ["0", "Record : 0"],
+    }, "no completed Challenges with the Challenges Add-on off");
     press(fake, "Exit");
 
     getProfileStore().switchTo("Alice");

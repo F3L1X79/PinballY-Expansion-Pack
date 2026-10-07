@@ -436,21 +436,31 @@ export default {
             current: (points, nextLevelPoints) => `Actuel : ${points} / ${nextLevelPoints}`,
         },
         collectionTitle: "MAÎTRISE DE LA COLLECTION",
-        achievementsCount: (unlocked, total) => `${unlocked}/${total}`,
         sections: {
             game: "JEU",
+            progression: "PROGRESSION",
         },
         // The stats' labels, over their values.
         stats: {
             gamesPlayed: "Parties jouées",
             totalTime: "Temps total",
             averageDuration: "Durée moyenne",
+            collection: "Collection",
+            challengesCompleted: "Défis réussis",
+            dayStreak: "Série du jour",
+            weekStreak: "Série de la semaine",
         },
         // Thousands separated by a no-break space: "1 206".
         number: (count) => String(count).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0"),
         // Minutes on two digits: "96 h 05".
         hoursAndMinutes: (hours, minutes) => `${hours} h ${String(minutes).padStart(2, "0")}`,
         minutes: (minutes) => `${minutes} min`,
+        fraction: (count, total) => `${count}/${total}`,
+        // The share of the collection played, in a pill.
+        percent: (percent) => `${percent} %`,
+        // A Streak's longest, in a pill; or the record set right now.
+        record: (longest) => `Record : ${longest}`,
+        recordInProgress: "Record en cours !",
         // A stat without a value, such as the average before any Play.
         none: "—",
     },

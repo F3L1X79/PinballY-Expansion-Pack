@@ -2,7 +2,7 @@
 // Guest follows the weekly Challenge like any other Profile, through
 // main.js on the fake PinballY globals: the Challenge Card, the counted
 // games, the Challenge Toast, the Challenge Tables, the Challenges
-// Achievements and the verdict on the previous week. Guest
+// Achievements, the Profile Stats' completed Challenges and the verdict on the previous week. Guest
 // still never shows in the Unlock Rate, and each Profile keeps its own
 // progress across switches.
 // ============================================================
@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
 import { pressAndGlide, readRows } from "./achievement_list_reader.js";
+import { openProfileStats, section, press } from "./profile_stats_reader.js";
 import config from "../common/config.js";
 
 // Wednesday 23 September 2026: its week is keyed "2026-09-21".
@@ -106,6 +107,10 @@ test("Guest follows the week's Challenge, completes it and earns its record, apa
     assert.ok(guestRow && guestRow.unlocked, "Guest unlocked the first Challenges Achievement");
     const progressRow = guestRows.find(row => row.title === ACHIEVEMENT.challengesCompletedTitles[5]);
     assert.equal(progressRow.progress, LIST.progressUnits.challenges.short(1, 5));
+    openProfileStats(fake, lang);
+    const STATS = lang.profileStats;
+    assert.deepEqual(section(fake, STATS.sections.progression, STATS.stats)[STATS.stats.challengesCompleted], ["1/1"]);
+    press(fake, "Exit");
 
     // Alice starts from zero and never sees Guest in the Unlock Rate.
     getProfileStore().switchTo("Alice");

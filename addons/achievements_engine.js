@@ -40,6 +40,7 @@ import { createProfileStats } from "../common/profile_stats.js";
 import { HALL_OF_FAME_FULL_FILTER_ID } from "../common/hall_of_fame.js";
 import { TABLES_TO_DISCOVER_FULL_FILTER_ID } from "../common/tables_to_discover.js";
 import { getDrawingAhead } from "../common/drawing_ahead.js";
+import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
 import { createPinballYHost } from "../common/pinbally_host.js";
 import { getProfileStore } from "../common/profile_store.js";
 import { getChallenges } from "../common/challenge.js";
@@ -93,6 +94,9 @@ export default function init() {
         achievementList,
         // From the active Profile's Notified Achievements, read on each opening.
         readPlayerLevel: () => getPlayerLevel(profileStore.getProfileData().notified, getAllAchievements()),
+        tableOfTheDay: getTableOfTheDay(),
+        tableOfTheWeek: getTableOfTheWeek(),
+        challenges: getEnabledChallenges(),
         // Without its Add-on, a selection has no filter, so no button.
         hallOfFameFilter: config.addOns.hallOfFame === false ? null : HALL_OF_FAME_FULL_FILTER_ID,
         tablesToDiscoverFilter: config.addOns.tablesToDiscover === false ? null : TABLES_TO_DISCOVER_FULL_FILTER_ID,

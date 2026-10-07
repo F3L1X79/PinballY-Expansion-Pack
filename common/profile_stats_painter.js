@@ -6,17 +6,18 @@
 // Level colour with a soft glow (Avatar, the Profile's name in gold, the
 // Player Level in big digits with its bar and points, a rule, the
 // Collection Mastery stacked like the Mastery Bar, the buttons at its
-// foot), the close cross and the right
-// column's sections (a title, then rows of stats, label over value), the
-// spare height shared evenly between the column's gaps, and one highlight
+// foot), the close cross and the right column's sections (a title, then
+// rows of stats, label over value, with a pill beside the value, or every
+// pill of the row under its value when one does not fit, and a thin bar),
+// the spare height shared evenly between the column's gaps, and one highlight
 // per choice (a gold halo, with a tooltip for the cross). Only drawing: no
 // layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
-import { metalOf, tierMetalOf, tierOf, MAX_MASTERY_LEVEL } from "./table_mastery.js";
+import { metalOf, tierMetalOf, tierOf, mix, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, glow, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, UNBOUNDED,
+    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, UNBOUNDED,
 } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
@@ -53,6 +54,12 @@ const LOOK = Object.freeze({
     // The column: a section title, rows of stats side by side, label over value.
     titleH: 60, titleSize: 20, ruleY: 34, statGap: 32, labelSize: 20, minLabelSize: 16, valueY: 26, valueSize: 36, minValueSize: 22, rowH: 78,
     sectionGap: 20, rowGap: 18,
+    // A stat's pill: beside its value (gap), or under it (underGap); gold
+    // when lit, its background the gold mixed that far into the panel.
+    pill: Object.freeze({ h: 30, size: 16, weight: 600, padX: 14, gap: 14, underGap: 16, litMix: 0.78 }),
+    // A stat's thin bar under its value (or its pill), short of the
+    // column's right edge by inset.
+    shareBar: Object.freeze({ h: 6, gap: 8, inset: 24 }),
     // Room around a highlighted element for its halo, and beside the cross
     // for its tooltip.
     haloMargin: 20, crossTooltipRoom: 240,
@@ -60,15 +67,35 @@ const LOOK = Object.freeze({
 
 // ---------- Layout ----------
 
+function measureWidth(host, str, { size, weight, font = FONTS.body }) {
+    const styled = host.createStyledText({ textAlign: "left", textStyle: { font, size, weight, color: COLORS.title } });
+    styled.add(str);
+    return Math.ceil(styled.measure(UNBOUNDED).width);
+}
+
+const pillWidth = (host, str) => measureWidth(host, str, { size: LOOK.pill.size, weight: LOOK.pill.weight }) + 2 * LOOK.pill.padX;
+
+// A row of stats side by side in the column: every pill goes under its
+// value when one does not fit beside its own, so the row stays aligned.
+function rowBlock(host, section, stats, columnW) {
+    const { pill, shareBar } = LOOK;
+    const colW = Math.round((columnW - LOOK.statGap * (stats.length - 1)) / stats.length);
+    const valueWidth = stat => Math.min(colW, measureWidth(host, stat.value, { size: LOOK.valueSize, weight: 700, font: FONTS.display }));
+    const isUnder = stats.some(stat => stat.pill && valueWidth(stat) + pill.gap + pillWidth(host, stat.pill.text) > colW);
+    const hasShare = stats.some(stat => stat.share !== undefined);
+    const h = LOOK.rowH + (isUnder ? pill.underGap + pill.h : 0) + (hasShare ? shareBar.gap + shareBar.h : 0);
+    return { kind: "row", h, section, stats, colW, isUnder };
+}
+
 // The column's blocks top down; the spare height goes to the gaps only.
-function columnBlocks(screen) {
+function columnBlocks(host, screen, columnW) {
     const blocks = [];
     screen.sections.forEach((section, index) => {
         if (index > 0) blocks.push({ kind: "gap", h: LOOK.sectionGap, isSpread: true });
         blocks.push({ kind: "title", h: LOOK.titleH, section, isFirst: index === 0 });
         section.rows.forEach((stats, rowIndex) => {
             if (rowIndex > 0) blocks.push({ kind: "gap", h: LOOK.rowGap, isSpread: true });
-            blocks.push({ kind: "row", h: LOOK.rowH, section, stats });
+            blocks.push(rowBlock(host, section, stats, columnW));
         });
     });
     return blocks;
@@ -90,7 +117,7 @@ function cardHeight(screen, avatar) {
 
 // The panel, the card and the column in a window referenceWidth wide; the
 // panel is as tall as the taller of the card and the column.
-function geometry(referenceWidth, screen) {
+function geometry(host, referenceWidth, screen) {
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
     const innerW = w - 2 * LOOK.pad;
     const cardW = Math.round(innerW * LOOK.cardShare);
@@ -98,7 +125,7 @@ function geometry(referenceWidth, screen) {
     const avatar = Math.min(contentW, LOOK.avatar);
     const columnX = LOOK.pad + cardW + LOOK.columnGap;
     const columnW = w - LOOK.pad - columnX;
-    const blocks = columnBlocks(screen);
+    const blocks = columnBlocks(host, screen, columnW);
     const naturalH = blocks.reduce((sum, block) => sum + block.h, 0);
     const innerH = Math.max(cardHeight(screen, avatar), naturalH);
     const spreads = blocks.filter(block => block.isSpread).length;
@@ -115,14 +142,8 @@ function geometry(referenceWidth, screen) {
 
 // The backdrop: the dimmed wheel and the panel, drawn on a window-sized
 // canvas whose height is REFERENCE_HEIGHT * scale.
-export function drawBackdrop(dc, size, referenceWidth, screen) {
-    drawPanelBackdrop(dc, size, REFERENCE_HEIGHT, geometry(referenceWidth, screen).panel);
-}
-
-function measureWidth(host, str, { size, weight, font = FONTS.body }) {
-    const styled = host.createStyledText({ textAlign: "left", textStyle: { font, size, weight, color: COLORS.title } });
-    styled.add(str);
-    return Math.ceil(styled.measure(UNBOUNDED).width);
+export function drawBackdrop(host, dc, size, referenceWidth, screen) {
+    drawPanelBackdrop(dc, size, REFERENCE_HEIGHT, geometry(host, referenceWidth, screen).panel);
 }
 
 // A bar on its track, filled to share (0 to 1).
@@ -166,6 +187,29 @@ function drawCollection(host, dc, collection, x, y, w) {
     drawMasterySquare(host, dc, tier, squareX, y + Math.round((look.h - size) / 2), look.squareK, lookLevel);
 }
 
+// A rounded pill holding pill.text, its left edge at x, from y; gold when lit.
+function drawPill(host, dc, { text: str, isLit }, x, y) {
+    const look = LOOK.pill;
+    const w = pillWidth(host, str);
+    fillRounded(dc, x, y, w, look.h, look.h / 2, isLit ? mix(COLORS.gold, COLORS.panel, look.litMix) : COLORS.track);
+    oneLine(host, dc, str, { x: x + look.padX, y, width: w - 2 * look.padX, height: look.h, size: look.size, weight: look.weight, color: isLit ? COLORS.gold : COLORS.description });
+}
+
+// A stat: its label over its value, its pill beside or under the value,
+// and its thin gold bar at the bottom.
+function drawStat(host, dc, stat, x, y, block) {
+    const { pill, shareBar } = LOOK;
+    oneLine(host, dc, stat.label, { x, y, width: block.colW, size: LOOK.labelSize, minSize: LOOK.minLabelSize, weight: 400, color: COLORS.description });
+    const valueW = oneLine(host, dc, stat.value, { x, y: y + LOOK.valueY, width: block.colW, size: LOOK.valueSize, minSize: LOOK.minValueSize, weight: 700, font: FONTS.display });
+    const underY = y + LOOK.rowH + pill.underGap;
+    if (stat.pill && block.isUnder) drawPill(host, dc, stat.pill, x, underY);
+    else if (stat.pill) drawPill(host, dc, stat.pill, Math.round(x + valueW + pill.gap), y + LOOK.valueY + Math.round((LOOK.rowH - LOOK.valueY - pill.h) / 2));
+    if (stat.share !== undefined) {
+        const barY = (block.isUnder ? underY + pill.h : y + LOOK.rowH) + shareBar.gap;
+        drawBar(dc, x, barY, block.colW - shareBar.inset, shareBar.h, stat.share, COLORS.gold);
+    }
+}
+
 // A button: a tile with its label, and its count in grey on its right.
 function drawButton(host, dc, entry, w, h) {
     const { button } = LOOK;
@@ -187,23 +231,19 @@ function drawSection(host, dc, blocks, top, columnW) {
             text(host, dc, block.section.title, { x: 0, y, width, size: LOOK.titleSize, weight: 700, color: COLORS.gold, font: FONTS.display });
             dc.fillRect(0, y + LOOK.ruleY, width, 1, COLORS.border);
         } else if (block.kind === "row") {
-            const colW = Math.round((columnW - LOOK.statGap * (block.stats.length - 1)) / block.stats.length);
-            block.stats.forEach((stat, index) => {
-                const x = index * (colW + LOOK.statGap);
-                oneLine(host, dc, stat.label, { x, y, width: colW, size: LOOK.labelSize, minSize: LOOK.minLabelSize, weight: 400, color: COLORS.description });
-                oneLine(host, dc, stat.value, { x, y: y + LOOK.valueY, width: colW, size: LOOK.valueSize, minSize: LOOK.minValueSize, weight: 700, font: FONTS.display });
-            });
+            block.stats.forEach((stat, index) => drawStat(host, dc, stat, index * (block.colW + LOOK.statGap), y, block));
         }
     }
 }
 
 // screen: { name, avatarPath, playerLevel ({ title, number, share (0 to 1),
 // current }), collectionTitle, collection (as drawCollection's), buttons (each { choice, label, count: null
-// or a string }), sections (each { title, rows: [[{ label, value }]] }),
+// or a string }), sections (each { title, rows: [[{ label, value, pill
+// (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]] }),
 // closeLabel }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn
 // in its rect's own coordinates, and the highlight of each choice.
 export function layoutProfileStats(host, screen, referenceWidth) {
-    const { panel, innerH, cardW, contentW, avatar, columnX, columnW, blocks } = geometry(referenceWidth, screen);
+    const { panel, innerH, cardW, contentW, avatar, columnX, columnW, blocks } = geometry(host, referenceWidth, screen);
     const top = panel.y + LOOK.pad;
     const cardX = panel.x + LOOK.pad;
     // Wider than the card by its glow, on every side.
