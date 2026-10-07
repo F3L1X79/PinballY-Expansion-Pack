@@ -14,7 +14,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop,
+    text, oneLine, fillGradient, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
 } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
@@ -58,19 +58,6 @@ function runs(host, dc, parts, { x, y, width, size, weight = 700, font = FONTS.d
     for (const [str, color] of parts) styled.add({ font, size, weight, color, text: str });
     const measured = styled.measure(width).height;
     styled.draw(dc, { x, y, width, height: measured });
-}
-
-// A wheel logo fitted in the box, its aspect kept; the title when it has none.
-function drawLogo(host, dc, card, w, h) {
-    const size = card.logoPath ? dc.getImageSize(card.logoPath) : null;
-    if (size && size.width > 0 && size.height > 0) {
-        const scale = Math.min(w / size.width, h / size.height);
-        const dw = Math.round(size.width * scale);
-        const dh = Math.round(size.height * scale);
-        dc.drawImage(card.logoPath, Math.round((w - dw) / 2), Math.round((h - dh) / 2), dw, dh);
-        return;
-    }
-    text(host, dc, card.title, { x: 0, y: 0, width: w, height: h, size: 30, weight: 700, font: FONTS.display, align: "center" });
 }
 
 // A thick check mark, as stacked squares along its two strokes.
@@ -253,7 +240,7 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
         pieces.push({
             zIndex: WELCOME_SCREEN_Z_INDEX.logos,
             rect: { x: inner.x + LOOK.logoInset, y: cardY + LOOK.logoTop, w: logoW, h: logoH },
-            draw: dc => drawLogo(host, dc, card, logoW, logoH),
+            draw: dc => drawWheelLogo(host, dc, card, { x: 0, y: 0, w: logoW, h: logoH }, 30),
         });
         highlights[card.choice] = haloAround({ x: inner.x + buttonRect.x, y: cardY + buttonRect.y, w: button.w, h: button.h });
         cardY += cardH + LOOK.gap;

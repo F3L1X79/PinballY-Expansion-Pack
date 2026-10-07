@@ -8,7 +8,8 @@
 // Collection Mastery stacked like the Mastery Bar, the buttons at its
 // foot), the close cross and the right column's sections (a title, then
 // rows of stats, label over value, with a pill beside the value, or every
-// pill of the row under its value when one does not fit, and a thin bar),
+// pill of the row under its value when one does not fit, and a thin bar,
+// then wide strips with a table's wheel logo, or its title without one),
 // the spare height shared evenly between the column's gaps, and one highlight
 // per choice (a gold halo, with a tooltip for the cross). Only drawing: no
 // layer, no event, no side effect.
@@ -17,7 +18,8 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, mix, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, UNBOUNDED,
+    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    UNBOUNDED,
 } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
@@ -60,6 +62,14 @@ const LOOK = Object.freeze({
     // A stat's thin bar under its value (or its pill), short of the
     // column's right edge by inset.
     shareBar: Object.freeze({ h: 6, gap: 8, inset: 24 }),
+    // A wide strip under a section's rows (gapAbove), the next one gap
+    // below: the wheel logo in a box at the left (a share of the column, at
+    // most logoMaxW, inset from the strip's edges), the label, the name
+    // and the pill beside it, from their tops.
+    strip: Object.freeze({
+        h: 132, gapAbove: 24, gap: 16, logoShare: 0.36, logoMaxW: 230, logoInsetX: 16, logoInsetY: 12, titleSize: 24, textGap: 24,
+        labelY: 16, labelSize: 18, nameY: 40, nameSize: 23, minNameSize: 17, pillY: 87,
+    }),
     // Room around a highlighted element for its halo, and beside the cross
     // for its tooltip.
     haloMargin: 20, crossTooltipRoom: 240,
@@ -96,6 +106,10 @@ function columnBlocks(host, screen, columnW) {
         section.rows.forEach((stats, rowIndex) => {
             if (rowIndex > 0) blocks.push({ kind: "gap", h: LOOK.rowGap, isSpread: true });
             blocks.push(rowBlock(host, section, stats, columnW));
+        });
+        (section.strips || []).forEach((strip, stripIndex) => {
+            blocks.push({ kind: "gap", h: stripIndex === 0 ? LOOK.strip.gapAbove : LOOK.strip.gap, isSpread: true });
+            blocks.push({ kind: "strip", h: LOOK.strip.h, section, strip });
         });
     });
     return blocks;
@@ -210,6 +224,23 @@ function drawStat(host, dc, stat, x, y, block) {
     }
 }
 
+// A strip, columnW wide from y: its tile, label, the table's wheel logo (its
+// title without one; nothing without a table), name and pill.
+function drawStrip(host, dc, strip, y, columnW) {
+    const look = LOOK.strip;
+    fillGradient(dc, 0, y, columnW, look.h, COLORS.rowUnlocked, COLORS.tile);
+    dc.frameRect(0, y, columnW, look.h, 1, COLORS.border);
+    const logoW = Math.min(look.logoMaxW, Math.round(columnW * look.logoShare));
+    const textX = look.logoInsetX + logoW + look.textGap;
+    const textW = columnW - textX - look.logoInsetX;
+    oneLine(host, dc, strip.label, { x: textX, y: y + look.labelY, width: textW, size: look.labelSize, weight: 400, color: COLORS.description });
+    if (strip.hasTable) {
+        drawWheelLogo(host, dc, strip, { x: look.logoInsetX, y: y + look.logoInsetY, w: logoW, h: look.h - 2 * look.logoInsetY }, look.titleSize);
+    }
+    oneLine(host, dc, strip.title, { x: textX, y: y + look.nameY, width: textW, size: look.nameSize, minSize: look.minNameSize, weight: 700, font: FONTS.display });
+    if (strip.pill) drawPill(host, dc, strip.pill, textX, y + look.pillY);
+}
+
 // A button: a tile with its label, and its count in grey on its right.
 function drawButton(host, dc, entry, w, h) {
     const { button } = LOOK;
@@ -232,6 +263,8 @@ function drawSection(host, dc, blocks, top, columnW) {
             dc.fillRect(0, y + LOOK.ruleY, width, 1, COLORS.border);
         } else if (block.kind === "row") {
             block.stats.forEach((stat, index) => drawStat(host, dc, stat, index * (block.colW + LOOK.statGap), y, block));
+        } else if (block.kind === "strip") {
+            drawStrip(host, dc, block.strip, y, columnW);
         }
     }
 }
@@ -239,7 +272,8 @@ function drawSection(host, dc, blocks, top, columnW) {
 // screen: { name, avatarPath, playerLevel ({ title, number, share (0 to 1),
 // current }), collectionTitle, collection (as drawCollection's), buttons (each { choice, label, count: null
 // or a string }), sections (each { title, rows: [[{ label, value, pill
-// (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]] }),
+// (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]],
+// strips (optional: [{ label, hasTable, title, logoPath, pill (null or as a stat's) }]) }),
 // closeLabel }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn
 // in its rect's own coordinates, and the highlight of each choice.
 export function layoutProfileStats(host, screen, referenceWidth) {

@@ -1,9 +1,9 @@
 // ============================================================
 // Steamball drawing helpers shared by the drawn screens (Welcome Screen,
 // Profile Stats): text on one or several lines, rounded and gradient
-// fills, glows, the dimmed backdrop with its panel, the Avatar, the close
-// cross, a tooltip and the gold selection halo. Each draws on the drawing context it is given, in its
-// coordinates. Only drawing: no layer, no event, no side effect.
+// fills, glows, the dimmed backdrop with its panel, the Avatar, a wheel
+// logo, the close cross, a tooltip and the gold selection halo. Each draws
+// on the drawing context it is given, in its coordinates. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
@@ -127,4 +127,18 @@ export function drawBackdrop(dc, { width, height }, referenceHeight, panel) {
 export function selectionHalo(dc, x, y, w, h) {
     glow(dc, x, y, w, h, COLORS.gold, 12, 0x90);
     dc.frameRect(x, y, w, h, 4, COLORS.gold);
+}
+
+// A table's wheel logo ({ title, logoPath }) fitted in the box, its aspect
+// kept; its title in size when it has none.
+export function drawWheelLogo(host, dc, { title, logoPath }, { x, y, w, h }, size) {
+    const image = logoPath ? dc.getImageSize(logoPath) : null;
+    if (image && image.width > 0 && image.height > 0) {
+        const scale = Math.min(w / image.width, h / image.height);
+        const dw = Math.round(image.width * scale);
+        const dh = Math.round(image.height * scale);
+        dc.drawImage(logoPath, x + Math.round((w - dw) / 2), y + Math.round((h - dh) / 2), dw, dh);
+        return;
+    }
+    text(host, dc, title, { x, y, width: w, height: h, size, weight: 700, font: FONTS.display, align: "center" });
 }

@@ -324,6 +324,7 @@ export default {
         sections: {
             game: "GAME",
             progression: "PROGRESSION",
+            tastes: "TASTES",
         },
         // The stats' labels, over their values.
         stats: {
@@ -334,6 +335,10 @@ export default {
             challengesCompleted: "Challenges completed",
             dayStreak: "Daily streak",
             weekStreak: "Weekly streak",
+            favouriteManufacturer: "Favorite manufacturer",
+            favouriteDecade: "Favorite decade",
+            favouriteTable: "Most played table",
+            firstTablePlayed: "First table played",
         },
         // Thousands separated: "1,206".
         number: (count) => String(count).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -346,6 +351,12 @@ export default {
         // A Streak's longest, in a pill; or the record set right now.
         record: (longest) => `Record: ${longest}`,
         recordInProgress: "New record!",
+        // A favourite's play time, in a pill; its hours and minutes given.
+        playTime: (time) => `${time} played`,
+        // The favourite decade, by its start year: 1990 for 1990 to 1999.
+        decade: (decadeStartYear) => `${decadeStartYear}s`,
+        // The first table played's date, day and month on two digits.
+        playedOn: (day, month, year) => `on ${month}/${day}/${year}`,
         // A stat without a value, such as the average before any Play.
         none: "—",
     },

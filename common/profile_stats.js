@@ -4,8 +4,9 @@
 // panel over the dimmed wheel, laid out by the Profile Stats painter,
 // with the Avatar, the Profile's name, the Player Level and the
 // Collection Mastery on a card whose foot holds the Achievements, Most
-// Played Tables and Tables to Discover buttons, and the GAME and
-// PROGRESSION sections on its right. Every stat is read again on each
+// Played Tables and Tables to Discover buttons, and the GAME, PROGRESSION
+// and TASTES sections on its right (the last with the favourite and first
+// table strips, read from the Hall of Fame and the Play Log). Every stat is read again on each
 // opening; the screen is drawn at once on all its layers, then faded in.
 // Created from the PinballY host, the Profile store, a reader of the
 // active Profile's Player Level, the Achievement List (its counts, and
@@ -14,14 +15,17 @@
 // Streaks), the Challenge module (null when the Challenges Add-on is
 // disabled: no completed Challenges) and the full ids of the Hall of
 // Fame and Tables to Discover filters (null when their Add-on is
-// disabled: no button). While open it swallows every button through "commandbuttondown": Next / Prev move a
-// gold halo through the cross and the buttons, looping, with PinballY's
-// navigation sound; Select runs the choice, Exit closes; attract mode
+// disabled: no button). While open it swallows every button through
+// "commandbuttondown": Next / Prev move a gold halo through the cross and
+// the buttons, looping, with PinballY's navigation sound; Select runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
 // the player asked for it.
 // ============================================================
 
 import lang from "./i18n.js";
+import config from "./config.js";
+import { getDecadeStartYear } from "./decade.js";
+import { cleanTitle } from "./table_title.js";
 import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
 import { countPlayedTables, tablesVisibleTo } from "./visible_tables.js";
@@ -110,15 +114,88 @@ export function createProfileStats(host, {
         return [{ label: TEXT.stats.challengesCompleted, value: TEXT.fraction(completed, total) }];
     }
 
+    const playTimeOf = seconds => TEXT.playTime(hoursAndMinutes(Math.floor(seconds / SECONDS_PER_MINUTE)));
+
+    // The group of the Profile's tables (by getKey, null for none) with the
+    // most play seconds, then games, then the first in alphabetical order,
+    // so it never changes at random; null before any Play.
+    function findFavourite(profileTables, getKey) {
+        const groups = new Map();
+        for (const game of profileTables) {
+            const key = getKey(game);
+            const play = profileStore.getPlay(game.configId);
+            if (key === null || play.count === 0) continue;
+            const group = groups.get(key) || { key, count: 0, seconds: 0 };
+            group.count += play.count;
+            group.seconds += play.seconds;
+            groups.set(key, group);
+        }
+        const [favourite = null] = [...groups.values()]
+            .sort((a, b) => b.seconds - a.seconds || b.count - a.count || String(a.key).localeCompare(String(b.key)));
+        return favourite;
+    }
+
+    function favouriteStat(label, favourite, valueOf) {
+        return favourite === null
+            ? { label, value: TEXT.none }
+            : { label, value: valueOf(favourite.key), pill: { text: playTimeOf(favourite.seconds), isLit: false } };
+    }
+
+    // The community tables' manufacturer is not a real one.
+    const manufacturerOf = game => (game.manufacturer && game.manufacturer !== config.communityTablesManufacturer ? game.manufacturer : null);
+
+    // The earliest Play of the oldest Play Log year with one; null when the
+    // Play Log is empty (older Plays are known only by their totals).
+    function readFirstPlay(profileName) {
+        for (const year of profileStore.getPlayLogYearsOf(profileName)) {
+            const [first = null] = [...profileStore.getPlayLogOf(profileName, year)].sort((a, b) => a.start.localeCompare(b.start));
+            if (first) return first;
+        }
+        return null;
+    }
+
+    // A strip: its label, the table's wheel logo and cleaned title, and its
+    // detail in a pill; "—" alone without a table.
+    function tableStrip(label, game, detail) {
+        return game === null
+            ? { label, hasTable: false, title: TEXT.none, logoPath: null, pill: null }
+            : { label, hasTable: true, title: cleanTitle(game.title), logoPath: game.logoPath, pill: { text: detail, isLit: false } };
+    }
+
+    // A table no longer in PinballY's list keeps its configId as title.
+    function tableOf(configId) {
+        const game = host.getGameInfo(configId);
+        return game ? { title: game.title, logoPath: host.getWheelImage(game) } : { title: configId, logoPath: null };
+    }
+
+    function tastesSection(profile, profileTables, hallOfFame) {
+        const favouriteGame = hallOfFame[0] || null;
+        const firstPlay = readFirstPlay(profile.name);
+        const [year, month, day] = firstPlay ? firstPlay.start.slice(0, 10).split("-") : [];
+        return {
+            title: TEXT.sections.tastes,
+            rows: [[
+                favouriteStat(TEXT.stats.favouriteManufacturer, findFavourite(profileTables, manufacturerOf), name => name),
+                favouriteStat(TEXT.stats.favouriteDecade, findFavourite(profileTables, game => getDecadeStartYear(game.year)), TEXT.decade),
+            ]],
+            strips: [
+                tableStrip(TEXT.stats.favouriteTable, favouriteGame && tableOf(favouriteGame.configId),
+                    favouriteGame && playTimeOf(profileStore.getPlay(favouriteGame.configId).seconds)),
+                tableStrip(TEXT.stats.firstTablePlayed, firstPlay && tableOf(firstPlay.configId), firstPlay && TEXT.playedOn(day, month, year)),
+            ],
+        };
+    }
+
     function readScreen() {
         const profile = profileStore.getActiveProfile();
         const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore);
         const plays = sumPlays();
         const achievements = achievementList.countAll();
         const playerLevel = readPlayerLevel();
+        const hallOfFame = getHallOfFame(profileTables, profileStore.getPlay);
         const buttons = [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
-            ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, getHallOfFame(profileTables, profileStore.getPlay)),
+            ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, hallOfFame),
             ...selectionButton(CHOICE.TO_DISCOVER, TEXT.buttons.tablesToDiscover, tablesToDiscoverFilter, getTablesToDiscover(profileTables, profileStore)),
         ];
         return {
@@ -147,7 +224,7 @@ export function createProfileStats(host, {
                     [collectionStat(profileTables), ...challengesStats()],
                     [streakStat(TEXT.stats.dayStreak, tableOfTheDay), streakStat(TEXT.stats.weekStreak, tableOfTheWeek)],
                 ],
-            }],
+            }, tastesSection(profile, profileTables, hallOfFame)],
             closeLabel: TEXT.closeTooltip,
             // The flippers' loop, the cross first.
             choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],

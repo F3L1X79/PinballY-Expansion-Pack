@@ -2,11 +2,11 @@
 // Reads the drawn Profile Stats the way the player sees it, on the fake
 // PinballY host: whether they are open, the card's texts (the Profile's
 // name first) and Avatar, its Player Level and Collection Mastery blocks,
-// the buttons at the card's foot (label and grey
-// count), a section of the right column by its title (each stat's label
-// with the texts drawn after it), the highlighted choice (the button under
-// the gold halo, or the cross's tooltip), and picks a choice with Next and
-// Select as a player would. Opens them from the main menu entry.
+// the buttons at the card's foot (label and grey count), a section of the
+// right column by its title (each stat's label with the texts drawn after
+// it, and its images), the highlighted choice (the button under the gold
+// halo, or the cross's tooltip), and picks a choice with Next and Select
+// as a player would. Opens them from the main menu entry.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -88,6 +88,12 @@ export function section(fake, title, labels) {
         else if (current !== null) stats[current].push(text);
     }
     return stats;
+}
+
+// The images drawn in a section of the right column, by its title.
+export function sectionImages(fake, title) {
+    const layer = shownLayers(fake, PROFILE_STATS_Z_INDEX.sections).find(candidate => candidate.texts()[0] === title);
+    return layer ? layer.images() : [];
 }
 
 function haloLayer(fake) {

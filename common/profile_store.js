@@ -72,7 +72,7 @@ const NO_PLAY = Object.freeze({ count: 0, seconds: 0, lastPlayed: "" });
 export const MIN_PLAY_SECONDS = 60;
 const playLogBaseName = year => `play-log-${year}`;
 // A Play Log year file or its backup: "play-log-2026.json", "play-log-2026.bak.json".
-const PLAY_LOG_FILE = /^(play-log-\d+)(\.bak)?\.json$/i;
+const PLAY_LOG_FILE = /^(play-log-(\d+))(\.bak)?\.json$/i;
 
 export function createProfileStore(host) {
     const projectFolder = host.getProjectFolder();
@@ -251,6 +251,16 @@ export function createProfileStore(host) {
         return [];
     }
 
+    // A year with only its backup counts: loadJson reads it in its place.
+    function playLogYearsOf(profile) {
+        const years = new Set();
+        for (const fileName of files.listFiles(profile.folder)) {
+            const match = PLAY_LOG_FILE.exec(fileName);
+            if (match) years.add(Number(match[2]));
+        }
+        return [...years].sort((a, b) => a - b);
+    }
+
     // Read and rewritten whole: only the year of the Play's start is touched.
     function addToPlayLog(profileName, configId, startDate, seconds) {
         const profile = profileNamed(profileName);
@@ -293,7 +303,7 @@ export function createProfileStore(host) {
             const match = PLAY_LOG_FILE.exec(fileName);
             if (!match) continue;
             const yearFiles = byBaseName.get(match[1]) || {};
-            yearFiles[match[2] ? "backup" : "main"] = fileName;
+            yearFiles[match[3] ? "backup" : "main"] = fileName;
             byBaseName.set(match[1], yearFiles);
         }
         const copyNames = [];
@@ -433,6 +443,9 @@ export function createProfileStore(host) {
         // The Plays of the named Profile's Play Log started in that year, in
         // the order they ended; an empty list when the year has none.
         getPlayLogOf: (profileName, year) => readPlayLog(profileNamed(profileName), year),
+        // The years of the named Profile's Play Log files, oldest first; its
+        // reset copies are not among them.
+        getPlayLogYearsOf: (profileName) => playLogYearsOf(profileNamed(profileName)),
         // The IDs of the Achievements the named Profile was Notified of.
         getNotifiedOf: (profileName) => profileWithData(profileName).data.notified,
         updateProfileData,

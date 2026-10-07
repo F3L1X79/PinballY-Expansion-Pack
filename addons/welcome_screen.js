@@ -25,6 +25,7 @@ import { createPinballYHost } from "../common/pinbally_host.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/wheel_dialog.js";
 import { getProfileStore } from "../common/profile_store.js";
 import { displayNameOf } from "../common/profile_name.js";
+import { cleanTitle } from "../common/table_title.js";
 import { getChangePlayer } from "../common/change_player.js";
 import { getRandomGame } from "../common/random_game.js";
 import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
@@ -51,13 +52,6 @@ function partOfDay(hour) {
     if (hour >= 12 && hour < 18) return "afternoon";
     if (hour >= 18 && hour < 22) return "evening";
     return "night";
-}
-
-// Drops parenthetical suffixes, the replacement characters some PinballY
-// databases carry in place of a lost "™" (raw, or read as Windows-1252),
-// and the doubled spaces they leave.
-function cleanTitle(title) {
-    return title.replace(/\s*\([^)]*\)/g, "").replace(/ï¿½|�/g, "").replace(/\s{2,}/g, " ").trim();
 }
 
 export default function init() {
