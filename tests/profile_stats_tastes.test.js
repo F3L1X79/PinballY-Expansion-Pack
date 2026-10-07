@@ -5,8 +5,10 @@
 // never the community tables manufacturer), the favourite table strip (the
 // Hall of Fame's first table) and the first table played strip (the
 // earliest Play across the Play Log's years, reset copies left out, with
-// its date), each with its wheel logo or else its cleaned title; "—"
-// everywhere for a Profile with no Play and an empty Play Log.
+// its date), each with its wheel logo, or else the scrambled TV of the
+// missing image (its cleaned title when that asset is unreadable), next to
+// its cleaned name; "—" everywhere for a Profile with no Play and an empty
+// Play Log.
 // ============================================================
 
 import { test } from "node:test";
@@ -16,6 +18,7 @@ import config from "../common/config.js";
 import { openProfileStats, section, sectionImages, press } from "./profile_stats_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
+const MISSING_IMAGE = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\missing_image.png";
 const MEDIEVAL_LOGO = "C:\\PinballY\\Media\\Visual Pinball X\\Wheel Images\\Medieval Madness (Williams 1997).png";
 
 function table(id, title, manufacturer, year, extra = {}) {
@@ -91,18 +94,20 @@ test("the TASTES section shows the favourites and the favourite and first table 
     assert.deepEqual(alice["Constructeur favori"], ["Stern", "1 h 00 de jeu"]);
     assert.deepEqual(alice["Décennie favorite"], ["Années 2020", "3 h 30 de jeu"]);
     assert.deepEqual(alice["Table préférée"], ["Homemade Table", "Homemade Table", "2 h 30 de jeu"],
-        "no logo: its title in the logo's place");
+        "no logo and no readable missing image: its title in the logo's place");
     assert.deepEqual(alice["Première table jouée"], ["—"], "Plays known only by their totals");
     press(fake, "Exit");
 
+    fake.addFile(MISSING_IMAGE);
     getProfileStore().switchTo("Bob");
     openProfileStats(fake, lang);
     assert.deepEqual(section(fake, "GOÛTS", TEXT.stats), {
         "Constructeur favori": ["Bally", "1 h 15 de jeu"],
         "Décennie favorite": ["Années 1990", "2 h 30 de jeu"],
-        "Table préférée": ["Attack from Mars", "Attack from Mars", "1 h 15 de jeu"],
+        "Table préférée": ["Attack from Mars", "1 h 15 de jeu"],
         "Première table jouée": ["Medieval Madness", "le 12/03/2025"],
     });
-    assert.deepEqual(sectionImages(fake, "GOÛTS"), [MEDIEVAL_LOGO], "the first table's wheel logo");
+    assert.deepEqual(sectionImages(fake, "GOÛTS"), [MISSING_IMAGE, MEDIEVAL_LOGO],
+        "the missing image for the favourite table without a logo, the first table's wheel logo");
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

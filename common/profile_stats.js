@@ -42,6 +42,7 @@ const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
 const FADE_MS = 220;
 const FRAME_MS = 16;
+const MISSING_IMAGE_FILE = "assets\\missing_image.png";
 
 export function createProfileStats(host, {
     profileStore, readPlayerLevel, achievementList, tableOfTheDay, tableOfTheWeek, challenges = null,
@@ -162,10 +163,19 @@ export function createProfileStats(host, {
             : { label, hasTable: true, title: cleanTitle(game.title), logoPath: game.logoPath, pill: { text: detail, isLit: false } };
     }
 
+    // Without a wheel logo, the scrambled TV of the missing image; its
+    // title when that asset is missing or unreadable too.
+    function logoOrMissingImage(game) {
+        const logoPath = game ? host.getWheelImage(game) : null;
+        if (logoPath) return logoPath;
+        const missingImagePath = `${host.getProjectFolder()}\\${MISSING_IMAGE_FILE}`;
+        return host.files.isImageReadable(missingImagePath) ? missingImagePath : null;
+    }
+
     // A table no longer in PinballY's list keeps its configId as title.
     function tableOf(configId) {
         const game = host.getGameInfo(configId);
-        return game ? { title: game.title, logoPath: host.getWheelImage(game) } : { title: configId, logoPath: null };
+        return { title: game ? game.title : configId, logoPath: logoOrMissingImage(game) };
     }
 
     function tastesSection(profile, profileTables, hallOfFame) {

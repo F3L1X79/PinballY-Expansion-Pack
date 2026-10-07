@@ -9,7 +9,8 @@
 // foot), the close cross and the right column's sections (a title, then
 // rows of stats, label over value, with a pill beside the value, or every
 // pill of the row under its value when one does not fit, and a thin bar,
-// then wide strips with a table's wheel logo, or its title without one),
+// then wide strips with a table's wheel logo or the missing image, or else
+// its title),
 // the spare height shared evenly between the column's gaps, and one highlight
 // per choice (a gold halo, with a tooltip for the cross). Only drawing: no
 // layer, no event, no side effect.
@@ -224,8 +225,9 @@ function drawStat(host, dc, stat, x, y, block) {
     }
 }
 
-// A strip, columnW wide from y: its tile, label, the table's wheel logo (its
-// title without one; nothing without a table), name and pill.
+// A strip, columnW wide from y: its tile, label, the table's wheel logo or
+// the missing image (its title without either; nothing without a table),
+// name and pill.
 function drawStrip(host, dc, strip, y, columnW) {
     const look = LOOK.strip;
     fillGradient(dc, 0, y, columnW, look.h, COLORS.rowUnlocked, COLORS.tile);
