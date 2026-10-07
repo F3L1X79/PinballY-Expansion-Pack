@@ -80,10 +80,12 @@ export function createProfileStats(host, {
     function collectionStat(profileTables) {
         const played = countPlayedTables(profileTables, profileStore);
         const share = profileTables.length === 0 ? 0 : played / profileTables.length;
+        // Rounded, but 100 only once complete: 199/200 shows 99.
+        const percent = share < 1 ? Math.min(99, Math.round(share * 100)) : 100;
         return {
             label: TEXT.stats.collection,
             value: TEXT.fraction(played, profileTables.length),
-            pill: { text: TEXT.percent(Math.round(share * 100)), isLit: true },
+            pill: { text: TEXT.percent(percent), isLit: true },
             share,
         };
     }
