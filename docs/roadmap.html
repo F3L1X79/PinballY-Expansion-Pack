@@ -291,14 +291,16 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit-moyen</span></div>
           </div>
           <p>À côté des Streaks des Period Tables, une série qui compte les jours consécutifs où le Profile vient jouer, quelle que soit la table. Idée née en relisant la spec du Welcome Screen.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code></div>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Lit le Play Log (livré)</div>
           <details>
-            <summary>Questions ouvertes</summary>
+            <summary>Décisions (grill du 07/10/2026)</summary>
             <ul>
-              <li>Qu'est-ce qui compte : ouvrir PinballY, ou faire au moins une Play ? Une Play de quelques secondes suffit-elle ?</li>
-              <li>Un nouveau terme du glossaire, distinct de la Streak d'une Period Table : lequel ? La famille Sessions la couvre-t-elle déjà en partie ?</li>
-              <li>Où l'afficher : Welcome Screen, Profile Stats ? Avec des succès à paliers ?</li>
+              <li>Terme du glossaire : Daily Streak (« Jours d'affilée sur la borne »). La Streak d'une Period Table devient Period Table Streak.</li>
+              <li>Un jour compte s'il voit démarrer au moins une Play, sur n'importe quelle table et lancée n'importe comment. Le jour change à minuit, comme pour la Table of the Day. Guest a sa série, et un Child Profile n'a pas de cas particulier.</li>
+              <li>Calculée depuis le Play Log (historique depuis le 01/10/2026), rien de nouveau dans <code>profile.json</code>. Pas de jour de grâce : la série reste vivante toute la journée tant que la veille compte.</li>
+              <li>Welcome Screen : une ligne sous le nom dès 2 jours, avec « : continue ! » tant que le jour n'est pas joué. Profile Stats : première des trois tuiles de séries, la plus longue en pastille.</li>
+              <li>Achievements dans la famille Sessions : 3 / 7 / 15 / 30 jours (Bronze à Platinum), débloqués par la plus longue série. Les clés <code>dailyStreak*</code> sont déjà prises par la Table of the Day. Aucune autre annonce.</li>
             </ul>
           </details>
         </div>
@@ -548,6 +550,13 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>07/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>Une Daily Streak : les jours d'affilée sur la borne</strong>
+              <span>Au moins une Play par jour, lue dans le Play Log, sans jour de grâce. Affichée sur le Welcome Screen et dans les Profile Stats, avec des Achievements à 3, 7, 15 et 30 jours dans la famille Sessions. Le mot Streak seul disparaît du glossaire : Period Table Streak d'un côté, Daily Streak de l'autre.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>05/10 <span class="count">(2)</span></summary>
           <ol>
             <li><strong>La comparaison des Profile Stats juste après la fiche joueur</strong>

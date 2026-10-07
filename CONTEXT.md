@@ -29,7 +29,7 @@ A Profile marked as a child's: Adult Tables are left out of everything it can pi
 _Avoid_: kid mode, parental control, family filter
 
 **Profile Reset**:
-Starting a Profile over as if it had never played: its plays, Play Log, Streaks, session stats, Random Games, Challenge progress and Notified Achievements are erased, after a dated copy of its former data is kept, while its name, Avatar and marks stay. Only an Admin Profile can reset one, or every Profile at once (Guest and itself included), and never while no Profile is an Admin Profile.
+Starting a Profile over as if it had never played: its plays, Play Log (and so its Daily Streak), Period Table Streaks, session stats, Random Games, Challenge progress and Notified Achievements are erased, after a dated copy of its former data is kept, while its name, Avatar and marks stay. Only an Admin Profile can reset one, or every Profile at once (Guest and itself included), and never while no Profile is an Admin Profile.
 _Avoid_: fresh start, wipe, achievement reset (the Achievements come from the plays, so the plays go too)
 
 **Avatar**:
@@ -48,8 +48,12 @@ _Avoid_: session (the session stats count only Plays, except the Rage Quit flag)
 The dated list of a Profile's Plays: when each started, which table, and how long it lasted, kept year by year. It starts empty on the day it is introduced: earlier games are known only by their totals. Shown to no one yet; it feeds later summaries such as a yearly one.
 _Avoid_: Game Log, play history, journal
 
+**Daily Streak**:
+The number of consecutive calendar days, up to today, in which the active Profile started at least one Play, on any table, however it was launched; a day without one breaks it, with no day of grace, but it is still alive all day long as long as yesterday counted. Read from the Play Log, so the days before it was introduced do not count. Shown as "Jours d'affilée sur la borne" in French.
+_Avoid_: Streak (alone: a Period Table Streak belongs to a Period Table), login streak, visit streak
+
 **Profile Stats**:
-The screen, opened by the player from the main menu, that sums up the active Profile's own plays: games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
+The screen, opened by the player from the main menu, that sums up the active Profile's own plays: games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
 _Avoid_: Pinball Profile, player card, profile screen (a Profile is the identity, not the screen)
 
 ### Choosing what to play
@@ -95,12 +99,12 @@ _Avoid_: top played, most played, leaderboard
 The tables the household has added to PinballY's favourites, offered as a wheel selection from the main menu, right under the Hall of Fame. Shown as "Tables favorites" in French.
 _Avoid_: Favorites, favourites filter
 
-**Streak**:
-The number of consecutive Periods in which the active Profile made a Play on the Period Table that started during its Period, however it was launched. A Period whose Period Table is an Adult Table neither extends nor breaks a Child Profile's Streak.
-_Avoid_: combo, chain
+**Period Table Streak**:
+The number of consecutive Periods in which the active Profile made a Play on the Period Table that started during its Period, however it was launched. A Period whose Period Table is an Adult Table neither extends nor breaks a Child Profile's Period Table Streak.
+_Avoid_: Streak (alone: the Daily Streak is another one), combo, chain
 
 **Periods Played**:
-The total number of Periods, consecutive or not, in which the active Profile made a Play on the Period Table that started during its Period, however it was launched. Never lower than the longest Streak.
+The total number of Periods, consecutive or not, in which the active Profile made a Play on the Period Table that started during its Period, however it was launched. Never lower than the longest Period Table Streak.
 _Avoid_: exploration count, total streak
 
 **Day's Manufacturers**:
@@ -161,7 +165,7 @@ A small card in the bottom-right corner of the playfield screen that announces o
 _Avoid_: popup, notification, dialog (a dialog waits for the player)
 
 **Unlocked**:
-An Achievement whose condition holds right now. It can be lost again, for example when a table joins a completed group; losing it does not announce it a second time when it comes back. A Streak Achievement is the exception: the longest Streak unlocks it, so a broken Streak never takes it back.
+An Achievement whose condition holds right now. It can be lost again, for example when a table joins a completed group; losing it does not announce it a second time when it comes back. An Achievement on a Period Table Streak or on the Daily Streak is the exception: the longest one unlocks it, so a broken streak never takes it back.
 _Avoid_: earned, obtained
 
 **Achievement List**:
@@ -169,7 +173,7 @@ The screen, opened by the player, that shows every Achievement in one scrolling 
 _Avoid_: My Achievements, trophy room
 
 **Achievement Family**:
-A kind of Achievement, absent as a whole when the Add-on it depends on is turned off: Collection, Play Time, Period Tables, Sessions, Random Game, Manufacturers, Decades, Categories, Challenges, Surprises. Surprises gathers Secret Achievements that hang on no Add-on but the Achievements themselves, such as a Play started at an unusual hour. Period Tables gathers every Achievement about playing the Table of the Day or the Table of the Week (first play, total Periods played, Streaks).
+A kind of Achievement, absent as a whole when the Add-on it depends on is turned off: Collection, Play Time, Period Tables, Sessions, Random Game, Manufacturers, Decades, Categories, Challenges, Surprises. Surprises gathers Secret Achievements that hang on no Add-on but the Achievements themselves, such as a Play started at an unusual hour. Period Tables gathers every Achievement about playing the Table of the Day or the Table of the Week (first play, total Periods played, Period Table Streaks).
 _Avoid_: group (a group is the set of tables a completion Achievement covers, such as one manufacturer's tables), category (a PinballY table category)
 
 **Notified**:
@@ -201,7 +205,7 @@ How many of the household's Profiles (Guest excepted) have been Notified of an A
 _Avoid_: rarity (a rare Achievement has a low Unlock Rate), household rate, global percentage
 
 **Achievement Progress**:
-How far the active Profile is from a missing Achievement: the very value its unlock condition tests, against the target that unlocks it (for a Streak, the current Streak: a missing Streak Achievement starts over from 0 when the Streak breaks). Only Achievements with a counted target of at least 2 have one, unless that value starts over at every game, like a tour of the wheel; an Unlocked Achievement shows none.
+How far the active Profile is from a missing Achievement: the very value its unlock condition tests, against the target that unlocks it (for a Period Table Streak or the Daily Streak, the current one: a missing Achievement on it starts over from 0 when it breaks). Only Achievements with a counted target of at least 2 have one, unless that value starts over at every game, like a tour of the wheel; an Unlocked Achievement shows none.
 _Avoid_: progress (alone), completion (a completion Achievement covers a group of tables)
 
 **Secret Achievement**:
