@@ -259,6 +259,24 @@
 
     <ol class="queue">
 
+      <li draggable="true" tabindex="0" class="item tr-share" id="readme-refresh" data-track="share" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>README à jour : les dernières captures, tout en anglais</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+          </div>
+          <p>Le dépôt a reçu sa première étoile GitHub : le README doit montrer ce que le pack est devenu depuis les captures du 30/09, avec de nouvelles captures prises sur la borne en anglais.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : captures sur la borne en anglais (<code>LANGUAGE=en</code>) puis mise à jour directe de <code>README.md</code> et <code>README.fr.md</code>, sans spec (petit chantier de doc)</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Les captures de <code>docs/images/</code> datent du 30/09/2026. Depuis : Welcome Screen (qui remplace le dialogue de démarrage), Achievement List et Profile Stats dessinées, Table Mastery et Mastery Bar, Player Level et Level Toast, Confetti Shower, Secret Achievements, Daily Streak, Admin Profile et Child Profile. Les captures anglaises servent aussi au README français.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-play" id="level-extras" data-track="play" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -553,8 +571,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>07/10 <span class="count">(2)</span></summary>
+          <summary>07/10 <span class="count">(3)</span></summary>
           <ol>
+            <li><strong>Le README repasse en tête après la première étoile</strong>
+              <span>Choix de Félix : remettre le README à jour avec des captures récentes en anglais des nouveautés, avant tout autre chantier.</span></li>
             <li><strong>Des Drawn Menus à la place des menus natifs du joueur</strong>
               <span>Le pack intercepte l'ouverture des menus que voit le joueur et les dessine en Steamball, mêmes entrées et mêmes boutons, avec repli sur le menu natif en cas d'erreur. Les menus d'entretien, le menu pause et les popups restent natifs. Quatre formes au prototype, dont une roue.</span></li>
             <li><strong>Une Daily Streak : les jours d'affilée sur la borne</strong>
