@@ -181,16 +181,20 @@ How hard an Achievement is: Bronze, Silver, Gold or Platinum. Every Achievement 
 _Avoid_: tier, level, difficulty, grade
 
 **Player Level**:
-How far a Profile has come as a player, earned through the Achievement Ranks of its Notified Achievements, each Rank worth more than the one below; each level takes more to reach than the one before, with no last level, so a bigger collection, which has more Achievements, lets a Profile climb higher. Levels have no names, only a number. It is worked out afresh from the Notified Achievements each time: an Achievement no longer Unlocked keeps its points, but a level can drop when a Notified Achievement is worth less (a smaller group lowers a group completion's Rank) or is gone (its Add-on turned off), and a Profile Reset starts it over. Shown as "Niveau" in French.
+How far a Profile has come as a player, earned through the Achievement Ranks of its Notified Achievements, each Rank worth more than the one below; each level takes more to reach than the one before, with no last level, so a bigger collection, which has more Achievements, lets a Profile climb higher. A Child Profile's points are scaled up by as much as the Achievements it is kept from (Adult Tables, Achievements a child never gets) would have given a Profile that is not a child, so that it climbs as fast as an adult. Levels have no names, only a number. It is worked out afresh from the Notified Achievements each time: an Achievement no longer Unlocked keeps its points, but a level can drop when a Notified Achievement is worth less (a smaller group lowers a group completion's Rank) or is gone (its Add-on turned off), and a Profile Reset starts it over. Shown as "Niveau" in French.
 _Avoid_: XP, player rank (an Achievement Rank is how hard an Achievement is), level (alone: a Mastery Level belongs to one table), Collection Tier
 
 **Level Toast**:
-A toast like the Achievement Toast, but with its own colour and no trophy, that announces the Player Level the active Profile has just reached, after the Achievement Toasts that brought it; one only per return to the wheel, for the highest level reached. Any rise after a Play is announced, even back to a level reached before and lost; a level a Profile already had when PinballY started, or when the Player Level first appeared, is not.
+A toast like the Achievement Toast, but with its own colour and no trophy, that announces the Player Level the active Profile has just reached, after the Achievement Toasts that brought it; one only per return to the wheel, for the highest level reached. It comes with the Fireworks, and when the same return brings a Confetti Shower, both wait for the shower to end. Any rise after a Play is announced, even back to a level reached before and lost; a level a Profile already had when PinballY started, or when the Player Level first appeared, is not.
 _Avoid_: level-up popup, rank-up
 
 **Confetti Shower**:
 A shower of coloured confetti released all at once from above the wheel screen, falling down across all of it, in front of everything, toasts and menus included (it waits for the Welcome Screen to close), to celebrate along with the toast of a completed Challenge, of a Platinum Achievement, of Mastery Level 10 or of a Collection Tier completed; one shower only when the same return to the wheel brings several. It never waits for the player nor takes their input, and vanishes at once when a table launches or attract mode starts. Shown as "Pluie de confettis" in French.
-_Avoid_: celebration, party, fireworks
+_Avoid_: celebration, party, fireworks (Fireworks celebrate a Player Level)
+
+**Fireworks**:
+Rockets shot up from the bottom of the wheel screen that burst into sparks, in front of everything like the Confetti Shower, to celebrate along with the Level Toast; the same show whatever the level reached. It never waits for the player nor takes their input, and vanishes at once when a table launches or attract mode starts. Shown as "Feu d'artifice" in French.
+_Avoid_: confetti, celebration, level-up effect
 
 **Unlock Rate**:
 How many of the household's Profiles (Guest excepted) have been Notified of an Achievement, shown on the Achievement List by the Avatars of the Profiles other than the active one. It is not shown while there is only one Profile besides Guest.
