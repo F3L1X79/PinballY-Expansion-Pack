@@ -234,7 +234,7 @@
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
       <p><strong>Fiche joueur dessinée</strong> livrée le 07/10 : reste la vérification visuelle sur la borne (ticket #160)</p>
-      <span class="next">Ensuite : <code>/prototype</code> du feu d'artifice pour <a href="#level-extras">les extras du Player Level</a></span>
+      <span class="next">Ensuite : <code>/to-spec</code> pour <a href="#level-extras">les extras du Player Level</a></span>
     </div>
   </section>
 
@@ -268,14 +268,14 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
           </div>
           <p>Trois idées du 06/10/2026 autour du Player Level de la fiche joueur (livrée) : le niveau d'un Child Profile ajusté pour suivre celui d'un adulte, des Fireworks avec chaque Level Toast, et le niveau en pastille sur l'Avatar.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">proto</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/prototype</code> (Fireworks sur la borne, juste après une Confetti Shower) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur le Player Level et le Level Toast (livrés)</div>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur le Player Level et le Level Toast (livrés). Prototype : branche <code>prototype/fireworks</code></div>
           <details>
-            <summary>Décisions (grill du 07/10/2026)</summary>
+            <summary>Décisions (grill et prototype du 07/10/2026)</summary>
             <ul>
               <li>Child Profile : ses points × (points accessibles à un Profile non enfant avec la même collection ÷ points accessibles à l'enfant), même courbe pour tous. Les points ajustés sont affichés partout, sans multiplicateur visible. Pas de Secret Achievement de remplacement. Une montée de niveau sans Play (des Adult Tables ajoutées) n'est pas annoncée.</li>
-              <li>Fireworks : un nouvel effet, avec la physique de fireworks-js (MIT) reprise sans import, comme react-confetti pour les confettis, et les éclats dessinés d'avance. Environ 8 s, des fusées tirées du bas, aux couleurs des confettis plus l'or, le même spectacle à chaque Level Toast (niveaux regagnés compris). Réglages <code>FIREWORKS</code> et <code>FIREWORKS_SOUND_FILE</code>, indépendants de <code>CONFETTI</code>.</li>
-              <li>Ordre : quand un même retour sur la roue amène une Confetti Shower, le Level Toast et les Fireworks attendent la fin des confettis ; le toast apparaît au départ des Fireworks.</li>
+              <li>Fireworks : un nouvel effet, le même spectacle à chaque Level Toast (niveaux regagnés compris), environ 8 s, 7 fusées tirées du bas (la course des fusées reprend fireworks-js, MIT, sans import). Style retenu au prototype (variante G) : chaque explosion est un film dessiné d'avance à 20 images/s, une seule image affichée à la fois ; deux anneaux réguliers de traits qui s'effilent, cœur blanc, halo de couleur et ombre sombre floue pour ressortir sur la table, un flash doux au départ, des points qui scintillent à la fin. Fusée : tête dorée lumineuse et traînée d'étincelles. Plus de couleurs d'une explosion à l'autre. Mesures sur la borne : 3,9 s de dessin d'avance (341 calques), 0,3 ms de calcul par image. Réglages <code>FIREWORKS</code> et <code>FIREWORKS_SOUND_FILE</code> (le son joue une fois, au départ), indépendants de <code>CONFETTI</code>.</li>
+              <li>Ordre : quand un même retour sur la roue amène une Confetti Shower, le Level Toast et les Fireworks partent 1 s avant la fin des confettis ; le toast apparaît au départ des Fireworks.</li>
               <li>Pastille ronde dans le coin bas-droit de l'Avatar, couleur du Player Level, ovale à partir de 3 chiffres, sur le badge de la roue et sur le Welcome Screen uniquement (Guest compris). Le badge change avec le Level Toast. Sans Profile picker, aucune pastille.</li>
             </ul>
           </details>

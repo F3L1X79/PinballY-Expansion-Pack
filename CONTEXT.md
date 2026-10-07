@@ -185,7 +185,7 @@ How far a Profile has come as a player, earned through the Achievement Ranks of 
 _Avoid_: XP, player rank (an Achievement Rank is how hard an Achievement is), level (alone: a Mastery Level belongs to one table), Collection Tier
 
 **Level Toast**:
-A toast like the Achievement Toast, but with its own colour and no trophy, that announces the Player Level the active Profile has just reached, after the Achievement Toasts that brought it; one only per return to the wheel, for the highest level reached. It comes with the Fireworks, and when the same return brings a Confetti Shower, both wait for the shower to end. Any rise after a Play is announced, even back to a level reached before and lost; a level a Profile already had when PinballY started, or when the Player Level first appeared, is not.
+A toast like the Achievement Toast, but with its own colour and no trophy, that announces the Player Level the active Profile has just reached, after the Achievement Toasts that brought it; one only per return to the wheel, for the highest level reached. It comes with the Fireworks, and when the same return brings a Confetti Shower, both start a second before the shower ends. Any rise after a Play is announced, even back to a level reached before and lost; a level a Profile already had when PinballY started, or when the Player Level first appeared, is not.
 _Avoid_: level-up popup, rank-up
 
 **Confetti Shower**:
@@ -193,7 +193,7 @@ A shower of coloured confetti released all at once from above the wheel screen, 
 _Avoid_: celebration, party, fireworks (Fireworks celebrate a Player Level)
 
 **Fireworks**:
-Rockets shot up from the bottom of the wheel screen that burst into sparks, in front of everything like the Confetti Shower, to celebrate along with the Level Toast; the same show whatever the level reached. It never waits for the player nor takes their input, and vanishes at once when a table launches or attract mode starts. Shown as "Feu d'artifice" in French.
+Rockets shot up from the bottom of the wheel screen that burst into rings of glowing streaks, in colours that change from one burst to the next, in front of everything like the Confetti Shower, to celebrate along with the Level Toast; the same show whatever the level reached. It never waits for the player nor takes their input, and vanishes at once when a table launches or attract mode starts. Shown as "Feu d'artifice" in French.
 _Avoid_: confetti, celebration, level-up effect
 
 **Unlock Rate**:
