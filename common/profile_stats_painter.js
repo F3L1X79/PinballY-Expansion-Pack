@@ -70,7 +70,7 @@ const LOOK = Object.freeze({
     // most logoMaxW, inset from the strip's edges), the label, the name
     // and the pill beside it, from their tops.
     strip: Object.freeze({
-        h: 132, gapAbove: 24, gap: 16, logoShare: 0.26, logoMaxW: 160, logoInsetX: 16, logoInsetY: 16, titleSize: 22, textGap: 20,
+        h: 132, gapAbove: 24, gap: 16, logoShare: 0.3, logoMaxW: 160, logoInsetX: 16, logoInsetY: 8, titleSize: 22, textGap: 16,
         labelY: 16, labelSize: 17, nameY: 40, nameSize: 21, minNameSize: 15, pillY: 87,
     }),
     // Room around a highlighted element for its halo, and beside the cross
