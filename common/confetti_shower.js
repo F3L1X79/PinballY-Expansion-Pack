@@ -3,7 +3,8 @@
 // main-window layers above toasts and menus, started with a celebrated toast;
 // it does not check for a drawn dialog itself: the toast waits for one.
 // Each confetto (front and back) is drawn ahead, then only moved, stretched
-// and shown or hidden. An optional sound plays once as a shower starts.
+// and shown or hidden; it waits shrunk to a dot, never as a hidden layer
+// the size of the window. An optional sound plays once as a shower starts.
 // Vanishes on "prelaunch", "gamestarted" and "attractmodestart".
 // CONFETTI=false prepares, draws and plays nothing.
 // ============================================================
@@ -50,6 +51,11 @@ const EDGE_STRIP = 1.6;
 // Below it, a confetto seen edge-on would vanish.
 const MIN_SQUASH = 0.08;
 const BACK_SHADE = 0.55;
+// The span of a confetto waiting to fall. PinballY stretches a layer over the
+// whole window by default and still fills every pixel of a hidden one on
+// each frame: hundreds of them slowed a single landscape screen's wheel to
+// about 10 frames a second.
+const WAITING_SPAN = { xSpan: 0.001, ySpan: 0.001 };
 
 const random = (min, max) => min + Math.random() * (max - min);
 
@@ -131,6 +137,7 @@ export function createConfettiShower(host, { enabled = true, soundFile = "", dra
     function hiddenLayer() {
         const layer = host.createDrawingLayer(CONFETTI_Z_INDEX);
         layer.alpha = 0;
+        layer.setScale(WAITING_SPAN);
         return layer;
     }
 

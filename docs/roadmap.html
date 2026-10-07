@@ -539,27 +539,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="single-screen-slowness" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Lenteur générale de la roue sur un seul écran paysage</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">à estimer</span></div>
-          </div>
-          <p>Constaté le 07/10/2026 : sur un seul écran en paysage, PinballY devient extrêmement lent dès qu'on est sur la roue. Avec deux écrans, le principal en portrait, tout va à vitesse normale. Sans le pack, la lenteur disparaît : elle vient de l'Expansion Pack, pas des développements en cours. Bloquant pour diffuser le pack hors d'une borne.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>diagnose</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/diagnosing-bugs</code> → <code>/implement</code>. Avant la distribution (n° <span data-ref="distrib"></span>)</div>
-          <details>
-            <summary>Pistes</summary>
-            <ul>
-              <li>Le nombre de calques gardés en permanence : la Confetti Shower en garde 684 cachés (opacité 0). PinballY les compose-t-il quand même à chaque image ? Premier test : <code>CONFETTI=false</code> dans <code>.env.local</code>.</li>
-              <li>Désactiver les Add-ons un par un via les <code>ADD_ON_*</code> de <code>.env.local</code> pour trouver le coupable.</li>
-              <li>Comparer dans <code>logfile.log</code> les temps d'ouverture (Welcome Screen, Profile Stats) entre les deux installations.</li>
-            </ul>
-          </details>
-        </div>
-      </li>
     </ol>
   </section>
 
