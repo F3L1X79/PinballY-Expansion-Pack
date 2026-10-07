@@ -31,3 +31,14 @@ test("no script loaded by PinballY uses optional chaining", () => {
         .filter(({ text }) => OPTIONAL_CHAINING.test(text)));
     assert.deepEqual(offenders, []);
 });
+
+// Without a byte order mark PinballY reads a script as Windows-1252, so a
+// UTF-8 "…" shows up as "â€¦" on the cabinet.
+test("every script loaded by PinballY with non-ASCII text starts with a UTF-8 byte order mark", () => {
+    const offenders = loadedScripts().filter(path => {
+        const bytes = readFileSync(ROOT + path);
+        const hasBom = bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF;
+        return !hasBom && bytes.some(byte => byte > 0x7F);
+    });
+    assert.deepEqual(offenders, []);
+});

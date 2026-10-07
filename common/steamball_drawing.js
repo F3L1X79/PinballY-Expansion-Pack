@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Steamball drawing helpers shared by the drawn screens (Welcome Screen,
 // Profile Stats): text on one or several lines, rounded and gradient
 // fills, glows, the dimmed backdrop with its panel, the Avatar, a wheel

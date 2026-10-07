@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Profile Stats module: the drawn screen the player opens from the main
 // menu to sum up the active Profile's own plays: a centred Steamball
 // panel over the dimmed wheel, laid out by the Profile Stats painter,

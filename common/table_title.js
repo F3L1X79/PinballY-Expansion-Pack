@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // The one rule for showing a table's title, shared by the Welcome Screen
 // and the Profile Stats: without its parenthetical suffixes, nor the
 // replacement characters some PinballY databases carry in place of a lost
