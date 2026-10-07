@@ -14,6 +14,6 @@ test("at tier 10 the card says every table reached the last level", async () => 
     const { card, errors } = await openCollectionCard({ tables, levels: tables.map(() => 10) });
 
     assert.deepEqual(card, { goal: "All your tables: Pinball Wizard", current: null, tier: 10 });
-    assert.equal(fr.welcomeScreen.collection.allTables("Mage du flipper"), "Toutes tes tables : Mage du flipper");
+    assert.equal(fr.tableMastery.collection.allTables("Mage du flipper"), "Toutes tes tables : Mage du flipper");
     assert.deepEqual(errors, []);
 });

@@ -1,27 +1,30 @@
 // ============================================================
 // Profile Stats module: the drawn screen the player opens from the main
 // menu to sum up the active Profile's own plays: a centred Steamball
-// panel over the dimmed wheel, laid out by the Profile Stats painter, with
-// the Avatar and the Profile's name on a card whose foot holds the
-// Achievements, Most Played Tables and Tables to Discover buttons, and the
-// GAME section on its right. Every stat is read again on each opening;
-// the screen is drawn at once on all its layers, then faded in.
-// Created from the PinballY host, the Profile store, the Achievement List
-// (its counts, and opening it from the Achievements button, Exit there
-// showing this screen again on that button) and the full ids of the Hall
-// of Fame and Tables to Discover filters (null when their Add-on is
-// disabled: no button). While open it
+// panel over the dimmed wheel, laid out by the Profile Stats painter,
+// with the Avatar, the Profile's name, the Player Level and the
+// Collection Mastery on a card whose foot holds the Achievements, Most
+// Played Tables and Tables to Discover buttons, and the GAME section on
+// its right. Every stat is read again on each opening; the screen is
+// drawn at once on all its layers, then faded in. Created from the
+// PinballY host, the Profile store, a reader of the active Profile's
+// Player Level, the Achievement List (its counts, and opening it from
+// the Achievements button, Exit there showing this screen again on that
+// button) and the full ids of the Hall of Fame and Tables to Discover
+// filters (null when their Add-on is disabled: no button). While open it
 // swallows every button through "commandbuttondown": Next / Prev move a
 // gold halo through the cross and the buttons, looping, with PinballY's
 // navigation sound; Select runs the choice, Exit closes; attract mode
-// closes it too. Opens directly, not through the wheel dialog module: the
-// player asked for it.
+// closes it too. Opens directly, not through the wheel dialog module:
+// the player asked for it.
 // ============================================================
 
 import lang from "./i18n.js";
 import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
 import { tablesVisibleTo } from "./visible_tables.js";
+import { collectionMasteryOfProfile } from "./table_mastery.js";
+import { collectionTextsOf } from "./mastery_bar.js";
 import { getHallOfFame } from "./hall_of_fame.js";
 import { getTablesToDiscover } from "./tables_to_discover.js";
 import { createNavigationSound } from "./navigation_sound.js";
@@ -35,7 +38,7 @@ const FADE_MS = 220;
 const FRAME_MS = 16;
 
 export function createProfileStats(host, {
-    profileStore, achievementList, hallOfFameFilter = null, tablesToDiscoverFilter = null,
+    profileStore, readPlayerLevel, achievementList, hallOfFameFilter = null, tablesToDiscoverFilter = null,
 }) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
@@ -75,6 +78,7 @@ export function createProfileStats(host, {
         const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore);
         const plays = sumPlays();
         const achievements = achievementList.countAll();
+        const playerLevel = readPlayerLevel();
         const buttons = [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.achievementsCount(achievements.unlocked, achievements.total) },
             ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, getHallOfFame(profileTables, profileStore.getPlay)),
@@ -83,6 +87,15 @@ export function createProfileStats(host, {
         return {
             name: displayNameOf(profile),
             avatarPath: profile.avatarPath,
+            playerLevel: {
+                title: TEXT.playerLevel.title,
+                number: String(playerLevel.level),
+                share: (playerLevel.points - playerLevel.from) / (playerLevel.to - playerLevel.from),
+                current: TEXT.playerLevel.current(TEXT.number(playerLevel.points), TEXT.number(playerLevel.to)),
+            },
+            // Over the tables the Profile can see; a tier it reached stays.
+            collectionTitle: TEXT.collectionTitle,
+            collection: collectionTextsOf(collectionMasteryOfProfile(profileTables, profileStore.getProfileData())),
             buttons,
             sections: [{
                 title: TEXT.sections.game,

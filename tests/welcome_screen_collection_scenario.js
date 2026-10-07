@@ -47,7 +47,7 @@ export async function openCollectionCard({ tables, levels, profile = {}, languag
     if (!isWelcomeScreenOpen(fake)) throw new Error("The Welcome Screen did not open.");
     return {
         card: collectionCard(fake),
-        TEXT: lang.welcomeScreen.collection,
+        TEXT: lang.tableMastery.collection,
         LEVEL_NAMES: lang.tableMastery.levelNames,
         errors: fake.logLines().filter(line => line.includes("ERROR")),
     };

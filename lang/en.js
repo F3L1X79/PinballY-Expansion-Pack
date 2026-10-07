@@ -94,14 +94,6 @@ export default {
             },
             go: "Go",
         },
-        // Collection Mastery: the goal toward the next Collection Tier
-        // (that many tables at the level of that name), how many tables
-        // already reach it, or, at the last tier, that all of them did.
-        collection: {
-            goal: (count, levelName) => `Goal: ${count} ${count === 1 ? "table" : "tables"} at ${levelName}`,
-            current: (reached, needed) => `Current: ${reached}/${needed}`,
-            allTables: (levelName) => `All your tables: ${levelName}`,
-        },
     },
 
     // Lower status line text for the currently selected table.
@@ -322,6 +314,13 @@ export default {
             mostPlayedTables: "Most Played Tables",
             tablesToDiscover: "Tables to Discover",
         },
+        // The card's Player Level: its title over the big digits, then the
+        // points so far and those of the next level, thousands separated.
+        playerLevel: {
+            title: "LEVEL",
+            current: (points, nextLevelPoints) => `Current: ${points} / ${nextLevelPoints}`,
+        },
+        collectionTitle: "COLLECTION MASTERY",
         achievementsCount: (unlocked, total) => `${unlocked}/${total}`,
         sections: {
             game: "GAME",
@@ -402,8 +401,17 @@ export default {
         toastDescription: (count) => (count === 1 ? "First Challenge completed" : `${count} Challenges completed`),
     },
 
-    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js), and the Mastery Toast.
+    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js), the Mastery Toast
+    // and the Collection Mastery's texts.
     tableMastery: {
+        // Collection Mastery: the goal toward the next Collection Tier
+        // (that many tables at the level of that name), how many tables
+        // already reach it, or, at the last tier, that all of them did.
+        collection: {
+            goal: (count, levelName) => `Goal: ${count} ${count === 1 ? "table" : "tables"} at ${levelName}`,
+            current: (reached, needed) => `Current: ${reached}/${needed}`,
+            allTables: (levelName) => `All your tables: ${levelName}`,
+        },
         // The Mastery Levels' names, from level 1 to 10.
         levelNames: ["Rookie", "Apprentice", "Regular", "Adept", "Specialist", "Ace", "Virtuoso", "Prodigy", "Legend", "Pinball Wizard"],
         // A table the active Profile never played.

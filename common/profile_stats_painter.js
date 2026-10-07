@@ -2,8 +2,11 @@
 // Profile Stats painter: the layout and drawing of the Profile Stats'
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // from the prototype validated on the cabinet: the dimmed backdrop with
-// the centred Steamball panel, the card on the left (Avatar, the Profile's
-// name in gold, the buttons at its foot), the close cross and the right
+// the centred Steamball panel, the card on the left framed in the Player
+// Level colour with a soft glow (Avatar, the Profile's name in gold, the
+// Player Level in big digits with its bar and points, a rule, the
+// Collection Mastery stacked like the Mastery Bar, the buttons at its
+// foot), the close cross and the right
 // column's sections (a title, then rows of stats, label over value), the
 // spare height shared evenly between the column's gaps, and one highlight
 // per choice (a gold halo, with a tooltip for the cross). Only drawing: no
@@ -11,9 +14,11 @@
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
+import { metalOf, tierMetalOf, tierOf, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, UNBOUNDED,
+    text, oneLine, fillGradient, glow, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, UNBOUNDED,
 } from "./steamball_drawing.js";
+import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
 // In the Welcome Screen's band, which never shows at the same time, above
 // its own values so each screen's reader sees only its own layers.
@@ -31,6 +36,19 @@ const LOOK = Object.freeze({
     // The card: its share of the inner width, its inset, the gap to the column.
     cardShare: 0.4, cardInset: 28, columnGap: 48,
     avatar: 190, avatarGap: 12, nameH: 66, nameSize: 34, minNameSize: 24, buttonsGap: 40,
+    // The card's soft glow, in rings around its frame.
+    cardGlow: 6, cardGlowPeak: 0x40,
+    // The Player Level block, top down: its title, the digits (their box
+    // taller than they are, so the bar sits clear below), the bar, the points.
+    playerLevel: Object.freeze({ titleH: 26, titleSize: 17, digitsH: 130, digitsSize: 96, digitsLift: 16, barH: 14, barGap: 12, pointsH: 58, pointsSize: 19 }),
+    // The rule, then the Collection Mastery's title and block, its square
+    // scaled by squareK.
+    ruleH: 31, // Inside the block: the left inset, the goal's, bar's and count's tops,
+    // the gaps to the square and from it to the right edge.
+    collection: Object.freeze({
+        titleH: 34, titleSize: 17, h: 124, squareK: 1.1, goalSize: 18, minGoalSize: 15, barH: 10, currentSize: 16,
+        inset: 20, goalY: 18, barY: 64, currentY: 86, barGap: 22, squareInset: 18,
+    }),
     button: Object.freeze({ h: 74, gap: 14, size: 22, minSize: 17, countSize: 22 }),
     // The column: a section title, rows of stats side by side, label over value.
     titleH: 60, titleSize: 20, ruleY: 34, statGap: 32, labelSize: 20, minLabelSize: 16, valueY: 26, valueSize: 36, minValueSize: 22, rowH: 78,
@@ -56,10 +74,18 @@ function columnBlocks(screen) {
     return blocks;
 }
 
+const playerLevelBlockH = () => {
+    const look = LOOK.playerLevel;
+    return look.titleH + look.digitsH + look.barH + look.barGap + look.pointsH;
+};
+
+const collectionBlockH = () => LOOK.collection.titleH + LOOK.collection.h;
+
 function cardHeight(screen, avatar) {
     const { button } = LOOK;
     const buttonsH = screen.buttons.length * (button.h + button.gap) - button.gap;
-    return LOOK.cardInset + avatar + LOOK.avatarGap + LOOK.nameH + LOOK.buttonsGap + buttonsH + LOOK.cardInset;
+    const blocksH = playerLevelBlockH() + LOOK.ruleH + collectionBlockH();
+    return LOOK.cardInset + avatar + LOOK.avatarGap + LOOK.nameH + blocksH + LOOK.buttonsGap + buttonsH + LOOK.cardInset;
 }
 
 // The panel, the card and the column in a window referenceWidth wide; the
@@ -99,6 +125,47 @@ function measureWidth(host, str, { size, weight, font = FONTS.body }) {
     return Math.ceil(styled.measure(UNBOUNDED).width);
 }
 
+// A bar on its track, filled to share (0 to 1).
+function drawBar(dc, x, y, w, h, share, color) {
+    dc.fillRect(x, y, w, h, COLORS.track);
+    const filled = Math.round(w * Math.max(0, Math.min(1, share)));
+    if (filled > 0) dc.fillRect(x, y, filled, h, color);
+}
+
+// The Player Level: its title, the level in big digits, the bar toward the
+// next level and the points, centred in the card (cardX, cardW), from y.
+function drawPlayerLevel(host, dc, playerLevel, cardX, cardW, contentX, contentW, y) {
+    const look = LOOK.playerLevel;
+    text(host, dc, playerLevel.title, { x: cardX, y, width: cardW, size: look.titleSize, weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
+    const digitsY = y + look.titleH;
+    text(host, dc, playerLevel.number, { x: cardX, y: digitsY - look.digitsLift, width: cardW, size: look.digitsSize, weight: 700, color: COLORS.playerLevel, font: FONTS.display, align: "center" });
+    const barY = digitsY + look.digitsH;
+    drawBar(dc, contentX, barY, contentW, look.barH, playerLevel.share, COLORS.playerLevel);
+    text(host, dc, playerLevel.current, { x: cardX, y: barY + look.barH + look.barGap, width: cardW, size: look.pointsSize, weight: 600, color: COLORS.description, align: "center" });
+}
+
+// The Collection Mastery as the Mastery Bar shows it, stacked to fit the
+// card: the goal, the bar in the tier's metal with the current count under
+// its end, the Collection Tier square on the right. collection: { tier,
+// reached, needed, goal, current }, current null at the last tier, whose
+// bar is full. At tier 0 the bar and square take level 1's metal, so the
+// block is never dull, and the goal is grey.
+function drawCollection(host, dc, collection, x, y, w) {
+    const look = LOOK.collection;
+    const { tier, reached, needed } = collection;
+    const lookLevel = Math.max(1, tier);
+    dc.fillRect(x, y, w, look.h, COLORS.panelTranslucent);
+    dc.frameRect(x, y, w, look.h, 1, COLORS.border);
+    const size = masterySquareSize(look.squareK);
+    const squareX = x + w - look.squareInset - size;
+    const left = x + look.inset;
+    const barW = squareX - look.barGap - left;
+    oneLine(host, dc, collection.goal, { x: left, y: y + look.goalY, width: barW, size: look.goalSize, minSize: look.minGoalSize, weight: 600, color: tier > 0 ? metalOf(tier) : COLORS.description });
+    drawBar(dc, left, y + look.barY, barW, look.barH, tier >= MAX_MASTERY_LEVEL ? 1 : reached / needed, tierMetalOf(tierOf(lookLevel)));
+    if (collection.current !== null) oneLine(host, dc, collection.current, { x: left, y: y + look.currentY, width: barW, size: look.currentSize, weight: 600, color: COLORS.description, align: "right" });
+    drawMasterySquare(host, dc, tier, squareX, y + Math.round((look.h - size) / 2), look.squareK, lookLevel);
+}
+
 // A button: a tile with its label, and its count in grey on its right.
 function drawButton(host, dc, entry, w, h) {
     const { button } = LOOK;
@@ -130,7 +197,8 @@ function drawSection(host, dc, blocks, top, columnW) {
     }
 }
 
-// screen: { name, avatarPath, buttons (each { choice, label, count: null
+// screen: { name, avatarPath, playerLevel ({ title, number, share (0 to 1),
+// current }), collectionTitle, collection (as drawCollection's), buttons (each { choice, label, count: null
 // or a string }), sections (each { title, rows: [[{ label, value }]] }),
 // closeLabel }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn
 // in its rect's own coordinates, and the highlight of each choice.
@@ -138,17 +206,31 @@ export function layoutProfileStats(host, screen, referenceWidth) {
     const { panel, innerH, cardW, contentW, avatar, columnX, columnW, blocks } = geometry(referenceWidth, screen);
     const top = panel.y + LOOK.pad;
     const cardX = panel.x + LOOK.pad;
+    // Wider than the card by its glow, on every side.
+    const G = LOOK.cardGlow;
     const pieces = [{
         zIndex: PROFILE_STATS_Z_INDEX.card,
-        rect: { x: cardX, y: top, w: cardW, h: innerH },
+        rect: { x: cardX - G, y: top - G, w: cardW + 2 * G, h: innerH + 2 * G },
         draw: dc => {
-            fillGradient(dc, 0, 0, cardW, innerH, COLORS.panelTop, COLORS.tile);
-            dc.frameRect(0, 0, cardW, innerH, 2, COLORS.border);
-            drawAvatar(dc, screen.avatarPath, Math.round((cardW - avatar) / 2), LOOK.cardInset, avatar);
+            fillGradient(dc, G, G, cardW, innerH, COLORS.panelTop, COLORS.tile);
+            glow(dc, G, G, cardW, innerH, COLORS.playerLevel, G, LOOK.cardGlowPeak);
+            dc.frameRect(G, G, cardW, innerH, 2, COLORS.playerLevel);
+            const contentX = G + LOOK.cardInset;
+            let y = G + LOOK.cardInset;
+            drawAvatar(dc, screen.avatarPath, G + Math.round((cardW - avatar) / 2), y, avatar);
+            y += avatar + LOOK.avatarGap;
             oneLine(host, dc, screen.name, {
-                x: LOOK.cardInset, y: LOOK.cardInset + avatar + LOOK.avatarGap, width: contentW, height: LOOK.nameH,
+                x: contentX, y, width: contentW, height: LOOK.nameH,
                 size: LOOK.nameSize, minSize: LOOK.minNameSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center",
             });
+            y += LOOK.nameH;
+            drawPlayerLevel(host, dc, screen.playerLevel, G, cardW, contentX, contentW, y);
+            y += playerLevelBlockH();
+            dc.fillRect(contentX, y, contentW, 1, COLORS.border);
+            y += LOOK.ruleH;
+            const collection = LOOK.collection;
+            text(host, dc, screen.collectionTitle, { x: G, y, width: cardW, size: collection.titleSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center" });
+            drawCollection(host, dc, screen.collection, contentX, y + collection.titleH, contentW);
         },
     }];
 

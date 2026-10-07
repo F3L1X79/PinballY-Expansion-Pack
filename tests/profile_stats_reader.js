@@ -1,7 +1,8 @@
 // ============================================================
 // Reads the drawn Profile Stats the way the player sees it, on the fake
 // PinballY host: whether they are open, the card's texts (the Profile's
-// name first) and Avatar, the buttons at the card's foot (label and grey
+// name first) and Avatar, its Player Level and Collection Mastery blocks,
+// the buttons at the card's foot (label and grey
 // count), a section of the right column by its title (each stat's label
 // with the texts drawn after it), the highlighted choice (the button under
 // the gold halo, or the cross's tooltip), and picks a choice with Next and
@@ -34,6 +35,31 @@ export function openProfileStats(fake, lang) {
 
 // The card's texts, top to bottom: the Profile's name first.
 export const cardTexts = fake => shownLayers(fake, PROFILE_STATS_Z_INDEX.card).flatMap(layer => layer.texts());
+
+// The texts drawn after title on the card, up to the next of titles (or
+// the card's end).
+function cardBlock(fake, title, titles) {
+    const texts = cardTexts(fake);
+    const start = texts.indexOf(title);
+    if (start < 0) return null;
+    const end = texts.findIndex((candidate, index) => index > start && titles.includes(candidate));
+    return texts.slice(start + 1, end < 0 ? texts.length : end);
+}
+
+// The Player Level block: { level (the big digits), current (the points
+// line) }; null when not shown. TEXT: lang.profileStats.
+export function playerLevel(fake, TEXT) {
+    const block = cardBlock(fake, TEXT.playerLevel.title, [TEXT.collectionTitle]);
+    return block && { level: block[0], current: block[1] };
+}
+
+// The Collection Mastery block: { goal, current (null at the last tier),
+// tier (the number in its square) }; null when not shown.
+export function collectionMastery(fake, TEXT) {
+    const block = cardBlock(fake, TEXT.collectionTitle, []);
+    if (!block) return null;
+    return { goal: block[0], current: block.length > 2 ? block[1] : null, tier: Number(block[block.length - 1]) };
+}
 
 export const cardImages = fake => shownLayers(fake, PROFILE_STATS_Z_INDEX.card).flatMap(layer => layer.images());
 

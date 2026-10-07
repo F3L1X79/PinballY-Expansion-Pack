@@ -28,9 +28,9 @@ import { displayNameOf } from "../common/profile_name.js";
 import { getChangePlayer } from "../common/change_player.js";
 import { getRandomGame } from "../common/random_game.js";
 import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
-import { masteryOf, collectionMasteryOfProfile, MAX_MASTERY_LEVEL } from "../common/table_mastery.js";
+import { masteryOf, collectionMasteryOfProfile } from "../common/table_mastery.js";
 import { tablesVisibleTo } from "../common/visible_tables.js";
-import { masteryHeadOf } from "../common/mastery_bar.js";
+import { masteryHeadOf, collectionTextsOf } from "../common/mastery_bar.js";
 import { createNavigationSound } from "../common/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/steamball_palette.js";
 import {
@@ -111,14 +111,8 @@ export default function init() {
     }
 
     // Over the tables the active Profile can see; a tier it reached stays.
-    function readCollection() {
-        const collection = collectionMasteryOfProfile(tablesVisibleTo(host.getVisibleTables(), store), store.getProfileData());
-        const { tier, reached, needed } = collection;
-        const levelNames = lang.tableMastery.levelNames;
-        return tier >= MAX_MASTERY_LEVEL
-            ? { ...collection, goal: TEXT.collection.allTables(levelNames[tier - 1]), current: null }
-            : { ...collection, goal: TEXT.collection.goal(needed, levelNames[tier]), current: TEXT.collection.current(reached, needed) };
-    }
+    const readCollection = () => collectionTextsOf(
+        collectionMasteryOfProfile(tablesVisibleTo(host.getVisibleTables(), store), store.getProfileData()));
 
     function readScreen() {
         const profile = store.getActiveProfile();

@@ -212,14 +212,6 @@ export default {
             },
             go: "Go",
         },
-        // Collection Mastery: the goal toward the next Collection Tier
-        // (that many tables at the level of that name), how many tables
-        // already reach it, or, at the last tier, that all of them did.
-        collection: {
-            goal: (count, levelName) => `Goal: ${count} ${count === 1 ? "table" : "tables"} at ${levelName}`,
-            current: (reached, needed) => `Current: ${reached}/${needed}`,
-            allTables: (levelName) => `All your tables: ${levelName}`,
-        },
     },
 
     // Lower status line text for the currently selected table.
@@ -439,6 +431,13 @@ export default {
             mostPlayedTables: "Most Played Tables",
             tablesToDiscover: "Tables to Discover",
         },
+        // The card's Player Level: its title over the big digits, then the
+        // points so far and those of the next level, thousands separated.
+        playerLevel: {
+            title: "LEVEL",
+            current: (points, nextLevelPoints) => `Current: ${points} / ${nextLevelPoints}`,
+        },
+        collectionTitle: "COLLECTION MASTERY",
         achievementsCount: (unlocked, total) => `${unlocked}/${total}`,
         sections: {
             game: "GAME",
@@ -519,8 +518,17 @@ export default {
         toastDescription: (count) => (count === 1 ? "Primer desafío superado" : `${count} desafíos superados`),
     },
 
-    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js).
+    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js), and the
+    // Collection Mastery's texts.
     tableMastery: {
+        // Collection Mastery: the goal toward the next Collection Tier
+        // (that many tables at the level of that name), how many tables
+        // already reach it, or, at the last tier, that all of them did.
+        collection: {
+            goal: (count, levelName) => `Goal: ${count} ${count === 1 ? "table" : "tables"} at ${levelName}`,
+            current: (reached, needed) => `Current: ${reached}/${needed}`,
+            allTables: (levelName) => `All your tables: ${levelName}`,
+        },
         // TODO: translation pass
         levelNames: ["Rookie", "Apprentice", "Regular", "Adept", "Specialist", "Ace", "Virtuoso", "Prodigy", "Legend", "Pinball Wizard"],
         toDiscover: "To discover",

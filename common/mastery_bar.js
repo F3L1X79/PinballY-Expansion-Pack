@@ -8,6 +8,7 @@
 // hidden; a state still missing is drawn on the spot. Its place (under
 // the Challenge Card or in its place) is asked for on each show. Lights
 // up on demand for about 1.2 s, drawn on the spot on a layer of its own.
+// Also gives the Collection Mastery's texts to the screens that show it.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -60,6 +61,17 @@ export function masteryHeadOf(level) {
     return level === NEVER_PLAYED
         ? { text: TEXT.toDiscover, color: STEAMBALL_COLORS.dim }
         : { text: TEXT.levelNames[level - 1], color: metalOf(level) };
+}
+
+// collection: collectionMasteryOf()'s { tier, reached, needed }, with its
+// goal and current count as texts; current is null at the last tier, which
+// says all the tables reached it. Shared by the Collection Mastery cards.
+export function collectionTextsOf(collection) {
+    const { tier, reached, needed } = collection;
+    const { levelNames, collection: TEXT } = lang.tableMastery;
+    return tier >= MAX_MASTERY_LEVEL
+        ? { ...collection, goal: TEXT.allTables(levelNames[tier - 1]), current: null }
+        : { ...collection, goal: TEXT.goal(needed, levelNames[tier]), current: TEXT.current(reached, needed) };
 }
 
 function drawPanel(host, dc, level) {

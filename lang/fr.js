@@ -212,13 +212,6 @@ export default {
             },
             go: "Y aller",
         },
-        // Collection Mastery: the goal toward the next Collection Tier, how
-        // many tables already reach it, or, at the last tier, that all did.
-        collection: {
-            goal: (count, levelName) => `Objectif : ${count} ${count === 1 ? "table" : "tables"} ${levelName}`,
-            current: (reached, needed) => `Actuel : ${reached}/${needed}`,
-            allTables: (levelName) => `Toutes tes tables : ${levelName}`,
-        },
     },
 
     // Lower status line text for the currently selected table.
@@ -436,6 +429,13 @@ export default {
             mostPlayedTables: "Tables les plus jouées",
             tablesToDiscover: "Tables à découvrir",
         },
+        // The card's Player Level: its title over the big digits, then the
+        // points so far and those of the next level, thousands separated.
+        playerLevel: {
+            title: "NIVEAU",
+            current: (points, nextLevelPoints) => `Actuel : ${points} / ${nextLevelPoints}`,
+        },
+        collectionTitle: "MAÎTRISE DE LA COLLECTION",
         achievementsCount: (unlocked, total) => `${unlocked}/${total}`,
         sections: {
             game: "JEU",
@@ -515,8 +515,16 @@ export default {
         toastDescription: (count) => (count === 1 ? "Premier défi réussi" : `${count} défis réussis`),
     },
 
-    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js).
+    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js), and the
+    // Collection Mastery's texts.
     tableMastery: {
+        // Collection Mastery: the goal toward the next Collection Tier, how
+        // many tables already reach it, or, at the last tier, that all did.
+        collection: {
+            goal: (count, levelName) => `Objectif : ${count} ${count === 1 ? "table" : "tables"} ${levelName}`,
+            current: (reached, needed) => `Actuel : ${reached}/${needed}`,
+            allTables: (levelName) => `Toutes tes tables : ${levelName}`,
+        },
         levelNames: ["Novice", "Élève", "Adepte", "Disciple", "Spécialiste", "As", "Virtuose", "Prodige", "Légende", "Mage du flipper"],
         toDiscover: "Table à découvrir",
         toastHeader: "Maîtrise",

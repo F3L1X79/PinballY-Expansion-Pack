@@ -26,7 +26,7 @@ test("with no table at all, the Welcome Screen opens with no Period Table card",
 
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.deepEqual(periodCards(fake), []);
-    const COLLECTION = TEXT.collection;
+    const COLLECTION = lang.tableMastery.collection;
     assert.deepEqual(collectionCard(fake), { goal: COLLECTION.goal(10, lang.tableMastery.levelNames[0]), current: COLLECTION.current(0, 10), tier: 0 });
     assert.deepEqual(readChoices(fake), [lang.profiles.menuEntry, TEXT.closeTooltip, TEXT.stayOnWheel, TEXT.randomTable]);
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
