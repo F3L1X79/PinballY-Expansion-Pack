@@ -10,6 +10,12 @@ Unofficial add-ons for the PinballY virtual pinball front end, built on its Java
 A self-contained feature that `main.js` starts at launch and that the player can turn off in the configuration.
 _Avoid_: plugin, script (a script is just a `.js` file)
 
+### Menus
+
+**Drawn Menu**:
+A menu the player sees drawn in the pack's own style instead of PinballY's native one, with the same entries and the same effect when one is chosen: the menus a player meets (main, Exit, filter choices, power off) and those the Add-ons open. The setup menus that look after the cabinet and the pause menu of a running game stay native, and so does every menu when the Add-on is turned off or a menu cannot be drawn. Shown simply as "menu".
+_Avoid_: Steamball menu (Steamball is the palette), custom menu, popup (a popup shows information, a menu offers choices)
+
 ### Profiles
 
 **Profile**:

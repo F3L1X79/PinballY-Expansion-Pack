@@ -314,15 +314,18 @@
             <h3>Tous les menus en design Steamball</h3>
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">gros</span></div>
           </div>
-          <p>Les menus encore natifs de PinballY (menu principal, menu Exit, réinitialisation d'un profil, invites des Add-ons…) deviennent des écrans dessinés dans la palette Steamball, comme le Welcome Screen, l'Achievement List et les Profile Stats.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (un menu dessiné générique sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <p>Les menus que voit le joueur (menu principal, menu Exit, choix de filtres, power off) et ceux qu'ouvrent les Add-ons (invites, Profile Reset) deviennent des Drawn Menus dans la palette Steamball, comme le Welcome Screen, l'Achievement List et les Profile Stats.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/prototype</code> (formes A, B, C et D sur la borne, mesure du temps d'ouverture) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Questions ouvertes</summary>
+            <summary>Décisions (grill du 07/10/2026)</summary>
             <ul>
-              <li>Quels menus : tous ceux de PinballY (menu principal, Exit, Game Info…), ou seulement ceux qu'ouvre le pack ?</li>
-              <li>Un composant de menu dessiné commun (liste, halo doré, son de navigation) partagé par tous, ou un dessin par menu ?</li>
-              <li>Les menus natifs de PinballY peuvent-ils être remplacés proprement, ou faut-il intercepter leur ouverture ?</li>
+              <li>Terme du glossaire : Drawn Menu (« menu » à l'écran). Un Add-on propre, activé par défaut et désactivable par <code>ADD_ON_…</code>.</li>
+              <li>Interception de <code>menuopen</code>, en dernier après les Add-ons qui modifient les items : <code>preventDefault()</code>, mêmes entrées dessinées, commande relancée. Si le dessin échoue, l'erreur est journalisée et le menu natif s'affiche. Les menus du pack passent par le composant commun, sans <code>showMenu</code>. ADR probable à la spec.</li>
+              <li>Restent natifs : les menus d'entretien (operator, game setup, game categories, capture, media drop, élévation, confirmations), le menu pause d'une partie, tous les popups (Game Info, High Scores, Flyer…). Rien de tout ça n'est ajouté à la roadmap.</li>
+              <li>Comportement natif : mêmes boutons (flippers, Select / Launch, Exit), mêmes items, « Retour » des sous-menus compris ; coche ou choix actif en doré ; le mode attract ferme le menu ; sons de PinballY. Toasts, confettis et Fireworks passent par-dessus, un dialogue du wheel dialog attend la fermeture.</li>
+              <li>Rien que les entrées (et le message d'un dialogue), mais un beau design. Effets permis tant que le menu s'ouvre en moins de 100 ms ; au-delà, chaque entrée sur son calque, préparé au démarrage.</li>
+              <li>Prototype de toutes les formes, écartées au fur et à mesure sur la borne : A liste en panneau, B roue verticale en arc, C carrousel horizontal, D boutons côte à côte pour les dialogues.</li>
             </ul>
           </details>
         </div>
@@ -550,8 +553,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>07/10 <span class="count">(1)</span></summary>
+          <summary>07/10 <span class="count">(2)</span></summary>
           <ol>
+            <li><strong>Des Drawn Menus à la place des menus natifs du joueur</strong>
+              <span>Le pack intercepte l'ouverture des menus que voit le joueur et les dessine en Steamball, mêmes entrées et mêmes boutons, avec repli sur le menu natif en cas d'erreur. Les menus d'entretien, le menu pause et les popups restent natifs. Quatre formes au prototype, dont une roue.</span></li>
             <li><strong>Une Daily Streak : les jours d'affilée sur la borne</strong>
               <span>Au moins une Play par jour, lue dans le Play Log, sans jour de grâce. Affichée sur le Welcome Screen et dans les Profile Stats, avec des Achievements à 3, 7, 15 et 30 jours dans la famille Sessions. Le mot Streak seul disparaît du glossaire : Period Table Streak d'un côté, Daily Streak de l'autre.</span></li>
           </ol>
