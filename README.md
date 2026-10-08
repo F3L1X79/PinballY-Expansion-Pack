@@ -52,11 +52,11 @@ Everything stays in one folder, with no change to PinballY itself.
 - a reminder to rate a table;
 - launches without a black flash;
 - the backglass hidden during a game;
-- your own sounds for launches, Achievements and greetings.
+- sounds for launches, Achievements, greetings, confetti and fireworks, or your own.
 
 ## Install
 
-Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows Media Player* optional feature, for your own sounds only).
+Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows Media Player* optional feature, for the sounds).
 
 1. **Copy the project into `PinballY\Scripts\ExpansionPack`**, under that exact name: the pack looks for its files there. From a downloaded zip, rename the extracted folder (`PinballY-Expansion-Pack-main`) to `ExpansionPack`; with git, run `git clone https://github.com/F3L1X79/PinballY-Expansion-Pack.git ExpansionPack` from `PinballY\Scripts`.
 2. **Add this line to `PinballY\Scripts\main.js`**, or create the file with only this line if you have none:
@@ -75,7 +75,7 @@ Settings live in `Scripts\ExpansionPack\.env.local`, one `KEY=value` per line. O
 
 ```
 LANGUAGE=en
-ACHIEVEMENT_SOUND_FILE=C:\PinballY\Media\Sounds\trophy.mp3
+ACHIEVEMENT_SOUND_FILE=assets\sounds\local\trophy.mp3
 ADD_ON_CLOCK=false
 ```
 
@@ -84,11 +84,11 @@ ADD_ON_CLOCK=false
 | `LANGUAGE` | `en` | Interface language: `en`, `fr`, `de`, `es`, `it` or `pt`. |
 | `ADULT_CATEGORY` | `NSFW` | PinballY category of the Adult Tables, hidden from Child Profiles. |
 | `COMMUNITY_TABLES_MANUFACTURER` | `VPX Community` | Manufacturer you gave to fictional or community tables, for the status line and the "Original Tables" filter. |
-| `LAUNCH_SOUND_FILE` | *(none)* | Sound played when a table launches: a path from the pack's folder (your own sounds go in `assets\sounds\local\`) or a full path. |
-| `ACHIEVEMENT_SOUND_FILE` | *(none)* | Sound played with each Achievement toast. |
-| `PROFILE_GREETING_SOUND_FILE` | *(none)* | Sound played when a player is greeted. |
-| `CONFETTI_SOUND_FILE` | *(none)* | Sound played once when a shower of confetti starts. |
-| `FIREWORKS_SOUND_FILE` | *(none)* | Sound played once when the Fireworks start. |
+| `LAUNCH_SOUND_FILE` | `assets\sounds\launch.mp3` | Sound played when a table launches: a path from the pack's folder (your own sounds go in `assets\sounds\local\`) or a full path; empty = no sound. |
+| `ACHIEVEMENT_SOUND_FILE` | `assets\sounds\achievement.wav` | Sound played with each Achievement toast. |
+| `PROFILE_GREETING_SOUND_FILE` | `assets\sounds\profile_greeting.mp3` | Sound played when a player is greeted. |
+| `CONFETTI_SOUND_FILE` | `assets\sounds\confetti.wav` | Sound played once when a shower of confetti starts. |
+| `FIREWORKS_SOUND_FILE` | `assets\sounds\fireworks.wav` | Sound played once when the Fireworks start. |
 | `ACHIEVEMENT_TOAST_SECONDS` | `4` | Seconds an Achievement toast stays on screen (up to 60). |
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Size of the toast, from `0.5` to `3`. Raise it on a large screen. |
 | `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge or a Platinum Achievement, if your PC struggles with it. |

@@ -233,8 +233,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>Daily Streak</strong> (Welcome Screen, Profile Stats, Achievements à 3 / 7 / 15 / 30 jours) livrée le 08/10 : reste la vérification sur la borne (ticket #173), comme pour les extras du Player Level (ticket #168)</p>
-      <span class="next">Ensuite : <code>/grill-with-docs</code> court pour <a href="#default-assets">les réglages par défaut de la borne</a></span>
+      <p><strong>Réglages par défaut</strong> (sons CC0 livrés, chemins de son relatifs au pack, Wheel Arc) livrés le 08/10 : reste la vérification sur la borne, comme pour la Daily Streak (ticket #173) et les extras du Player Level (ticket #168)</p>
+      <span class="next">Ensuite : captures en anglais sur la borne pour <a href="#readme-refresh">le README à jour</a></span>
     </div>
   </section>
 
@@ -258,31 +258,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="default-assets" data-track="share" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Réglages par défaut : les sons et la couleur de la roue de la borne</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
-          </div>
-          <p>Un nouveau joueur doit avoir dès l'installation ce que Félix a réglé sur sa borne : un son pour le lancement d'une table, chaque Achievement Toast, le Profile Greeting, la Confetti Shower et les Fireworks, et la couleur de la roue qu'il a retouchée. Aujourd'hui, tous les sons sont vides par défaut.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : grill fait le 08/10 → <code>/implement</code> direct (petit chantier, sans spec). Avant le <a href="#readme-refresh">README à jour (n° <span data-ref="readme-refresh"></span>)</a>, pour que les captures montrent les réglages par défaut</div>
-          <details>
-            <summary>Décisions du grill</summary>
-            <ul>
-              <li>Commit 1 (rangement seul) : tous les PNG de <code>assets/</code> vont dans <code>assets/images/</code> ; <code>assets/wheel_arcs_gold.png</code> devient <code>assets/images/wheel_arc.png</code>. Chemins mis à jour dans le code, les tests, <code>CONTRIBUTING.md</code> et cette roadmap.</li>
-              <li>Sons livrés : des sons libres (CC0) dans <code>assets/sounds/</code> avec un <code>CREDITS.md</code> (source, licence). Claude cherche 2 ou 3 candidats par son et les dépose dans le scratchpad ; Félix choisit à l'écoute ; un son refusé partout reste vide par défaut.</li>
-              <li>Sons de Félix : dans <code>assets/sounds/local/</code>, ignoré par git (déjà fait).</li>
-              <li>Chemins : un chemin de son sans lettre de lecteur ni <code>\\</code> est relatif au dossier du pack (<code>\</code> et <code>/</code> acceptés), pour les défauts du code comme pour <code>.env.local</code>. Une valeur vide coupe toujours le son ; un fichier manquant est journalisé. Commentaires de <code>config.js</code> et <code>.env.example</code> à jour, dont le dossier <code>local/</code>.</li>
-              <li>Le <code>.env.local</code> de Félix passe en chemins relatifs vers <code>assets\sounds\local\…</code>.</li>
-              <li>Wheel Arc (voir <code>CONTEXT.md</code>) : Add-on <code>addons/wheel_arc.js</code>, clé <code>wheelArc</code>, <code>ADD_ON_WHEEL_ARC</code>, activé par défaut. Au démarrage <code>setUnderlay</code> avec <code>assets/images/wheel_arc.png</code> ; sur <code>underlaychange</code>, ne remplace <code>filename</code> que si PinballY allait prendre son underlay par défaut (<code>&lt;PinballY&gt;\Assets\Images\underlay.png</code>) : un underlay du joueur ou d'un système est gardé.</li>
-            </ul>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-share" id="readme-refresh" data-track="share" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -750,7 +725,6 @@
 
           <div class="ax row">Fort</div>
           <div class="cell sweet">
-            <a class="chip tr-share" href="#default-assets"><b></b>Réglages par défaut</a>
             <a class="chip tr-share" href="#readme-refresh"><b></b>README à jour</a>
           </div>
           <div class="cell">

@@ -1,13 +1,14 @@
 // ============================================================
 // Sound paths tests: the five sound settings, from the defaults or a
 // .env.local, may be relative to the pack's folder; absolute and network
-// paths stay as they are, and an empty value still means no sound. Pure
-// function; no PinballY host needed.
+// paths stay as they are, and an empty value still means no sound. The
+// defaults are sounds shipped in assets\sounds\, each with its credit.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { resolveSoundFiles } from "../common/config.js";
+import { readFileSync, existsSync } from "node:fs";
+import { resolveSoundFiles, SHIPPED_SOUNDS } from "../common/config.js";
 
 const PACK = "C:\\PinballY\\Scripts\\ExpansionPack";
 
@@ -48,6 +49,17 @@ test("absolute and network paths are kept, an empty one still means no sound", (
 });
 
 test("the other settings are left untouched", () => {
-    const config = { language: "fr", launchSoundFile: "", adultCategory: "assets\\NSFW", addOns: { clock: true } };
-    assert.deepEqual(resolveSoundFiles(config, PACK), config);
+    const settings = { language: "fr", launchSoundFile: "", adultCategory: "assets\\NSFW", addOns: { clock: true } };
+    assert.deepEqual(resolveSoundFiles(settings, PACK), settings);
+});
+
+test("every default sound ships with the pack and is credited", () => {
+    const credits = readFileSync(new URL("../assets/sounds/CREDITS.md", import.meta.url), "utf8");
+    assert.deepEqual(Object.keys(SHIPPED_SOUNDS),
+        ["launchSoundFile", "achievementSoundFile", "profileGreetingSoundFile", "confettiSoundFile", "fireworksSoundFile"]);
+    for (const [key, path] of Object.entries(SHIPPED_SOUNDS)) {
+        assert.match(path, /^assets\\sounds\\[a-z_]+\.(mp3|wav)$/, `${key} is a shipped sound`);
+        assert.ok(existsSync(new URL(`../${path.replace(/\\/g, "/")}`, import.meta.url)), `${path} exists`);
+        assert.ok(credits.includes(path.split("\\").pop()), `${path} is in CREDITS.md`);
+    }
 });

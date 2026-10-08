@@ -72,11 +72,11 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 - un rappel pour noter une table ;
 - un lancement sans flash noir ;
 - le backglass masqué pendant une partie ;
-- vos propres sons au lancement, aux succès et à l'accueil.
+- des sons au lancement, aux succès, à l'accueil, aux confettis et au feu d'artifice, ou les vôtres.
 
 ## Installation
 
-Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fonctionnalité facultative *Lecteur Windows Media*, uniquement pour vos propres sons).
+Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fonctionnalité facultative *Lecteur Windows Media*, pour les sons).
 
 1. **Copiez le projet dans `PinballY\Scripts\ExpansionPack`**, sous ce nom exact : le pack y cherche ses fichiers. Depuis un zip téléchargé, renommez le dossier extrait (`PinballY-Expansion-Pack-main`) en `ExpansionPack` ; avec git, lancez `git clone https://github.com/F3L1X79/PinballY-Expansion-Pack.git ExpansionPack` depuis `PinballY\Scripts`.
 2. **Ajoutez cette ligne à `PinballY\Scripts\main.js`**, ou créez le fichier avec cette seule ligne si vous n'en avez pas :
@@ -95,7 +95,7 @@ Les réglages se trouvent dans `Scripts\ExpansionPack\.env.local`, un `CLÉ=vale
 
 ```
 LANGUAGE=fr
-ACHIEVEMENT_SOUND_FILE=C:\PinballY\Media\Sounds\trophee.mp3
+ACHIEVEMENT_SOUND_FILE=assets\sounds\local\trophee.mp3
 ADD_ON_CLOCK=false
 ```
 
@@ -104,11 +104,11 @@ ADD_ON_CLOCK=false
 | `LANGUAGE` | `en` | Langue : `en`, `fr`, `de`, `es`, `it` ou `pt`. |
 | `ADULT_CATEGORY` | `NSFW` | Catégorie PinballY des tables pour adultes, cachées aux Profils enfant. |
 | `COMMUNITY_TABLES_MANUFACTURER` | `VPX Community` | Fabricant donné aux tables fictives ou communautaires, pour la ligne d'état et le filtre « Tables Originales ». |
-| `LAUNCH_SOUND_FILE` | *(aucun)* | Son joué au lancement d'une table : un chemin depuis le dossier du pack (vos sons vont dans `assets\sounds\local\`) ou un chemin complet. |
-| `ACHIEVEMENT_SOUND_FILE` | *(aucun)* | Son joué avec chaque annonce de Succès. |
-| `PROFILE_GREETING_SOUND_FILE` | *(aucun)* | Son joué quand un joueur est accueilli. |
-| `CONFETTI_SOUND_FILE` | *(aucun)* | Son joué une fois au début d'une pluie de confettis. |
-| `FIREWORKS_SOUND_FILE` | *(aucun)* | Son joué une fois au début du feu d'artifice. |
+| `LAUNCH_SOUND_FILE` | `assets\sounds\launch.mp3` | Son joué au lancement d'une table : un chemin depuis le dossier du pack (vos sons vont dans `assets\sounds\local\`) ou un chemin complet ; vide = aucun son. |
+| `ACHIEVEMENT_SOUND_FILE` | `assets\sounds\achievement.wav` | Son joué avec chaque annonce de Succès. |
+| `PROFILE_GREETING_SOUND_FILE` | `assets\sounds\profile_greeting.mp3` | Son joué quand un joueur est accueilli. |
+| `CONFETTI_SOUND_FILE` | `assets\sounds\confetti.wav` | Son joué une fois au début d'une pluie de confettis. |
+| `FIREWORKS_SOUND_FILE` | `assets\sounds\fireworks.wav` | Son joué une fois au début du feu d'artifice. |
 | `ACHIEVEMENT_TOAST_SECONDS` | `4` | Secondes d'affichage d'une annonce de Succès (60 au plus). |
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Taille de l'annonce, de `0.5` à `3` : à augmenter sur un grand écran. |
 | `CONFETTI` | `true` | `false` coupe la pluie de confettis qui accompagne l'annonce d'un Défi réussi ou d'un Succès Platine, si votre PC peine. |

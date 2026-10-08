@@ -9,24 +9,31 @@
 import { applyEnvOverrides } from "./env_overrides.js";
 import { projectFolderOf } from "./pinbally_host.js";
 
+// The sounds shipped in assets\sounds\, by setting.
+export const SHIPPED_SOUNDS = Object.freeze({
+    // Played when a table launches.
+    launchSoundFile: "assets\\sounds\\launch.mp3",
+    // Played with each Achievement Toast.
+    achievementSoundFile: "assets\\sounds\\achievement.wav",
+    // Played with each Profile Greeting.
+    profileGreetingSoundFile: "assets\\sounds\\profile_greeting.mp3",
+    // Played once when a Confetti Shower starts.
+    confettiSoundFile: "assets\\sounds\\confetti.wav",
+    // Played once when the Fireworks start.
+    fireworksSoundFile: "assets\\sounds\\fireworks.wav",
+});
+const NO_SOUNDS = Object.fromEntries(Object.keys(SHIPPED_SOUNDS).map(key => [key, ""]));
+
 const DEFAULTS = {
     // --- Set these for your setup ---
 
     // Interface language: "en", "fr", "de", "es", "it" or "pt".
     language: "en",
-    // Sounds: a path relative to the pack's folder (such as
+    // Sounds: by default the ones shipped in assets\sounds\ (see CREDITS.md
+    // there). A path relative to the pack's folder (such as
     // assets\sounds\local\launch.mp3, kept out of git) or an absolute one.
     // Empty = no sound.
-    // Sound played when a table launches.
-    launchSoundFile: "",
-    // Sound played with each Achievement Toast.
-    achievementSoundFile: "",
-    // Sound played with each Profile Greeting.
-    profileGreetingSoundFile: "",
-    // Sound played once when a Confetti Shower starts.
-    confettiSoundFile: "",
-    // Sound played once when the Fireworks start.
-    fireworksSoundFile: "",
+    ...SHIPPED_SOUNDS,
     // Manufacturer name you gave fictional/community VPX tables in PinballY.
     // Used by the status line and the "Original Tables" filter.
     communityTablesManufacturer: "VPX Community",
@@ -86,7 +93,6 @@ const LOG_PREFIX = "[Config]";
 const ADODB_TEXT_TYPE = 2;
 const ADODB_READ_ALL = -1;
 
-const SOUND_FILE_KEYS = Object.keys(DEFAULTS).filter(key => key.endsWith("SoundFile"));
 // A drive letter ("C:\\", "d:/"), a network path ("\\\\server\\share") or
 // the root of the current drive ("\\sounds").
 const ABSOLUTE_PATH_PATTERN = /^([A-Za-z]:|[\\/])/;
@@ -95,7 +101,7 @@ const ABSOLUTE_PATH_PATTERN = /^([A-Za-z]:|[\\/])/;
 // from the pack's folder: Windows Media Player knows nothing of the pack.
 export function resolveSoundFiles(config, projectFolder) {
     const resolved = { ...config };
-    for (const key of SOUND_FILE_KEYS) {
+    for (const key of Object.keys(SHIPPED_SOUNDS)) {
         const path = resolved[key];
         if (typeof path !== "string" || path === "" || ABSOLUTE_PATH_PATTERN.test(path)) continue;
         resolved[key] = `${projectFolder}\\${path.replace(/\//g, "\\").replace(/^\.\\/, "")}`;
@@ -123,8 +129,9 @@ function readEnvLocal(path) {
 }
 
 function loadConfig() {
-    // Under Node (tests) there is no COM: the defaults apply.
-    if (typeof createAutomationObject !== "function") return DEFAULTS;
+    // Under Node (tests) there is no COM and no pack folder: the defaults
+    // apply without the shipped sounds, which each test sets as it needs.
+    if (typeof createAutomationObject !== "function") return { ...DEFAULTS, ...NO_SOUNDS };
 
     const projectFolder = projectFolderOf(systemInfo.programDir);
     const path = `${projectFolder}\\.env.local`;
