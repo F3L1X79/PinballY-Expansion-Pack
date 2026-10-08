@@ -291,6 +291,9 @@ export function createFakePinballYHost({
         let texts = [];
         let images = [];
         let frames = [];
+        // Fills and texts in drawing order: five numbers per fill (x, y,
+        // width, height, colour) and a text's { text, rect } in one flat
+        // array, as films drawn ahead make millions of fills.
         let strokes = [];
         let canvasSize = null;
         let position = { x: 0, y: 0 };
@@ -298,7 +301,7 @@ export function createFakePinballYHost({
         let scale = { xSpan: 1, ySpan: 1 };
         const dc = {
             getSize: () => ({ ...canvasSize }),
-            fillRect: (x, y, width, height, color) => { strokes.push({ fill: color, rect: { x, y, width, height } }); },
+            fillRect: (x, y, width, height, color) => { strokes.push(x, y, width, height, color); },
             frameRect: (x, y, width, height) => { frames.push({ x, y, width, height }); },
             drawImage: (path) => { images.push(path); },
             // Like PinballY: throws on a missing or unreadable image.
@@ -334,15 +337,30 @@ export function createFakePinballYHost({
             texts: () => [...texts],
             images: () => [...images],
             frames: () => frames.map(frame => ({ ...frame })),
-            fills: () => strokes.filter(stroke => "fill" in stroke).map(stroke => stroke.fill),
+            fills: () => readStrokes(strokes).filter(stroke => "fill" in stroke).map(stroke => stroke.fill),
             // Fills ({ fill: color, rect }) and texts ({ text, rect }) in drawing order.
-            strokes: () => strokes.map(stroke => ({ ...stroke })),
+            strokes: () => readStrokes(strokes),
             canvasSize: () => ({ ...canvasSize }),
             position: () => ({ ...position }),
             scale: () => ({ ...scale }),
         };
         layers.push(layer);
         return layer;
+    }
+
+    function readStrokes(data) {
+        const strokes = [];
+        for (let index = 0; index < data.length;) {
+            if (typeof data[index] === "object") {
+                strokes.push({ ...data[index] });
+                index++;
+            } else {
+                const [x, y, width, height, fill] = data.slice(index, index + 5);
+                strokes.push({ fill, rect: { x, y, width, height } });
+                index += 5;
+            }
+        }
+        return strokes;
     }
 
     function removeDrawingLayer(layer) {

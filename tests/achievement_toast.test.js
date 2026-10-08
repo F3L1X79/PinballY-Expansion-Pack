@@ -6,7 +6,8 @@
 // configured scale enlarges the whole card (1 when out of range, logged)
 // and the configured sound plays once per card, a failing one only logged.
 // A Challenge Toast shares the queue, with its own header and target icon.
-// A celebrated toast starts the Confetti Shower, unless it went stale.
+// A celebrated toast starts the Confetti Shower, unless it went stale; a
+// Level Toast starts the Fireworks, and failing ones never stop it.
 // An Achievement Toast shows its Achievement Rank's emblem in the Rank's
 // colour, the trophy when that emblem's file is missing (logged once).
 // ============================================================
@@ -156,6 +157,38 @@ test("a celebrated toast starts the Confetti Shower when it starts, never when i
     fake.advanceTime(SETTLE_MS);
     assert.deepEqual(cardsOnScreen(fake), ["plain", "celebrated"]);
     assert.deepEqual(starts, [fake.now().getTime() - SETTLE_MS + ARRIVAL_GAP_MS], "once, when its card arrives");
+});
+
+test("a Level Toast starts the Fireworks when it starts, and failing ones never stop it", () => {
+    const fake = createFakePinballYHost();
+    fake.installGlobals();
+    const starts = [];
+    let failing = false;
+    const fireworks = {
+        start() {
+            if (failing) throw new Error("no film drawn");
+            starts.push(fake.now().getTime());
+        },
+    };
+    const toasts = createAchievementToasts(fake, { fireworks });
+    const shown = [];
+    const levelToast = (title, tileNumber) => ({
+        kind: TOAST_KIND.LEVEL, title, description: "", tileNumber, onShown: () => shown.push(title),
+    });
+    toasts.submit({ title: "plain", description: "", celebrate: true, onShown: () => shown.push("plain") });
+    toasts.submit(levelToast("level 2", 2));
+    assert.deepEqual(starts, [], "not before its turn");
+
+    fake.advanceTime(SETTLE_MS);
+    assert.deepEqual(shown, ["plain", "level 2"]);
+    assert.deepEqual(starts, [fake.now().getTime() - SETTLE_MS + ARRIVAL_GAP_MS], "once, when the Level Toast arrives");
+
+    failing = true;
+    toasts.submit(levelToast("level 3", 3));
+    fake.advanceTime(SETTLE_MS);
+    assert.deepEqual(shown, ["plain", "level 2", "level 3"], "the Level Toast still starts");
+    assert.ok(fake.drawingLayers().some(layer => layer.texts().includes("level 3")), "and is drawn");
+    assert.equal(fake.logLines().filter(line => line.startsWith("[AchievementToast]") && line.includes("no film drawn")).length, 1);
 });
 
 test("an Achievement Toast shows its Rank's emblem in its Rank's colour", () => {

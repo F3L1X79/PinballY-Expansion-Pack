@@ -2,7 +2,8 @@
 // Achievement Toast module with the wheel dialog module on the fake host:
 // an Achievement Toast, a Mastery Toast and the Confetti Shower of a
 // celebrated toast submitted while a drawn dialog is open are not drawn
-// until it closes, then play. A native dialog does not hold them.
+// until it closes, then play; so are a Level Toast and its Fireworks. A
+// native dialog does not hold them.
 // ============================================================
 
 import { test } from "node:test";
@@ -63,6 +64,27 @@ test("toasts and the Confetti Shower wait for a drawn dialog to close, then play
     assert.deepEqual(cardTitles(fake), ["achievement", "mastery"]);
     assert.deepEqual(shown, ["achievement", "mastery"]);
     assert.equal(showers.length, 1);
+});
+
+test("a Level Toast and its Fireworks wait for a drawn dialog to close, then play", async () => {
+    const fake = createFakePinballYHost();
+    fake.installGlobals();
+    const wheelDialogs = createWheelDialogs(fake);
+    const fireworks = [];
+    const toasts = createAchievementToasts(fake, { wheelDialogs, fireworks: { start: () => fireworks.push(true) } });
+    const close = await openDrawnDialog(wheelDialogs);
+    const shown = [];
+
+    toasts.submit({ kind: TOAST_KIND.LEVEL, title: "level", description: "", tileNumber: 2, onShown: () => shown.push("level") });
+    fake.fire("wheelmode");
+    fake.advanceTime(RISE_MS);
+    assert.deepEqual(shown, [], "no Level Toast over the drawn dialog");
+    assert.deepEqual(fireworks, [], "no Fireworks over the drawn dialog");
+
+    close();
+    fake.advanceTime(RISE_MS);
+    assert.deepEqual(shown, ["level"]);
+    assert.equal(fireworks.length, 1);
 });
 
 test("a native dialog does not hold the toasts", async () => {

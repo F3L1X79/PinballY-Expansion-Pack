@@ -16,7 +16,7 @@
 // Toast its own header (Collection Mastery's for a Collection Tier), the reached level's metal as its accent and the
 // level's number drawn in its tile; a Level Toast the Player Level's colour
 // and the reached level's number in its tile. A celebrated toast starts the
-// Confetti Shower when it starts.
+// Confetti Shower when it starts, a Level Toast the Fireworks.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -25,6 +25,7 @@ import { createPinballYHost } from "./pinbally_host.js";
 import config from "./config.js";
 import { STEAMBALL_COLORS, STEAMBALL_FONTS, RANK_COLORS } from "./steamball_palette.js";
 import { getConfettiShower } from "./confetti_shower.js";
+import { getFireworks } from "./fireworks.js";
 import { getWheelDialogs } from "./wheel_dialog.js";
 
 const SCRIPT_NAME = "AchievementToast";
@@ -201,11 +202,12 @@ function toScale(scale) {
 
 // soundFile: absolute path played at the start of each card, empty for none.
 // confettiShower: started by a celebrated toast; the tests may leave it out.
+// fireworks: started by a Level Toast; the tests may leave it out.
 // wheelDialogs: the wheel dialog module, whose drawn dialogs toasts wait
 // for; the tests may leave it out.
 export function createAchievementToasts(host, {
     toastSeconds = DEFAULT_TOAST_SECONDS, soundFile = "", scale = DEFAULT_TOAST_SCALE, confettiShower = { start() {} },
-    wheelDialogs = { hasDrawnDialog: () => false, onDrawnDialogClosed() {} },
+    fireworks = { start() {} }, wheelDialogs = { hasDrawnDialog: () => false, onDrawnDialogClosed() {} },
 } = {}) {
     const holdMs = toHoldMs(toastSeconds);
     const look = scaleLook(toScale(scale));
@@ -213,6 +215,8 @@ export function createAchievementToasts(host, {
     const playSound = safeHandler(SCRIPT_NAME, () => { if (soundFile) host.playSound(soundFile); });
     // A shower that fails is logged and never stops the card.
     const celebrate = safeHandler(SCRIPT_NAME, () => confettiShower.start());
+    // Fireworks that fail are logged and never stop the Level Toast.
+    const startFireworks = safeHandler(SCRIPT_NAME, () => fireworks.start());
     const waiting = [];
     const projectFolder = host.getProjectFolder();
     // Each Rank's emblem path, or null when its file is missing: checked once.
@@ -309,7 +313,7 @@ export function createAchievementToasts(host, {
         // exits, and the game covers it.
         if (host.getFullUIMode().runMode !== undefined) return;
         // A drawn dialog is the one exception to "over everything": the
-        // toast, and the confetti it may start, would hide what it asks.
+        // toast, and the confetti or Fireworks it may start, would hide what it asks.
         if (wheelDialogs.hasDrawnDialog()) return;
 
         const toast = waiting.shift();
@@ -330,6 +334,7 @@ export function createAchievementToasts(host, {
         // Animated before onShown, so a failing callback never leaves the card stuck on screen.
         startFrames();
         if (toast.celebrate) celebrate();
+        if (toast.kind === TOAST_KIND.LEVEL) startFireworks();
         playSound();
         toast.onShown();
     }
@@ -366,6 +371,7 @@ export function getAchievementToasts() {
             soundFile: config.achievementSoundFile,
             scale: config.achievementToastScale,
             confettiShower: getConfettiShower(),
+            fireworks: getFireworks(),
             wheelDialogs: getWheelDialogs(),
         });
     }
