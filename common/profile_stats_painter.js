@@ -51,18 +51,22 @@ const LOOK = Object.freeze({
     playerLevel: Object.freeze({ titleH: 26, titleSize: 17, digitsH: 130, digitsSize: 96, digitsLift: 30, barH: 14, barGap: 12, pointsH: 58, pointsSize: 19 }),
     // The rule, then the Collection Mastery's title and block, its square
     // scaled by squareK.
-    ruleH: 31, // Inside the block: the left inset, the goal's, bar's and count's tops,
-    // the gaps to the square and from it to the right edge.
+    ruleH: 31,
+    // Inside the block: the side inset, the goal's top (across the block's
+    // width, over the square), the square's, bar's and count's tops, the
+    // gap from the bar to the square.
     collection: Object.freeze({
-        titleH: 34, titleSize: 17, h: 124, squareK: 1, goalSize: 16, minGoalSize: 13, barH: 10, currentSize: 16,
-        inset: 16, goalY: 18, barY: 64, currentY: 86, barGap: 16, squareInset: 14,
+        titleH: 34, titleSize: 15, minTitleSize: 12, h: 120, squareK: 1, goalSize: 16, minGoalSize: 13, barH: 10, currentSize: 16,
+        inset: 16, goalY: 14, squareY: 48, barY: 67, currentY: 84, barGap: 16,
     }),
-    button: Object.freeze({ h: 74, gap: 14, size: 22, minSize: 17, countSize: 22 }),
+    // The buttons' labels share one size, the largest at which they all
+    // fit, down to minSize.
+    button: Object.freeze({ h: 74, gap: 14, size: 19, minSize: 14, weight: 600, countSize: 19 }),
     // The column: a section title, rows of stats side by side (statGap
     // apart, portraitStatGap in a portrait window), label over value; the
     // labels shrink together down to minLabelSize.
     titleH: 56, titleSize: 19, ruleY: 32, statGap: 24, portraitStatGap: 16, labelSize: 18, minLabelSize: 14,
-    valueY: 32, valueSize: 30, minValueSize: 22, rowH: 80,
+    valueY: 32, valueSize: 26, minValueSize: 20, rowH: 74,
     sectionGap: 20, rowGap: 18,
     // A stat's pill: beside its value (gap), or under it (underGap); gold
     // when lit, its background the gold mixed that far into the panel. Never
@@ -202,8 +206,8 @@ function drawPlayerLevel(host, dc, playerLevel, cardX, cardW, contentX, contentW
 }
 
 // The Collection Mastery as the Mastery Bar shows it, stacked to fit the
-// card: the goal, the bar in the tier's metal with the current count under
-// its end, the Collection Tier square on the right. collection: { tier,
+// card: the goal across the top, then the bar in the tier's metal with the
+// current count under its end, and the Collection Tier square on the right. collection: { tier,
 // reached, needed, goal, current }, current null at the last tier, whose
 // bar is full. At tier 0 the bar and square take level 1's metal, so the
 // block is never dull, and the goal is grey.
@@ -214,13 +218,13 @@ function drawCollection(host, dc, collection, x, y, w) {
     dc.fillRect(x, y, w, look.h, COLORS.panelTranslucent);
     dc.frameRect(x, y, w, look.h, 1, COLORS.border);
     const size = masterySquareSize(look.squareK);
-    const squareX = x + w - look.squareInset - size;
+    const squareX = x + w - look.inset - size;
     const left = x + look.inset;
     const barW = squareX - look.barGap - left;
-    oneLine(host, dc, collection.goal, { x: left, y: y + look.goalY, width: barW, size: look.goalSize, minSize: look.minGoalSize, weight: 600, color: tier > 0 ? metalOf(tier) : COLORS.description });
+    oneLine(host, dc, collection.goal, { x: left, y: y + look.goalY, width: w - 2 * look.inset, size: look.goalSize, minSize: look.minGoalSize, weight: 600, color: tier > 0 ? metalOf(tier) : COLORS.description });
     drawBar(dc, left, y + look.barY, barW, look.barH, tier >= MAX_MASTERY_LEVEL ? 1 : reached / needed, tierMetalOf(tierOf(lookLevel)));
     if (collection.current !== null) oneLine(host, dc, collection.current, { x: left, y: y + look.currentY, width: barW, size: look.currentSize, weight: 600, color: COLORS.description, align: "right" });
-    drawMasterySquare(host, dc, tier, squareX, y + Math.round((look.h - size) / 2), look.squareK, lookLevel);
+    drawMasterySquare(host, dc, tier, squareX, y + look.squareY, look.squareK, lookLevel);
 }
 
 // A rounded pill holding pill.text, its left edge at x, from y, at most
@@ -270,15 +274,29 @@ function drawStrip(host, dc, strip, y, columnW) {
     if (strip.pill) drawPill(host, dc, strip.pill, textX, y + look.pillY, textW);
 }
 
-// A button: a tile with its label, and its count in grey on its right.
-function drawButton(host, dc, entry, w, h) {
+// A button's room for its label, left of its count.
+function buttonLabelWidth(host, entry, w) {
+    const { button } = LOOK;
+    const countW = entry.count === null ? 0 : measureWidth(host, entry.count, { size: button.countSize, weight: button.weight });
+    return w - 52 - countW;
+}
+
+// The largest size, down to minSize, at which every button's label fits.
+function buttonLabelSize(host, buttons, w) {
+    const { button } = LOOK;
+    const fitsAt = size => buttons.every(entry => measureWidth(host, entry.label, { size, weight: button.weight }) <= buttonLabelWidth(host, entry, w));
+    let size = button.size;
+    while (size > button.minSize && !fitsAt(size)) size--;
+    return size;
+}
+
+// A button: a tile with its label at labelSize, and its count in grey on its right.
+function drawButton(host, dc, entry, w, h, labelSize) {
     const { button } = LOOK;
     fillGradient(dc, 0, 0, w, h, COLORS.rowUnlocked, COLORS.tile);
     dc.frameRect(0, 0, w, h, 1, COLORS.border);
-    // The label is drawn first, so the count is measured ahead.
-    const countW = entry.count === null ? 0 : measureWidth(host, entry.count, { size: button.countSize, weight: 600 });
-    oneLine(host, dc, entry.label, { x: 20, y: 0, width: w - 52 - countW, height: h, size: button.size, minSize: button.minSize, weight: 700, font: FONTS.display });
-    if (entry.count !== null) oneLine(host, dc, entry.count, { x: 20, y: 0, width: w - 40, height: h, size: button.countSize, weight: 600, color: COLORS.description, align: "right" });
+    oneLine(host, dc, entry.label, { x: 20, y: 0, width: buttonLabelWidth(host, entry, w), height: h, size: labelSize, weight: button.weight });
+    if (entry.count !== null) oneLine(host, dc, entry.count, { x: 20, y: 0, width: w - 40, height: h, size: button.countSize, weight: button.weight, color: COLORS.description, align: "right" });
 }
 
 // A section of the column: its title and rule, then its rows of stats.
@@ -332,7 +350,9 @@ export function layoutProfileStats(host, screen, referenceWidth) {
             dc.fillRect(contentX, y, contentW, 1, COLORS.border);
             y += LOOK.ruleH;
             const collection = LOOK.collection;
-            text(host, dc, screen.collectionTitle, { x: G, y, width: cardW, size: collection.titleSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center" });
+            oneLine(host, dc, screen.collectionTitle, {
+                x: contentX, y, width: contentW, size: collection.titleSize, minSize: collection.minTitleSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center",
+            });
             drawCollection(host, dc, screen.collection, contentX, y + collection.titleH, contentW);
         },
     }];
@@ -348,10 +368,11 @@ export function layoutProfileStats(host, screen, referenceWidth) {
 
     // At the card's foot, whatever the panel's height.
     const { button } = LOOK;
+    const buttonSize = buttonLabelSize(host, screen.buttons, contentW);
     let buttonY = top + innerH - LOOK.cardInset - (screen.buttons.length * (button.h + button.gap) - button.gap);
     for (const entry of screen.buttons) {
         const rect = { x: cardX + LOOK.cardInset, y: buttonY, w: contentW, h: button.h };
-        pieces.push({ zIndex: PROFILE_STATS_Z_INDEX.buttons, rect, draw: dc => drawButton(host, dc, entry, rect.w, rect.h) });
+        pieces.push({ zIndex: PROFILE_STATS_Z_INDEX.buttons, rect, draw: dc => drawButton(host, dc, entry, rect.w, rect.h, buttonSize) });
         highlights[entry.choice] = haloAround(rect);
         buttonY += button.h + button.gap;
     }
