@@ -477,9 +477,8 @@ export default {
         fraction: (count, total) => `${count}/${total}`,
         // The share of the collection played, in a pill.
         percent: (percent) => `${percent} %`,
-        // A Streak's longest, in a pill; or the record set right now.
+        // A Streak's longest, in a pill (gold while the current one sets it).
         record: (longest) => `Record : ${longest}`,
-        recordInProgress: "Record !",
         // A favourite's play time, in a pill; its hours and minutes given.
         playTime: (time) => `${time} de jeu`,
         // The favourite decade, by its start year: 1990 for 1990 to 1999.

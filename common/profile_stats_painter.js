@@ -7,8 +7,9 @@
 // Player Level in big digits with its bar and points, a rule, the
 // Collection Mastery stacked like the Mastery Bar, the buttons at its
 // foot), the close cross and the right column's sections (a title, then
-// rows of stats, label over value, with a pill beside the value, or every
-// pill of the row under its value when one does not fit, and a thin bar,
+// rows of stats, label over value (on two lines when it does not fit on
+// one), with a pill beside the value, or every pill of the row under its
+// value when one does not fit, and a thin bar,
 // then wide strips with a table's wheel logo or the missing image, or else
 // its title),
 // the spare height shared evenly between the column's gaps, and one highlight
@@ -57,12 +58,12 @@ const LOOK = Object.freeze({
     }),
     button: Object.freeze({ h: 74, gap: 14, size: 22, minSize: 17, countSize: 22 }),
     // The column: a section title, rows of stats side by side, label over value.
-    titleH: 56, titleSize: 19, ruleY: 32, statGap: 24, labelSize: 18, minLabelSize: 14, valueY: 26, valueSize: 34, minValueSize: 22, rowH: 78,
+    titleH: 56, titleSize: 19, ruleY: 32, statGap: 24, labelSize: 18, valueY: 26, valueSize: 34, minValueSize: 22, rowH: 78,
     sectionGap: 20, rowGap: 18,
     // A stat's pill: beside its value (gap), or under it (underGap); gold
     // when lit, its background the gold mixed that far into the panel. Never
-    // wider than its room: its text shrinks to minSize, then is cut.
-    pill: Object.freeze({ h: 30, size: 16, minSize: 12, weight: 600, padX: 14, gap: 14, underGap: 16, litMix: 0.78 }),
+    // wider than its room: its text is cut, at one size for every pill.
+    pill: Object.freeze({ h: 30, size: 16, weight: 600, padX: 14, gap: 14, underGap: 16, litMix: 0.78 }),
     // A stat's thin bar under its value (or its pill), short of the
     // column's right edge by inset.
     shareBar: Object.freeze({ h: 6, gap: 8, inset: 24 }),
@@ -89,16 +90,27 @@ function measureWidth(host, str, { size, weight, font = FONTS.body }) {
 
 const pillWidth = (host, str, maxW = Infinity) => Math.min(maxW, measureWidth(host, str, { size: LOOK.pill.size, weight: LOOK.pill.weight }) + 2 * LOOK.pill.padX);
 
+// A stat's label wrapped within width.
+function labelText(host, str) {
+    const styled = host.createStyledText({ textAlign: "left", textStyle: { font: FONTS.body, size: LOOK.labelSize, weight: 400, color: COLORS.description } });
+    styled.add(str);
+    return styled;
+}
+
 // A row of stats side by side in the column: every pill goes under its
-// value when one does not fit beside its own, so the row stays aligned.
+// value when one does not fit beside its own, and every value moves down
+// by labelExtra when a label takes two lines, so the row stays aligned.
 function rowBlock(host, section, stats, columnW) {
     const { pill, shareBar } = LOOK;
     const colW = Math.round((columnW - LOOK.statGap * (stats.length - 1)) / stats.length);
     const valueWidth = stat => Math.min(colW, measureWidth(host, stat.value, { size: LOOK.valueSize, weight: 700, font: FONTS.display }));
     const isUnder = stats.some(stat => stat.pill && valueWidth(stat) + pill.gap + pillWidth(host, stat.pill.text) > colW);
     const hasShare = stats.some(stat => stat.share !== undefined);
-    const h = LOOK.rowH + (isUnder ? pill.underGap + pill.h : 0) + (hasShare ? shareBar.gap + shareBar.h : 0);
-    return { kind: "row", h, section, stats, colW, isUnder };
+    const lineH = Math.max(...stats.map(stat => labelText(host, stat.label).measure(UNBOUNDED).height));
+    const labelH = Math.max(...stats.map(stat => labelText(host, stat.label).measure(colW).height));
+    const labelExtra = Math.ceil(Math.max(0, Math.min(2 * lineH, labelH) - lineH));
+    const h = labelExtra + LOOK.rowH + (isUnder ? pill.underGap + pill.h : 0) + (hasShare ? shareBar.gap + shareBar.h : 0);
+    return { kind: "row", h, section, stats, colW, isUnder, labelExtra };
 }
 
 // The column's blocks top down; the spare height goes to the gaps only.
@@ -212,15 +224,23 @@ function drawPill(host, dc, { text: str, isLit }, x, y, maxW) {
     const w = pillWidth(host, str, maxW);
     fillRounded(dc, x, y, w, look.h, look.h / 2, isLit ? mix(COLORS.gold, COLORS.panel, look.litMix) : COLORS.track);
     oneLine(host, dc, str, {
-        x: x + look.padX, y, width: w - 2 * look.padX, height: look.h, size: look.size, minSize: look.minSize, weight: look.weight, color: isLit ? COLORS.gold : COLORS.description,
+        x: x + look.padX, y, width: w - 2 * look.padX, height: look.h, size: look.size, weight: look.weight, color: isLit ? COLORS.gold : COLORS.description,
     });
 }
 
 // A stat: its label over its value, its pill beside or under the value,
-// and its thin gold bar at the bottom.
-function drawStat(host, dc, stat, x, y, block) {
+// and its thin gold bar at the bottom. Labels keep one size: in a row whose
+// labels take two lines, each sits on its value, and beyond two it is cut.
+function drawStat(host, dc, stat, x, rowY, block) {
     const { pill, shareBar } = LOOK;
-    oneLine(host, dc, stat.label, { x, y, width: block.colW, size: LOOK.labelSize, minSize: LOOK.minLabelSize, weight: 400, color: COLORS.description });
+    const y = rowY + block.labelExtra;
+    const fitsOneLine = measureWidth(host, stat.label, { size: LOOK.labelSize, weight: 400 }) <= block.colW;
+    if (block.labelExtra === 0 || fitsOneLine) {
+        oneLine(host, dc, stat.label, { x, y, width: block.colW, size: LOOK.labelSize, weight: 400, color: COLORS.description });
+    } else {
+        const styled = labelText(host, stat.label);
+        styled.draw(dc, { x, y: rowY, width: block.colW, height: Math.min(styled.measure(block.colW).height, block.labelExtra + LOOK.valueY) });
+    }
     const valueW = oneLine(host, dc, stat.value, { x, y: y + LOOK.valueY, width: block.colW, size: LOOK.valueSize, minSize: LOOK.minValueSize, weight: 700, font: FONTS.display });
     const underY = y + LOOK.rowH + pill.underGap;
     if (stat.pill && block.isUnder) drawPill(host, dc, stat.pill, x, underY, block.colW);

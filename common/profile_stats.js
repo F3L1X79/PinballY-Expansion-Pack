@@ -96,14 +96,14 @@ export function createProfileStats(host, {
         };
     }
 
-    // A Daily Streak or Period Table Streak, its longest in a pill; a gold
-    // "record in progress" instead while the current one, at least 1, sets it.
+    // A Daily Streak or Period Table Streak, its longest in a pill, gold
+    // while the current one, at least 1, sets it.
     function streakStat(label, { current, longest }) {
         const isRecord = current > 0 && current >= longest;
         return {
             label,
             value: TEXT.number(current),
-            pill: isRecord ? { text: TEXT.recordInProgress, isLit: true } : { text: TEXT.record(TEXT.number(longest)), isLit: false },
+            pill: { text: TEXT.record(TEXT.number(longest)), isLit: isRecord },
         };
     }
 

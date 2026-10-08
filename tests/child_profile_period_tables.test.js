@@ -124,7 +124,7 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     }
 
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheWeek], "no Table of the Day entry for the child");
-    assert.deepEqual(dayStreakShown(), ["3", STATS.recordInProgress], "the child's Streak goes on across the adult day");
+    assert.deepEqual(dayStreakShown(), ["3", STATS.record(3)], "the child's Streak goes on across the adult day");
     assert.deepEqual(dayStreakProgress(), progressOf(3, 3));
 
     await switchTo("Bob");
@@ -134,9 +134,9 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     // Thursday 1 October: back to an ordinary table, which extends the Streak.
     await goToDay(1);
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek]);
-    assert.deepEqual(dayStreakShown(), ["3", STATS.recordInProgress], "today can still extend the Streak");
+    assert.deepEqual(dayStreakShown(), ["3", STATS.record(3)], "today can still extend the Streak");
     assert.equal((await playTableOfTheDay()).configId, MEDIEVAL.configId);
-    assert.deepEqual(dayStreakShown(), ["4", STATS.recordInProgress]);
+    assert.deepEqual(dayStreakShown(), ["4", STATS.record(4)]);
     assert.deepEqual(dayStreakProgress(), progressOf(4, 4), "the adult day is not counted");
 
     await switchTo("Bob");

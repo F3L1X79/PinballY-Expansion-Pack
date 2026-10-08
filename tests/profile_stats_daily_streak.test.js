@@ -68,7 +68,7 @@ test("the Profile Stats show the Daily Streak first in the streak row, its longe
 
     getProfileStore().switchTo("Bob");
     await settle();
-    assert.deepEqual(streakRow()[TEXT.stats.cabinetStreak], ["2", TEXT.recordInProgress], "the current run is the longest");
+    assert.deepEqual(streakRow()[TEXT.stats.cabinetStreak], ["2", TEXT.record(2)], "the current run is the longest");
 
     getProfileStore().switchTo("Carol");
     await settle();
