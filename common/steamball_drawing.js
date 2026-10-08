@@ -1,9 +1,10 @@
 ﻿// ============================================================
 // Steamball drawing helpers shared by the drawn screens (Welcome Screen,
-// Profile Stats): text on one or several lines, rounded and gradient
+// Profile Stats) and the Profile badge: text on one or several lines, rounded and gradient
 // fills, glows, the dimmed backdrop with its panel, the Avatar, a wheel
-// logo, the close cross, a tooltip and the gold selection halo. Each draws
-// on the drawing context it is given, in its coordinates. Only drawing: no layer, no event, no side effect.
+// logo, the close cross, a tooltip, the gold selection halo and the
+// Player Level pip. Each draws on the drawing context it is given, in its
+// coordinates. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
@@ -72,6 +73,33 @@ export function glow(dc, x, y, w, h, color, rings, peak) {
     for (let ring = rings; ring >= 1; ring--) {
         dc.frameRect(x - ring, y - ring, w + 2 * ring, h + 2 * ring, 1, withAlpha(color, Math.round(peak * (1 - ring / (rings + 1)))));
     }
+}
+
+// The Player Level pip, centred on (cx, cy), size pixels high: round, in
+// the Player Level colour, widening into an oval for three digits or more.
+// A dark ring keeps it apart from any Avatar.
+export function drawLevelPip(host, dc, level, cx, cy, size) {
+    const number = String(level);
+    const styled = host.createStyledText({ textAlign: "center", textStyle: { font: FONTS.display, size: Math.round(size * 0.6), weight: 700, color: COLORS.panel } });
+    styled.add(number);
+    const measured = styled.measure(UNBOUNDED);
+    const ring = Math.max(2, Math.round(size / 14));
+    // Even, so the round ends have a whole radius.
+    const height = 2 * Math.round((size - 2 * ring) / 2);
+    const width = number.length < 3 ? height : Math.max(height, Math.ceil(measured.width) + height / 2);
+    const x = Math.round(cx - width / 2);
+    const y = Math.round(cy - height / 2);
+    fillPill(dc, x - ring, y - ring, width + 2 * ring, height + 2 * ring, COLORS.tile);
+    fillPill(dc, x, y, width, height, COLORS.playerLevel);
+    styled.draw(dc, { x, y: y + (height - measured.height) / 2, width, height: measured.height });
+}
+
+// A disc when as wide as high, an oval with round ends when wider.
+function fillPill(dc, x, y, w, h, color) {
+    const r = h / 2;
+    if (w > h) dc.fillRect(Math.round(x + r), y, Math.round(w - h), h, color);
+    fillDisc(dc, x + r, y + r, r, color);
+    if (w > h) fillDisc(dc, x + w - r, y + r, r, color);
 }
 
 export function drawAvatar(dc, path, x, y, size) {

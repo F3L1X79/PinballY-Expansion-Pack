@@ -13,6 +13,8 @@
 // rise that comes without new Achievements (a change in the collection). A
 // Child Profile's level is read with its points scaled up by the set a
 // Profile that is not a child would have, built only to be counted.
+// Keeps the shown Player Level (the level pip's): the baseline, then each
+// Level Toast's level as it starts.
 // Also adds the Achievement List entry to the main menu, right after "Play",
 // and the Profile Stats entry right after it. The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
@@ -36,7 +38,8 @@ import { createWorldTour } from "../common/world_tour.js";
 import { buildSurprisesAchievements } from "../achievements/surprises.js";
 import { createSurprises } from "../common/surprises.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
-import { getPlayerLevel } from "../common/player_level.js";
+import { getPlayerLevel, playerLevelOf } from "../common/player_level.js";
+import { getShownPlayerLevel } from "../common/shown_player_level.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
 import { createAchievementList } from "../common/achievement_list.js";
 import { createProfileStats } from "../common/profile_stats.js";
@@ -86,6 +89,7 @@ const nonChildAchievementsFor = profileStore => (profileStore.isChild() ? getAll
 export default function init() {
     const achievementToasts = getAchievementToasts();
     const profileStore = getProfileStore();
+    const shownPlayerLevel = getShownPlayerLevel();
 
     const achievementList = createAchievementList(createPinballYHost(), {
         getAchievements: getAllAchievements, profileStore, drawingAhead: getDrawingAhead(),
@@ -139,7 +143,7 @@ export default function init() {
             tileNumber: level,
             title: TEXT.toastTitle(level),
             description: TEXT.toastDescription,
-            onShown() {},
+            onShown: () => shownPlayerLevel.set(profileKey, level),
             isStale: () => resetCountOf(profileKey) !== resetCount,
         });
     }
@@ -174,7 +178,8 @@ export default function init() {
             });
         });
         const levelAfter = levelOnceShown(submittedIds, achievements, nonChildAchievements);
-        if (levelAfter > levelBefore && !isBaseline) submitLevelToast(profileKey, levelAfter, resetCount);
+        if (isBaseline) shownPlayerLevel.set(profileName, levelAfter);
+        else if (levelAfter > levelBefore) submitLevelToast(profileKey, levelAfter, resetCount);
     }
 
     // The timer callback runs outside the event handler's call stack, so it
@@ -201,6 +206,7 @@ export default function init() {
         const profileKey = profileName.toLowerCase();
         submittedIdsByProfile.delete(profileKey);
         resetCountByProfile.set(profileKey, resetCountOf(profileKey) + 1);
+        shownPlayerLevel.set(profileName, playerLevelOf(0).level);
     }));
 
     // Fires on every Profile switch: announces what the new Profile has

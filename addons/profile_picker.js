@@ -15,8 +15,10 @@
 // blocks PinballY for 20 to 45 ms. The Profiles are read again each time it
 // opens, and anything not drawn ahead yet is drawn on the spot.
 // A badge at the top right of the wheel screen shows the active Profile's
-// Avatar and name; it is redrawn on every switch, hidden on "gamestarted"
-// and shown again on "wheelmode".
+// Avatar and name, with the shown Player Level as a pip at the Avatar's
+// bottom-right corner; it is redrawn on every switch and whenever the
+// shown level changes, hidden on "gamestarted" and shown again on
+// "wheelmode".
 // When the Welcome Screen Add-on is on, a pick closes the carousel and the
 // screen welcomes the new Profile (picking the active one changes nothing).
 // When it is off, a Profile Greeting (the Avatar growing slightly, a
@@ -37,6 +39,8 @@ import { getWheelDialogs } from "../common/wheel_dialog.js";
 import { registerChangePlayer } from "../common/change_player.js";
 import { drawShadowedText } from "../common/shadowed_text.js";
 import { getDrawingAhead } from "../common/drawing_ahead.js";
+import { getShownPlayerLevel } from "../common/shown_player_level.js";
+import { drawLevelPip } from "../common/steamball_drawing.js";
 import { createNavigationSound } from "../common/navigation_sound.js";
 import config from "../common/config.js";
 
@@ -90,7 +94,9 @@ const HINT = Object.freeze({ size: 12, weight: 400, top: 180 });
 // not laid out yet, so a window-sized canvas drawn then ends up distorted.
 // The name is centred under the Avatar, across the canvas width, which also
 // leaves the Avatar ~30 px from the right edge.
-const BADGE = Object.freeze({ width: 160, height: 170, avatarSize: 96, frame: 3, top: 30, nameGap: 8 });
+// The level pip straddles the Avatar's bottom-right corner, a little inside
+// it; the name sits low enough to clear the pip's lower half.
+const BADGE = Object.freeze({ width: 160, height: 170, avatarSize: 96, frame: 3, top: 30, nameGap: 14, pipSize: 34, pipInset: 6 });
 // The size validated on the cabinet's 1920 px high playfield, kept in
 // proportion to the window's height on any other window.
 const BADGE_REFERENCE_HEIGHT = 1920;
@@ -105,6 +111,7 @@ export default function init() {
     const { profiles: TEXT } = lang;
     const host = createPinballYHost();
     const profileStore = getProfileStore();
+    const shownPlayerLevel = getShownPlayerLevel();
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const hiddenLayer = zIndex => {
         const layer = host.createDrawingLayer(zIndex);
@@ -356,10 +363,12 @@ export default function init() {
         const profile = profileStore.getActiveProfile();
         badgeLayer.clear(COLORS.transparent);
         badgeLayer.draw(dc => {
-            const { width, avatarSize, frame, top, nameGap } = BADGE;
+            const { width, avatarSize, frame, top, nameGap, pipSize, pipInset } = BADGE;
             const x = (width - avatarSize) / 2;
             dc.fillRect(x - frame, top - frame, avatarSize + 2 * frame, avatarSize + 2 * frame, COLORS.gold);
             dc.drawImage(profile.avatarPath, x, top, avatarSize, avatarSize);
+            const level = shownPlayerLevel.get();
+            if (level !== null) drawLevelPip(host, dc, level, x + avatarSize - pipInset, top + avatarSize - pipInset, pipSize);
             drawShadowedText(host, dc, BADGE_NAME, COLORS.text, displayNameOf(profile), top + avatarSize + nameGap);
         }, BADGE.width, BADGE.height);
     }
@@ -545,6 +554,9 @@ export default function init() {
         drawBadge();
         markAheadStale();
     }));
+    // Fires when the active Profile's shown level changes: a Level Toast
+    // starting, a Profile Reset, the baseline after a switch.
+    shownPlayerLevel.onChange(safeHandler(SCRIPT_NAME, drawBadge));
 
     // The badge and the greeting must never cover a game; a player who
     // started one from the Welcome Screen was greeted by it already.
