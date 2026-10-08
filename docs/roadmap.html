@@ -233,8 +233,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>Fiche joueur dessinée</strong> livrée le 07/10 : reste la vérification visuelle sur la borne (ticket #160)</p>
-      <span class="next">Ensuite : <code>/implement</code> #162 à #167 (tickets de la spec #161) pour <a href="#level-extras">les extras du Player Level</a></span>
+      <p><strong>Extras du Player Level</strong> (Child Profile à égalité, Fireworks, pastille de niveau sur l'Avatar) livrés le 08/10 : reste la vérification visuelle sur la borne (ticket #168)</p>
+      <span class="next">Ensuite : <code>/implement</code> #170 à #172 (tickets de la spec #169) pour <a href="#visit-streak">la Daily Streak</a></span>
     </div>
   </section>
 
@@ -295,29 +295,6 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Les captures de <code>docs/images/</code> datent du 30/09/2026. Depuis : Welcome Screen (qui remplace le dialogue de démarrage), Achievement List et Profile Stats dessinées, Table Mastery et Mastery Bar, Player Level et Level Toast, Confetti Shower, Secret Achievements, Daily Streak, Admin Profile et Child Profile. Les captures anglaises servent aussi au README français.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="level-extras" data-track="play" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Player Level : enfants à égalité, feu d'artifice, niveau sur l'Avatar</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Trois idées du 06/10/2026 autour du Player Level de la fiche joueur (livrée) : le niveau d'un Child Profile ajusté pour suivre celui d'un adulte, des Fireworks avec chaque Level Toast, et le niveau en pastille sur l'Avatar.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/implement</code> par ticket (#162 à #167, puis vérification sur la borne #168, spec #161). S'appuie sur le Player Level et le Level Toast (livrés). Prototype : branche <code>prototype/fireworks</code></div>
-          <details>
-            <summary>Décisions (grill et prototype du 07/10/2026)</summary>
-            <ul>
-              <li>Child Profile : ses points × (points accessibles à un Profile non enfant avec la même collection ÷ points accessibles à l'enfant), même courbe pour tous. Les points ajustés sont affichés partout, sans multiplicateur visible. Pas de Secret Achievement de remplacement. Une montée de niveau sans Play (des Adult Tables ajoutées) n'est pas annoncée.</li>
-              <li>Fireworks : un nouvel effet, le même spectacle à chaque Level Toast (niveaux regagnés compris), environ 8 s, 7 fusées tirées du bas (la course des fusées reprend fireworks-js, MIT, sans import). Style retenu au prototype (variante G) : chaque explosion est un film dessiné d'avance à 20 images/s, une seule image affichée à la fois ; deux anneaux réguliers de traits qui s'effilent, cœur blanc, halo de couleur et ombre sombre floue pour ressortir sur la table, un flash doux au départ, des points qui scintillent à la fin. Fusée : tête dorée lumineuse et traînée d'étincelles. Plus de couleurs d'une explosion à l'autre : 4 jeux de trois couleurs, deux explosions de suite jamais pareilles (ADR 0012). Mesures sur la borne : 3,9 s de dessin d'avance (341 calques), 0,3 ms de calcul par image. Réglages <code>FIREWORKS</code> et <code>FIREWORKS_SOUND_FILE</code> (le son joue une fois, au départ), indépendants de <code>CONFETTI</code>.</li>
-              <li>Ordre : quand un même retour sur la roue amène une Confetti Shower, le Level Toast et les Fireworks partent 1 s avant la fin des confettis ; le toast apparaît au départ des Fireworks.</li>
-              <li>Pastille ronde dans le coin bas-droit de l'Avatar, couleur du Player Level, ovale à partir de 3 chiffres, sur le badge de la roue et sur le Welcome Screen uniquement (Guest compris). Le badge change avec le Level Toast. Sans Profile picker, aucune pastille.</li>
-            </ul>
           </details>
         </div>
       </li>
@@ -810,7 +787,6 @@
             <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
           </div>
           <div class="cell">
-            <a class="chip tr-play" href="#level-extras"><b></b>Extras du Player Level</a>
             <a class="chip tr-profiles" href="#stats"><b></b>Stats des autres</a>
             <a class="chip tr-play" href="#profile-records"><b></b>Records par Profile</a>
             <a class="chip tr-profiles" href="#profile-rivalries"><b></b>Rivalités</a>
