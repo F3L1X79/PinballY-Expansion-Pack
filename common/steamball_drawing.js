@@ -83,12 +83,15 @@ export function playerLevelColorOf(level) {
     return mix(RANK_COLORS[rank], WHITE, 0.3 * progress);
 }
 
+const LEVEL_PIP_RATIO = 1 / 4;
+
 // Where the level pip sits on an Avatar whose box, frame included, is side
 // pixels from (x, y): on its bottom-right corner, in the same proportions on
-// the Profile badge, the Welcome Screen and the Profile picker.
-export function levelPipOn(x, y, side) {
-    const inset = side * 9 / 102;
-    return { cx: x + side - inset, cy: y + side - inset, size: Math.round(side / 3) };
+// the Profile badge, the Welcome Screen and the Profile picker. The pip is
+// ratio of the side high; its centre sits inside the corner by 9/34 of it.
+export function levelPipOn(x, y, side, ratio = LEVEL_PIP_RATIO) {
+    const inset = side * ratio * 9 / 34;
+    return { cx: x + side - inset, cy: y + side - inset, size: Math.round(side * ratio) };
 }
 
 // The Player Level pip, centred on (cx, cy), size pixels high: round, in

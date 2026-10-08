@@ -40,9 +40,9 @@ test("the pip goes from Bronze to Platinum as the level climbs, lighter at each 
 });
 
 test("the pip sits on any Avatar in the same proportions", () => {
-    assert.deepEqual(levelPipOn(10, 20, 102), { cx: 103, cy: 113, size: 34 }, "the Profile badge's");
-    const small = levelPipOn(0, 0, 102);
-    const big = levelPipOn(0, 0, 204);
+    assert.deepEqual(levelPipOn(10, 20, 136), { cx: 137, cy: 147, size: 34 }, "the Profile badge's");
+    const small = levelPipOn(0, 0, 136);
+    const big = levelPipOn(0, 0, 272);
     assert.deepEqual([big.cx, big.cy, big.size], [2 * small.cx, 2 * small.cy, 2 * small.size]);
 });
 

@@ -84,7 +84,8 @@ const AVATAR_ART = Object.freeze({ image: 260, goldFrame: 5, plainFrame: 2 });
 const AVATAR_SIDE = AVATAR_ART.image + 2 * AVATAR_ART.plainFrame;
 const GOLD_FRAME_SIDE = AVATAR_ART.image + 2 * AVATAR_ART.goldFrame;
 // A carousel pip's canvas: as high as the pip, wide enough for four digits.
-const PIP_ART = levelPipOn(0, 0, AVATAR_SIDE);
+// Smaller than elsewhere, as several Avatars share the row.
+const PIP_ART = levelPipOn(0, 0, AVATAR_SIDE, 1 / 5);
 const PIP_CANVAS = Object.freeze({ width: 2 * PIP_ART.size, height: PIP_ART.size });
 // The Avatars' row sits at this fraction of the height; the texts are
 // placed from it.
