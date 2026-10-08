@@ -2,17 +2,31 @@
 // Daily Streak: the active Profile's days in a row on the cabinet, read
 // from its Play Log (every year file) whenever it is asked, so nothing is
 // persisted and a Profile Reset, which sets the Play Log aside, brings it
-// back to 0. A day counts when a Play started on it; the day key changes
-// at midnight, as the Table of the Day's. Created from the PinballY host
-// (for the time) and the Profile store; the Add-ons share one instance
-// through getDailyStreak(). No event, no side effect.
+// back to 0, its longest too. A day counts when a Play started on it; the
+// day key changes at midnight, as the Table of the Day's. Created from the
+// PinballY host (for the time) and the Profile store; the Add-ons share one
+// instance through getDailyStreak(). No event, no side effect.
 // ============================================================
 
 import { createPinballYHost } from "./pinbally_host.js";
 import { getProfileStore } from "./profile_store.js";
-import { formatDateKey } from "./period_table.js";
+import { formatDateKey, shiftDateKey } from "./period_table.js";
 
 const dayBefore = date => new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1);
+
+// The longest run of consecutive days, across month and year ends: the
+// day keys sort as dates.
+function longestRun(days) {
+    let longest = 0;
+    let length = 0;
+    let previous = null;
+    for (const day of [...days].sort()) {
+        length = previous !== null && shiftDateKey(day, -1) === previous ? length + 1 : 1;
+        longest = Math.max(longest, length);
+        previous = day;
+    }
+    return longest;
+}
 
 export function createDailyStreak(host, store) {
     // The day keys of the active Profile's Plays: a Play Log start is local
@@ -26,7 +40,7 @@ export function createDailyStreak(host, store) {
         return days;
     }
 
-    // { current, isTodayCounted }: current counts back from today when it
+    // { current, longest, isTodayCounted }: current counts back from today when it
     // counts, else from yesterday, so the Daily Streak stays alive all day.
     function read() {
         const days = playedDays();
@@ -34,7 +48,7 @@ export function createDailyStreak(host, store) {
         const isTodayCounted = days.has(formatDateKey(today));
         let current = 0;
         for (let day = isTodayCounted ? today : dayBefore(today); days.has(formatDateKey(day)); day = dayBefore(day)) current++;
-        return { current, isTodayCounted };
+        return { current, longest: longestRun(days), isTodayCounted };
     }
 
     return { read };

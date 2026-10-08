@@ -29,7 +29,7 @@ export function formatDateKey(date) {
     return `${year}-${month}-${day}`;
 }
 
-function shiftDateKey(dateKey, days) {
+export function shiftDateKey(dateKey, days) {
     const [year, month, day] = dateKey.split("-").map(Number);
     return formatDateKey(new Date(year, month - 1, day + days));
 }

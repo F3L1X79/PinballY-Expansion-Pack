@@ -456,6 +456,8 @@ export default {
             averageDuration: "Average game",
             collection: "Collection",
             challengesCompleted: "Challenges completed",
+            // TODO: translation pass
+            cabinetStreak: "Days in a row on the cabinet",
             dayStreak: "Daily streak",
             weekStreak: "Weekly streak",
             favouriteManufacturer: "Favorite manufacturer",

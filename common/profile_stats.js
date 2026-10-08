@@ -11,9 +11,9 @@
 // Created from the PinballY host, the Profile store, a reader of the
 // active Profile's Player Level, the Achievement List (its counts, and
 // opening it from the Achievements button, Exit there showing this screen
-// again on that button), the Table of the Day and Table of the Week (their
-// Streaks), the Challenge module (null when the Challenges Add-on is
-// disabled: no completed Challenges) and the full ids of the Hall of
+// again on that button), the Daily Streak, the Table of the Day and Table
+// of the Week (their Streaks), the Challenge module (null when the
+// Challenges Add-on is disabled: no completed Challenges) and the full ids of the Hall of
 // Fame and Tables to Discover filters (null when their Add-on is
 // disabled: no button). While open it swallows every button through
 // "commandbuttondown": Next / Prev move a gold halo through the cross and
@@ -45,7 +45,7 @@ const FRAME_MS = 16;
 const MISSING_IMAGE_FILE = "assets\\missing_image.png";
 
 export function createProfileStats(host, {
-    profileStore, readPlayerLevel, achievementList, tableOfTheDay, tableOfTheWeek, challenges = null,
+    profileStore, readPlayerLevel, achievementList, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
     hallOfFameFilter = null, tablesToDiscoverFilter = null,
 }) {
     const { profileStats: TEXT } = lang;
@@ -95,11 +95,9 @@ export function createProfileStats(host, {
         };
     }
 
-    // A Period Table's current Streak, its longest in a pill; a gold "record
-    // in progress" instead while the current one, at least 1, sets it.
-    function streakStat(label, periodTable) {
-        const current = periodTable.getStreak();
-        const longest = periodTable.getLongestStreak();
+    // A Daily Streak or Period Table Streak, its longest in a pill; a gold
+    // "record in progress" instead while the current one, at least 1, sets it.
+    function streakStat(label, { current, longest }) {
         const isRecord = current > 0 && current >= longest;
         return {
             label,
@@ -107,6 +105,8 @@ export function createProfileStats(host, {
             pill: isRecord ? { text: TEXT.recordInProgress, isLit: true } : { text: TEXT.record(TEXT.number(longest)), isLit: false },
         };
     }
+
+    const periodTableStreakOf = periodTable => ({ current: periodTable.getStreak(), longest: periodTable.getLongestStreak() });
 
     // Absent without the Challenges Add-on: Collection then takes the row.
     function challengesStats() {
@@ -232,7 +232,11 @@ export function createProfileStats(host, {
                 title: TEXT.sections.progression,
                 rows: [
                     [collectionStat(profileTables), ...challengesStats()],
-                    [streakStat(TEXT.stats.dayStreak, tableOfTheDay), streakStat(TEXT.stats.weekStreak, tableOfTheWeek)],
+                    [
+                        streakStat(TEXT.stats.cabinetStreak, dailyStreak.read()),
+                        streakStat(TEXT.stats.dayStreak, periodTableStreakOf(tableOfTheDay)),
+                        streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek)),
+                    ],
                 ],
             }, tastesSection(profile, profileTables, hallOfFame)],
             closeLabel: TEXT.closeTooltip,

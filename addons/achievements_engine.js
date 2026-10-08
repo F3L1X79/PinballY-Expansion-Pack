@@ -43,6 +43,7 @@ import { getShownPlayerLevel } from "../common/shown_player_level.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
 import { createAchievementList } from "../common/achievement_list.js";
 import { createProfileStats } from "../common/profile_stats.js";
+import { getDailyStreak } from "../common/daily_streak.js";
 import { HALL_OF_FAME_FULL_FILTER_ID } from "../common/hall_of_fame.js";
 import { TABLES_TO_DISCOVER_FULL_FILTER_ID } from "../common/tables_to_discover.js";
 import { getDrawingAhead } from "../common/drawing_ahead.js";
@@ -108,6 +109,7 @@ export default function init() {
         // From the active Profile's Notified Achievements, read on each opening.
         readPlayerLevel: () => getPlayerLevel(
             profileStore.getProfileData().notified, getAllAchievements(), nonChildAchievementsFor(profileStore)),
+        dailyStreak: getDailyStreak(),
         tableOfTheDay: getTableOfTheDay(),
         tableOfTheWeek: getTableOfTheWeek(),
         challenges: getEnabledChallenges(),
