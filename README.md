@@ -2,7 +2,7 @@
 
 An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), written with the JavaScript scripting API that PinballY opens to every developer. · *[Version française](README.fr.md)*
 
-> **Give everyone in the house a real reason to come back to your pincab.** A Profile with an Avatar for each of you, a Table of the Day, weekly Challenges, Achievements from Bronze to Platinum (a few of them secret), your own stats, and PinballY itself in French, German, Spanish, Italian or Portuguese: everything PinballY was missing, without touching PinballY. And this is only the beginning…
+> **Give everyone in the house a real reason to come back to your pincab.** A Profile with an Avatar for each of you, a Welcome Screen with the Table of the Day, weekly Challenges, a Mastery Level on every table, Achievements from Bronze to Platinum (a few of them secret) that raise your Player Level, your own stats, and PinballY itself in French, German, Spanish, Italian or Portuguese: everything PinballY was missing, without touching PinballY. And this is only the beginning…
 
 <img src="docs/images/hero.png" alt="The wheel screen with the clock, the active Profile's badge and the week's Challenge Card" width="360">
 
@@ -10,13 +10,17 @@ An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), 
 
 <img src="docs/images/profiles.png" alt="The Change Player carousel and its Avatars" width="480">
 
-With Change Player, each of you picks your own Profile and Avatar, and a greeting shows whose games will count. **Your Stats** sums up your pinball life: games played, total time, favourite manufacturer and decade, most played and never played tables, how much of the collection you have tried, and your Streaks. Only games of at least a minute count, so a launch by mistake never spoils them. Guest is always there for visitors.
+With Change Player, each of you picks your own Profile and Avatar, and the Welcome Screen greets you by name so you know whose games will count. Only games of at least a minute count, so a launch by mistake never spoils anything. Your Daily Streak counts the days in a row you have played, on any table. Guest is always there for visitors.
 
-### Table of the Day, Table of the Week
+### Profile Stats
+
+**Your Stats**, in the main menu, sums up your pinball life: games played and total time, your Player Level and Collection Mastery, average game length, favourite manufacturer, decade and table, the first table you ever played, how much of the collection you have tried, your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, the Challenges you completed, and the way to your most played tables and to the ones still to discover.
+
+### Welcome Screen: Table of the Day, Table of the Week
 
 <img src="docs/images/period_tables.png" alt="The startup dialog with the Table of the Day and the Table of the Week" width="480">
 
-Every day there is a table you have never played or long forgotten, and every week a random one. Both are offered right at startup. Play them several days or weeks in a row to build a Streak.
+Every day there is a table you have never played or long forgotten, and every week a random one. The Welcome Screen greets you with both at startup, and again after Change Player, with what they mean for you: launch one of them, stay on the table on the wheel, change player or spin a Random Game. Play them several days or weeks in a row to build a Streak.
 
 ### Weekly Challenges
 
@@ -24,11 +28,17 @@ Every day there is a table you have never played or long forgotten, and every we
 
 A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward. Completing it brings a shower of confetti across the wheel screen.
 
+### Table Mastery
+
+Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti.
+
 ### Achievements
 
 <img src="docs/images/achievements.png" alt="The Achievement List" width="380">
 
 There are dozens of Achievements, from Bronze to Platinum: manufacturers and decades completed, hours played, Streaks, Challenges, a full tour of the wheel... Each one is announced by a small toast in a corner, without interrupting your games; a Platinum also brings a shower of confetti across the wheel screen. The Achievement List shows how far you are from each missing one, and which of the household's Avatars already have it. A few stay secret, shown as "???" with a hint, until you stumble upon them.
+
+Each Achievement earns points toward your **Player Level**, the more the higher its Rank, with no last level. It shows as a small pip on your Avatar, in bronze, then silver, gold and platinum as you climb, and reaching a new level brings its own toast and fireworks.
 
 ### PinballY in 6 languages
 
@@ -48,7 +58,7 @@ Everything stays in one folder, with no change to PinballY itself.
 **And also**:
 - a Random Game spun on a wheel of fortune;
 - "Tables to Discover", "Most Played Tables", "Favorite Tables" and "Original Tables" in the menus;
-- a clock, a gold arc under the wheel and a richer status line;
+- a clock, a gold arc under the wheel (the Wheel Arc) and a richer status line;
 - a reminder to rate a table;
 - launches without a black flash;
 - the backglass hidden during a game;
@@ -91,7 +101,7 @@ ADD_ON_CLOCK=false
 | `FIREWORKS_SOUND_FILE` | `assets\sounds\fireworks.wav` | Sound played once when the Fireworks start. |
 | `ACHIEVEMENT_TOAST_SECONDS` | `4` | Seconds an Achievement toast stays on screen (up to 60). |
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Size of the toast, from `0.5` to `3`. Raise it on a large screen. |
-| `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge or a Platinum Achievement, if your PC struggles with it. |
+| `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge, a Platinum Achievement, Mastery Level 10 on a table or a new Collection Tier, if your PC struggles with it. |
 | `FIREWORKS` | `true` | `false` turns off the Fireworks that come with the toast of a new Player Level, if your PC struggles with them. Independent of `CONFETTI`. |
 | `SKIP_RANDOM_GAME_ANIMATION` | `false` | `true` skips the wheel of fortune and launches the Random Game at once. |
 | `ASK_TO_RATE_AFTER_MINUTES_PLAYED` | `60` | Minutes played on a table before you are asked to rate it. |

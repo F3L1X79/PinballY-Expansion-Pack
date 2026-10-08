@@ -50,9 +50,10 @@ const DEFAULTS = {
     achievementToastSeconds: 4,
     // Size of an Achievement Toast: 1 = the original card, 2 = twice as large (from 0.5 to 3).
     achievementToastScale: 1.0,
-    // false = no Confetti Shower with the toast of a completed Challenge or a
-    // Platinum Achievement (nothing is drawn ahead for it, no sound plays),
-    // for a PC that struggles with it.
+    // false = no Confetti Shower with the toast of a completed Challenge, a
+    // Platinum Achievement, Mastery Level 10 or a new Collection Tier
+    // (nothing is drawn ahead for it, no sound plays), for a PC that
+    // struggles with it.
     confetti: true,
     // false = no Fireworks with a Level Toast (nothing is drawn ahead for
     // them, no sound plays), for a PC that struggles with them.

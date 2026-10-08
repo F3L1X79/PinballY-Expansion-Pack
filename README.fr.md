@@ -4,9 +4,10 @@ Extension non officielle de [PinballY](http://mjrnet.org/pinscape/PinballY.php),
 
 > **Votre pincab, en français, avec de vraies raisons d'y revenir.** Ce qui manquait à PinballY, sans toucher à PinballY :
 > - un Profil avec avatar pour chacun, et vos statistiques ;
-> - la table du jour ;
+> - un écran d'accueil avec la table du jour ;
 > - des défis hebdomadaires ;
-> - des succès du Bronze au Platine, dont quelques secrets.
+> - un niveau de maîtrise sur chaque table ;
+> - des succès du Bronze au Platine, dont quelques secrets, qui font monter votre niveau.
 >
 > Et ce n'est que le début…
 
@@ -22,26 +23,33 @@ Les menus et messages de PinballY enfin en français, mais aussi en allemand, es
 
 <img src="docs/images/profiles.png" alt="Le carrousel « Changer de joueur » et ses Avatars" width="480">
 
-Avec « Changer de joueur », chacun prend son Profil et son Avatar, et un message d'accueil indique pour qui les parties vont compter. **Vos statistiques** résument votre vie de flippeur :
-- parties jouées et temps total ;
-- fabricant et décennie préférés ;
-- tables les plus jouées, et celles jamais jouées ;
+Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran d'accueil vous salue par votre nom : vous savez pour qui les parties vont compter. Seules les parties d'au moins une minute comptent : un lancement par erreur ne fausse rien. Vos jours d'affilée sur la borne comptent les jours de suite où vous avez joué, sur n'importe quelle table. Le Profil Invité reste toujours là pour les visiteurs.
+
+### Vos statistiques
+
+**Vos statistiques**, dans le menu principal, résument votre vie de flippeur :
+- parties jouées, temps total et durée moyenne d'une partie ;
+- votre niveau et la maîtrise de votre collection ;
+- fabricant, décennie et table préférés, et la toute première table jouée ;
 - la part de la collection que vous avez essayée ;
-- vos séries.
+- vos succès, vos jours d'affilée sur la borne, vos séries sur la table du jour et la table de la semaine, et les défis réussis ;
+- et le chemin vers vos tables les plus jouées et celles qui restent à découvrir.
 
-Seules les parties d'au moins une minute comptent : un lancement par erreur ne fausse rien. Le Profil Invité reste toujours là pour les visiteurs.
-
-### Table du jour, table de la semaine
+### Écran d'accueil : table du jour, table de la semaine
 
 <img src="docs/images/period_tables.png" alt="Le dialogue de démarrage avec la table du jour et la table de la semaine" width="480">
 
-Chaque jour une table jamais jouée ou oubliée, chaque semaine une table au hasard, proposées dès le démarrage. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série.
+Chaque jour une table jamais jouée ou oubliée, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, et après chaque « Changer de joueur », avec ce qu'elles représentent pour vous : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série.
 
 ### Défis de la semaine
 
 <img src="docs/images/challenges.png" alt="La carte du Défi de la semaine sous le badge du Profil" width="376">
 
 Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une heure sur une même table… Sa carte suit votre progression sur l'écran de la roue. **Tables du défi**, juste sous « Toutes les tables » dans le menu principal, ne garde que les tables qui le font avancer. Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
+
+### Maîtrise des tables
+
+Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis.
 
 ### Succès
 
@@ -56,6 +64,8 @@ Des dizaines de Succès, du Bronze au Platine :
 
 Chacun est annoncé par un petit encart dans un coin, sans interrompre vos parties ; un Succès Platine fait aussi pleuvoir des confettis sur tout l'écran de la roue. « Succès personnels » montre où vous en êtes de chaque Succès manquant, et quels avatars de la maison l'ont déjà. Quelques-uns restent secrets : vous ne voyez que « ??? » et un indice, jusqu'à ce que vous tombiez dessus.
 
+Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son rang est élevé, sans dernier niveau. Il s'affiche en pastille sur votre Avatar, en bronze, puis en argent, en or et en platine à mesure que vous montez, et chaque nouveau niveau atteint a son encart et son feu d'artifice.
+
 ### Pour le propriétaire de la borne
 
 - **Profil admin** : les entrées de configuration pour vous seul.
@@ -68,7 +78,7 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 **Et aussi** :
 - une table au hasard sur une roue de la fortune ;
 - « Tables à découvrir », « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
-- une horloge, un arc doré sous la roue et une ligne d'état enrichie ;
+- une horloge, l'arc doré de la roue et une ligne d'état enrichie ;
 - un rappel pour noter une table ;
 - un lancement sans flash noir ;
 - le backglass masqué pendant une partie ;
@@ -111,7 +121,7 @@ ADD_ON_CLOCK=false
 | `FIREWORKS_SOUND_FILE` | `assets\sounds\fireworks.wav` | Son joué une fois au début du feu d'artifice. |
 | `ACHIEVEMENT_TOAST_SECONDS` | `4` | Secondes d'affichage d'une annonce de Succès (60 au plus). |
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Taille de l'annonce, de `0.5` à `3` : à augmenter sur un grand écran. |
-| `CONFETTI` | `true` | `false` coupe la pluie de confettis qui accompagne l'annonce d'un Défi réussi ou d'un Succès Platine, si votre PC peine. |
+| `CONFETTI` | `true` | `false` coupe la pluie de confettis qui accompagne l'annonce d'un Défi réussi, d'un Succès Platine, du niveau 10 de maîtrise sur une table ou d'un nouveau palier de la collection, si votre PC peine. |
 | `FIREWORKS` | `true` | `false` coupe le feu d'artifice qui accompagne l'annonce d'un nouveau niveau, si votre PC peine. Indépendant de `CONFETTI`. |
 | `SKIP_RANDOM_GAME_ANIMATION` | `false` | `true` saute la roue de la fortune et lance la table au hasard aussitôt. |
 | `ASK_TO_RATE_AFTER_MINUTES_PLAYED` | `60` | Minutes jouées sur une table avant qu'on vous demande de la noter. |
