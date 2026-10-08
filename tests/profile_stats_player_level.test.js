@@ -39,7 +39,7 @@ test("the card shows the Player Level and the points toward the next one", async
         fake.addFile(`${PROFILES}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified }));
     }
     fake.installGlobals();
-    for (const key of Object.keys(config.addOns)) config.addOns[key] = ["achievements", "challenges"].includes(key);
+    for (const key of Object.keys(config.addOns)) config.addOns[key] = ["achievements", "challenges", "sessionStatsTracker"].includes(key);
     config.language = "fr";
 
     const { default: lang } = await import("../common/i18n.js");

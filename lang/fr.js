@@ -314,6 +314,13 @@ export default {
             60: "Marathonien errant",
         },
         marathonDescription: (minutes) => `Jouer une session de plus de ${minutes} minutes d'affilée.`,
+        cabinetStreakTitles: {
+            3: "On y revient",
+            7: "Une semaine à la borne",
+            15: "Pilier de la borne",
+            30: "Fait partie des meubles",
+        },
+        cabinetStreakDescription: (days) => `Jouer sur la borne ${days} jours d'affilée, n'importe quelle table.`,
         rageQuitTitle: () => "Rage quit ?!",
         rageQuitDescription: (minSeconds, maxSeconds) => `Quitter une table au bout de ${minSeconds} à ${maxSeconds} secondes...`,
         grandReturnTitle: () => "Le grand retour",

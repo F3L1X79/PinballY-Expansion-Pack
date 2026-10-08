@@ -62,6 +62,10 @@ const ACHIEVEMENT_LIST_ENTRY = "achievementList";
 // family nor the Profile Stats line exists.
 const getEnabledChallenges = () => (config.addOns.challenges === false ? null : getChallenges());
 
+// Empty when the session stats tracker Add-on is disabled: the Sessions
+// family follows the Add-on that records what most of it reads.
+const getEnabledSessionMilestones = () => (config.addOns.sessionStatsTracker === false ? [] : buildSessionMilestoneAchievements());
+
 // Exported for the tests, which read each Achievement's rank. asNonChild:
 // the set as a Profile that is not a child would see it with the same
 // collection, only ever counted (never evaluated, toasted nor Notified).
@@ -76,7 +80,7 @@ export function getAllAchievements({ asNonChild = false } = {}) {
         ...buildPeriodTableAchievements(),
         ...buildDecadeCompletionAchievements({ asNonChild }),
         ...buildCategoryCompletionAchievements({ asNonChild }),
-        ...buildSessionMilestoneAchievements(),
+        ...getEnabledSessionMilestones(),
         ...buildRandomGameFanAchievements(),
         ...(challenges ? buildChallengeAchievements(challenges) : []),
         ...buildSurprisesAchievements({ asNonChild }),

@@ -198,6 +198,13 @@ export default {
             60: "Marathoner",
         },
         marathonDescription: (minutes) => `Play a single session lasting over ${minutes} minutes.`,
+        cabinetStreakTitles: {
+            3: "Back for More",
+            7: "A Week at the Cabinet",
+            15: "Cabinet Regular",
+            30: "Part of the Furniture",
+        },
+        cabinetStreakDescription: (days) => `Play on the cabinet ${days} days in a row, any table.`,
         rageQuitTitle: () => "Rage Quit?!",
         rageQuitDescription: (minSeconds, maxSeconds) => `Quit a table after only ${minSeconds} to ${maxSeconds} seconds...`,
         grandReturnTitle: () => "The Grand Comeback",

@@ -59,6 +59,8 @@ test("every Achievement has an Achievement Rank deduced from its ladder or group
     assert.deepEqual(ranksOf(["playTimeMilestone:1h", "playTimeMilestone:5h", "playTimeMilestone:10h",
         "playTimeMilestone:50h", "playTimeMilestone:100h"]), [BRONZE, SILVER, GOLD, GOLD, PLATINUM]);
     assert.deepEqual(ranksOf(["marathon:30", "marathon:60"]), [BRONZE, PLATINUM]);
+    assert.deepEqual(ranksOf(["cabinetStreak:3", "cabinetStreak:7", "cabinetStreak:15", "cabinetStreak:30"]),
+        [BRONZE, SILVER, GOLD, PLATINUM]);
     assert.deepEqual(ranksOf(["dayManufacturers:3", "dayManufacturers:5", "dayManufacturers:8", "dayManufacturers:10"]),
         [BRONZE, SILVER, GOLD, PLATINUM]);
     assert.deepEqual(ranksOf(["collectionMilestone:firstTable", "collectionMilestone:10percent",

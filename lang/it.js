@@ -314,6 +314,15 @@ export default {
             60: "Maratoneta",
         },
         marathonDescription: (minutes) => `Giocare una singola sessione di oltre ${minutes} minuti.`,
+        // TODO: translation pass
+        cabinetStreakTitles: {
+            3: "Back for More",
+            7: "A Week at the Cabinet",
+            15: "Cabinet Regular",
+            30: "Part of the Furniture",
+        },
+        // TODO: translation pass
+        cabinetStreakDescription: (days) => `Play on the cabinet ${days} days in a row, any table.`,
         rageQuitTitle: () => "Abbandono per rabbia?!",
         rageQuitDescription: (minSeconds, maxSeconds) => `Lasciare un tavolo dopo appena ${minSeconds}-${maxSeconds} secondi...`,
         grandReturnTitle: () => "Il grande ritorno",

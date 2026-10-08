@@ -22,7 +22,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { createProfileStore } from "../common/profile_store.js";
-import { createPeriodTable, TABLE_OF_THE_DAY, TABLE_OF_THE_WEEK } from "../common/period_table.js";
+import { createPeriodTable, formatDateKey, TABLE_OF_THE_DAY, TABLE_OF_THE_WEEK } from "../common/period_table.js";
 import { createRandomGame } from "../common/random_game.js";
 import { createChallenges, CHALLENGE_TEMPLATE_IDS } from "../common/challenge.js";
 import { buildChallengeAchievements } from "../achievements/challenges.js";
@@ -66,6 +66,10 @@ const TABLES = [
 ];
 
 const EXPECTED_ACHIEVEMENT_IDS = [
+    "cabinetStreak:15",
+    "cabinetStreak:3",
+    "cabinetStreak:30",
+    "cabinetStreak:7",
     "categoryCompletion:Classic",
     "categoryCompletion:Fantasy",
     "categoryCompletion:SciFi",
@@ -133,6 +137,15 @@ const SEEDED_SESSIONS = {
     dayManufacturers: { day: "2026-09-23", list: SEEDED_DAY_MANUFACTURERS }, mostManufacturersInADay: 9,
 };
 
+// A Play every day of the 30 days up to yesterday: every Daily Streak
+// Achievement is already reached.
+const SEEDED_PLAY_LOG = {
+    version: 1,
+    plays: Array.from({ length: 30 }, (_, index) => ({
+        start: `${formatDateKey(new Date(2026, 7, 24 + index))}T21:00:00`, configId: "Seeded Table (Williams 1990)", seconds: 600,
+    })),
+};
+
 // One Period short of the longest Streak and Periods Played Achievements.
 const SEEDED_STREAKS = {
     tableOfTheDay: { current: 29, longest: 29, lastPeriod: "2026-09-22", periodsPlayed: 99 },
@@ -182,6 +195,7 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
         randomGames: 99,
         sessions: SEEDED_SESSIONS, notified: [],
     }));
+    fake.addFile(`${PROFILES_FOLDER}\\guest\\play-log-2026.json`, JSON.stringify(SEEDED_PLAY_LOG));
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
 

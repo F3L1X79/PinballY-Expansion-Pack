@@ -26,17 +26,17 @@ function shownLevel(fake) {
 
 test("Adult Tables added between two checks never bring a Level Toast by themselves", async () => {
     pickLastTables();
-    // Four Seasons, Mirror Hour, Grand Return and Rage Quit: 110 points of
-    // its own, scaled to 116 (1890 / 1790) without Adult Tables, level 2.
+    // Four Seasons, Mirror Hour and four Bronze ones: 115 points of its
+    // own, scaled to 120 (2075 / 1975) without Adult Tables, level 2.
     const fake = await startScenario({
-        addOns: ["achievements", "profilePicker"],
+        addOns: ["achievements", "profilePicker", "sessionStatsTracker"],
         active: "Kid",
-        profiles: { Kid: { isChild: true, notified: ["fourSeasons", "mirrorHour", "grandReturn", "rageQuit"] } },
+        profiles: { Kid: { isChild: true, notified: ["fourSeasons", "mirrorHour", "rageQuit", "marathon:30", "tableOfTheDayFirstPlay", "tableOfTheWeekFirstPlay"] } },
     });
     fake.advanceTime(ALL_TOASTS_MS);
     assert.equal(shownLevel(fake), "2");
 
-    // Scaled to 125 (2045 / 1790): level 3.
+    // Scaled to 129 (2230 / 1975): level 3.
     fake.setTables([...TABLES, ...ADULT_TABLES]);
     await play(fake, FIRST, MISTAKEN_LAUNCH_SECONDS);
     fake.advanceTime(ALL_TOASTS_MS);
