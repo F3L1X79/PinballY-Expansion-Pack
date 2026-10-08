@@ -14,4 +14,4 @@ Achievements used to be announced by a dialog from `common/wheel_dialog.js`, whi
 - While a game runs or launches, PinballY stops redrawing its window and the game covers it: toasts wait in a queue and start once back on the wheel. An Achievement becomes Notified when its toast starts.
 - Fonts are limited to those installed in Windows: PinballY cannot load a font file shipped with the project.
 
-Research (local notes, not tracked by git): `.claude/reference/research-discreet-achievement-popup.md`.
+Research: `docs/research/discreet-achievement-popup.md`.

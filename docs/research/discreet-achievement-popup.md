@@ -8,7 +8,7 @@ Question: can a PinballY Javascript add-on show a small toast in the **bottom-ri
 
 - Local help (authoritative): `c:\vPinball\PinballY\Help\*.html`. Page and section are named inline as *Help › Page › Section*.
 - PinballY source, `mjrgh/PinballY` at commit `d84763e` (2026-02-23). Links have the form `https://github.com/mjrgh/PinballY/blob/d84763e32f089317db405798d83ea26f77a18606/<path>#L<n>`. Below they are abbreviated **src:** `<path>:<lines>`.
-- Official examples: the digest `.claude/reference/pinbally-examples.md`, plus *Help › CustomMediaWindowExample* for the fade idiom.
+- Official examples: the digest `docs/pinbally/pinbally-examples.md`, plus *Help › CustomMediaWindowExample* for the fade idiom.
 - **[unverified]** marks anything that neither the help nor the source settles. Those points need testing in PinballY.
 
 ---

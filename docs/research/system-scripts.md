@@ -369,7 +369,7 @@ Facts only, as input for the "nested-install" roadmap item (`docs/roadmap.html`,
 - `.claude/rules/conventions.md:3`: the conventions do not apply to `System/`, "never modify it".
 - `CONTRIBUTING.md:45`: "Never edit the `System` folder: it belongs to PinballY."
 - `README.md:46` / `README.fr.md:46`: "Copy the project into `PinballY\Scripts`, keeping your own `System` folder", i.e. the repo root is the player's `Scripts\` folder, with `System\` inside it.
-- `.claude/reference/pinbally-help.md:3`, `:12`, `:16`: paths `Scripts/System/SystemClasses.js` and `Scripts\System\`; "Don't edit `Scripts\System\*.js`".
+- `docs/pinbally/pinbally-help.md:3`, `:12`, `:16`: paths `Scripts/System/SystemClasses.js` and `Scripts\System\`; "Don't edit `Scripts\System\*.js`".
 - `docs/roadmap.html:324` (this item: `System\` stays in `Scripts\System\` and is not part of the project), `:344` (nested-install question: where the git root goes "with `System\` outside the repository", and the impact on `tests/file_layout.test.js` and the "root holds only `main.js`" rule), `:560` (the distribution item preserves the `System` folder).
 
 **Adjacent fact, about our own folder rather than `System\`**: our code assumes it sits directly in `<program folder>\Scripts\`. Paths built as `<programDir>\Scripts\…`: `common/achievement_list.js:85`, `common/config.js:71`, `common/profile_store.js:67`. `Scripts\assets\…` paths relative to the program folder, joined to it at `common/achievement_toast.js:143`: `common/achievement_toast.js:76`, `:82`.

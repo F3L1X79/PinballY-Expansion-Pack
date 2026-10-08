@@ -1,6 +1,6 @@
 ## PinballY reference
 
-Before using a PinballY API, read `.claude/reference/pinbally-help.md` (digest of the full PinballY help in `docs/pinbally/Help/`) and `.claude/reference/pinbally-examples.md` (idioms from the official PinballY-Addons-and-Examples repo). Go back to `docs/pinbally/Help/*.html` for details.
+Before using a PinballY API, read `docs/pinbally/pinbally-help.md` (digest of the full PinballY help in `docs/pinbally/Help/`) and `docs/pinbally/pinbally-examples.md` (idioms from the official PinballY-Addons-and-Examples repo). Go back to `docs/pinbally/Help/*.html` for details.
 
 ## Agent skills
 

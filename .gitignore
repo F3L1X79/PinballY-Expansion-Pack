@@ -1,12 +1,9 @@
 #security
 .devcontainer
-.claude/settings.local.json
 
 #AI-related
+.claude/
 .agents/
-.claude/rules/
-.claude/skills/
-.claude/memory/
 .scratch/
 skills-lock.json
 
@@ -22,16 +19,6 @@ skills-lock.json
 .vscode
 .zprofile
 .zshrc
-.claude/agents
-.claude/commands
-.claude/hooks
-.claude/launch.json
-.claude/loop.md
-.claude/output-styles
-.claude/routines
-.claude/scheduled_tasks.json
-.claude/settings.json
-.claude/workflows
 
 # Player settings (see .env.example)
 .env.local
