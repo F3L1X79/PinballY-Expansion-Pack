@@ -259,6 +259,28 @@
 
     <ol class="queue">
 
+      <li draggable="true" tabindex="0" class="item tr-share" id="default-assets" data-track="share" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Réglages par défaut : les sons et la couleur de la roue de la borne</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+          </div>
+          <p>Un nouveau joueur doit avoir dès l'installation ce que Félix a réglé sur sa borne : un son pour le lancement d'une table, chaque Achievement Toast, le Profile Greeting, la Confetti Shower et les Fireworks, et la couleur de la roue qu'il a retouchée. Aujourd'hui, tous les sons sont vides par défaut.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/implement</code> direct (petit chantier, sans spec). Avant le <a href="#readme-refresh">README à jour (n° <span data-ref="readme-refresh"></span>)</a>, pour que les captures montrent les réglages par défaut</div>
+          <details>
+            <summary>Questions à trancher</summary>
+            <ul>
+              <li>Sons : livrés dans le pack (<code>assets/sounds/</code>) avec des chemins relatifs au pack, à la place des chemins absolus ? Un chemin de <code>.env.local</code> doit toujours les remplacer, et une valeur vide doit encore couper un son.</li>
+              <li>Licences : les sons de la borne (voix de Super Mario 64, son de succès Steam…) ne peuvent sans doute pas être publiés sur GitHub. Faut-il chercher des sons libres (CC0) qui leur ressemblent ?</li>
+              <li>Couleur de la roue : quel réglage a été changé (Settings de PinballY, ou un calque du pack) ? Le pack peut-il l'appliquer, ou seulement la recommander dans le README ?</li>
+            </ul>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-share" id="readme-refresh" data-track="share" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -772,6 +794,7 @@
 
           <div class="ax row">Fort</div>
           <div class="cell sweet">
+            <a class="chip tr-share" href="#default-assets"><b></b>Réglages par défaut</a>
             <a class="chip tr-share" href="#readme-refresh"><b></b>README à jour</a>
           </div>
           <div class="cell">
