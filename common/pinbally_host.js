@@ -1,7 +1,9 @@
 ﻿// ============================================================
 // Production PinballY host: the single seam through which the deepened
 // modules reach PinballY (settings, clock, timers, visible tables, wheel
-// selection and its current table, wheel logos, filter and metafilters, game list and settings events, main window menus / UI mode / events / drawing layers,
+// selection and its current table, wheel logos, global media and the
+// underlay, filter and metafilters, game list and settings events, main
+// window menus / UI mode / events / drawing layers,
 // StyledText, commands and running them, table launch, program and pack folders,
 // monitor count, backglass window, sound playback (one-off or on players
 // in turn), logfile.log, and the few file operations the Profile store
@@ -177,6 +179,12 @@ export function createPinballYHost() {
         onGameListEvent: (eventName, handler) => { gameList.on(eventName, handler); },
         createDrawingLayer: (zIndex) => mainWindow.createDrawingLayer(zIndex),
         removeDrawingLayer: (layer) => { mainWindow.removeDrawingLayer(layer); },
+        // Fires no "underlaychange".
+        setUnderlay: (filePath) => { mainWindow.setUnderlay(filePath); },
+        // The image PinballY would pick for a global media file, such as
+        // ("Images", "underlay"): the media folder first, then PinballY's
+        // Assets folder; undefined when neither has one.
+        resolveGlobalImage: (subfolder, baseName) => gameList.resolveMedia(subfolder, baseName, "image"),
         createStyledText: (options) => new StyledText(options),
 
         allocateCommand: (name) => command.allocate(name),

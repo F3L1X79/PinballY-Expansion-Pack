@@ -9,7 +9,7 @@
 // to the wheel selection and a filter's games, enter and leave attract
 // mode, open the Exit menu
 // or main menu with their native items, pick menu items, play launched games, and inspect shown menus, launches, written settings keys,
-// drawing layers, what was drawn, running intervals, sounds played (and on which player), the
+// drawing layers, what was drawn, the underlay set by a script, running intervals, sounds played (and on which player), the
 // backglass window shown or hidden, and the lower status line (which can
 // start with the player's own messages, and get a temporary one as
 // PinballY's show() puts it); script filters are shown with selectFilter().
@@ -120,6 +120,8 @@ export function createFakePinballYHost({
     const layers = [];
     // Every layer draw, in order: { zIndex, texts, images }.
     const drawingList = [];
+    // The underlay a script set, null until one does.
+    let underlayFile = null;
     // Every sound played, in order: { filePath, playerId }.
     const sounds = [];
     // Each Windows Media Player gets the next id when created.
@@ -235,6 +237,20 @@ export function createFakePinballYHost({
         Object.defineProperties(ev, Object.getOwnPropertyDescriptors(properties));
         for (const handler of [...(handlers.get(type) || [])]) handler(ev);
         return ev;
+    }
+
+    function setUnderlay(filePath) { underlayFile = filePath; }
+
+    // As PinballY searches a global image: the media folder, then the Assets folder.
+    function resolveGlobalImage(subfolder, baseName) {
+        const program = withoutTrailingSlash(programFolder);
+        for (const folder of [`${program}\\Media\\${subfolder}`, `${program}\\Assets\\${subfolder}`]) {
+            for (const extension of ["png", "jpg", "jpeg"]) {
+                const path = `${folder}\\${baseName}.${extension}`;
+                if (files.has(path)) return path;
+            }
+        }
+        return undefined;
     }
 
     function returnToWheel() {
@@ -655,6 +671,8 @@ export function createFakePinballYHost({
         onSettingsEvent: on,
         createDrawingLayer,
         removeDrawingLayer,
+        setUnderlay,
+        resolveGlobalImage,
         createStyledText: (options) => new FakeStyledText(options, (text) => { logLines.push(text); }),
         allocateCommand,
         getBuiltInCommand,
@@ -681,6 +699,7 @@ export function createFakePinballYHost({
         runningIntervalCount: () => timers.filter(timer => timer.intervalMs !== undefined).length,
         setLayoutSize(size) { currentLayoutSize = { ...size }; },
         drawingLayers: () => [...layers],
+        underlay: () => underlayFile,
         drawings: () => drawingList.map(drawing => ({ ...drawing, texts: [...drawing.texts], images: [...drawing.images] })),
         soundsPlayed: () => sounds.map(sound => sound.filePath),
         // The id of the player each sound played on, in the same order.
@@ -913,6 +932,7 @@ export function createFakePinballYHost({
                     refreshFilter,
                     createMetaFilter,
                     getGameInfo,
+                    resolveMedia: (subfolder, baseName) => resolveGlobalImage(subfolder, baseName),
                 },
                 mainWindow: {
                     on,
@@ -922,6 +942,7 @@ export function createFakePinballYHost({
                     doCommand: host.doCommand,
                     createDrawingLayer,
                     removeDrawingLayer,
+                    setUnderlay,
                     statusLines: {
                         upper: statusLineObject(upperStatusLine),
                         lower: statusLineObject(lowerStatusLine),

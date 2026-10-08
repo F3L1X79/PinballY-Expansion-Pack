@@ -24,6 +24,7 @@ import * as tablesToDiscover from "./addons/tables_to_discover.js";
 import * as menuCleanup from "./addons/menu_cleanup.js";
 import * as profilePicker from "./addons/profile_picker.js";
 import * as clock from "./addons/clock.js";
+import * as wheelArc from "./addons/wheel_arc.js";
 import * as seamlessLaunchOverlay from "./addons/seamless_launch_overlay.js";
 import * as forceBackglass from "./addons/force_backglass.js";
 import * as playLaunchSound from "./addons/play_launch_sound.js";
@@ -51,7 +52,7 @@ import * as welcomeScreen from "./addons/welcome_screen.js";
 // by non-blocking toasts, which wait for the Welcome Screen.
 const SCRIPTS = [
     // Interface: translations, status line, menus, filters, menu cleanup,
-    // Profile picker, clock, launch overlay.
+    // Profile picker, clock, Wheel Arc, launch overlay.
     { key: "uiTranslation", module: uiTranslation },
     { key: "statusLineInfo", module: statusLineInfo },
     { key: "customMenuCommands", module: customMenuCommands },
@@ -61,6 +62,7 @@ const SCRIPTS = [
     { key: "menuCleanup", module: menuCleanup },
     { key: "profilePicker", module: profilePicker },
     { key: "clock", module: clock },
+    { key: "wheelArc", module: wheelArc },
     { key: "seamlessLaunchOverlay", module: seamlessLaunchOverlay },
 
     // Game session: windows, sound, stats, achievements, Challenges, Table

@@ -3,6 +3,7 @@
 // defaults. Each player overrides them in a git-ignored .env.local in the
 // pack's folder (copy .env.example), read synchronously at load time; the
 // overridden keys and any invalid line are written to the PinballY log.
+// Sound paths may be relative to the pack's folder.
 // ============================================================
 
 import { applyEnvOverrides } from "./env_overrides.js";
@@ -13,15 +14,18 @@ const DEFAULTS = {
 
     // Interface language: "en", "fr", "de", "es", "it" or "pt".
     language: "en",
-    // ABSOLUTE path to the sound played when a table launches. Empty = no sound.
+    // Sounds: a path relative to the pack's folder (such as
+    // assets\sounds\local\launch.mp3, kept out of git) or an absolute one.
+    // Empty = no sound.
+    // Sound played when a table launches.
     launchSoundFile: "",
-    // ABSOLUTE path to the sound played with each Achievement Toast. Empty = no sound.
+    // Sound played with each Achievement Toast.
     achievementSoundFile: "",
-    // ABSOLUTE path to the sound played with each Profile Greeting. Empty = no sound.
+    // Sound played with each Profile Greeting.
     profileGreetingSoundFile: "",
-    // ABSOLUTE path to the sound played once when a Confetti Shower starts. Empty = no sound.
+    // Sound played once when a Confetti Shower starts.
     confettiSoundFile: "",
-    // ABSOLUTE path to the sound played once when the Fireworks start. Empty = no sound.
+    // Sound played once when the Fireworks start.
     fireworksSoundFile: "",
     // Manufacturer name you gave fictional/community VPX tables in PinballY.
     // Used by the status line and the "Original Tables" filter.
@@ -71,6 +75,7 @@ const DEFAULTS = {
         ratingPrompt: true,
         profilePicker: true,
         clock: true,
+        wheelArc: true,
         challenges: true,
         tableMastery: true,
         menuCleanup: false,
@@ -80,6 +85,23 @@ const DEFAULTS = {
 const LOG_PREFIX = "[Config]";
 const ADODB_TEXT_TYPE = 2;
 const ADODB_READ_ALL = -1;
+
+const SOUND_FILE_KEYS = Object.keys(DEFAULTS).filter(key => key.endsWith("SoundFile"));
+// A drive letter ("C:\\", "d:/"), a network path ("\\\\server\\share") or
+// the root of the current drive ("\\sounds").
+const ABSOLUTE_PATH_PATTERN = /^([A-Za-z]:|[\\/])/;
+
+// The configuration with each non-empty, relative sound path made absolute
+// from the pack's folder: Windows Media Player knows nothing of the pack.
+export function resolveSoundFiles(config, projectFolder) {
+    const resolved = { ...config };
+    for (const key of SOUND_FILE_KEYS) {
+        const path = resolved[key];
+        if (typeof path !== "string" || path === "" || ABSOLUTE_PATH_PATTERN.test(path)) continue;
+        resolved[key] = `${projectFolder}\\${path.replace(/\//g, "\\").replace(/^\.\\/, "")}`;
+    }
+    return resolved;
+}
 
 // Returns the text of the .env.local at that path, or null when there is none.
 // Read through COM (not an async API) because modules read the configuration
@@ -104,17 +126,18 @@ function loadConfig() {
     // Under Node (tests) there is no COM: the defaults apply.
     if (typeof createAutomationObject !== "function") return DEFAULTS;
 
-    const path = `${projectFolderOf(systemInfo.programDir)}\\.env.local`;
+    const projectFolder = projectFolderOf(systemInfo.programDir);
+    const path = `${projectFolder}\\.env.local`;
     let text;
     try {
         text = readEnvLocal(path);
     } catch (error) {
         logfile.log(`${LOG_PREFIX} ERROR reading ${path}, using defaults: ${error.message}`);
-        return DEFAULTS;
+        return resolveSoundFiles(DEFAULTS, projectFolder);
     }
     if (text === null) {
         logfile.log(`${LOG_PREFIX} No .env.local found at ${path}; using defaults.`);
-        return DEFAULTS;
+        return resolveSoundFiles(DEFAULTS, projectFolder);
     }
 
     const { config, overridden, problems } = applyEnvOverrides(DEFAULTS, text);
@@ -122,7 +145,7 @@ function loadConfig() {
     for (const problem of problems) {
         logfile.log(`${LOG_PREFIX} .env.local ${problem}; ignored.`);
     }
-    return config;
+    return resolveSoundFiles(config, projectFolder);
 }
 
 export default loadConfig();

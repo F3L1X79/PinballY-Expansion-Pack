@@ -48,7 +48,7 @@ Everything stays in one folder, with no change to PinballY itself.
 **And also**:
 - a Random Game spun on a wheel of fortune;
 - "Tables to Discover", "Most Played Tables", "Favorite Tables" and "Original Tables" in the menus;
-- a clock and a richer status line;
+- a clock, a gold arc under the wheel and a richer status line;
 - a reminder to rate a table;
 - launches without a black flash;
 - the backglass hidden during a game;
@@ -84,7 +84,7 @@ ADD_ON_CLOCK=false
 | `LANGUAGE` | `en` | Interface language: `en`, `fr`, `de`, `es`, `it` or `pt`. |
 | `ADULT_CATEGORY` | `NSFW` | PinballY category of the Adult Tables, hidden from Child Profiles. |
 | `COMMUNITY_TABLES_MANUFACTURER` | `VPX Community` | Manufacturer you gave to fictional or community tables, for the status line and the "Original Tables" filter. |
-| `LAUNCH_SOUND_FILE` | *(none)* | Full path of a sound played when a table launches. |
+| `LAUNCH_SOUND_FILE` | *(none)* | Sound played when a table launches: a path from the pack's folder (your own sounds go in `assets\sounds\local\`) or a full path. |
 | `ACHIEVEMENT_SOUND_FILE` | *(none)* | Sound played with each Achievement toast. |
 | `PROFILE_GREETING_SOUND_FILE` | *(none)* | Sound played when a player is greeted. |
 | `CONFETTI_SOUND_FILE` | *(none)* | Sound played once when a shower of confetti starts. |

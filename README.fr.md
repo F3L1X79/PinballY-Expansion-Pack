@@ -68,7 +68,7 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 **Et aussi** :
 - une table au hasard sur une roue de la fortune ;
 - « Tables à découvrir », « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
-- une horloge et une ligne d'état enrichie ;
+- une horloge, un arc doré sous la roue et une ligne d'état enrichie ;
 - un rappel pour noter une table ;
 - un lancement sans flash noir ;
 - le backglass masqué pendant une partie ;
@@ -104,7 +104,7 @@ ADD_ON_CLOCK=false
 | `LANGUAGE` | `en` | Langue : `en`, `fr`, `de`, `es`, `it` ou `pt`. |
 | `ADULT_CATEGORY` | `NSFW` | Catégorie PinballY des tables pour adultes, cachées aux Profils enfant. |
 | `COMMUNITY_TABLES_MANUFACTURER` | `VPX Community` | Fabricant donné aux tables fictives ou communautaires, pour la ligne d'état et le filtre « Tables Originales ». |
-| `LAUNCH_SOUND_FILE` | *(aucun)* | Chemin complet d'un son joué au lancement d'une table. |
+| `LAUNCH_SOUND_FILE` | *(aucun)* | Son joué au lancement d'une table : un chemin depuis le dossier du pack (vos sons vont dans `assets\sounds\local\`) ou un chemin complet. |
 | `ACHIEVEMENT_SOUND_FILE` | *(aucun)* | Son joué avec chaque annonce de Succès. |
 | `PROFILE_GREETING_SOUND_FILE` | *(aucun)* | Son joué quand un joueur est accueilli. |
 | `CONFETTI_SOUND_FILE` | *(aucun)* | Son joué une fois au début d'une pluie de confettis. |
