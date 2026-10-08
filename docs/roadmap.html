@@ -233,8 +233,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>Extras du Player Level</strong> (Child Profile à égalité, Fireworks, pastille de niveau sur l'Avatar) livrés le 08/10 : reste la vérification visuelle sur la borne (ticket #168)</p>
-      <span class="next">Ensuite : <code>/implement</code> #170 à #172 (tickets de la spec #169) pour <a href="#visit-streak">la Daily Streak</a></span>
+      <p><strong>Daily Streak</strong> (Welcome Screen, Profile Stats, Achievements à 3 / 7 / 15 / 30 jours) livrée le 08/10 : reste la vérification sur la borne (ticket #173), comme pour les extras du Player Level (ticket #168)</p>
+      <span class="next">Ensuite : <code>/grill-with-docs</code> court pour <a href="#default-assets">les réglages par défaut de la borne</a></span>
     </div>
   </section>
 
@@ -295,30 +295,6 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Les captures de <code>docs/images/</code> datent du 30/09/2026. Depuis : Welcome Screen (qui remplace le dialogue de démarrage), Achievement List et Profile Stats dessinées, Table Mastery et Mastery Bar, Player Level et Level Toast, Confetti Shower, Secret Achievements, Daily Streak, Admin Profile et Child Profile. Les captures anglaises servent aussi au README français.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="visit-streak" data-track="play" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Une série globale : les jours d'affilée passés sur la borne</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit-moyen</span></div>
-          </div>
-          <p>À côté des Streaks des Period Tables, une série qui compte les jours consécutifs où le Profile vient jouer, quelle que soit la table. Idée née en relisant la spec du Welcome Screen.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : <code>/implement</code> par ticket (#170 à #172, puis vérification sur la borne #173, spec #169). Lit le Play Log (livré)</div>
-          <details>
-            <summary>Décisions (grill du 07/10/2026)</summary>
-            <ul>
-              <li>Terme du glossaire : Daily Streak (« Jours d'affilée sur la borne »). La Streak d'une Period Table devient Period Table Streak.</li>
-              <li>Un jour compte s'il voit démarrer au moins une Play, sur n'importe quelle table et lancée n'importe comment. Le jour change à minuit, comme pour la Table of the Day. Guest a sa série, et un Child Profile n'a pas de cas particulier.</li>
-              <li>Calculée depuis le Play Log (historique depuis le 01/10/2026), rien de nouveau dans <code>profile.json</code>. Pas de jour de grâce : la série reste vivante toute la journée tant que la veille compte.</li>
-              <li>Welcome Screen : une ligne sous le nom dès 2 jours, avec « : continue ! » tant que le jour n'est pas joué. Profile Stats : première des trois tuiles de séries, la plus longue en pastille.</li>
-              <li>Achievements dans la famille Sessions : 3 / 7 / 15 / 30 jours (Bronze à Platinum), débloqués par la plus longue série. Les clés <code>dailyStreak*</code> sont déjà prises par la Table of the Day. Aucune autre annonce.</li>
-            </ul>
           </details>
         </div>
       </li>
@@ -783,7 +759,6 @@
 
           <div class="ax row">Moyen</div>
           <div class="cell sweet">
-            <a class="chip tr-play" href="#visit-streak"><b></b>Jours d'affilée</a>
             <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
           </div>
           <div class="cell">
