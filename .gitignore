@@ -1,5 +1,5 @@
 #security
-.devcontainer
+.devcontainer/
 
 #AI-related
 .claude/
@@ -23,11 +23,11 @@ skills-lock.json
 # Player settings (see .env.example)
 .env.local
 
-# Players' Profiles and their progress; only the empty Guest folder ships
+# Players' Profiles and their progress; only the Guest folder and its Avatar ship
 profiles/*
 !profiles/guest/
 profiles/guest/*
-!profiles/guest/.gitkeep
+!profiles/guest/avatar.png
 
 # Personal sounds, not published (see .env.example)
 assets/sounds/local/
