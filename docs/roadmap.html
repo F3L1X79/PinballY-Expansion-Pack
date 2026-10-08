@@ -324,6 +324,32 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rewards" data-track="profiles" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Récompenses de profil : cadres d'Avatar et titres à débloquer</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
+          </div>
+          <p>La progression change l'apparence du Profile. Des skins de cadre d'Avatar, affichés partout où l'Avatar apparaît, remplacent le cadre doré actuel, qui devient lui-même un cadre à débloquer. Des titres de profil (« Pinball Explorer ») s'affichent sous le nom, sur la roue de sélection et dans les Profile Stats. Le joueur choisit le cadre et le titre qu'il porte parmi ceux qu'il a débloqués.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (rendu des cadres sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur l'Avatar, le Player Level et les Achievements (livrés)</div>
+          <details>
+            <summary>Questions ouvertes (6)</summary>
+            <ul>
+              <li>Ce qui débloque un cadre ou un titre : Player Level, Collection Tier, Achievements précis (Platinum, Secret), Mastery Level 10 sur une table ? Une Profile Reset les reprend-elle ?</li>
+              <li>Le cadre doré actuel : débloqué dès le départ ou à un premier palier, et quel cadre par défaut avant ?</li>
+              <li>« Partout » : badge de la roue, Profile Picker, Profile Greeting, Welcome Screen, Profile Stats, Avatars de l'Unlock Rate dans l'Achievement List ? Comment cohabiter avec la pastille du Player Level ?</li>
+              <li>Choisir son cadre et son titre : depuis les Profile Stats, ou depuis un menu du Profile Picker ?</li>
+              <li>L'annonce d'un déblocage : un toast de plus, ou une ligne dans le toast qui l'amène, pour ne pas multiplier les célébrations après une Play ?</li>
+              <li>Les dessins des cadres : dessinés en code comme le reste du Steamball, ou des images à créer ? C'est là que se trouve le vrai coût. Termes du glossaire à fixer (sans « badge », pris par le badge de la roue).</li>
+            </ul>
+            <p class="ctx">Idée externe du 08/10/2026 (« le profil n'est plus une sauvegarde, c'est un personnage »), retenue par Félix et placée haut. Le cadre doré actuel est la bague de <code>addons/profile_picker.js</code> (<code>goldFrame</code>). Les titres prendront tout leur sens avec <a href="#stats">les Profile Stats des autres Profiles</a>, où chacun voit ceux des autres.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-share" id="steamball-menus" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -349,28 +375,24 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rewards" data-track="profiles" data-rank="gold">
+      <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Récompenses de profil : cadres d'Avatar et titres à débloquer</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
+            <h3>Table Mastery : le temps restant avant le prochain niveau</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
           </div>
-          <p>La progression change l'apparence du Profile. Des skins de cadre d'Avatar, affichés partout où l'Avatar apparaît, remplacent le cadre doré actuel, qui devient lui-même un cadre à débloquer. Des titres de profil (« Pinball Explorer ») s'affichent sous le nom, sur la roue de sélection et dans les Profile Stats. Le joueur choisit le cadre et le titre qu'il porte parmi ceux qu'il a débloqués.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (rendu des cadres sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur l'Avatar, le Player Level et les Achievements (livrés)</div>
+          <p>Dire combien de minutes de jeu il manque sur une table pour atteindre le Mastery Level suivant (« Niveau 8 dans 12 min »). C'est la seule info vraiment nouvelle de l'idée d'un moteur de recommandation, dont le reste existe déjà (Table of the Day, Tables to Discover, Challenge Tables, Random Game).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur la Mastery Bar et le Welcome Screen (livrés)</div>
           <details>
-            <summary>Questions ouvertes (6)</summary>
+            <summary>Questions ouvertes (2)</summary>
             <ul>
-              <li>Ce qui débloque un cadre ou un titre : Player Level, Collection Tier, Achievements précis (Platinum, Secret), Mastery Level 10 sur une table ? Une Profile Reset les reprend-elle ?</li>
-              <li>Le cadre doré actuel : débloqué dès le départ ou à un premier palier, et quel cadre par défaut avant ?</li>
-              <li>« Partout » : badge de la roue, Profile Picker, Profile Greeting, Welcome Screen, Profile Stats, Avatars de l'Unlock Rate dans l'Achievement List ? Comment cohabiter avec la pastille du Player Level ?</li>
-              <li>Choisir son cadre et son titre : depuis les Profile Stats, ou depuis un menu du Profile Picker ?</li>
-              <li>L'annonce d'un déblocage : un toast de plus, ou une ligne dans le toast qui l'amène, pour ne pas multiplier les célébrations après une Play ?</li>
-              <li>Les dessins des cadres : dessinés en code comme le reste du Steamball, ou des images à créer ? C'est là que se trouve le vrai coût. Termes du glossaire à fixer (sans « badge », pris par le badge de la roue).</li>
+              <li>Où l'afficher : dans la Mastery Bar sous la jauge, sur les Period Tables du Welcome Screen, ou les deux ?</li>
+              <li>À partir de quand : toujours, ou seulement quand le niveau suivant est proche (moins d'une partie ou deux) ?</li>
             </ul>
-            <p class="ctx">Idée externe du 08/10/2026 (« le profil n'est plus une sauvegarde, c'est un personnage »), retenue par Félix et placée haut. Le cadre doré actuel est la bague de <code>addons/profile_picker.js</code> (<code>goldFrame</code>). Les titres prendront tout leur sens avec <a href="#stats">les Profile Stats des autres Profiles</a>, où chacun voit ceux des autres.</p>
+            <p class="ctx">Idée externe du 08/10/2026. Écartés en même temps : un moteur de suggestion de plus, les objectifs de session quotidiens, les quêtes (doublons des Achievements Manufacturers et Decades) et des annonces de progression supplémentaires.</p>
           </details>
         </div>
       </li>
@@ -589,28 +611,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Table Mastery : le temps restant avant le prochain niveau</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
-          </div>
-          <p>Dire combien de minutes de jeu il manque sur une table pour atteindre le Mastery Level suivant (« Niveau 8 dans 12 min »). C'est la seule info vraiment nouvelle de l'idée d'un moteur de recommandation, dont le reste existe déjà (Table of the Day, Tables to Discover, Challenge Tables, Random Game).</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur la Mastery Bar et le Welcome Screen (livrés)</div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>Où l'afficher : dans la Mastery Bar sous la jauge, sur les Period Tables du Welcome Screen, ou les deux ?</li>
-              <li>À partir de quand : toujours, ou seulement quand le niveau suivant est proche (moins d'une partie ou deux) ?</li>
-            </ul>
-            <p class="ctx">Idée externe du 08/10/2026. Écartés en même temps : un moteur de suggestion de plus, les objectifs de session quotidiens, les quêtes (doublons des Achievements Manufacturers et Decades) et des annonces de progression supplémentaires.</p>
-          </details>
-        </div>
-      </li>
-
     </ol>
   </section>
 
@@ -772,20 +772,26 @@
 
           <div class="ax row">Fort</div>
           <div class="cell sweet">
+            <a class="chip tr-share" href="#readme-refresh"><b></b>README à jour</a>
           </div>
           <div class="cell">
           </div>
           <div class="cell">
+            <a class="chip tr-profiles" href="#profile-rewards"><b></b>Cadres et titres</a>
             <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
           </div>
 
           <div class="ax row">Moyen</div>
           <div class="cell sweet">
+            <a class="chip tr-play" href="#visit-streak"><b></b>Jours d'affilée</a>
+            <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
           </div>
           <div class="cell">
+            <a class="chip tr-play" href="#level-extras"><b></b>Extras du Player Level</a>
             <a class="chip tr-profiles" href="#stats"><b></b>Stats des autres</a>
             <a class="chip tr-play" href="#profile-records"><b></b>Records par Profile</a>
             <a class="chip tr-profiles" href="#profile-rivalries"><b></b>Rivalités</a>
+            <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
             <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
             <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
           </div>
@@ -796,9 +802,13 @@
           </div>
 
           <div class="ax row">Faible</div>
-          <div class="cell"></div>
-          <div class="cell"></div>
-          <div class="cell"></div>
+          <div class="cell">
+          </div>
+          <div class="cell">
+            <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
+          </div>
+          <div class="cell">
+          </div>
         </div>
         <div class="legend">
           <span class="tr-profiles">Profiles</span>
