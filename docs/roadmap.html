@@ -225,7 +225,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 07.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 08.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -349,6 +349,32 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rewards" data-track="profiles" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Récompenses de profil : cadres d'Avatar et titres à débloquer</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
+          </div>
+          <p>La progression change l'apparence du Profile. Des skins de cadre d'Avatar, affichés partout où l'Avatar apparaît, remplacent le cadre doré actuel, qui devient lui-même un cadre à débloquer. Des titres de profil (« Pinball Explorer ») s'affichent sous le nom, sur la roue de sélection et dans les Profile Stats. Le joueur choisit le cadre et le titre qu'il porte parmi ceux qu'il a débloqués.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (rendu des cadres sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur l'Avatar, le Player Level et les Achievements (livrés)</div>
+          <details>
+            <summary>Questions ouvertes (6)</summary>
+            <ul>
+              <li>Ce qui débloque un cadre ou un titre : Player Level, Collection Tier, Achievements précis (Platinum, Secret), Mastery Level 10 sur une table ? Une Profile Reset les reprend-elle ?</li>
+              <li>Le cadre doré actuel : débloqué dès le départ ou à un premier palier, et quel cadre par défaut avant ?</li>
+              <li>« Partout » : badge de la roue, Profile Picker, Profile Greeting, Welcome Screen, Profile Stats, Avatars de l'Unlock Rate dans l'Achievement List ? Comment cohabiter avec la pastille du Player Level ?</li>
+              <li>Choisir son cadre et son titre : depuis les Profile Stats, ou depuis un menu du Profile Picker ?</li>
+              <li>L'annonce d'un déblocage : un toast de plus, ou une ligne dans le toast qui l'amène, pour ne pas multiplier les célébrations après une Play ?</li>
+              <li>Les dessins des cadres : dessinés en code comme le reste du Steamball, ou des images à créer ? C'est là que se trouve le vrai coût. Termes du glossaire à fixer (sans « badge », pris par le badge de la roue).</li>
+            </ul>
+            <p class="ctx">Idée externe du 08/10/2026 (« le profil n'est plus une sauvegarde, c'est un personnage »), retenue par Félix et placée haut. Le cadre doré actuel est la bague de <code>addons/profile_picker.js</code> (<code>goldFrame</code>). Les titres prendront tout leur sens avec <a href="#stats">les Profile Stats des autres Profiles</a>, où chacun voit ceux des autres.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="stats" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -444,12 +470,13 @@
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Lit le Play Log (livré) ; sur l'écran des Profile Stats dessinées (livré)</div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Questions ouvertes (5)</summary>
             <ul>
               <li>Quand le proposer : premier lancement après le 31/12, ou dès la mi-décembre ? Le garder consultable ensuite depuis les Profile Stats ?</li>
               <li>Comment le partager : une capture enregistrée dans un dossier, prête pour Discord ?</li>
               <li>Première année incomplète (journal commencé en cours d'année) : l'annoncer, ou ne rien montrer avant une année pleine ?</li>
               <li>Un bilan de la maison, tous Profiles confondus, en plus de celui de chaque Profile ?</li>
+              <li>Une carte « ton style de joueur » : taux d'exploration (tables différentes par Play), régularité, et un archétype (Explorer, Completionist…) ? Avec quels seuils, pour que ça ne ressemble pas à un horoscope ?</li>
             </ul>
             <p class="ctx">Idée externe du 30/09/2026, sans doute la plus partageable. En fin de file car elle a besoin d'une année de journal et de la Distribution pour être vue.</p>
           </details>
@@ -562,6 +589,28 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Table Mastery : le temps restant avant le prochain niveau</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Dire combien de minutes de jeu il manque sur une table pour atteindre le Mastery Level suivant (« Niveau 8 dans 12 min »). C'est la seule info vraiment nouvelle de l'idée d'un moteur de recommandation, dont le reste existe déjà (Table of the Day, Tables to Discover, Challenge Tables, Random Game).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur la Mastery Bar et le Welcome Screen (livrés)</div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Où l'afficher : dans la Mastery Bar sous la jauge, sur les Period Tables du Welcome Screen, ou les deux ?</li>
+              <li>À partir de quand : toujours, ou seulement quand le niveau suivant est proche (moins d'une partie ou deux) ?</li>
+            </ul>
+            <p class="ctx">Idée externe du 08/10/2026. Écartés en même temps : un moteur de suggestion de plus, les objectifs de session quotidiens, les quêtes (doublons des Achievements Manufacturers et Decades) et des annonces de progression supplémentaires.</p>
+          </details>
+        </div>
+      </li>
+
     </ol>
   </section>
 
@@ -571,6 +620,13 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>08/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>Des récompenses de profil placées haut, trois idées retenues sur huit</strong>
+              <span>Choix de Félix sur une liste d'idées externes : des cadres d'Avatar et des titres à débloquer (n° 5), le temps restant avant le prochain Mastery Level (en fin de file), un style de joueur dans Year in Pinball. Écartés : un moteur de recommandation de plus, les objectifs de session, les quêtes, les annonces de progression supplémentaires.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>07/10 <span class="count">(3)</span></summary>
           <ol>
             <li><strong>Le README repasse en tête après la première étoile</strong>
