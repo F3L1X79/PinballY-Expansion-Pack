@@ -6,15 +6,16 @@
 // to multiple groups (e.g. multiple categories), in which case it counts
 // toward each of them. Groups are made of the tables the active Profile can
 // see, so a group with none of them gives no Achievement. The Achievements
-// come sorted by group key. No side effects.
+// come sorted by group key. asNonChild builds them as a Profile that is
+// not a child would see them. No side effects.
 // ============================================================
 
 import { getActiveProfileTables } from "./visible_tables.js";
 import { getProfileStore } from "./profile_store.js";
 import { countedAchievement, PROGRESS_UNIT } from "./achievements.js";
 
-export function buildGroupedCompletionAchievements({ getGroupKeys, idPrefix, family, getTitle, getDescription }) {
-    const allGames = getActiveProfileTables();
+export function buildGroupedCompletionAchievements({ getGroupKeys, idPrefix, family, getTitle, getDescription, asNonChild = false }) {
+    const allGames = getActiveProfileTables({ asNonChild });
     const groups = new Map();
 
     for (const game of allGames) {

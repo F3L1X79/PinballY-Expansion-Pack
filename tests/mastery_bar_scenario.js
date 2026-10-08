@@ -32,6 +32,16 @@ export const TABLES = [
     table(3, "Theatre of Magic", "Bally", 1995),
     table(4, "Twilight Zone", "Bally", 1993),
 ];
+// Adult Tables (category "NSFW") of other manufacturers and decades, which
+// a Child Profile never sees.
+const adultTable = (id, title, manufacturer, year) => ({ ...table(id, title, manufacturer, year), categories: ["NSFW"] });
+export const ADULT_TABLES = [
+    adultTable(11, "Playboy", "Bally", 1978),
+    adultTable(12, "Party A", "Gottlieb", 1965),
+    adultTable(13, "Party B", "Stern", 2005),
+    adultTable(14, "Party C", "VPX Community", 2023),
+    adultTable(15, "Party D", "Zaccaria", 1985),
+];
 
 // A Profile's earlier Plays on a table, as its profile.json keeps them.
 export const playedFor = seconds => ({ count: 1, seconds, lastPlayed: "2026-09-01T20:00:00" });

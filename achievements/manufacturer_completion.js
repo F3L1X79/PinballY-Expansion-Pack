@@ -4,8 +4,9 @@
 // unlocked once the active Profile has played every table it can see from
 // that manufacturer at least once, with the tables played of that
 // manufacturer as Achievement Progress and an Achievement Rank from the
-// number of its tables. Sorted by manufacturer. Called by
-// achievements_engine.js; no side effects.
+// number of its tables. Sorted by manufacturer. asNonChild builds them as
+// a Profile that is not a child would see them (for the Player Level's
+// scaling). Called by achievements_engine.js; no side effects.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements.js";
@@ -13,10 +14,10 @@ import lang from "../common/i18n.js";
 import { getActiveProfileTables } from "../common/visible_tables.js";
 import { getProfileStore } from "../common/profile_store.js";
 
-export function buildManufacturerCompletionAchievements() {
+export function buildManufacturerCompletionAchievements({ asNonChild = false } = {}) {
     const { achievements: TEXT } = lang;
 
-    const allGames = getActiveProfileTables();
+    const allGames = getActiveProfileTables({ asNonChild });
 
     const manufacturers = new Set();
     for (const game of allGames) {

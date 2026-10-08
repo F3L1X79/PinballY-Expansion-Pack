@@ -2,8 +2,11 @@
 // Player Level: turns a Profile's Notified Achievements into its level,
 // worked out afresh each time from the Achievements that still exist, at
 // their current Achievement Rank. Pure: takes the Notified ids and the
-// current Achievements, returns { level, points, from, to }. Nothing is
-// persisted.
+// current Achievements, returns { level, points, from, to }. For a Child
+// Profile, also takes the Achievements a Profile that is not a child would
+// have with the same collection, and scales the points up by what those
+// are worth over the current ones, so the child climbs the same curve as
+// fast for the same share of play. Nothing is persisted.
 // ============================================================
 
 import { ACHIEVEMENT_RANK } from "./achievements.js";
@@ -31,11 +34,15 @@ export function playerLevelOf(points) {
     return { level, points, from, to: from + cost };
 }
 
+const pointsOf = achievements =>
+    achievements.reduce((sum, achievement) => sum + (RANK_POINTS[achievement.rank] || 0), 0);
+
 // A gone Achievement counts nothing; an Unlock later lost keeps its points.
-export function getPlayerLevel(notifiedIds, achievements) {
+// nonChildAchievements: only counted, null for a Profile that is not a child.
+export function getPlayerLevel(notifiedIds, achievements, nonChildAchievements = null) {
     const notified = new Set(notifiedIds);
-    const points = achievements
-        .filter(achievement => notified.has(achievement.id))
-        .reduce((sum, achievement) => sum + (RANK_POINTS[achievement.rank] || 0), 0);
-    return playerLevelOf(points);
+    const points = pointsOf(achievements.filter(achievement => notified.has(achievement.id)));
+    const currentWorth = pointsOf(achievements);
+    if (nonChildAchievements === null || currentWorth === 0) return playerLevelOf(points);
+    return playerLevelOf(Math.floor(points * pointsOf(nonChildAchievements) / currentWorth));
 }

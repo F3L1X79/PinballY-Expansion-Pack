@@ -4,7 +4,9 @@
 // a special "first table ever" achievement, plus one per percentage of the
 // full collection in COLLECTION_PERCENT_THRESHOLDS, with the tables played
 // against the count the percentage needs as Achievement Progress.
-// Called by achievements_engine.js at each check; no side effects.
+// asNonChild builds them as a Profile that is not
+// a child would see them (for the Player Level's scaling). Called by achievements_engine.js at each check;
+// no side effects.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements.js";
@@ -20,13 +22,13 @@ const COLLECTION_PERCENT_THRESHOLDS = [10, 25, 50, 75, 100];
 const FIRST_TABLE_STEP = "firstTable";
 const COLLECTION_LADDER = [FIRST_TABLE_STEP, ...COLLECTION_PERCENT_THRESHOLDS];
 
-export function buildCollectionCompletionAchievements() {
+export function buildCollectionCompletionAchievements({ asNonChild = false } = {}) {
     const { achievements: TEXT } = lang;
 
-    const totalCount = getActiveProfileTables().length;
+    const totalCount = getActiveProfileTables({ asNonChild }).length;
 
     function countPlayed() {
-        return countPlayedTables(getActiveProfileTables(), getProfileStore());
+        return countPlayedTables(getActiveProfileTables({ asNonChild }), getProfileStore());
     }
 
     // A target of 1 shows no Achievement Progress.

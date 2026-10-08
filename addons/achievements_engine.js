@@ -9,7 +9,10 @@
 // announced to that Profile and drops its toasts still waiting. When the
 // toasts of a check bring a higher Player Level, one Level Toast for the
 // highest level follows them; the level at startup, at a Profile switch
-// and after a Profile Reset is the baseline, kept in memory, never announced.
+// and after a Profile Reset is the baseline, never announced, and so is a
+// rise that comes without new Achievements (a change in the collection). A
+// Child Profile's level is read with its points scaled up by the set a
+// Profile that is not a child would have, built only to be counted.
 // Also adds the Achievement List entry to the main menu, right after "Play",
 // and the Profile Stats entry right after it. The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
@@ -55,24 +58,30 @@ const ACHIEVEMENT_LIST_ENTRY = "achievementList";
 // family nor the Profile Stats line exists.
 const getEnabledChallenges = () => (config.addOns.challenges === false ? null : getChallenges());
 
-// Exported for the tests, which read each Achievement's rank.
-export function getAllAchievements() {
+// Exported for the tests, which read each Achievement's rank. asNonChild:
+// the set as a Profile that is not a child would see it with the same
+// collection, only ever counted (never evaluated, toasted nor Notified).
+export function getAllAchievements({ asNonChild = false } = {}) {
     const challenges = getEnabledChallenges();
     return [
         ...buildDayManufacturersAchievements(),
-        ...buildManufacturerCompletionAchievements(),
-        ...buildCollectionCompletionAchievements(),
+        ...buildManufacturerCompletionAchievements({ asNonChild }),
+        ...buildCollectionCompletionAchievements({ asNonChild }),
         ...buildWorldTourAchievements(),
         ...buildPlayTimeTotalAchievements(),
         ...buildPeriodTableAchievements(),
-        ...buildDecadeCompletionAchievements(),
-        ...buildCategoryCompletionAchievements(),
+        ...buildDecadeCompletionAchievements({ asNonChild }),
+        ...buildCategoryCompletionAchievements({ asNonChild }),
         ...buildSessionMilestoneAchievements(),
         ...buildRandomGameFanAchievements(),
         ...(challenges ? buildChallengeAchievements(challenges) : []),
-        ...buildSurprisesAchievements(),
+        ...buildSurprisesAchievements({ asNonChild }),
     ];
 }
+
+// What a Child Profile's points are scaled by: the set a Profile that is
+// not a child would have, only built for a child; null otherwise.
+const nonChildAchievementsFor = profileStore => (profileStore.isChild() ? getAllAchievements({ asNonChild: true }) : null);
 
 export default function init() {
     const achievementToasts = getAchievementToasts();
@@ -93,7 +102,8 @@ export default function init() {
         profileStore,
         achievementList,
         // From the active Profile's Notified Achievements, read on each opening.
-        readPlayerLevel: () => getPlayerLevel(profileStore.getProfileData().notified, getAllAchievements()),
+        readPlayerLevel: () => getPlayerLevel(
+            profileStore.getProfileData().notified, getAllAchievements(), nonChildAchievementsFor(profileStore)),
         tableOfTheDay: getTableOfTheDay(),
         tableOfTheWeek: getTableOfTheWeek(),
         challenges: getEnabledChallenges(),
@@ -115,14 +125,11 @@ export default function init() {
     // before its Profile's reset is stale.
     const resetCountByProfile = new Map();
     const resetCountOf = profileKey => resetCountByProfile.get(profileKey) || 0;
-    // The Player Level each Profile is known to have, by Profile name in
-    // lower case: announced, or the baseline.
-    const knownLevelByProfile = new Map();
 
     // The level once every toast submitted so far has started.
-    function levelOnceShown(achievements, submittedIds) {
+    function levelOnceShown(submittedIds, achievements, nonChildAchievements) {
         const ids = [...profileStore.getProfileData().notified, ...submittedIds];
-        return getPlayerLevel(ids, achievements).level;
+        return getPlayerLevel(ids, achievements, nonChildAchievements).level;
     }
 
     function submitLevelToast(profileKey, level, resetCount) {
@@ -148,10 +155,12 @@ export default function init() {
         const submittedIds = submittedIdsByProfile.get(profileKey);
         const resetCount = resetCountOf(profileKey);
         const achievements = getAllAchievements();
-        // Follows a drop (a gone Achievement, a lowered Rank), so a level
-        // lost then won back is announced again.
-        const levelBefore = levelOnceShown(achievements, submittedIds);
-        const knownLevel = Math.min(knownLevelByProfile.get(profileKey) ?? levelBefore, levelBefore);
+        const nonChildAchievements = nonChildAchievementsFor(profileStore);
+        // Read with the collection as it is now: a drop (a gone Achievement,
+        // a lowered Rank) lets a level won back by this check be announced
+        // again, and a rise from the collection alone (Adult Tables added,
+        // which scales a child's points up) is never announced.
+        const levelBefore = levelOnceShown(submittedIds, achievements, nonChildAchievements);
         evaluateAchievements(achievements, profileStore, (achievement) => {
             if (submittedIds.has(achievement.id)) return;
             submittedIds.add(achievement.id);
@@ -164,9 +173,8 @@ export default function init() {
                 isStale: () => resetCountOf(profileKey) !== resetCount,
             });
         });
-        const levelAfter = levelOnceShown(achievements, submittedIds);
-        if (levelAfter > knownLevel && !isBaseline) submitLevelToast(profileKey, levelAfter, resetCount);
-        knownLevelByProfile.set(profileKey, Math.max(knownLevel, levelAfter));
+        const levelAfter = levelOnceShown(submittedIds, achievements, nonChildAchievements);
+        if (levelAfter > levelBefore && !isBaseline) submitLevelToast(profileKey, levelAfter, resetCount);
     }
 
     // The timer callback runs outside the event handler's call stack, so it
@@ -192,7 +200,6 @@ export default function init() {
         if (!isReset) return;
         const profileKey = profileName.toLowerCase();
         submittedIdsByProfile.delete(profileKey);
-        knownLevelByProfile.delete(profileKey);
         resetCountByProfile.set(profileKey, resetCountOf(profileKey) + 1);
     }));
 

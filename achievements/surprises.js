@@ -5,7 +5,8 @@
 // "surprises" part: a flag, or for Four Seasons every season seen. Night
 // Owl and Full Moon Night are absent for a Child Profile, whatever their
 // flags say; Time Travel is absent while the active Profile's tables cover
-// fewer decades than its run needs. No Achievement Progress. Called by
+// fewer decades than its run needs. asNonChild builds the set as a Profile
+// that is not a child would see it. No Achievement Progress. Called by
 // achievements_engine.js at each check; no side effects.
 // ============================================================
 
@@ -25,14 +26,14 @@ const hourStart = hour => `${String(hour).padStart(2, "0")}:00`;
 // "03:59" for 3.
 const hourEnd = hour => `${String(hour).padStart(2, "0")}:59`;
 
-export function buildSurprisesAchievements() {
+export function buildSurprisesAchievements({ asNonChild = false } = {}) {
     const { achievements: TEXT } = lang;
     const profileStore = getProfileStore();
     const activeSurprises = () => surprisesOf(profileStore.getProfileData());
     const achievements = [];
 
     // Never pushes a child to play at night.
-    if (!profileStore.isChild()) {
+    if (asNonChild || !profileStore.isChild()) {
         achievements.push(standaloneAchievement({
             id: "nightOwl",
             family: ACHIEVEMENT_FAMILY.SURPRISES,
@@ -102,7 +103,7 @@ export function buildSurprisesAchievements() {
     );
 
     // Like the Decades family: never an impossible Achievement.
-    const decades = new Set(getActiveProfileTables().map(game => getDecadeStartYear(game.year)));
+    const decades = new Set(getActiveProfileTables({ asNonChild }).map(game => getDecadeStartYear(game.year)));
     decades.delete(null);
     if (decades.size >= TIME_TRAVEL_PLAYS) {
         achievements.push(standaloneAchievement({

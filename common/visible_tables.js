@@ -4,7 +4,9 @@
 // Profile, the Adult Tables. Used by the achievement builders, the Profile
 // Stats, the Hall of Fame and the Challenges, with the one rule for
 // collection completion. The Period Table pick deliberately reads the
-// household's visible tables instead. Read-only, no side effects.
+// household's visible tables instead. getActiveProfileTables() can also
+// give the tables as a Profile that is not a child would see them, for a
+// Child Profile's Player Level scaling. Read-only, no side effects.
 // ============================================================
 
 import { createPinballYHost } from "./pinbally_host.js";
@@ -22,8 +24,11 @@ export function tablesVisibleTo(visibleTables, profileStore, profileName) {
     return visibleTables.filter(game => isVisibleTo(game, profileStore, profileName));
 }
 
-export function getActiveProfileTables() {
-    return tablesVisibleTo(createPinballYHost().getVisibleTables(), getProfileStore());
+// asNonChild: the tables as a Profile that is not a child would see them,
+// Adult Tables included, for the Player Level's scaling.
+export function getActiveProfileTables({ asNonChild = false } = {}) {
+    const visibleTables = createPinballYHost().getVisibleTables();
+    return asNonChild ? visibleTables : tablesVisibleTo(visibleTables, getProfileStore());
 }
 
 // Collection completion: how many of the tables the active Profile can see
