@@ -7,8 +7,8 @@
 // Player Level in big digits with its bar and points, a rule, the
 // Collection Mastery stacked like the Mastery Bar, the buttons at its
 // foot), the close cross and the right column's sections (a title, then
-// rows of stats, label over value (on two lines when it does not fit on
-// one), with a pill beside the value, or every pill of the row under its
+// rows of stats, label over value (every label at one size, the largest
+// at which they all fit), with a pill beside the value, or every pill of the row under its
 // value when one does not fit, and a thin bar,
 // then wide strips with a table's wheel logo or the missing image, or else
 // its title),
@@ -38,8 +38,9 @@ const LOOK = Object.freeze({
     pad: 32, cross: 56,
     // The panel's width: a share of the window's, at most maxWidth.
     widthShare: 0.9, maxWidth: 1500,
-    // The card: its share of the inner width, its inset, the gap to the column.
-    cardShare: 0.4, cardInset: 20, columnGap: 36,
+    // The card: its share of the inner width (narrower in a portrait window,
+    // so the column's stats have room), its inset, the gap to the column.
+    cardShare: 0.4, portraitCardShare: 0.35, cardInset: 20, columnGap: 36,
     avatar: 190, avatarGap: 12, nameH: 66, nameSize: 34, minNameSize: 24, buttonsGap: 40,
     // The name drawn that much higher than its box, closer to the Avatar.
     nameLift: 12,
@@ -57,8 +58,11 @@ const LOOK = Object.freeze({
         inset: 16, goalY: 18, barY: 64, currentY: 86, barGap: 16, squareInset: 14,
     }),
     button: Object.freeze({ h: 74, gap: 14, size: 22, minSize: 17, countSize: 22 }),
-    // The column: a section title, rows of stats side by side, label over value.
-    titleH: 56, titleSize: 19, ruleY: 32, statGap: 24, labelSize: 18, valueY: 26, valueSize: 34, minValueSize: 22, rowH: 78,
+    // The column: a section title, rows of stats side by side (statGap
+    // apart, portraitStatGap in a portrait window), label over value; the
+    // labels shrink together down to minLabelSize.
+    titleH: 56, titleSize: 19, ruleY: 32, statGap: 24, portraitStatGap: 16, labelSize: 18, minLabelSize: 14,
+    valueY: 32, valueSize: 30, minValueSize: 22, rowH: 80,
     sectionGap: 20, rowGap: 18,
     // A stat's pill: beside its value (gap), or under it (underGap); gold
     // when lit, its background the gold mixed that far into the panel. Never
@@ -90,44 +94,45 @@ function measureWidth(host, str, { size, weight, font = FONTS.body }) {
 
 const pillWidth = (host, str, maxW = Infinity) => Math.min(maxW, measureWidth(host, str, { size: LOOK.pill.size, weight: LOOK.pill.weight }) + 2 * LOOK.pill.padX);
 
-// A stat's label wrapped within width.
-function labelText(host, str) {
-    const styled = host.createStyledText({ textAlign: "left", textStyle: { font: FONTS.body, size: LOOK.labelSize, weight: 400, color: COLORS.description } });
-    styled.add(str);
-    return styled;
-}
-
 // A row of stats side by side in the column: every pill goes under its
-// value when one does not fit beside its own, and every value moves down
-// by labelExtra when a label takes two lines, so the row stays aligned.
-function rowBlock(host, section, stats, columnW) {
+// value when one does not fit beside its own, so the row stays aligned.
+function rowBlock(host, section, stats, columnW, statGap) {
     const { pill, shareBar } = LOOK;
-    const colW = Math.round((columnW - LOOK.statGap * (stats.length - 1)) / stats.length);
+    const colW = Math.round((columnW - statGap * (stats.length - 1)) / stats.length);
     const valueWidth = stat => Math.min(colW, measureWidth(host, stat.value, { size: LOOK.valueSize, weight: 700, font: FONTS.display }));
     const isUnder = stats.some(stat => stat.pill && valueWidth(stat) + pill.gap + pillWidth(host, stat.pill.text) > colW);
     const hasShare = stats.some(stat => stat.share !== undefined);
-    const lineH = Math.max(...stats.map(stat => labelText(host, stat.label).measure(UNBOUNDED).height));
-    const labelH = Math.max(...stats.map(stat => labelText(host, stat.label).measure(colW).height));
-    const labelExtra = Math.ceil(Math.max(0, Math.min(2 * lineH, labelH) - lineH));
-    const h = labelExtra + LOOK.rowH + (isUnder ? pill.underGap + pill.h : 0) + (hasShare ? shareBar.gap + shareBar.h : 0);
-    return { kind: "row", h, section, stats, colW, isUnder, labelExtra };
+    const h = LOOK.rowH + (isUnder ? pill.underGap + pill.h : 0) + (hasShare ? shareBar.gap + shareBar.h : 0);
+    return { kind: "row", h, section, stats, colW, statGap, isUnder };
+}
+
+// The largest label size, down to minLabelSize, at which every row's
+// labels fit their stat's width, so the whole column's labels match.
+function labelSizeOf(host, rows) {
+    const fitsAt = size => rows.every(row => row.stats.every(stat => measureWidth(host, stat.label, { size, weight: 400 }) <= row.colW));
+    let size = LOOK.labelSize;
+    while (size > LOOK.minLabelSize && !fitsAt(size)) size--;
+    return size;
 }
 
 // The column's blocks top down; the spare height goes to the gaps only.
-function columnBlocks(host, screen, columnW) {
+function columnBlocks(host, screen, columnW, statGap) {
     const blocks = [];
     screen.sections.forEach((section, index) => {
         if (index > 0) blocks.push({ kind: "gap", h: LOOK.sectionGap, isSpread: true });
         blocks.push({ kind: "title", h: LOOK.titleH, section, isFirst: index === 0 });
         section.rows.forEach((stats, rowIndex) => {
             if (rowIndex > 0) blocks.push({ kind: "gap", h: LOOK.rowGap, isSpread: true });
-            blocks.push(rowBlock(host, section, stats, columnW));
+            blocks.push(rowBlock(host, section, stats, columnW, statGap));
         });
         (section.strips || []).forEach((strip, stripIndex) => {
             blocks.push({ kind: "gap", h: stripIndex === 0 ? LOOK.strip.gapAbove : LOOK.strip.gap, isSpread: true });
             blocks.push({ kind: "strip", h: LOOK.strip.h, section, strip });
         });
     });
+    const rows = blocks.filter(block => block.kind === "row");
+    const labelSize = labelSizeOf(host, rows);
+    for (const row of rows) row.labelSize = labelSize;
     return blocks;
 }
 
@@ -150,12 +155,13 @@ function cardHeight(screen, avatar) {
 function geometry(host, referenceWidth, screen) {
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
     const innerW = w - 2 * LOOK.pad;
-    const cardW = Math.round(innerW * LOOK.cardShare);
+    const isPortrait = referenceWidth < REFERENCE_HEIGHT;
+    const cardW = Math.round(innerW * (isPortrait ? LOOK.portraitCardShare : LOOK.cardShare));
     const contentW = cardW - 2 * LOOK.cardInset;
     const avatar = Math.min(contentW, LOOK.avatar);
     const columnX = LOOK.pad + cardW + LOOK.columnGap;
     const columnW = w - LOOK.pad - columnX;
-    const blocks = columnBlocks(host, screen, columnW);
+    const blocks = columnBlocks(host, screen, columnW, isPortrait ? LOOK.portraitStatGap : LOOK.statGap);
     const naturalH = blocks.reduce((sum, block) => sum + block.h, 0);
     const innerH = Math.max(cardHeight(screen, avatar), naturalH);
     const spreads = blocks.filter(block => block.isSpread).length;
@@ -229,18 +235,10 @@ function drawPill(host, dc, { text: str, isLit }, x, y, maxW) {
 }
 
 // A stat: its label over its value, its pill beside or under the value,
-// and its thin gold bar at the bottom. Labels keep one size: in a row whose
-// labels take two lines, each sits on its value, and beyond two it is cut.
-function drawStat(host, dc, stat, x, rowY, block) {
+// and its thin gold bar at the bottom.
+function drawStat(host, dc, stat, x, y, block) {
     const { pill, shareBar } = LOOK;
-    const y = rowY + block.labelExtra;
-    const fitsOneLine = measureWidth(host, stat.label, { size: LOOK.labelSize, weight: 400 }) <= block.colW;
-    if (block.labelExtra === 0 || fitsOneLine) {
-        oneLine(host, dc, stat.label, { x, y, width: block.colW, size: LOOK.labelSize, weight: 400, color: COLORS.description });
-    } else {
-        const styled = labelText(host, stat.label);
-        styled.draw(dc, { x, y: rowY, width: block.colW, height: Math.min(styled.measure(block.colW).height, block.labelExtra + LOOK.valueY) });
-    }
+    oneLine(host, dc, stat.label, { x, y, width: block.colW, size: block.labelSize, weight: 400, color: COLORS.description });
     const valueW = oneLine(host, dc, stat.value, { x, y: y + LOOK.valueY, width: block.colW, size: LOOK.valueSize, minSize: LOOK.minValueSize, weight: 700, font: FONTS.display });
     const underY = y + LOOK.rowH + pill.underGap;
     if (stat.pill && block.isUnder) drawPill(host, dc, stat.pill, x, underY, block.colW);
@@ -293,7 +291,7 @@ function drawSection(host, dc, blocks, top, columnW) {
             text(host, dc, block.section.title, { x: 0, y, width, size: LOOK.titleSize, weight: 700, color: COLORS.gold, font: FONTS.display });
             dc.fillRect(0, y + LOOK.ruleY, width, 1, COLORS.border);
         } else if (block.kind === "row") {
-            block.stats.forEach((stat, index) => drawStat(host, dc, stat, index * (block.colW + LOOK.statGap), y, block));
+            block.stats.forEach((stat, index) => drawStat(host, dc, stat, index * (block.colW + block.statGap), y, block));
         } else if (block.kind === "strip") {
             drawStrip(host, dc, block.strip, y, columnW);
         }

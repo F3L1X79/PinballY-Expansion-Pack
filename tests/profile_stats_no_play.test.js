@@ -54,7 +54,7 @@ test("no Play shows a dash and no selection button; long games show hours", asyn
     });
     assert.deepEqual(section(fake, "PROGRESSION", TEXT.stats), {
         "Collection": ["0/1", "0 %"],
-        "Jours d'affilée sur la borne": ["0", "Record : 0"],
+        "Jours d'affilée": ["0", "Record : 0"],
         "Série du jour": ["0", "Record : 0"],
         "Série de la semaine": ["0", "Record : 0"],
     }, "no completed Challenges with the Challenges Add-on off");

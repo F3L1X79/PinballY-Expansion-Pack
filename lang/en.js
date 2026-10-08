@@ -346,7 +346,7 @@ export default {
             averageDuration: "Average game",
             collection: "Collection",
             challengesCompleted: "Challenges completed",
-            cabinetStreak: "Days in a row on the cabinet",
+            cabinetStreak: "Days in a row",
             dayStreak: "Table of the Day streak",
             weekStreak: "Table of the Week streak",
             favouriteManufacturer: "Favorite manufacturer",

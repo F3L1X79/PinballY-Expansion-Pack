@@ -461,7 +461,7 @@ export default {
             averageDuration: "Durée moyenne",
             collection: "Collection",
             challengesCompleted: "Défis réussis",
-            cabinetStreak: "Jours d'affilée sur la borne",
+            cabinetStreak: "Jours d'affilée",
             dayStreak: "Série du jour",
             weekStreak: "Série de la semaine",
             favouriteManufacturer: "Constructeur favori",

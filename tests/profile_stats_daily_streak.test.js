@@ -54,7 +54,7 @@ test("the Profile Stats show the Daily Streak first in the streak row, its longe
         return progression;
     }
 
-    assert.equal(TEXT.stats.cabinetStreak, "Days in a row on the cabinet");
+    assert.equal(TEXT.stats.cabinetStreak, "Days in a row");
     const alice = streakRow();
     assert.deepEqual(Object.keys(alice).slice(1), [TEXT.stats.cabinetStreak, TEXT.stats.dayStreak, TEXT.stats.weekStreak],
         "the Daily Streak first, the Period Table Streaks after it");
