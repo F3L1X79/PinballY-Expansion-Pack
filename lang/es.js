@@ -459,8 +459,8 @@ export default {
             challengesCompleted: "Challenges completed",
             // TODO: translation pass
             cabinetStreak: "Days in a row on the cabinet",
-            dayStreak: "Daily streak",
-            weekStreak: "Weekly streak",
+            dayStreak: "Table of the Day streak",
+            weekStreak: "Table of the Week streak",
             favouriteManufacturer: "Favorite manufacturer",
             favouriteDecade: "Favorite decade",
             favouriteTable: "Most played table",
