@@ -7,8 +7,9 @@
 // coordinates. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
-import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
+import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "./steamball_palette.js";
 import { mix, withAlpha, WHITE } from "./table_mastery.js";
+import { playerLevelMetalOf } from "./player_level.js";
 
 const TOOLTIP = Object.freeze({ color: 0xFF0C0C0E, size: 22, weight: 400, height: 52, padX: 28, radius: 6, arrow: 10 });
 
@@ -75,8 +76,15 @@ export function glow(dc, x, y, w, h, color, rings, peak) {
     }
 }
 
+// The pip's colour: its Rank's metal, a little lighter at each level up to
+// the next Rank.
+export function levelPipColorOf(level) {
+    const { rank, progress } = playerLevelMetalOf(level);
+    return mix(RANK_COLORS[rank], WHITE, 0.3 * progress);
+}
+
 // The Player Level pip, centred on (cx, cy), size pixels high: round, in
-// the Player Level colour, widening into an oval for three digits or more.
+// the metal of the level (Bronze up to Platinum), widening into an oval for three digits or more.
 // A dark ring keeps it apart from any Avatar.
 export function drawLevelPip(host, dc, level, cx, cy, size) {
     const number = String(level);
@@ -90,7 +98,7 @@ export function drawLevelPip(host, dc, level, cx, cy, size) {
     const x = Math.round(cx - width / 2);
     const y = Math.round(cy - height / 2);
     fillPill(dc, x - ring, y - ring, width + 2 * ring, height + 2 * ring, COLORS.tile);
-    fillPill(dc, x, y, width, height, COLORS.playerLevel);
+    fillPill(dc, x, y, width, height, levelPipColorOf(level));
     styled.draw(dc, { x, y: y + (height - measured.height) / 2, width, height: measured.height });
 }
 

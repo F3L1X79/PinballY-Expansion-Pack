@@ -17,6 +17,14 @@ const RANK_POINTS = Object.freeze({
     [ACHIEVEMENT_RANK.GOLD]: 50,
     [ACHIEVEMENT_RANK.PLATINUM]: 100,
 });
+// The first level of each Rank's metal on the level pip; from the last,
+// Platinum for good.
+const METAL_FIRST_LEVELS = Object.freeze([
+    [ACHIEVEMENT_RANK.BRONZE, 1],
+    [ACHIEVEMENT_RANK.SILVER, 10],
+    [ACHIEVEMENT_RANK.GOLD, 20],
+    [ACHIEVEMENT_RANK.PLATINUM, 30],
+]);
 const FIRST_LEVEL_COST = 50;
 const LEVEL_COST_STEP = 25;
 
@@ -32,6 +40,17 @@ export function playerLevelOf(points) {
         level++;
     }
     return { level, points, from, to: from + cost };
+}
+
+// The level pip's metal: the Rank and how far into it the level is, from
+// 0 at its first level to 1 at the next Rank's (Platinum never ends, so it
+// reaches 1 at its own first level plus ten and stays there).
+export function playerLevelMetalOf(level) {
+    let index = 0;
+    while (index + 1 < METAL_FIRST_LEVELS.length && level >= METAL_FIRST_LEVELS[index + 1][1]) index++;
+    const [rank, first] = METAL_FIRST_LEVELS[index];
+    const next = index + 1 < METAL_FIRST_LEVELS.length ? METAL_FIRST_LEVELS[index + 1][1] : first + 10;
+    return { rank, progress: Math.min(1, (level - first) / (next - first)) };
 }
 
 const pointsOf = achievements =>

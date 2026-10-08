@@ -94,9 +94,9 @@ const HINT = Object.freeze({ size: 12, weight: 400, top: 180 });
 // not laid out yet, so a window-sized canvas drawn then ends up distorted.
 // The name is centred under the Avatar, across the canvas width, which also
 // leaves the Avatar ~30 px from the right edge.
-// The level pip straddles the Avatar's bottom-right corner, a little inside
-// it; the name sits low enough to clear the pip's lower half.
-const BADGE = Object.freeze({ width: 160, height: 170, avatarSize: 96, frame: 3, top: 30, nameGap: 14, pipSize: 34, pipInset: 6 });
+// The level pip sits on the Avatar's bottom-right corner, mostly inside it
+// so that it barely spills over the frame; the name clears it.
+const BADGE = Object.freeze({ width: 160, height: 170, avatarSize: 96, frame: 3, top: 30, nameGap: 14, pipSize: 34, pipInset: 12 });
 // The size validated on the cabinet's 1920 px high playfield, kept in
 // proportion to the window's height on any other window.
 const BADGE_REFERENCE_HEIGHT = 1920;

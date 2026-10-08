@@ -1,11 +1,23 @@
 // ============================================================
 // Reads the Player Level pip a layer shows: its number (the digits drawn
-// over the Player Level colour) and its width. Never loaded by PinballY.
+// over the level's metal) and its width. Never loaded by PinballY.
 // ============================================================
 
-import { STEAMBALL_COLORS } from "../common/steamball_palette.js";
+import { levelPipColorOf } from "../common/steamball_drawing.js";
 
-const pipFills = layer => layer.strokes().filter(stroke => stroke.fill === STEAMBALL_COLORS.playerLevel);
+// The fills in the metal of the level the layer's digits show.
+function pipFills(layer) {
+    const digits = layer.strokes().filter(stroke => "text" in stroke && /^\d+$/.test(stroke.text));
+    if (digits.length !== 1) return [];
+    const color = levelPipColorOf(Number(digits[0].text));
+    return layer.strokes().filter(stroke => stroke.fill === color);
+}
+
+// The colour the layer's pip is drawn in, null when it shows no pip.
+export function pipColor(layer) {
+    const fills = pipFills(layer);
+    return fills.length === 0 ? null : fills[0].fill;
+}
 
 // The pip's number, null when the layer is hidden or shows no pip.
 export function shownPip(layer) {

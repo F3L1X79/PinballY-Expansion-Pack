@@ -1,6 +1,7 @@
 // ============================================================
 // Level pip: drawn by the shared helper, round up to two digits and
-// widening into an oval from three; through main.js on the fake PinballY
+// widening into an oval from three, in a metal from Bronze to Platinum
+// that lightens with each level; through main.js on the fake PinballY
 // globals, no pip on the badge with the Achievements Add-on off.
 // ============================================================
 
@@ -8,8 +9,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "./fake_pinbally_host.js";
 import { startScenario, errorLines, ALL_TOASTS_MS } from "./mastery_bar_scenario.js";
-import { shownPip, pipWidth } from "./level_pip_reader.js";
+import { shownPip, pipWidth, pipColor } from "./level_pip_reader.js";
 import { drawLevelPip } from "../common/steamball_drawing.js";
+import { RANK_COLORS } from "../common/steamball_palette.js";
+import { ACHIEVEMENT_RANK } from "../common/achievements.js";
 
 const BADGE_Z = 4500;
 
@@ -24,6 +27,16 @@ test("the pip is round up to two digits and widens into an oval from three", () 
     for (const level of [7, 42, 123]) assert.equal(shownPip(drawnPip(level)), String(level));
     assert.equal(pipWidth(drawnPip(7)), pipWidth(drawnPip(42)), "one or two digits: the same disc");
     assert.ok(pipWidth(drawnPip(123)) > pipWidth(drawnPip(42)), "three digits: wider");
+});
+
+test("the pip goes from Bronze to Platinum as the level climbs, lighter at each level", () => {
+    const { BRONZE, SILVER, GOLD, PLATINUM } = ACHIEVEMENT_RANK;
+    for (const [level, rank] of [[1, BRONZE], [10, SILVER], [20, GOLD], [30, PLATINUM]]) {
+        assert.equal(pipColor(drawnPip(level)), RANK_COLORS[rank], `level ${level}`);
+    }
+    const brightness = color => ((color >>> 16) & 0xFF) + ((color >>> 8) & 0xFF) + (color & 0xFF);
+    assert.ok(brightness(pipColor(drawnPip(9))) > brightness(pipColor(drawnPip(1))), "lighter within a Rank");
+    assert.equal(pipColor(drawnPip(40)), pipColor(drawnPip(80)), "Platinum stops lightening");
 });
 
 test("no pip with the Achievements Add-on off", async () => {

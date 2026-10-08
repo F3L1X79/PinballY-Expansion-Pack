@@ -31,9 +31,9 @@ export const CHOICE = Object.freeze({ AVATAR: "avatar", CLOSE: "close", DAY: "da
 const LOOK = Object.freeze({
     pad: 40, gap: 26,
     avatar: 120, cross: 56,
-    // The level pip straddles the Avatar's bottom-right corner, in the
-    // Profile badge's proportions.
-    pipSize: 42, pipInset: 8,
+    // The level pip sits on the Avatar's bottom-right corner, mostly inside
+    // it, in the Profile badge's proportions.
+    pipSize: 42, pipInset: 15,
     greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
     // The Daily Streak line, when there is one, between the greeting and
     // Collection Mastery.
