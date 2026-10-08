@@ -95,6 +95,18 @@ export default function init() {
     const achievementToasts = getAchievementToasts();
     const profileStore = getProfileStore();
     const shownPlayerLevel = getShownPlayerLevel();
+    // Another Profile's level, from its Notified Achievements. A Profile that
+    // is not a child counts the whole set; a Child Profile the active
+    // Profile's set when it is a child too, else the whole set unscaled
+    // (its own set needs it active): close enough for the picker's pip.
+    shownPlayerLevel.setUnshownReader(profileName => {
+        const notified = profileStore.getNotifiedOf(profileName);
+        const nonChild = getAllAchievements({ asNonChild: true });
+        if (profileStore.isChild(profileName) && profileStore.isChild()) {
+            return getPlayerLevel(notified, getAllAchievements(), nonChild).level;
+        }
+        return getPlayerLevel(notified, nonChild).level;
+    });
 
     const achievementList = createAchievementList(createPinballYHost(), {
         getAchievements: getAllAchievements, profileStore, drawingAhead: getDrawingAhead(),

@@ -83,6 +83,14 @@ export function playerLevelColorOf(level) {
     return mix(RANK_COLORS[rank], WHITE, 0.3 * progress);
 }
 
+// Where the level pip sits on an Avatar whose box, frame included, is side
+// pixels from (x, y): on its bottom-right corner, in the same proportions on
+// the Profile badge, the Welcome Screen and the Profile picker.
+export function levelPipOn(x, y, side) {
+    const inset = side * 9 / 102;
+    return { cx: x + side - inset, cy: y + side - inset, size: Math.round(side / 3) };
+}
+
 // The Player Level pip, centred on (cx, cy), size pixels high: round, in
 // the metal of the level (Bronze up to Platinum), widening into an oval for three digits or more.
 // A dark ring keeps it apart from any Avatar.

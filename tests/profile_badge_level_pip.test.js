@@ -4,7 +4,6 @@
 // Guest included; after a Play crossing a level, the old level until the
 // Level Toast starts; the new Profile's level right after a switch; level
 // 1 after a Profile Reset; a level drop shown only at the next switch.
-// No pip on the Profile picker's carousel.
 // ============================================================
 
 import { test } from "node:test";
@@ -15,8 +14,6 @@ import config from "../common/config.js";
 
 const [FIRST] = TABLES;
 const BADGE_Z = 4500;
-// The carousel's background, Avatars, gold frame and names.
-const CAROUSEL_Z = [6500, 6501, 6502];
 const badgePip = fake => shownPip(fake.drawingLayers().find(layer => layer.zIndex === BADGE_Z));
 
 test("the badge's pip follows the Level Toast, switches and Profile Resets", async () => {
@@ -57,13 +54,6 @@ test("the badge's pip follows the Level Toast, switches and Profile Resets", asy
     fake.advanceTime(ALL_TOASTS_MS);
     assert.equal(badgePip(fake), "1", "the drop shows at the next switch");
     assert.equal(levelToasts(fake).length, 1, "nothing announced");
-
-    const { default: lang } = await import("../common/i18n.js");
-    fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
-    fake.selectMenuItem(lang.profiles.menuEntry);
-    const carousel = fake.drawingLayers().filter(layer => CAROUSEL_Z.includes(layer.zIndex) && layer.alpha > 0);
-    assert.ok(carousel.length > 0, "the carousel is open");
-    assert.ok(carousel.every(layer => shownPip(layer) === null), "no pip on the carousel");
 
     assert.deepEqual(errorLines(fake), []);
 });

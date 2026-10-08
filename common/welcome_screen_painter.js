@@ -15,7 +15,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawLevelPip, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, drawAvatar, drawLevelPip, levelPipOn, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
 } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
@@ -31,9 +31,6 @@ export const CHOICE = Object.freeze({ AVATAR: "avatar", CLOSE: "close", DAY: "da
 const LOOK = Object.freeze({
     pad: 40, gap: 26,
     avatar: 120, cross: 56,
-    // The level pip sits on the Avatar's bottom-right corner, mostly inside
-    // it, in the Profile badge's proportions.
-    pipSize: 42, pipInset: 15,
     greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
     // The Daily Streak line, when there is one, between the greeting and
     // Collection Mastery.
@@ -279,8 +276,10 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         draw: dc => {
             if (screen.picker) {
                 drawAvatar(dc, screen.avatarPath, 0, 0, LOOK.avatar);
-                const corner = LOOK.avatar - LOOK.pipInset;
-                if (screen.level !== null) drawLevelPip(host, dc, screen.level, corner, corner, LOOK.pipSize);
+                if (screen.level !== null) {
+                    const pip = levelPipOn(0, 0, LOOK.avatar);
+                    drawLevelPip(host, dc, screen.level, pip.cx, pip.cy, pip.size);
+                }
             }
             drawCross(dc, inner.w - LOOK.cross, 0, LOOK.cross);
             const parts = screen.greeting.map(([str, gold]) => [str, gold ? COLORS.gold : COLORS.title]);

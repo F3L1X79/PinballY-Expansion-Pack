@@ -16,7 +16,7 @@
 // opens, and anything not drawn ahead yet is drawn on the spot.
 // A badge at the top right of the wheel screen shows the active Profile's
 // Avatar and name, with the shown Player Level as a pip at the Avatar's
-// bottom-right corner; it is redrawn on every switch and whenever the
+// bottom-right corner (each Avatar of the carousel has its own pip too); it is redrawn on every switch and whenever the
 // shown level changes, hidden on "gamestarted" and shown again on
 // "wheelmode".
 // When the Welcome Screen Add-on is on, a pick closes the carousel and the
@@ -40,7 +40,7 @@ import { registerChangePlayer } from "../common/change_player.js";
 import { drawShadowedText } from "../common/shadowed_text.js";
 import { getDrawingAhead } from "../common/drawing_ahead.js";
 import { getShownPlayerLevel } from "../common/shown_player_level.js";
-import { drawLevelPip } from "../common/steamball_drawing.js";
+import { drawLevelPip, levelPipOn } from "../common/steamball_drawing.js";
 import { createNavigationSound } from "../common/navigation_sound.js";
 import config from "../common/config.js";
 
@@ -51,6 +51,8 @@ const SCRIPT_NAME = "ProfilePicker";
 const PICKER_Z_INDEX = 6500;
 const AVATAR_Z_INDEX = 6501;
 const TOP_Z_INDEX = 6502;
+// Above the gold frame, which runs under the pip's corner.
+const PIP_Z_INDEX = 6503;
 // Above the wheel and the game info box, under popups and menus.
 const BADGE_Z_INDEX = 4500;
 const COLORS = Object.freeze({
@@ -81,6 +83,9 @@ const GLIDE_SNAP = 0.02;
 const AVATAR_ART = Object.freeze({ image: 260, goldFrame: 5, plainFrame: 2 });
 const AVATAR_SIDE = AVATAR_ART.image + 2 * AVATAR_ART.plainFrame;
 const GOLD_FRAME_SIDE = AVATAR_ART.image + 2 * AVATAR_ART.goldFrame;
+// A carousel pip's canvas: as high as the pip, wide enough for four digits.
+const PIP_ART = levelPipOn(0, 0, AVATAR_SIDE);
+const PIP_CANVAS = Object.freeze({ width: 2 * PIP_ART.size, height: PIP_ART.size });
 // The Avatars' row sits at this fraction of the height; the texts are
 // placed from it.
 const ROW_HEIGHT_RATIO = 0.4;
@@ -94,9 +99,9 @@ const HINT = Object.freeze({ size: 12, weight: 400, top: 180 });
 // not laid out yet, so a window-sized canvas drawn then ends up distorted.
 // The name is centred under the Avatar, across the canvas width, which also
 // leaves the Avatar ~30 px from the right edge.
-// The level pip sits on the Avatar's bottom-right corner, mostly inside it
-// so that it barely spills over the frame; the name clears it.
-const BADGE = Object.freeze({ width: 160, height: 170, avatarSize: 96, frame: 3, top: 30, nameGap: 14, pipSize: 34, pipInset: 12 });
+// The level pip straddles the Avatar's bottom-right corner; the name sits
+// low enough to clear the pip's lower half.
+const BADGE = Object.freeze({ width: 160, height: 170, avatarSize: 96, frame: 3, top: 30, nameGap: 14 });
 // The size validated on the cabinet's 1920 px high playfield, kept in
 // proportion to the window's height on any other window.
 const BADGE_REFERENCE_HEIGHT = 1920;
@@ -137,6 +142,7 @@ export default function init() {
     // By Profile name, each with the signature of what it was drawn with.
     const avatarLayers = new Map();
     const nameLayers = new Map();
+    const pipLayers = new Map();
     // The Profiles to draw ahead, and whether the window must be measured
     // and the Profiles read again first.
     let aheadProfiles = [];
@@ -228,6 +234,15 @@ export default function init() {
         });
     }
 
+    // null when the Profile has no level to show.
+    function pipLayer(profile) {
+        const level = shownPlayerLevel.getOf(profile.name);
+        if (level === null) return null;
+        return signedLayer(pipLayers, profile.name, PIP_Z_INDEX, String(level), PIP_CANVAS.width, PIP_CANVAS.height, dc => {
+            drawLevelPip(host, dc, level, PIP_CANVAS.width / 2, PIP_CANVAS.height / 2, PIP_ART.size);
+        });
+    }
+
     function nameLayer(profile) {
         return signedLayer(nameLayers, profile.name, TOP_Z_INDEX, nameSignature(profile), layout.width, NAME_LAYER_HEIGHT, dc => {
             drawShadowedText(host, dc, NAME, isActive(profile) ? COLORS.gold : COLORS.text, displayNameOf(profile), 0);
@@ -258,9 +273,21 @@ export default function init() {
 
     function placeAvatar(profile, x, y, size, opacity, gold) {
         placeAroundImage(avatarLayer(profile), AVATAR_SIDE, x, y, size, opacity);
+        placePip(profile, x, y, size, opacity);
         if (!gold) return;
         if (!isGoldFrameDrawn) drawGoldFrame();
         placeAroundImage(goldFrameLayer, GOLD_FRAME_SIDE, x, y, size, opacity);
+    }
+
+    // On the Avatar's corner, scaled with it.
+    function placePip(profile, x, y, size, opacity) {
+        const layer = pipLayer(profile);
+        if (!layer) return;
+        const scale = size / AVATAR_ART.image;
+        const offset = (PIP_ART.cx - AVATAR_SIDE / 2) * scale;
+        layer.setScale({ ySpan: PIP_CANVAS.height * scale / layout.height });
+        layer.setPos((x + offset) / layout.width - 0.5, 0.5 - (y + offset) / layout.height);
+        layer.alpha = opacity;
     }
 
     const hideAll = records => {
@@ -274,6 +301,7 @@ export default function init() {
         goldFrameLayer.alpha = 0;
         hideAll(avatarLayers);
         hideAll(nameLayers);
+        hideAll(pipLayers);
     }
 
     // The highlighted name, once the Avatars are at rest.
@@ -297,8 +325,10 @@ export default function init() {
         const shownProfiles = new Map(shownOffsets(count)
             .map(offset => [profiles[((highlighted + offset) % count + count) % count], offset]));
         const shownNames = new Set([...shownProfiles.keys()].map(profile => profile.name));
-        for (const [name, { layer }] of avatarLayers) {
-            if (!shownNames.has(name) && layer.alpha !== 0) layer.alpha = 0;
+        for (const records of [avatarLayers, pipLayers]) {
+            for (const [name, { layer }] of records) {
+                if (!shownNames.has(name) && layer.alpha !== 0) layer.alpha = 0;
+            }
         }
         for (const [profile, offset] of shownProfiles) {
             const slot = slotAt(offset + glide);
@@ -346,6 +376,11 @@ export default function init() {
                 nameLayer(profile);
                 return true;
             }
+            const level = shownPlayerLevel.getOf(profile.name);
+            if (level !== null && !isDrawn(pipLayers, profile.name, String(level))) {
+                pipLayer(profile);
+                return true;
+            }
         }
         return false;
     }
@@ -363,12 +398,15 @@ export default function init() {
         const profile = profileStore.getActiveProfile();
         badgeLayer.clear(COLORS.transparent);
         badgeLayer.draw(dc => {
-            const { width, avatarSize, frame, top, nameGap, pipSize, pipInset } = BADGE;
+            const { width, avatarSize, frame, top, nameGap } = BADGE;
             const x = (width - avatarSize) / 2;
             dc.fillRect(x - frame, top - frame, avatarSize + 2 * frame, avatarSize + 2 * frame, COLORS.gold);
             dc.drawImage(profile.avatarPath, x, top, avatarSize, avatarSize);
             const level = shownPlayerLevel.get();
-            if (level !== null) drawLevelPip(host, dc, level, x + avatarSize - pipInset, top + avatarSize - pipInset, pipSize);
+            if (level !== null) {
+                const pip = levelPipOn(x - frame, top - frame, avatarSize + 2 * frame);
+                drawLevelPip(host, dc, level, pip.cx, pip.cy, pip.size);
+            }
             drawShadowedText(host, dc, BADGE_NAME, COLORS.text, displayNameOf(profile), top + avatarSize + nameGap);
         }, BADGE.width, BADGE.height);
     }

@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "./fake_pinbally_host.js";
 import { startScenario, errorLines, ALL_TOASTS_MS } from "./mastery_bar_scenario.js";
 import { shownPip, pipWidth, pipColor } from "./level_pip_reader.js";
-import { drawLevelPip } from "../common/steamball_drawing.js";
+import { drawLevelPip, levelPipOn } from "../common/steamball_drawing.js";
 import { RANK_COLORS } from "../common/steamball_palette.js";
 import { ACHIEVEMENT_RANK } from "../common/achievements.js";
 
@@ -37,6 +37,13 @@ test("the pip goes from Bronze to Platinum as the level climbs, lighter at each 
     const brightness = color => ((color >>> 16) & 0xFF) + ((color >>> 8) & 0xFF) + (color & 0xFF);
     assert.ok(brightness(pipColor(drawnPip(4))) > brightness(pipColor(drawnPip(1))), "lighter within a Rank");
     assert.equal(pipColor(drawnPip(30)), pipColor(drawnPip(80)), "Platinum stops lightening");
+});
+
+test("the pip sits on any Avatar in the same proportions", () => {
+    assert.deepEqual(levelPipOn(10, 20, 102), { cx: 103, cy: 113, size: 34 }, "the Profile badge's");
+    const small = levelPipOn(0, 0, 102);
+    const big = levelPipOn(0, 0, 204);
+    assert.deepEqual([big.cx, big.cy, big.size], [2 * small.cx, 2 * small.cy, 2 * small.size]);
 });
 
 test("no pip with the Achievements Add-on off", async () => {
