@@ -364,7 +364,7 @@ export default {
         percent: (percent) => `${percent}%`,
         // A Streak's longest, in a pill; or the record set right now.
         record: (longest) => `Record: ${longest}`,
-        recordInProgress: "New record!",
+        recordInProgress: "Record!",
         // A favourite's play time, in a pill; its hours and minutes given.
         playTime: (time) => `${time} played`,
         // The favourite decade, by its start year: 1990 for 1990 to 1999.

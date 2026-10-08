@@ -60,8 +60,9 @@ const LOOK = Object.freeze({
     titleH: 56, titleSize: 19, ruleY: 32, statGap: 24, labelSize: 18, minLabelSize: 14, valueY: 26, valueSize: 34, minValueSize: 22, rowH: 78,
     sectionGap: 20, rowGap: 18,
     // A stat's pill: beside its value (gap), or under it (underGap); gold
-    // when lit, its background the gold mixed that far into the panel.
-    pill: Object.freeze({ h: 30, size: 16, weight: 600, padX: 14, gap: 14, underGap: 16, litMix: 0.78 }),
+    // when lit, its background the gold mixed that far into the panel. Never
+    // wider than its room: its text shrinks to minSize, then is cut.
+    pill: Object.freeze({ h: 30, size: 16, minSize: 12, weight: 600, padX: 14, gap: 14, underGap: 16, litMix: 0.78 }),
     // A stat's thin bar under its value (or its pill), short of the
     // column's right edge by inset.
     shareBar: Object.freeze({ h: 6, gap: 8, inset: 24 }),
@@ -86,7 +87,7 @@ function measureWidth(host, str, { size, weight, font = FONTS.body }) {
     return Math.ceil(styled.measure(UNBOUNDED).width);
 }
 
-const pillWidth = (host, str) => measureWidth(host, str, { size: LOOK.pill.size, weight: LOOK.pill.weight }) + 2 * LOOK.pill.padX;
+const pillWidth = (host, str, maxW = Infinity) => Math.min(maxW, measureWidth(host, str, { size: LOOK.pill.size, weight: LOOK.pill.weight }) + 2 * LOOK.pill.padX);
 
 // A row of stats side by side in the column: every pill goes under its
 // value when one does not fit beside its own, so the row stays aligned.
@@ -204,12 +205,15 @@ function drawCollection(host, dc, collection, x, y, w) {
     drawMasterySquare(host, dc, tier, squareX, y + Math.round((look.h - size) / 2), look.squareK, lookLevel);
 }
 
-// A rounded pill holding pill.text, its left edge at x, from y; gold when lit.
-function drawPill(host, dc, { text: str, isLit }, x, y) {
+// A rounded pill holding pill.text, its left edge at x, from y, at most
+// maxW wide; gold when lit.
+function drawPill(host, dc, { text: str, isLit }, x, y, maxW) {
     const look = LOOK.pill;
-    const w = pillWidth(host, str);
+    const w = pillWidth(host, str, maxW);
     fillRounded(dc, x, y, w, look.h, look.h / 2, isLit ? mix(COLORS.gold, COLORS.panel, look.litMix) : COLORS.track);
-    oneLine(host, dc, str, { x: x + look.padX, y, width: w - 2 * look.padX, height: look.h, size: look.size, weight: look.weight, color: isLit ? COLORS.gold : COLORS.description });
+    oneLine(host, dc, str, {
+        x: x + look.padX, y, width: w - 2 * look.padX, height: look.h, size: look.size, minSize: look.minSize, weight: look.weight, color: isLit ? COLORS.gold : COLORS.description,
+    });
 }
 
 // A stat: its label over its value, its pill beside or under the value,
@@ -219,8 +223,11 @@ function drawStat(host, dc, stat, x, y, block) {
     oneLine(host, dc, stat.label, { x, y, width: block.colW, size: LOOK.labelSize, minSize: LOOK.minLabelSize, weight: 400, color: COLORS.description });
     const valueW = oneLine(host, dc, stat.value, { x, y: y + LOOK.valueY, width: block.colW, size: LOOK.valueSize, minSize: LOOK.minValueSize, weight: 700, font: FONTS.display });
     const underY = y + LOOK.rowH + pill.underGap;
-    if (stat.pill && block.isUnder) drawPill(host, dc, stat.pill, x, underY);
-    else if (stat.pill) drawPill(host, dc, stat.pill, Math.round(x + valueW + pill.gap), y + LOOK.valueY + Math.round((LOOK.rowH - LOOK.valueY - pill.h) / 2));
+    if (stat.pill && block.isUnder) drawPill(host, dc, stat.pill, x, underY, block.colW);
+    else if (stat.pill) {
+        const pillX = Math.round(x + valueW + pill.gap);
+        drawPill(host, dc, stat.pill, pillX, y + LOOK.valueY + Math.round((LOOK.rowH - LOOK.valueY - pill.h) / 2), x + block.colW - pillX);
+    }
     if (stat.share !== undefined) {
         const barY = (block.isUnder ? underY + pill.h : y + LOOK.rowH) + shareBar.gap;
         drawBar(dc, x, barY, block.colW - shareBar.inset, shareBar.h, stat.share, COLORS.gold);
@@ -242,7 +249,7 @@ function drawStrip(host, dc, strip, y, columnW) {
         drawWheelLogo(host, dc, strip, { x: look.logoInsetX, y: y + look.logoInsetY, w: logoW, h: look.h - 2 * look.logoInsetY }, look.titleSize);
     }
     oneLine(host, dc, strip.title, { x: textX, y: y + look.nameY, width: textW, size: look.nameSize, minSize: look.minNameSize, weight: 700, font: FONTS.display });
-    if (strip.pill) drawPill(host, dc, strip.pill, textX, y + look.pillY);
+    if (strip.pill) drawPill(host, dc, strip.pill, textX, y + look.pillY, textW);
 }
 
 // A button: a tile with its label, and its count in grey on its right.
