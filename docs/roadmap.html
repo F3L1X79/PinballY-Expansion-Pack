@@ -234,7 +234,7 @@
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
       <p><strong>Réglages par défaut</strong> (sons CC0 livrés, chemins de son relatifs au pack, Wheel Arc) livrés le 08/10 : reste la vérification sur la borne, comme pour la Daily Streak (ticket #173) et les extras du Player Level (ticket #168)</p>
-      <span class="next">Ensuite : <a href="#profile-rewards">les récompenses de profil</a> (cadres d'Avatar et titres), grill fait, à passer au <code>/prototype</code></span>
+      <span class="next">Ensuite : <a href="#profile-rewards">les récompenses de profil</a> (cadres d'Avatar et titres), prototype validé, à passer au <code>/to-spec</code></span>
     </div>
   </section>
 
@@ -267,14 +267,14 @@
             <h3>Récompenses de profil : cadres d'Avatar et titres à débloquer</h3>
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
-          <p>La progression change l'apparence du Profile : 10 Avatar Frames, un par Collection Tier, et 10 Profile Titles, un tous les 3 Player Levels jusqu'au 30. Le joueur choisit le cadre et le titre qu'il porte parmi ceux qu'il a débloqués, depuis les Profile Stats.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/prototype</code> (les 10 cadres et l'écran de choix sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur l'Avatar, la Collection Mastery et le Player Level (livrés)</div>
+          <p>La progression change l'apparence du Profile : 10 Avatar Frames à thème, un par Collection Tier, et 10 Profile Titles, un tous les 3 Player Levels jusqu'au 30. Le joueur choisit le cadre et le titre qu'il porte parmi ceux qu'il a débloqués, depuis les Profile Stats.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">proto</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur l'Avatar, la Collection Mastery et le Player Level (livrés)</div>
           <details>
-            <summary>Décisions (grill du 08/10/2026)</summary>
+            <summary>Décisions (grill et prototype du 08/10/2026)</summary>
             <ul>
               <li>Termes du glossaire : Profile Reward = Avatar Frame (« cadre ») + Profile Title (« titre »). Tous les Profiles en ont, Guest et Child Profile compris.</li>
-              <li>Cadres : un par Collection Tier (1 à 10), à la couleur du Mastery Level du même numéro, dessinés en code et validés par <code>/prototype</code>. L'anneau doré du Profile picker reste la marque de sélection, pas un cadre ; sans cadre porté, chaque endroit garde son aspect actuel.</li>
+              <li>Cadres : un par Collection Tier (1 à 10), chacun son thème, dans cet ordre : Sylve enchantée, Vapeur et engrenages, Néon d'arcade, Givre éternel, Épice d'Arrakis, Grimoire arcanique, Station orbitale, Souffle du dragon, Flipper royal, Légende céleste. Plus de couleur de Mastery Level. Ce sont des PNG dessinés d'avance par un script Node du dépôt (sans bibliothèque), en 384 et 192 px avec une copie grisée pour les verrouillés ; chaque image déborde d'un quart de l'Avatar de tous côtés, et chaque endroit doit lui laisser cette place. Prototype : branche <code>prototype/avatar-frames</code> (<code>assets/images/avatar_frames_prototype/</code>, aperçu dans <code>preview.png</code>). L'anneau doré du Profile picker reste la marque de sélection, pas un cadre ; sans cadre porté, chaque endroit garde son aspect actuel.</li>
               <li>Titres : un tous les 3 Player Levels (3 à 30), drôles (humour, SF façon Dune, heroic fantasy, un peu de steampunk), jamais un nom de Mastery Level ; liste en et fr arrêtée à la spec. Secondaires : ils passent après les cadres. Le niveau garde son seul numéro.</li>
               <li>Déblocage recalculé à chaque fois, jamais stocké : seul le choix porté va dans <code>profile.json</code>. Un titre se reverrouille si le niveau baisse (le Profile porte alors le plus haut qui lui reste) ; une Profile Reset reprend tout.</li>
               <li>Annonce : une ligne dans le toast qui l'amène (Mastery Toast du palier, Level Toast), sans toast de plus. Le premier débloqué de chaque sorte est porté aussitôt, ensuite le choix du joueur ne change plus.</li>

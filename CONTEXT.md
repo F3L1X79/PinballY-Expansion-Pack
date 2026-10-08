@@ -73,7 +73,7 @@ An Avatar Frame or a Profile Title that a Profile unlocks through play and then 
 _Avoid_: cosmetic, unlockable, skin
 
 **Avatar Frame**:
-A frame drawn around the Avatar wherever it is shown, one for each Collection Tier from 1 to 10, unlocked by reaching that tier, in the colour of the Mastery Level of the same number; a new Avatar Frame is announced by a line in the toast of its Collection Tier, and the first one a Profile unlocks is worn at once. A Profile that wears none keeps each place's usual look. It is not the gold ring that marks the selected Avatar in the Profile picker, which stays around it. The Player Level pip stays on top of it, in its corner. Shown as "cadre" in French.
+A frame drawn around the Avatar wherever it is shown, one for each Collection Tier from 1 to 10, unlocked by reaching that tier, each with a theme of its own (an enchanted forest, steam and gears, a celestial legend…) rather than the colour of a Mastery Level, and reaching a quarter of the Avatar's size beyond it on every side; a new Avatar Frame is announced by a line in the toast of its Collection Tier, and the first one a Profile unlocks is worn at once. A Profile that wears none keeps each place's usual look. It is not the gold ring that marks the selected Avatar in the Profile picker, which stays around it. The Player Level pip stays on top of it, in its corner. Shown as "cadre" in French.
 _Avoid_: skin, border, badge (the Profile badge is the Avatar shown at the top right of the wheel screen), gold frame
 
 **Profile Title**:
