@@ -21,6 +21,8 @@ const DEFAULTS = {
     profileGreetingSoundFile: "",
     // ABSOLUTE path to the sound played once when a Confetti Shower starts. Empty = no sound.
     confettiSoundFile: "",
+    // ABSOLUTE path to the sound played once when the Fireworks start. Empty = no sound.
+    fireworksSoundFile: "",
     // Manufacturer name you gave fictional/community VPX tables in PinballY.
     // Used by the status line and the "Original Tables" filter.
     communityTablesManufacturer: "VPX Community",
@@ -41,6 +43,9 @@ const DEFAULTS = {
     // Platinum Achievement (nothing is drawn ahead for it, no sound plays),
     // for a PC that struggles with it.
     confetti: true,
+    // false = no Fireworks with a Level Toast (nothing is drawn ahead for
+    // them, no sound plays), for a PC that struggles with them.
+    fireworks: true,
     // true = every PinballY menu title shown without a translation is written
     // to the PinballY log (for a new PinballY version or a new language).
     logUntranslatedMenuTitles: false,

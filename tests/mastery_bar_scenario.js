@@ -48,11 +48,14 @@ export const playedFor = seconds => ({ count: 1, seconds, lastPlayed: "2026-09-0
 
 // addOns: the Add-ons on; profiles: { name: { plays, isChild, collectionTier, notified } }, Guest's
 // under "guest"; active: the Profile in cabinet.json; challenge: the week's
-// lock in cabinet.json (undefined lets the Challenges draw one).
+// lock in cabinet.json (undefined lets the Challenges draw one); settings:
+// config keys to change; soundFiles: the files that exist.
 export async function startScenario({
     addOns = ["tableMastery"], profiles = {}, active = "guest", challenge, tables = TABLES, language = "en",
+    settings = {}, soundFiles = [],
 } = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
+    for (const file of soundFiles) fake.addFile(file);
     for (const [name, { plays = {}, isChild = false, collectionTier, notified = [] }] of Object.entries(profiles)) {
         fake.addFile(profileFile(name), JSON.stringify({
             version: 1, plays, notified, ...(isChild ? { isChild } : {}), ...(collectionTier ? { collectionTier } : {}),
@@ -65,6 +68,7 @@ export async function startScenario({
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = language;
+    Object.assign(config, settings);
 
     await import("../main.js");
     await settle();

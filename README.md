@@ -88,9 +88,11 @@ ADD_ON_CLOCK=false
 | `ACHIEVEMENT_SOUND_FILE` | *(none)* | Sound played with each Achievement toast. |
 | `PROFILE_GREETING_SOUND_FILE` | *(none)* | Sound played when a player is greeted. |
 | `CONFETTI_SOUND_FILE` | *(none)* | Sound played once when a shower of confetti starts. |
+| `FIREWORKS_SOUND_FILE` | *(none)* | Sound played once when the Fireworks start. |
 | `ACHIEVEMENT_TOAST_SECONDS` | `4` | Seconds an Achievement toast stays on screen (up to 60). |
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Size of the toast, from `0.5` to `3`. Raise it on a large screen. |
 | `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge or a Platinum Achievement, if your PC struggles with it. |
+| `FIREWORKS` | `true` | `false` turns off the Fireworks that come with the toast of a new Player Level, if your PC struggles with them. Independent of `CONFETTI`. |
 | `SKIP_RANDOM_GAME_ANIMATION` | `false` | `true` skips the wheel of fortune and launches the Random Game at once. |
 | `ASK_TO_RATE_AFTER_MINUTES_PLAYED` | `60` | Minutes played on a table before you are asked to rate it. |
 | `LOG_UNTRANSLATED_MENU_TITLES` | `false` | `true` writes each untranslated PinballY menu title to `PinballY.log`. |

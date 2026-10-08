@@ -7,6 +7,7 @@
 // by frame, one frame shown at a time (docs/adr/0012); only the rockets and
 // their trails are moved piece by piece. Every layer waits shrunk to a dot.
 // Vanishes on "prelaunch", "gamestarted" and "attractmodestart".
+// FIREWORKS=false prepares, draws and plays nothing.
 // ============================================================
 
 import { safeHandler } from "./safe_handler.js";
@@ -14,6 +15,7 @@ import { createPinballYHost } from "./pinbally_host.js";
 import { getDrawingAhead } from "./drawing_ahead.js";
 import { STEAMBALL_COLORS } from "./steamball_palette.js";
 import { CONFETTI_Z_INDEX } from "./confetti_shower.js";
+import config from "./config.js";
 
 const SCRIPT_NAME = "Fireworks";
 
@@ -270,8 +272,13 @@ function burstFrame(index, [outer, inner, twinkle], seed) {
     return items;
 }
 
-export function createFireworks(host, { drawingAhead }) {
+// soundFile: absolute path played once per show, empty for none.
+export function createFireworks(host, { enabled = true, soundFile = "", drawingAhead }) {
+    if (!enabled) return { start() {} };
+
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
+    // A sound that cannot play is logged and never stops the show.
+    const playSound = safeHandler(SCRIPT_NAME, () => { if (soundFile) host.playSound(soundFile); });
     let screenSize = null;
     // The layer the window was measured on, kept for the first sprite.
     let measureLayer = null;
@@ -471,6 +478,7 @@ export function createFireworks(host, { drawingAhead }) {
         show = { rockets: [], schemes: [], startMs: host.now().getTime(), lastFrameMs: null };
         log(`Started with ${ROCKET_TIMES_S.length} rockets.`);
         frameTimer = host.setInterval(safeHandler(SCRIPT_NAME, step), FRAME_MS);
+        playSound();
         // The first rocket leaves with the Level Toast, not a frame later.
         step();
     }
@@ -486,6 +494,12 @@ export function createFireworks(host, { drawingAhead }) {
 let sharedFireworks = null;
 
 export function getFireworks() {
-    if (!sharedFireworks) sharedFireworks = createFireworks(createPinballYHost(), { drawingAhead: getDrawingAhead() });
+    if (!sharedFireworks) {
+        sharedFireworks = createFireworks(createPinballYHost(), {
+            enabled: config.fireworks,
+            soundFile: config.fireworksSoundFile,
+            drawingAhead: getDrawingAhead(),
+        });
+    }
     return sharedFireworks;
 }
