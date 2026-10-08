@@ -68,6 +68,18 @@ _Avoid_: Streak (alone: a Period Table Streak belongs to a Period Table), login 
 The screen, opened by the player from the main menu, that sums up the active Profile's own plays: games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
 _Avoid_: Pinball Profile, player card, profile screen (a Profile is the identity, not the screen)
 
+**Profile Reward**:
+An Avatar Frame or a Profile Title that a Profile unlocks through play and then chooses to wear; it wears at most one of each. Every Profile has them, Guest and Child Profiles included. Unlocked rewards follow what earned them and are never kept apart from it, so a Profile Reset takes them back and the Profile wears none again. Chosen from the Profile Stats, where the rewards still to unlock show with what unlocks them. Shown as "récompense" in French.
+_Avoid_: cosmetic, unlockable, skin
+
+**Avatar Frame**:
+A frame drawn around the Avatar wherever it is shown, one for each Collection Tier from 1 to 10, unlocked by reaching that tier, in the colour of the Mastery Level of the same number; a new Avatar Frame is announced by a line in the toast of its Collection Tier, and the first one a Profile unlocks is worn at once. A Profile that wears none keeps each place's usual look. It is not the gold ring that marks the selected Avatar in the Profile picker, which stays around it. The Player Level pip stays on top of it, in its corner. Shown as "cadre" in French.
+_Avoid_: skin, border, badge (the Profile badge is the Avatar shown at the top right of the wheel screen), gold frame
+
+**Profile Title**:
+A short title shown under a Profile's name, such as "Pinball Explorer", one for every third Player Level up to level 30, unlocked by reaching that level and locked again if the Player Level drops below it, the Profile then wearing the highest one it still has. It does not name the level, which keeps only its number: the player chooses which unlocked title to wear, or none. A new Profile Title is announced by a line in its Level Toast, and the first one a Profile unlocks is worn at once. Shown as "titre" in French.
+_Avoid_: rank (an Achievement Rank is how hard an Achievement is), badge, nickname
+
 ### Choosing what to play
 
 **Period**:
