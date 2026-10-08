@@ -73,12 +73,16 @@ An Avatar Frame or a Profile Title that a Profile unlocks through play and then 
 _Avoid_: cosmetic, unlockable, skin
 
 **Avatar Frame**:
-A frame drawn around the Avatar wherever it is shown, one for each Collection Tier from 1 to 10, unlocked by reaching that tier, each with a theme of its own (an enchanted forest, steam and gears, a celestial legend…) rather than the colour of a Mastery Level, and reaching a quarter of the Avatar's size beyond it on every side; a new Avatar Frame is announced by a line in the toast of its Collection Tier, and the first one a Profile unlocks is worn at once. A Profile that wears none keeps each place's usual look. It is not the gold ring that marks the selected Avatar in the Profile picker, which stays around it. The Player Level pip stays on top of it, in its corner. Shown as "cadre" in French.
+A frame drawn around the Avatar wherever it is shown, one for each Collection Tier from 1 to 10, unlocked by reaching that tier, each with a theme of its own (an enchanted forest, steam and gears, a celestial legend…) rather than the colour of a Mastery Level, and reaching a quarter of the Avatar's size beyond it on every side; a new Avatar Frame is announced by a line in the toast of its Collection Tier, and the first one a Profile unlocks is worn at once and followed by a Reward Prompt. A Profile that wears none keeps each place's usual look. It is not the gold ring that marks the selected Avatar in the Profile picker, which stays around it. The Player Level pip stays on top of it, in its corner. Shown as "cadre" in French.
 _Avoid_: skin, border, badge (the Profile badge is the Avatar shown at the top right of the wheel screen), gold frame
 
 **Profile Title**:
-A short title shown under a Profile's name, such as "Pinball Explorer", one for every third Player Level up to level 30, unlocked by reaching that level and locked again if the Player Level drops below it, the Profile then wearing the highest one it still has. It does not name the level, which keeps only its number: the player chooses which unlocked title to wear, or none. A new Profile Title is announced by a line in its Level Toast, and the first one a Profile unlocks is worn at once. Shown as "titre" in French.
+A short title shown under a Profile's name, such as "Pinball Explorer", one for every third Player Level up to level 30, unlocked by reaching that level and locked again if the Player Level drops below it, the Profile then wearing the highest one it still has. It does not name the level, which keeps only its number: the player chooses which unlocked title to wear, or none. A new Profile Title is announced by a line in its Level Toast, and the first one a Profile unlocks is worn at once and followed by a Reward Prompt. Shown as "titre" in French.
 _Avoid_: rank (an Achievement Rank is how hard an Achievement is), badge, nickname
+
+**Reward Prompt**:
+The dialog that follows the toast of a Profile's first Avatar Frame, and the one of its first Profile Title, once per kind: it names the reward, says it is now worn and where to change it (Your Stats, then Frame or Title), and offers to open that list at once. Later rewards get only their toast line. A Profile Reset brings it back with the next first reward. Waits its turn after the Welcome Screen and before the rating prompt.
+_Avoid_: popup, notification, reward toast (a toast never waits for the player)
 
 ### Choosing what to play
 
