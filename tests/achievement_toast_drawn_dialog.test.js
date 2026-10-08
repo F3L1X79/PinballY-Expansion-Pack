@@ -31,7 +31,7 @@ function setUp() {
     fake.installGlobals();
     const wheelDialogs = createWheelDialogs(fake);
     const showers = [];
-    const toasts = createAchievementToasts(fake, { wheelDialogs, confettiShower: { start: () => showers.push(true) } });
+    const toasts = createAchievementToasts(fake, { wheelDialogs, confettiShower: { start: () => showers.push(true), endsAtMs: () => null, onStopped() {} } });
     return { fake, wheelDialogs, toasts, showers };
 }
 

@@ -1,13 +1,14 @@
 // ============================================================
 // Confetti Shower tests' scenario: main.js on the fake globals, 26 Williams
 // tables of the 1990s, 25 played by Guest. Playing the last one unlocks
-// three Platinums at once (collection, Williams, 1990s). Optionally, a
+// three Platinums at once (collection, Williams, 1990s) and a new Player Level. Optionally, a
 // week's Challenge that one more Williams table completes. Reads the
-// confetti layers. Never loaded by PinballY.
+// confetti layers and the Level Toasts. Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import { CONFETTI_Z_INDEX } from "../common/confetti_shower.js";
+import { toastDrawings } from "./achievement_toast_reader.js";
 import config from "../common/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -39,6 +40,21 @@ export const PLAYED_TABLE = TABLES[0];
 export const confettiLayers = fake => fake.drawingLayers().filter(layer => layer.zIndex === CONFETTI_Z_INDEX);
 export const visibleConfettiCount = fake => confettiLayers(fake).filter(layer => layer.alpha > 0).length;
 export const showerStartLogs = fake => fake.logLines().filter(line => line.startsWith("[ConfettiShower] Started"));
+
+// Level Toasts drawn so far: Platinums bring a new Player Level.
+export const levelToastCount = fake => toastDrawings(fake).filter(drawing => drawing.texts.includes("LEVEL UP")).length;
+
+// Steps by stepMs until the Level Toast shows; returns the ms elapsed since
+// the shower started, or null when none shows within maxMs.
+export function msFromShowerToLevelToast(fake, { stepMs, maxMs }) {
+    let showerAtMs = null;
+    for (let elapsedMs = 0; elapsedMs <= maxMs; elapsedMs += stepMs) {
+        if (showerAtMs === null && showerStartLogs(fake).length > 0) showerAtMs = elapsedMs;
+        if (levelToastCount(fake) > 0) return elapsedMs - showerAtMs;
+        fake.advanceTime(stepMs);
+    }
+    return null;
+}
 
 // confetti, confettiSoundFile, achievementSoundFile: the settings;
 // soundFiles: the files that exist; challenge: with the Challenges Add-on

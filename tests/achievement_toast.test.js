@@ -148,7 +148,7 @@ test("a celebrated toast starts the Confetti Shower when it starts, never when i
     const fake = createFakePinballYHost();
     fake.installGlobals();
     const starts = [];
-    const toasts = createAchievementToasts(fake, { confettiShower: { start: () => starts.push(fake.now().getTime()) } });
+    const toasts = createAchievementToasts(fake, { confettiShower: { start: () => starts.push(fake.now().getTime()), endsAtMs: () => null, onStopped() {} } });
     submitOne(toasts, "plain");
     toasts.submit({ title: "stale", description: "", celebrate: true, isStale: () => true, onShown() {} });
     toasts.submit({ title: "celebrated", description: "", celebrate: true, onShown() {} });

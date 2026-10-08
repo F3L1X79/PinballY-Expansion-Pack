@@ -2,6 +2,8 @@
 // Confetti Shower: about 8 s of confetti across the wheel screen, on
 // main-window layers above toasts and menus, started with a celebrated toast;
 // it does not check for a drawn dialog itself: the toast waits for one.
+// It tells when the falling shower is due to end, and when it stops, so a
+// Level Toast can follow it.
 // Each confetto (front and back) is drawn ahead, then only moved, stretched
 // and shown or hidden; it waits shrunk to a dot, never as a hidden layer
 // the size of the window. An optional sound plays once as a shower starts.
@@ -51,6 +53,9 @@ const EDGE_STRIP = 1.6;
 // Below it, a confetto seen edge-on would vanish.
 const MIN_SQUASH = 0.08;
 const BACK_SHADE = 0.55;
+// The shower's nominal length, from its start: what a Level Toast waiting
+// for its end counts on, though the last confetti may fall a little longer.
+const SHOWER_MS = 8000;
 // The span of a confetto waiting to fall. PinballY stretches a layer over the
 // whole window by default and still fills every pixel of a hidden one on
 // each frame: hundreds of them slowed a single landscape screen's wheel to
@@ -119,7 +124,7 @@ function drawPaper(dc, rgb, angle) {
 
 // soundFile: absolute path played once per shower, empty for none.
 export function createConfettiShower(host, { enabled = true, soundFile = "", drawingAhead } = {}) {
-    if (!enabled) return { start() {} };
+    if (!enabled) return { start() {}, endsAtMs: () => null, onStopped() {} };
 
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
     // A sound that cannot play is logged and never stops the shower.
@@ -133,6 +138,7 @@ export function createConfettiShower(host, { enabled = true, soundFile = "", dra
     // The falling shower, or null.
     let shower = null;
     let frameTimer = null;
+    const stopListeners = [];
 
     function hiddenLayer() {
         const layer = host.createDrawingLayer(CONFETTI_Z_INDEX);
@@ -173,6 +179,7 @@ export function createConfettiShower(host, { enabled = true, soundFile = "", dra
         if (!shower) return;
         for (const piece of shower.pieces) hide(piece);
         shower = null;
+        for (const listener of stopListeners) listener();
     }
 
     // A new piece on the top edge, as react-confetti's generator and
@@ -268,7 +275,15 @@ export function createConfettiShower(host, { enabled = true, soundFile = "", dra
         host.on(eventName, safeHandler(SCRIPT_NAME, stop));
     }
 
-    return { start };
+    // The time (ms) the falling shower is due to end, or null when none falls.
+    const endsAtMs = () => (shower ? shower.startMs + SHOWER_MS : null);
+
+    // listener: runs when a shower stops, at its end or vanishing early.
+    function onStopped(listener) {
+        stopListeners.push(listener);
+    }
+
+    return { start, endsAtMs, onStopped };
 }
 
 let sharedConfettiShower = null;

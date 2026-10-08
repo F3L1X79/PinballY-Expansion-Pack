@@ -16,7 +16,8 @@
 // Toast its own header (Collection Mastery's for a Collection Tier), the reached level's metal as its accent and the
 // level's number drawn in its tile; a Level Toast the Player Level's colour
 // and the reached level's number in its tile. A celebrated toast starts the
-// Confetti Shower when it starts, a Level Toast the Fireworks.
+// Confetti Shower when it starts, a Level Toast the Fireworks; while a shower
+// falls, a Level Toast waits until a second before its end.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -40,6 +41,9 @@ const FADE_MS = 250;
 const RISE_EASE = 0.2;
 const ARRIVAL_GAP_MS = 350;
 const MAX_CARDS = 5;
+// A Level Toast and its Fireworks start this long before a falling
+// Confetti Shower's end, so the celebrations follow each other without a gap.
+const LEVEL_TOAST_SHOWER_LEAD_MS = 1000;
 
 // Card look at scale 1, validated with a prototype in PinballY; sizes in
 // pixels, fonts in points. The player's scale multiplies all of them.
@@ -201,12 +205,13 @@ function toScale(scale) {
 }
 
 // soundFile: absolute path played at the start of each card, empty for none.
-// confettiShower: started by a celebrated toast; the tests may leave it out.
+// confettiShower: started by a celebrated toast, and followed by a Level
+// Toast; the tests may leave it out.
 // fireworks: started by a Level Toast; the tests may leave it out.
 // wheelDialogs: the wheel dialog module, whose drawn dialogs toasts wait
 // for; the tests may leave it out.
 export function createAchievementToasts(host, {
-    toastSeconds = DEFAULT_TOAST_SECONDS, soundFile = "", scale = DEFAULT_TOAST_SCALE, confettiShower = { start() {} },
+    toastSeconds = DEFAULT_TOAST_SECONDS, soundFile = "", scale = DEFAULT_TOAST_SCALE, confettiShower = { start() {}, endsAtMs: () => null, onStopped() {} },
     fireworks = { start() {} }, wheelDialogs = { hasDrawnDialog: () => false, onDrawnDialogClosed() {} },
 } = {}) {
     const holdMs = toHoldMs(toastSeconds);
@@ -230,6 +235,8 @@ export function createAchievementToasts(host, {
     let frameTimer = null;
     // False for ARRIVAL_GAP_MS after a card arrives, so a batch arrives staggered.
     let arrivalOpen = true;
+    // Shows the Level Toast that waits for a Confetti Shower's end, or null.
+    let showerTimer = null;
 
     // The plain emblem cropped to its edges, so it fills the tile; the list
     // keeps the uncropped one, framed like its muted twin.
@@ -305,6 +312,23 @@ export function createAchievementToasts(host, {
         showNext();
     }
 
+    // Holds a Level Toast while the Confetti Shower falls, with a timer that
+    // shows it a second before the shower's end; true when it holds it.
+    function holdForShower(toast) {
+        if (toast.kind !== TOAST_KIND.LEVEL) return false;
+        const endMs = confettiShower.endsAtMs();
+        if (endMs === null) return false;
+        const waitMs = endMs - LEVEL_TOAST_SHOWER_LEAD_MS - host.now().getTime();
+        if (waitMs <= 0) return false;
+        if (showerTimer === null) {
+            showerTimer = host.setTimeout(safeHandler(SCRIPT_NAME, () => {
+                showerTimer = null;
+                showNext();
+            }), waitMs);
+        }
+        return true;
+    }
+
     function showNext() {
         // A toast gone stale while it waited (its Profile was reset) never shows.
         while (waiting.length > 0 && waiting[0].isStale && waiting[0].isStale()) waiting.shift();
@@ -315,6 +339,7 @@ export function createAchievementToasts(host, {
         // A drawn dialog is the one exception to "over everything": the
         // toast, and the confetti or Fireworks it may start, would hide what it asks.
         if (wheelDialogs.hasDrawnDialog()) return;
+        if (holdForShower(waiting[0])) return;
 
         const toast = waiting.shift();
         const layer = freeLayers.pop() || host.createDrawingLayer(ACHIEVEMENT_TOAST_Z_INDEX);
@@ -344,6 +369,15 @@ export function createAchievementToasts(host, {
     // Fires on every return to the wheel: starts the toasts that waited for a game.
     host.on("wheelmode", safeShowNext);
     wheelDialogs.onDrawnDialogClosed(safeShowNext);
+    // Fires when a shower ends or vanishes early (a launch, attract mode):
+    // releases a Level Toast that waited for it, which then follows the usual
+    // waits. A tick later: on "prelaunch" the game is not launched yet, so
+    // the toast would not see it running and would show under it.
+    confettiShower.onStopped(safeHandler(SCRIPT_NAME, () => {
+        if (showerTimer !== null) host.clearTimeout(showerTimer);
+        showerTimer = null;
+        host.setTimeout(safeShowNext, 0);
+    }));
 
     // toast: { kind, title, description, onShown, isStale, celebrate,
     // rank, accent, tileNumber, header }, kind a TOAST_KIND (an Achievement when
