@@ -547,6 +547,31 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="event-frames" data-track="profiles" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Cadres de fête et d'année : Noël, Halloween, millésimes</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Des Avatar Frames en plus de ceux des Collection Tiers : un cadre de fête (Noël, Halloween, Nouvel An…) gagné en venant jouer pendant la fête, et un cadre d'année (« 2026 ») gagné en jouant dans l'année, comme les cadres datés des jeux mobiles. Ils rejoignent la liste de choix des Profile Stats.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après <a href="#profile-rewards">les récompenses de profil (n° <span data-ref="profile-rewards"></span>)</a>, dont il reprend les Avatar Frames et la liste de choix ; le cadre d'année touche au <a href="#year-in-pinball">Year in Pinball</a></div>
+          <details>
+            <summary>Questions ouvertes (5)</summary>
+            <ul>
+              <li>Gagné comment : un passage sur la borne pendant la fête (le Welcome Screen ou la Profile Greeting de ce jour-là) ou une vraie Play ? Lu dans le Play Log pour rester « recalculé, jamais stocké » comme les autres Profile Rewards, donc repris par une Profile Reset.</li>
+              <li>Quelles fêtes et quelles dates : Noël, Halloween, Nouvel An, Saint-Valentin, Pâques ? Fixes ou réglables ? Le cadre reste-t-il acquis pour toujours, ou seulement jusqu'à la fête suivante ?</li>
+              <li>Cadre d'année : un par année jouée, gardé ensuite comme un millésime ? Offert avec le bilan du Year in Pinball ?</li>
+              <li>Annonce : sur le Welcome Screen du jour de fête, par un toast, ou par une ligne dans un toast existant ?</li>
+              <li>Dessins : même technique que les cadres des Collection Tiers (choisie au prototype des récompenses de profil), un dessin par fête, l'année écrite dans le cadre d'année.</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 08/10/2026, pendant le prototype des récompenses de profil, inspirée des cadres de fête et des cadres datés de Mobile Legends (planches de newjer53 sur DeviantArt). Ces visuels appartiennent à Moonton : on s'en inspire sans les reprendre.</p>
+          </details>
+        </div>
+      </li>
+
     </ol>
   </section>
 
@@ -727,6 +752,7 @@
             <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
             <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
             <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
+            <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
           </div>
           <div class="cell">
             <a class="chip tr-share" href="#steamball-menus"><b></b>Menus Steamball</a>
