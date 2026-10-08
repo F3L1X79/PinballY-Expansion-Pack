@@ -196,6 +196,12 @@ export default {
         stayOn: (tableTitle) => `Rester sur ${tableTitle}`,
         stayOnWheel: "Rester sur la roue",
         randomTable: "Lancer une table au hasard",
+        // The active Profile's Daily Streak under the greeting, from 2 days
+        // on, its count shown in a square before the text.
+        cabinetStreak: {
+            notYetToday: "jours d'affilée sur la borne : continue !",
+            playedToday: "jours d'affilée sur la borne",
+        },
         // One card per Period Table; its grey line says it was played this
         // Period, or else the Streak of the daily or weekly rendezvous, its
         // count shown in a square before the text.

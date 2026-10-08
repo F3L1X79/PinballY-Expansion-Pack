@@ -3,9 +3,9 @@
 // to another Profile, a centred Steamball panel drawn over the
 // dimmed wheel greets the active Profile by the hour (its Avatar, with
 // the shown Player Level as a pip, and its name in gold when the Profile
-// picker is on), shows its Collection
-// Mastery (the tier kept in profile.json when the tables no longer reach
-// it) and offers to close, to play the Table of the Day or of the Week
+// picker is on), shows its Daily Streak under the greeting from 2 days
+// on, its Collection Mastery (the tier kept in profile.json when the
+// tables no longer reach it) and offers to close, to play the Table of the Day or of the Week
 // (one card each, with its Table Mastery and the active Profile's Streak;
 // reading them picks and locks this Period's tables, and Select launches
 // one), to stay on the table selected on the wheel or to launch a Random Game. It
@@ -30,6 +30,7 @@ import { displayNameOf } from "../common/profile_name.js";
 import { cleanTitle } from "../common/table_title.js";
 import { getChangePlayer } from "../common/change_player.js";
 import { getRandomGame } from "../common/random_game.js";
+import { getDailyStreak } from "../common/daily_streak.js";
 import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
 import { masteryOf, collectionMasteryOfProfile } from "../common/table_mastery.js";
 import { tablesVisibleTo } from "../common/visible_tables.js";
@@ -62,6 +63,7 @@ export default function init() {
     const store = getProfileStore();
     const shownPlayerLevel = getShownPlayerLevel();
     const randomGame = getRandomGame();
+    const dailyStreak = getDailyStreak();
     const periodTables = { [CHOICE.DAY]: getTableOfTheDay(), [CHOICE.WEEK]: getTableOfTheWeek() };
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
@@ -81,6 +83,14 @@ export default function init() {
         if (periodTable.isPlayedThisPeriod()) return { played: true, streak: 0, text: texts.played };
         const streak = periodTable.getStreak();
         return streak >= 2 ? { played: false, streak, text: texts.streak } : null;
+    }
+
+    // The Daily Streak line: from 2 days on, asking to keep it going while
+    // today has no Play yet.
+    function readDailyStreakLine() {
+        const { current, isTodayCounted } = dailyStreak.read();
+        if (current < 2) return null;
+        return { count: current, text: isTodayCounted ? TEXT.cabinetStreak.playedToday : TEXT.cabinetStreak.notYetToday };
     }
 
     // A card per Period Table offered to the active Profile; reading it
@@ -127,6 +137,7 @@ export default function init() {
             greeting: picker
                 ? TEXT.greetingWithName(greeting, displayNameOf(profile)).map((part, index) => [part, index === 1])
                 : [[TEXT.greetingAlone(greeting), false]],
+            dailyStreak: readDailyStreakLine(),
             collection: readCollection(),
             cards,
             // The flippers' loop; the first one is selected on opening.

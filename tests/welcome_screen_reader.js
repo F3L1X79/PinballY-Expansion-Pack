@@ -1,8 +1,8 @@
 // ============================================================
 // Reads the drawn Welcome Screen the way the player sees it, on the fake
-// PinballY host: whether it is open, its greeting, its Collection Mastery
-// card, its Period Table cards (period, name, Mastery head, grey line,
-// logo), its bottom row's labels, the highlighted choice (the label under
+// PinballY host: whether it is open, its greeting, its Daily Streak line,
+// its Collection Mastery card, its Period Table cards (period, name,
+// Mastery head, grey line, logo), its bottom row's labels, the highlighted choice (the label under
 // the gold halo, the period of the card whose button it surrounds, or the
 // tooltip of the Avatar or the cross), and picks a choice with Next and Select as a player would.
 // Never loaded by PinballY.
@@ -54,6 +54,13 @@ export function collectionCard(fake) {
     const texts = layer.texts();
     const tier = Number(texts[texts.length - 1]);
     return { goal: texts[0], current: texts.length > 2 ? texts[1] : null, tier };
+}
+
+// The Daily Streak line under the greeting, its square's count first, as
+// in "3 days in a row…"; null when there is none or the screen is closed.
+export function dailyStreakLine(fake) {
+    const texts = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.dailyStreak).flatMap(layer => layer.texts());
+    return texts.length > 0 ? texts.join(" ") : null;
 }
 
 // The bottom row's labels, from left to right, without the mystery box

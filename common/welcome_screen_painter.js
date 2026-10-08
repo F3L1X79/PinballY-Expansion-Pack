@@ -3,10 +3,10 @@
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // from the prototype validated on the cabinet: the dimmed backdrop with
 // the centred Steamball panel, the header (Avatar with its Player Level
-// pip, close cross, greeting
-// with the Profile's name in gold, Collection Mastery on the Mastery Bar's
-// card), one card per Period Table (logo, period, name on one line, Table
-// Mastery card around the Mastery Bar's square, grey line, "Go" button),
+// pip, close cross, greeting with the Profile's name in gold, Daily
+// Streak line, Collection Mastery on the Mastery Bar's card), one card
+// per Period Table (logo, period, name on one line, Table Mastery card
+// around the Mastery Bar's square, grey line, "Go" button),
 // the bottom row ("stay" and "random") and one highlight per choice (a
 // gold halo, with a tooltip for the Avatar and the cross). Only drawing:
 // no layer, no event, no side effect.
@@ -21,7 +21,7 @@ import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
 // Above the Achievement List (6000 to 6006), under the toasts and the
 // Profile picker. Exported for the tests' reader.
-export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, highlights: 6110 });
+export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, highlights: 6110 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -35,6 +35,9 @@ const LOOK = Object.freeze({
     // Profile badge's proportions.
     pipSize: 42, pipInset: 8,
     greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
+    // The Daily Streak line, when there is one, between the greeting and
+    // Collection Mastery.
+    dailyStreakGap: 4,
     rowH: 90, rowSize: 21, rowIcon: 60,
     // A Period Table card, from its top: period, name, Mastery card (the
     // Mastery Bar's, scaled by cardK), then the grey line, if any.
@@ -71,16 +74,16 @@ function drawCheck(dc, x, y, size, color) {
     for (let i = 0; i <= size * 0.65; i++) dc.fillRect(Math.round(x + size * 0.35 + i), Math.round(y + size * 0.85 - i * 1.15), t, t, color);
 }
 
-// The grey line: the check mark, or the Streak's count, in a small square
-// like the go-back arrow's, then its text.
-function drawGreyLine(host, dc, line, x, y, w) {
+// A grey line: a small square like the go-back arrow's, with the check
+// mark when count is null, else the count, then its text.
+function drawGreyLine(host, dc, count, lineText, x, y, w) {
     const tile = LOOK.lineTile;
     const top = y + 2;
     fillGradient(dc, x, top, tile, tile, COLORS.rowUnlocked, COLORS.tile);
     dc.frameRect(x, top, tile, tile, 2, COLORS.border);
-    if (line.played) drawCheck(dc, x + 6, top + 5, 15, COLORS.description);
-    else text(host, dc, String(line.streak), { x, y: top, width: tile, height: tile, size: line.streak > 99 ? 11 : 14, weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
-    oneLine(host, dc, line.text, { x: x + tile + 12, y: top, width: w - tile - 12, height: tile, size: LOOK.lineSize, minSize: LOOK.minLineSize, color: COLORS.description });
+    if (count === null) drawCheck(dc, x + 6, top + 5, 15, COLORS.description);
+    else text(host, dc, String(count), { x, y: top, width: tile, height: tile, size: count > 99 ? 11 : 14, weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
+    oneLine(host, dc, lineText, { x: x + tile + 12, y: top, width: w - tile - 12, height: tile, size: LOOK.lineSize, minSize: LOOK.minLineSize, color: COLORS.description });
 }
 
 // ---------- Mastery cards ----------
@@ -190,7 +193,10 @@ function geometry(referenceWidth, screen) {
     const inner = { x: Math.round((referenceWidth - w) / 2) + LOOK.pad, w: w - 2 * LOOK.pad };
     // Under the Avatar; without one, on the top line, beside the cross.
     const greetingY = screen.picker ? LOOK.avatar + LOOK.greetingGap : 0;
-    const collectionY = greetingY + Math.round(LOOK.greetingSize * 1.4) + LOOK.greetingBottom;
+    const greetingEndY = greetingY + Math.round(LOOK.greetingSize * 1.4);
+    const dailyStreakY = greetingEndY + LOOK.dailyStreakGap;
+    const dailyStreakH = screen.dailyStreak ? LOOK.dailyStreakGap + LOOK.lineH : 0;
+    const collectionY = greetingEndY + dailyStreakH + LOOK.greetingBottom;
     const masteryCardH = Math.round(LOOK.masteryCardH * LOOK.cardK);
     const headerH = collectionY + masteryCardH + LOOK.headerBottom;
     // Each card ends under its Mastery card, or under its grey line.
@@ -203,7 +209,7 @@ function geometry(referenceWidth, screen) {
     const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
     const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + LOOK.pad;
     const panel = { x: inner.x - LOOK.pad, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
-    return { panel, inner, headerH, greetingY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
+    return { panel, inner, headerH, greetingY, dailyStreakY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
 }
 
 // The backdrop: the dimmed wheel and the panel, drawn on a window-sized
@@ -233,7 +239,7 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
                 text(host, dc, card.period, { x: detailsX, y: LOOK.cardTop, width: detailsW, size: LOOK.periodSize, weight: 700, color: COLORS.gold, font: FONTS.display });
                 oneLine(host, dc, card.title, { x: detailsX, y: LOOK.nameY, width: detailsW, size: LOOK.nameSize, minSize: LOOK.minNameSize });
                 drawTableMasteryCard(host, dc, card.mastery, card.masteryHead, detailsX, LOOK.masteryY, detailsW);
-                if (card.line) drawGreyLine(host, dc, card.line, detailsX, lineY, detailsW);
+                if (card.line) drawGreyLine(host, dc, card.line.played ? null : card.line.streak, card.line.text, detailsX, lineY, detailsW);
                 fillGradient(dc, buttonRect.x, buttonRect.y, button.w, button.h, COLORS.rowUnlocked, COLORS.tile);
                 dc.frameRect(buttonRect.x, buttonRect.y, button.w, button.h, 1, COLORS.border);
                 text(host, dc, card.goLabel, { x: buttonRect.x, y: buttonRect.y, width: button.w, height: button.h, size: button.size, weight: 700, font: FONTS.display, align: "center" });
@@ -253,7 +259,8 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
 }
 
 // screen: { picker, avatarPath, level (the shown Player Level, null for
-// no pip), greeting (runs of [text, gold?]),
+// no pip), greeting (runs of [text, gold?]), dailyStreak (null, or
+// { count, text }),
 // collection ({ tier, reached, needed, goal, current }), cards
 // (each { choice, period, title, logoPath, mastery, masteryHead ({ text,
 // color }, as the Mastery Bar's), line
@@ -262,8 +269,10 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
 // its rect's own coordinates, and the highlight of each choice.
 export function layoutWelcomeScreen(host, screen, referenceWidth) {
     const layout = geometry(referenceWidth, screen);
-    const { inner, headerH, greetingY, collectionY, masteryCardH, detailsX, panel, cardsH } = layout;
+    const { inner, headerH, greetingY, dailyStreakY, collectionY, masteryCardH, detailsX, panel, cardsH } = layout;
     const top = panel.y + LOOK.pad;
+    // The greeting and the Daily Streak line stop short of the cross.
+    const greetingW = inner.w - LOOK.cross - 40;
     const pieces = [{
         zIndex: WELCOME_SCREEN_Z_INDEX.header,
         rect: { x: inner.x, y: top, w: inner.w, h: headerH },
@@ -275,9 +284,17 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
             }
             drawCross(dc, inner.w - LOOK.cross, 0, LOOK.cross);
             const parts = screen.greeting.map(([str, gold]) => [str, gold ? COLORS.gold : COLORS.title]);
-            runs(host, dc, parts, { x: 0, y: greetingY, width: inner.w - LOOK.cross - 40, size: LOOK.greetingSize });
+            runs(host, dc, parts, { x: 0, y: greetingY, width: greetingW, size: LOOK.greetingSize });
         },
     }];
+    // Under the greeting, on a layer of its own.
+    if (screen.dailyStreak) {
+        pieces.push({
+            zIndex: WELCOME_SCREEN_Z_INDEX.dailyStreak,
+            rect: { x: inner.x, y: top + dailyStreakY, w: greetingW, h: LOOK.lineH },
+            draw: dc => drawGreyLine(host, dc, screen.dailyStreak.count, screen.dailyStreak.text, 0, 0, greetingW),
+        });
+    }
     // From the card details' left edge to the right edge, on a layer of its
     // own with room for its square's halo.
     const squareRoom = LOOK.squareHaloMargin;
