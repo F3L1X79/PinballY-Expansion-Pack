@@ -19,6 +19,7 @@ import { createAchievementToasts, TOAST_KIND } from "../common/achievement_toast
 import lang from "../common/i18n.js";
 import { ACHIEVEMENT_RANK } from "../common/achievements.js";
 import { RANK_COLORS, STEAMBALL_COLORS } from "../common/steamball_palette.js";
+import { playerLevelColorOf } from "../common/steamball_drawing.js";
 
 const ARRIVAL_GAP_MS = 350;
 const MAX_CARDS = 5;
@@ -205,6 +206,21 @@ test("an Achievement Toast shows its Rank's emblem in its Rank's colour", () => 
         assert.ok(layer.fills().includes(RANK_COLORS[rank]), `${rank} takes its Rank's colour`);
         assert.ok(!layer.fills().includes(STEAMBALL_COLORS.gold), `${rank} drops the default gold`);
     }
+    assert.deepEqual(fake.logLines(), []);
+});
+
+test("a Level Toast takes the metal of the level it reaches, as the level pip", () => {
+    const fake = createFakePinballYHost();
+    fake.installGlobals();
+    const toasts = createAchievementToasts(fake);
+    for (const level of [3, 12]) toasts.submit({ kind: TOAST_KIND.LEVEL, title: `level ${level}`, description: "", tileNumber: level, onShown() {} });
+    fake.advanceTime(SETTLE_MS + 2 * ARRIVAL_GAP_MS);
+
+    for (const level of [3, 12]) {
+        const layer = fake.drawingLayers().find(candidate => candidate.texts().includes(`level ${level}`));
+        assert.ok(layer.fills().includes(playerLevelColorOf(level)), `level ${level} in its metal`);
+    }
+    assert.notEqual(playerLevelColorOf(3), playerLevelColorOf(12));
     assert.deepEqual(fake.logLines(), []);
 });
 

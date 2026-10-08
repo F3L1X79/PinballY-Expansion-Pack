@@ -3,13 +3,13 @@
 // over the level's metal) and its width. Never loaded by PinballY.
 // ============================================================
 
-import { levelPipColorOf } from "../common/steamball_drawing.js";
+import { playerLevelColorOf } from "../common/steamball_drawing.js";
 
 // The fills in the metal of the level the layer's digits show.
 function pipFills(layer) {
     const digits = layer.strokes().filter(stroke => "text" in stroke && /^\d+$/.test(stroke.text));
     if (digits.length !== 1) return [];
-    const color = levelPipColorOf(Number(digits[0].text));
+    const color = playerLevelColorOf(Number(digits[0].text));
     return layer.strokes().filter(stroke => stroke.fill === color);
 }
 

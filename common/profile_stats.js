@@ -35,6 +35,7 @@ import { getHallOfFame } from "./hall_of_fame.js";
 import { getTablesToDiscover } from "./tables_to_discover.js";
 import { createNavigationSound } from "./navigation_sound.js";
 import { STEAMBALL_COLORS } from "./steamball_palette.js";
+import { playerLevelColorOf } from "./steamball_drawing.js";
 import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
 
 const SCRIPT_NAME = "ProfileStats";
@@ -214,6 +215,7 @@ export function createProfileStats(host, {
             playerLevel: {
                 title: TEXT.playerLevel.title,
                 number: String(playerLevel.level),
+                color: playerLevelColorOf(playerLevel.level),
                 share: (playerLevel.points - playerLevel.from) / (playerLevel.to - playerLevel.from),
                 current: TEXT.playerLevel.current(TEXT.number(playerLevel.points), TEXT.number(playerLevel.to)),
             },

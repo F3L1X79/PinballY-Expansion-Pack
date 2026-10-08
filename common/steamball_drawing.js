@@ -76,9 +76,9 @@ export function glow(dc, x, y, w, h, color, rings, peak) {
     }
 }
 
-// The pip's colour: its Rank's metal, a little lighter at each level up to
-// the next Rank.
-export function levelPipColorOf(level) {
+// The Player Level's colour (pip, Level Toast, Profile Stats card): its
+// Rank's metal, a little lighter at each level up to the next Rank.
+export function playerLevelColorOf(level) {
     const { rank, progress } = playerLevelMetalOf(level);
     return mix(RANK_COLORS[rank], WHITE, 0.3 * progress);
 }
@@ -98,7 +98,7 @@ export function drawLevelPip(host, dc, level, cx, cy, size) {
     const x = Math.round(cx - width / 2);
     const y = Math.round(cy - height / 2);
     fillPill(dc, x - ring, y - ring, width + 2 * ring, height + 2 * ring, COLORS.tile);
-    fillPill(dc, x, y, width, height, levelPipColorOf(level));
+    fillPill(dc, x, y, width, height, playerLevelColorOf(level));
     styled.draw(dc, { x, y: y + (height - measured.height) / 2, width, height: measured.height });
 }
 

@@ -25,6 +25,7 @@ import { safeHandler } from "./safe_handler.js";
 import { createPinballYHost } from "./pinbally_host.js";
 import config from "./config.js";
 import { STEAMBALL_COLORS, STEAMBALL_FONTS, RANK_COLORS } from "./steamball_palette.js";
+import { playerLevelColorOf } from "./steamball_drawing.js";
 import { getConfettiShower } from "./confetti_shower.js";
 import { getFireworks } from "./fireworks.js";
 import { getWheelDialogs } from "./wheel_dialog.js";
@@ -105,9 +106,10 @@ const KIND_LOOKS = Object.freeze({
     [TOAST_KIND.MASTERY]: {
         header: () => lang.tableMastery.toastHeader,
     },
-    // No icon either: the reached level's number fills the tile.
+    // No icon either: the reached level's number fills the tile, in that
+    // level's metal.
     [TOAST_KIND.LEVEL]: {
-        accent: STEAMBALL_COLORS.playerLevel,
+        accent: toast => playerLevelColorOf(toast.tileNumber),
         header: () => lang.playerLevel.toastHeader,
     },
 });
@@ -164,7 +166,8 @@ function drawTile(host, dc, look, x, y, accent, { iconPath, iconInset, number })
 function drawCard(host, dc, look, toast, iconOf) {
     const { cardWidth, edgeMargin, accentBarWidth, tileSize, tileGap, smallFont } = look;
     const kindLook = KIND_LOOKS[toast.kind || TOAST_KIND.ACHIEVEMENT];
-    const accent = toast.accent || RANK_COLORS[toast.rank] || kindLook.accent;
+    const kindAccent = typeof kindLook.accent === "function" ? kindLook.accent(toast) : kindLook.accent;
+    const accent = toast.accent || RANK_COLORS[toast.rank] || kindAccent;
     const size = dc.getSize();
     const textLeft = accentBarWidth + tileGap + tileSize + tileGap;
     const textWidth = cardWidth - textLeft - look.paddingRight;

@@ -174,11 +174,11 @@ function drawBar(dc, x, y, w, h, share, color) {
 // next level and the points, centred in the card (cardX, cardW), from y.
 function drawPlayerLevel(host, dc, playerLevel, cardX, cardW, contentX, contentW, y) {
     const look = LOOK.playerLevel;
-    text(host, dc, playerLevel.title, { x: cardX, y, width: cardW, size: look.titleSize, weight: 700, color: COLORS.playerLevel, font: FONTS.display, align: "center" });
+    text(host, dc, playerLevel.title, { x: cardX, y, width: cardW, size: look.titleSize, weight: 700, color: playerLevel.color, font: FONTS.display, align: "center" });
     const digitsY = y + look.titleH;
-    text(host, dc, playerLevel.number, { x: cardX, y: digitsY - look.digitsLift, width: cardW, size: look.digitsSize, weight: 700, color: COLORS.playerLevel, font: FONTS.display, align: "center" });
+    text(host, dc, playerLevel.number, { x: cardX, y: digitsY - look.digitsLift, width: cardW, size: look.digitsSize, weight: 700, color: playerLevel.color, font: FONTS.display, align: "center" });
     const barY = digitsY + look.digitsH;
-    drawBar(dc, contentX, barY, contentW, look.barH, playerLevel.share, COLORS.playerLevel);
+    drawBar(dc, contentX, barY, contentW, look.barH, playerLevel.share, playerLevel.color);
     text(host, dc, playerLevel.current, { x: cardX, y: barY + look.barH + look.barGap, width: cardW, size: look.pointsSize, weight: 600, color: COLORS.description, align: "center" });
 }
 
@@ -273,8 +273,8 @@ function drawSection(host, dc, blocks, top, columnW) {
     }
 }
 
-// screen: { name, avatarPath, playerLevel ({ title, number, share (0 to 1),
-// current }), collectionTitle, collection (as drawCollection's), buttons (each { choice, label, count: null
+// screen: { name, avatarPath, playerLevel ({ title, number, color (the
+// level's metal), share (0 to 1), current }), collectionTitle, collection (as drawCollection's), buttons (each { choice, label, count: null
 // or a string }), sections (each { title, rows: [[{ label, value, pill
 // (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]],
 // strips (optional: [{ label, hasTable, title, logoPath, pill (null or as a stat's) }]) }),
@@ -291,8 +291,8 @@ export function layoutProfileStats(host, screen, referenceWidth) {
         rect: { x: cardX - G, y: top - G, w: cardW + 2 * G, h: innerH + 2 * G },
         draw: dc => {
             fillGradient(dc, G, G, cardW, innerH, COLORS.panelTop, COLORS.tile);
-            glow(dc, G, G, cardW, innerH, COLORS.playerLevel, G, LOOK.cardGlowPeak);
-            dc.frameRect(G, G, cardW, innerH, 2, COLORS.playerLevel);
+            glow(dc, G, G, cardW, innerH, screen.playerLevel.color, G, LOOK.cardGlowPeak);
+            dc.frameRect(G, G, cardW, innerH, 2, screen.playerLevel.color);
             const contentX = G + LOOK.cardInset;
             let y = G + LOOK.cardInset;
             drawAvatar(dc, screen.avatarPath, G + Math.round((cardW - avatar) / 2), y, avatar);
