@@ -17,7 +17,7 @@
 // Fame and Tables to Discover filters (null when their Add-on is
 // disabled: no button). While open it swallows every button through
 // "commandbuttondown": Next / Prev move a gold halo through the cross and
-// the buttons, looping, with PinballY's navigation sound; Select runs the choice, Exit closes; attract mode
+// the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
 // the player asked for it.
 // ============================================================
@@ -347,7 +347,8 @@ export function createProfileStats(host, {
         // Swallowed first, so a failing choice still never reaches the wheel.
         ev.preventDefault();
         if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
-        else if (ev.command === "Select") choose();
+        // Launch is the plunger, which selects in PinballY's own menus too.
+        else if (ev.command === "Select" || ev.command === "Launch") choose();
         else if (ev.command === "Exit") close();
     }));
 

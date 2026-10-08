@@ -71,7 +71,7 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     press(fake, "Prev");
     assert.deepEqual(highlighted(fake), { label: TEXT.randomTable, tooltip: null }, "Prev loops back to the last choice");
 
-    for (const button of ["Next", "Prev", "Launch", "Info", "Coin"]) {
+    for (const button of ["Next", "Prev", "Info", "Coin"]) {
         assert.equal(press(fake, button).defaultPrevented, true, `${button} is swallowed`);
     }
     assert.equal(fake.getCurrentTable().configId, MARS.configId, "the wheel never moved");

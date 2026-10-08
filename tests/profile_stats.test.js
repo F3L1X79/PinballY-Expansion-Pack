@@ -84,7 +84,7 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
     assert.deepEqual(fake.soundsPlayed(), Array(4).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
     press(fake, "Prev");
     assert.equal(highlighted(fake), TEXT.buttons.tablesToDiscover, "Prev loops back to the last choice");
-    for (const button of ["Next", "Prev", "Launch", "Info", "Coin"]) {
+    for (const button of ["Next", "Prev", "Info", "Coin"]) {
         assert.equal(press(fake, button).defaultPrevented, true, `${button} is swallowed`);
     }
     assert.equal(fake.getCurrentTable().configId, MARS.configId, "the wheel never moved");

@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // Period Table module: picks a table once per Period and keeps it for the
-// whole Period, launches it, and keeps its Streak and its Periods Played.
+// whole Period, launches it (selected on the wheel first), and keeps its Streak and its Periods Played.
 // Created from the PinballY host, a Period definition (TABLE_OF_THE_DAY,
 // TABLE_OF_THE_WEEK) and the Profile store; the add-ons share one instance
 // of each through getTableOfTheDay() and getTableOfTheWeek(). The table is
@@ -15,7 +15,7 @@
 // ============================================================
 
 import { safeHandler } from "./safe_handler.js";
-import { createPinballYHost } from "./pinbally_host.js";
+import { createPinballYHost, ALL_TABLES_FILTER } from "./pinbally_host.js";
 import { getProfileStore } from "./profile_store.js";
 import { isAdultTable } from "./adult_tables.js";
 
@@ -160,9 +160,24 @@ export function createPeriodTable(host, definition, profileStore) {
         return period === lastPeriod;
     }
 
+    // Selected on the wheel first, so the wheel is on it when the game
+    // ends and at the next startup; a filter that leaves it out gives way
+    // to all tables.
+    function selectOnWheel(game) {
+        const offsetOf = () => host.getWheelTables().findIndex(table => table.configId === game.configId);
+        let offset = offsetOf();
+        if (offset < 0) {
+            host.setCurrentFilter(ALL_TABLES_FILTER);
+            offset = offsetOf();
+        }
+        if (offset > 0) host.setWheelGame(offset);
+    }
+
     function launch() {
         const game = getTable();
-        if (game) host.playGame(game);
+        if (!game) return;
+        selectOnWheel(game);
+        host.playGame(game);
     }
 
     // Whether the active Profile already played this Period's table.

@@ -8,7 +8,7 @@
 // tables no longer reach it) and offers to close, to play the Table of the Day or of the Week
 // (one card each, with its Table Mastery and the active Profile's Streak;
 // reading them picks and locks this Period's tables, and Select launches
-// one), to stay on the table selected on the wheel or to launch a Random Game. It
+// one, selected on the wheel first), to stay on the table selected on the wheel or to launch a Random Game. It
 // is a drawn dialog of the wheel dialog module (docs/adr/0011), submitted
 // at init with the startup priority, so it comes before any other dialog and the
 // toasts wait for it. It opens 500 ms after its turn comes, drawn at once
@@ -16,9 +16,10 @@
 // sound, since it greets the Profile in its place. While it is open it
 // swallows every button through "commandbuttondown": Next / Prev move a
 // gold halo through the choices, looping, with PinballY's navigation
-// sound; Select runs the highlighted choice, Exit closes it; attract mode
-// closes it too, and a game started during the pause drops it. Its layers
-// are removed once it closes.
+// sound, from Change Player at startup and from Close after a change of
+// player; Select or Launch (the plunger) runs the highlighted choice, Exit
+// closes it; attract mode closes it too, and a game started during the
+// pause drops it. Its layers are removed once it closes.
 // ============================================================
 
 import lang from "../common/i18n.js";
@@ -84,6 +85,8 @@ export default function init() {
     let isWaitingForWheel = false;
     // The screen on show: its layers, choices and selection; null when closed.
     let shown = null;
+    // Highlighted on opening: Close once the player was just changed.
+    let firstChoice = null;
 
     // The grey line: played this Period, or else a Streak of at least 2.
     function greyLineOf(periodTable, texts) {
@@ -147,7 +150,8 @@ export default function init() {
             dailyStreak: readDailyStreakLine(),
             collection: readCollection(),
             cards,
-            // The flippers' loop; the first one is selected on opening.
+            // The flippers' loop; the first one is selected on opening,
+            // unless firstChoice is one of them.
             choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, ...cards.map(card => card.choice), CHOICE.STAY, CHOICE.RANDOM],
             labels: {
                 [CHOICE.AVATAR]: lang.profiles.menuEntry,
@@ -198,7 +202,8 @@ export default function init() {
         const highlightLayers = screen.choices.map(choice => drawPiece(highlights[choice]));
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
-        shown = { layers, highlightLayers, choices: screen.choices, selected: 0, opacity: 0, fadeTimer: null };
+        const selected = Math.max(0, screen.choices.indexOf(firstChoice));
+        shown = { layers, highlightLayers, choices: screen.choices, selected, opacity: 0, fadeTimer: null };
         fadeIn(shown);
         playGreetingSound();
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
@@ -281,18 +286,19 @@ export default function init() {
         return undefined;
     }
 
-    function submit() {
+    function submit(choice) {
         isSubmitted = true;
+        firstChoice = choice;
         getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open });
     }
 
-    submit();
+    submit(null);
 
     // Fires on every switch, which the Profile picker makes only to another
     // Profile: the new player is welcomed too, read again when the screen
     // opens. Once only when the screen is still waiting or open.
     store.onSwitch(safeHandler(SCRIPT_NAME, () => {
-        if (!isSubmitted && !closeDialog) submit();
+        if (!isSubmitted && !closeDialog) submit(CHOICE.CLOSE);
     }));
 
     // Fires on every mapped button press; drives the screen while it is
@@ -303,7 +309,8 @@ export default function init() {
         // Swallowed first, so a failing choice still never reaches the wheel.
         ev.preventDefault();
         if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
-        else if (ev.command === "Select") await choose();
+        // Launch is the plunger, which selects in PinballY's own menus too.
+        else if (ev.command === "Select" || ev.command === "Launch") await choose();
         else if (ev.command === "Exit") close();
     }));
 

@@ -5,6 +5,7 @@
 .claude/
 .agents/
 .scratch/
+CLAUDE.md
 skills-lock.json
 
 # Placeholders mounted by the Claude Code sandbox (/dev/null devices)
