@@ -41,3 +41,6 @@ profiles/*
 !profiles/guest/
 profiles/guest/*
 !profiles/guest/.gitkeep
+
+# Personal sounds, not published (see .env.example)
+assets/sounds/local/

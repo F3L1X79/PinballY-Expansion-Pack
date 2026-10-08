@@ -268,14 +268,17 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
           </div>
           <p>Un nouveau joueur doit avoir dès l'installation ce que Félix a réglé sur sa borne : un son pour le lancement d'une table, chaque Achievement Toast, le Profile Greeting, la Confetti Shower et les Fireworks, et la couleur de la roue qu'il a retouchée. Aujourd'hui, tous les sons sont vides par défaut.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/implement</code> direct (petit chantier, sans spec). Avant le <a href="#readme-refresh">README à jour (n° <span data-ref="readme-refresh"></span>)</a>, pour que les captures montrent les réglages par défaut</div>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Flow Matt : grill fait le 08/10 → <code>/implement</code> direct (petit chantier, sans spec). Avant le <a href="#readme-refresh">README à jour (n° <span data-ref="readme-refresh"></span>)</a>, pour que les captures montrent les réglages par défaut</div>
           <details>
-            <summary>Questions à trancher</summary>
+            <summary>Décisions du grill</summary>
             <ul>
-              <li>Sons : livrés dans le pack (<code>assets/sounds/</code>) avec des chemins relatifs au pack, à la place des chemins absolus ? Un chemin de <code>.env.local</code> doit toujours les remplacer, et une valeur vide doit encore couper un son.</li>
-              <li>Licences : les sons de la borne (voix de Super Mario 64, son de succès Steam…) ne peuvent sans doute pas être publiés sur GitHub. Faut-il chercher des sons libres (CC0) qui leur ressemblent ?</li>
-              <li>Couleur de la roue : quel réglage a été changé (Settings de PinballY, ou un calque du pack) ? Le pack peut-il l'appliquer, ou seulement la recommander dans le README ?</li>
+              <li>Commit 1 (rangement seul) : tous les PNG de <code>assets/</code> vont dans <code>assets/images/</code> ; <code>assets/wheel_arcs_gold.png</code> devient <code>assets/images/wheel_arc.png</code>. Chemins mis à jour dans le code, les tests, <code>CONTRIBUTING.md</code> et cette roadmap.</li>
+              <li>Sons livrés : des sons libres (CC0) dans <code>assets/sounds/</code> avec un <code>CREDITS.md</code> (source, licence). Claude cherche 2 ou 3 candidats par son et les dépose dans le scratchpad ; Félix choisit à l'écoute ; un son refusé partout reste vide par défaut.</li>
+              <li>Sons de Félix : dans <code>assets/sounds/local/</code>, ignoré par git (déjà fait).</li>
+              <li>Chemins : un chemin de son sans lettre de lecteur ni <code>\\</code> est relatif au dossier du pack (<code>\</code> et <code>/</code> acceptés), pour les défauts du code comme pour <code>.env.local</code>. Une valeur vide coupe toujours le son ; un fichier manquant est journalisé. Commentaires de <code>config.js</code> et <code>.env.example</code> à jour, dont le dossier <code>local/</code>.</li>
+              <li>Le <code>.env.local</code> de Félix passe en chemins relatifs vers <code>assets\sounds\local\…</code>.</li>
+              <li>Wheel Arc (voir <code>CONTEXT.md</code>) : Add-on <code>addons/wheel_arc.js</code>, clé <code>wheelArc</code>, <code>ADD_ON_WHEEL_ARC</code>, activé par défaut. Au démarrage <code>setUnderlay</code> avec <code>assets/images/wheel_arc.png</code> ; sur <code>underlaychange</code>, ne remplace <code>filename</code> que si PinballY allait prendre son underlay par défaut (<code>&lt;PinballY&gt;\Assets\Images\underlay.png</code>) : un underlay du joueur ou d'un système est gardé.</li>
             </ul>
           </details>
         </div>

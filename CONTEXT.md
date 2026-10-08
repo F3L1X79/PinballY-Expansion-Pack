@@ -16,6 +16,12 @@ _Avoid_: plugin, script (a script is just a `.js` file)
 A menu the player sees drawn in the pack's own style instead of PinballY's native one, with the same entries and the same effect when one is chosen: the menus a player meets (main, Exit, filter choices, power off) and those the Add-ons open. The setup menus that look after the cabinet and the pause menu of a running game stay native, and so does every menu when the Add-on is turned off or a menu cannot be drawn. Shown simply as "menu".
 _Avoid_: Steamball menu (Steamball is the palette), custom menu, popup (a popup shows information, a menu offers choices)
 
+### Wheel
+
+**Wheel Arc**:
+The gold arc drawn under the wheel's icons and following its curve, shown by default unless the player has their own decoration there. Shown as "arc de la roue" in French.
+_Avoid_: underlay (PinballY's name for the image layer that carries it), wheel colour
+
 ### Profiles
 
 **Profile**:
