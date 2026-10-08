@@ -10,6 +10,7 @@
 
 import assert from "node:assert/strict";
 import { WELCOME_SCREEN_Z_INDEX } from "../common/welcome_screen_painter.js";
+import { shownPip } from "./level_pip_reader.js";
 
 // The startup pause: the screen is drawn then, and starts fading in.
 export const WELCOME_SCREEN_PAUSE_MS = 500;
@@ -26,14 +27,23 @@ export const isWelcomeScreenOpen = fake => shownLayers(fake, WELCOME_SCREEN_Z_IN
 export const welcomeScreenLayerCount = fake => fake.drawingLayers()
     .filter(layer => Object.values(WELCOME_SCREEN_Z_INDEX).includes(layer.zIndex)).length;
 
-// The greeting, its runs joined; null when the screen is closed.
+// The greeting, its runs joined, without the Avatar's level pip; null
+// when the screen is closed.
 export function greeting(fake) {
     const header = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.header);
-    return header.length > 0 ? header.flatMap(layer => layer.texts()).join("") : null;
+    if (header.length === 0) return null;
+    return header.flatMap(layer => {
+        const texts = layer.texts();
+        const pipAt = texts.indexOf(shownPip(layer));
+        return pipAt < 0 ? texts : texts.filter((_, index) => index !== pipAt);
+    }).join("");
 }
 
 // Whether the header shows the active Profile's Avatar.
 export const headerImages = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.header).flatMap(layer => layer.images());
+
+// The level pip's number on the Avatar, null when there is none.
+export const headerPip = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.header).map(shownPip).find(pip => pip !== null) ?? null;
 
 // The Collection Mastery card: { goal (its head), current (the count on
 // its right, null at the last tier), tier (the number in its square) };

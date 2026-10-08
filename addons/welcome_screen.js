@@ -1,8 +1,9 @@
 ﻿// ============================================================
 // Welcome Screen: at startup, and again whenever Change Player switches
 // to another Profile, a centred Steamball panel drawn over the
-// dimmed wheel greets the active Profile by the hour (its Avatar and its
-// name in gold when the Profile picker is on), shows its Collection
+// dimmed wheel greets the active Profile by the hour (its Avatar, with
+// the shown Player Level as a pip, and its name in gold when the Profile
+// picker is on), shows its Collection
 // Mastery (the tier kept in profile.json when the tables no longer reach
 // it) and offers to close, to play the Table of the Day or of the Week
 // (one card each, with its Table Mastery and the active Profile's Streak;
@@ -24,6 +25,7 @@ import { safeHandler } from "../common/safe_handler.js";
 import { createPinballYHost } from "../common/pinbally_host.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/wheel_dialog.js";
 import { getProfileStore } from "../common/profile_store.js";
+import { getShownPlayerLevel } from "../common/shown_player_level.js";
 import { displayNameOf } from "../common/profile_name.js";
 import { cleanTitle } from "../common/table_title.js";
 import { getChangePlayer } from "../common/change_player.js";
@@ -58,6 +60,7 @@ export default function init() {
     const { welcomeScreen: TEXT } = lang;
     const host = createPinballYHost();
     const store = getProfileStore();
+    const shownPlayerLevel = getShownPlayerLevel();
     const randomGame = getRandomGame();
     const periodTables = { [CHOICE.DAY]: getTableOfTheDay(), [CHOICE.WEEK]: getTableOfTheWeek() };
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
@@ -119,6 +122,7 @@ export default function init() {
         return {
             picker,
             avatarPath: profile.avatarPath,
+            level: shownPlayerLevel.get(),
             // Runs of [text, gold?]: only the name is gold.
             greeting: picker
                 ? TEXT.greetingWithName(greeting, displayNameOf(profile)).map((part, index) => [part, index === 1])

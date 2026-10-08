@@ -2,7 +2,8 @@
 // Welcome Screen painter: the layout and drawing of the Welcome Screen's
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // from the prototype validated on the cabinet: the dimmed backdrop with
-// the centred Steamball panel, the header (Avatar, close cross, greeting
+// the centred Steamball panel, the header (Avatar with its Player Level
+// pip, close cross, greeting
 // with the Profile's name in gold, Collection Mastery on the Mastery Bar's
 // card), one card per Period Table (logo, period, name on one line, Table
 // Mastery card around the Mastery Bar's square, grey line, "Go" button),
@@ -14,7 +15,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, drawAvatar, drawLevelPip, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
 } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
@@ -30,6 +31,9 @@ export const CHOICE = Object.freeze({ AVATAR: "avatar", CLOSE: "close", DAY: "da
 const LOOK = Object.freeze({
     pad: 40, gap: 26,
     avatar: 120, cross: 56,
+    // The level pip straddles the Avatar's bottom-right corner, in the
+    // Profile badge's proportions.
+    pipSize: 42, pipInset: 8,
     greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
     rowH: 90, rowSize: 21, rowIcon: 60,
     // A Period Table card, from its top: period, name, Mastery card (the
@@ -248,7 +252,8 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
     return { pieces, highlights };
 }
 
-// screen: { picker, avatarPath, greeting (runs of [text, gold?]),
+// screen: { picker, avatarPath, level (the shown Player Level, null for
+// no pip), greeting (runs of [text, gold?]),
 // collection ({ tier, reached, needed, goal, current }), cards
 // (each { choice, period, title, logoPath, mastery, masteryHead ({ text,
 // color }, as the Mastery Bar's), line
@@ -263,7 +268,11 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         zIndex: WELCOME_SCREEN_Z_INDEX.header,
         rect: { x: inner.x, y: top, w: inner.w, h: headerH },
         draw: dc => {
-            if (screen.picker) drawAvatar(dc, screen.avatarPath, 0, 0, LOOK.avatar);
+            if (screen.picker) {
+                drawAvatar(dc, screen.avatarPath, 0, 0, LOOK.avatar);
+                const corner = LOOK.avatar - LOOK.pipInset;
+                if (screen.level !== null) drawLevelPip(host, dc, screen.level, corner, corner, LOOK.pipSize);
+            }
             drawCross(dc, inner.w - LOOK.cross, 0, LOOK.cross);
             const parts = screen.greeting.map(([str, gold]) => [str, gold ? COLORS.gold : COLORS.title]);
             runs(host, dc, parts, { x: 0, y: greetingY, width: inner.w - LOOK.cross - 40, size: LOOK.greetingSize });
