@@ -4,21 +4,23 @@ An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), 
 
 > **Give everyone in the house a real reason to come back to your pincab.** A Profile with an Avatar for each of you, a Welcome Screen with the Table of the Day, weekly Challenges, a Mastery Level on every table, Achievements from Bronze to Platinum (a few of them secret) that raise your Player Level, your own stats, and PinballY itself in French, German, Spanish, Italian or Portuguese: everything PinballY was missing, without touching PinballY. And this is only the beginning…
 
-<img src="docs/images/hero.png" alt="The wheel screen with the clock, the active Profile's badge and the week's Challenge Card" width="360">
+<img src="docs/images/hero.png" alt="The wheel screen with the clock, the active Profile's badge and its Player Level, the week's Challenge Card, the Mastery Bar and the Wheel Arc" width="360">
 
 ### A Profile for everyone
 
-<img src="docs/images/profiles.png" alt="The Change Player carousel and its Avatars" width="480">
+<img src="docs/images/profiles.png" alt="The Change Player carousel and its Avatars with their Player Level" width="400">
 
 With Change Player, each of you picks your own Profile and Avatar, and the Welcome Screen greets you by name so you know whose games will count. Only games of at least a minute count, so a launch by mistake never spoils anything. Your Daily Streak counts the days in a row you have played, on any table. Guest is always there for visitors.
 
 ### Profile Stats
 
+<img src="docs/images/profile_stats.png" alt="The Profile Stats of Guest" width="480">
+
 **Your Stats**, in the main menu, sums up your pinball life: games played and total time, your Player Level and Collection Mastery, average game length, favourite manufacturer, decade and table, the first table you ever played, how much of the collection you have tried, your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, the Challenges you completed, and the way to your most played tables and to the ones still to discover.
 
 ### Welcome Screen: Table of the Day, Table of the Week
 
-<img src="docs/images/period_tables.png" alt="The startup dialog with the Table of the Day and the Table of the Week" width="480">
+<img src="docs/images/welcome_screen.png" alt="The Welcome Screen with the Table of the Day and the Table of the Week" width="480">
 
 Every day there is a table you have never played or long forgotten, and every week a random one. The Welcome Screen greets you with both at startup, and again after Change Player, with what they mean for you: launch one of them, stay on the table on the wheel, change player or spin a Random Game. Play them several days or weeks in a row to build a Streak.
 
@@ -37,6 +39,8 @@ Every minute you play a table builds your Table Mastery of it, through ten Maste
 <img src="docs/images/achievements.png" alt="The Achievement List" width="380">
 
 There are dozens of Achievements, from Bronze to Platinum: manufacturers and decades completed, hours played, Streaks, Challenges, a full tour of the wheel... Each one is announced by a small toast in a corner, without interrupting your games; a Platinum also brings a shower of confetti across the wheel screen. The Achievement List shows how far you are from each missing one, and which of the household's Avatars already have it. A few stay secret, shown as "???" with a hint, until you stumble upon them.
+
+<img src="docs/images/toasts.png" alt="An Achievement Toast" width="440">
 
 Each Achievement earns points toward your **Player Level**, the more the higher its Rank, with no last level. It shows as a small pip on your Avatar, in bronze, then silver, gold and platinum as you climb, and reaching a new level brings its own toast and fireworks.
 

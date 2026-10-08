@@ -11,7 +11,7 @@ Extension non officielle de [PinballY](http://mjrnet.org/pinscape/PinballY.php),
 >
 > Et ce n'est que le début…
 
-<img src="docs/images/hero.png" alt="L'écran de la roue avec l'horloge, le badge du Profil actif et la carte du Défi de la semaine" width="360">
+<img src="docs/images/hero.png" alt="L'écran de la roue avec l'horloge, le badge du Profil actif et son niveau, la carte du Défi de la semaine, la barre de maîtrise et l'arc de la roue" width="360">
 
 ### PinballY en 6 langues
 
@@ -21,11 +21,13 @@ Les menus et messages de PinballY enfin en français, mais aussi en allemand, es
 
 ### Un Profil pour chacun
 
-<img src="docs/images/profiles.png" alt="Le carrousel « Changer de joueur » et ses Avatars" width="480">
+<img src="docs/images/profiles.png" alt="Le carrousel « Changer de joueur » et ses Avatars avec leur niveau" width="400">
 
 Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran d'accueil vous salue par votre nom : vous savez pour qui les parties vont compter. Seules les parties d'au moins une minute comptent : un lancement par erreur ne fausse rien. Vos jours d'affilée sur la borne comptent les jours de suite où vous avez joué, sur n'importe quelle table. Le Profil Invité reste toujours là pour les visiteurs.
 
 ### Vos statistiques
+
+<img src="docs/images/profile_stats.png" alt="Les statistiques du Profil Invité" width="480">
 
 **Vos statistiques**, dans le menu principal, résument votre vie de flippeur :
 - parties jouées, temps total et durée moyenne d'une partie ;
@@ -37,7 +39,7 @@ Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran
 
 ### Écran d'accueil : table du jour, table de la semaine
 
-<img src="docs/images/period_tables.png" alt="Le dialogue de démarrage avec la table du jour et la table de la semaine" width="480">
+<img src="docs/images/welcome_screen.png" alt="L'écran d'accueil avec la table du jour et la table de la semaine" width="480">
 
 Chaque jour une table jamais jouée ou oubliée, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, et après chaque « Changer de joueur », avec ce qu'elles représentent pour vous : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série.
 
@@ -63,6 +65,8 @@ Des dizaines de Succès, du Bronze au Platine :
 - tour complet de la roue…
 
 Chacun est annoncé par un petit encart dans un coin, sans interrompre vos parties ; un Succès Platine fait aussi pleuvoir des confettis sur tout l'écran de la roue. « Succès personnels » montre où vous en êtes de chaque Succès manquant, et quels avatars de la maison l'ont déjà. Quelques-uns restent secrets : vous ne voyez que « ??? » et un indice, jusqu'à ce que vous tombiez dessus.
+
+<img src="docs/images/toasts.png" alt="L'annonce d'un Succès" width="440">
 
 Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son rang est élevé, sans dernier niveau. Il s'affiche en pastille sur votre Avatar, en bronze, puis en argent, en or et en platine à mesure que vous montez, et chaque nouveau niveau atteint a son encart et son feu d'artifice.
 
