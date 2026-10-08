@@ -49,7 +49,7 @@ The picture that stands for a Profile.
 _Avoid_: profile picture, photo
 
 **Profile Greeting**:
-The short greeting, with the Avatar and the Profile's name, shown when a Profile is picked and when PinballY starts, so the player knows whose plays will count. It gives way to the Welcome Screen whenever that screen shows, since it greets the Profile itself.
+The short greeting, with the Avatar and the Profile's name, shown when a Profile is picked and when PinballY starts, so the player knows whose plays will count. It gives way to the Welcome Screen whenever that screen shows, since it greets the Profile itself, and the screen then plays its sound.
 _Avoid_: welcome toast, login message
 
 **Play**:

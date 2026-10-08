@@ -12,7 +12,8 @@
 // is a drawn dialog of the wheel dialog module (docs/adr/0011), submitted
 // at init with the startup priority, so it comes before any other dialog and the
 // toasts wait for it. It opens 500 ms after its turn comes, drawn at once
-// on all its layers, then faded in as a whole. While it is open it
+// on all its layers, then faded in as a whole with the Profile Greeting's
+// sound, since it greets the Profile in its place. While it is open it
 // swallows every button through "commandbuttondown": Next / Prev move a
 // gold halo through the choices, looping, with PinballY's navigation
 // sound; Select runs the highlighted choice, Exit closes it; attract mode
@@ -21,6 +22,7 @@
 // ============================================================
 
 import lang from "../common/i18n.js";
+import config from "../common/config.js";
 import { safeHandler } from "../common/safe_handler.js";
 import { createPinballYHost } from "../common/pinbally_host.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/wheel_dialog.js";
@@ -66,6 +68,11 @@ export default function init() {
     const dailyStreak = getDailyStreak();
     const periodTables = { [CHOICE.DAY]: getTableOfTheDay(), [CHOICE.WEEK]: getTableOfTheWeek() };
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
+    // The screen greets the Profile in place of the Profile Greeting, so it
+    // takes its sound; one that cannot play is logged and never stops the screen.
+    const playGreetingSound = safeHandler(SCRIPT_NAME, () => {
+        if (config.profileGreetingSoundFile) host.playSound(config.profileGreetingSoundFile);
+    });
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
 
     // Queued, waiting its turn in the wheel dialog module.
@@ -193,6 +200,7 @@ export default function init() {
         navigationSound.load();
         shown = { layers, highlightLayers, choices: screen.choices, selected: 0, opacity: 0, fadeTimer: null };
         fadeIn(shown);
+        playGreetingSound();
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
     }
 
