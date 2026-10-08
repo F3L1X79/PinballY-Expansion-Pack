@@ -93,13 +93,13 @@ export const TOAST_KIND = Object.freeze({ ACHIEVEMENT: "achievement", CHALLENGE:
 const KIND_LOOKS = Object.freeze({
     [TOAST_KIND.ACHIEVEMENT]: {
         accent: STEAMBALL_COLORS.gold,
-        iconFile: "assets\\achievement_trophy.png",
+        iconFile: "assets\\images\\achievement_trophy.png",
         header: () => lang.achievements.toastHeader,
     },
     // The Challenge Card's accent, so the toast reads as the card's news.
     [TOAST_KIND.CHALLENGE]: {
         accent: STEAMBALL_COLORS.challengeAccent,
-        iconFile: "assets\\challenge_target.png",
+        iconFile: "assets\\images\\challenge_target.png",
         header: () => lang.challenges.toastHeader,
     },
     // No icon: each toast brings its accent and the number its tile shows.
@@ -245,7 +245,7 @@ export function createAchievementToasts(host, {
     // keeps the uncropped one, framed like its muted twin.
     function rankEmblemOf(rank) {
         if (!rankEmblems.has(rank)) {
-            const path = `${projectFolder}\\assets\\rank_${rank}_tile.png`;
+            const path = `${projectFolder}\\assets\\images\\rank_${rank}_tile.png`;
             const exists = host.files.fileExists(path);
             if (!exists) host.log(`[${SCRIPT_NAME}] Rank emblem not found, drawing the trophy instead: ${path}`);
             rankEmblems.set(rank, exists ? path : null);

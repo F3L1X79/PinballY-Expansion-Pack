@@ -77,7 +77,7 @@ const PLAY_LOG_FILE = /^(play-log-(\d+))(\.bak)?\.json$/i;
 export function createProfileStore(host) {
     const projectFolder = host.getProjectFolder();
     const profilesFolder = `${projectFolder}\\profiles`;
-    const defaultAvatarPath = `${projectFolder}\\assets\\default_avatar.png`;
+    const defaultAvatarPath = `${projectFolder}\\assets\\images\\default_avatar.png`;
     const files = host.files;
     const switchListeners = [];
     const updateListeners = [];

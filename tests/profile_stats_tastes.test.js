@@ -18,7 +18,7 @@ import config from "../common/config.js";
 import { openProfileStats, section, sectionImages, press } from "./profile_stats_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
-const MISSING_IMAGE = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\missing_image.png";
+const MISSING_IMAGE = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\missing_image.png";
 const MEDIEVAL_LOGO = "C:\\PinballY\\Media\\Visual Pinball X\\Wheel Images\\Medieval Madness (Williams 1997).png";
 
 function table(id, title, manufacturer, year, extra = {}) {

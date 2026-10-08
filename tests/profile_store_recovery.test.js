@@ -16,7 +16,7 @@ const NOW = new Date(2026, 8, 24, 21, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const ALICE = `${PROFILES}\\Alice`;
 const CABINET_FILE = `${PROFILES}\\cabinet.json`;
-const DEFAULT_AVATAR = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\default_avatar.png";
+const DEFAULT_AVATAR = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\default_avatar.png";
 
 const MEDIEVAL = { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", isHidden: false };
 

@@ -62,7 +62,7 @@ function sampleAchievements() {
 }
 
 const avatarOf = name => `${PROFILES}\\${name}\\avatar.png`;
-const ASSETS = "C:\\PinballY\\Scripts\\ExpansionPack\\assets";
+const ASSETS = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images";
 // Plain (without its halo) for an Unlocked row and the header, greyed for a missing one.
 const emblemOf = (rank, variant = "") => `${ASSETS}\\rank_${rank}${variant}.png`;
 const EMBLEM_IMAGES = Object.values(ACHIEVEMENT_RANK).flatMap(rank => ["_plain", "_missing"].map(variant => emblemOf(rank, variant)));

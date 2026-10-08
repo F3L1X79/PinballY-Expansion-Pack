@@ -90,7 +90,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     const pieceLayers = new Map();
     // The scrollbar's thumb: one layer, kept in a map like the others.
     const thumbLayers = new Map();
-    const assetsFolder = `${host.getProjectFolder()}\\assets`;
+    const imagesFolder = `${host.getProjectFolder()}\\assets\\images`;
     // Each emblem image's path, or null when its file is missing: checked
     // once per session.
     const emblemImagePaths = new Map();
@@ -139,7 +139,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // The rank's emblem image for where it shows, or null when its file is
     // missing: that emblem is drawn instead.
     function emblemImageOf(rank, variant) {
-        const path = `${assetsFolder}\\rank_${rank}${variant}.png`;
+        const path = `${imagesFolder}\\rank_${rank}${variant}.png`;
         if (!emblemImagePaths.has(path)) {
             const exists = host.files.fileExists(path);
             if (!exists) host.log(`[${SCRIPT_NAME}] Emblem image not found, drawing the emblem instead: ${path}`);

@@ -14,7 +14,7 @@ import config from "../common/config.js";
 
 const PROJECT_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack";
 const PROFILES_FOLDER = `${PROJECT_FOLDER}\\profiles`;
-const DEFAULT_AVATAR = `${PROJECT_FOLDER}\\assets\\default_avatar.png`;
+const DEFAULT_AVATAR = `${PROJECT_FOLDER}\\assets\\images\\default_avatar.png`;
 const ALICE_AVATAR = `${PROFILES_FOLDER}\\Alice\\avatar.png`;
 const BADGE_Z = 4500;
 const GAME = { id: 1, configId: "mm", title: "Medieval Madness" };

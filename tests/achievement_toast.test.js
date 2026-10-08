@@ -26,7 +26,7 @@ const MAX_CARDS = 5;
 const SOUND_FILE = "C:\\Sounds\\achievement.wav";
 // Enough for a card to rise into place, shorter than any hold.
 const SETTLE_MS = 1000;
-const ASSETS = "C:\\PinballY\\Scripts\\ExpansionPack\\assets";
+const ASSETS = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images";
 const TROPHY = `${ASSETS}\\achievement_trophy.png`;
 const emblemOf = rank => `${ASSETS}\\rank_${rank}_tile.png`;
 
@@ -142,7 +142,7 @@ test("a Challenge Toast shares the queue with the Achievement Toasts, with its o
     const [trophy] = byTitle("achievement").images();
     const [target] = byTitle("challenge").images();
     assert.equal(trophy, TROPHY);
-    assert.equal(target, "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\challenge_target.png");
+    assert.equal(target, "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\challenge_target.png");
 });
 
 test("a celebrated toast starts the Confetti Shower when it starts, never when it went stale", () => {

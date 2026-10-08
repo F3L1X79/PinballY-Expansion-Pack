@@ -20,7 +20,7 @@ const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // Only the muted emblems have their image: the header's are drawn, so its
 // per-rank recap can be read from its colours.
-const mutedEmblem = rank => `C:\\PinballY\\Scripts\\ExpansionPack\\assets\\rank_${rank}_missing.png`;
+const mutedEmblem = rank => `C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\rank_${rank}_missing.png`;
 const avatarOf = name => `${PROFILES}\\${name}\\avatar.png`;
 // Longer than an Achievement Toast's whole life (rise, hold, fade).
 const TOAST_MS = 6000;

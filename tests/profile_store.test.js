@@ -273,7 +273,7 @@ test("a Profile's own avatar.png or avatar.jpg is its Avatar, otherwise the defa
     const store = createProfileStore(fake);
 
     const avatars = Object.fromEntries(store.listProfiles().map(profile => [profile.name, profile.avatarPath]));
-    const defaultAvatar = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\default_avatar.png";
+    const defaultAvatar = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\default_avatar.png";
     assert.deepEqual(avatars, {
         guest: defaultAvatar,
         Alice: `${PROFILES}\\Alice\\avatar.png`,
@@ -284,7 +284,7 @@ test("a Profile's own avatar.png or avatar.jpg is its Avatar, otherwise the defa
 });
 
 test("the default Avatar is committed in the assets folder", () => {
-    assert.ok(existsSync(fileURLToPath(new URL("../assets/default_avatar.png", import.meta.url))));
+    assert.ok(existsSync(fileURLToPath(new URL("../assets/images/default_avatar.png", import.meta.url))));
 });
 
 test("accented Profile names survive a switch, a save and a restart", () => {

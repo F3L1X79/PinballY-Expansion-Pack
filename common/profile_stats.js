@@ -43,7 +43,7 @@ const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
 const FADE_MS = 220;
 const FRAME_MS = 16;
-const MISSING_IMAGE_FILE = "assets\\missing_image.png";
+const MISSING_IMAGE_FILE = "assets\\images\\missing_image.png";
 
 export function createProfileStats(host, {
     profileStore, readPlayerLevel, achievementList, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
