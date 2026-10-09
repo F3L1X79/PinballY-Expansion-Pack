@@ -9,7 +9,7 @@
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
-import { oneLine, fillGradient, drawAvatar, selectionHalo } from "./steamball_drawing.js";
+import { oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, selectionHalo } from "./steamball_drawing.js";
 
 // Above the Profile Stats' band, which never shows at the same time, so
 // each reader sees only its own layers.
@@ -29,7 +29,7 @@ const LOOK = Object.freeze({
     haloMargin: 20,
 });
 
-const FRAME_SIZE = LOOK.avatar * 1.5;
+const FRAME_SIZE = avatarFrameSide(LOOK.avatar);
 
 // The panel, its title and each of rowCount rows, in a window
 // referenceWidth wide.
@@ -65,7 +65,7 @@ export function drawRow(host, dc, row, w, h) {
     const frameY = Math.round((h - FRAME_SIZE) / 2);
     const margin = (FRAME_SIZE - LOOK.avatar) / 2;
     drawAvatar(dc, row.avatarPath, frameX + margin, frameY + margin, LOOK.avatar);
-    if (row.framePath) dc.drawImage(row.framePath, frameX, frameY, FRAME_SIZE, FRAME_SIZE);
+    drawAvatarFrame(dc, row.framePath, frameX + margin, frameY + margin, LOOK.avatar);
     const textX = frameX + FRAME_SIZE + LOOK.textGap;
     const textW = w - textX - LOOK.textGap;
     oneLine(host, dc, row.name, {

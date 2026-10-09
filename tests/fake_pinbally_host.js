@@ -299,17 +299,17 @@ export function createFakePinballYHost({
 
     // A drawing layer that keeps only what the tests look at: the texts,
     // image paths, frames (frameRect) and fill colours (fillRect) drawn
-    // since the last draw or clear, the fills and texts in their drawing
-    // order, the canvas size of the last draw, its position, scale and
+    // since the last draw or clear, the fills, texts and images in their
+    // drawing order, the canvas size of the last draw, its position, scale and
     // alpha. Like PinballY, a draw without a size gets a canvas the size of
     // the window.
     function createDrawingLayer(zIndex) {
         let texts = [];
         let images = [];
         let frames = [];
-        // Fills and texts in drawing order: five numbers per fill (x, y,
-        // width, height, colour) and a text's { text, rect } in one flat
-        // array, as films drawn ahead make millions of fills.
+        // Fills, texts and images in drawing order: five numbers per fill
+        // (x, y, width, height, colour), a text's { text, rect } and an
+        // image's { image, rect } in one flat array, as films drawn ahead make millions of fills.
         let strokes = [];
         let canvasSize = null;
         let position = { x: 0, y: 0 };
@@ -319,7 +319,10 @@ export function createFakePinballYHost({
             getSize: () => ({ ...canvasSize }),
             fillRect: (x, y, width, height, color) => { strokes.push(x, y, width, height, color); },
             frameRect: (x, y, width, height) => { frames.push({ x, y, width, height }); },
-            drawImage: (path) => { images.push(path); },
+            drawImage: (path, x, y, width, height) => {
+                images.push(path);
+                strokes.push({ image: path, rect: { x, y, width, height } });
+            },
             // Like PinballY: throws on a missing or unreadable image.
             getImageSize: (path) => {
                 if (!isImageReadable(path)) throw new Error(`Cannot load image: ${path}`);
@@ -354,7 +357,8 @@ export function createFakePinballYHost({
             images: () => [...images],
             frames: () => frames.map(frame => ({ ...frame })),
             fills: () => readStrokes(strokes).filter(stroke => "fill" in stroke).map(stroke => stroke.fill),
-            // Fills ({ fill: color, rect }) and texts ({ text, rect }) in drawing order.
+            // Fills ({ fill: color, rect }), texts ({ text, rect }) and images
+            // ({ image: path, rect }) in drawing order.
             strokes: () => readStrokes(strokes),
             canvasSize: () => ({ ...canvasSize }),
             position: () => ({ ...position }),

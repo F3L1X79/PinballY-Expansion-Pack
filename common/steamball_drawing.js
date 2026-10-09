@@ -1,10 +1,10 @@
 ﻿// ============================================================
 // Steamball drawing helpers shared by the drawn screens (Welcome Screen,
-// Profile Stats) and the Profile badge: text on one or several lines, rounded and gradient
-// fills, glows, the dimmed backdrop with its panel, the Avatar, a wheel
-// logo, the close cross, a tooltip, the gold selection halo and the
-// Player Level pip. Each draws on the drawing context it is given, in its
-// coordinates. Only drawing: no layer, no event, no side effect.
+// Profile Stats) and the Profile badge: text on one or several lines,
+// rounded and gradient fills, glows, the dimmed backdrop with its panel,
+// the Avatar, a wheel logo, the close cross, a tooltip, the gold selection
+// halo, the Avatar Frame around an Avatar and the Player Level pip. Each
+// draws on the drawing context it is given, in its coordinates. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "./steamball_palette.js";
@@ -119,6 +119,21 @@ function fillPill(dc, x, y, w, h, color) {
     if (w > h) dc.fillRect(Math.round(x + r), y, Math.round(w - h), h, color);
     fillDisc(dc, x + r, y + r, r, color);
     if (w > h) fillDisc(dc, x + w - r, y + r, r, color);
+}
+
+// An Avatar Frame reaches this share of the Avatar's size beyond it on
+// every side: the image's middle two thirds is the Avatar's box.
+export const AVATAR_FRAME_MARGIN = 0.25;
+
+export const avatarFrameSide = avatarSize => avatarSize * (1 + 2 * AVATAR_FRAME_MARGIN);
+
+// The Avatar Frame image framePath around the Avatar's box at (x, y), size
+// pixels wide; nothing for null. Drawn after the Avatar and before the
+// Player Level pip, which stays on top.
+export function drawAvatarFrame(dc, framePath, x, y, size) {
+    if (!framePath) return;
+    const margin = size * AVATAR_FRAME_MARGIN;
+    dc.drawImage(framePath, x - margin, y - margin, avatarFrameSide(size), avatarFrameSide(size));
 }
 
 export function drawAvatar(dc, path, x, y, size) {

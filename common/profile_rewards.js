@@ -16,6 +16,8 @@ import lang from "./i18n.js";
 import config from "./config.js";
 
 const FRAME_COUNT = 10;
+// Frames drawn this wide or less take the 192 px image, wider ones the 384 px one.
+const SMALL_IMAGE_MAX_WIDTH = 192;
 const FRAMES_FOLDER = "assets\\images\\avatar_frames";
 const SCRIPT_NAME = "ProfileRewards";
 
@@ -63,6 +65,12 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
     return {
         framesOf,
         wornFrameOf,
+        // The image of the frame the Profile wears, for a frame drawn
+        // frameWidth pixels wide; null when it wears none or the file is missing.
+        wornImageOf(profileName, frameWidth) {
+            const frame = wornFrameOf(profileName);
+            return frame ? existingImage(frame.images[frameWidth <= SMALL_IMAGE_MAX_WIDTH ? "small" : "large"]) : null;
+        },
         // The image of that size ("large", "small" or "locked") of a frame
         // from framesOf, null when its file is missing.
         imageOf: (frame, size) => existingImage(frame.images[size]),
