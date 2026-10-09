@@ -17,6 +17,7 @@ The repository is the pack's folder, installed as `PinballY\Scripts\ExpansionPac
 - `common/` holds the shared code, which is never an Add-on.
 - `achievements/` holds the Achievement definitions, one file per Achievement Family.
 - `lang/` holds the translations, `assets/images/` the images drawn by the scripts, `assets/sounds/` the sounds they play, `profiles/` the Profiles' saved progress, and `tests/` the tests.
+- `tools/` holds the maintainers' Node.js scripts, run by hand and never loaded by PinballY. They are `.mjs` files, so that the checks on the scripts PinballY loads leave them out. `tools/avatar_frames/` paints the Avatar Frame images of `assets/images/avatar_frames/` (`node tools/avatar_frames/generate_frames.mjs [numbers]`).
 
 `tests/file_layout.test.js` checks this layout.
 
