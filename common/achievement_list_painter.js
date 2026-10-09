@@ -11,6 +11,7 @@
 
 import { ACHIEVEMENT_RANK, RANKS_IN_ORDER } from "./achievements.js";
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "./steamball_palette.js";
+import { drawAvatarFrame, avatarFrameSide, avatarFrameInset } from "./steamball_drawing.js";
 
 // The wheel shows dimmed through it.
 const OVERLAY_COLOR = 0xD0080A0E;
@@ -224,12 +225,16 @@ export function drawBackdrop(dc, g) {
     dc.frameRect(g.x, g.y, g.panelWidth, g.panelHeight, 1, COLORS.border);
 }
 
-// Where the header's Avatar and texts sit, and where its rank counts start.
-function headerLayout(g, rankCountsLength) {
+// How wide the header's Avatar Frame is drawn, for its image's size.
+export const AVATAR_FRAME_WIDTH = avatarFrameSide(LIST_LOOK.avatarSize);
+
+// Where the header's Avatar and texts sit, and where its rank counts start;
+// inset: the Avatar Frame's margin around the Avatar, 0 without one.
+function headerLayout(g, rankCountsLength, inset = 0) {
     const look = LIST_LOOK;
-    const avatarX = g.x + look.padding;
+    const avatarX = g.x + look.padding + inset;
     const avatarY = g.y + (look.headerHeight - look.avatarSize) / 2;
-    const textX = avatarX + look.avatarSize + 28;
+    const textX = avatarX + look.avatarSize + inset + 28;
     const textWidth = g.panelWidth - (textX - g.x) - look.padding - 8;
     const rankCountsWidth = rankCountsLength * look.rankCountWidth;
     return { avatarX, avatarY, textX, textWidth, rankCountsWidth, rankCountsX: textX + textWidth - rankCountsWidth };
@@ -257,7 +262,7 @@ export function layoutHeaderEmblems(g, rankCounts) {
     });
 }
 
-// The Avatar in a double gold frame, the title, the Profile's name, the
+// The Avatar in its worn Avatar Frame (in a double gold frame without one), the title, the Profile's name, the
 // total line and its gauge, with a diamond at the gauge's tip; on the
 // name's line, right-aligned, the count of Unlocked Achievements of each
 // rank after its small emblem, drawn here only for a rank without an
@@ -267,12 +272,17 @@ function drawHeader(host, dc, g, header) {
     const { x, y, panelWidth: width } = g;
     fillGradient(dc, x, y, width, look.headerHeight, COLORS.panelTop, HEADER_BOTTOM_COLOR);
     const avatar = look.avatarSize;
-    const layout = headerLayout(g, header.rankCounts.length);
+    const layout = headerLayout(g, header.rankCounts.length, avatarFrameInset(header.framePath, avatar));
     const { avatarX, avatarY, textX, textWidth, rankCountsWidth } = layout;
-    dc.fillRect(avatarX - 7, avatarY - 7, avatar + 14, avatar + 14, COLORS.gold);
-    dc.fillRect(avatarX - 4, avatarY - 4, avatar + 8, avatar + 8, COLORS.tile);
-    dc.frameRect(avatarX - 2, avatarY - 2, avatar + 4, avatar + 4, 1, COLORS.gold);
-    dc.drawImage(header.avatarPath, avatarX, avatarY, avatar, avatar);
+    if (header.framePath) {
+        dc.drawImage(header.avatarPath, avatarX, avatarY, avatar, avatar);
+        drawAvatarFrame(dc, header.framePath, avatarX, avatarY, avatar);
+    } else {
+        dc.fillRect(avatarX - 7, avatarY - 7, avatar + 14, avatar + 14, COLORS.gold);
+        dc.fillRect(avatarX - 4, avatarY - 4, avatar + 8, avatar + 8, COLORS.tile);
+        dc.frameRect(avatarX - 2, avatarY - 2, avatar + 4, avatar + 4, 1, COLORS.gold);
+        dc.drawImage(header.avatarPath, avatarX, avatarY, avatar, avatar);
+    }
 
     // Only the title and the name share their width with the rank counts.
     const nameSize = drawText(host, dc, [

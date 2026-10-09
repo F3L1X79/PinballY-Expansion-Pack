@@ -3,8 +3,8 @@
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // from the prototype validated on the cabinet: the dimmed backdrop with
 // the centred Steamball panel, the card on the left framed in the Player
-// Level colour with a soft glow (Avatar, the Profile's name in gold, the
-// Player Level in big digits with its bar and points, a rule, the
+// Level colour with a soft glow (Avatar in its worn Avatar Frame, the
+// Profile's name in gold, the Player Level in big digits with its bar and points, a rule, the
 // Collection Mastery stacked like the Mastery Bar, the buttons at its
 // foot), the close cross and the right column's sections (a title, then
 // rows of stats, label over value (every label at one size, the largest
@@ -20,7 +20,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, mix, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
     UNBOUNDED,
 } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
@@ -140,6 +140,17 @@ function columnBlocks(host, screen, columnW, statGap) {
     return blocks;
 }
 
+// How wide the card's Avatar Frame is drawn at most, for its image's size.
+export const AVATAR_FRAME_WIDTH = avatarFrameSide(LOOK.avatar);
+
+// The Avatar's size, and its frame's margin on every side when it wears
+// one: the frame, not only the Avatar, stays within the card's content width.
+function avatarOf(screen, contentW) {
+    const widest = screen.framePath ? contentW * contentW / avatarFrameSide(contentW) : contentW;
+    const size = Math.min(widest, LOOK.avatar);
+    return { size, inset: avatarFrameInset(screen.framePath, size) };
+}
+
 const playerLevelBlockH = () => {
     const look = LOOK.playerLevel;
     return look.titleH + look.digitsH + look.barH + look.barGap + look.pointsH;
@@ -151,7 +162,7 @@ function cardHeight(screen, avatar) {
     const { button } = LOOK;
     const buttonsH = screen.buttons.length * (button.h + button.gap) - button.gap;
     const blocksH = playerLevelBlockH() + LOOK.ruleH + collectionBlockH();
-    return LOOK.cardInset + avatar + LOOK.avatarGap + LOOK.nameH + blocksH + LOOK.buttonsGap + buttonsH + LOOK.cardInset;
+    return LOOK.cardInset + avatar.size + 2 * avatar.inset + LOOK.avatarGap + LOOK.nameH + blocksH + LOOK.buttonsGap + buttonsH + LOOK.cardInset;
 }
 
 // The panel, the card and the column in a window referenceWidth wide; the
@@ -162,7 +173,7 @@ function geometry(host, referenceWidth, screen) {
     const isPortrait = referenceWidth < REFERENCE_HEIGHT;
     const cardW = Math.round(innerW * (isPortrait ? LOOK.portraitCardShare : LOOK.cardShare));
     const contentW = cardW - 2 * LOOK.cardInset;
-    const avatar = Math.min(contentW, LOOK.avatar);
+    const avatar = avatarOf(screen, contentW);
     const columnX = LOOK.pad + cardW + LOOK.columnGap;
     const columnW = w - LOOK.pad - columnX;
     const blocks = columnBlocks(host, screen, columnW, isPortrait ? LOOK.portraitStatGap : LOOK.statGap);
@@ -316,7 +327,8 @@ function drawSection(host, dc, blocks, top, columnW) {
     }
 }
 
-// screen: { name, avatarPath, playerLevel ({ title, number, color (the
+// screen: { name, avatarPath, framePath (the worn Avatar Frame's image,
+// null for none), playerLevel ({ title, number, color (the
 // level's metal), share (0 to 1), current }), collectionTitle, collection (as drawCollection's), buttons (each { choice, label, count: null
 // or a string }), sections (each { title, rows: [[{ label, value, pill
 // (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]],
@@ -338,8 +350,11 @@ export function layoutProfileStats(host, screen, referenceWidth) {
             dc.frameRect(G, G, cardW, innerH, 2, screen.playerLevel.color);
             const contentX = G + LOOK.cardInset;
             let y = G + LOOK.cardInset;
-            drawAvatar(dc, screen.avatarPath, G + Math.round((cardW - avatar) / 2), y, avatar);
-            y += avatar + LOOK.avatarGap;
+            const avatarX = G + Math.round((cardW - avatar.size) / 2);
+            y += avatar.inset;
+            drawAvatar(dc, screen.avatarPath, avatarX, y, avatar.size);
+            drawAvatarFrame(dc, screen.framePath, avatarX, y, avatar.size);
+            y += avatar.size + avatar.inset + LOOK.avatarGap;
             oneLine(host, dc, screen.name, {
                 x: contentX, y: y - LOOK.nameLift, width: contentW, height: LOOK.nameH,
                 size: LOOK.nameSize, minSize: LOOK.minNameSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center",

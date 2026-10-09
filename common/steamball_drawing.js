@@ -127,6 +127,10 @@ export const AVATAR_FRAME_MARGIN = 0.25;
 
 export const avatarFrameSide = avatarSize => avatarSize * (1 + 2 * AVATAR_FRAME_MARGIN);
 
+// The room to leave on every side of an Avatar size pixels wide for its
+// frame framePath: none for null.
+export const avatarFrameInset = (framePath, size) => (framePath ? size * AVATAR_FRAME_MARGIN : 0);
+
 // The Avatar Frame image framePath around the Avatar's box at (x, y), size
 // pixels wide; nothing for null. Drawn after the Avatar and before the
 // Player Level pip, which stays on top.

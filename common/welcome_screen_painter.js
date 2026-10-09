@@ -2,9 +2,9 @@
 // Welcome Screen painter: the layout and drawing of the Welcome Screen's
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // from the prototype validated on the cabinet: the dimmed backdrop with
-// the centred Steamball panel, the header (Avatar with its Player Level
-// pip, close cross, greeting with the Profile's name in gold, Daily
-// Streak line, Collection Mastery on the Mastery Bar's card), one card
+// the centred Steamball panel, the header (Avatar in its worn Avatar
+// Frame, with its Player Level pip, close cross, greeting with the
+// Profile's name in gold, Daily Streak line, Collection Mastery on the Mastery Bar's card), one card
 // per Period Table (logo, period, name on one line, Table Mastery card
 // around the Mastery Bar's square, grey line, "Go" button),
 // the bottom row ("stay" and "random") and one highlight per choice (a
@@ -15,7 +15,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawLevelPip, levelPipOn, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
 } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
@@ -53,6 +53,14 @@ const LOOK = Object.freeze({
     // Room around the Collection Mastery card for its square's halo.
     squareHaloMargin: 24,
 });
+
+// How wide the header's Avatar Frame is drawn, for its image's size.
+export const AVATAR_FRAME_WIDTH = avatarFrameSide(LOOK.avatar);
+
+// The Avatar's room in the header: the Avatar, and its frame's margin on
+// every side when it wears one.
+const avatarInsetOf = screen => avatarFrameInset(screen.framePath, LOOK.avatar);
+const avatarRoomOf = screen => LOOK.avatar + 2 * avatarInsetOf(screen);
 
 // ---------- Small drawing helpers ----------
 
@@ -189,7 +197,7 @@ function geometry(referenceWidth, screen) {
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
     const inner = { x: Math.round((referenceWidth - w) / 2) + LOOK.pad, w: w - 2 * LOOK.pad };
     // Under the Avatar; without one, on the top line, beside the cross.
-    const greetingY = screen.picker ? LOOK.avatar + LOOK.greetingGap : 0;
+    const greetingY = screen.picker ? avatarRoomOf(screen) + LOOK.greetingGap : 0;
     const greetingEndY = greetingY + Math.round(LOOK.greetingSize * 1.4);
     const dailyStreakY = greetingEndY + LOOK.dailyStreakGap;
     const dailyStreakH = screen.dailyStreak ? LOOK.dailyStreakGap + LOOK.lineH : 0;
@@ -255,7 +263,8 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
     return { pieces, highlights };
 }
 
-// screen: { picker, avatarPath, level (the shown Player Level, null for
+// screen: { picker, avatarPath, framePath (the worn Avatar Frame's image,
+// null for none), level (the shown Player Level, null for
 // no pip), greeting (runs of [text, gold?]), dailyStreak (null, or
 // { count, text }),
 // collection ({ tier, reached, needed, goal, current }), cards
@@ -275,9 +284,11 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         rect: { x: inner.x, y: top, w: inner.w, h: headerH },
         draw: dc => {
             if (screen.picker) {
-                drawAvatar(dc, screen.avatarPath, 0, 0, LOOK.avatar);
+                const inset = avatarInsetOf(screen);
+                drawAvatar(dc, screen.avatarPath, inset, inset, LOOK.avatar);
+                drawAvatarFrame(dc, screen.framePath, inset, inset, LOOK.avatar);
                 if (screen.level !== null) {
-                    const pip = levelPipOn(0, 0, LOOK.avatar);
+                    const pip = levelPipOn(inset, inset, LOOK.avatar);
                     drawLevelPip(host, dc, screen.level, pip.cx, pip.cy, pip.size);
                 }
             }
@@ -362,12 +373,14 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         }
     );
     if (screen.picker) {
+        // Around the frame, when the Avatar wears one.
         const room = LOOK.avatarTooltipRoom;
+        const side = avatarRoomOf(screen);
         highlights[CHOICE.AVATAR] = highlightPiece(
-            { x: inner.x - M, y: top - M, w: M + LOOK.avatar + room, h: LOOK.avatar + 2 * M },
+            { x: inner.x - M, y: top - M, w: M + side + room, h: side + 2 * M },
             dc => {
-                selectionHalo(dc, M, M, LOOK.avatar, LOOK.avatar);
-                tooltip(host, dc, screen.labels[CHOICE.AVATAR], M + LOOK.avatar + 18, M + LOOK.avatar / 2, "right");
+                selectionHalo(dc, M, M, side, side);
+                tooltip(host, dc, screen.labels[CHOICE.AVATAR], M + side + 18, M + side / 2, "right");
             }
         );
     }

@@ -110,8 +110,9 @@ export default function init() {
         return getPlayerLevel(notified, nonChild).level;
     });
 
+    const profileRewards = getProfileRewards();
     const achievementList = createAchievementList(createPinballYHost(), {
-        getAchievements: getAllAchievements, profileStore, drawingAhead: getDrawingAhead(),
+        getAchievements: getAllAchievements, profileStore, drawingAhead: getDrawingAhead(), profileRewards,
     });
     const mainMenu = getMainMenu();
     mainMenu.add({
@@ -122,11 +123,12 @@ export default function init() {
         action: () => achievementList.open(() => mainMenu.reopenOn(ACHIEVEMENT_LIST_ENTRY)),
     });
     const frameList = createAvatarFrameList(createPinballYHost(), {
-        profileStore, profileRewards: getProfileRewards(), drawingAhead: getDrawingAhead(),
+        profileStore, profileRewards, drawingAhead: getDrawingAhead(),
     });
     const profileStats = createProfileStats(createPinballYHost(), {
         profileStore,
         achievementList,
+        profileRewards,
         frameList,
         // From the active Profile's Notified Achievements, read on each opening.
         readPlayerLevel: () => getPlayerLevel(

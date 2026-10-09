@@ -1,9 +1,9 @@
 ﻿// ============================================================
 // Welcome Screen: at startup, and again whenever Change Player switches
 // to another Profile, a centred Steamball panel drawn over the
-// dimmed wheel greets the active Profile by the hour (its Avatar, with
-// the shown Player Level as a pip, and its name in gold when the Profile
-// picker is on), shows its Daily Streak under the greeting from 2 days
+// dimmed wheel greets the active Profile by the hour (its Avatar, in its
+// worn Avatar Frame, with the shown Player Level as a pip, and its name
+// in gold when the Profile picker is on), shows its Daily Streak under the greeting from 2 days
 // on, its Collection Mastery (the tier kept in profile.json when the
 // tables no longer reach it) and offers to close, to play the Table of the Day or of the Week
 // (one card each, with its Table Mastery and the active Profile's Streak;
@@ -28,6 +28,7 @@ import { safeHandler } from "../common/safe_handler.js";
 import { createPinballYHost } from "../common/pinbally_host.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/wheel_dialog.js";
 import { getProfileStore } from "../common/profile_store.js";
+import { getProfileRewards } from "../common/profile_rewards.js";
 import { getShownPlayerLevel } from "../common/shown_player_level.js";
 import { displayNameOf } from "../common/profile_name.js";
 import { cleanTitle } from "../common/table_title.js";
@@ -41,7 +42,7 @@ import { masteryHeadOf, collectionTextsOf } from "../common/mastery_bar.js";
 import { createNavigationSound } from "../common/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/steamball_palette.js";
 import {
-    WELCOME_SCREEN_Z_INDEX, REFERENCE_HEIGHT, CHOICE, drawBackdrop, layoutWelcomeScreen,
+    WELCOME_SCREEN_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutWelcomeScreen,
 } from "../common/welcome_screen_painter.js";
 
 const SCRIPT_NAME = "WelcomeScreen";
@@ -142,6 +143,7 @@ export default function init() {
         return {
             picker,
             avatarPath: profile.avatarPath,
+            framePath: picker ? getProfileRewards().wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
             level: shownPlayerLevel.get(),
             // Runs of [text, gold?]: only the name is gold.
             greeting: picker

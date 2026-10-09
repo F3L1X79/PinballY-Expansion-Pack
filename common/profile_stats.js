@@ -11,8 +11,9 @@
 // Created from the PinballY host, the Profile store, a reader of the
 // active Profile's Player Level, the Achievement List (its counts, and
 // opening it from the Achievements button, Exit there showing this screen
-// again on that button), the Avatar Frame list (its count, and opening it
-// from the Frame button, Select or Exit there showing this screen again on
+// again on that button), the Profile Rewards module (the worn Avatar
+// Frame around the Avatar; null: none), the Avatar Frame list (its count,
+// and opening it from the Frame button, Select or Exit there showing this screen again on
 // that button; null or without frames: no button), the Daily Streak, the Table of the Day and Table
 // of the Week (their Streaks), the Challenge module (null when the
 // Challenges Add-on is disabled: no completed Challenges) and the full ids of the Hall of
@@ -38,7 +39,7 @@ import { getTablesToDiscover } from "./tables_to_discover.js";
 import { createNavigationSound } from "./navigation_sound.js";
 import { STEAMBALL_COLORS } from "./steamball_palette.js";
 import { playerLevelColorOf } from "./steamball_drawing.js";
-import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
+import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
 
 const SCRIPT_NAME = "ProfileStats";
 const SECONDS_PER_MINUTE = 60;
@@ -48,7 +49,7 @@ const FRAME_MS = 16;
 const MISSING_IMAGE_FILE = "assets\\images\\missing_image.png";
 
 export function createProfileStats(host, {
-    profileStore, readPlayerLevel, achievementList, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
+    profileStore, readPlayerLevel, achievementList, profileRewards = null, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
     hallOfFameFilter = null, tablesToDiscoverFilter = null,
 }) {
     const { profileStats: TEXT } = lang;
@@ -221,6 +222,7 @@ export function createProfileStats(host, {
         return {
             name: displayNameOf(profile),
             avatarPath: profile.avatarPath,
+            framePath: profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
             playerLevel: {
                 title: TEXT.playerLevel.title,
                 number: String(playerLevel.level),

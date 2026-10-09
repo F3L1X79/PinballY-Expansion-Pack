@@ -2,7 +2,8 @@
 // Achievement List module: the screen the player opens (from the main menu
 // or the Profile Stats) to browse every Achievement of the active Profile
 // in one drawn scrolling list over a dimmed wheel (see docs/adr/0005): a
-// header with the Profile, its total and its count per Achievement Rank,
+// header with the Profile (its Avatar in its worn Avatar Frame, from the
+// Profile Rewards module), its total and its count per Achievement Rank,
 // then the Unlocked Achievements (a toast still waiting first, then the
 // most recently Notified) and the missing ones (the highest Unlock Rate
 // first, then the furthest Achievement Progress), each part under its
@@ -32,6 +33,7 @@
 // What the list shows is read again on each opening, and ahead after a
 // Profile switch or a change of a Profile's data; the other Profiles'
 // files only when their Notified Achievements may have changed.
+// The Profile Rewards module gives the header's Avatar Frame (null: none).
 // Opens directly, not through the wheel dialog module: the player asked
 // for it.
 // ============================================================
@@ -42,7 +44,7 @@ import { createNavigationSound } from "./navigation_sound.js";
 import { displayNameOf } from "./profile_name.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
 import {
-    LIST_LOOK, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
+    LIST_LOOK, AVATAR_FRAME_WIDTH, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
     drawPiece, layoutScrollbar, thumbTopAt, drawScrollbarThumb,
 } from "./achievement_list_painter.js";
 
@@ -70,7 +72,7 @@ const MAX_OWNER_AVATARS = 4;
 const EMBLEM_VARIANT = Object.freeze({ UNLOCKED: "_plain", MISSING: "_missing", HEADER: "_plain" });
 
 // drawingAhead: the shared drawing ahead (common/drawing_ahead.js).
-export function createAchievementList(host, { getAchievements, profileStore, drawingAhead }) {
+export function createAchievementList(host, { getAchievements, profileStore, drawingAhead, profileRewards = null }) {
     const { achievementList: TEXT } = lang;
     const hiddenLayer = zIndex => {
         const layer = host.createDrawingLayer(zIndex);
@@ -285,6 +287,8 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
             title: TEXT.title.toLocaleUpperCase(),
             profileName: displayNameOf(profile),
             avatarPath: profile.avatarPath,
+            // Only the header's Avatar: the Unlock Rate Avatars stay plain.
+            framePath: profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
             totalLine: TEXT.totalLine(unlocked, total, percent),
             ratio: total === 0 ? 0 : unlocked / total,
             rankCounts: RANKS_IN_ORDER.map(rank => ({
