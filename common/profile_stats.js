@@ -3,15 +3,17 @@
 // menu to sum up the active Profile's own plays: a centred Steamball
 // panel over the dimmed wheel, laid out by the Profile Stats painter,
 // with the Avatar, the Profile's name, the Player Level and the
-// Collection Mastery on a card whose foot holds the Achievements, Most
-// Played Tables and Tables to Discover buttons, and the GAME, PROGRESSION
+// Collection Mastery on a card whose foot holds the Achievements, Frame,
+// Most Played Tables and Tables to Discover buttons, and the GAME, PROGRESSION
 // and TASTES sections on its right (the last with the favourite and first
 // table strips, read from the Hall of Fame and the Play Log). Every stat is read again on each
 // opening; the screen is drawn at once on all its layers, then faded in.
 // Created from the PinballY host, the Profile store, a reader of the
 // active Profile's Player Level, the Achievement List (its counts, and
 // opening it from the Achievements button, Exit there showing this screen
-// again on that button), the Daily Streak, the Table of the Day and Table
+// again on that button), the Avatar Frame list (its count, and opening it
+// from the Frame button, Select or Exit there showing this screen again on
+// that button; null or without frames: no button), the Daily Streak, the Table of the Day and Table
 // of the Week (their Streaks), the Challenge module (null when the
 // Challenges Add-on is disabled: no completed Challenges) and the full ids of the Hall of
 // Fame and Tables to Discover filters (null when their Add-on is
@@ -46,7 +48,7 @@ const FRAME_MS = 16;
 const MISSING_IMAGE_FILE = "assets\\images\\missing_image.png";
 
 export function createProfileStats(host, {
-    profileStore, readPlayerLevel, achievementList, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
+    profileStore, readPlayerLevel, achievementList, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
     hallOfFameFilter = null, tablesToDiscoverFilter = null,
 }) {
     const { profileStats: TEXT } = lang;
@@ -80,6 +82,12 @@ export function createProfileStats(host, {
     // the player is never sent to an empty wheel.
     function selectionButton(choice, label, filterId, tables) {
         return filterId !== null && tables.length > 0 ? [{ choice, label, count: TEXT.number(tables.length), filterId }] : [];
+    }
+
+    // Left out without frames to choose (Table Mastery off).
+    function frameButton() {
+        const frames = frameList && frameList.count();
+        return frames ? [{ choice: CHOICE.FRAME, label: TEXT.buttons.frame, count: TEXT.fraction(frames.unlocked, frames.total) }] : [];
     }
 
     // The Collection Achievements' rule, so the two never disagree.
@@ -206,6 +214,7 @@ export function createProfileStats(host, {
         const hallOfFame = getHallOfFame(profileTables, profileStore.getPlay);
         const buttons = [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
+            ...frameButton(),
             ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, hallOfFame),
             ...selectionButton(CHOICE.TO_DISCOVER, TEXT.buttons.tablesToDiscover, tablesToDiscoverFilter, getTablesToDiscover(profileTables, profileStore)),
         ];
@@ -336,12 +345,13 @@ export function createProfileStats(host, {
         close();
         // Exit from the list comes back here, on its button.
         if (choice === CHOICE.ACHIEVEMENTS) achievementList.open(() => open(CHOICE.ACHIEVEMENTS));
+        else if (choice === CHOICE.FRAME) frameList.open(() => open(CHOICE.FRAME));
         else if (entry) host.setCurrentFilter(entry.filterId);
     }
 
     // Fires on every mapped button press; drives the screen while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        // Already handled: the Achievement List's Exit reopens this screen
+        // Already handled: the Achievement List's or Avatar Frame list's Exit reopens this screen
         // within the same press, which must not close it again.
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing choice still never reaches the wheel.

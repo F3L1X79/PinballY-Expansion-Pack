@@ -439,8 +439,17 @@ export default {
         // The buttons at the card's foot.
         buttons: {
             achievements: "Succès",
+            frame: "Cadre",
             mostPlayedTables: "Tables les plus jouées",
             tablesToDiscover: "Tables à découvrir",
+        },
+        // The Avatar Frame list opened from the Frame button: its title, the
+        // "no frame" row, the worn row's mark and a locked frame's condition.
+        frameList: {
+            title: "Cadres d'Avatar",
+            none: "Aucun",
+            worn: "Porté",
+            unlockCondition: (tier) => `Palier de collection ${tier}`,
         },
         // The card's Player Level: its title over the big digits, then the
         // points so far and those of the next level, thousands separated.

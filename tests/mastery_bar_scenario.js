@@ -21,6 +21,10 @@ export const DRAWN_AHEAD_MS = 10000;
 export const REFERENCE_HEIGHT = 1920;
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 export const profileFile = name => `${PROFILES_FOLDER}\\${name}\\profile.json`;
+// The thirty Avatar Frame images, as the pack ships them.
+export const AVATAR_FRAMES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\avatar_frames";
+const AVATAR_FRAME_IMAGES = Array.from({ length: 10 }, (_, index) => `${AVATAR_FRAMES_FOLDER}\\frame_${String(index + 1).padStart(2, "0")}`)
+    .flatMap(base => [`${base}_384.png`, `${base}_192.png`, `${base}_192_locked.png`]);
 
 const table = (id, title, manufacturer, year) => ({
     id, configId: `${title} (${manufacturer} ${year})`, title, manufacturer, year, categories: [],
@@ -46,19 +50,22 @@ export const ADULT_TABLES = [
 // A Profile's earlier Plays on a table, as its profile.json keeps them.
 export const playedFor = seconds => ({ count: 1, seconds, lastPlayed: "2026-09-01T20:00:00" });
 
-// addOns: the Add-ons on; profiles: { name: { plays, isChild, collectionTier, notified } }, Guest's
+// addOns: the Add-ons on; profiles: { name: { plays, isChild, collectionTier, notified, avatarFrame } }, Guest's
 // under "guest"; active: the Profile in cabinet.json; challenge: the week's
 // lock in cabinet.json (undefined lets the Challenges draw one); settings:
-// config keys to change; soundFiles: the files that exist.
+// config keys to change; soundFiles: the files that exist; frameImages:
+// whether the Avatar Frame images exist.
 export async function startScenario({
     addOns = ["tableMastery"], profiles = {}, active = "guest", challenge, tables = TABLES, language = "en",
-    settings = {}, soundFiles = [],
+    settings = {}, soundFiles = [], frameImages = false,
 } = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
     for (const file of soundFiles) fake.addFile(file);
-    for (const [name, { plays = {}, isChild = false, collectionTier, notified = [] }] of Object.entries(profiles)) {
+    if (frameImages) for (const file of AVATAR_FRAME_IMAGES) fake.addFile(file);
+    for (const [name, { plays = {}, isChild = false, collectionTier, notified = [], ...rest }] of Object.entries(profiles)) {
         fake.addFile(profileFile(name), JSON.stringify({
             version: 1, plays, notified, ...(isChild ? { isChild } : {}), ...(collectionTier ? { collectionTier } : {}),
+            ...("avatarFrame" in rest ? { avatarFrame: rest.avatarFrame } : {}),
         }));
     }
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({

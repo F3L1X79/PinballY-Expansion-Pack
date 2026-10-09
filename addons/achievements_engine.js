@@ -43,6 +43,8 @@ import { getShownPlayerLevel } from "../common/shown_player_level.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
 import { createAchievementList } from "../common/achievement_list.js";
 import { createProfileStats } from "../common/profile_stats.js";
+import { createAvatarFrameList } from "../common/avatar_frame_list.js";
+import { getProfileRewards } from "../common/profile_rewards.js";
 import { getDailyStreak } from "../common/daily_streak.js";
 import { HALL_OF_FAME_FULL_FILTER_ID } from "../common/hall_of_fame.js";
 import { TABLES_TO_DISCOVER_FULL_FILTER_ID } from "../common/tables_to_discover.js";
@@ -119,9 +121,13 @@ export default function init() {
         // Exit goes back one level: the main menu, on this entry.
         action: () => achievementList.open(() => mainMenu.reopenOn(ACHIEVEMENT_LIST_ENTRY)),
     });
+    const frameList = createAvatarFrameList(createPinballYHost(), {
+        profileStore, profileRewards: getProfileRewards(), drawingAhead: getDrawingAhead(),
+    });
     const profileStats = createProfileStats(createPinballYHost(), {
         profileStore,
         achievementList,
+        frameList,
         // From the active Profile's Notified Achievements, read on each opening.
         readPlayerLevel: () => getPlayerLevel(
             profileStore.getProfileData().notified, getAllAchievements(), nonChildAchievementsFor(profileStore)),

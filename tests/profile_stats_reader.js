@@ -6,12 +6,16 @@
 // right column by its title (each stat's label with the texts drawn after
 // it, and its images), the highlighted choice (the button under the gold
 // halo, or the cross's tooltip), and picks a choice with Next and Select
-// as a player would. Opens them from the main menu entry.
+// as a player would. Opens them from the main menu entry. Reads the
+// Avatar Frame list opened from the Frame button too: whether it is open,
+// its rows (name, status and frame image) and the highlighted one, and
+// picks a row as a player would.
 // Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";
 import { PROFILE_STATS_Z_INDEX } from "../common/profile_stats_painter.js";
+import { AVATAR_FRAME_LIST_Z_INDEX } from "../common/avatar_frame_list_painter.js";
 
 // Past the fade in.
 export const PROFILE_STATS_OPEN_MS = 300;
@@ -132,5 +136,38 @@ export function readChoices(fake) {
 export function choose(fake, name) {
     for (let guard = 0; guard < 20 && highlighted(fake) !== name; guard++) press(fake, "Next");
     assert.equal(highlighted(fake), name, `the Profile Stats offer "${name}"`);
+    return press(fake, "Select");
+}
+
+// ---------- The Avatar Frame list ----------
+
+export const isFrameListOpen = fake => shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.backdrop).length > 0;
+
+const rowLayers = fake => topToBottom(shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.rows));
+const fileNameOf = path => path.slice(path.lastIndexOf("\\") + 1);
+
+// Each row top to bottom: { name, status (the worn mark or the unlock
+// condition, null without either), frame (the file name of the frame
+// image drawn around the Avatar, null for none), avatar (the Avatar's
+// path) }.
+export const frameRows = fake => rowLayers(fake).map(layer => {
+    const [name, status = null] = layer.texts();
+    const [avatar = null, frame = null] = layer.images();
+    return { name, status, frame: frame && fileNameOf(frame), avatar };
+});
+
+// The name of the row under the gold halo.
+export function highlightedRow(fake) {
+    const lit = shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.highlight);
+    assert.equal(lit.length, 1, "exactly one row is highlighted");
+    const same = (a, b) => Math.abs(a - b) < 1e-9;
+    const row = rowLayers(fake).find(layer => same(layer.position().x, lit[0].position().x) && same(layer.position().y, lit[0].position().y));
+    return row ? row.texts()[0] : null;
+}
+
+// Moves the highlight with Next to the row of that name, then presses Select.
+export function pickRow(fake, name) {
+    for (let guard = 0; guard < 20 && highlightedRow(fake) !== name; guard++) press(fake, "Next");
+    assert.equal(highlightedRow(fake), name, `the Avatar Frame list offers "${name}"`);
     return press(fake, "Select");
 }

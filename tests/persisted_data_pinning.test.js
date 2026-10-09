@@ -15,6 +15,7 @@
 // World Tour's key in profile.json and its Achievement ID, and one the
 // Surprises part's key, its flags, seasons, runs and Achievement IDs. These
 // strings are players' saved progress: this test must keep passing unchanged.
+// The last test locks the Avatar Frame choice's key in profile.json.
 // ============================================================
 
 import { test } from "node:test";
@@ -28,6 +29,7 @@ import { createChallenges, CHALLENGE_TEMPLATE_IDS } from "../common/challenge.js
 import { buildChallengeAchievements } from "../achievements/challenges.js";
 import { buildWorldTourAchievements } from "../achievements/world_tour.js";
 import { createWorldTour } from "../common/world_tour.js";
+import { createProfileRewards } from "../common/profile_rewards.js";
 import { buildSurprisesAchievements } from "../achievements/surprises.js";
 import { createSurprises } from "../common/surprises.js";
 import { WELCOME_SCREEN_PAUSE_MS, choose } from "./welcome_screen_reader.js";
@@ -517,4 +519,15 @@ test("the Surprises part keeps its key in profile.json, its flags, seasons, runs
     });
     assert.deepEqual(buildSurprisesAchievements().map(achievement => achievement.id),
         ["nightOwl", "fullMoonNight", "fridayThe13th", "fourSeasons", "oneMoreGame", "lunchBreak", "mirrorHour", "timeTravel"]);
+});
+
+test("the Avatar Frame choice keeps its key in profile.json", () => {
+    const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
+    fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({ version: 1, collectionTier: 2 }));
+    const profileRewards = createProfileRewards(fake, { profileStore: createProfileStore(fake) });
+
+    profileRewards.choose(2);
+    assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).avatarFrame, 2);
+    profileRewards.choose(null);
+    assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).avatarFrame, null);
 });
