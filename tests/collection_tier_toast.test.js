@@ -25,7 +25,7 @@ test("a Play that raises the Collection Tier keeps it and announces it with one 
 
     await play(fake, FOURTH, MINUTE);
     fake.advanceTime(ONE_TOAST_MS);
-    assert.deepEqual(collectionToasts(fake), ["1 | COLLECTION MASTERY | Tier 1: Rookie | 4 tables at Rookie or above"]);
+    assert.deepEqual(collectionToasts(fake), ["1 | COLLECTION MASTERY | Tier 1: Rookie | 4 tables at Rookie or above | New frame: Enchanted Forest"]);
     assert.equal(savedCollectionTier(fake, "guest"), 1);
     assert.equal(showerStarts(fake), 1);
 

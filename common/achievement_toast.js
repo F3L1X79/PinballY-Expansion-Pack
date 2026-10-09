@@ -13,9 +13,10 @@
 // the Rank's colour, or the trophy when that emblem's file is missing
 // (logged once). A Challenge Toast shares the queue and the card, with its
 // own accent colour, header and target icon instead of the trophy; a Mastery
-// Toast its own header (Collection Mastery's for a Collection Tier), the reached level's metal as its accent and the
-// level's number drawn in its tile; a Level Toast the Player Level's colour
-// and the reached level's number in its tile. A celebrated toast starts the
+// Toast its own header (Collection Mastery's for a Collection Tier, with an
+// extra line naming the Avatar Frame it unlocks), the reached level's metal
+// as its accent and the level's number drawn in its tile; a Level Toast the
+// Player Level's colour and the reached level's number in its tile. A celebrated toast starts the
 // Confetti Shower when it starts, a Level Toast the Fireworks; while a shower
 // falls, a Level Toast waits until a second before its end.
 // ============================================================
@@ -174,7 +175,10 @@ function drawCard(host, dc, look, toast, iconOf) {
     const text = host.createStyledText({ textStyle: { font: FONT, size: smallFont, color: COLORS.description } });
     text.add({ size: smallFont, weight: 600, color: accent, text: (toast.header || kindLook.header()).toLocaleUpperCase() + "\n" });
     text.add({ size: look.titleFont, weight: 600, color: COLORS.title, text: toast.title + "\n" });
-    text.add(toast.description);
+    if (toast.extraLine) {
+        text.add(toast.description + "\n");
+        text.add({ weight: 600, color: accent, text: toast.extraLine });
+    } else text.add(toast.description);
     const textHeight = text.measure(textWidth).height;
     const height = Math.max(textHeight, tileSize) + 2 * look.paddingY;
     const x = size.width - cardWidth - edgeMargin;
@@ -383,14 +387,14 @@ export function createAchievementToasts(host, {
     }));
 
     // toast: { kind, title, description, onShown, isStale, celebrate,
-    // rank, accent, tileNumber, header }, kind a TOAST_KIND (an Achievement when
+    // rank, accent, tileNumber, header, extraLine }, kind a TOAST_KIND (an Achievement when
     // missing), rank (optional) the Achievement Rank of an Achievement
     // Toast, onShown running when the toast starts, isStale (optional)
     // dropping it unshown when it returns true at its turn, celebrate
     // (optional) starting the Confetti Shower with it; a Mastery Toast
     // gives its accent and the number its tile shows, a Level Toast that
-    // number only, and header (optional)
-    // replaces the kind's.
+    // number only, header (optional) replaces the kind's, and extraLine
+    // (optional) shows under the description, in the accent, growing the card.
     function submit(toast) {
         waiting.push(toast);
         safeShowNext();

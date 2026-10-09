@@ -567,6 +567,15 @@ export default {
         collectionToastTitle: (tier, name) => `Palier ${tier} : ${name}`,
         collectionToastDescription: (count, name) => `${count} ${count === 1 ? "table" : "tables"} au niveau ${name} ou plus`,
     },
+    profileRewards: {
+        // The Avatar Frames' names, from Collection Tier 1 to 10.
+        frameNames: [
+            "Sylve enchantée", "Vapeur et engrenages", "Néon d'arcade", "Givre éternel", "Épice d'Arrakis",
+            "Grimoire arcanique", "Station orbitale", "Souffle du dragon", "Flipper royal", "Légende céleste",
+        ],
+        // The Mastery Toast's extra line, when its Collection Tier unlocks a frame.
+        toastLine: (name) => `Nouveau cadre : ${name}`,
+    },
     playerLevel: {
         // Kept in English on purpose: the gamers' phrase.
         toastHeader: "Level up",

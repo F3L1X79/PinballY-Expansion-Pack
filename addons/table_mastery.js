@@ -11,7 +11,8 @@
 // After one that raised the Collection Tier above the one kept in the
 // Profile's profile.json ("collectionTier"), keeps the new tier there and
 // submits its Mastery Toast, with the Confetti Shower unless a level 10
-// toast of the same Play brings it.
+// toast of the same Play brings it, and a line naming the Avatar Frame
+// that tier unlocks.
 // ============================================================
 
 import { createPinballYHost } from "../common/pinbally_host.js";
@@ -25,6 +26,7 @@ import {
 } from "../common/table_mastery.js";
 import { tablesVisibleTo } from "../common/visible_tables.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
+import { getProfileRewards } from "../common/profile_rewards.js";
 import lang from "../common/i18n.js";
 import { safeHandler } from "../common/safe_handler.js";
 import config from "../common/config.js";
@@ -117,12 +119,14 @@ export default function init() {
     function announceTier(profileName, tier, needed, celebrate) {
         const TEXT = lang.tableMastery;
         const levelName = TEXT.levelNames[tier - 1];
+        const frame = getProfileRewards().frameBroughtBy(tier);
         submitFor(profileName, {
             header: TEXT.collectionToastHeader,
             accent: metalOf(tier),
             tileNumber: tier,
             title: TEXT.collectionToastTitle(tier, levelName),
             description: TEXT.collectionToastDescription(needed, levelName),
+            extraLine: frame ? lang.profileRewards.toastLine(frame.name) : undefined,
             celebrate,
         });
     }

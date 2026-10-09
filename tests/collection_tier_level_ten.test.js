@@ -25,7 +25,7 @@ test("Mastery Level 10 and a new Collection Tier in the same Play bring both toa
     fake.advanceTime(2 * ONE_TOAST_MS);
 
     assert.deepEqual(masteryToasts(fake), ["10 | TABLE MASTERY | Pinball Wizard (10) | Twilight Zone"]);
-    assert.deepEqual(collectionToasts(fake), ["10 | COLLECTION MASTERY | Tier 10: Pinball Wizard | 4 tables at Pinball Wizard or above"]);
+    assert.deepEqual(collectionToasts(fake), ["10 | COLLECTION MASTERY | Tier 10: Pinball Wizard | 4 tables at Pinball Wizard or above | New frame: Celestial Legend"]);
     assert.equal(showerStarts(fake), 1);
     assert.equal(savedCollectionTier(fake, "guest"), 10);
     assert.deepEqual(errorLines(fake), []);

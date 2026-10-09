@@ -25,7 +25,7 @@ test("a Child Profile's Collection Tier counts only the tables it can see", asyn
     await play(fake, FOURTH, MINUTE);
     fake.advanceTime(ONE_TOAST_MS);
 
-    assert.deepEqual(collectionToasts(fake), ["1 | COLLECTION MASTERY | Tier 1: Rookie | 4 tables at Rookie or above"]);
+    assert.deepEqual(collectionToasts(fake), ["1 | COLLECTION MASTERY | Tier 1: Rookie | 4 tables at Rookie or above | New frame: Enchanted Forest"]);
     assert.equal(savedCollectionTier(fake, "Alice"), 1);
     assert.deepEqual(errorLines(fake), []);
 });
