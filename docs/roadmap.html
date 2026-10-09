@@ -329,8 +329,20 @@
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span></div>
           </div>
           <p>Consulter les Profile Stats d'un autre Profile que l'actif, puis comparer tous les Profiles de la maison.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Sur l'écran des Profile Stats dessinées (livré)</div>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur l'écran des Profile Stats dessinées (livré)</div>
+          <details>
+            <summary>Décisions (grill du 09/10/2026)</summary>
+            <ul>
+              <li>Termes du glossaire : Household (tous les Profiles sauf Guest, « la maison ») et Household Stats (« Statistiques de la maison »).</li>
+              <li>Un bouton « La maison » au pied de la carte des Profile Stats, dès que le Household compte 2 Profiles, Guest compris (sans colonne à lui). Pas de carrousel : le tableau sert aussi de porte vers les stats de chacun.</li>
+              <li>Tableau : une colonne par Profile (Avatar avec son Avatar Frame, nom, sans pastille), le Profile actif d'abord puis l'ordre du Profile picker ; jusqu'à 5 colonnes visibles, défilement horizontal au-delà.</li>
+              <li>Lignes : Player Level, Collection Mastery, Achievements Unlocked, parties jouées, temps total, Daily Streak, Challenges réussis. Le meilleur en doré, égalités comprises ; pas de doré sur une ligne vide. Une ligne disparaît avec son Add-on. Pas de nouvel Add-on ni de réglage.</li>
+              <li>Select sur une colonne : les Profile Stats de ce Profile, même écran en lecture seule sans aucun bouton ; Exit ramène au tableau, puis aux Profile Stats du joueur. Sa propre colonne ramène directement à ses Profile Stats.</li>
+              <li>Un Child Profile voit les Adult Tables (nom, logo) dans les stats des autres : voir n'est pas choisir.</li>
+              <li>Pas de records de table : une ligne « records détenus » sera envisagée au grill des Records par Profile.</li>
+            </ul>
+          </details>
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Reporté pendant le grilling des Profile Stats : la première version ne montre que le Profile actif. Les données de chaque Profile sont déjà dans son <code>profile.json</code>. Un classement des Challenges réussis pourrait s'y ajouter. L'Unlock Rate (Avatars des autres Profiles sur chaque Achievement) est déjà dans l'Achievement List dessinée.</p>

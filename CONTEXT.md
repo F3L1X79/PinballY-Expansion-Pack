@@ -32,6 +32,10 @@ _Avoid_: account, user, login
 The Profile that always exists and cannot be removed; it is the active Profile until another one is picked, and whenever the Profile picker is turned off. Its plays, Achievements and Challenge progress stay its own when a player who played as Guest creates a Profile: nothing moves over.
 _Avoid_: default user, anonymous
 
+**Household**:
+Every Profile of the cabinet except Guest, Child Profiles included, whether or not it has played. Shown as "la maison" in French.
+_Avoid_: family, all players, users
+
 **Admin Profile**:
 A Profile marked as one of those who look after the cabinet: only Admin Profiles see the setup entries of the menus, and only they find the Profile Reset in the Exit menu. While no Profile is marked, every Profile sees everything. Guest is never one.
 _Avoid_: administrator, operator (the operator is whoever holds the coin door key)
@@ -65,8 +69,12 @@ The number of consecutive calendar days, up to today, in which the active Profil
 _Avoid_: Streak (alone: a Period Table Streak belongs to a Period Table), login streak, visit streak
 
 **Profile Stats**:
-The screen, opened by the player from the main menu, that sums up the active Profile's own plays: games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
+The screen, opened by the player from the main menu, that sums up the active Profile's own plays (or, opened from the Household Stats, another Household Profile's, only to look at): games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
 _Avoid_: Pinball Profile, player card, profile screen (a Profile is the identity, not the screen)
+
+**Household Stats**:
+The screen, opened from the Profile Stats, that sets the Household's Profiles side by side, one column each (the active Profile first, then in the Profile picker's order), on the stats where more is better: Player Level, Collection Mastery, Achievements Unlocked, games played, total time, Daily Streak and completed Challenges; the best of each line is in gold, every Profile tied for it too, and a line where nobody has anything has none. Each column shows the Profile's Avatar, in its Avatar Frame, and name. Picking a column opens that Profile's Profile Stats. Offered once the Household has two Profiles, to Guest too, which has no column of its own. Shown as "Statistiques de la maison" in French, opened from "La maison".
+_Avoid_: leaderboard, ranking, comparison
 
 **Profile Reward**:
 Something a Profile unlocks through play and then chooses to wear; today only Avatar Frames, of which it wears at most one. Every Profile has them, Guest and Child Profiles included. Unlocked rewards follow what earned them and are never kept apart from it, so a Profile Reset takes them back and the Profile wears none again. Chosen from the Profile Stats, where the rewards still to unlock show with what unlocks them. Shown as "récompense" in French.
@@ -225,7 +233,7 @@ Rockets shot up from the bottom of the wheel screen that burst into rings of glo
 _Avoid_: confetti, celebration, level-up effect
 
 **Unlock Rate**:
-How many of the household's Profiles (Guest excepted) have been Notified of an Achievement, shown on the Achievement List by the Avatars of the Profiles other than the active one. It is not shown while there is only one Profile besides Guest.
+How many of the Household's Profiles have been Notified of an Achievement, shown on the Achievement List by the Avatars of the Profiles other than the active one. It is not shown while there is only one Profile besides Guest.
 _Avoid_: rarity (a rare Achievement has a low Unlock Rate), household rate, global percentage
 
 **Achievement Progress**:
