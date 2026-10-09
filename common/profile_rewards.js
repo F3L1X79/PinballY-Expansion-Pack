@@ -28,10 +28,15 @@ export function createProfileRewards(host, { isEnabled = () => true } = {}) {
     }
 
     return {
-        // The frame a newly reached Collection Tier unlocks, null when none.
-        frameBroughtBy(tier) {
-            if (!isEnabled() || !(tier >= 1 && tier <= FRAME_COUNT)) return null;
-            return frameOf(tier);
+        // The frames a Collection Tier raised from keptTier to tier unlocks,
+        // lowest first: none when it unlocks none.
+        framesUnlockedBetween(keptTier, tier) {
+            if (!isEnabled()) return [];
+            const frames = [];
+            for (let frameTier = Math.max(1, keptTier + 1); frameTier <= Math.min(tier, FRAME_COUNT); frameTier++) {
+                frames.push(frameOf(frameTier));
+            }
+            return frames;
         },
     };
 }

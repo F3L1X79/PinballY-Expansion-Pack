@@ -11,8 +11,8 @@
 // After one that raised the Collection Tier above the one kept in the
 // Profile's profile.json ("collectionTier"), keeps the new tier there and
 // submits its Mastery Toast, with the Confetti Shower unless a level 10
-// toast of the same Play brings it, and a line naming the Avatar Frame
-// that tier unlocks.
+// toast of the same Play brings it, and a line naming the Avatar Frames
+// it unlocks (every one, when the Play raised it by more than a tier).
 // ============================================================
 
 import { createPinballYHost } from "../common/pinbally_host.js";
@@ -116,17 +116,17 @@ export default function init() {
 
     // celebrate is false when a Mastery Level 10 toast of the same Play
     // already brings the Confetti Shower: one shower per return to the wheel.
-    function announceTier(profileName, tier, needed, celebrate) {
+    function announceTier(profileName, keptTier, tier, needed, celebrate) {
         const TEXT = lang.tableMastery;
         const levelName = TEXT.levelNames[tier - 1];
-        const frame = getProfileRewards().frameBroughtBy(tier);
+        const frameNames = getProfileRewards().framesUnlockedBetween(keptTier, tier).map(frame => frame.name);
         submitFor(profileName, {
             header: TEXT.collectionToastHeader,
             accent: metalOf(tier),
             tileNumber: tier,
             title: TEXT.collectionToastTitle(tier, levelName),
             description: TEXT.collectionToastDescription(needed, levelName),
-            extraLine: frame ? lang.profileRewards.toastLine(frame.name) : undefined,
+            extraLine: frameNames.length > 0 ? lang.profileRewards.toastLine(frameNames) : undefined,
             celebrate,
         });
     }
@@ -139,7 +139,7 @@ export default function init() {
         const { tier, needed } = collectionMasteryOfProfile(tables, data);
         if (tier <= keptTier) return;
         store.updateProfileData(data => { data.collectionTier = tier; }, profileName);
-        announceTier(profileName, tier, needed, celebrate);
+        announceTier(profileName, keptTier, tier, needed, celebrate);
     }
 
     // The totals already count the Play when it is announced.

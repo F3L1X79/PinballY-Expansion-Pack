@@ -573,8 +573,9 @@ export default {
             "Sylve enchantée", "Vapeur et engrenages", "Néon d'arcade", "Givre éternel", "Épice d'Arrakis",
             "Grimoire arcanique", "Station orbitale", "Souffle du dragon", "Flipper royal", "Légende céleste",
         ],
-        // The Mastery Toast's extra line, when its Collection Tier unlocks a frame.
-        toastLine: (name) => `Nouveau cadre : ${name}`,
+        // The Mastery Toast's extra line, naming the frames its Collection
+        // Tier unlocks (more than one when a Play raised it by several tiers).
+        toastLine: (names) => `${names.length === 1 ? "Nouveau cadre" : "Nouveaux cadres"} : ${names.join(", ")}`,
     },
     playerLevel: {
         // Kept in English on purpose: the gamers' phrase.

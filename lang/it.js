@@ -583,8 +583,9 @@ export default {
             "Enchanted Forest", "Steam and Gears", "Arcade Neon", "Eternal Frost", "Spice of Arrakis",
             "Arcane Grimoire", "Orbital Station", "Dragon's Breath", "Royal Pinball", "Celestial Legend",
         ],
-        // The Mastery Toast's extra line, when its Collection Tier unlocks a frame.
-        toastLine: (name) => `New frame: ${name}`,
+        // The Mastery Toast's extra line, naming the frames its Collection
+        // Tier unlocks (more than one when a Play raised it by several tiers).
+        toastLine: (names) => `${names.length === 1 ? "New frame" : "New frames"}: ${names.join(", ")}`,
     },
     // TODO: translation pass
     playerLevel: {

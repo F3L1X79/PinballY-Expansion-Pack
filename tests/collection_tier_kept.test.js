@@ -27,7 +27,7 @@ test("a Collection Tier kept stays once a table leaves the visible set", async (
 
     await play(fake, NEARLY_TWO, MINUTE);
     fake.advanceTime(ONE_TOAST_MS);
-    assert.deepEqual(collectionToasts(fake), ["2 | COLLECTION MASTERY | Tier 2: Apprentice | 10 tables at Apprentice or above | New frame: Steam and Gears"]);
+    assert.deepEqual(collectionToasts(fake), ["2 | COLLECTION MASTERY | Tier 2: Apprentice | 10 tables at Apprentice or above | New frames: Enchanted Forest, Steam and Gears"]);
 
     // Ten tables left, nine of them at level 2: the tables now reach tier 0.
     fake.setTables(TABLES.map(game => (game === LEAVING ? { ...game, isHidden: true } : game)));
