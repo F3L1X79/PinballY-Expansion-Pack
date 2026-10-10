@@ -501,7 +501,7 @@
           <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket</div>
           <details>
             <summary>Contexte</summary>
-            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
+            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
           </details>
         </div>
       </li>
@@ -633,7 +633,7 @@
               <li>La forme : un module ES à importer (<code>import … from "./ExpansionPack/api.js"</code>, mais la racine n'accepte que <code>main.js</code>), des événements, ou un fichier JSON exporté que n'importe quel outil peut lire ?</li>
               <li>Lecture seule, ou aussi quelques actions (changer de Profile, lancer la Table of the Day) ?</li>
               <li>Quelles données : tout ce qu'affichent les Profile Stats, ou aussi le Play Log brut ?</li>
-              <li>Comment garantir la compatibilité d'une version à l'autre (numéro de version de l'API, données figées comme dans <code>tests/persisted_data_pinning.test.js</code>) ?</li>
+              <li>Comment garantir la compatibilité d'une version à l'autre (numéro de version de l'API, données figées comme dans <code>tests/project/persisted_data_pinning.test.js</code>) ?</li>
             </ul>
             <p class="ctx">Idée du 10/10/2026. Les données existent déjà dans le Profile Store, le Play Log et <code>common/profile_stats.js</code> ; le travail est surtout de choisir une surface stable et de la documenter.</p>
           </details>

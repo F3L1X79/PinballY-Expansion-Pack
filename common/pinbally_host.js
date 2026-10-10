@@ -9,7 +9,7 @@
 // in turn), logfile.log, and the few file operations the Profile store
 // needs).
 // Every call passes straight through to PinballY's globals; tests use the
-// in-memory fake host from tests/fake_pinbally_host.js instead. No side
+// in-memory fake host from tests/support/fake_pinbally_host.js instead. No side
 // effects on import.
 // ============================================================
 

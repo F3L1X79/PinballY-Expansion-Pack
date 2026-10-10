@@ -2,7 +2,7 @@
 // Shared language selection for all project-owned UI text.
 // Translation can be disabled globally, in which case English is used.
 // Any key missing from the selected language falls back to its English
-// text (per key, recursively); tests/lang_keys.test.js keeps every key in
+// text (per key, recursively); tests/project/lang_keys.test.js keeps every key in
 // every language. No side effects.
 // ============================================================
 

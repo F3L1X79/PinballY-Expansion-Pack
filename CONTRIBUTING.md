@@ -17,15 +17,16 @@ The repository is the pack's folder, installed as `PinballY\Scripts\ExpansionPac
 - `common/` holds the shared code, which is never an Add-on.
 - `achievements/` holds the Achievement definitions, one file per Achievement Family.
 - `lang/` holds the translations, `assets/images/` the images drawn by the scripts, `assets/sounds/` the sounds they play, `profiles/` the Profiles' saved progress, and `tests/` the tests.
+- `tests/` only holds subfolders: one per feature (`achievements/`, `welcome_screen/`, `drawn_menu/`…), plus `common/` for the shared modules, `project/` for the checks on the whole project and `support/` for the fake PinballY host. A feature's `*_reader.js` and `*_scenario.js` helpers stay in its folder.
 - `maintainer/` holds the maintainers' Node.js scripts, run by hand and never loaded by PinballY. They are `.mjs` files, so that the checks on the scripts PinballY loads leave them out. `maintainer/avatar_frames/` paints the Avatar Frame images of `assets/images/avatar_frames/` (`node maintainer/avatar_frames/generate_frames.mjs [numbers]`).
 
-`tests/file_layout.test.js` checks this layout.
+`tests/project/file_layout.test.js` checks this layout.
 
 `.gitattributes` leaves `maintainer/`, `tests/`, the docs (except `docs/images/`, shown by the README), `CONTEXT.md` and this file out of the downloaded zip: the players only get the pack.
 
 ### Shared modules
 
-- `pinbally_host`: the only way from a shared module to PinballY's globals, so that tests can run on a fake host (`tests/fake_pinbally_host.js`).
+- `pinbally_host`: the only way from a shared module to PinballY's globals, so that tests can run on a fake host (`tests/support/fake_pinbally_host.js`).
 - `profile_store`: the only module that reads and writes the `profiles` folder (see [Progress and reset](#progress-and-reset)).
 - `profile_reset_menu`: the Profile Reset's Profile list (one Profile or every Profile), confirmation and outcome message, opened from the Exit menu.
 - `period_table`: the Table of the Day and the Table of the Week, and their Streaks.
@@ -58,7 +59,7 @@ node --test
 
 Run from the project root with Node.js 22 or later; nothing to install. PinballY never loads the tests.
 
-`tests/persisted_data_pinning.test.js` locks the saved data format and every Achievement ID: they are the Profiles' progress. Never change it to make a change pass.
+`tests/project/persisted_data_pinning.test.js` locks the saved data format and every Achievement ID: they are the Profiles' progress. Never change it to make a change pass.
 
 ## Adding a language
 
@@ -66,7 +67,7 @@ Translations live in `lang/<code>.js`. English is the fallback, and missing keys
 
 1. Copy `lang/fr.js` to `lang/<code>.js`. Not `en.js`: PinballY's own menus are already in English, so its sections for them are empty or nearly so.
 2. Translate the texts, keeping the keys, the `[Game.Xxx]` markers and the `${...}` parameters unchanged.
-3. Register it in `common/i18n.js`: one `import` and one entry in `AVAILABLE_LANGUAGES`, then add its code to `LANGUAGE_CODES` in `tests/lang_keys.test.js`.
+3. Register it in `common/i18n.js`: one `import` and one entry in `AVAILABLE_LANGUAGES`, then add its code to `LANGUAGE_CODES` in `tests/project/lang_keys.test.js`.
 4. Save the file as UTF-8 with BOM, like the other language files, and run `node --test`.
 
 ## Progress and reset

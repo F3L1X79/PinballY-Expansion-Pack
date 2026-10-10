@@ -357,8 +357,8 @@ Facts only, as input for the "nested-install" roadmap item (`docs/roadmap.html`,
 
 **Our code and tests**
 - No file in `main.js`, `common/`, `addons/`, `achievements/`, `lang/` or `tests/` imports, reads or names `System`, `SystemClasses` or `CParser` (grep). Our code depends on the **globals** the System scripts create (the list in `.claude/rules/conventions.md:33`), not on where the files are.
-- `tests/file_layout.test.js:17-21` lists the `.js` files directly at the repo root, with a non-recursive `readdirSync` filtered on `.js`. A `System/` folder at the root is neither required nor counted. The same goes for `addons/` and `common/`.
-- The tests never load the System scripts. Shared modules get PinballY through `tests/fake_pinbally_host.js` (`.claude/rules/conventions.md`, "Modules partagés"). **Inference:** `node --test` does not pick up `System/*.js`, because those names match none of Node's default test-file patterns (not checked against the Node documentation here).
+- `tests/project/file_layout.test.js:17-21` lists the `.js` files directly at the repo root, with a non-recursive `readdirSync` filtered on `.js`. A `System/` folder at the root is neither required nor counted. The same goes for `addons/` and `common/`.
+- The tests never load the System scripts. Shared modules get PinballY through `tests/support/fake_pinbally_host.js` (`.claude/rules/conventions.md`, "Modules partagés"). **Inference:** `node --test` does not pick up `System/*.js`, because those names match none of Node's default test-file patterns (not checked against the Node documentation here).
 
 **Git**
 - `System/`, with all four files, was committed in `75ded5f` "first commit" (2026-09-22) and untracked in `84e7f7b` "Stop tracking the System folder" (2026-09-24).
@@ -370,6 +370,6 @@ Facts only, as input for the "nested-install" roadmap item (`docs/roadmap.html`,
 - `CONTRIBUTING.md:45`: "Never edit the `System` folder: it belongs to PinballY."
 - `README.md:46` / `README.fr.md:46`: "Copy the project into `PinballY\Scripts`, keeping your own `System` folder", i.e. the repo root is the player's `Scripts\` folder, with `System\` inside it.
 - `docs/pinbally/pinbally-help.md:3`, `:12`, `:16`: paths `Scripts/System/SystemClasses.js` and `Scripts\System\`; "Don't edit `Scripts\System\*.js`".
-- `docs/roadmap.html:324` (this item: `System\` stays in `Scripts\System\` and is not part of the project), `:344` (nested-install question: where the git root goes "with `System\` outside the repository", and the impact on `tests/file_layout.test.js` and the "root holds only `main.js`" rule), `:560` (the distribution item preserves the `System` folder).
+- `docs/roadmap.html:324` (this item: `System\` stays in `Scripts\System\` and is not part of the project), `:344` (nested-install question: where the git root goes "with `System\` outside the repository", and the impact on `tests/project/file_layout.test.js` and the "root holds only `main.js`" rule), `:560` (the distribution item preserves the `System` folder).
 
 **Adjacent fact, about our own folder rather than `System\`**: our code assumes it sits directly in `<program folder>\Scripts\`. Paths built as `<programDir>\Scripts\…`: `common/achievement_list.js:85`, `common/config.js:71`, `common/profile_store.js:67`. `Scripts\assets\…` paths relative to the program folder, joined to it at `common/achievement_toast.js:143`: `common/achievement_toast.js:76`, `:82`.

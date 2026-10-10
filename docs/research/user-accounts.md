@@ -50,10 +50,10 @@ Date: 2026-09-24. Sources: local PinballY help (`C:\vPinball\PinballY\Help\*.htm
 - `gameInfo.update()` can write `playCount`, `playTime`, `lastPlayed`, `rating`, `isFavorite`, `isHidden` (`Help/GameInfo.html` § "Updating metadata").
 
 **Facts: this repo**
-- All progress is in `optionSettings` under `custom.*`: Period Table locks, Streaks, Periods Played, Random Game count, session stats, `custom.achievements.notified.<id>` (`tests/persisted_data_pinning.test.js`, `EXPECTED_FIXED_KEYS`; `common/achievements.js` l.26-30; `session_stats_tracker.js`).
+- All progress is in `optionSettings` under `custom.*`: Period Table locks, Streaks, Periods Played, Random Game count, session stats, `custom.achievements.notified.<id>` (`tests/project/persisted_data_pinning.test.js`, `EXPECTED_FIXED_KEYS`; `common/achievements.js` l.26-30; `session_stats_tracker.js`).
 - Player preferences are in `.env.local`, read synchronously through COM when modules load (`docs/adr/0002-user-settings-in-env-local.md`, `common/config.js`).
 - Many Achievements are **computed from PinballY's global stats**, not stored: collection / manufacturer / decade / category completion use `game.playCount > 0` (`achievements/collection_completion.js` l.23, `manufacturer_completion.js` l.32), play-time milestones sum `game.playTime` (`achievements/play_time_totals.js` l.22). Period Table and Random Game use `game.lastPlayed` (`common/period_table.js` l.43-49, `common/random_game.js` l.36-38). Only the Notified flags and the session / period counters are the add-on's own data.
-- `tests/persisted_data_pinning.test.js` fixes the exact key strings and Achievement IDs and "must keep passing unchanged" (header; `.claude/rules/conventions.md` § Tests).
+- `tests/project/persisted_data_pinning.test.js` fixes the exact key strings and Achievement IDs and "must keep passing unchanged" (header; `.claude/rules/conventions.md` § Tests).
 
 **Inference**
 - Per-account Achievements are **not just a key prefix**. Everything computed from `playCount` / `playTime` / `lastPlayed` would show the same values for every account. The add-on would have to record per-account play (count, time, last played per `configId`) from `gamestarted` / `gameover`, which it already listens to (`session_stats_tracker.js` l.64, 85), and feed Achievements from that. Before accounts existed, play history belongs to nobody: decide whether it goes to a default account.
