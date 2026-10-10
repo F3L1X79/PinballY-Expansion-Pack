@@ -36,7 +36,7 @@ import { getDrawingAhead } from "./drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "./navigation_sound.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER } from "./drawn_menu_images.js";
 import {
-    DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, computeGeometry, rowHeightIn, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
+    DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, pointsOf, computeGeometry, rowHeightIn, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
 } from "./drawn_menu_painter.js";
 import { STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
 
@@ -224,10 +224,11 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         return [top.layer, middle.layer, bottom.layer];
     }
 
+    // size: in pixels, as the painter's look gives it.
     function messageHeightAt(width, size) {
         const styled = host.createStyledText({
             textAlign: "center",
-            textStyle: { font: FONTS.body, size, weight: DRAWN_MENU_LOOK.message.weight, color: DRAWN_MENU_LOOK.colors.message },
+            textStyle: { font: FONTS.body, size: pointsOf(size), weight: DRAWN_MENU_LOOK.message.weight, color: DRAWN_MENU_LOOK.colors.message },
         });
         styled.add(shown.model.message);
         return styled.measure(width).height;

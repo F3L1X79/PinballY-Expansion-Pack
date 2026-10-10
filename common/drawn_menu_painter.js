@@ -26,7 +26,8 @@ export const DRAWN_MENU_Z_INDEX = Object.freeze({ backdrop: 6200, panel: 6201, t
 export const ROW_KIND = Object.freeze({ ENTRY: "entry", HEADING: "heading", SEPARATOR: "separator" });
 
 // Sizes in pixels at the 1920 px reference height, at which the painted
-// images show 1:1.
+// images show 1:1; the font sizes too, as in the prototype, turned into
+// points for StyledText by pointsOf().
 export const DRAWN_MENU_LOOK = Object.freeze({
     referenceHeight: 1920,
     // Of the window: the panel's width at most, and its height before the list scrolls.
@@ -60,6 +61,10 @@ export const DRAWN_MENU_LOOK = Object.freeze({
 export const DRAWN_MENU_MARKS = Object.freeze({ check: "\u2713", radio: "\u25CF", submenu: "\u203A" });
 
 const LOOK = DRAWN_MENU_LOOK;
+
+// StyledText takes its size in points and PinballY turns it into pixels
+// (size * 96 / 72): a size given in pixels would show a third bigger.
+export const pointsOf = px => px * 72 / 96;
 
 const heightOf = row => LOOK.rowHeights[row.kind];
 
@@ -139,16 +144,17 @@ function lineHeightOf(host, textStyle) {
     return lineHeights.get(key);
 }
 
-// One line in the box, centred. Measuring is most of a line's cost: a
-// line estimated to fit is drawn centred by DirectWrite without it, and
+// One line in the box, centred; size and minSize in pixels. Measuring is
+// most of a line's cost: a line estimated to fit is drawn centred by
+// DirectWrite without it, and
 // only one that may overflow is measured, going through oneLine(), which
 // shrinks then cuts it when it is too wide.
 function line(host, dc, str, { x, y, width, height, size, minSize, weight, color, font = FONTS.body }) {
     if (estimatedWidthPx(str, size) > width) {
-        oneLine(host, dc, str, { x, y, width, height, size, minSize, weight, color, font, align: "center" });
+        oneLine(host, dc, str, { x, y, width, height, size: pointsOf(size), minSize: pointsOf(minSize), weight, color, font, align: "center" });
         return;
     }
-    const textStyle = { font, size, weight, color };
+    const textStyle = { font, size: pointsOf(size), weight, color };
     const lineHeight = lineHeightOf(host, textStyle);
     const styled = host.createStyledText({ textAlign: "center", textStyle });
     styled.add(str);
@@ -194,7 +200,7 @@ export function drawTexts(host, dc, geometry, model, scroll) {
     if (model.message !== null) {
         text(host, dc, model.message, {
             x: 0, y: 0, width: listWidth, height: geometry.messageHeight,
-            size: LOOK.message.size * k, weight: LOOK.message.weight, color: LOOK.colors.message, align: "center",
+            size: pointsOf(LOOK.message.size * k), weight: LOOK.message.weight, color: LOOK.colors.message, align: "center",
         });
         drawSeparator(dc, 0, geometry.messageHeight + LOOK.message.gap * k, listWidth, LOOK.rowHeights.separator * k, k, 0xFF);
     }

@@ -101,7 +101,10 @@ class FakeStyledText {
 
     draw(dc, rect) {
         const baseColor = this.options.textStyle && this.options.textStyle.color;
-        for (const run of this.runs) dc.drawText(run.text.replace(/\n$/, ""), rect, run.color === undefined ? baseColor : run.color);
+        const baseSize = this.options.textStyle && this.options.textStyle.size;
+        for (const run of this.runs) {
+            dc.drawText(run.text.replace(/\n$/, ""), rect, run.color === undefined ? baseColor : run.color, run.size === undefined ? baseSize : run.size);
+        }
     }
 }
 
@@ -332,9 +335,10 @@ export function createFakePinballYHost({
                 if (!isImageReadable(path)) throw new Error(`Cannot load image: ${path}`);
                 return { width: 256, height: 256 };
             },
-            drawText: (text, rect, color) => {
+            // size: the StyledText's, in points as PinballY takes it.
+            drawText: (text, rect, color, size) => {
                 texts.push(text);
-                strokes.push({ text, rect: rect && { ...rect }, color });
+                strokes.push({ text, rect: rect && { ...rect }, color, size });
             },
         };
         const layer = {
