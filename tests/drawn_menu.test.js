@@ -6,7 +6,7 @@
 // once on the new entry while the outline glides to it; Select or Launch runs the
 // entry's command with the Select sound, Exit and attract mode close it
 // without running anything, and no button reaches the wheel while it is
-// open. The other menus stay native.
+// open.
 // ============================================================
 
 import { test } from "node:test";
@@ -134,12 +134,4 @@ test("attract mode closes the menu without running anything", () => {
     assert.ok(!isDrawnMenuShown(fake));
     assert.equal(fake.executedCommands().length, commandsBefore);
     fake.exitAttractMode();
-});
-
-test("the Exit menu stays native", () => {
-    fake.openExitMenu();
-
-    assert.ok(!isDrawnMenuShown(fake));
-    assert.equal(fake.currentMenu().id, "exit");
-    fake.closeMenu();
 });

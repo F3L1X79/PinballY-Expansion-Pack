@@ -3,7 +3,8 @@
 // with only the Drawn Menus Add-on on: its painted images are drawn ahead
 // while the wheel sits idle, then only placed on opening, and every
 // layer is shrunk to a dot while hidden; the texts are drawn again only
-// when they changed; each opening's time is logged;
+// when they changed; a line that clearly fits is drawn without being
+// measured; each opening's time is logged;
 // a menu that fails to draw logs the error and shows natively.
 // ============================================================
 
@@ -13,7 +14,7 @@ import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import { DRAWN_MENU_Z_INDEX } from "../common/drawn_menu_painter.js";
 import { DRAWN_MENU_IMAGES } from "../common/drawn_menu_images.js";
-import { isDrawnMenuShown, openMainMenu, press } from "./drawn_menu_reader.js";
+import { isDrawnMenuShown, drawnMenuLines, openMainMenu, press, OPEN_OVER_MS } from "./drawn_menu_reader.js";
 
 const IMAGES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\drawn_menu";
 const DOT = { xSpan: 0.001, ySpan: 0.001 };
@@ -78,6 +79,41 @@ test("reopening the same menu draws its texts no more, a changed one draws them 
     fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     press(fake, "Exit");
     assert.equal(textDrawings(), before + 1);
+});
+
+// Counts DirectWrite's measures while the menu with these items opens.
+function measuresOnOpening(items) {
+    const RealStyledText = globalThis.StyledText;
+    let count = 0;
+    globalThis.StyledText = class extends RealStyledText {
+        measure(width) {
+            count++;
+            return super.measure(width);
+        }
+    };
+    try {
+        fake.openMenu("main", items);
+    } finally {
+        globalThis.StyledText = RealStyledText;
+    }
+    fake.advanceTime(OPEN_OVER_MS);
+    return count;
+}
+
+test("a line that clearly fits is drawn without being measured; only a title that may overflow is, and is cut", () => {
+    const LONG_TITLE = "An entry title so long that it can never fit on one line of the panel";
+    const shortItems = [{ title: "Play", cmd: globalThis.command.PlayGame }, { title: "Quit", cmd: globalThis.command.Quit, checked: true }];
+    measuresOnOpening(shortItems);
+    press(fake, "Exit");
+
+    assert.equal(measuresOnOpening([...shortItems, { title: "Flyer", cmd: globalThis.command.Flyer }]), 0);
+    assert.deepEqual(drawnMenuLines(fake), ["Play", "Quit", "Flyer"]);
+    press(fake, "Exit");
+
+    assert.ok(measuresOnOpening([...shortItems, { title: LONG_TITLE, cmd: globalThis.command.Flyer }]) > 0);
+    const cut = drawnMenuLines(fake).at(-1);
+    assert.ok(cut.endsWith("…") && LONG_TITLE.startsWith(cut.slice(0, -1).trimEnd()), cut);
+    press(fake, "Exit");
 });
 
 test("a menu that fails to draw logs the error and shows natively", () => {

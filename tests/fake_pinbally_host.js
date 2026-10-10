@@ -182,6 +182,9 @@ export function createFakePinballYHost({
     const launchList = [];
     const logLines = [];
     const executedCommands = [];
+    // What PinballY does itself for a command a test describes (opening a
+    // filter submenu, applying a filter...), unless a listener prevented it.
+    const nativeCommands = new Map();
     // Every showWindow() call on the backglass window, in order.
     const backglassShowCalls = [];
 
@@ -684,7 +687,8 @@ export function createFakePinballYHost({
         // Like PinballY, fires "command" as a menu entry would.
         doCommand: (id) => {
             executedCommands.push(id);
-            fire("command", { id });
+            const ev = fire("command", { id });
+            if (!ev.defaultPrevented && nativeCommands.has(id)) nativeCommands.get(id)();
         },
         // PinballY leaves the wheel as soon as a launch starts.
         playGame: (game) => {
@@ -769,6 +773,8 @@ export function createFakePinballYHost({
         storedSettings: () => Object.fromEntries(storedSettings),
         writtenSettingsKeys: () => new Set(writtenKeys),
         commandId: (name) => commandIds.get(name),
+        // What PinballY does on doCommand(id), such as opening a submenu.
+        setNativeCommand(id, action) { nativeCommands.set(id, action); },
         fire,
 
         shownMenus: () => [...shownMenuList],

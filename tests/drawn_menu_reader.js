@@ -3,7 +3,7 @@
 // host: whether one is shown, its message, its rows from top to bottom
 // (an entry with its title and its gold mark, a heading or a separator),
 // the highlighted entry (the one written in gold on the selection), and
-// helpers to open the main menu, press buttons and choose an entry by its
+// helpers to open a menu, press buttons and choose an entry by its
 // title, letting the fade in and the glide end.
 // Never loaded by PinballY.
 // ============================================================
@@ -69,6 +69,17 @@ export function press(fake, buttonCommand) {
 
 export function openMainMenu(fake) {
     fake.openMainMenu();
+    fake.advanceTime(OPEN_OVER_MS);
+}
+
+export function openExitMenu(fake) {
+    fake.openExitMenu();
+    fake.advanceTime(OPEN_OVER_MS);
+}
+
+// Any menu, as PinballY opens it with these native items.
+export function openMenu(fake, id, items) {
+    fake.openMenu(id, items);
     fake.advanceTime(OPEN_OVER_MS);
 }
 

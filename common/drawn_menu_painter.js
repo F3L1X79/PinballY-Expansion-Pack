@@ -4,8 +4,10 @@
 // draws its live parts: the texts (the message, the entries in white
 // with their gold mark, the headings, the separators as a gold line
 // fading at both ends), the selected entry's gold text, the dimming
-// backdrop and the painted images (common/drawn_menu_images.js).
-// Only drawing: no layer, no event, no side effect.
+// backdrop and the painted images (common/drawn_menu_images.js). A line
+// estimated to fit is drawn without being measured; each text style's
+// line height is measured once and kept for the session.
+// Only drawing: no layer, no event.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
@@ -105,18 +107,52 @@ export function computeGeometry({ width, height }, model, messageHeightAt) {
 
 export const rowHeightIn = (geometry, row) => heightOf(row) * geometry.k;
 
-// One line in the box, centred: one measure and one draw, the cost of a
-// line; only a line too wide goes through oneLine(), which shrinks then
-// cuts it.
+// Each character's width in ems, rounded up for Segoe UI, so that a line
+// estimated to fit surely does. Past the Latin letters (CJK, emoji...),
+// a character counts as so wide that its line is always measured; the
+// gold marks are known.
+const NARROW_CHARS = " .,;:'!|iIlfjrt()[]-";
+const WIDE_CHARS = "MWmw@%";
+const LAST_LATIN_CODE = 0x24F;
+const MARK_GLYPHS = Object.values(DRAWN_MENU_MARKS);
+const EM_WIDTHS = Object.freeze({ narrow: 0.4, lower: 0.62, upper: 0.78, wide: 1, unknown: 100 });
+const emWidthOf = char => {
+    if (MARK_GLYPHS.includes(char)) return EM_WIDTHS.wide;
+    if (char.codePointAt(0) > LAST_LATIN_CODE) return EM_WIDTHS.unknown;
+    if (NARROW_CHARS.includes(char)) return EM_WIDTHS.narrow;
+    if (WIDE_CHARS.includes(char)) return EM_WIDTHS.wide;
+    return char === char.toLowerCase() ? EM_WIDTHS.lower : EM_WIDTHS.upper;
+};
+// In pixels, at this font size.
+const estimatedWidthPx = (str, size) => [...str].reduce((width, char) => width + emWidthOf(char), 0) * size;
+
+// One line's height for each style, measured once for the session: a
+// single line's height does not depend on its text.
+const lineHeights = new Map();
+function lineHeightOf(host, textStyle) {
+    const key = `${textStyle.font}|${textStyle.size}|${textStyle.weight}`;
+    if (!lineHeights.has(key)) {
+        const styled = host.createStyledText({ textAlign: "left", textStyle });
+        styled.add("Ag");
+        lineHeights.set(key, styled.measure(UNBOUNDED).height);
+    }
+    return lineHeights.get(key);
+}
+
+// One line in the box, centred. Measuring is most of a line's cost: a
+// line estimated to fit is drawn centred by DirectWrite without it, and
+// only one that may overflow is measured, going through oneLine(), which
+// shrinks then cuts it when it is too wide.
 function line(host, dc, str, { x, y, width, height, size, minSize, weight, color, font = FONTS.body }) {
-    const styled = host.createStyledText({ textAlign: "left", textStyle: { font, size, weight, color } });
-    styled.add(str);
-    const measured = styled.measure(UNBOUNDED);
-    if (measured.width > width) {
+    if (estimatedWidthPx(str, size) > width) {
         oneLine(host, dc, str, { x, y, width, height, size, minSize, weight, color, font, align: "center" });
         return;
     }
-    styled.draw(dc, { x: x + (width - measured.width) / 2, y: y + (height - measured.height) / 2, width: measured.width + 4, height: measured.height });
+    const textStyle = { font, size, weight, color };
+    const lineHeight = lineHeightOf(host, textStyle);
+    const styled = host.createStyledText({ textAlign: "center", textStyle });
+    styled.add(str);
+    styled.draw(dc, { x, y: y + (height - lineHeight) / 2, width, height: lineHeight });
 }
 
 // The gold line fading at both ends, centred in the box, as short fills.
