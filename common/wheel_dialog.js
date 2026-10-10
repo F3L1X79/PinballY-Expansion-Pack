@@ -8,7 +8,9 @@
 // dismissed; tells whether any dialog is on screen or waiting. A drawn
 // dialog (see docs/adr/0011) draws itself when its turn comes and holds the
 // queue until it reports closed; listeners hear it close, so toasts can
-// wait for it from its submission on. Listens to "command", "menuclose" and "wheelmode".
+// wait for it from its submission on. A dialog not ready yet holds its
+// place, and every dialog after it, until it is; a stale one is dropped
+// unshown. Listens to "command", "menuclose" and "wheelmode".
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";
@@ -19,7 +21,8 @@ const SCRIPT_NAME = "WheelDialog";
 // Lower is shown first.
 export const DIALOG_PRIORITY = Object.freeze({
     STARTUP_PROMPT: 0,
-    RATING_PROMPT: 1,
+    REWARD_PROMPT: 1,
+    RATING_PROMPT: 2,
 });
 
 export function createWheelDialogs(host) {
@@ -42,12 +45,18 @@ export function createWheelDialogs(host) {
 
     let showScheduled = false;
 
+    const isLive = dialog => !(dialog.isStale && dialog.isStale());
+
     function showNext() {
         showScheduled = false;
+        for (let index = queue.length - 1; index >= 0; index--) if (!isLive(queue[index])) queue.splice(index, 1);
         if (shown || queue.length === 0) return;
         // A dialog opened while a game is exiting would sit under the launch
         // overlay, and one opened over another menu would replace it.
         if (host.getUIMode() !== "wheel") return;
+        // Whatever it waits for must not wait for this queue in turn: a
+        // drawn dialog queued behind it would hold the toasts it waits on.
+        if (queue[0].isReady && !queue[0].isReady()) return;
 
         const dialog = queue.shift();
         if (dialog.open) {
@@ -99,7 +108,9 @@ export function createWheelDialogs(host) {
 
     // dialog: either a native one { id, message, buttons, priority, onShown },
     // or a drawn one { priority, open(close) }, open drawing it and close
-    // to be called once it is gone.
+    // to be called once it is gone. Either may add isReady (optional: the
+    // queue waits on it while it returns false; wake() once it may be ready)
+    // and isStale (optional: dropped unshown when it returns true at its turn).
     function submit(dialog) {
         const insertAt = queue.findIndex(queued => queued.priority > dialog.priority);
         if (insertAt === -1) queue.push(dialog);
@@ -128,7 +139,7 @@ export function createWheelDialogs(host) {
 
     // True when no dialog is on screen or waiting, so an add-on drawing over
     // the wheel knows it would not cover one.
-    const isIdle = () => !shown && queue.length === 0;
+    const isIdle = () => !shown && !queue.some(isLive);
 
     // True while a drawn dialog is on screen or waiting its turn: toasts
     // and Confetti Showers wait for it to close instead of drawing over it,
@@ -140,7 +151,7 @@ export function createWheelDialogs(host) {
         drawnClosedListeners.push(safeHandler(SCRIPT_NAME, listener));
     }
 
-    return { submit, isIdle, hasDrawnDialog, onDrawnDialogClosed };
+    return { submit, wake: scheduleShowNext, isIdle, hasDrawnDialog, onDrawnDialogClosed };
 }
 
 let sharedWheelDialogs = null;

@@ -585,6 +585,13 @@ export default {
         // The Mastery Toast's extra line, naming the frames its Collection
         // Tier unlocks (more than one when a Play raised it by several tiers).
         toastLine: (names) => `${names.length === 1 ? "Nouveau cadre" : "Nouveaux cadres"} : ${names.join(", ")}`,
+        // The Reward Prompt, after a Profile's first frame: the frame's name,
+        // then the main menu entry and the Profile Stats button to equip it from.
+        prompt: {
+            message: (name, menuEntry, button) => `Vous avez gagné le cadre « ${name} » ! Équipez-le depuis « ${menuEntry} », puis « ${button} ».`,
+            goEquip: "Aller l'équiper",
+            gotIt: "Plus tard...",
+        },
     },
     playerLevel: {
         // Kept in English on purpose: the gamers' phrase.

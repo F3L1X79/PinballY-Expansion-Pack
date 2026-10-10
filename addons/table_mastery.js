@@ -12,7 +12,8 @@
 // Profile's profile.json ("collectionTier"), keeps the new tier there and
 // submits its Mastery Toast, with the Confetti Shower unless a level 10
 // toast of the same Play brings it, and a line naming the Avatar Frames
-// it unlocks (every one, when the Play raised it by more than a tier).
+// it unlocks (every one, when the Play raised it by more than a tier),
+// followed by the Reward Prompt when it brings the Profile's first frame.
 // ============================================================
 
 import { createPinballYHost } from "../common/pinbally_host.js";
@@ -90,15 +91,17 @@ export default function init() {
 
     // toast: what a Mastery Toast shows, submitted for the named Profile and
     // dropped when that Profile is reset or no longer active at its turn.
-    function submitFor(profileName, toast) {
+    // unlocksFrames: the Reward Prompt of a first frame follows it.
+    function submitFor(profileName, toast, { unlocksFrames = false } = {}) {
         const profileKey = profileName.toLowerCase();
         const resetCount = resetCountOf(profileKey);
+        const isStale = () => resetCountOf(profileKey) !== resetCount
+            || store.getActiveProfile().name.toLowerCase() !== profileKey;
         toasts.submit({
             kind: TOAST_KIND.MASTERY,
             ...toast,
-            onShown() {},
-            isStale: () => resetCountOf(profileKey) !== resetCount
-                || store.getActiveProfile().name.toLowerCase() !== profileKey,
+            onShown: unlocksFrames ? getProfileRewards().promptAfterToast(profileName, isStale) : () => {},
+            isStale,
         });
     }
 
@@ -128,7 +131,7 @@ export default function init() {
             description: TEXT.collectionToastDescription(needed, levelName),
             extraLine: frameNames.length > 0 ? lang.profileRewards.toastLine(frameNames) : undefined,
             celebrate,
-        });
+        }, { unlocksFrames: frameNames.length > 0 });
     }
 
     // Kept only once a tier is reached: a Profile Reset drops the key.

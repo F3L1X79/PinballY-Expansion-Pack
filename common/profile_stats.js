@@ -22,7 +22,8 @@
 // "commandbuttondown": Next / Prev move a gold halo through the cross and
 // the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
-// the player asked for it.
+// the player asked for it. Can also open the frame list straight away, for
+// the Reward Prompt.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -368,5 +369,13 @@ export function createProfileStats(host, {
     // attract mode nor keep the buttons.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
 
-    return { open: () => open() };
+    return {
+        open: () => open(),
+        // Opens the frame list straight away on that tier's row, onClosed
+        // called once it closes; Select or Exit there shows this screen on the
+        // Frame button, as if the list had been opened from it.
+        openFrameList(tier, onClosed) {
+            frameList.open(() => open(CHOICE.FRAME), { selectedTier: tier, onClosed });
+        },
+    };
 }

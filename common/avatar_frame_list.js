@@ -5,7 +5,8 @@
 // Avatar, then "None", laid out by the Avatar Frame list painter. A locked
 // row shows the greyed frame and its unlock condition; the worn row is
 // marked and the list opens on it. Next / Prev move a gold halo through
-// the rows, looping, with PinballY's navigation sound; Select or Launch
+// the rows, looping, with PinballY's navigation sound (it may open on
+// another row, such as the Reward Prompt's new frame); Select or Launch
 // (the plunger) on an unlocked row or "None" saves the choice through the
 // Profile Rewards module, on a locked row does nothing; Exit changes
 // nothing. Both then close the list and call the return given to open();
@@ -174,8 +175,11 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     }
 
     // onBack: what Select and Exit return to, called once the list is
-    // closed. Anything not drawn ahead yet is drawn on the spot.
-    function open(onBack = () => {}) {
+    // closed; selectedTier (optional): the frame row it opens on instead of
+    // the worn one; onClosed (optional): called whenever it closes, attract
+    // mode included, before onBack. Anything not drawn ahead yet is drawn
+    // on the spot.
+    function open(onBack = () => {}, { selectedTier = null, onClosed = () => {} } = {}) {
         if (shown) return;
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
@@ -187,17 +191,20 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
             place(layer, piece.rect);
             layer.alpha = 1;
         }
-        shown = { onBack, selected: Math.max(0, content.rows.findIndex(row => row.isWorn)) };
+        const isOpenedOn = row => (selectedTier === null ? row.isWorn : row.tier === selectedTier);
+        shown = { onBack, onClosed, selected: Math.max(0, content.rows.findIndex(isOpenedOn)) };
         placeHalo();
     }
 
     function close() {
         if (!shown) return;
+        const { onClosed } = shown;
         shown = null;
         hide(backdropLayer);
         for (const { layer } of layers.values()) hide(layer);
         // What changed while it was open is read again once it is closed.
         wakeDrawingAhead();
+        onClosed();
     }
 
     // direction: 1 for Next, -1 for Prev.

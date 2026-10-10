@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // Welcome Screen in French, through main.js on the fake PinballY globals,
-// at 18 h: a menu opened before the startup pause ends keeps it closed
+// at 19 h: a menu opened before the startup pause ends keeps it closed
 // until the menu closes and another pause ends; it greets the Profile by
 // its name with the evening greeting, offers to stay on the wheel when
 // no table is selected, shows the Avatar's tooltip in French, and Exit closes it.
@@ -15,7 +15,7 @@ import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, greeting, bottomRow
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 
 test("the Welcome Screen waits for a menu to close, greets in the evening and closes on Exit", async () => {
-    const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 18, 0, 0) });
+    const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 19, 0, 0) });
     fake.addFolder(`${PROFILES}\\Chloé`);
     fake.addFile(`${PROFILES}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Chloé" }));
     // Never uninstalled: node --test runs each test file in its own process.

@@ -16,7 +16,9 @@
 // Keeps the shown Player Level (the level pip's): the baseline, then each
 // Level Toast's level as it starts.
 // Also adds the Achievement List entry to the main menu, right after "Play",
-// and the Profile Stats entry right after it. The Challenges family and the
+// and the Profile Stats entry right after it, and lets the Profile Rewards
+// module submit its Reward Prompt, which opens the Profile Stats' frame
+// list. The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
 // Challenges Add-on is enabled. Also starts the Surprises tracker, which
 // records each Play for the Surprises family.
@@ -141,6 +143,9 @@ export default function init() {
         hallOfFameFilter: config.addOns.hallOfFame === false ? null : HALL_OF_FAME_FULL_FILTER_ID,
         tablesToDiscoverFilter: config.addOns.tablesToDiscover === false ? null : TABLES_TO_DISCOVER_FULL_FILTER_ID,
     });
+    // "Go equip it" needs the Profile Stats' frame list, so the Reward
+    // Prompt exists only with them.
+    profileRewards.enablePrompts(profileStats.openFrameList);
     mainMenu.add({
         name: "profileStats",
         label: lang.profileStats.menuEntry,

@@ -53,11 +53,11 @@ const STARTUP_PAUSE_MS = 500;
 const FADE_MS = 220;
 const FRAME_MS = 16;
 
-// The greeting by the hour: from 5 h, 12 h, 18 h and 22 h.
+// The greeting by the hour: from 5 h, 12 h, 19 h and 22 h.
 function partOfDay(hour) {
     if (hour >= 5 && hour < 12) return "morning";
-    if (hour >= 12 && hour < 18) return "afternoon";
-    if (hour >= 18 && hour < 22) return "evening";
+    if (hour >= 12 && hour < 19) return "afternoon";
+    if (hour >= 19 && hour < 22) return "evening";
     return "night";
 }
 

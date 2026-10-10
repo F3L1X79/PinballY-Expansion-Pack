@@ -595,6 +595,13 @@ export default {
         // The Mastery Toast's extra line, naming the frames its Collection
         // Tier unlocks (more than one when a Play raised it by several tiers).
         toastLine: (names) => `${names.length === 1 ? "New frame" : "New frames"}: ${names.join(", ")}`,
+        // The Reward Prompt, after a Profile's first frame: the frame's name,
+        // then the main menu entry and the Profile Stats button to equip it from.
+        prompt: {
+            message: (name, menuEntry, button) => `You won the Avatar Frame "${name}"! Equip it from "${menuEntry}", then "${button}".`,
+            goEquip: "Go equip it",
+            gotIt: "Got it",
+        },
     },
     // TODO: translation pass
     playerLevel: {

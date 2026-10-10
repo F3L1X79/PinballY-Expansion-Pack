@@ -8,10 +8,18 @@
 // Writes only the active Profile's choice ("avatarFrame": the worn frame's
 // tier, or null for none), through the Profile store. A missing frame
 // image is logged once and read as none.
+// Once given a way to open the frame list (enablePrompts), submits the
+// Reward Prompt through the wheel dialog module for a Profile with a frame
+// unlocked and no "avatarFrame" key yet: at startup and on each Profile
+// switch, and after the Mastery Toast that announces a first frame. The
+// prompt sets the key to null when it shows, so it never comes back short
+// of a Profile Reset.
 // ============================================================
 
 import { createPinballYHost } from "./pinbally_host.js";
 import { getProfileStore } from "./profile_store.js";
+import { getWheelDialogs, DIALOG_PRIORITY } from "./wheel_dialog.js";
+import { safeHandler } from "./safe_handler.js";
 import lang from "./i18n.js";
 import config from "./config.js";
 
@@ -20,8 +28,9 @@ const FRAME_COUNT = 10;
 const SMALL_IMAGE_MAX_WIDTH = 192;
 const FRAMES_FOLDER = "assets\\images\\avatar_frames";
 const SCRIPT_NAME = "ProfileRewards";
+const REWARD_PROMPT_ID = "rewardPrompt";
 
-export function createProfileRewards(host, { profileStore, isEnabled = () => true }) {
+export function createProfileRewards(host, { profileStore, isEnabled = () => true, wheelDialogs = null }) {
     const projectFolder = host.getProjectFolder();
     // Each image's path, or null when its file is missing: checked once per session.
     const imagePaths = new Map();
@@ -62,6 +71,47 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
     // that is not unlocked (a hand edit) wears none.
     const wornFrameOf = profileName => unlockedFrameOf(dataOf(profileName).avatarFrame, profileName);
 
+    // Opens the frame list on that tier's row, then calls onClosed once it
+    // closes; null until enablePrompts.
+    let openFrameList = null;
+    // Profile Resets so far, by Profile name in lower case (Profile names
+    // ignore case): a prompt submitted before its Profile's reset is stale.
+    const resetCounts = new Map();
+    const resetCountOf = profileKey => resetCounts.get(profileKey) || 0;
+
+    const isPromptPending = profileName => openFrameList !== null
+        && !("avatarFrame" in dataOf(profileName)) && framesOf(profileName).some(frame => frame.isUnlocked);
+
+    // The Reward Prompt for the named Profile, dropped when that Profile is
+    // reset, no longer active or already prompted at its turn; isBlocked
+    // (optional) also drops it, isReady (optional) holds it.
+    function submitPrompt(profileName, { isBlocked = () => false, isReady } = {}) {
+        if (!isPromptPending(profileName)) return;
+        const profileKey = profileName.toLowerCase();
+        const resetCount = resetCountOf(profileKey);
+        // The newest frame: the one just won.
+        const frame = framesOf(profileName).filter(candidate => candidate.isUnlocked).pop();
+        const TEXT = lang.profileRewards.prompt;
+        wheelDialogs.submit({
+            id: REWARD_PROMPT_ID,
+            message: TEXT.message(frame.name, lang.profileStats.menuEntry, lang.profileStats.buttons.frame),
+            buttons: [
+                // A drawn dialog of its own once the prompt closed: the queue
+                // waits for the frame list, so no dialog opens over it.
+                { label: TEXT.goEquip, action: () => wheelDialogs.submit({ priority: DIALOG_PRIORITY.REWARD_PROMPT, open: close => openFrameList(frame.tier, close) }) },
+                // No action: the dialog closing is all it must do.
+                { label: TEXT.gotIt },
+            ],
+            priority: DIALOG_PRIORITY.REWARD_PROMPT,
+            isReady,
+            isStale: () => isBlocked() || resetCountOf(profileKey) !== resetCount
+                || profileStore.getActiveProfile().name.toLowerCase() !== profileKey || !isPromptPending(profileName),
+            onShown: safeHandler(SCRIPT_NAME, () => profileStore.updateProfileData(data => { data.avatarFrame = null; }, profileName)),
+        });
+    }
+
+    const submitForActive = () => submitPrompt(profileStore.getActiveProfile().name);
+
     return {
         framesOf,
         wornFrameOf,
@@ -91,6 +141,31 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
             }
             return frames;
         },
+        // opener(tier, onClosed): opens the frame list on that tier's row,
+        // calling onClosed once the list is closed. Submits the
+        // active Profile's pending prompt now, which waits for the Welcome
+        // Screen, and the new one's on each Profile switch.
+        enablePrompts(opener) {
+            openFrameList = opener;
+            profileStore.onUpdate(safeHandler(SCRIPT_NAME, (profileName, { isReset }) => {
+                if (isReset) resetCounts.set(profileName.toLowerCase(), resetCountOf(profileName.toLowerCase()) + 1);
+            }));
+            profileStore.onSwitch(safeHandler(SCRIPT_NAME, submitForActive));
+            submitForActive();
+        },
+        // For the Mastery Toast of a Collection Tier that unlocks frames,
+        // isStale being the toast's: submits the Profile's pending prompt
+        // now, so it holds its place ahead of the rating prompt, and returns
+        // the toast's onShown, which lets it show. A stale toast never shows,
+        // so neither does its prompt.
+        promptAfterToast(profileName, isStale) {
+            let isToastShown = false;
+            submitPrompt(profileName, { isBlocked: isStale, isReady: () => isToastShown });
+            return () => {
+                isToastShown = true;
+                wheelDialogs.wake();
+            };
+        },
     };
 }
 
@@ -99,7 +174,7 @@ let shared = null;
 export function getProfileRewards() {
     if (!shared) {
         shared = createProfileRewards(createPinballYHost(), {
-            profileStore: getProfileStore(), isEnabled: () => config.addOns.tableMastery !== false,
+            profileStore: getProfileStore(), isEnabled: () => config.addOns.tableMastery !== false, wheelDialogs: getWheelDialogs(),
         });
     }
     return shared;
