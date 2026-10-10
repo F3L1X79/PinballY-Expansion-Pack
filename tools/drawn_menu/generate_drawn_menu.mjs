@@ -102,15 +102,14 @@ function addGlow(color, x, y) {
     const glow = y < face - 1 ? 0 : r < 0.45 ? mix(0.095, 0.03, r / 0.45) : r < 0.78 ? mix(0.03, 0, (r - 0.45) / 0.33) : 0;
     let out = mixRGB(color, GOLD, glow);
     // A 2 px light on the frame's top (its gold line and the row below),
-    // from 14 % to 86 % of the face, brightest in the middle, in a 10 px
-    // halo on both sides of it that also fades past its ends.
-    const start = face + 0.14 * faceWidth;
-    const end = face + 0.86 * faceWidth;
+    // from corner to corner, so the lit line and the bare gold line never
+    // show side by side as two lines; brightest in the middle, fading
+    // towards the corners, in a 10 px halo on both sides of it.
     const across = y < face ? face - y : Math.max(0, y - face - 1);
-    const beyond = Math.max(0, start - x, x - end);
-    const distance = Math.hypot(across, beyond);
-    if (distance < EDGE_HALO_RADIUS) out = mixRGB(out, EDGE_HALO, 0.25 * (1 - distance / EDGE_HALO_RADIUS) ** 2);
-    if (distance === 0) out = mixRGB(out, EDGE_LIGHT, 0.7 * (1 - Math.abs((x - face) / faceWidth - 0.5) / 0.36));
+    const fromMiddle = Math.abs((x - face) / faceWidth - 0.5) / 0.5;
+    const strength = 1 - fromMiddle ** 2;
+    if (across < EDGE_HALO_RADIUS) out = mixRGB(out, EDGE_HALO, 0.25 * strength * (1 - across / EDGE_HALO_RADIUS) ** 2);
+    if (across === 0) out = mixRGB(out, EDGE_LIGHT, 0.7 * strength);
     return out;
 }
 
