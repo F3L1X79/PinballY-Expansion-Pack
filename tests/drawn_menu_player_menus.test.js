@@ -2,15 +2,15 @@
 // The player's other menus as Drawn Menus, through main.js on the fake
 // PinballY globals: the Exit menu with the pack's entries (Change Player,
 // Reset profile for an Admin Profile), the power off menu, the filter
-// menus, the table's setup and categories menus are drawn (ticking a
-// category redraws it in place, the cursor kept); the operator and pause
-// menus stay native, and a native menu opening replaces a Drawn
-// one. A command that opens another menu (a
-// filter submenu, its "Back" entry) gets it drawn in its place; Exit or
-// a Cancel entry in a filter submenu goes back to the main menu, the
-// cursor on that filter; the active filter
-// carries its gold mark; a list too long for the window scrolls with the
-// selection and pages with NextPage / PrevPage.
+// menus, the table's setup and categories menus (ticking a category
+// redraws it in place, the cursor kept) and the operator menu are drawn;
+// the capture and pause menus stay native, and a native menu opening
+// replaces a Drawn one. A command that opens another menu (a filter
+// submenu, its "Back" entry) gets it drawn in its place; Exit or a Cancel
+// entry in a filter submenu goes back to the main menu, the cursor on
+// that filter; the active filter carries its gold mark; a list too long
+// for the window scrolls with the selection and pages with NextPage /
+// PrevPage.
 // ============================================================
 
 import { test } from "node:test";
@@ -264,8 +264,21 @@ test("ticking a category redraws the categories menu in place, the cursor on it"
     fake.advanceTime(OPEN_OVER_MS);
 });
 
-test("the other setup menus and the pause menu stay native", () => {
-    for (const id of ["operator", "pause game"]) {
+test("the operator menu is drawn", () => {
+    openMenu(fake, "operator", [
+        { title: "Options", cmd: 3200 },
+        { title: "", cmd: -1 },
+        { title: "Cancel", cmd: COMMAND.MenuReturn },
+    ]);
+
+    assert.equal(fake.currentMenu(), null);
+    assert.deepEqual(drawnMenuLines(fake), ["Options", "---", "Cancel"]);
+    press(fake, "Exit");
+    assert.ok(!isDrawnMenuShown(fake));
+});
+
+test("the capture menus and the pause menu stay native", () => {
+    for (const id of ["capture", "pause game"]) {
         fake.openMenu(id, [{ title: "Something", cmd: COMMAND.MenuReturn }]);
         assert.ok(!isDrawnMenuShown(fake), id);
         assert.equal(fake.currentMenu().id, id);
@@ -275,10 +288,10 @@ test("the other setup menus and the pause menu stay native", () => {
 
 test("a native menu opening replaces an open Drawn Menu", () => {
     openMainMenu(fake);
-    fake.openMenu("operator", [{ title: "Something", cmd: COMMAND.MenuReturn }]);
+    fake.openMenu("capture", [{ title: "Something", cmd: COMMAND.MenuReturn }]);
 
     assert.ok(!isDrawnMenuShown(fake));
-    assert.equal(fake.currentMenu().id, "operator");
+    assert.equal(fake.currentMenu().id, "capture");
     assert.ok(!press(fake, "Next").defaultPrevented, "the buttons are left to the native menu");
     fake.closeMenu();
 });
