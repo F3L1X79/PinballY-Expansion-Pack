@@ -86,6 +86,8 @@ const DEFAULTS = {
         wheelArc: true,
         challenges: true,
         tableMastery: true,
+        // The main menu drawn in the pack's look instead of PinballY's native one.
+        drawnMenus: true,
         menuCleanup: false,
     },
 };

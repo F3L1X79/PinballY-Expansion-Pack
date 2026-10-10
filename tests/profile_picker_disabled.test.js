@@ -19,8 +19,9 @@ test("turning the Profile picker off removes its main-menu entry and Welcome Scr
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     // Not the Challenges Add-on either: it locks the week's Challenge in
-    // cabinet.json at startup, for Guest too.
-    for (const key of Object.keys(config.addOns)) config.addOns[key] = !["profilePicker", "challenges"].includes(key);
+    // cabinet.json at startup, for Guest too. Nor the Drawn Menus, so the
+    // main menu is read natively.
+    for (const key of Object.keys(config.addOns)) config.addOns[key] = !["profilePicker", "challenges", "drawnMenus"].includes(key);
     config.language = "en";
 
     const { default: lang } = await import("../common/i18n.js");

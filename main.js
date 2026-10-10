@@ -34,6 +34,7 @@ import * as challenges from "./addons/challenges.js";
 import * as tableMastery from "./addons/table_mastery.js";
 import * as ratingPrompt from "./addons/rating_prompt.js";
 import * as welcomeScreen from "./addons/welcome_screen.js";
+import * as drawnMenus from "./addons/drawn_menus.js";
 
 // Scripts are initialized in this order, which is also the order their event
 // listeners are registered in, and listeners for the same event run in that
@@ -46,6 +47,8 @@ import * as welcomeScreen from "./addons/welcome_screen.js";
 //   this session).
 // - profilePicker must come before the Welcome Screen, which offers
 //   "Change Player" only when the picker registered itself at init.
+// - drawnMenus must come last, so its "menuopen" listener draws the final
+//   entries, after every Add-on and shared module edited them.
 // The other scripts don't depend on each other's order. In particular, the
 // Welcome Screen and the rating prompt go through the wheel dialog module,
 // which shows them in a fixed priority order, and Achievements are announced
@@ -78,6 +81,9 @@ const SCRIPTS = [
     // Welcome Screen, under the startup prompt's former key, which owners'
     // env.local overrides still use.
     { key: "startupChoicePrompt", module: welcomeScreen },
+
+    // Drawn Menus, last of all.
+    { key: "drawnMenus", module: drawnMenus },
 ];
 
 const ENABLED_SCRIPTS = config.addOns;

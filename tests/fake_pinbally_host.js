@@ -59,8 +59,8 @@ const withoutTrailingSlash = path => path.replace(/\\+$/, "");
 const parentFolder = path => path.slice(0, path.lastIndexOf("\\"));
 
 // Records its runs and gives a plausible measure; drawing it writes each
-// run's text (without its line break) to the drawing context, where the
-// fake layer records it. Like PinballY, measuring it with no text logs a
+// run's text (without its line break) and colour to the drawing context,
+// where the fake layer records it. Like PinballY, measuring it with no text logs a
 // layout error and gives 0 by 0, and so does a style whose size or weight
 // is given but isn't a usable number (an undefined weight included):
 // DirectWrite's CreateTextFormat rejects it.
@@ -100,7 +100,8 @@ class FakeStyledText {
     }
 
     draw(dc, rect) {
-        for (const run of this.runs) dc.drawText(run.text.replace(/\n$/, ""), rect);
+        const baseColor = this.options.textStyle && this.options.textStyle.color;
+        for (const run of this.runs) dc.drawText(run.text.replace(/\n$/, ""), rect, run.color === undefined ? baseColor : run.color);
     }
 }
 
@@ -328,9 +329,9 @@ export function createFakePinballYHost({
                 if (!isImageReadable(path)) throw new Error(`Cannot load image: ${path}`);
                 return { width: 256, height: 256 };
             },
-            drawText: (text, rect) => {
+            drawText: (text, rect, color) => {
                 texts.push(text);
-                strokes.push({ text, rect: rect && { ...rect } });
+                strokes.push({ text, rect: rect && { ...rect }, color });
             },
         };
         const layer = {
@@ -357,7 +358,7 @@ export function createFakePinballYHost({
             images: () => [...images],
             frames: () => frames.map(frame => ({ ...frame })),
             fills: () => readStrokes(strokes).filter(stroke => "fill" in stroke).map(stroke => stroke.fill),
-            // Fills ({ fill: color, rect }), texts ({ text, rect }) and images
+            // Fills ({ fill: color, rect }), texts ({ text, rect, color }) and images
             // ({ image: path, rect }) in drawing order.
             strokes: () => readStrokes(strokes),
             canvasSize: () => ({ ...canvasSize }),
@@ -680,7 +681,11 @@ export function createFakePinballYHost({
         createStyledText: (options) => new FakeStyledText(options, (text) => { logLines.push(text); }),
         allocateCommand,
         getBuiltInCommand,
-        doCommand: (id) => { executedCommands.push(id); },
+        // Like PinballY, fires "command" as a menu entry would.
+        doCommand: (id) => {
+            executedCommands.push(id);
+            fire("command", { id });
+        },
         // PinballY leaves the wheel as soon as a launch starts.
         playGame: (game) => {
             launchList.push(game);

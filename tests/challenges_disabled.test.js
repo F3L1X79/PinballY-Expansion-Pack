@@ -24,7 +24,8 @@ test("no Challenge, Challenge Card or Challenges Achievements when the Challenge
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Alice" }));
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
-    for (const key of Object.keys(config.addOns)) config.addOns[key] = key !== "challenges";
+    // Nor the Drawn Menus, so the main menu is read natively.
+    for (const key of Object.keys(config.addOns)) config.addOns[key] = !["challenges", "drawnMenus"].includes(key);
     config.language = "en";
 
     const { default: lang } = await import("../common/i18n.js");
