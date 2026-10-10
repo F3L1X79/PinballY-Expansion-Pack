@@ -1,6 +1,6 @@
 // ============================================================
 // Drawn Menu images: the PNG files of the Drawn Menu look, painted ahead
-// by tools/drawn_menu/generate_drawn_menu.mjs into assets/images/
+// by maintainer/drawn_menu/generate_drawn_menu.mjs into assets/images/
 // drawn_menu/, with their size in pixels at the 1920 px reference height,
 // at which they are shown 1:1. The panel and the glass are each cut into
 // a top, a middle stretched to the menu's length and a bottom; the

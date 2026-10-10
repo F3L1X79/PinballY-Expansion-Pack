@@ -1,7 +1,7 @@
 // ============================================================
 // Avatar Frame images tests: the ten frames ship with the pack, each at
 // 384 px, at 192 px and greyed at 192 px for a locked frame, as painted by
-// tools/avatar_frames/generate_frames.mjs. Reads the files only.
+// maintainer/avatar_frames/generate_frames.mjs. Reads the files only.
 // ============================================================
 
 import { test } from "node:test";

@@ -6,7 +6,7 @@
 // the Avatar's image box is [-1, 1] on both axes, y pointing down; the
 // canvas spans [-EXTENT, EXTENT]. A rectangular canvas may instead be
 // painted in coordinates of its own (Canvas.rect). Run by
-// generate_frames.mjs and tools/drawn_menu/, never by PinballY.
+// generate_frames.mjs and maintainer/drawn_menu/, never by PinballY.
 // ============================================================
 
 import zlib from "node:zlib";

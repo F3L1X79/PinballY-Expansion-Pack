@@ -1,0 +1,13 @@
+# Left out of the downloaded zip (GitHub "Download ZIP" and release archives):
+# the players only need the pack itself. docs/images stays for the README.
+maintainer/ export-ignore
+tests/ export-ignore
+docs/adr/ export-ignore
+docs/agents/ export-ignore
+docs/pinbally/ export-ignore
+docs/research/ export-ignore
+docs/roadmap/ export-ignore
+docs/roadmap.html export-ignore
+CONTRIBUTING.md export-ignore
+CONTEXT.md export-ignore
+.gitattributes export-ignore

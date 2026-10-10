@@ -9,7 +9,7 @@
 // top left, a cold one on the right, a neon along the top, a faint warm
 // one at the bottom), each cut into a top, a stretchable middle and a
 // bottom; and the chosen entry's glowing, pointed gold outline.
-// Run: node tools/drawn_menu/generate_drawn_menu.mjs [--sheet], --sheet
+// Run: node maintainer/drawn_menu/generate_drawn_menu.mjs [--sheet], --sheet
 // also writing sheet.png next to them (not committed): a short and a
 // long menu built from the slices, to check by eye that they join
 // without a seam.

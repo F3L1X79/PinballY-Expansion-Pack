@@ -1,7 +1,7 @@
 // ============================================================
 // Drawn Menu images tests: every image the Drawn Menus use ships with the
 // pack, as a PNG of the size they place it at, as painted by
-// tools/drawn_menu/generate_drawn_menu.mjs. Reads the files only.
+// maintainer/drawn_menu/generate_drawn_menu.mjs. Reads the files only.
 // ============================================================
 
 import { test } from "node:test";

@@ -4,7 +4,7 @@
 // avatar_frames/, each frame at 384 and 192 px (frame_NN_384.png,
 // frame_NN_192.png) and a greyed 192 px copy for locked frames
 // (frame_NN_192_locked.png). The Avatar's box is the middle two thirds.
-// Run: node tools/avatar_frames/generate_frames.mjs [numbers], numbers
+// Run: node maintainer/avatar_frames/generate_frames.mjs [numbers], numbers
 // such as 3,7 to paint only those frames.
 // ============================================================
 
