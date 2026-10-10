@@ -47,3 +47,14 @@ test("the selected entry's gold text is drawn at the same size", () => {
     const [stroke] = textStrokesOn(DRAWN_MENU_Z_INDEX.selectedText);
     assert.ok(Math.abs(pixelsOf(stroke) - 36 * K) < 0.01, `${pixelsOf(stroke)} px`);
 });
+
+test("the texts land on whole pixels, so a separator's 1 px line stays one sharp row", () => {
+    const layer = fake.drawingLayers().find(candidate => candidate.zIndex === DRAWN_MENU_Z_INDEX.texts && candidate.alpha > 0);
+    const { width: canvasWidth, height: canvasHeight } = layer.canvasSize();
+    const height = layer.scale().ySpan * WINDOW.height;
+    const width = canvasWidth * height / canvasHeight;
+    const left = (layer.position().x + 0.5) * WINDOW.width - width / 2;
+    const top = (0.5 - layer.position().y) * WINDOW.height - height / 2;
+    assert.ok(Math.abs(height - canvasHeight) < 1e-6, `${canvasHeight} px drawn, ${height} px shown`);
+    assert.ok(Math.abs(left - Math.round(left)) < 1e-6 && Math.abs(top - Math.round(top)) < 1e-6, `at ${left}, ${top}`);
+});

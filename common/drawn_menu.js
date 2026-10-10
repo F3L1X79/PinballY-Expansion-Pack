@@ -16,7 +16,7 @@
 // entry while the gold outline glides to it;
 // NextPage / PrevPage move by a page; Select or Launch plays the Select
 // sound, closes the menu (unless the entry stays open) and runs the
-// entry's command through doCommand, as a native menu would, then
+// entry's command through runCommand, as a native menu would, then
 // reports the close; Exit plays the Deselect sound and closes it. Attract
 // mode closes it too, and so does a menu shown in its place. isOpen() and
 // onClosed() let what waits for a free wheel wait for it.
@@ -208,6 +208,13 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         layer.setPos((x + width / 2) / windowWidth - 0.5, 0.5 - (y + height / 2) / windowHeight);
     }
 
+    // A texts' layer, drawn at its size, on whole pixels: between two,
+    // PinballY's filtering spreads each 1 px line (a separator) over two
+    // faint rows and blurs the letters.
+    function placeText(layer, box) {
+        place(layer, { ...box, x: Math.round(box.x), y: Math.round(box.y) }, false);
+    }
+
     // A top, a middle stretched to the panel's length and a bottom; the
     // middle is hidden when the ends already meet.
     function placeStack([top, middle, bottom], box, k) {
@@ -248,7 +255,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             textsLayer.draw(dc => drawTexts(host, dc, geometry, model, shown.scroll), width, height);
             textsSignature = signature;
         }
-        place(textsLayer, { x: geometry.listX, y: geometry.contentTop, width, height }, false);
+        placeText(textsLayer, { x: geometry.listX, y: geometry.contentTop, width, height });
     }
 
     // The selected entry's middle in window pixels, at the current scroll.
@@ -280,7 +287,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // the new title would cross the other entries' white text.
     function placeSelectedText() {
         const { width, height } = shown.selectedTextSize;
-        place(selectedTextLayer, { x: shown.geometry.listX, y: selectedCenterY() - height / 2, width, height }, false);
+        placeText(selectedTextLayer, { x: shown.geometry.listX, y: selectedCenterY() - height / 2, width, height });
     }
 
     function stopTimers() {
@@ -468,7 +475,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         sounds.select.play();
         const onClose = row.stayOpen ? null : takeDown();
         try {
-            host.doCommand(row.cmd);
+            host.runCommand(row.cmd);
         } finally {
             reportClosed(onClose);
         }

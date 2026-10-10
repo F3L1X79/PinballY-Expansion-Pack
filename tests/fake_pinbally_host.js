@@ -70,6 +70,19 @@ const isInvalidTextStyle = style => Boolean(style) && (
     ("size" in style && !(Number.isFinite(style.size) && style.size > 0))
     || ("weight" in style && !(Number.isFinite(style.weight) && style.weight >= 1 && style.weight <= 999)));
 
+// SystemClasses.js's CommandEvent, as PinballY fires it for a menu entry
+// or a button.
+class FakeCommandEvent {
+    constructor(id) {
+        this.type = "command";
+        this.id = id;
+        this.cancelable = true;
+        this.defaultPrevented = false;
+    }
+
+    preventDefault() { this.defaultPrevented = true; }
+}
+
 class FakeStyledText {
     constructor(options = {}, log = () => {}) {
         this.options = options;
@@ -688,11 +701,21 @@ export function createFakePinballYHost({
         createStyledText: (options) => new FakeStyledText(options, (text) => { logLines.push(text); }),
         allocateCommand,
         getBuiltInCommand,
-        // Like PinballY, fires "command" as a menu entry would.
+        // Like PinballY's JsDoCommand: carries the command out without
+        // firing "command", so no script hears it.
         doCommand: (id) => {
             executedCommands.push(id);
-            const ev = fire("command", { id });
-            if (!ev.defaultPrevented && nativeCommands.has(id)) nativeCommands.get(id)();
+            if (nativeCommands.has(id)) nativeCommands.get(id)();
+        },
+        // Like the PinballY host: "command" first, then doCommand.
+        runCommand: (id) => {
+            if (host.dispatchEvent(new FakeCommandEvent(id))) host.doCommand(id);
+        },
+        // Like SystemClasses.js's EventTarget: runs the listeners, and
+        // returns false when one prevented the default.
+        dispatchEvent: (ev) => {
+            for (const handler of [...(handlers.get(ev.type) || [])]) handler(ev);
+            return !(ev.cancelable && ev.defaultPrevented);
         },
         // PinballY leaves the wheel as soon as a launch starts.
         playGame: (game) => {
@@ -916,7 +939,7 @@ export function createFakePinballYHost({
         installGlobals() {
             const globalNames = [
                 "optionSettings", "gameList", "mainWindow", "command", "logfile", "Date",
-                "StyledText", "systemInfo", "createAutomationObject",
+                "StyledText", "CommandEvent", "systemInfo", "createAutomationObject",
                 "setTimeout", "clearTimeout", "setInterval", "clearInterval",
                 "backglassWindow", "dllImport",
             ];
@@ -962,6 +985,7 @@ export function createFakePinballYHost({
                     getUIMode: getFullUIMode,
                     playGame: host.playGame,
                     doCommand: host.doCommand,
+                    dispatchEvent: host.dispatchEvent,
                     createDrawingLayer,
                     removeDrawingLayer,
                     setUnderlay,
@@ -984,6 +1008,7 @@ export function createFakePinballYHost({
                 setInterval: (callback, ms) => addTimer(callback, ms, ms),
                 clearInterval: removeTimer,
                 StyledText: FakeStyledText,
+                CommandEvent: FakeCommandEvent,
                 systemInfo: { programDir: programFolder },
                 backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
                 // Only User32's GetSystemMetrics, for the monitor count

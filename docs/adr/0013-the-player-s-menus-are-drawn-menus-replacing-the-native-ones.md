@@ -2,7 +2,7 @@
 
 PinballY's native menus (main, Exit, filter choices, power off) and the menus the Add-ons open with `showMenu` look like another program next to the pack's drawn screens. PinballY offers no way to restyle them. We decided that the Drawn Menus Add-on, started last in `main.js`, listens to `menuopen` for the player's menu ids, hands a copy of the final entries to the shared Drawn Menu module (`common/drawn_menu.js`), and calls `preventDefault()` only once the module drew them, setting `menuUpdated` back to false too: PinballY shows a menu marked updated even when `menuopen` is cancelled. Every menu the pack opens itself goes through the same module instead of `showMenu`. The native menu is the fallback: when the Add-on is off, when a menu has no entry to choose, or when drawing throws (the error goes to `logfile.log`).
 
-A Drawn Menu keeps the native behaviour: same entries in the same order, the flippers to move, Select or Launch to choose, Exit to close, PinballY's button sounds. Choosing runs the entry's command through `mainWindow.doCommand`, so every Add-on's `command` listener hears it as with a native menu, and a command that opens another menu fires `menuopen` again.
+A Drawn Menu keeps the native behaviour: same entries in the same order, the flippers to move, Select or Launch to choose, Exit to close, PinballY's button sounds. Choosing runs the entry's command as PinballY does for a native menu: the `command` event through `mainWindow.dispatchEvent(new CommandEvent(id))`, then `mainWindow.doCommand` unless a listener prevented it (`doCommand` alone fires no `command` event). So every Add-on's `command` listener hears it as with a native menu, and a command that opens another menu fires `menuopen` again.
 
 ## Considered Options
 

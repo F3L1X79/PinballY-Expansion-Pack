@@ -196,6 +196,13 @@ export function createPinballYHost() {
         // PinballY's own command IDs, such as "PlayGame" or "MenuReturn".
         getBuiltInCommand: (name) => command[name],
         doCommand: (id) => { mainWindow.doCommand(id); },
+        // As a menu entry or a button runs it: "command" first, then
+        // PinballY's own handling unless a listener prevented it.
+        // doCommand() alone fires no "command" (JsDoCommand skips
+        // FireCommandEvent), so a script's own command would do nothing.
+        runCommand: (id) => {
+            if (mainWindow.dispatchEvent(new CommandEvent(id))) mainWindow.doCommand(id);
+        },
         playGame: (game) => { mainWindow.playGame(game); },
 
         // drawImage resolves relative paths from this folder, not from Scripts/.

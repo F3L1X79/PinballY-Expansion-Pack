@@ -73,7 +73,7 @@ The backglass, DMD, topper and instruction-card windows add nothing else (Backgl
 - `showMediaWhenRunningFlag`: true, false or undefined (undefined means use the key).
 
 ### 2.2 mainWindow (MainWindowObject.html)
-- `doCommand(id)` runs a menu-level command (§4.3).
+- `doCommand(id)` runs a menu-level command (§4.3). It does **not** fire the `command` event (`JsDoCommand` calls `OnCommandImpl`, past `FireCommandEvent`): a command allocated by a script does nothing through it. To run a command as a menu entry would, call `mainWindow.dispatchEvent(new CommandEvent(id))` first, then `doCommand(id)` if it returned true.
 - `doButtonCommand(name, down, repeatCount)` simulates a mapped button ("Next", "Prev", "NextPage", "Select", "Exit" and so on, from the CommandButtonEvent list). It does **not** fire key or commandbutton JS events.
 - `playGame(game, {command, system, overrides})` launches a game. `overrides` takes the prelaunch override properties (§3).
 - `showMenu(id, items, options)`: see §4. It does **not** fire `menuopen`.
