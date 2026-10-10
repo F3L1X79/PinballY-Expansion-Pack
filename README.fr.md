@@ -35,6 +35,7 @@ Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran
 - fabricant, décennie et table préférés, et la toute première table jouée ;
 - la part de la collection que vous avez essayée ;
 - vos succès, vos jours d'affilée sur la borne, vos séries sur la table du jour et la table de la semaine, et les défis réussis ;
+- le cadre que porte votre Avatar ;
 - et le chemin vers vos tables les plus jouées et celles qui restent à découvrir.
 
 ### Écran d'accueil : table du jour, table de la semaine
@@ -51,7 +52,7 @@ Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq table
 
 ### Maîtrise des tables
 
-Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis.
+Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis. Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Vos statistiques**, sous **Cadre**.
 
 ### Succès
 

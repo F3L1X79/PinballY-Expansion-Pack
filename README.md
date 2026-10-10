@@ -16,7 +16,7 @@ With Change Player, each of you picks your own Profile and Avatar, and the Welco
 
 <img src="docs/images/profile_stats.png" alt="The Profile Stats of Guest" width="480">
 
-**Your Stats**, in the main menu, sums up your pinball life: games played and total time, your Player Level and Collection Mastery, average game length, favourite manufacturer, decade and table, the first table you ever played, how much of the collection you have tried, your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, the Challenges you completed, and the way to your most played tables and to the ones still to discover.
+**Your Stats**, in the main menu, sums up your pinball life: games played and total time, your Player Level and Collection Mastery, average game length, favourite manufacturer, decade and table, the first table you ever played, how much of the collection you have tried, your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, the Challenges you completed, the Avatar Frame you wear, and the way to your most played tables and to the ones still to discover.
 
 ### Welcome Screen: Table of the Day, Table of the Week
 
@@ -32,7 +32,7 @@ A new Challenge comes every Monday, the same for the whole household: five diffe
 
 ### Table Mastery
 
-Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti.
+Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti. Each Collection Tier also unlocks an Avatar Frame, from the Enchanted Forest to the Celestial Legend, to wear around your Avatar: pick it in **Your Stats**, under **Frame**.
 
 ### Achievements
 

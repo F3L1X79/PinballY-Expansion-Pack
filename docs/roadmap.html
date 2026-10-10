@@ -225,7 +225,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 09.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 10.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -233,8 +233,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>Réglages par défaut</strong> (sons CC0 livrés, chemins de son relatifs au pack, Wheel Arc) livrés le 08/10 : reste la vérification sur la borne, comme pour la Daily Streak (ticket #173) et les extras du Player Level (ticket #168)</p>
-      <span class="next">Ensuite : <a href="#profile-rewards">les récompenses de profil</a> (cadres d'Avatar), tickets #176 à #181 publiés, à passer au <code>/implement</code></span>
+      <p><strong>Récompenses de profil</strong> (dix Avatar Frames à débloquer par Collection Tier, liste de choix dans les Profile Stats, Reward Prompt du premier cadre) livrées le 10/10 : reste la vérification sur la borne, comme pour les réglages par défaut, la Daily Streak (ticket #173) et les extras du Player Level (ticket #168)</p>
+      <span class="next">Ensuite : <a href="#steamball-menus">tous les menus en design Steamball</a>, tickets #183 à #188 publiés, à passer au <code>/implement</code></span>
     </div>
   </section>
 
@@ -259,31 +259,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rewards" data-track="profiles" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Récompenses de profil : cadres d'Avatar à débloquer</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
-          </div>
-          <p>La progression change l'apparence du Profile : 10 Avatar Frames à thème, un par Collection Tier. Le joueur choisit le cadre qu'il porte parmi ceux qu'il a débloqués, depuis les Profile Stats.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec : ticket #175, tickets #176 à #181. Flow Matt : <code>/implement</code> par ticket. S'appuie sur l'Avatar, la Collection Mastery et le Player Level (livrés)</div>
-          <details>
-            <summary>Décisions (grill et prototype du 08/10/2026)</summary>
-            <ul>
-              <li>Termes du glossaire : Profile Reward, aujourd'hui le seul Avatar Frame (« cadre »). Tous les Profiles en ont, Guest et Child Profile compris. Les Profile Titles ont été retirés le 09/10 (voir <a href="#profile-titles">en fin de file</a>).</li>
-              <li>Cadres : un par Collection Tier (1 à 10), chacun son thème, dans cet ordre : Sylve enchantée, Vapeur et engrenages, Néon d'arcade, Givre éternel, Épice d'Arrakis, Grimoire arcanique, Station orbitale, Souffle du dragon, Flipper royal, Légende céleste. Plus de couleur de Mastery Level. Ce sont des PNG dessinés d'avance par un script Node du dépôt (sans bibliothèque), en 384 et 192 px avec une copie grisée pour les verrouillés ; chaque image déborde d'un quart de l'Avatar de tous côtés, et chaque endroit doit lui laisser cette place. Prototype : branche <code>prototype/avatar-frames</code> (<code>assets/images/avatar_frames_prototype/</code>, aperçu dans <code>preview.png</code>). L'anneau doré du Profile picker reste la marque de sélection, pas un cadre ; sans cadre porté, chaque endroit garde son aspect actuel.</li>
-              <li>Déblocage recalculé à chaque fois, jamais stocké : seul le choix porté va dans <code>profile.json</code>. Un cadre ne se reverrouille jamais ; une Profile Reset reprend tout.</li>
-              <li>Annonce : une ligne dans le Mastery Toast du palier, sans toast de plus. Rien n'est porté sans le joueur : le premier cadre est suivi d'une Reward Prompt (« Aller l'équiper » ouvre la liste, « Compris » ferme), une seule fois ; ensuite le choix du joueur ne change plus.</li>
-              <li>Cadre visible sur le badge, le Profile picker et la Profile Greeting, le Welcome Screen, les Profile Stats et l'en-tête de l'Achievement List, pas sur l'Unlock Rate ; la pastille du Player Level reste par-dessus.</li>
-              <li>Choix : bouton « Cadre » sur la carte des Profile Stats, une liste dessinée (son Avatar dans chaque cadre), verrouillés en grisé avec leur palier, « Aucun » possible.</li>
-            </ul>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="steamball-menus" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -294,7 +269,7 @@
           </div>
           <p>Les menus que voit le joueur (menu principal, menu Exit, choix de filtres, power off) et ceux qu'ouvrent les Add-ons (invites, Profile Reset) deviennent des Drawn Menus dans la palette Steamball, comme le Welcome Screen, l'Achievement List et les Profile Stats.</p>
           <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec : ticket #182, tickets #183 à #188. Flow Matt : <code>/implement</code> par ticket. Attend le kit de peinture PNG des Avatar Frames (ticket #176)</div>
+          <div class="links">Spec : ticket #182, tickets #183 à #188. Flow Matt : <code>/implement</code> par ticket. S'appuie sur le kit de peinture PNG des Avatar Frames (livré)</div>
           <details>
             <summary>Décisions (grill du 07/10/2026)</summary>
             <ul>
@@ -330,7 +305,7 @@
           </div>
           <p>Consulter les Profile Stats d'un autre Profile que l'actif, puis comparer tous les Profiles de la maison.</p>
           <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec : ticket #189, tickets #190 à #194. Flow Matt : <code>/implement</code> par ticket. Sur l'écran des Profile Stats dessinées (livré), après les tickets #176 à #181</div>
+          <div class="links">Spec : ticket #189, tickets #190 à #194. Flow Matt : <code>/implement</code> par ticket. Sur l'écran des Profile Stats dessinées et les Avatar Frames (livrés)</div>
           <details>
             <summary>Décisions (grill du 09/10/2026)</summary>
             <ul>
@@ -342,7 +317,7 @@
               <li>Un Child Profile voit les Adult Tables (nom, logo) dans les stats des autres : voir n'est pas choisir.</li>
               <li>Pas de records de table : une ligne « records détenus » sera envisagée au grill des Records par Profile.</li>
               <li>Look du tableau : celui des autres écrans dessinés (Profile Stats, Achievement List) : panneau Steamball sur la roue assombrie, halo doré sur la colonne choisie, comme dans les Profile Stats. Ce n'est pas un menu : rien de propre aux Drawn Menus (vitre, contour lumineux).</li>
-              <li>L'Avatar Frame porté se montre dans l'en-tête de colonne : un endroit de plus que la spec Profile Rewards (#175), noté dans la spec des Household Stats, qui attend les tickets #176 à #181.</li>
+              <li>L'Avatar Frame porté se montre dans l'en-tête de colonne : un endroit de plus que la spec Profile Rewards (#175), noté dans la spec des Household Stats (Avatar Frames livrés le 10/10).</li>
             </ul>
           </details>
           <details>
@@ -410,7 +385,7 @@
           </div>
           <p>Des Avatar Frames en plus de ceux des Collection Tiers : un cadre de fête (Noël, Halloween, Nouvel An…) gagné en venant jouer pendant la fête, et un cadre d'année (« 2026 ») gagné en jouant dans l'année, comme les cadres datés des jeux mobiles. Ils rejoignent la liste de choix des Profile Stats.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après <a href="#profile-rewards">les récompenses de profil (n° <span data-ref="profile-rewards"></span>)</a>, dont il reprend les Avatar Frames et la liste de choix ; le cadre d'année touche au <a href="#year-in-pinball">Year in Pinball</a></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les récompenses de profil (livrées), dont il reprend les Avatar Frames et la liste de choix ; le cadre d'année touche au <a href="#year-in-pinball">Year in Pinball</a></div>
           <details>
             <summary>Questions ouvertes (5)</summary>
             <ul>
@@ -603,7 +578,7 @@
             <h3>Titres de profil (mis de côté, pas prévu)</h3>
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">pas prévu</span></div>
           </div>
-          <p>Un titre drôle sous le nom du Profile, un tous les 3 Player Levels jusqu'au 30, choisi depuis les Profile Stats. Retiré des <a href="#profile-rewards">récompenses de profil</a> le 09/10/2026 : ça faisait trop. Gardé ici pour mémoire, sans intention de l'implémenter.</p>
+          <p>Un titre drôle sous le nom du Profile, un tous les 3 Player Levels jusqu'au 30, choisi depuis les Profile Stats. Retiré des récompenses de profil (livrées le 10/10) le 09/10/2026 : ça faisait trop. Gardé ici pour mémoire, sans intention de l'implémenter.</p>
           <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt, si on le reprend : <code>/grill-with-docs</code> (à revoir après les cadres) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
@@ -788,7 +763,6 @@
           <div class="cell">
           </div>
           <div class="cell">
-            <a class="chip tr-profiles" href="#profile-rewards"><b></b>Cadres d'Avatar</a>
             <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
           </div>
 
