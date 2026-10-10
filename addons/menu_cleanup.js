@@ -2,9 +2,10 @@
 // Menu Cleanup (off by default): lightens PinballY's native menus for
 // every Profile, Admin Profiles included. Listens to "menuopen" and
 // removes Help and About from the Exit menu, and Information, Flyer, High
-// Scores and Instruction Card from the main menu, leaving no doubled,
-// leading or trailing separator. PinballY's dedicated buttons still open
-// those screens.
+// Scores, Instruction Card and the filter submenus by system, last played
+// and date added from the main menu, leaving no doubled, leading or
+// trailing separator. PinballY's dedicated buttons still open those
+// screens.
 // ============================================================
 
 import { safeHandler } from "../common/safe_handler.js";
@@ -14,7 +15,7 @@ const SCRIPT_NAME = "MenuCleanup";
 // PinballY's built-in commands removed from each menu, by menu id.
 const REMOVED_COMMANDS = {
     exit: ["Help", "AboutBox"],
-    main: ["GameInfo", "Flyer", "HighScores", "Instructions"],
+    main: ["GameInfo", "Flyer", "HighScores", "Instructions", "FilterBySystem", "FilterByRecency", "FilterByAdded"],
 };
 
 // Looser than PinballY's tidyMenu(), which needs title === "": the main

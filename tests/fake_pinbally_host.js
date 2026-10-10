@@ -37,6 +37,8 @@ const BUILT_IN_COMMANDS = {
     PlayGame: 1, ShowGameSetupMenu: 2, RateGame: 3, MenuReturn: 4, MenuPageUp: 5, MenuPageDown: 6, Quit: 7,
     ShowMainMenu: 8, ShowOperatorMenu: 9, PowerOff: 10, GameInfo: 11, Flyer: 12, HighScores: 13,
     Instructions: 14, AddFavorite: 15, Help: 16, AboutBox: 17,
+    FilterByEra: 18, FilterByManufacturer: 19, FilterBySystem: 20, FilterByCategory: 21, FilterByRating: 22,
+    FilterByRecency: 23, FilterByAdded: 24,
 };
 // The [Top] filters' commands in the native main menu (any ids below the custom ones).
 const ALL_TABLES_FILTER_CMD = 900;

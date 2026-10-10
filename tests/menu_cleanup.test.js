@@ -2,7 +2,8 @@
 // Menu Cleanup, started through main.js on the fake PinballY globals: off
 // by default, PinballY's native menus keep Help, About and the information
 // entries; turned on, they are gone for every Profile, Admin Profiles
-// included, Rate Table and Add to Favorites stay, the Operator Menu rules
+// included, as are the filter submenus by system, last played and date
+// added; Rate Table and Add to Favorites stay, the Operator Menu rules
 // are unchanged, and no doubled, leading or trailing separator is left.
 // ============================================================
 
@@ -84,5 +85,23 @@ test("no doubled, leading or trailing separator is left, titled or not", async (
         { title: "About PinballY", cmd: AboutBox },
     ]);
     assert.deepEqual(fake.currentMenu().items.map(item => item.title), ["Exit PinballY"]);
+    fake.closeMenu();
+});
+
+test("the filter submenus by system, last played and date added are gone, the others stay", () => {
+    const { PlayGame, FilterByEra, FilterByManufacturer, FilterBySystem, FilterByCategory, FilterByRating, FilterByRecency, FilterByAdded } = globalThis.command;
+    fake.openMenu("main", [
+        { title: "Play", cmd: PlayGame },
+        { title: "", cmd: -1 },
+        { title: "Filter by Era", cmd: FilterByEra, hasSubmenu: true },
+        { title: "Filter by Manufacturer", cmd: FilterByManufacturer, hasSubmenu: true },
+        { title: "Filter by System", cmd: FilterBySystem, hasSubmenu: true },
+        { title: "Filter by Category", cmd: FilterByCategory, hasSubmenu: true },
+        { title: "Filter by Rating", cmd: FilterByRating, hasSubmenu: true },
+        { title: "Filter by Last Played", cmd: FilterByRecency, hasSubmenu: true },
+        { title: "Filter by Date Added", cmd: FilterByAdded, hasSubmenu: true },
+    ]);
+    const titles = fake.currentMenu().items.map(item => item.title);
+    assert.deepEqual(titles.slice(-4), ["Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating"]);
     fake.closeMenu();
 });
