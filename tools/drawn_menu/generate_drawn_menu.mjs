@@ -47,6 +47,9 @@ const CORNER = 28;
 const CORNER_THICKNESS = 3;
 // The corners stand out of the face's gold line by this much.
 const CORNER_OUTSET = 1;
+// The halo around the light on the face's top edge, as the prototype's
+// 10 px shadow: above the gold line as much as below it.
+const EDGE_HALO_RADIUS = 10;
 // From the face's gold frame to the first entry, in the sheet only.
 const SHEET_LIST_TOP = 54;
 
@@ -82,7 +85,7 @@ function panelPixel(x, y, bottom) {
     // The face's thin gold frame, half see-through.
     const onFrame = (xEdge === face && yEdge >= face) || (yEdge === face && xEdge >= face);
     if (onFrame) color = mixRGB(color, GOLD, 0.5);
-    if (!bottom && xEdge > face && y >= face - 1) color = addGlow(color, x, y);
+    if (!bottom && xEdge > face && y >= face - EDGE_HALO_RADIUS) color = addGlow(color, x, y);
     return [...color, 1];
 }
 
@@ -95,17 +98,18 @@ function addGlow(color, x, y) {
     const dx = (x - WIDTH / 2) / (0.6 * faceWidth);
     const dy = (y - face) / GLOW_HEIGHT;
     const r = Math.hypot(dx, dy);
-    const glow = r < 0.45 ? mix(0.095, 0.03, r / 0.45) : r < 0.78 ? mix(0.03, 0, (r - 0.45) / 0.33) : 0;
+    // The glow falls from the gold line down, never above it.
+    const glow = y < face - 1 ? 0 : r < 0.45 ? mix(0.095, 0.03, r / 0.45) : r < 0.78 ? mix(0.03, 0, (r - 0.45) / 0.33) : 0;
     let out = mixRGB(color, GOLD, glow);
     // A 2 px light on the frame's top (its gold line and the row below),
     // from 14 % to 86 % of the face, brightest in the middle, in a 10 px
-    // halo that also fades past its ends.
+    // halo on both sides of it that also fades past its ends.
     const start = face + 0.14 * faceWidth;
     const end = face + 0.86 * faceWidth;
     const across = y < face ? face - y : Math.max(0, y - face - 1);
     const beyond = Math.max(0, start - x, x - end);
     const distance = Math.hypot(across, beyond);
-    if (distance < 10) out = mixRGB(out, EDGE_HALO, 0.25 * (1 - distance / 10) ** 2);
+    if (distance < EDGE_HALO_RADIUS) out = mixRGB(out, EDGE_HALO, 0.25 * (1 - distance / EDGE_HALO_RADIUS) ** 2);
     if (distance === 0) out = mixRGB(out, EDGE_LIGHT, 0.7 * (1 - Math.abs((x - face) / faceWidth - 0.5) / 0.36));
     return out;
 }
