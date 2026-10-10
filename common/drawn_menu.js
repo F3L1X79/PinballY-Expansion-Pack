@@ -17,7 +17,9 @@
 // NextPage / PrevPage move by a page; Select or Launch plays the Select
 // sound, closes the menu (unless the entry stays open) and runs the
 // entry's command through runCommand, as a native menu would, then
-// reports the close; Exit plays the Deselect sound and closes it. Attract
+// reports the close; Exit plays the Deselect sound and closes it. A menu
+// drawn with onBack (a submenu) goes back instead, on Exit and on its
+// MenuReturn entry. Attract
 // mode closes it too, and so does a menu shown in its place. isOpen() and
 // onClosed() let what waits for a free wheel wait for it.
 // The button sounds are loaded and the painted images (panel, glass,
@@ -125,6 +127,7 @@ export function createNativeMenus(host) {
 export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativeMenus(host) }) {
     const imagesFolder = `${host.getProjectFolder()}\\${DRAWN_MENU_IMAGES_FOLDER}`;
     const pagingCommands = [host.getBuiltInCommand("MenuPageUp"), host.getBuiltInCommand("MenuPageDown")];
+    const menuReturnCommand = host.getBuiltInCommand("MenuReturn");
     const sounds = {
         move: createNavigationSound(host, SCRIPT_NAME),
         // One player each: choosing or Exit closes the menu.
@@ -395,7 +398,10 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
 
     // Draws the menu; false, with the error logged and nothing left
     // drawn, when it cannot, or when it has no entry to choose.
-    function draw(id, items, { dialogStyle = false, onClose = null } = {}) {
+    // onBack: what Exit and a MenuReturn entry run instead of only closing
+    // (a submenu going back to its menu); selectedCmd: the entry the cursor
+    // opens on, over the one PinballY marks.
+    function draw(id, items, { dialogStyle = false, onClose = null, onBack = null, selectedCmd = null } = {}) {
         const startMs = host.now().getTime();
         // The same menu shown again over itself (PinballY refreshing it after
         // a stayOpen entry, as when ticking a category): no fade, and the
@@ -407,7 +413,10 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             if (!model) return false;
             const kept = model.entries.find(index => model.rows[index].cmd === refreshedCmd);
             if (kept !== undefined && !model.entries.some(index => model.rows[index].selected)) model.selected = kept;
+            const chosen = model.entries.find(index => model.rows[index].cmd === selectedCmd);
+            if (selectedCmd !== null && chosen !== undefined) model.selected = chosen;
             const timings = open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})), { fadeIn: refreshedCmd === null });
+            shown.onBack = onBack;
             const parts = Object.entries(timings).map(([name, ms]) => `${name} ${ms}`).join(", ");
             host.log(`[${SCRIPT_NAME}] "${id}" opened in ${host.now().getTime() - startMs} ms (${model.entries.length} entries; ${parts}).`);
             return true;
@@ -478,12 +487,28 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         selectEntry(Math.max(0, Math.min(model.entries.length - 1, currentPosition() + direction * step)), false);
     }
 
+    // Closes the menu for the one it goes back to; the close is reported
+    // after, as for a command.
+    function goBack() {
+        const { onBack } = shown;
+        const onClose = takeDown();
+        try {
+            onBack();
+        } finally {
+            reportClosed(onClose);
+        }
+    }
+
     // The close is reported after the command, as PinballY's "menuclose"
     // follows its "command"; even when the command fails, for a wheel
     // dialog's queue not to stay held.
     function choose() {
         const row = shown.model.rows[shown.model.selected];
         sounds.select.play();
+        if (shown.onBack && row.cmd === menuReturnCommand) {
+            goBack();
+            return;
+        }
         const onClose = row.stayOpen ? null : takeDown();
         try {
             host.runCommand(row.cmd);
@@ -505,7 +530,8 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         else if (ev.command === "Select" || ev.command === "Launch") choose();
         else if (ev.command === "Exit") {
             sounds.deselect.play();
-            close();
+            if (shown.onBack) goBack();
+            else close();
         }
     }));
 

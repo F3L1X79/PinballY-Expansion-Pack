@@ -6,7 +6,9 @@
 // it draws, it hands over a copy of them and cancels the native menu only
 // once drawing succeeded (preventDefault() and menuUpdated back to false),
 // so the native menu shows on any error. Any
-// other menu stays native, and replaces an open Drawn Menu.
+// other menu stays native, and replaces an open Drawn Menu. Exit or a
+// Cancel entry in a filter submenu goes back to the main menu, the cursor
+// on the entry that opened it.
 // ============================================================
 
 import { safeHandler } from "../common/safe_handler.js";
@@ -23,6 +25,16 @@ const DRAWN_MENU_IDS = ["main", "exit", "power off", "game setup", "game categor
 
 export default function init() {
     const drawnMenus = getDrawnMenus();
+    const showMainMenu = command.ShowMainMenu;
+    // The last command run, as the one that opened a filter submenu; and
+    // the main menu's entry to put the cursor on when going back to it.
+    let lastCommand = null;
+    let mainMenuSelectedCmd = null;
+
+    // Fires on every command, a menu's entries' included.
+    mainWindow.on("command", safeHandler(SCRIPT_NAME, ev => {
+        lastCommand = ev.id;
+    }));
 
     // Fires when any menu opens, after every other Add-on edited its entries.
     mainWindow.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
@@ -34,7 +46,18 @@ export default function init() {
             return;
         }
         const options = ev.options || {};
-        if (!drawnMenus.draw(ev.id, [...ev.items], { dialogStyle: Boolean(options.dialogStyle) })) return;
+        const drawOptions = { dialogStyle: Boolean(options.dialogStyle) };
+        if (FILTER_MENU_IDS.includes(ev.id)) {
+            const parentCmd = lastCommand;
+            drawOptions.onBack = () => {
+                mainMenuSelectedCmd = parentCmd;
+                mainWindow.doCommand(showMainMenu);
+            };
+        } else if (ev.id === "main") {
+            drawOptions.selectedCmd = mainMenuSelectedCmd;
+            mainMenuSelectedCmd = null;
+        }
+        if (!drawnMenus.draw(ev.id, [...ev.items], drawOptions)) return;
         ev.preventDefault();
         // PinballY shows a menu marked updated even when "menuopen" is
         // cancelled (FireMenuEvent checks menuUpdated first), and the other

@@ -6,8 +6,9 @@
 // category redraws it in place, the cursor kept); the operator and pause
 // menus stay native, and a native menu opening replaces a Drawn
 // one. A command that opens another menu (a
-// filter submenu, its "Back" entry) gets it drawn in its place; Exit
-// closes a filter submenu without running anything; the active filter
+// filter submenu, its "Back" entry) gets it drawn in its place; Exit or
+// a Cancel entry in a filter submenu goes back to the main menu, the
+// cursor on that filter; the active filter
 // carries its gold mark; a list too long for the window scrolls with the
 // selection and pages with NextPage / PrevPage.
 // ============================================================
@@ -67,6 +68,7 @@ test("setup", async () => {
     // What PinballY does itself on these commands.
     fake.setNativeCommand(ERA_SUBMENU_CMD, () => fake.openMenu(FILTER_BY_ERA, eraMenu()));
     fake.setNativeCommand(ERA_BACK_CMD, () => fake.openMenu("main", mainMenuWithFilters()));
+    fake.setNativeCommand(COMMAND.ShowMainMenu, () => fake.openMenu("main", mainMenuWithFilters()));
     fake.setNativeCommand(ERA_1970S_CMD, () => { appliedFilter = "1970s"; });
     fake.setNativeCommand(ERA_1980S_CMD, () => { appliedFilter = "1980s"; });
     fake.setNativeCommand(COMMAND.PowerOff, () => fake.openMenu("power off", [
@@ -152,14 +154,32 @@ test("the submenu's Back entry goes back to the main menu, drawn", () => {
     press(fake, "Exit");
 });
 
-test("Exit closes a filter submenu without running anything", () => {
-    openMenu(fake, FILTER_BY_ERA, eraMenu());
+test("Exit in a filter submenu goes back to the main menu, the cursor on that filter", () => {
+    openMenu(fake, "main", mainMenuWithFilters());
+    chooseEntry(fake, "Filter by Era");
     const commandsBefore = fake.executedCommands().length;
     press(fake, "Exit");
+    fake.advanceTime(OPEN_OVER_MS);
 
-    assert.ok(!isDrawnMenuShown(fake));
     assert.equal(fake.currentMenu(), null);
-    assert.equal(fake.executedCommands().length, commandsBefore);
+    assert.equal(drawnMenuLines(fake)[0], "Play");
+    assert.equal(highlightedEntry(fake), "Filter by Era");
+    assert.deepEqual(fake.executedCommands().slice(commandsBefore), [COMMAND.ShowMainMenu], "no filter applied");
+    press(fake, "Exit");
+    assert.ok(!isDrawnMenuShown(fake), "Exit in the main menu closes it");
+});
+
+test("a filter submenu's Cancel entry goes back to the main menu too", () => {
+    openMenu(fake, "main", mainMenuWithFilters());
+    chooseEntry(fake, "Filter by Era");
+    fake.openMenu(FILTER_BY_ERA, [...eraMenu().slice(0, 3), { title: "Cancel", cmd: COMMAND.MenuReturn }]);
+    fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Cancel");
+    fake.advanceTime(OPEN_OVER_MS);
+
+    assert.equal(fake.currentMenu(), null);
+    assert.equal(highlightedEntry(fake), "Filter by Era");
+    press(fake, "Exit");
 });
 
 test("every filter menu is drawn", () => {
@@ -169,6 +189,8 @@ test("every filter menu is drawn", () => {
         assert.equal(fake.currentMenu(), null, id);
         press(fake, "Exit");
     }
+    // Back in the main menu.
+    press(fake, "Exit");
 });
 
 test("a long filter list scrolls with the selection and pages with NextPage / PrevPage", () => {
@@ -195,6 +217,7 @@ test("a long filter list scrolls with the selection and pages with NextPage / Pr
     for (let count = 0; count < 5; count++) press(fake, "NextPage");
     assert.equal(highlightedEntry(fake), MANUFACTURERS.at(-1), "NextPage stops at the last entry");
     assert.ok(shownTitles().includes(MANUFACTURERS.at(-1)));
+    press(fake, "Exit");
     press(fake, "Exit");
 });
 
