@@ -53,6 +53,8 @@ export async function runDialogPriorityScenario(initOrder) {
     fake.installGlobals();
     config.language = "en";
     config.askToRateAfterMinutesPlayed = 60;
+    // The rating prompt is read as a native dialog.
+    config.addOns.drawnMenus = false;
 
     const { default: lang } = await import("../common/i18n.js");
     // All imported first, then started in one go, as main.js does: no tick

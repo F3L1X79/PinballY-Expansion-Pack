@@ -628,7 +628,8 @@ export default function init() {
 
     // Fires on every mapped button press; drives the carousel while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        if (!profiles) return;
+        // A press already handled may be the one that opened it, from a Drawn Menu.
+        if (!profiles || ev.defaultPrevented) return;
         // Swallowed first, so a failing switch still never reaches the wheel.
         ev.preventDefault();
         if (ev.command === "Next" || ev.command === "Prev") {

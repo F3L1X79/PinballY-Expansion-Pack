@@ -22,7 +22,8 @@ const textsLayer = fake => shownLayers(fake, DRAWN_MENU_Z_INDEX.texts).find(laye
 
 export const isDrawnMenuShown = fake => textsLayer(fake) !== null;
 
-// The message above the list (null when none) and the rows from top to
+// The message above the list (null when none; its wrapped lines joined
+// as drawn, without the spaces between them) and the rows from top to
 // bottom: { kind: "entry", title, mark } (mark: "check", "radio",
 // "submenu" or null), { kind: "heading", title } or { kind: "separator" }.
 export function readDrawnMenu(fake) {
@@ -33,6 +34,8 @@ export function readDrawnMenu(fake) {
     let inSeparator = false;
     for (const stroke of layer.strokes()) {
         if ("fill" in stroke) {
+            // The gold line under a dialog's message is not a row.
+            if (message !== null && rows.length === 0) continue;
             if (!inSeparator) rows.push({ kind: "separator" });
             inSeparator = true;
             continue;
@@ -46,6 +49,9 @@ export function readDrawnMenu(fake) {
     }
     return { message, rows };
 }
+
+// A message as readDrawnMenu gives it, to compare with its full text.
+export const squeezed = text => text.replace(/\s+/g, "");
 
 // The entries' titles and the separators ("---"), the headings in brackets.
 export const drawnMenuLines = fake => readDrawnMenu(fake).rows.map(row => {

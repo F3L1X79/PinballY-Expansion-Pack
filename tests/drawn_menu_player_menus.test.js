@@ -101,9 +101,9 @@ test("Reset profile in the Exit menu opens the Profile Reset list", () => {
     openExitMenu(fake);
     chooseEntry(fake, lang.profileReset.menuEntry);
 
-    assert.ok(!isDrawnMenuShown(fake));
-    assert.ok(fake.currentMenu().items.some(item => item.title === "Alice"), "the Profile Reset list shows");
-    fake.closeMenu();
+    assert.equal(fake.currentMenu(), null);
+    assert.ok(drawnMenuLines(fake).includes("Alice"), "the Profile Reset list is drawn in its place");
+    press(fake, "Exit");
 });
 
 test("Shut Down in the Exit menu draws the power off menu in its place", () => {

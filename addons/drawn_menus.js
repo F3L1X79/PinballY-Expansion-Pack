@@ -28,6 +28,6 @@ export default function init() {
         drawnMenus.close();
         if (!DRAWN_MENU_IDS.includes(ev.id)) return;
         const options = ev.options || {};
-        if (drawnMenus.show(ev.id, [...ev.items], { dialogStyle: Boolean(options.dialogStyle) })) ev.preventDefault();
+        if (drawnMenus.draw(ev.id, [...ev.items], { dialogStyle: Boolean(options.dialogStyle) })) ev.preventDefault();
     }));
 }

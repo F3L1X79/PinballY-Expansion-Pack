@@ -3,18 +3,20 @@
 // message, buttons with optional actions, priority) and it shows them one
 // at a time, only when the wheel is free, highest priority first, so the
 // add-on order in main.js never decides which dialog comes first. It owns
-// the dialog layout, the button commands and their dispatch, and advances
-// the queue on "menuclose", whether the dialog was acknowledged or
-// dismissed; tells whether any dialog is on screen or waiting. A drawn
-// dialog (see docs/adr/0011) draws itself when its turn comes and holds the
-// queue until it reports closed; listeners hear it close, so toasts can
+// the dialog layout, the button commands and their dispatch, shows the
+// dialog through the Drawn Menu module (a Drawn Menu, or PinballY's native
+// one), and advances the queue when it reports the dialog closed, whether
+// acknowledged or dismissed; tells whether any dialog is on screen or
+// waiting. A drawn dialog (see docs/adr/0011) draws itself when its turn
+// comes and holds the queue until it reports closed; listeners hear it close, so toasts can
 // wait for it from its submission on. A dialog not ready yet holds its
 // place, and every dialog after it, until it is; a stale one is dropped
-// unshown. Listens to "command", "menuclose" and "wheelmode".
+// unshown. Listens to "command" and "wheelmode".
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";
 import { createPinballYHost } from "./pinbally_host.js";
+import { createNativeMenus, getDrawnMenus } from "./drawn_menu.js";
 
 const SCRIPT_NAME = "WheelDialog";
 
@@ -25,7 +27,8 @@ export const DIALOG_PRIORITY = Object.freeze({
     RATING_PROMPT: 2,
 });
 
-export function createWheelDialogs(host) {
+// menus: what shows a native-style dialog (common/drawn_menu.js).
+export function createWheelDialogs(host, menus = createNativeMenus(host)) {
     // Waiting dialogs, sorted by priority, then submission order.
     const queue = [];
     // Dialog on screen, with the command of each of its buttons.
@@ -64,16 +67,23 @@ export function createWheelDialogs(host) {
             return;
         }
         const buttons = dialog.buttons.map((button, index) => ({ ...button, cmd: getButtonCommand(index) }));
-        shown = { dialog, buttons };
+        const current = { dialog, buttons };
+        shown = current;
+        // The button and Exit both close the dialog.
+        const onClose = () => {
+            if (shown !== current) return;
+            shown = null;
+            scheduleShowNext();
+        };
 
-        host.showMenu(
+        menus.show(
             dialog.id,
             [
                 { title: dialog.message, cmd: -1 },
                 { cmd: -1 },
                 ...buttons.map(({ label, cmd }) => ({ title: label, cmd })),
             ],
-            { dialogStyle: true }
+            { dialogStyle: true, onClose }
         );
         if (dialog.onShown) dialog.onShown();
     }
@@ -118,20 +128,13 @@ export function createWheelDialogs(host) {
         scheduleShowNext();
     }
 
-    // Fires on every command. PinballY closes the menu after the command,
-    // so the queue advances on "menuclose", not here. Async because an
+    // Fires on every command. The menu reports its close after the
+    // command, so the queue advances there, not here. Async because an
     // action may animate the wheel, so its rejections are logged too.
     host.on("command", safeHandler(SCRIPT_NAME, async ev => {
         if (!shown || shown.drawn) return;
         const button = shown.buttons.find(item => item.cmd === ev.id);
         if (button && button.action) await button.action();
-    }));
-
-    // Fires after any menu closes; the button and Escape both close the dialog.
-    host.on("menuclose", safeHandler(SCRIPT_NAME, ev => {
-        if (!shown || shown.drawn || ev.id !== shown.dialog.id) return;
-        shown = null;
-        scheduleShowNext();
     }));
 
     // Fires on every return to the wheel (from a game, a menu or a popup).
@@ -158,6 +161,6 @@ let sharedWheelDialogs = null;
 
 // One queue for every add-on, so their dialogs never replace each other.
 export function getWheelDialogs() {
-    if (!sharedWheelDialogs) sharedWheelDialogs = createWheelDialogs(createPinballYHost());
+    if (!sharedWheelDialogs) sharedWheelDialogs = createWheelDialogs(createPinballYHost(), getDrawnMenus());
     return sharedWheelDialogs;
 }

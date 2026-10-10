@@ -3,20 +3,23 @@
 // Profile, ending with "Every Profile" when there are two or more, then one
 // confirmation, cursor on "No"; "Yes" resets them, a failure not stopping the
 // others, and a one-line message with "OK" tells the outcome (causes go to the
-// log only). The player asked for them, so they open directly, not through
-// the wheel dialog module. Listens to "command".
+// log only). The player asked for them, so they open directly through the
+// Drawn Menu module, not through the wheel dialog module. Listens to
+// "command".
 // ============================================================
 
 import lang from "./i18n.js";
 import { displayNameOf } from "./profile_name.js";
 import { logHandlerError, safeHandler } from "./safe_handler.js";
+import { createNativeMenus } from "./drawn_menu.js";
 
 const SCRIPT_NAME = "ProfileReset";
 const LIST_MENU_ID = "profileResetList";
 const CONFIRM_MENU_ID = "profileResetConfirm";
 const OUTCOME_MENU_ID = "profileResetOutcome";
 
-export function createProfileResetMenu(host, profileStore) {
+// menus: what shows the menus (common/drawn_menu.js).
+export function createProfileResetMenu(host, profileStore, menus = createNativeMenus(host)) {
     const { profileReset: TEXT } = lang;
     const yesCommand = host.allocateCommand("profileResetYes");
     const everyProfileCommand = host.allocateCommand("profileResetEveryProfile");
@@ -40,7 +43,7 @@ export function createProfileResetMenu(host, profileStore) {
 
     function open() {
         listedProfiles = profileStore.listProfiles();
-        host.showMenu(LIST_MENU_ID, [
+        menus.show(LIST_MENU_ID, [
             { title: TEXT.listTitle, cmd: -1 },
             { cmd: -1 },
             ...listedProfiles.map((profile, index) => ({ title: displayNameOf(profile), cmd: getProfileCommand(index) })),
@@ -53,7 +56,7 @@ export function createProfileResetMenu(host, profileStore) {
     function confirm(profiles) {
         profilesToReset = profiles;
         const question = profiles.length === 1 ? TEXT.confirm(displayNameOf(profiles[0])) : TEXT.confirmEvery(profiles.length);
-        host.showMenu(CONFIRM_MENU_ID, [
+        menus.show(CONFIRM_MENU_ID, [
             { title: question, cmd: -1 },
             { cmd: -1 },
             { title: TEXT.yes, cmd: yesCommand },
@@ -81,7 +84,7 @@ export function createProfileResetMenu(host, profileStore) {
         } else {
             message = failedNames.length > 0 ? TEXT.everyFailed(resetCount, failedNames) : TEXT.everyDone(resetCount);
         }
-        host.showMenu(OUTCOME_MENU_ID, [
+        menus.show(OUTCOME_MENU_ID, [
             { title: message, cmd: -1 },
             { cmd: -1 },
             { title: TEXT.ok, cmd: cancelCommand, selected: true },

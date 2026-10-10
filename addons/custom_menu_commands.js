@@ -17,6 +17,7 @@ import { getRandomGame } from "../common/random_game.js";
 import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
 import { createProfileResetMenu } from "../common/profile_reset_menu.js";
+import { getDrawnMenus } from "../common/drawn_menu.js";
 import { createPinballYHost } from "../common/pinbally_host.js";
 import lang from "../common/i18n.js";
 
@@ -47,7 +48,7 @@ export default function init() {
     const mainMenu = getMainMenu();
     for (const entry of MENU_COMMANDS) mainMenu.add(entry);
 
-    const profileResetMenu = createProfileResetMenu(createPinballYHost(), profileStore);
+    const profileResetMenu = createProfileResetMenu(createPinballYHost(), profileStore, getDrawnMenus());
     const resetProfileCommand = command.allocate("resetProfile");
 
     // Fires when any menu opens, with a fresh item list each time: in the

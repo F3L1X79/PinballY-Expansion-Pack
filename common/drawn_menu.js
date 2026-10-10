@@ -5,16 +5,20 @@
 // a titled static item into a heading the cursor skips, collapses the
 // separators and draws one centred list in a panel over a dimmed wheel,
 // with a glass over it, the cursor on the item marked "selected" (else
-// the first entry). It returns false, logging the error, when the menu
-// cannot be drawn, so the caller shows the native one instead.
+// the first entry); a dialog's message shows above the list. When the
+// Drawn Menus Add-on is off, or the menu cannot be drawn (logged), it
+// shows PinballY's native menu instead, and reports its "menuclose"
+// through the same onClose. draw(), for the Drawn Menus Add-on, returns
+// false instead of showing the native menu.
 // While it is open, every button is swallowed through
 // "commandbuttondown": Next / Prev move the selection, wrapping, with
 // PinballY's navigation sound, the gold text landing at once on the new
 // entry while the gold outline glides to it;
 // NextPage / PrevPage move by a page; Select or Launch plays the Select
 // sound, closes the menu (unless the entry stays open) and runs the
-// entry's command through doCommand, as a native menu would; Exit plays
-// the Deselect sound and closes it. Attract mode closes it too.
+// entry's command through doCommand, as a native menu would, then
+// reports the close; Exit plays the Deselect sound and closes it. Attract
+// mode closes it too, and so does a menu shown in its place.
 // The button sounds are loaded and the painted images (panel, glass,
 // selection outline) drawn on layers ahead through the shared drawing
 // ahead; the images are drawn again when the window size changes, only
@@ -26,6 +30,7 @@
 
 import { safeHandler } from "./safe_handler.js";
 import { createPinballYHost } from "./pinbally_host.js";
+import config from "./config.js";
 import { getDrawingAhead } from "./drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "./navigation_sound.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER } from "./drawn_menu_images.js";
@@ -90,8 +95,30 @@ export function buildMenuModel(items, { dialogStyle = false, pagingCommands = []
     return { message, rows, entries, selected: selected === undefined ? entries[0] : selected };
 }
 
-// drawingAhead: the shared drawing ahead (common/drawing_ahead.js).
-export function createDrawnMenus(host, { drawingAhead }) {
+// PinballY's own menus, behind the same show() as the Drawn Menus: each
+// onClose runs on the "menuclose" of its menu's id.
+export function createNativeMenus(host) {
+    const waitingCloses = [];
+
+    function show(id, items, { dialogStyle = false, onClose = null } = {}) {
+        host.showMenu(id, items, dialogStyle ? { dialogStyle: true } : {});
+        if (onClose) waitingCloses.push({ id, onClose });
+    }
+
+    // Fires after any menu closes, chosen, dismissed or replaced.
+    host.on("menuclose", safeHandler(SCRIPT_NAME, ev => {
+        const index = waitingCloses.findIndex(waiting => waiting.id === ev.id);
+        if (index === -1) return;
+        const [{ onClose }] = waitingCloses.splice(index, 1);
+        onClose();
+    }));
+
+    return { show };
+}
+
+// drawingAhead: the shared drawing ahead (common/drawing_ahead.js);
+// nativeMenus: what shows a menu that cannot be drawn.
+export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativeMenus(host) }) {
     const imagesFolder = `${host.getProjectFolder()}\\${DRAWN_MENU_IMAGES_FOLDER}`;
     const pagingCommands = [host.getBuiltInCommand("MenuPageUp"), host.getBuiltInCommand("MenuPageDown")];
     const sounds = {
@@ -287,7 +314,7 @@ export function createDrawnMenus(host, { drawingAhead }) {
     }
 
     // Returns how long each part took, in ms, for the log.
-    function open(id, model) {
+    function open(id, model, onClose) {
         const timings = {};
         let partStartMs = host.now().getTime();
         const lap = name => {
@@ -303,7 +330,7 @@ export function createDrawnMenus(host, { drawingAhead }) {
         // sees it, so the images drawn for the old size are drawn again here.
         for (const record of images) if (record.signature !== windowSignature()) drawImage(record);
         lap("images");
-        shown = { id, model, geometry: null, scroll: 0, layers: [], fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
+        shown = { id, model, onClose, geometry: null, scroll: 0, layers: [], fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
         shown.geometry = computeGeometry(windowSize, model, messageHeightAt);
         const { geometry } = shown;
         scrollToSelected();
@@ -327,30 +354,42 @@ export function createDrawnMenus(host, { drawingAhead }) {
         return timings;
     }
 
+    // Hides the menu without reporting its close; returns its onClose.
     // Also clears what a failed drawing left.
-    function close() {
+    function takeDown() {
+        const onClose = shown ? shown.onClose : null;
         stopTimers();
         shown = null;
         for (const layer of allLayers) hide(layer);
+        return onClose;
+    }
+
+    function close() {
+        const onClose = takeDown();
+        if (onClose) onClose();
     }
 
     // Draws the menu; false, with the error logged and nothing left
     // drawn, when it cannot, or when it has no entry to choose.
-    function show(id, items, { dialogStyle = false } = {}) {
+    function draw(id, items, { dialogStyle = false, onClose = null } = {}) {
         const startMs = host.now().getTime();
         close();
         try {
             const model = buildMenuModel(items, { dialogStyle, pagingCommands });
             if (!model) return false;
-            const timings = open(id, model);
+            const timings = open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})));
             const parts = Object.entries(timings).map(([name, ms]) => `${name} ${ms}`).join(", ");
             host.log(`[${SCRIPT_NAME}] "${id}" opened in ${host.now().getTime() - startMs} ms (${model.entries.length} entries; ${parts}).`);
             return true;
         } catch (error) {
-            close();
+            takeDown();
             host.log(`[${SCRIPT_NAME}] ERROR drawing the "${id}" menu, the native one shows instead: ${error.stack || error.message}`);
             return false;
         }
+    }
+
+    function show(id, items, options = {}) {
+        if (!draw(id, items, options)) nativeMenus.show(id, items, options);
     }
 
     // Runs every frame while the selection glides to its entry.
@@ -409,16 +448,24 @@ export function createDrawnMenus(host, { drawingAhead }) {
         selectEntry(Math.max(0, Math.min(model.entries.length - 1, currentPosition() + direction * step)), false);
     }
 
+    // The close is reported after the command, as PinballY's "menuclose"
+    // follows its "command"; even when the command fails, for a wheel
+    // dialog's queue not to stay held.
     function choose() {
         const row = shown.model.rows[shown.model.selected];
         sounds.select.play();
-        if (!row.stayOpen) close();
-        host.doCommand(row.cmd);
+        const onClose = row.stayOpen ? null : takeDown();
+        try {
+            host.doCommand(row.cmd);
+        } finally {
+            if (onClose) onClose();
+        }
     }
 
     // Fires on every mapped button press; drives the menu while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        if (!shown) return;
+        // A press already handled may be the one that opened it.
+        if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
         if (ev.command === "Next") move(1);
@@ -435,13 +482,19 @@ export function createDrawnMenus(host, { drawingAhead }) {
     // Fires when the cabinet sits idle: the menu closes without choosing.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
 
-    return { show, close, isOpen: () => shown !== null };
+    return { show, draw, close, isOpen: () => shown !== null };
 }
 
 let sharedDrawnMenus = null;
 
-// One for the whole pack, so a single menu shows at a time.
+// One for the whole pack, so a single menu shows at a time; PinballY's
+// own menus, with nothing drawn ahead, when the Drawn Menus Add-on is off.
 export function getDrawnMenus() {
-    if (!sharedDrawnMenus) sharedDrawnMenus = createDrawnMenus(createPinballYHost(), { drawingAhead: getDrawingAhead() });
+    if (!sharedDrawnMenus) {
+        const host = createPinballYHost();
+        sharedDrawnMenus = config.addOns.drawnMenus === false
+            ? createNativeMenus(host)
+            : createDrawnMenus(host, { drawingAhead: getDrawingAhead() });
+    }
     return sharedDrawnMenus;
 }
