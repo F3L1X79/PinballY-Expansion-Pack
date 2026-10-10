@@ -131,7 +131,7 @@ export default {
         randomGame: "Start Random Game",
         tableOfTheDay: "Launch Table of the Day",
         tableOfTheWeek: "Launch Table of the Week",
-        tableSetup: "Table Setup",
+        tableSetup: "Set Up Table",
     },
 
     // Thresholded titles are keyed by their threshold, which is part of the

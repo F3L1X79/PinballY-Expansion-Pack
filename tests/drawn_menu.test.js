@@ -49,7 +49,7 @@ test("the main menu is drawn instead of the native one, with the same entries in
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.ok(isDrawnMenuShown(fake));
     assert.deepEqual(drawnMenuLines(fake), [
-        "Play", LABELS.tableSetup, LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, "---",
+        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, "---", LABELS.tableSetup, "---",
         "Information", "Flyer", "High Scores", "Instruction Card", "---",
         "Rate Table", "Add to Favorites", "---",
         "All Tables", "Favorite Tables",

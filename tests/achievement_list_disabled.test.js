@@ -25,10 +25,11 @@ test("no Achievement List or Profile Stats entry when the achievements Add-on is
     fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     assert.deepEqual(fake.currentMenu().items.map(item => item.title), [
         "Play",
-        MENU_LABELS.tableSetup,
         MENU_LABELS.tableOfTheDay,
         MENU_LABELS.tableOfTheWeek,
         MENU_LABELS.randomGame,
+        undefined,
+        MENU_LABELS.tableSetup,
     ]);
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

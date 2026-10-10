@@ -2,8 +2,9 @@
 // Menu Cleanup, started through main.js on the fake PinballY globals: off
 // by default, PinballY's native menus keep Help, About and the information
 // entries; turned on, they are gone for every Profile, Admin Profiles
-// included, as are the filter submenus by system, last played and date
-// added; Rate Table and Add to Favorites stay, the Operator Menu rules
+// included, from the Operator menu too, as are the filter submenus by
+// system, last played and date added, the others set apart by a
+// separator; Rate Table and Add to Favorites stay, the Operator Menu rules
 // are unchanged, and no doubled, leading or trailing separator is left.
 // ============================================================
 
@@ -63,7 +64,7 @@ test("turned on, Menu Cleanup lightens the menus for every Profile, Admin includ
 
     store.switchTo("Bob");
     assert.deepEqual(mainMenuTitles(), [
-        "Play", LABELS.tableSetup, LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, ...CLEANED_NATIVE_MAIN_MENU,
+        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR, LABELS.tableSetup, ...CLEANED_NATIVE_MAIN_MENU,
     ]);
     assert.deepEqual(exitMenuTitles(), CLEANED_ADMIN_EXIT_MENU);
 
@@ -93,6 +94,7 @@ test("the filter submenus by system, last played and date added are gone, the ot
     fake.openMenu("main", [
         { title: "Play", cmd: PlayGame },
         { title: "", cmd: -1 },
+        { title: "All Tables", cmd: 900 },
         { title: "Filter by Era", cmd: FilterByEra, hasSubmenu: true },
         { title: "Filter by Manufacturer", cmd: FilterByManufacturer, hasSubmenu: true },
         { title: "Filter by System", cmd: FilterBySystem, hasSubmenu: true },
@@ -102,6 +104,36 @@ test("the filter submenus by system, last played and date added are gone, the ot
         { title: "Filter by Date Added", cmd: FilterByAdded, hasSubmenu: true },
     ]);
     const titles = fake.currentMenu().items.map(item => item.title);
-    assert.deepEqual(titles.slice(-4), ["Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating"]);
+    assert.deepEqual(titles.slice(-6), ["All Tables", undefined, "Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating"]);
+    fake.closeMenu();
+});
+
+test("a separator sets the filter submenus apart from the filters, never doubled", () => {
+    const { PlayGame, FilterBySystem, FilterByCategory } = globalThis.command;
+    fake.openMenu("main", [
+        { title: "Play", cmd: PlayGame },
+        { title: "", cmd: -1 },
+        { title: "All Tables", cmd: 900 },
+        { title: "Filter by System", cmd: FilterBySystem, hasSubmenu: true },
+        { title: "", cmd: -1 },
+        { title: "Filter by Category", cmd: FilterByCategory, hasSubmenu: true },
+    ]);
+    assert.deepEqual(fake.currentMenu().items.map(item => (item.cmd === -1 ? SEPARATOR : item.title)).slice(-4),
+        [SEPARATOR, "All Tables", SEPARATOR, "Filter by Category"]);
+    fake.closeMenu();
+});
+
+test("Help and About leave the Operator menu too", () => {
+    const { ShowGameSetupMenu, Help, AboutBox, MenuReturn } = globalThis.command;
+    fake.openMenu("operator", [
+        { title: "Game Setup", cmd: ShowGameSetupMenu },
+        { title: "", cmd: -1 },
+        { title: "Help", cmd: Help },
+        { title: "About PinballY", cmd: AboutBox },
+        { title: "", cmd: -1 },
+        { title: "Cancel", cmd: MenuReturn },
+    ]);
+    assert.deepEqual(fake.currentMenu().items.map(item => (item.cmd === -1 ? SEPARATOR : item.title)),
+        ["Game Setup", SEPARATOR, "Cancel"]);
     fake.closeMenu();
 });

@@ -249,7 +249,7 @@ export default {
         randomGame: "Lancer une table au hasard",
         tableOfTheDay: "Lancer la table du jour",
         tableOfTheWeek: "Lancer la table de la semaine",
-        tableSetup: "Configuration de la table",
+        tableSetup: "Configurer la table",
     },
 
     achievements: {

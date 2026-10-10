@@ -37,7 +37,7 @@ test("entries sit right after Play, in their sections and position order, whatev
     openMainMenu();
 
     assert.deepEqual(titles(fake.currentMenu()),
-        ["Play", "Setup", "Day", "Week", "Random", SEPARATOR, "Player", "List", "Stats", SEPARATOR, "Exit"]);
+        ["Play", "Day", "Week", "Random", SEPARATOR, "Setup", SEPARATOR, "Player", "List", "Stats", SEPARATOR, "Exit"]);
     assert.ok(fake.currentMenu().items.filter(item => item.title === SEPARATOR).every(item => item.cmd === -1));
 });
 

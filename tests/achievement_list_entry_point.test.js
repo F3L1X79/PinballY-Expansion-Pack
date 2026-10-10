@@ -69,10 +69,11 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
     openMainMenu();
     assert.deepEqual(fake.currentMenu().items.map(item => item.title), [
         "Play",
-        MENU_LABELS.tableSetup,
         MENU_LABELS.tableOfTheDay,
         MENU_LABELS.tableOfTheWeek,
         MENU_LABELS.randomGame,
+        SEPARATOR,
+        MENU_LABELS.tableSetup,
         SEPARATOR,
         TEXT.menuEntry,
         lang.profileStats.menuEntry,
