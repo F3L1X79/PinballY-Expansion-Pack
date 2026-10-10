@@ -3,7 +3,8 @@
 // PinballY host: whether they are open, the title, the line labels, the
 // columns from left to right (the Profile's name, its Avatar image, and
 // each line's cell: its texts and whether its value is gold), the
-// highlighted column (the one the gold halo surrounds), and opens them
+// highlighted column (the one the gold halo surrounds), the columns in
+// view and those faded at the edges while gliding, and opens them
 // from the Profile Stats' "Household" button as a player would.
 // Never loaded by PinballY.
 // ============================================================
@@ -70,6 +71,18 @@ export function columns(fake) {
 }
 
 export const columnNames = fake => columns(fake).map(column => column.name);
+
+// Past five Profiles (fewer in a narrow window), only the columns in view
+// show, so they are the columns above: their names left to right, the
+// edges' while gliding included.
+export const columnsInView = columnNames;
+
+// The columns in view faded at the cut edges while gliding (every column
+// during the opening fade).
+export const fadedColumns = fake => columnLayers(fake).filter(layer => layer.alpha < 1).map(layer => textStrokes(layer)[0].text);
+
+// Long enough for any glide to end.
+export const GLIDE_OVER_MS = 400;
 
 // One line across the columns, left to right: each cell's first text, or
 // null when absent.

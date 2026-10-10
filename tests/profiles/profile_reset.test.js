@@ -111,7 +111,7 @@ test("an Admin Profile resets another Profile from the Exit menu, after one conf
     fake.openExitMenu();
     fake.selectMenuItem(TEXT.menuEntry);
     const listTitles = fake.currentMenu().items.map(item => item.title ?? "");
-    assert.deepEqual(listTitles, [TEXT.listTitle, "", lang.profiles.guestName, "Alice", "Bob", "", TEXT.everyProfile, TEXT.cancel],
+    assert.deepEqual(listTitles, [TEXT.listTitle, "", lang.profiles.guestName, "Alice", "Bob", "", TEXT.everyProfile, "", TEXT.cancel],
         "every Profile, Guest and the admin included");
     fake.closeMenu();
 

@@ -6,7 +6,9 @@
 // on the left, then one column per Profile (its Avatar and name as a
 // header, then one cell per line, the best values in gold, the Collection
 // Mastery with its Collection Tier square) and the gold halo of the
-// highlighted column. Only drawing: no layer, no event, no side effect.
+// highlighted column. Past five columns, or fewer in a narrow window, the
+// layout also gives the view the columns show through and their pitch,
+// for the module to glide them sideways. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
@@ -19,15 +21,16 @@ export const HOUSEHOLD_STATS_Z_INDEX = Object.freeze({ backdrop: 6160, title: 61
 
 export const REFERENCE_HEIGHT = 1920;
 
-// At most that many columns side by side.
+// At most that many columns in view, fewer when the window is too
+// narrow for them at columnMinW: the others glide in sideways.
 const MAX_COLUMNS = 5;
 
 const LOOK = Object.freeze({
     // The panel's width: a share of the window's, at most what its columns need.
     widthShare: 0.9, pad: 32,
     titleH: 72, titleSize: 30, titleGap: 24,
-    // The labels' column, then each Profile's, at most columnMaxW wide.
-    labelsW: 300, labelSize: 21, minLabelSize: 15, columnGap: 20, columnMaxW: 230,
+    // The labels' column, then each Profile's, columnMinW to columnMaxW wide.
+    labelsW: 300, labelSize: 21, minLabelSize: 15, columnGap: 20, columnMinW: 160, columnMaxW: 230,
     // A column's header: the Avatar, then the name under it.
     avatar: 112, avatarY: 16, nameY: 140, nameH: 40, nameSize: 24, minNameSize: 16, headerH: 196,
     // Each line: its height, its value at valueSize, a thin rule under it.
@@ -35,13 +38,16 @@ const LOOK = Object.freeze({
     haloMargin: 16,
 });
 
-// The panel, its title, the labels' column and each column, in a window
+// The panel, its title, the labels' column, each column as if none were
+// scrolled (the first ones in view, the others lined up after them), the
+// view the columns show through and their pitch, in a window
 // referenceWidth wide, for columnCount columns and lineCount lines.
 export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
-    const shown = Math.min(columnCount, MAX_COLUMNS);
     const widest = Math.round(referenceWidth * LOOK.widthShare);
+    const fitting = Math.floor((widest - 2 * LOOK.pad - LOOK.labelsW) / (LOOK.columnGap + LOOK.columnMinW));
+    const shown = Math.max(1, Math.min(columnCount, MAX_COLUMNS, fitting));
     const room = widest - 2 * LOOK.pad - LOOK.labelsW - shown * LOOK.columnGap;
-    const columnW = Math.min(LOOK.columnMaxW, Math.floor(room / shown));
+    const columnW = Math.max(LOOK.columnMinW, Math.min(LOOK.columnMaxW, Math.floor(room / shown)));
     const w = 2 * LOOK.pad + LOOK.labelsW + shown * (LOOK.columnGap + columnW);
     const tableH = LOOK.headerH + lineCount * LOOK.lineH;
     const h = 2 * LOOK.pad + LOOK.titleH + LOOK.titleGap + tableH;
@@ -50,9 +56,11 @@ export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     const title = { x, y: panel.y + LOOK.pad, w: w - 2 * LOOK.pad, h: LOOK.titleH };
     const tableY = title.y + title.h + LOOK.titleGap;
     const labels = { x, y: tableY, w: LOOK.labelsW, h: tableH };
-    const columns = Array.from({ length: columnCount }, (_, index) =>
-        ({ x: x + LOOK.labelsW + LOOK.columnGap + index * (columnW + LOOK.columnGap), y: tableY, w: columnW, h: tableH }));
-    return { panel, title, labels, columns };
+    const pitch = columnW + LOOK.columnGap;
+    const firstX = x + LOOK.labelsW + LOOK.columnGap;
+    const columns = Array.from({ length: columnCount }, (_, index) => ({ x: firstX + index * pitch, y: tableY, w: columnW, h: tableH }));
+    const view = { x: firstX, w: shown * pitch - LOOK.columnGap, count: shown };
+    return { panel, title, labels, columns, view, pitch };
 }
 
 // The halo's rect around a column's, centred on it as the reader expects.

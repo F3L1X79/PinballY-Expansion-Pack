@@ -48,7 +48,8 @@ export function createProfileResetMenu(host, profileStore, menus = createNativeM
             { cmd: -1 },
             ...listedProfiles.map((profile, index) => ({ title: displayNameOf(profile), cmd: getProfileCommand(index) })),
             { cmd: -1 },
-            ...(offersEveryProfile() ? [{ title: TEXT.everyProfile, cmd: everyProfileCommand }] : []),
+            // Its own separator before Cancel; without it, the one above already sets Cancel apart.
+            ...(offersEveryProfile() ? [{ title: TEXT.everyProfile, cmd: everyProfileCommand }, { cmd: -1 }] : []),
             { title: TEXT.cancel, cmd: cancelCommand },
         ]);
     }

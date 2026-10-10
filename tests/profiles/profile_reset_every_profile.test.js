@@ -66,8 +66,8 @@ test("Every Profile resets them all, and a failing one does not stop the others"
     getProfileStore().switchTo("Alice");
 
     assert.deepEqual(openList(),
-        [TEXT.listTitle, "", GUEST, "Alice", "Bob", "Carol", "", TEXT.everyProfile, TEXT.cancel],
-        "the list ends with a separator, Every Profile, then Cancel");
+        [TEXT.listTitle, "", GUEST, "Alice", "Bob", "Carol", "", TEXT.everyProfile, "", TEXT.cancel],
+        "the list ends with Every Profile and Cancel, each after a separator");
     fake.selectMenuItem(TEXT.everyProfile);
     assert.deepEqual(shownMessage(), {
         titles: [TEXT.confirmEvery(4), "", TEXT.yes, TEXT.no], selected: [TEXT.no], dialogStyle: true,

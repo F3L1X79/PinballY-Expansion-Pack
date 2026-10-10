@@ -9,7 +9,10 @@
 // the Profile Stats' reader; the screen is drawn at once on all its
 // layers, then faded in. While open it swallows every button through
 // "commandbuttondown": Next / Prev move a gold halo from column to column,
-// looping, with PinballY's navigation sound; Exit closes it and calls the
+// looping, with PinballY's navigation sound. Past five columns (fewer in a
+// narrow window), the columns glide sideways to keep the halo in view, the
+// ones cut by the view's edges faded, and a wrap jumps instead of gliding
+// across them all. Exit closes it and calls the
 // return given to open(); attract mode only closes it. Opens directly, not
 // through the wheel dialog module: the player asked for it. isOpen() and
 // onClosed() let the wheel dialogs wait for it.
@@ -32,6 +35,10 @@ const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
 const FADE_MS = 220;
 const FRAME_MS = 16;
+// The sideways glide slows down as it arrives (exponential ease-out), as
+// the Achievement List's does.
+const GLIDE_TIME_CONSTANT_MS = 40;
+const GLIDE_SNAP_PX = 0.5;
 
 // readStats(profileName): the Profile Stats' values for that Profile
 // (common/profile_stats.js); hasCollectionMastery: false without the
@@ -158,32 +165,69 @@ export function createHouseholdStats(host, { profileStore, readStats, hasCollect
             drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);
         });
         layers.push(backdrop);
-        const drawPiece = (zIndex, rect, draw) => {
+        const drawPiece = (zIndex, rect, draw, into = layers) => {
             const layer = hiddenLayer(zIndex);
             place(layer, rect, referenceWidth);
             layer.draw(draw, rect.w, rect.h);
-            layers.push(layer);
+            into.push(layer);
             return layer;
         };
         drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
         drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
+        // Apart from the other layers: their alpha also fades them at the view's edges.
+        const columnLayers = [];
         screen.columns.forEach((column, index) => {
             const rect = geometry.columns[index];
-            drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, rect, dc => drawColumn(host, dc, column, rect.w));
+            drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, rect, dc => drawColumn(host, dc, column, rect.w), columnLayers);
         });
         // Drawn once for the columns' size and only moved.
         const haloRect = haloRectOf(geometry.columns[0]);
         const halo = drawPiece(HOUSEHOLD_STATS_Z_INDEX.highlight, haloRect, dc => drawHalo(dc, haloRect.w, haloRect.h));
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
-        shown = { onBack, layers, halo, geometry, referenceWidth, selected: 0, opacity: 0, fadeTimer: null };
+        // first: the first column in view once the glide is over; scroll:
+        // how far the columns have glided, in reference pixels.
+        shown = {
+            onBack, layers, columnLayers, halo, geometry, referenceWidth, selected: 0, first: 0, scroll: 0,
+            opacity: 0, fadeTimer: null, glideTimer: null, glideMs: 0,
+        };
+        placeColumns(shown);
         fadeIn(shown);
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
+    }
+
+    // Where the columns glide to: the first one in view at the view's left.
+    const targetScroll = screen => screen.first * screen.geometry.pitch;
+
+    // A column's alpha by how much of it the view cuts off: gone once half
+    // of it is cut, so a column leaving never shows much over the labels
+    // or past the panel, which nothing masks.
+    function edgeAlpha({ view }, x, w) {
+        const share = (Math.min(x + w, view.x + view.w) - Math.max(x, view.x)) / w;
+        return Math.max(0, Math.min(1, 2 * share - 1));
+    }
+
+    // Each column at the glide's scroll, faded at the view's edges; the
+    // halo on the selected column, held inside the view while that column
+    // glides into it.
+    function placeColumns(screen) {
+        const { geometry, referenceWidth } = screen;
+        const { view } = geometry;
+        screen.columnLayers.forEach((layer, index) => {
+            const rect = geometry.columns[index];
+            const x = rect.x - screen.scroll;
+            place(layer, { ...rect, x }, referenceWidth);
+            layer.alpha = screen.opacity * edgeAlpha(geometry, x, rect.w);
+        });
+        const selected = geometry.columns[screen.selected];
+        const x = Math.max(view.x, Math.min(view.x + view.w - selected.w, selected.x - screen.scroll));
+        place(screen.halo, haloRectOf({ ...selected, x }), referenceWidth);
     }
 
     function setOpacity(screen, opacity) {
         screen.opacity = opacity;
         for (const layer of screen.layers) layer.alpha = opacity;
+        placeColumns(screen);
     }
 
     function fadeIn(screen) {
@@ -201,20 +245,52 @@ export function createHouseholdStats(host, { profileStore, readStats, hasCollect
         screen.fadeTimer = null;
     }
 
+    function stopGlide(screen) {
+        host.clearInterval(screen.glideTimer);
+        screen.glideTimer = null;
+    }
+
+    // Runs every frame while the columns glide; timed on the clock, since
+    // Windows timers fire late.
+    function glideStep(screen) {
+        const nowMs = host.now().getTime();
+        const target = targetScroll(screen);
+        screen.scroll = target + (screen.scroll - target) * Math.exp(-(nowMs - screen.glideMs) / GLIDE_TIME_CONSTANT_MS);
+        screen.glideMs = nowMs;
+        if (Math.abs(screen.scroll - target) < GLIDE_SNAP_PX) {
+            screen.scroll = target;
+            stopGlide(screen);
+        }
+        placeColumns(screen);
+    }
+
     function close() {
         if (!shown) return;
         stopFade(shown);
-        for (const layer of shown.layers) host.removeDrawingLayer(layer);
+        stopGlide(shown);
+        for (const layer of [...shown.layers, ...shown.columnLayers]) host.removeDrawingLayer(layer);
         shown = null;
         closedListeners.tell();
     }
 
-    // direction: 1 for Next, -1 for Prev.
+    // direction: 1 for Next, -1 for Prev. Brings the selected column into
+    // view, gliding unless it wrapped.
     function move(direction) {
         navigationSound.play();
-        const { columns } = shown.geometry;
-        shown.selected = (shown.selected + direction + columns.length) % columns.length;
-        place(shown.halo, haloRectOf(columns[shown.selected]), shown.referenceWidth);
+        const screen = shown;
+        const { columns, view } = screen.geometry;
+        const previous = screen.selected;
+        screen.selected = (previous + direction + columns.length) % columns.length;
+        screen.first = Math.min(screen.selected, Math.max(screen.first, screen.selected - view.count + 1));
+        const wrapped = direction > 0 ? screen.selected < previous : screen.selected > previous;
+        if (wrapped) {
+            stopGlide(screen);
+            screen.scroll = targetScroll(screen);
+        } else if (screen.glideTimer === null && screen.scroll !== targetScroll(screen)) {
+            screen.glideMs = host.now().getTime();
+            screen.glideTimer = host.setInterval(safeHandler(SCRIPT_NAME, () => glideStep(screen)), FRAME_MS);
+        }
+        placeColumns(screen);
     }
 
     function back() {

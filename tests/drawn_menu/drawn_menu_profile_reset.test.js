@@ -47,7 +47,7 @@ test("the list is drawn from the Exit menu, its title as a heading", () => {
 
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.deepEqual(drawnMenuLines(fake), [
-        `[${TEXT.listTitle.toUpperCase()}]`, "---", GUEST, "Alice", "Bob", "---", TEXT.everyProfile, TEXT.cancel,
+        `[${TEXT.listTitle.toUpperCase()}]`, "---", GUEST, "Alice", "Bob", "---", TEXT.everyProfile, "---", TEXT.cancel,
     ]);
     assert.equal(highlightedEntry(fake), GUEST, "the cursor skips the heading");
     chooseEntry(fake, TEXT.cancel);
