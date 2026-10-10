@@ -40,6 +40,7 @@
 
 import lang from "./i18n.js";
 import { safeHandler } from "./safe_handler.js";
+import { createClosedListeners } from "./closed_listeners.js";
 import { createNavigationSound } from "./navigation_sound.js";
 import { displayNameOf } from "./profile_name.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
@@ -111,7 +112,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // The open list, null when closed: the highlighted item's index, the
     // scroll it glides to and what Exit returns to.
     let shown = null;
-    const closedListeners = [];
+    const closedListeners = createClosedListeners(SCRIPT_NAME);
     // Where the list and the highlighted line are while gliding, in pixels.
     const glide = { scroll: 0, highlightTop: 0, timer: null, lastMs: 0 };
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
@@ -614,12 +615,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         for (const layers of [itemLayers, pieceLayers, headerEmblemLayers, thumbLayers]) hideAllExcept(layers, new Set());
         // What changed while it was open is read again once it is closed.
         wakeDrawingAhead();
-        for (const listener of closedListeners) listener();
-    }
-
-    // listener: runs, guarded, each time the list closes.
-    function onClosed(listener) {
-        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
+        closedListeners.tell();
     }
 
     // Fires on every mapped button press; drives the list while it is open.
@@ -655,5 +651,5 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         markContentStale();
     }));
 
-    return { open, isOpen: () => shown !== null, onClosed, countAll: () => countAll() };
+    return { open, isOpen: () => shown !== null, onClosed: closedListeners.onClosed, countAll: () => countAll() };
 }

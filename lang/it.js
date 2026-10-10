@@ -446,6 +446,19 @@ export default {
             frame: "Frame",
             mostPlayedTables: "Most Played Tables",
             tablesToDiscover: "Tables to Discover",
+            household: "Household", // TODO: translation pass
+        },
+        // TODO: translation pass
+        // The Household Stats opened from the Household button: the title and
+        // the line labels the stats above do not have.
+        household: {
+            title: "Household Stats",
+            lines: {
+                playerLevel: "Player Level",
+                collectionMastery: "Collection Mastery",
+                achievementsUnlocked: "Achievements unlocked",
+                dailyStreak: "Daily Streak",
+            },
         },
         // The Avatar Frame list opened from the Frame button: its title, the
         // "no frame" row, the worn row's mark and a locked frame's condition.

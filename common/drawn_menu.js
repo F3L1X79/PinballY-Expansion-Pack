@@ -33,6 +33,7 @@
 // ============================================================
 
 import { safeHandler } from "./safe_handler.js";
+import { createClosedListeners } from "./closed_listeners.js";
 import { createPinballYHost } from "./pinbally_host.js";
 import config from "./config.js";
 import { getDrawingAhead } from "./drawing_ahead.js";
@@ -163,7 +164,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     let shown = null;
     // What the texts' layer was drawn with; null when it holds nothing.
     let textsSignature = null;
-    const closedListeners = [];
+    const closedListeners = createClosedListeners(SCRIPT_NAME);
 
     // Draws the backdrop on a window-sized canvas, which also measures the window.
     function measure() {
@@ -389,7 +390,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     function reportClosed(onClose) {
         if (!onClose) return;
         onClose();
-        for (const listener of closedListeners) listener();
+        closedListeners.tell();
     }
 
     function close() {
@@ -538,13 +539,9 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // Fires when the cabinet sits idle: the menu closes without choosing.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
 
-    // listener: runs, guarded, each time a Drawn Menu closes; a Drawn Menu
-    // never changes the UI mode, so no "wheelmode" follows.
-    function onClosed(listener) {
-        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
-    }
-
-    return { show, draw, close, isOpen: () => shown !== null, onClosed };
+    // onClosed: a Drawn Menu never changes the UI mode, so no "wheelmode"
+    // follows its closing.
+    return { show, draw, close, isOpen: () => shown !== null, onClosed: closedListeners.onClosed };
 }
 
 let sharedDrawnMenus = null;

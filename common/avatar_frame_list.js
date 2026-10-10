@@ -23,6 +23,7 @@
 
 import lang from "./i18n.js";
 import { safeHandler } from "./safe_handler.js";
+import { createClosedListeners } from "./closed_listeners.js";
 import { createNavigationSound } from "./navigation_sound.js";
 import { STEAMBALL_COLORS } from "./steamball_palette.js";
 import {
@@ -63,7 +64,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     // The open list, null when closed: the highlighted row's index and what
     // Select and Exit return to.
     let shown = null;
-    const closedListeners = [];
+    const closedListeners = createClosedListeners(SCRIPT_NAME);
 
     function readRows() {
         const { avatarPath } = profileStore.getActiveProfile();
@@ -207,12 +208,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         // What changed while it was open is read again once it is closed.
         wakeDrawingAhead();
         onClosed();
-        for (const listener of closedListeners) listener();
-    }
-
-    // listener: runs, guarded, each time the list closes.
-    function onListClosed(listener) {
-        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
+        closedListeners.tell();
     }
 
     // direction: 1 for Next, -1 for Prev.
@@ -262,7 +258,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     return {
         open,
         isOpen: () => shown !== null,
-        onClosed: onListClosed,
+        onClosed: closedListeners.onClosed,
         // The active Profile's frames unlocked and in all, null when there
         // are none (Table Mastery off).
         count() {

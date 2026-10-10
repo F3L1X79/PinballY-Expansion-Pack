@@ -442,6 +442,18 @@ export default {
             frame: "Cadre",
             mostPlayedTables: "Tables les plus jouées",
             tablesToDiscover: "Tables à découvrir",
+            household: "La maison",
+        },
+        // The Household Stats opened from the Household button: the title and
+        // the line labels the stats above do not have.
+        household: {
+            title: "Statistiques de la maison",
+            lines: {
+                playerLevel: "Niveau de joueur",
+                collectionMastery: "Maîtrise de la collection",
+                achievementsUnlocked: "Succès débloqués",
+                dailyStreak: "Jours d'affilée",
+            },
         },
         // The Avatar Frame list opened from the Frame button: its title, the
         // "no frame" row, the worn row's mark and a locked frame's condition.

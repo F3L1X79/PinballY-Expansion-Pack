@@ -4,7 +4,7 @@
 // panel over the dimmed wheel, laid out by the Profile Stats painter,
 // with the Avatar, the Profile's name, the Player Level and the
 // Collection Mastery on a card whose foot holds the Achievements, Frame,
-// Most Played Tables and Tables to Discover buttons, and the GAME, PROGRESSION
+// Most Played Tables, Tables to Discover and Household buttons, and the GAME, PROGRESSION
 // and TASTES sections on its right (the last with the favourite and first
 // table strips, read from the Hall of Fame and the Play Log). Every stat is read again on each
 // opening; the screen is drawn at once on all its layers, then faded in.
@@ -18,7 +18,9 @@
 // of the Week (their Streaks), the Challenge module (null when the
 // Challenges Add-on is disabled: no completed Challenges) and the full ids of the Hall of
 // Fame and Tables to Discover filters (null when their Add-on is
-// disabled: no button). While open it swallows every button through
+// disabled: no button) and the Household Stats (opened from the Household
+// button, shown while the Household has two Profiles; Exit there shows
+// this screen again on that button). While open it swallows every button through
 // "commandbuttondown": Next / Prev move a gold halo through the cross and
 // the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
@@ -34,6 +36,7 @@ import { getDecadeStartYear } from "./decade.js";
 import { cleanTitle } from "./table_title.js";
 import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
+import { createClosedListeners } from "./closed_listeners.js";
 import { countPlayedTablesIn, tablesVisibleTo } from "./visible_tables.js";
 import { collectionMasteryOfProfile } from "./table_mastery.js";
 import { collectionTextsOf } from "./mastery_bar.js";
@@ -53,14 +56,14 @@ const MISSING_IMAGE_FILE = "assets\\images\\missing_image.png";
 
 export function createProfileStats(host, {
     profileStore, readPlayerLevel, countAchievements, achievementList, profileRewards = null, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
-    hallOfFameFilter = null, tablesToDiscoverFilter = null,
+    hallOfFameFilter = null, tablesToDiscoverFilter = null, householdStats = null,
 }) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     // The screen on show: its layers, choices and selection; null when closed.
     let shown = null;
-    const closedListeners = [];
+    const closedListeners = createClosedListeners(SCRIPT_NAME);
 
     // Over every table the Profile played, hidden or no longer listed ones
     // included: hiding a table never erases a player's history.
@@ -113,6 +116,11 @@ export function createProfileStats(host, {
     function frameButton() {
         const frames = frameList && frameList.count();
         return frames ? [{ choice: CHOICE.FRAME, label: TEXT.buttons.frame, count: TEXT.fraction(frames.unlocked, frames.total) }] : [];
+    }
+
+    // Left out while the Household has fewer than two Profiles.
+    function householdButton() {
+        return householdStats && householdStats.isOffered() ? [{ choice: CHOICE.HOUSEHOLD, label: TEXT.buttons.household, count: null }] : [];
     }
 
     function collectionStat({ played, total }) {
@@ -239,6 +247,7 @@ export function createProfileStats(host, {
             ...frameButton(),
             ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, hallOfFame),
             ...selectionButton(CHOICE.TO_DISCOVER, TEXT.buttons.tablesToDiscover, tablesToDiscoverFilter, getTablesToDiscover(profileTables, profileStore)),
+            ...householdButton(),
         ];
         return {
             name: displayNameOf(profile),
@@ -351,12 +360,7 @@ export function createProfileStats(host, {
         stopFade(shown);
         for (const layer of shown.layers) host.removeDrawingLayer(layer);
         shown = null;
-        for (const listener of closedListeners) listener();
-    }
-
-    // listener: runs, guarded, each time the screen closes.
-    function onClosed(listener) {
-        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
+        closedListeners.tell();
     }
 
     // direction: 1 for Next, -1 for Prev.
@@ -374,12 +378,13 @@ export function createProfileStats(host, {
         // Exit from the list comes back here, on its button.
         if (choice === CHOICE.ACHIEVEMENTS) achievementList.open(() => open(CHOICE.ACHIEVEMENTS));
         else if (choice === CHOICE.FRAME) frameList.open(() => open(CHOICE.FRAME));
+        else if (choice === CHOICE.HOUSEHOLD) householdStats.open(() => open(CHOICE.HOUSEHOLD));
         else if (entry) host.setCurrentFilter(entry.filterId);
     }
 
     // Fires on every mapped button press; drives the screen while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        // Already handled: the Achievement List's or Avatar Frame list's Exit reopens this screen
+        // Already handled: the Achievement List's, Avatar Frame list's or Household Stats' Exit reopens this screen
         // within the same press, which must not close it again.
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing choice still never reaches the wheel.
@@ -398,7 +403,7 @@ export function createProfileStats(host, {
         open: () => open(),
         readStats,
         isOpen: () => shown !== null,
-        onClosed,
+        onClosed: closedListeners.onClosed,
         // Opens the frame list straight away on that tier's row, onClosed
         // called once it closes; Select or Exit there shows this screen on the
         // Frame button, as if the list had been opened from it.

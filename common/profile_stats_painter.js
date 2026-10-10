@@ -31,7 +31,7 @@ export const PROFILE_STATS_Z_INDEX = Object.freeze({ backdrop: 6120, card: 6121,
 
 export const REFERENCE_HEIGHT = 1920;
 
-export const CHOICE = Object.freeze({ CLOSE: "close", ACHIEVEMENTS: "achievements", FRAME: "frame", MOST_PLAYED: "mostPlayed", TO_DISCOVER: "toDiscover" });
+export const CHOICE = Object.freeze({ CLOSE: "close", ACHIEVEMENTS: "achievements", FRAME: "frame", MOST_PLAYED: "mostPlayed", TO_DISCOVER: "toDiscover", HOUSEHOLD: "household" });
 
 
 const LOOK = Object.freeze({

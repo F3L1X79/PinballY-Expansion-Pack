@@ -1,0 +1,42 @@
+// ============================================================
+// The Household Stats' way in, through main.js on the fake PinballY
+// globals: the Profile Stats' "Household" button, after the other foot
+// buttons, shows once the Household has two Profiles, Guest seeing it too;
+// Exit on the Household Stats shows the Profile Stats again on that button,
+// and attract mode closes them.
+// ============================================================
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { startHousehold, errorLines } from "./household_stats_scenario.js";
+import { openProfileStats, buttons, highlighted, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
+import { openHouseholdStats, isHouseholdStatsOpen, householdStatsLayerCount, title, press } from "./household_stats_reader.js";
+
+test("the Household button opens the Household Stats, Exit goes back to it, attract mode closes them", async () => {
+    // Guest is active: without the Profile picker, it is at startup.
+    const { fake, lang } = await startHousehold({ profiles: { Alice: {}, Bob: {} } });
+    openProfileStats(fake, lang);
+    const shownButtons = buttons(fake);
+    assert.deepEqual(shownButtons[shownButtons.length - 1], { label: "Household", count: null }, "last, Guest seeing it too");
+    press(fake, "Exit");
+
+    openHouseholdStats(fake, lang);
+    assert.ok(isHouseholdStatsOpen(fake));
+    assert.ok(!isProfileStatsOpen(fake));
+    assert.equal(title(fake), "Household Stats");
+
+    const exit = press(fake, "Exit");
+    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    assert.ok(exit.defaultPrevented, "Exit never reaches the wheel");
+    assert.equal(householdStatsLayerCount(fake), 0, "its layers are gone");
+    assert.ok(isProfileStatsOpen(fake));
+    assert.equal(highlighted(fake), "Household");
+
+    press(fake, "Select");
+    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    assert.ok(isHouseholdStatsOpen(fake), "opened again from its button");
+    fake.fire("attractmodestart", {});
+    assert.equal(householdStatsLayerCount(fake), 0);
+    assert.ok(!isProfileStatsOpen(fake));
+    assert.deepEqual(errorLines(fake), []);
+});
