@@ -1,7 +1,8 @@
 // ============================================================
-// Drawn Menu painter: the look and the layout of a Drawn Menu. Lays a menu out in the window (one centred panel
-// sized to its rows, scrolling past 90 % of the window's height) and
-// draws its live parts: the texts (the message, the entries in white
+// Drawn Menu painter: the look and the layout of a Drawn Menu. Lays a
+// menu out in the window (one panel sized to its rows, its middle a third
+// of the way down when short, scrolling past 90 % of the window's height)
+// and draws its live parts: the texts (the message, the entries in white
 // with their gold mark, the headings, the separators as a gold line
 // fading at both ends), the selected entry's gold text, the dimming
 // backdrop and the painted images (common/drawn_menu_images.js). A line
@@ -33,6 +34,10 @@ export const DRAWN_MENU_LOOK = Object.freeze({
     // Of the window: the panel's width at most, and its height before the list scrolls.
     maxWidthShare: 0.75,
     maxHeightShare: 0.9,
+    // Of the window's height from its top: where a short panel's middle
+    // stands, higher than the centre; a tall one stops at the margin
+    // maxHeightShare leaves above it.
+    middleShare: 1 / 3,
     // From the face's gold frame to the first and after the last row.
     listTop: 54,
     listBottom: 50,
@@ -90,7 +95,7 @@ export function computeGeometry({ width, height }, model, messageHeightAt) {
     const areaHeightRef = Math.max(LOOK.rowHeights.entry, Math.min(rowsHeightRef, maxPanelRef - fixedRef));
     const panelHeightRef = Math.max(LOOK.minPanelHeight, fixedRef + areaHeightRef);
     const contentTopRef = DRAWN_MENU_FACE_INSET + LOOK.listTop + (panelHeightRef - fixedRef - areaHeightRef) / 2;
-    const panelTop = (height - panelHeightRef * k) / 2;
+    const panelTop = Math.max(height * (1 - LOOK.maxHeightShare) / 2, height * LOOK.middleShare - panelHeightRef * k / 2);
     return {
         width,
         height,
