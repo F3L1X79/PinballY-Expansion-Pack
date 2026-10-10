@@ -74,45 +74,55 @@ const getEnabledSessionMilestones = () => (config.addOns.sessionStatsTracker ===
 
 // Exported for the tests, which read each Achievement's rank. asNonChild:
 // the set as a Profile that is not a child would see it with the same
-// collection, only ever counted (never evaluated, toasted nor Notified).
-export function getAllAchievements({ asNonChild = false } = {}) {
+// collection; profileName: as that Profile would see it (the active one by
+// default). Either is only ever counted (never evaluated, toasted nor
+// Notified).
+export function getAllAchievements({ asNonChild = false, profileName } = {}) {
     const challenges = getEnabledChallenges();
+    const seenBy = { asNonChild, profileName };
     return [
         ...buildDayManufacturersAchievements(),
-        ...buildManufacturerCompletionAchievements({ asNonChild }),
-        ...buildCollectionCompletionAchievements({ asNonChild }),
+        ...buildManufacturerCompletionAchievements(seenBy),
+        ...buildCollectionCompletionAchievements(seenBy),
         ...buildWorldTourAchievements(),
         ...buildPlayTimeTotalAchievements(),
         ...buildPeriodTableAchievements(),
-        ...buildDecadeCompletionAchievements({ asNonChild }),
-        ...buildCategoryCompletionAchievements({ asNonChild }),
+        ...buildDecadeCompletionAchievements(seenBy),
+        ...buildCategoryCompletionAchievements(seenBy),
         ...getEnabledSessionMilestones(),
         ...buildRandomGameFanAchievements(),
         ...(challenges ? buildChallengeAchievements(challenges) : []),
-        ...buildSurprisesAchievements({ asNonChild }),
+        ...buildSurprisesAchievements(seenBy),
     ];
 }
 
 // What a Child Profile's points are scaled by: the set a Profile that is
-// not a child would have, only built for a child; null otherwise.
-const nonChildAchievementsFor = profileStore => (profileStore.isChild() ? getAllAchievements({ asNonChild: true }) : null);
+// not a child would have, only built for a child (the named Profile, the
+// active one by default); null otherwise.
+const nonChildAchievementsFor = (profileStore, profileName) =>
+    (profileStore.isChild(profileName) ? getAllAchievements({ asNonChild: true }) : null);
+
+// The named Profile's Player Level, from its Notified Achievements over the
+// set it would see, a Child Profile's points scaled up: the same for every
+// screen, whichever Profile is active.
+function readPlayerLevelOf(profileStore, profileName) {
+    return getPlayerLevel(profileStore.getNotifiedOf(profileName), getAllAchievements({ profileName }),
+        nonChildAchievementsFor(profileStore, profileName));
+}
+
+// The Profile Stats, once init() created them.
+let sharedProfileStats = null;
+
+// Exported for the tests: the values the Profile Stats show for the named
+// Profile (the active one by default).
+export const readProfileStats = profileName => sharedProfileStats.readStats(profileName);
 
 export default function init() {
     const achievementToasts = getAchievementToasts();
     const profileStore = getProfileStore();
     const shownPlayerLevel = getShownPlayerLevel();
-    // Another Profile's level, from its Notified Achievements. A Profile that
-    // is not a child counts the whole set; a Child Profile the active
-    // Profile's set when it is a child too, else the whole set unscaled
-    // (its own set needs it active): close enough for the picker's pip.
-    shownPlayerLevel.setUnshownReader(profileName => {
-        const notified = profileStore.getNotifiedOf(profileName);
-        const nonChild = getAllAchievements({ asNonChild: true });
-        if (profileStore.isChild(profileName) && profileStore.isChild()) {
-            return getPlayerLevel(notified, getAllAchievements(), nonChild).level;
-        }
-        return getPlayerLevel(notified, nonChild).level;
-    });
+    // Another Profile's level, as its Profile Stats show it.
+    shownPlayerLevel.setUnshownReader(profileName => readPlayerLevelOf(profileStore, profileName).level);
 
     const profileRewards = getProfileRewards();
     const achievementList = createAchievementList(createPinballYHost(), {
@@ -134,9 +144,16 @@ export default function init() {
         achievementList,
         profileRewards,
         frameList,
-        // From the active Profile's Notified Achievements, read on each opening.
-        readPlayerLevel: () => getPlayerLevel(
-            profileStore.getProfileData().notified, getAllAchievements(), nonChildAchievementsFor(profileStore)),
+        // Read on each opening, for the active Profile or another one.
+        readPlayerLevel: profileName => readPlayerLevelOf(profileStore, profileName),
+        // The active Profile's live count, as its Achievement List shows it;
+        // another Profile's Notified Achievements, the only Unlocks known
+        // without it active, out of the set it would see.
+        countAchievements(profileName) {
+            if (profileName.toLowerCase() === profileStore.getActiveProfile().name.toLowerCase()) return achievementList.countAll();
+            const ids = new Set(getAllAchievements({ profileName }).map(achievement => achievement.id));
+            return { unlocked: profileStore.getNotifiedOf(profileName).filter(id => ids.has(id)).length, total: ids.size };
+        },
         dailyStreak: getDailyStreak(),
         tableOfTheDay: getTableOfTheDay(),
         tableOfTheWeek: getTableOfTheWeek(),
@@ -145,6 +162,7 @@ export default function init() {
         hallOfFameFilter: config.addOns.hallOfFame === false ? null : HALL_OF_FAME_FULL_FILTER_ID,
         tablesToDiscoverFilter: config.addOns.tablesToDiscover === false ? null : TABLES_TO_DISCOVER_FULL_FILTER_ID,
     });
+    sharedProfileStats = profileStats;
     // Drawn over the wheel without leaving its UI mode: a waiting dialog
     // (such as the rating prompt after "Go equip it") shows only once the
     // player is back on the wheel.

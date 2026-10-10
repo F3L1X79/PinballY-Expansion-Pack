@@ -1,6 +1,6 @@
 // ============================================================
-// Daily Streak: the active Profile's days in a row on the cabinet, read
-// from its Play Log (every year file) whenever it is asked, so nothing is
+// Daily Streak: a Profile's days in a row on the cabinet (the active
+// Profile's by default), read from its Play Log (every year file) whenever it is asked, so nothing is
 // persisted and a Profile Reset, which sets the Play Log aside, brings it
 // back to 0, its longest too. A day counts when a Play started on it; the
 // day key changes at midnight, as the Table of the Day's. Created from the
@@ -29,10 +29,9 @@ function longestRun(days) {
 }
 
 export function createDailyStreak(host, store) {
-    // The day keys of the active Profile's Plays: a Play Log start is local
+    // The day keys of the named Profile's Plays: a Play Log start is local
     // time, "2026-10-07T21:10:00", whose date part is the day key.
-    function playedDays() {
-        const { name } = store.getActiveProfile();
+    function playedDays(name) {
         const days = new Set();
         for (const year of store.getPlayLogYearsOf(name)) {
             for (const play of store.getPlayLogOf(name, year)) days.add(String(play.start).slice(0, 10));
@@ -42,8 +41,8 @@ export function createDailyStreak(host, store) {
 
     // { current, longest, isTodayCounted }: current counts back from today when it
     // counts, else from yesterday, so the Daily Streak stays alive all day.
-    function read() {
-        const days = playedDays();
+    function read(profileName = store.getActiveProfile().name) {
+        const days = playedDays(profileName);
         const today = host.now();
         const isTodayCounted = days.has(formatDateKey(today));
         let current = 0;

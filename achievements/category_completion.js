@@ -10,11 +10,12 @@ import { buildGroupedCompletionAchievements } from "../common/grouped_completion
 import { ACHIEVEMENT_FAMILY } from "../common/achievements.js";
 import lang from "../common/i18n.js";
 
-export function buildCategoryCompletionAchievements({ asNonChild = false } = {}) {
+export function buildCategoryCompletionAchievements({ asNonChild = false, profileName } = {}) {
     const { achievements: TEXT } = lang;
     return buildGroupedCompletionAchievements({
         getGroupKeys: (game) => Array.isArray(game.categories) ? game.categories : [],
         asNonChild,
+        profileName,
         idPrefix: "categoryCompletion",
         family: ACHIEVEMENT_FAMILY.CATEGORIES,
         getTitle: (category) => TEXT.categoryCompletionTitle(category),

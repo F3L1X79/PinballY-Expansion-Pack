@@ -8,9 +8,9 @@
 // and TASTES sections on its right (the last with the favourite and first
 // table strips, read from the Hall of Fame and the Play Log). Every stat is read again on each
 // opening; the screen is drawn at once on all its layers, then faded in.
-// Created from the PinballY host, the Profile store, a reader of the
-// active Profile's Player Level, the Achievement List (its counts, and
-// opening it from the Achievements button, Exit there showing this screen
+// Created from the PinballY host, the Profile store, readers of a named
+// Profile's Player Level and Achievements Unlocked, the Achievement List
+// (opening it from the Achievements button, Exit there showing this screen
 // again on that button), the Profile Rewards module (the worn Avatar
 // Frame around the Avatar; null: none), the Avatar Frame list (its count,
 // and opening it from the Frame button, Select or Exit there showing this screen again on
@@ -24,7 +24,8 @@
 // closes it too. Opens directly, not through the wheel dialog module:
 // the player asked for it. Can also open the frame list straight away, for
 // the Reward Prompt. isOpen() and onClosed() let the wheel dialogs wait
-// for it.
+// for it. readStats() reads the values it shows for any named Profile,
+// writing nothing.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -33,7 +34,7 @@ import { getDecadeStartYear } from "./decade.js";
 import { cleanTitle } from "./table_title.js";
 import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
-import { countPlayedTables, tablesVisibleTo } from "./visible_tables.js";
+import { countPlayedTablesIn, tablesVisibleTo } from "./visible_tables.js";
 import { collectionMasteryOfProfile } from "./table_mastery.js";
 import { collectionTextsOf } from "./mastery_bar.js";
 import { getHallOfFame } from "./hall_of_fame.js";
@@ -51,7 +52,7 @@ const FRAME_MS = 16;
 const MISSING_IMAGE_FILE = "assets\\images\\missing_image.png";
 
 export function createProfileStats(host, {
-    profileStore, readPlayerLevel, achievementList, profileRewards = null, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
+    profileStore, readPlayerLevel, countAchievements, achievementList, profileRewards = null, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
     hallOfFameFilter = null, tablesToDiscoverFilter = null,
 }) {
     const { profileStats: TEXT } = lang;
@@ -63,11 +64,31 @@ export function createProfileStats(host, {
 
     // Over every table the Profile played, hidden or no longer listed ones
     // included: hiding a table never erases a player's history.
-    function sumPlays() {
-        const plays = Object.values(profileStore.getProfileData().plays);
+    function sumPlays(data) {
+        const plays = Object.values(data.plays);
         return {
             count: plays.reduce((sum, play) => sum + play.count, 0),
             seconds: plays.reduce((sum, play) => sum + play.seconds, 0),
+        };
+    }
+
+    // Every value of the Profile Stats that another Profile's can be set
+    // beside, for the named Profile (the active one by default): one reader,
+    // so a value never differs between screens. Reads only.
+    function readStats(profileName = profileStore.getActiveProfile().name) {
+        const data = profileStore.getProfileDataOf(profileName);
+        // Over the tables the Profile can see; a tier it reached stays.
+        const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore, profileName);
+        return {
+            plays: sumPlays(data),
+            playerLevel: readPlayerLevel(profileName),
+            collectionMastery: collectionMasteryOfProfile(profileTables, data),
+            // The Collection Achievements' rule, so the two never disagree.
+            collection: { played: countPlayedTablesIn(profileTables, data.plays), total: profileTables.length },
+            achievements: countAchievements(profileName),
+            dailyStreak: dailyStreak.read(profileName),
+            // Null without the Challenges Add-on.
+            challenges: challenges ? challenges.getRecord(profileName) : null,
         };
     }
 
@@ -94,15 +115,13 @@ export function createProfileStats(host, {
         return frames ? [{ choice: CHOICE.FRAME, label: TEXT.buttons.frame, count: TEXT.fraction(frames.unlocked, frames.total) }] : [];
     }
 
-    // The Collection Achievements' rule, so the two never disagree.
-    function collectionStat(profileTables) {
-        const played = countPlayedTables(profileTables, profileStore);
-        const share = profileTables.length === 0 ? 0 : played / profileTables.length;
+    function collectionStat({ played, total }) {
+        const share = total === 0 ? 0 : played / total;
         // Rounded, but 100 only once complete: 199/200 shows 99.
         const percent = share < 1 ? Math.min(99, Math.round(share * 100)) : 100;
         return {
             label: TEXT.stats.collection,
-            value: TEXT.fraction(played, profileTables.length),
+            value: TEXT.fraction(played, total),
             pill: { text: TEXT.percent(percent), isLit: true },
             share,
         };
@@ -122,9 +141,9 @@ export function createProfileStats(host, {
     const periodTableStreakOf = periodTable => ({ current: periodTable.getStreak(), longest: periodTable.getLongestStreak() });
 
     // Absent without the Challenges Add-on: Collection then takes the row.
-    function challengesStats() {
-        if (!challenges) return [];
-        const { completed, total } = challenges.getRecord();
+    function challengesStats(record) {
+        if (!record) return [];
+        const { completed, total } = record;
         return [{ label: TEXT.stats.challengesCompleted, value: TEXT.fraction(completed, total) }];
     }
 
@@ -212,9 +231,8 @@ export function createProfileStats(host, {
     function readScreen() {
         const profile = profileStore.getActiveProfile();
         const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore);
-        const plays = sumPlays();
-        const achievements = achievementList.countAll();
-        const playerLevel = readPlayerLevel();
+        const stats = readStats(profile.name);
+        const { plays, achievements, playerLevel } = stats;
         const hallOfFame = getHallOfFame(profileTables, profileStore.getPlay);
         const buttons = [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
@@ -233,9 +251,8 @@ export function createProfileStats(host, {
                 share: (playerLevel.points - playerLevel.from) / (playerLevel.to - playerLevel.from),
                 current: TEXT.playerLevel.current(TEXT.number(playerLevel.points), TEXT.number(playerLevel.to)),
             },
-            // Over the tables the Profile can see; a tier it reached stays.
             collectionTitle: TEXT.collectionTitle,
-            collection: collectionTextsOf(collectionMasteryOfProfile(profileTables, profileStore.getProfileData())),
+            collection: collectionTextsOf(stats.collectionMastery),
             buttons,
             sections: [{
                 title: TEXT.sections.game,
@@ -247,9 +264,9 @@ export function createProfileStats(host, {
             }, {
                 title: TEXT.sections.progression,
                 rows: [
-                    [collectionStat(profileTables), ...challengesStats()],
+                    [collectionStat(stats.collection), ...challengesStats(stats.challenges)],
                     [
-                        streakStat(TEXT.stats.cabinetStreak, dailyStreak.read()),
+                        streakStat(TEXT.stats.cabinetStreak, stats.dailyStreak),
                         streakStat(TEXT.stats.dayStreak, periodTableStreakOf(tableOfTheDay)),
                         streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek)),
                     ],
@@ -379,6 +396,7 @@ export function createProfileStats(host, {
 
     return {
         open: () => open(),
+        readStats,
         isOpen: () => shown !== null,
         onClosed,
         // Opens the frame list straight away on that tier's row, onClosed

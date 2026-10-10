@@ -5,7 +5,8 @@
 // full collection in COLLECTION_PERCENT_THRESHOLDS, with the tables played
 // against the count the percentage needs as Achievement Progress.
 // asNonChild builds them as a Profile that is not
-// a child would see them (for the Player Level's scaling). Called by achievements_engine.js at each check;
+// a child would see them (for the Player Level's scaling), profileName as
+// that Profile would. Called by achievements_engine.js at each check;
 // no side effects.
 // ============================================================
 
@@ -22,13 +23,13 @@ const COLLECTION_PERCENT_THRESHOLDS = [10, 25, 50, 75, 100];
 const FIRST_TABLE_STEP = "firstTable";
 const COLLECTION_LADDER = [FIRST_TABLE_STEP, ...COLLECTION_PERCENT_THRESHOLDS];
 
-export function buildCollectionCompletionAchievements({ asNonChild = false } = {}) {
+export function buildCollectionCompletionAchievements({ asNonChild = false, profileName } = {}) {
     const { achievements: TEXT } = lang;
 
-    const totalCount = getActiveProfileTables({ asNonChild }).length;
+    const totalCount = getActiveProfileTables({ asNonChild, profileName }).length;
 
     function countPlayed() {
-        return countPlayedTables(getActiveProfileTables({ asNonChild }), getProfileStore());
+        return countPlayedTables(getActiveProfileTables({ asNonChild, profileName }), getProfileStore());
     }
 
     // A target of 1 shows no Achievement Progress.

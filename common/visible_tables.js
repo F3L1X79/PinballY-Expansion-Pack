@@ -5,8 +5,8 @@
 // Stats, the Hall of Fame and the Challenges, with the one rule for
 // collection completion. The Period Table pick deliberately reads the
 // household's visible tables instead. getActiveProfileTables() can also
-// give the tables as a Profile that is not a child would see them, for a
-// Child Profile's Player Level scaling. Read-only, no side effects.
+// give the tables as a Profile that is not a child, or another named
+// Profile, would see them, for the Player Level. Read-only, no side effects.
 // ============================================================
 
 import { createPinballYHost } from "./pinbally_host.js";
@@ -25,16 +25,22 @@ export function tablesVisibleTo(visibleTables, profileStore, profileName) {
 }
 
 // asNonChild: the tables as a Profile that is not a child would see them,
-// Adult Tables included, for the Player Level's scaling.
-export function getActiveProfileTables({ asNonChild = false } = {}) {
+// Adult Tables included, for the Player Level's scaling. profileName: as
+// that Profile would see them (the active one by default).
+export function getActiveProfileTables({ asNonChild = false, profileName } = {}) {
     const visibleTables = createPinballYHost().getVisibleTables();
-    return asNonChild ? visibleTables : tablesVisibleTo(visibleTables, getProfileStore());
+    return asNonChild ? visibleTables : tablesVisibleTo(visibleTables, getProfileStore(), profileName);
 }
 
-// Collection completion: how many of the tables the active Profile can see
-// it played at least once.
+// Collection completion: how many of a Profile's tables its plays (from
+// its profile.json) count at least once.
+export function countPlayedTablesIn(profileTables, plays) {
+    return profileTables.filter(game => (plays[game.configId] || { count: 0 }).count > 0).length;
+}
+
+// The same for the tables the active Profile can see.
 export function countPlayedTables(profileTables, profileStore) {
-    return profileTables.filter(game => profileStore.hasPlayed(game.configId)).length;
+    return countPlayedTablesIn(profileTables, profileStore.getProfileData().plays);
 }
 
 // The tables the active Profile can see and never played: the other side

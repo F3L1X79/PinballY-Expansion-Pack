@@ -12,7 +12,7 @@ import { ACHIEVEMENT_FAMILY } from "../common/achievements.js";
 import lang from "../common/i18n.js";
 import { getDecadeStartYear } from "../common/decade.js";
 
-export function buildDecadeCompletionAchievements({ asNonChild = false } = {}) {
+export function buildDecadeCompletionAchievements({ asNonChild = false, profileName } = {}) {
     const { achievements: TEXT } = lang;
     return buildGroupedCompletionAchievements({
         getGroupKeys: (game) => {
@@ -20,6 +20,7 @@ export function buildDecadeCompletionAchievements({ asNonChild = false } = {}) {
             return decadeStartYear === null ? [] : [`${decadeStartYear}s`];
         },
         asNonChild,
+        profileName,
         idPrefix: "decadeCompletion",
         family: ACHIEVEMENT_FAMILY.DECADES,
         // The "1980s" group key stays in the achievement ID for backward compatibility;

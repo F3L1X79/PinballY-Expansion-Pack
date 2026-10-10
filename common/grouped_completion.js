@@ -7,15 +7,15 @@
 // toward each of them. Groups are made of the tables the active Profile can
 // see, so a group with none of them gives no Achievement. The Achievements
 // come sorted by group key. asNonChild builds them as a Profile that is
-// not a child would see them. No side effects.
+// not a child would see them, profileName as that Profile would. No side effects.
 // ============================================================
 
 import { getActiveProfileTables } from "./visible_tables.js";
 import { getProfileStore } from "./profile_store.js";
 import { countedAchievement, PROGRESS_UNIT } from "./achievements.js";
 
-export function buildGroupedCompletionAchievements({ getGroupKeys, idPrefix, family, getTitle, getDescription, asNonChild = false }) {
-    const allGames = getActiveProfileTables({ asNonChild });
+export function buildGroupedCompletionAchievements({ getGroupKeys, idPrefix, family, getTitle, getDescription, asNonChild = false, profileName }) {
+    const allGames = getActiveProfileTables({ asNonChild, profileName });
     const groups = new Map();
 
     for (const game of allGames) {
