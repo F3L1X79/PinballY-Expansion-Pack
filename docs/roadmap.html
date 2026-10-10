@@ -591,6 +591,77 @@
           </details>
         </div>
       </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="themes" data-track="share" data-rank="platinum">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Thèmes : d'autres palettes que Steamball, au choix</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">gros</span></div>
+          </div>
+          <p>Le propriétaire choisit le thème de tous les écrans dessinés (Welcome Screen, Achievement List, Profile Stats, toasts, Drawn Menus…) parmi plusieurs, Steamball restant celui par défaut.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (les palettes, à juger sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant l'<a href="#theme-editor">éditeur de palette (n° <span data-ref="theme-editor"></span>)</a></div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Quels thèmes, et combien pour commencer ?</li>
+              <li>Ce que couvre un thème : seulement les couleurs et les polices de <code>common/steamball_palette.js</code>, ou aussi les images peintes d'avance (cadres, panneau et verre des Drawn Menus, blasons), à repeindre une fois par thème par les scripts de <code>tools/</code> ?</li>
+              <li>Où le choisir : un réglage dans <code>.env.local</code>, un choix par Profile, ou une entrée de menu ?</li>
+              <li>Les confettis et les feux d'artifice suivent-ils le thème ?</li>
+            </ul>
+            <p class="ctx">Idée du 10/10/2026. Aujourd'hui, les couleurs passent déjà presque toutes par <code>common/steamball_palette.js</code>, mais les images PNG sont peintes en Steamball.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="stats-api" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Une API des statistiques pour les autres développeurs</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Offrir aux auteurs d'autres scripts PinballY un accès à toutes nos statistiques et métriques (Profiles, Plays, Player Level, Table Mastery, Achievements, Challenges, Streaks…), pour qu'ils les réutilisent dans leurs propres plugins.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui fixe où vit le pack chez les autres</div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>La forme : un module ES à importer (<code>import … from "./ExpansionPack/api.js"</code>, mais la racine n'accepte que <code>main.js</code>), des événements, ou un fichier JSON exporté que n'importe quel outil peut lire ?</li>
+              <li>Lecture seule, ou aussi quelques actions (changer de Profile, lancer la Table of the Day) ?</li>
+              <li>Quelles données : tout ce qu'affichent les Profile Stats, ou aussi le Play Log brut ?</li>
+              <li>Comment garantir la compatibilité d'une version à l'autre (numéro de version de l'API, données figées comme dans <code>tests/persisted_data_pinning.test.js</code>) ?</li>
+            </ul>
+            <p class="ctx">Idée du 10/10/2026. Les données existent déjà dans le Profile Store, le Play Log et <code>common/profile_stats.js</code> ; le travail est surtout de choisir une surface stable et de la documenter.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="theme-editor" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Mini-éditeur de palette pour les thèmes</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Un petit éditeur pour créer ou retoucher un thème : les couleurs principales, les formes (coins, cadres, contours de sélection…).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les <a href="#themes">thèmes (n° <span data-ref="themes"></span>)</a>, qui fixent ce qu'un thème contient</div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Où : une page HTML hors de la borne (comme la roadmap), qui écrit un fichier de thème, ou un écran dessiné sur la borne, piloté aux boutons ?</li>
+              <li>Les formes changent-elles les images peintes ? Il faudrait alors relancer les scripts de peinture de <code>tools/</code> (Node.js), ce qu'une page sur la borne ne peut pas faire.</li>
+              <li>Un aperçu en direct des écrans du pack pendant la retouche ?</li>
+            </ul>
+            <p class="ctx">Idée du 10/10/2026.</p>
+          </details>
+        </div>
+      </li>
     </ol>
   </section>
 
