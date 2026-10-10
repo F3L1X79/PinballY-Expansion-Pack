@@ -112,6 +112,11 @@ function createFileSystem() {
     };
 }
 
+// The sound rotations by file path, one set per PinballY session (its COM
+// factory): every screen playing Next.wav shares the same players instead
+// of creating its own.
+const soundRotationsBySession = new WeakMap();
+
 function requireSoundFile(filePath) {
     if (!createAutomationObject("Scripting.FileSystemObject").FileExists(filePath)) {
         throw new Error(`Sound file not found: ${filePath}`);
@@ -219,8 +224,12 @@ export function createPinballYHost() {
         // For a short sound played in quick succession: its players, loaded
         // once, play it in turn. Restarting a player still playing blocks
         // PinballY for 60 to 130 ms, while one at rest starts in a few.
-        // Throws like playSound().
+        // Shared by every caller asking for the same file, with the player
+        // count of the first. Throws like playSound().
         createSoundRotation: (filePath, playerCount) => {
+            if (!soundRotationsBySession.has(createAutomationObject)) soundRotationsBySession.set(createAutomationObject, new Map());
+            const rotations = soundRotationsBySession.get(createAutomationObject);
+            if (rotations.has(filePath)) return rotations.get(filePath);
             requireSoundFile(filePath);
             const players = [];
             for (let index = 0; index < playerCount; index++) {
@@ -230,7 +239,7 @@ export function createPinballYHost() {
                 players.push(player);
             }
             let next = 0;
-            return {
+            const rotation = {
                 play: () => {
                     const player = players[next];
                     next = (next + 1) % players.length;
@@ -238,6 +247,8 @@ export function createPinballYHost() {
                     player.controls.play();
                 },
             };
+            rotations.set(filePath, rotation);
+            return rotation;
         },
         files: createFileSystem(),
         log: (text) => { logfile.log(text); },

@@ -397,6 +397,29 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
     });
 }
 
+describe("production host sound players", () => {
+    test("every caller asking for the same sound shares its players, created once", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            const filePath = "C:\\PinballY\\Assets\\Button Sounds\\Next.wav";
+            fake.addFile(filePath);
+            const first = createPinballYHost().createSoundRotation(filePath, 3);
+            const second = createPinballYHost().createSoundRotation(filePath, 3);
+            first.play();
+            second.play();
+            first.play();
+            second.play();
+
+            const players = fake.soundPlayers();
+            assert.equal(new Set(players.slice(0, 3)).size, 3, "the second caller goes on with the next player");
+            assert.equal(players[3], players[0], "three players in all");
+        } finally {
+            uninstallGlobals();
+        }
+    });
+});
+
 describe("fake host timers", () => {
     test("run on the manual clock as the test advances time, and can be cleared", () => {
         const fake = createFakePinballYHost({ now: NOW });

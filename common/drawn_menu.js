@@ -18,7 +18,8 @@
 // The button sounds are loaded and the painted images (panel, glass,
 // selection outline) drawn on layers ahead through the shared drawing
 // ahead; the images are drawn again when the window size changes, only
-// placed and scaled on each opening, and shrunk to a dot while hidden; the texts are drawn live on opening. The menu
+// placed and scaled on each opening, and shrunk to a dot while hidden.
+// The texts are drawn on opening, again only when they changed. The menu
 // fades in; it never changes PinballY's UI mode. Each opening's time is
 // logged, part by part.
 // ============================================================
@@ -26,7 +27,7 @@
 import { safeHandler } from "./safe_handler.js";
 import { createPinballYHost } from "./pinbally_host.js";
 import { getDrawingAhead } from "./drawing_ahead.js";
-import { createButtonSound } from "./navigation_sound.js";
+import { createButtonSound, createNavigationSound } from "./navigation_sound.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER } from "./drawn_menu_images.js";
 import {
     DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, computeGeometry, rowHeightIn, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
@@ -94,9 +95,10 @@ export function createDrawnMenus(host, { drawingAhead }) {
     const imagesFolder = `${host.getProjectFolder()}\\${DRAWN_MENU_IMAGES_FOLDER}`;
     const pagingCommands = [host.getBuiltInCommand("MenuPageUp"), host.getBuiltInCommand("MenuPageDown")];
     const sounds = {
-        move: createButtonSound(host, SCRIPT_NAME, "Next"),
-        select: createButtonSound(host, SCRIPT_NAME, "Select"),
-        deselect: createButtonSound(host, SCRIPT_NAME, "Deselect"),
+        move: createNavigationSound(host, SCRIPT_NAME),
+        // One player each: choosing or Exit closes the menu.
+        select: createButtonSound(host, SCRIPT_NAME, "Select", 1),
+        deselect: createButtonSound(host, SCRIPT_NAME, "Deselect", 1),
     };
 
     function hide(layer) {
@@ -125,6 +127,8 @@ export function createDrawnMenus(host, { drawingAhead }) {
     // The open menu, null when closed: its model, layout, scroll and the
     // selection's place on screen while it glides.
     let shown = null;
+    // What the texts' layer was drawn with; null when it holds nothing.
+    let textsSignature = null;
 
     // Draws the backdrop on a window-sized canvas, which also measures the window.
     function measure() {
@@ -198,12 +202,20 @@ export function createDrawnMenus(host, { drawingAhead }) {
         return styled.measure(width).height;
     }
 
+    // Kept from one opening to the next and drawn again only when what it
+    // shows changed: the texts are most of an opening's time, and the main
+    // menu usually shows the same entries.
     function drawTextsLayer() {
         const { geometry, model } = shown;
         const width = Math.max(1, Math.round(geometry.listWidth));
         const height = Math.max(1, Math.round(geometry.contentHeight));
-        textsLayer.clear(TRANSPARENT);
-        textsLayer.draw(dc => drawTexts(host, dc, geometry, model, shown.scroll), width, height);
+        const rows = model.rows.map(({ kind, title, mark }) => [kind, title, mark]);
+        const signature = JSON.stringify([model.message, rows, shown.scroll, width, height, geometry.k]);
+        if (signature !== textsSignature) {
+            textsLayer.clear(TRANSPARENT);
+            textsLayer.draw(dc => drawTexts(host, dc, geometry, model, shown.scroll), width, height);
+            textsSignature = signature;
+        }
         place(textsLayer, { x: geometry.listX, y: geometry.contentTop, width, height }, false);
     }
 

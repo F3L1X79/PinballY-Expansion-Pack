@@ -12,10 +12,11 @@ const BUTTON_SOUNDS_FOLDER = "Assets\\Button Sounds";
 // Enough for a held button: a player is still playing when asked again.
 const NAVIGATION_SOUND_PLAYERS = 3;
 
-export const createNavigationSound = (host, scriptName) => createButtonSound(host, scriptName, "Next");
+export const createNavigationSound = (host, scriptName) => createButtonSound(host, scriptName, "Next", NAVIGATION_SOUND_PLAYERS);
 
-// soundName: the file name in PinballY's button sounds, without ".wav".
-export function createButtonSound(host, scriptName, soundName) {
+// soundName: the file name in PinballY's button sounds, without ".wav";
+// playerCount: 1 for a sound never played twice in quick succession.
+export function createButtonSound(host, scriptName, soundName, playerCount) {
     // Null until loaded; false once it failed, so it is logged only once.
     let rotation = null;
 
@@ -31,7 +32,7 @@ export function createButtonSound(host, scriptName, soundName) {
             if (rotation !== null) return;
             try {
                 const filePath = `${host.getProgramFolder().replace(/\\+$/, "")}\\${BUTTON_SOUNDS_FOLDER}\\${soundName}.wav`;
-                rotation = host.createSoundRotation(filePath, NAVIGATION_SOUND_PLAYERS);
+                rotation = host.createSoundRotation(filePath, playerCount);
             } catch (error) {
                 disable(error);
             }

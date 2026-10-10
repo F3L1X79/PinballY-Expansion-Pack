@@ -2,7 +2,8 @@
 // How a Drawn Menu is drawn, through main.js on the fake PinballY globals
 // with only the Drawn Menus Add-on on: its painted images are drawn ahead
 // while the wheel sits idle, then only placed on opening, and every
-// layer is shrunk to a dot while hidden; each opening's time is logged;
+// layer is shrunk to a dot while hidden; the texts are drawn again only
+// when they changed; each opening's time is logged;
 // a menu that fails to draw logs the error and shows natively.
 // ============================================================
 
@@ -65,6 +66,18 @@ test("closed, every layer is hidden and shrunk to a dot again", () => {
         assert.equal(layer.alpha, 0);
         assert.deepEqual(layer.scale(), DOT);
     }
+});
+
+test("reopening the same menu draws its texts no more, a changed one draws them again", () => {
+    const textDrawings = () => fake.drawings().filter(drawing => drawing.zIndex === DRAWN_MENU_Z_INDEX.texts).length;
+    const before = textDrawings();
+    openMainMenu(fake);
+    press(fake, "Exit");
+    assert.equal(textDrawings(), before);
+
+    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
+    press(fake, "Exit");
+    assert.equal(textDrawings(), before + 1);
 });
 
 test("a menu that fails to draw logs the error and shows natively", () => {
