@@ -35,7 +35,7 @@
 // files only when their Notified Achievements may have changed.
 // The Profile Rewards module gives the header's Avatar Frame (null: none).
 // Opens directly, not through the wheel dialog module: the player asked
-// for it.
+// for it. isOpen() and onClosed() let the wheel dialogs wait for it.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -111,6 +111,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // The open list, null when closed: the highlighted item's index, the
     // scroll it glides to and what Exit returns to.
     let shown = null;
+    const closedListeners = [];
     // Where the list and the highlighted line are while gliding, in pixels.
     const glide = { scroll: 0, highlightTop: 0, timer: null, lastMs: 0 };
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
@@ -613,6 +614,12 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         for (const layers of [itemLayers, pieceLayers, headerEmblemLayers, thumbLayers]) hideAllExcept(layers, new Set());
         // What changed while it was open is read again once it is closed.
         wakeDrawingAhead();
+        for (const listener of closedListeners) listener();
+    }
+
+    // listener: runs, guarded, each time the list closes.
+    function onClosed(listener) {
+        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
     }
 
     // Fires on every mapped button press; drives the list while it is open.
@@ -648,5 +655,5 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         markContentStale();
     }));
 
-    return { open, countAll: () => countAll() };
+    return { open, isOpen: () => shown !== null, onClosed, countAll: () => countAll() };
 }

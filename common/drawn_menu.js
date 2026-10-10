@@ -18,7 +18,8 @@
 // sound, closes the menu (unless the entry stays open) and runs the
 // entry's command through doCommand, as a native menu would, then
 // reports the close; Exit plays the Deselect sound and closes it. Attract
-// mode closes it too, and so does a menu shown in its place.
+// mode closes it too, and so does a menu shown in its place. isOpen() and
+// onClosed() let what waits for a free wheel wait for it.
 // The button sounds are loaded and the painted images (panel, glass,
 // selection outline) drawn on layers ahead through the shared drawing
 // ahead; the images are drawn again when the window size changes, only
@@ -113,7 +114,9 @@ export function createNativeMenus(host) {
         onClose();
     }));
 
-    return { show };
+    // A native menu leaves the wheel's UI mode, and "wheelmode" fires on
+    // its close: nothing to wait for here.
+    return { show, isOpen: () => false, onClosed() {} };
 }
 
 // drawingAhead: the shared drawing ahead (common/drawing_ahead.js);
@@ -156,6 +159,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     let shown = null;
     // What the texts' layer was drawn with; null when it holds nothing.
     let textsSignature = null;
+    const closedListeners = [];
 
     // Draws the backdrop on a window-sized canvas, which also measures the window.
     function measure() {
@@ -364,9 +368,16 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         return onClose;
     }
 
+    // After the menu's own onClose: what waited for a free wheel checks
+    // isOpen() itself, since a command may have opened another menu.
+    function reportClosed(onClose) {
+        if (!onClose) return;
+        onClose();
+        for (const listener of closedListeners) listener();
+    }
+
     function close() {
-        const onClose = takeDown();
-        if (onClose) onClose();
+        reportClosed(takeDown());
     }
 
     // Draws the menu; false, with the error logged and nothing left
@@ -458,7 +469,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         try {
             host.doCommand(row.cmd);
         } finally {
-            if (onClose) onClose();
+            reportClosed(onClose);
         }
     }
 
@@ -482,7 +493,13 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // Fires when the cabinet sits idle: the menu closes without choosing.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
 
-    return { show, draw, close, isOpen: () => shown !== null };
+    // listener: runs, guarded, each time a Drawn Menu closes; a Drawn Menu
+    // never changes the UI mode, so no "wheelmode" follows.
+    function onClosed(listener) {
+        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
+    }
+
+    return { show, draw, close, isOpen: () => shown !== null, onClosed };
 }
 
 let sharedDrawnMenus = null;

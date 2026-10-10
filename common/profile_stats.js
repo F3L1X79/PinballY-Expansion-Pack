@@ -23,7 +23,8 @@
 // the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
 // the player asked for it. Can also open the frame list straight away, for
-// the Reward Prompt.
+// the Reward Prompt. isOpen() and onClosed() let the wheel dialogs wait
+// for it.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -58,6 +59,7 @@ export function createProfileStats(host, {
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     // The screen on show: its layers, choices and selection; null when closed.
     let shown = null;
+    const closedListeners = [];
 
     // Over every table the Profile played, hidden or no longer listed ones
     // included: hiding a table never erases a player's history.
@@ -332,6 +334,12 @@ export function createProfileStats(host, {
         stopFade(shown);
         for (const layer of shown.layers) host.removeDrawingLayer(layer);
         shown = null;
+        for (const listener of closedListeners) listener();
+    }
+
+    // listener: runs, guarded, each time the screen closes.
+    function onClosed(listener) {
+        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
     }
 
     // direction: 1 for Next, -1 for Prev.
@@ -371,6 +379,8 @@ export function createProfileStats(host, {
 
     return {
         open: () => open(),
+        isOpen: () => shown !== null,
+        onClosed,
         // Opens the frame list straight away on that tier's row, onClosed
         // called once it closes; Select or Exit there shows this screen on the
         // Frame button, as if the list had been opened from it.

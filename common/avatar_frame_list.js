@@ -17,7 +17,8 @@
 // shows or the window size changed; what the list shows is read again on
 // each opening, and ahead after a Profile switch or a change of a
 // Profile's data. Opens directly, not through the wheel dialog module:
-// the player asked for it.
+// the player asked for it. isOpen() and onClosed() let the wheel dialogs
+// wait for it.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -62,6 +63,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     // The open list, null when closed: the highlighted row's index and what
     // Select and Exit return to.
     let shown = null;
+    const closedListeners = [];
 
     function readRows() {
         const { avatarPath } = profileStore.getActiveProfile();
@@ -205,6 +207,12 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         // What changed while it was open is read again once it is closed.
         wakeDrawingAhead();
         onClosed();
+        for (const listener of closedListeners) listener();
+    }
+
+    // listener: runs, guarded, each time the list closes.
+    function onListClosed(listener) {
+        closedListeners.push(safeHandler(SCRIPT_NAME, listener));
     }
 
     // direction: 1 for Next, -1 for Prev.
@@ -253,6 +261,8 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
 
     return {
         open,
+        isOpen: () => shown !== null,
+        onClosed: onListClosed,
         // The active Profile's frames unlocked and in all, null when there
         // are none (Table Mastery off).
         count() {

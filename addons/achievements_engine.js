@@ -18,7 +18,8 @@
 // Also adds the Achievement List entry to the main menu, right after "Play",
 // and the Profile Stats entry right after it, and lets the Profile Rewards
 // module submit its Reward Prompt, which opens the Profile Stats' frame
-// list. The Challenges family and the
+// list. No wheel dialog shows while one of these drawn screens is open.
+// The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
 // Challenges Add-on is enabled. Also starts the Surprises tracker, which
 // records each Play for the Surprises family.
@@ -46,6 +47,7 @@ import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
 import { createAchievementList } from "../common/achievement_list.js";
 import { createProfileStats } from "../common/profile_stats.js";
 import { createAvatarFrameList } from "../common/avatar_frame_list.js";
+import { getWheelDialogs } from "../common/wheel_dialog.js";
 import { getProfileRewards } from "../common/profile_rewards.js";
 import { getDailyStreak } from "../common/daily_streak.js";
 import { HALL_OF_FAME_FULL_FILTER_ID } from "../common/hall_of_fame.js";
@@ -143,6 +145,10 @@ export default function init() {
         hallOfFameFilter: config.addOns.hallOfFame === false ? null : HALL_OF_FAME_FULL_FILTER_ID,
         tablesToDiscoverFilter: config.addOns.tablesToDiscover === false ? null : TABLES_TO_DISCOVER_FULL_FILTER_ID,
     });
+    // Drawn over the wheel without leaving its UI mode: a waiting dialog
+    // (such as the rating prompt after "Go equip it") shows only once the
+    // player is back on the wheel.
+    for (const screen of [achievementList, frameList, profileStats]) getWheelDialogs().waitFor(screen);
     // "Go equip it" needs the Profile Stats' frame list, so the Reward
     // Prompt exists only with them.
     profileRewards.enablePrompts(profileStats.openFrameList);

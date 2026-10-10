@@ -30,7 +30,7 @@
 // profileGreetingSoundFile) follows every pick after a short pause, the
 // carousel staying still meanwhile, and greets the restored Profile once
 // at startup, after the same pause, as soon as the wheel is free of menus
-// and dialogs; a game or the carousel started first cancels it.
+// (drawn or native), drawn screens and dialogs; a game or the carousel started first cancels it.
 // ============================================================
 
 import lang from "../common/i18n.js";
@@ -529,7 +529,8 @@ export default function init() {
         playGreetingSound();
     }
 
-    const isWheelFree = () => host.getUIMode() === "wheel" && getWheelDialogs().isIdle();
+    // A Drawn Menu or a drawn screen leaves the UI mode on the wheel.
+    const isWheelFree = () => host.getUIMode() === "wheel" && !getWheelDialogs().isOverlayOpen() && getWheelDialogs().isIdle();
 
     // Greets the active Profile after a pause: right on the press or on the
     // wheel's first frame, it felt abrupt. Whatever is drawn stays still
@@ -684,6 +685,8 @@ export default function init() {
         badgeLayer.alpha = 1;
         greetAtStartupIfFree();
     }));
+    // No "wheelmode" follows the close of a Drawn Menu or a drawn screen.
+    getWheelDialogs().onOverlayClosed(greetAtStartupIfFree);
 
     // Fires when the cabinet sits idle: the player left without picking, so
     // the carousel must not stay drawn over attract mode or keep the buttons.

@@ -11,7 +11,9 @@
 // comes and holds the queue until it reports closed; listeners hear it close, so toasts can
 // wait for it from its submission on. A dialog not ready yet holds its
 // place, and every dialog after it, until it is; a stale one is dropped
-// unshown. Listens to "command" and "wheelmode".
+// unshown. A screen the pack draws over the wheel without leaving its UI
+// mode (a Drawn Menu, the Profile Stats…) keeps it busy while open, once
+// handed to waitFor(). Listens to "command" and "wheelmode".
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";
@@ -38,6 +40,9 @@ export function createWheelDialogs(host, menus = createNativeMenus(host)) {
     // buttons than any before it, since command IDs are finite.
     const buttonCommands = [];
     const drawnClosedListeners = [];
+    // Drawn over the wheel in its UI mode: no "wheelmode" tells their close.
+    const wheelOverlays = [];
+    const overlayClosedListeners = [];
 
     function getButtonCommand(index) {
         while (buttonCommands.length <= index) {
@@ -57,6 +62,7 @@ export function createWheelDialogs(host, menus = createNativeMenus(host)) {
         // A dialog opened while a game is exiting would sit under the launch
         // overlay, and one opened over another menu would replace it.
         if (host.getUIMode() !== "wheel") return;
+        if (isOverlayOpen()) return;
         // Whatever it waits for must not wait for this queue in turn: a
         // drawn dialog queued behind it would hold the toasts it waits on.
         if (queue[0].isReady && !queue[0].isReady()) return;
@@ -154,7 +160,30 @@ export function createWheelDialogs(host, menus = createNativeMenus(host)) {
         drawnClosedListeners.push(safeHandler(SCRIPT_NAME, listener));
     }
 
-    return { submit, wake: scheduleShowNext, isIdle, hasDrawnDialog, onDrawnDialogClosed };
+    // True while a screen handed to waitFor() is open.
+    const isOverlayOpen = () => wheelOverlays.some(overlay => overlay.isOpen());
+
+    // screen: { isOpen(), onClosed(listener) }; no dialog shows while it is
+    // open, and the queue moves on once it closes.
+    function waitFor(screen) {
+        wheelOverlays.push(screen);
+        screen.onClosed(() => {
+            scheduleShowNext();
+            for (const listener of overlayClosedListeners) listener();
+        });
+    }
+
+    // listener: runs, guarded, each time a screen handed to waitFor() closes,
+    // for what else waits for a free wheel.
+    function onOverlayClosed(listener) {
+        overlayClosedListeners.push(safeHandler(SCRIPT_NAME, listener));
+    }
+
+    // A dialog's own menu is never open while the queue is free to move:
+    // it is the one on screen.
+    waitFor(menus);
+
+    return { submit, wake: scheduleShowNext, isIdle, hasDrawnDialog, onDrawnDialogClosed, waitFor, isOverlayOpen, onOverlayClosed };
 }
 
 let sharedWheelDialogs = null;
