@@ -25,7 +25,8 @@
 // ahead; the images are drawn again when the window size changes, only
 // placed and scaled on each opening, and shrunk to a dot while hidden.
 // The texts are drawn on opening, again only when they changed. The menu
-// fades in; it never changes PinballY's UI mode. Each opening's time is
+// fades in, unless it is the same menu shown again over itself (then the
+// cursor stays on its entry); it never changes PinballY's UI mode. Each opening's time is
 // logged, part by part.
 // ============================================================
 
@@ -326,7 +327,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     }
 
     // Returns how long each part took, in ms, for the log.
-    function open(id, model, onClose) {
+    function open(id, model, onClose, { fadeIn }) {
         const timings = {};
         let partStartMs = host.now().getTime();
         const lap = name => {
@@ -360,6 +361,10 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             textsLayer, outline.layer, selectedTextLayer,
             ...placeStack(glass, geometry.panel, geometry.k),
         ];
+        if (!fadeIn) {
+            setAlpha(1);
+            return timings;
+        }
         setAlpha(0);
         shown.fadeStartMs = host.now().getTime();
         shown.fadeTimer = host.setInterval(safeHandler(SCRIPT_NAME, fadeStep), FRAME_MS);
@@ -392,11 +397,17 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // drawn, when it cannot, or when it has no entry to choose.
     function draw(id, items, { dialogStyle = false, onClose = null } = {}) {
         const startMs = host.now().getTime();
+        // The same menu shown again over itself (PinballY refreshing it after
+        // a stayOpen entry, as when ticking a category): no fade, and the
+        // cursor stays on its entry unless PinballY marks one.
+        const refreshedCmd = shown && shown.id === id ? shown.model.rows[shown.model.selected].cmd : null;
         close();
         try {
             const model = buildMenuModel(items, { dialogStyle, pagingCommands });
             if (!model) return false;
-            const timings = open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})));
+            const kept = model.entries.find(index => model.rows[index].cmd === refreshedCmd);
+            if (kept !== undefined && !model.entries.some(index => model.rows[index].selected)) model.selected = kept;
+            const timings = open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})), { fadeIn: refreshedCmd === null });
             const parts = Object.entries(timings).map(([name, ms]) => `${name} ${ms}`).join(", ");
             host.log(`[${SCRIPT_NAME}] "${id}" opened in ${host.now().getTime() - startMs} ms (${model.entries.length} entries; ${parts}).`);
             return true;

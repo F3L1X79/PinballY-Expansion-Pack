@@ -15,20 +15,24 @@ import { getDrawnMenus } from "../common/drawn_menu.js";
 const SCRIPT_NAME = "DrawnMenus";
 
 // The PinballY menu ids drawn instead of shown natively: the player's
-// menus and the table's setup menu, opened from the main menu. The other
-// setup menus (operator, game categories, capture, media drop,
+// menus and the table's setup and categories menus, opened from the main
+// menu. The other setup menus (operator, capture, media drop,
 // elevation...) and the pause menu stay native.
 const FILTER_MENU_IDS = ["category", "era", "manuf", "rating", "system", "when added", "when played"].map(name => `filter by ${name}`);
-const DRAWN_MENU_IDS = ["main", "exit", "power off", "game setup", ...FILTER_MENU_IDS];
+const DRAWN_MENU_IDS = ["main", "exit", "power off", "game setup", "game categories", ...FILTER_MENU_IDS];
 
 export default function init() {
     const drawnMenus = getDrawnMenus();
 
     // Fires when any menu opens, after every other Add-on edited its entries.
     mainWindow.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
-        // As a native menu replaces another, the new menu replaces a Drawn one.
-        drawnMenus.close();
-        if (!DRAWN_MENU_IDS.includes(ev.id)) return;
+        // As a native menu replaces another, the new menu replaces a Drawn
+        // one; draw() closes it itself, seeing first whether it is the same
+        // menu shown again.
+        if (!DRAWN_MENU_IDS.includes(ev.id)) {
+            drawnMenus.close();
+            return;
+        }
         const options = ev.options || {};
         if (!drawnMenus.draw(ev.id, [...ev.items], { dialogStyle: Boolean(options.dialogStyle) })) return;
         ev.preventDefault();
