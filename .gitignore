@@ -32,3 +32,6 @@ profiles/guest/*
 
 # Personal sounds, not published (see .env.example)
 assets/sounds/local/
+
+# Drawn Menu check sheet (tools/drawn_menu/generate_drawn_menu.mjs --sheet)
+assets/images/drawn_menu/sheet.png

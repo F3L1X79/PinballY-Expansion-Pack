@@ -4,8 +4,9 @@
 // anti-aliased edges, bevelled metal, gems, spheres, glows and noise on a
 // premultiplied RGBA canvas, saved as PNG with transparency. Coordinates:
 // the Avatar's image box is [-1, 1] on both axes, y pointing down; the
-// canvas spans [-EXTENT, EXTENT]. Run by generate_frames.mjs, never by
-// PinballY.
+// canvas spans [-EXTENT, EXTENT]. A rectangular canvas may instead be
+// painted in coordinates of its own (Canvas.rect). Run by
+// generate_frames.mjs and tools/drawn_menu/, never by PinballY.
 // ============================================================
 
 import zlib from "node:zlib";
@@ -291,24 +292,35 @@ export function gradient(sdf, x, y, e) {
 }
 
 export class Canvas {
-    constructor(size) {
+    // A square canvas of size pixels over [-EXTENT, EXTENT]; size is also
+    // the width of a rectangular one.
+    constructor(size, { height = size, origin = -EXTENT, px = (2 * EXTENT) / size } = {}) {
         this.size = size;
-        this.px = (2 * EXTENT) / size;
-        this.buf = new Float32Array(size * size * 4);
+        this.height = height;
+        this.origin = origin;
+        this.px = px;
+        this.buf = new Float32Array(size * height * 4);
+    }
+
+    // A width x height canvas whose coordinates start at 0 in its top left
+    // corner, unit pixels apart: a unit of 1 / scale, painted at scale
+    // times the size and shrunk with half() back to 1 unit per pixel.
+    static rect(width, height, scale = 1) {
+        return new Canvas(width * scale, { height: height * scale, origin: 0, px: 1 / scale });
     }
 
     // Calls fn(x, y, k) on every pixel centre in the box, k its index.
     each(bbox, fn) {
-        const [x0, y0, x1, y1] = bbox || [-EXTENT, -EXTENT, EXTENT, EXTENT];
-        const toPx = v => (v + EXTENT) / this.px;
+        const [x0, y0, x1, y1] = bbox || [-Infinity, -Infinity, Infinity, Infinity];
+        const toPx = v => (v - this.origin) / this.px;
         const i0 = Math.max(0, Math.floor(toPx(x0)) - 1);
         const i1 = Math.min(this.size - 1, Math.ceil(toPx(x1)) + 1);
         const j0 = Math.max(0, Math.floor(toPx(y0)) - 1);
-        const j1 = Math.min(this.size - 1, Math.ceil(toPx(y1)) + 1);
+        const j1 = Math.min(this.height - 1, Math.ceil(toPx(y1)) + 1);
         for (let j = j0; j <= j1; j++) {
-            const y = -EXTENT + (j + 0.5) * this.px;
+            const y = this.origin + (j + 0.5) * this.px;
             for (let i = i0; i <= i1; i++) {
-                fn(-EXTENT + (i + 0.5) * this.px, y, (j * this.size + i) * 4);
+                fn(this.origin + (i + 0.5) * this.px, y, (j * this.size + i) * 4);
             }
         }
     }
@@ -381,9 +393,9 @@ export class Canvas {
 
     // Half the size, each pixel the average of four.
     half() {
-        const out = new Canvas(this.size / 2);
+        const out = new Canvas(this.size / 2, { height: this.height / 2, origin: this.origin, px: this.px * 2 });
         const s = this.size;
-        for (let j = 0; j < out.size; j++) {
+        for (let j = 0; j < out.height; j++) {
             for (let i = 0; i < out.size; i++) {
                 const o = (j * out.size + i) * 4;
                 for (let c = 0; c < 4; c++) {
@@ -397,7 +409,7 @@ export class Canvas {
 
     // Straight-alpha RGBA bytes.
     toRGBA() {
-        const n = this.size * this.size;
+        const n = this.size * this.height;
         const out = Buffer.alloc(n * 4);
         for (let p = 0; p < n; p++) {
             const a = clamp(this.buf[p * 4 + 3]);
@@ -408,7 +420,7 @@ export class Canvas {
     }
 
     save(file) {
-        writePNG(file, this.size, this.size, this.toRGBA());
+        writePNG(file, this.size, this.height, this.toRGBA());
     }
 }
 
