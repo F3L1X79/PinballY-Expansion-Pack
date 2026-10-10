@@ -15,10 +15,11 @@ import { getDrawnMenus } from "../common/drawn_menu.js";
 const SCRIPT_NAME = "DrawnMenus";
 
 // The PinballY menu ids drawn instead of shown natively: the player's
-// menus. The setup menus (operator, game setup, game categories, capture,
-// media drop, elevation...) and the pause menu stay native.
+// menus and the table's setup menu, opened from the main menu. The other
+// setup menus (operator, game categories, capture, media drop,
+// elevation...) and the pause menu stay native.
 const FILTER_MENU_IDS = ["category", "era", "manuf", "rating", "system", "when added", "when played"].map(name => `filter by ${name}`);
-const DRAWN_MENU_IDS = ["main", "exit", "power off", ...FILTER_MENU_IDS];
+const DRAWN_MENU_IDS = ["main", "exit", "power off", "game setup", ...FILTER_MENU_IDS];
 
 export default function init() {
     const drawnMenus = getDrawnMenus();

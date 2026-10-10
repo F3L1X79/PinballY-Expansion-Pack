@@ -13,4 +13,4 @@ A Drawn Menu keeps the native behaviour: same entries in the same order, the fli
 - PinballY's UI mode stays "wheel" while a Drawn Menu is open: no `wheelmode` fires when it closes, and modules that wait for a free wheel must ask the module whether a menu is open.
 - While a Drawn Menu is open, it swallows every mapped button through `commandbuttondown`, as the other drawn screens do.
 - The panel, the glass and the selection outline are images painted by `tools/drawn_menu/generate_drawn_menu.mjs`, drawn ahead once and only placed on each opening (ADR 0005, 0010); the texts are drawn live, within a 100 ms opening budget checked on the cabinet.
-- The setup menus, the pause menu of a running game and the popups stay native.
+- The table's setup menu (`game setup`), opened from the main menu, is drawn too; the other setup menus, the pause menu of a running game and the popups stay native.

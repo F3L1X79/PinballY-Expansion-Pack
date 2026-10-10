@@ -1,9 +1,10 @@
 // ============================================================
 // The player's other menus as Drawn Menus, through main.js on the fake
 // PinballY globals: the Exit menu with the pack's entries (Change Player,
-// Reset profile for an Admin Profile), the power off menu and the filter
-// menus are drawn; the setup and pause menus stay native, and a native
-// menu opening replaces a Drawn one. A command that opens another menu (a
+// Reset profile for an Admin Profile), the power off menu, the filter
+// menus and the table's setup menu are drawn; the other setup menus and
+// the pause menu stay native, and a native menu opening replaces a Drawn
+// one. A command that opens another menu (a
 // filter submenu, its "Back" entry) gets it drawn in its place; Exit
 // closes a filter submenu without running anything; the active filter
 // carries its gold mark; a list too long for the window scrolls with the
@@ -195,8 +196,22 @@ test("a long filter list scrolls with the selection and pages with NextPage / Pr
     press(fake, "Exit");
 });
 
-test("the setup and pause menus stay native", () => {
-    for (const id of ["operator", "game setup", "game categories", "pause game"]) {
+test("the table's setup menu is drawn", () => {
+    openMenu(fake, "game setup", [
+        { title: "Edit Game Details", cmd: 3000 },
+        { title: "Hide This Game", cmd: 3001, checked: true },
+        { title: "", cmd: -1 },
+        { title: "Back", cmd: COMMAND.MenuReturn },
+    ]);
+
+    assert.ok(isDrawnMenuShown(fake));
+    assert.equal(fake.currentMenu(), null);
+    assert.deepEqual(drawnMenuLines(fake), ["Edit Game Details", "Hide This Game", "---", "Back"]);
+    press(fake, "Exit");
+});
+
+test("the other setup menus and the pause menu stay native", () => {
+    for (const id of ["operator", "game categories", "pause game"]) {
         fake.openMenu(id, [{ title: "Something", cmd: COMMAND.MenuReturn }]);
         assert.ok(!isDrawnMenuShown(fake), id);
         assert.equal(fake.currentMenu().id, id);
