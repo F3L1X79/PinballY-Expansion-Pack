@@ -25,6 +25,8 @@ export function createButtonSound(host, scriptName, soundName) {
     }
 
     return {
+        // True once load() ran, whether the sound plays or was disabled.
+        isLoaded: () => rotation !== null,
         load() {
             if (rotation !== null) return;
             try {

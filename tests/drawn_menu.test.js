@@ -2,7 +2,8 @@
 // The main menu as a Drawn Menu, through main.js on the fake PinballY
 // globals: it is drawn instead of the native one with the same entries in
 // the same order, the cursor on the first entry; Next and Prev move it,
-// wrapping, with PinballY's navigation sound; Select or Launch runs the
+// wrapping, with PinballY's navigation sound, the gold title landing at
+// once on the new entry while the outline glides to it; Select or Launch runs the
 // entry's command with the Select sound, Exit and attract mode close it
 // without running anything, and no button reaches the wheel while it is
 // open. The other menus stay native.
@@ -13,8 +14,9 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "./fake_pinbally_host.js";
 import config from "../common/config.js";
 import {
-    isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, press, openMainMenu, chooseEntry,
+    isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, press, openMainMenu, chooseEntry, GLIDE_OVER_MS,
 } from "./drawn_menu_reader.js";
+import { DRAWN_MENU_Z_INDEX } from "../common/drawn_menu_painter.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "drawnMenus"];
 const BUTTON_SOUNDS = "C:\\PinballY\\Assets\\Button Sounds";
@@ -65,6 +67,21 @@ test("Next and Prev move the cursor over the entries only, wrapping, with the na
     for (let count = 0; count < 5; count++) press(fake, "Next");
     assert.equal(highlightedEntry(fake), "Information", "the separator is skipped");
     assert.deepEqual(fake.soundsPlayed().slice(soundsBefore), Array(7).fill(NEXT_SOUND));
+});
+
+test("the gold title lands at once on the new entry, while only the outline glides", () => {
+    const goldLayer = () => fake.drawingLayers().find(layer => layer.zIndex === DRAWN_MENU_Z_INDEX.selectedText);
+    const outlineLayer = () => fake.drawingLayers().find(layer => layer.zIndex === DRAWN_MENU_Z_INDEX.selection);
+    const outlineBefore = outlineLayer().position();
+    fake.fire("commandbuttondown", { command: "Next", repeat: false });
+    const goldOnPress = goldLayer().position();
+    const outlineOnPress = outlineLayer().position();
+    fake.advanceTime(GLIDE_OVER_MS);
+
+    assert.deepEqual(goldOnPress, goldLayer().position(), "the gold title does not move after the press");
+    assert.deepEqual(outlineOnPress, outlineBefore, "the outline starts from the previous entry");
+    assert.notDeepEqual(outlineLayer().position(), outlineBefore, "then glides to the new one");
+    press(fake, "Prev");
 });
 
 test("no button reaches the wheel while the menu is open", () => {

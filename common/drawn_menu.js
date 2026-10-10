@@ -9,17 +9,18 @@
 // cannot be drawn, so the caller shows the native one instead.
 // While it is open, every button is swallowed through
 // "commandbuttondown": Next / Prev move the selection, wrapping, with
-// PinballY's navigation sound, the gold outline and text gliding to it;
+// PinballY's navigation sound, the gold text landing at once on the new
+// entry while the gold outline glides to it;
 // NextPage / PrevPage move by a page; Select or Launch plays the Select
 // sound, closes the menu (unless the entry stays open) and runs the
 // entry's command through doCommand, as a native menu would; Exit plays
 // the Deselect sound and closes it. Attract mode closes it too.
-// The painted images (panel, glass, selection outline) sit on layers
-// drawn ahead through the shared drawing ahead and again when the window
-// size changes, then only placed and scaled on each opening, and shrunk
-// to a dot while hidden; the texts are drawn live on opening. The menu
+// The button sounds are loaded and the painted images (panel, glass,
+// selection outline) drawn on layers ahead through the shared drawing
+// ahead; the images are drawn again when the window size changes, only
+// placed and scaled on each opening, and shrunk to a dot while hidden; the texts are drawn live on opening. The menu
 // fades in; it never changes PinballY's UI mode. Each opening's time is
-// logged.
+// logged, part by part.
 // ============================================================
 
 import { safeHandler } from "./safe_handler.js";
@@ -147,6 +148,12 @@ export function createDrawnMenus(host, { drawingAhead }) {
     // One step of the drawing ahead: the window's size, then each image.
     function drawAheadStep() {
         if (shown) return false;
+        // Not drawing, but as slow: loading a sound creates its players.
+        const sound = Object.values(sounds).find(candidate => !candidate.isLoaded());
+        if (sound) {
+            sound.load();
+            return true;
+        }
         if (!windowSize) {
             measure();
             return true;
@@ -217,13 +224,19 @@ export function createDrawnMenus(host, { drawingAhead }) {
     }
 
     // The outline and the gold text, centred on this height.
-    function placeSelection(centerY) {
+    // The outline, centred on this height while it glides.
+    function placeOutline(centerY) {
         const { geometry } = shown;
         const size = selectionSize(geometry);
         place(outline.layer, { x: geometry.listX - size.margin, y: centerY - size.height / 2, width: size.width, height: size.height }, false);
-        const { width, height } = shown.selectedTextSize;
-        place(selectedTextLayer, { x: geometry.listX, y: centerY - height / 2, width, height }, false);
         shown.glideY = centerY;
+    }
+
+    // The gold text, right on the selected entry: gliding with the outline,
+    // the new title would cross the other entries' white text.
+    function placeSelectedText() {
+        const { width, height } = shown.selectedTextSize;
+        place(selectedTextLayer, { x: shown.geometry.listX, y: selectedCenterY() - height / 2, width, height }, false);
     }
 
     function stopTimers() {
@@ -261,21 +274,33 @@ export function createDrawnMenus(host, { drawingAhead }) {
         shown.scroll = Math.max(0, Math.min(Math.max(0, geometry.rowsHeight - geometry.areaHeight), scroll));
     }
 
+    // Returns how long each part took, in ms, for the log.
     function open(id, model) {
-        sounds.move.load();
-        sounds.select.load();
-        sounds.deselect.load();
+        const timings = {};
+        let partStartMs = host.now().getTime();
+        const lap = name => {
+            const nowMs = host.now().getTime();
+            timings[name] = nowMs - partStartMs;
+            partStartMs = nowMs;
+        };
+        for (const sound of Object.values(sounds)) sound.load();
+        lap("sounds");
         measure();
+        lap("measure");
         // PinballY tells no script of a new window size: only this measure
         // sees it, so the images drawn for the old size are drawn again here.
         for (const record of images) if (record.signature !== windowSignature()) drawImage(record);
+        lap("images");
         shown = { id, model, geometry: null, scroll: 0, layers: [], fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
         shown.geometry = computeGeometry(windowSize, model, messageHeightAt);
         const { geometry } = shown;
         scrollToSelected();
         drawTextsLayer();
+        lap("texts");
         drawSelectedTextLayer();
-        placeSelection(selectedCenterY());
+        lap("selection");
+        placeSelectedText();
+        placeOutline(selectedCenterY());
         backdrop.setScale({ xSpan: 1, ySpan: 1 });
         backdrop.setPos(0, 0);
         shown.layers = [
@@ -287,6 +312,7 @@ export function createDrawnMenus(host, { drawingAhead }) {
         setAlpha(0);
         shown.fadeStartMs = host.now().getTime();
         shown.fadeTimer = host.setInterval(safeHandler(SCRIPT_NAME, fadeStep), FRAME_MS);
+        return timings;
     }
 
     // Also clears what a failed drawing left.
@@ -304,8 +330,9 @@ export function createDrawnMenus(host, { drawingAhead }) {
         try {
             const model = buildMenuModel(items, { dialogStyle, pagingCommands });
             if (!model) return false;
-            open(id, model);
-            host.log(`[${SCRIPT_NAME}] "${id}" opened in ${host.now().getTime() - startMs} ms (${model.entries.length} entries).`);
+            const timings = open(id, model);
+            const parts = Object.entries(timings).map(([name, ms]) => `${name} ${ms}`).join(", ");
+            host.log(`[${SCRIPT_NAME}] "${id}" opened in ${host.now().getTime() - startMs} ms (${model.entries.length} entries; ${parts}).`);
             return true;
         } catch (error) {
             close();
@@ -322,10 +349,10 @@ export function createDrawnMenus(host, { drawingAhead }) {
         const target = selectedCenterY();
         const y = target + (shown.glideY - target) * remaining;
         if (Math.abs(y - target) >= GLIDE_SNAP_PX) {
-            placeSelection(y);
+            placeOutline(y);
             return;
         }
-        placeSelection(target);
+        placeOutline(target);
         host.clearInterval(shown.glideTimer);
         shown.glideTimer = null;
     }
@@ -341,13 +368,13 @@ export function createDrawnMenus(host, { drawingAhead }) {
         drawSelectedTextLayer();
         const jumps = wrapped || shown.scroll !== previousScroll;
         if (shown.scroll !== previousScroll) drawTextsLayer();
+        placeSelectedText();
         if (jumps) {
             if (shown.glideTimer !== null) host.clearInterval(shown.glideTimer);
             shown.glideTimer = null;
-            placeSelection(selectedCenterY());
+            placeOutline(selectedCenterY());
             return;
         }
-        placeSelection(shown.glideY);
         if (shown.glideTimer === null) {
             shown.glideLastMs = host.now().getTime();
             shown.glideTimer = host.setInterval(safeHandler(SCRIPT_NAME, glideStep), FRAME_MS);
