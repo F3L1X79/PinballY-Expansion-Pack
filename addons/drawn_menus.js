@@ -4,7 +4,8 @@
 // PinballY's native ones (see docs/adr/0013). Listens to "menuopen" last
 // of all the Add-ons, so it sees the final entries; for one of the menus
 // it draws, it hands over a copy of them and cancels the native menu only
-// once drawing succeeded, so the native menu shows on any error. Any
+// once drawing succeeded (preventDefault() and menuUpdated back to false),
+// so the native menu shows on any error. Any
 // other menu stays native, and replaces an open Drawn Menu.
 // ============================================================
 
@@ -28,6 +29,11 @@ export default function init() {
         drawnMenus.close();
         if (!DRAWN_MENU_IDS.includes(ev.id)) return;
         const options = ev.options || {};
-        if (drawnMenus.draw(ev.id, [...ev.items], { dialogStyle: Boolean(options.dialogStyle) })) ev.preventDefault();
+        if (!drawnMenus.draw(ev.id, [...ev.items], { dialogStyle: Boolean(options.dialogStyle) })) return;
+        ev.preventDefault();
+        // PinballY shows a menu marked updated even when "menuopen" is
+        // cancelled (FireMenuEvent checks menuUpdated first), and the other
+        // Add-ons' edits mark it so: the native menu would open under ours.
+        ev.menuUpdated = false;
     }));
 }

@@ -236,7 +236,7 @@ Text may contain `[substitution]` variables (StatuslineOptions.html).
 | joystickaxischange(/bg) | mainWindow | – (must enable first) | `unit`, axis values via JoystickInfo |
 | commandbuttondown/up/bgdown/bgup (CommandButtonEvent.html) | mainWindow | yes | `command` (e.g. "Next", "Select", "Exit", "ExitGame", "Launch"…), `repeat`, `background` |
 | command (CommandEvent.html) | mainWindow | **yes → command not executed** | `id`, `name`, `index` (ranged) |
-| menuopen / menuclose (MenuEvent.html) | mainWindow | open: **yes → menu not shown**; close: no | `id`, `items`, `options`, `menuUpdated`; `addMenuItem`, `deleteMenuItem`, `tidyMenu` |
+| menuopen / menuclose (MenuEvent.html) | mainWindow | open: **yes → menu not shown, unless `menuUpdated` is true** (see §4.2); close: no | `id`, `items`, `options`, `menuUpdated`; `addMenuItem`, `deleteMenuItem`, `tidyMenu` |
 | popupopen / popupclose (PopupEvent.html) | mainWindow | open: yes → popup and its side effects skipped | `id` |
 | attractmodestart / attractmodeend (AttractModeEvent.html) | mainWindow | start: yes → timer reset; end: no | – |
 | wheelmode (WheelModeEvent.html) | mainWindow | no | fires on **return to the wheel** from a menu, popup, attract mode or **a running game** |
@@ -294,7 +294,7 @@ If the launch fails, `launcherror` fires *instead of* `gamestarted` and `gameove
 - The id you pass is reported in `getUIMode().menuID`.
 
 ### 4.2 Editing system menus in `menuopen`
-- **Suppress** the menu with `ev.preventDefault()`.
+- **Suppress** the menu with `ev.preventDefault()`. **Also set `ev.menuUpdated = false`** if any listener may have edited it: `FireMenuEvent` (`PlayfieldView.cpp`) checks `menuUpdated` first and, when true, shows the edited menu through `showMenu` even though the event was cancelled.
 - **Edit** by changing `ev.items`, `ev.id` or `ev.options`, then set **`ev.menuUpdated = true`**, which is undefined by default.
 - `ev.addMenuItem(where, item|items)`:
   - `where` can be a command ID, an exact title string, a RegExp, a predicate, undefined (the top), or `{before: x}` / `{after: x}`.

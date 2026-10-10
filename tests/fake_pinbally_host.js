@@ -807,7 +807,10 @@ export function createFakePinballYHost({
                     this.menuUpdated = true;
                 },
             });
-            if (!ev.defaultPrevented) showMenu(id, menuItems);
+            // Like PinballY's FireMenuEvent: a menu marked updated is shown
+            // even when "menuopen" was cancelled; preventDefault() only
+            // stops the unchanged native menu.
+            if (ev.menuUpdated || !ev.defaultPrevented) showMenu(id, menuItems);
         },
 
         // The Exit menu as PinballY opens it on the Exit button, with its
