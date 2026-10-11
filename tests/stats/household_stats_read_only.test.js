@@ -1,9 +1,9 @@
 // ============================================================
 // Another Profile's Profile Stats, opened from its Household Stats column,
 // through main.js on the fake PinballY globals: the same card and sections
-// with that Profile's values, read-only (no button at the card's foot);
-// Exit, or Select on the cross, goes back to the Household Stats on that
-// column, and Exit there to one's own Profile Stats on the "Household"
+// with that Profile's values, read-only (no button at the card's foot, the
+// cross's tooltip saying Back); Exit, or Select on the cross, goes back to the Household Stats on that
+// column, and Exit there to one's own Profile Stats on the "Household Stats"
 // button.
 // ============================================================
 
@@ -32,9 +32,9 @@ test("Select on another Profile's column opens its Profile Stats, read-only", as
     assert.equal(cardTexts(fake)[0], "Bob");
     assert.deepEqual(section(fake, TEXT.sections.game, TEXT.stats)[TEXT.stats.gamesPlayed], ["5"]);
     assert.ok(isReadOnly(fake), "no button at the card's foot");
-    assert.equal(highlighted(fake), TEXT.closeTooltip, "only the cross");
+    assert.equal(highlighted(fake), TEXT.backTooltip, "only the cross, which goes back");
     press(fake, "Next");
-    assert.equal(highlighted(fake), TEXT.closeTooltip);
+    assert.equal(highlighted(fake), TEXT.backTooltip);
 
     const exit = press(fake, "Exit");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
@@ -56,6 +56,6 @@ test("Select on another Profile's column opens its Profile Stats, read-only", as
     assert.ok(!isHouseholdStatsOpen(fake));
     assert.ok(isProfileStatsOpen(fake));
     assert.equal(cardTexts(fake)[0], "Alice", "one's own Profile Stats");
-    assert.equal(highlighted(fake), "Household");
+    assert.equal(highlighted(fake), "Household Stats");
     assert.deepEqual(errorLines(fake), []);
 });

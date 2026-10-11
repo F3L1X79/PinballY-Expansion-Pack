@@ -3,15 +3,17 @@
 // globals: the active Profile's column first, then the Profile picker's
 // order without Guest; each value as that Profile's own Profile Stats show
 // it, a Profile with no Play showing zeros; the best value of each line in
-// gold, ties included, none on an all-zero line; Next / Prev move the halo
-// from column to column with wrapping, and no button reaches the wheel.
+// gold, ties included, none on an all-zero line, the Collection Mastery's
+// tier square and value centred together; Next / Prev move the halo
+// through the cross (its tooltip saying Back), then from column to column,
+// looping, and no button reaches the wheel.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHousehold, errorLines, played, PROFILES, DEFAULT_AVATAR, NAVIGATION_SOUND, HOUR, MEDIEVAL, MARS, THEATRE } from "./household_stats_scenario.js";
 import { openProfileStats, playerLevel, buttons, press } from "./profile_stats_reader.js";
-import { openHouseholdStats, columns, columnNames, labels, lineValues, goldOn, highlightedColumn, isHouseholdStatsOpen } from "./household_stats_reader.js";
+import { openHouseholdStats, columns, columnNames, labels, lineValues, goldOn, highlightedColumn, isHouseholdStatsOpen, collectionPairMiddles } from "./household_stats_reader.js";
 
 // Past every toast a Profile switch brings.
 const ALL_TOASTS_MS = 600000;
@@ -50,6 +52,10 @@ test("the Household side by side, the best of each line in gold", async () => {
     assert.deepEqual(columns(fake).map(column => column.cells["Collection Mastery"].texts), [["1/4", "0"], ["2/4", "0"], ["0/4", "0"]],
         "the progress toward the next Collection Tier, then the tier in its square");
     assert.deepEqual(goldOn(fake, "Collection Mastery"), ["Alice"], "by tier, then progress");
+    for (const name of ["Bob", "Alice", "Zoe"]) {
+        const { pair, level } = collectionPairMiddles(fake, name, lang);
+        assert.ok(Math.abs(pair - level) <= 1, `${name}'s Collection Mastery is centred like the other values (${pair} vs ${level})`);
+    }
     assert.deepEqual(lineValues(fake, "Games played"), ["4", "4", "0"]);
     assert.deepEqual(lineValues(fake, "Total time"), ["1 h 00", "2 h 10", "0 h 00"]);
     assert.deepEqual(lineValues(fake, "Daily Streak"), ["0", "2", "0"]);
@@ -67,10 +73,13 @@ test("the Household side by side, the best of each line in gold", async () => {
     assert.equal(highlightedColumn(fake), "Alice");
     press(fake, "Prev");
     press(fake, "Prev");
-    assert.equal(highlightedColumn(fake), "Zoe", "wrapping from the first column to the last");
+    assert.equal(highlightedColumn(fake), "Back", "the cross comes before the first column");
+    press(fake, "Prev");
+    assert.equal(highlightedColumn(fake), "Zoe", "then the last one");
+    press(fake, "Next");
     press(fake, "Next");
     assert.equal(highlightedColumn(fake), "Bob", "and back");
-    assert.deepEqual(fake.soundsPlayed(), [...soundsBefore, ...Array(4).fill(NAVIGATION_SOUND)], "PinballY's navigation sound on each move");
+    assert.deepEqual(fake.soundsPlayed(), [...soundsBefore, ...Array(6).fill(NAVIGATION_SOUND)], "PinballY's navigation sound on each move");
 
     assert.ok(press(fake, "Info").defaultPrevented, "a button the screen does not use never reaches the wheel");
     assert.ok(isHouseholdStatsOpen(fake), "and does nothing");

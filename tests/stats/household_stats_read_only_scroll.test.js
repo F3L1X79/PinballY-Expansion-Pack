@@ -25,8 +25,9 @@ test("back from a column past the first five, it is in view under the halo", asy
     assert.deepEqual(columnsInView(fake), NAMES.slice(2), "no glide: already there");
 
     press(fake, "Next");
+    press(fake, "Next");
     fake.advanceTime(GLIDE_OVER_MS);
-    assert.equal(highlightedColumn(fake), "Ann", "still wrapping");
+    assert.equal(highlightedColumn(fake), "Ann", "still looping, through the cross");
     assert.deepEqual(columnsInView(fake), NAMES.slice(0, 5));
     assert.deepEqual(errorLines(fake), []);
 });

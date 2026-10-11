@@ -1,7 +1,8 @@
 // ============================================================
 // The Household Stats' way in, through main.js on the fake PinballY
-// globals: the Profile Stats' "Household" button, after the other foot
-// buttons, shows once the Household has two Profiles, Guest seeing it too;
+// globals: the Profile Stats' "Household Stats" button, after the other
+// foot buttons, shows once the Household has two Profiles, Guest seeing it
+// too, with the count of Profiles they set side by side (Guest left out);
 // Exit on the Household Stats shows the Profile Stats again on that button,
 // and attract mode closes them.
 // ============================================================
@@ -17,7 +18,7 @@ test("the Household button opens the Household Stats, Exit goes back to it, attr
     const { fake, lang } = await startHousehold({ profiles: { Alice: {}, Bob: {} } });
     openProfileStats(fake, lang);
     const shownButtons = buttons(fake);
-    assert.deepEqual(shownButtons[shownButtons.length - 1], { label: "Household", count: null }, "last, Guest seeing it too");
+    assert.deepEqual(shownButtons[shownButtons.length - 1], { label: "Household Stats", count: "2" }, "last, Guest seeing it too, Guest left out of its count");
     press(fake, "Exit");
 
     openHouseholdStats(fake, lang);
@@ -30,7 +31,7 @@ test("the Household button opens the Household Stats, Exit goes back to it, attr
     assert.ok(exit.defaultPrevented, "Exit never reaches the wheel");
     assert.equal(householdStatsLayerCount(fake), 0, "its layers are gone");
     assert.ok(isProfileStatsOpen(fake));
-    assert.equal(highlighted(fake), "Household");
+    assert.equal(highlighted(fake), "Household Stats");
 
     press(fake, "Select");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);

@@ -1,6 +1,6 @@
 // ============================================================
 // A Household of one, through main.js on the fake PinballY globals: the
-// Profile Stats offer no "Household" button.
+// Profile Stats offer no "Household Stats" button.
 // ============================================================
 
 import { test } from "node:test";
@@ -13,6 +13,6 @@ test("one Household Profile: no Household button", async () => {
     openProfileStats(fake, lang);
 
     assert.ok(buttons(fake).length > 0);
-    assert.ok(!buttons(fake).some(button => button.label === "Household"));
+    assert.ok(!buttons(fake).some(button => button.label === "Household Stats"));
     assert.deepEqual(errorLines(fake), []);
 });

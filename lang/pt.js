@@ -441,13 +441,14 @@ export default {
         menuEntry: "Estatísticas",
         // TODO: translation pass
         closeTooltip: "Close",
+        backTooltip: "Back", // TODO: translation pass
         // The buttons at the card's foot.
         buttons: {
             achievements: "Achievements",
             frame: "Frame",
             mostPlayedTables: "Most Played Tables",
             tablesToDiscover: "Tables to Discover",
-            household: "Household", // TODO: translation pass
+            household: "Household Stats", // TODO: translation pass
         },
         // TODO: translation pass
         // The Household Stats opened from the Household button: the title and

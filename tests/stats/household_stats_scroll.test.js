@@ -1,8 +1,8 @@
 // ============================================================
 // A big Household, through main.js on the fake PinballY globals: past
 // five Profiles the Household Stats' columns glide sideways with the gold
-// halo, which always stays in view, wrapping both ways; the cut edges
-// fade while gliding.
+// halo, which always stays in view, looping both ways through the cross,
+// from which the columns jump; the cut edges fade while gliding.
 // ============================================================
 
 import { test } from "node:test";
@@ -46,11 +46,17 @@ test("past five Profiles, the columns glide sideways with the halo", async () =>
 
     press(fake, "Next");
     fake.advanceTime(GLIDE_OVER_MS);
-    assert.deepEqual(columnsInView(fake), NAMES.slice(0, 5), "wrapping to the first column brings it into view");
+    assert.equal(highlightedColumn(fake), "Back", "the cross after the last column");
+    assert.deepEqual(columnsInView(fake), NAMES.slice(2, 7), "the columns stay where they were");
+
+    press(fake, "Next");
+    fake.advanceTime(FRAME_MS);
+    assert.deepEqual(columnsInView(fake), NAMES.slice(0, 5), "from the cross, the first column comes into view at once");
     assert.equal(highlightedColumn(fake), "Ann");
 
     press(fake, "Prev");
-    fake.advanceTime(GLIDE_OVER_MS);
+    press(fake, "Prev");
+    fake.advanceTime(FRAME_MS);
     assert.deepEqual(columnsInView(fake), NAMES.slice(2, 7), "and back to the last");
     assert.equal(highlightedColumn(fake), "Gus");
 

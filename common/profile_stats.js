@@ -28,7 +28,7 @@
 // the Reward Prompt. openReadOnly() opens another Profile's screen from its
 // Household Stats column: its own values and tables (Adult Tables
 // included, whoever looks), no button at the card's foot, Exit or Select
-// on the cross going back there. isOpen() and onClosed() let the wheel
+// on the cross (whose tooltip says Back) going back there. isOpen() and onClosed() let the wheel
 // dialogs wait for it. readStats() reads the values it shows for any
 // named Profile, writing nothing.
 // ============================================================
@@ -120,9 +120,12 @@ export function createProfileStats(host, {
         return frames ? [{ choice: CHOICE.FRAME, label: TEXT.buttons.frame, count: TEXT.fraction(frames.unlocked, frames.total) }] : [];
     }
 
-    // Left out while the Household has fewer than two Profiles.
+    // Left out while the Household has fewer than two Profiles; its count:
+    // the Profiles in the Household Stats, Guest left out.
     function householdButton() {
-        return householdStats && householdStats.isOffered() ? [{ choice: CHOICE.HOUSEHOLD, label: TEXT.buttons.household, count: null }] : [];
+        if (!householdStats) return [];
+        const count = householdStats.countProfiles();
+        return count >= 2 ? [{ choice: CHOICE.HOUSEHOLD, label: TEXT.buttons.household, count: TEXT.number(count) }] : [];
     }
 
     function collectionStat({ played, total }) {
@@ -295,7 +298,8 @@ export function createProfileStats(host, {
                     ],
                 ],
             }, tastesSection(profile, profileTables, getPlay, hallOfFame)],
-            closeLabel: TEXT.closeTooltip,
+            // Another Profile's screen goes back to the Household Stats.
+            closeLabel: isReadOnly ? TEXT.backTooltip : TEXT.closeTooltip,
             // The flippers' loop, the cross first.
             choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],
         };

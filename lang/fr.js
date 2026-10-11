@@ -436,13 +436,16 @@ export default {
     profileStats: {
         menuEntry: "Vos statistiques",
         closeTooltip: "Fermer",
+        // The cross's tooltip where it goes back: the Household Stats, and
+        // another Profile's Profile Stats opened from them.
+        backTooltip: "Retour",
         // The buttons at the card's foot.
         buttons: {
             achievements: "Succès",
             frame: "Cadre",
             mostPlayedTables: "Tables les plus jouées",
             tablesToDiscover: "Tables à découvrir",
-            household: "La maison",
+            household: "Stats de la maison",
         },
         // The Household Stats opened from the Household button: the title and
         // the line labels the stats above do not have.

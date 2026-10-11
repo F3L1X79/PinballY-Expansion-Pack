@@ -1,7 +1,7 @@
 // ============================================================
 // One's own Household Stats column, through main.js on the fake PinballY
 // globals: Select there goes straight back to one's own Profile Stats on
-// the "Household" button, as Exit does, never to a read-only copy.
+// the "Household Stats" button, as Exit does, never to a read-only copy.
 // ============================================================
 
 import { test } from "node:test";
@@ -19,6 +19,6 @@ test("Select on one's own column goes back to one's own Profile Stats", async ()
     assert.ok(select.defaultPrevented);
     assert.ok(!isHouseholdStatsOpen(fake));
     assert.equal(cardTexts(fake)[0], "Bob");
-    assert.equal(highlighted(fake), "Household", "as Exit does");
+    assert.equal(highlighted(fake), "Household Stats", "as Exit does");
     assert.deepEqual(errorLines(fake), []);
 });

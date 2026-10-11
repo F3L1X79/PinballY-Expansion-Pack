@@ -4,8 +4,8 @@
 // columns from left to right (the Profile's name, its Avatar image, the
 // Avatar Frame around it, and each line's cell: its texts and whether its
 // value is gold), the highlighted column (the one the gold halo
-// surrounds), the columns in view and those faded at the edges while
-// gliding, opens them from the Profile Stats' "Household" button and picks
+// surrounds, or the cross's tooltip), the columns in view and those faded at the edges while
+// gliding, opens them from the Profile Stats' "Household Stats" button and picks
 // a column as a player would. Never loaded by PinballY.
 // ============================================================
 
@@ -25,7 +25,7 @@ export const isHouseholdStatsOpen = fake => shownLayers(fake, HOUSEHOLD_STATS_Z_
 export const householdStatsLayerCount = fake => fake.drawingLayers()
     .filter(layer => Object.values(HOUSEHOLD_STATS_Z_INDEX).includes(layer.zIndex)).length;
 
-// Opens the Profile Stats from the main menu, picks "Household" and lets
+// Opens the Profile Stats from the main menu, picks "Household Stats" and lets
 // the fade end.
 export function openHouseholdStats(fake, lang) {
     openProfileStats(fake, lang);
@@ -73,6 +73,24 @@ export function columns(fake) {
     });
 }
 
+// The middles of a column's Collection Mastery pair (its tier square's
+// left to its value's right) and of its Player Level value, centred like
+// every other value. A centred text's rect is 4 px wider than measured; a
+// left-aligned one fills its room, so its width is its length at the
+// fake's character width, read from the centred value.
+export function collectionPairMiddles(fake, name, lang) {
+    const layer = columnLayers(fake).find(candidate => textStrokes(candidate)[0].text === name);
+    const { lines } = lang.profileStats.household;
+    const labelStrokes = textStrokes(labelLayer(fake));
+    const lineMiddle = label => middleOf(labelStrokes.find(stroke => stroke.text === label).rect);
+    const onLine = label => textStrokes(layer).filter(stroke => Math.abs(middleOf(stroke.rect) - lineMiddle(label)) < 20);
+    const [value, tier] = onLine(lines.collectionMastery);
+    const [level] = onLine(lines.playerLevel);
+    const levelW = level.rect.width - 4;
+    const charW = levelW / level.text.length;
+    return { pair: (tier.rect.x + value.rect.x + value.text.length * charW) / 2, level: level.rect.x + levelW / 2 };
+}
+
 export const columnNames = fake => columns(fake).map(column => column.name);
 
 // Past five Profiles (fewer in a narrow window), only the columns in view
@@ -94,10 +112,13 @@ export const lineValues = (fake, label) => columns(fake).map(column => (column.c
 // The names of the columns whose value on that line is gold.
 export const goldOn = (fake, label) => columns(fake).filter(column => column.cells[label] && column.cells[label].isGold).map(column => column.name);
 
-// The name of the column the gold halo surrounds (both centred on the same point).
+// The name of the column the gold halo surrounds (both centred on the same
+// point), or the cross's tooltip when the halo is on the cross.
 export function highlightedColumn(fake) {
     const lit = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.highlight);
-    assert.equal(lit.length, 1, "exactly one column is highlighted");
+    assert.equal(lit.length, 1, "exactly one halo is shown");
+    const [tooltip] = lit[0].texts();
+    if (tooltip) return tooltip;
     const same = (a, b) => Math.abs(a - b) < 1e-9;
     const column = columnLayers(fake).find(layer => same(layer.position().x, lit[0].position().x) && same(layer.position().y, lit[0].position().y));
     return column ? textStrokes(column)[0].text : null;

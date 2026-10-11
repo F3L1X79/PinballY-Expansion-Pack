@@ -1,6 +1,6 @@
 // ============================================================
 // Household Stats module: the drawn screen the player opens from the
-// Profile Stats' "Household" button to set the Household's Profiles (every
+// Profile Stats' "Household Stats" button to set the Household's Profiles (every
 // Profile but Guest) side by side: a centred Steamball panel over the
 // dimmed wheel, laid out by the Household Stats painter, with one column
 // per Profile (its Avatar in the Avatar Frame it wears; the active one
@@ -9,14 +9,15 @@
 // value is read again on each opening, through the Profile Stats' reader;
 // the screen is drawn at once on all its layers, then faded in. While open
 // it swallows every button through "commandbuttondown": Next / Prev move a
-// gold halo from column to column, looping, with PinballY's navigation
-// sound. Past five columns (fewer in a narrow window), the columns glide
+// gold halo through the cross at the top right (its tooltip says Back),
+// then from column to column, looping, with PinballY's navigation sound.
+// Past five columns (fewer in a narrow window), the columns glide
 // sideways to keep the halo in view, the ones cut by the view's edges
-// faded, and a wrap jumps instead of gliding across them all. Select or
-// Launch on another Profile's column opens its Profile Stats read-only,
-// whose Exit shows this screen again on that column; on one's own column
-// it goes back as Exit does. Exit closes it and calls the return given to
-// open(); attract mode only closes it. Opens directly, not through the
+// faded, and coming from the cross jumps instead of gliding across them
+// all. Select or Launch on another Profile's column opens its Profile
+// Stats read-only, whose Exit shows this screen again on that column; on
+// one's own column or the cross it goes back as Exit does. Exit closes it
+// and calls the return given to open(); attract mode only closes it. Opens directly, not through the
 // wheel dialog module: the player asked for it. isOpen() and onClosed()
 // let the wheel dialogs wait for it.
 // ============================================================
@@ -30,7 +31,8 @@ import { openDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import { drawBackdrop } from "./steamball_drawing.js";
 import {
-    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, haloRectOf, drawTitle, drawLabels, drawColumn, drawHalo,
+    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, haloRectOf, crossHaloRectOf,
+    drawTitle, drawLabels, drawColumn, drawHalo, drawCross, drawCrossHalo,
 } from "./household_stats_painter.js";
 
 const SCRIPT_NAME = "HouseholdStats";
@@ -40,6 +42,9 @@ const MINUTES_PER_HOUR = 60;
 // the Achievement List's does.
 const GLIDE_TIME_CONSTANT_MS = 40;
 const GLIDE_SNAP_PX = 0.5;
+// The selection on the cross rather than on a column; first in the
+// Next / Prev loop, as on the Profile Stats.
+const CROSS = -1;
 
 // readStats(profileName): the Profile Stats' values for that Profile
 // (common/profile_stats.js); openProfileStats(profileName, onBack): opens
@@ -129,6 +134,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         });
         return {
             title: TEXT.household.title,
+            backLabel: TEXT.backTooltip,
             labels: lines.map(line => line.label),
             columns: profiles.map((profile, column) => ({
                 profileName: profile.name,
@@ -160,6 +166,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
             },
         });
         drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
+        drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.cross, geometry.cross, drawCross);
         drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
         // Apart from the other layers: their alpha also fades them at the view's edges.
         const columnLayers = [];
@@ -170,6 +177,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         // Drawn once for the columns' size and only moved.
         const haloRect = haloRectOf(geometry.columns[0]);
         const halo = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.highlight, haloRect, dc => drawHalo(dc, haloRect.w, haloRect.h));
+        const crossHalo = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.highlight, crossHaloRectOf(geometry.cross), dc => drawCrossHalo(host, dc, screen.backLabel));
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         const column = Math.max(0, screen.columns.findIndex(entry => entry.profileName === selectedName));
@@ -177,7 +185,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         // first: the first column in view once the glide is over; scroll:
         // how far the columns have glided, in reference pixels.
         const opened = {
-            onBack, columns: screen.columns, drawn, columnLayers, halo, geometry, selected: column, first, scroll: first * geometry.pitch,
+            onBack, columns: screen.columns, drawn, columnLayers, halo, crossHalo, geometry, selected: column, first, scroll: first * geometry.pitch,
             opacity: 0, glideTimer: null, glideMs: 0,
         };
         shown = opened;
@@ -199,7 +207,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
 
     // Each column at the glide's scroll, faded at the view's edges; the
     // halo on the selected column, held inside the view while that column
-    // glides into it.
+    // glides into it, or the cross's halo alone.
     function placeColumns(screen) {
         const { geometry, drawn } = screen;
         const { view } = geometry;
@@ -209,6 +217,10 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
             drawn.place(layer, { ...rect, x });
             layer.alpha = screen.opacity * edgeAlpha(geometry, x, rect.w);
         });
+        const isOnCross = screen.selected === CROSS;
+        screen.halo.alpha = isOnCross ? 0 : screen.opacity;
+        screen.crossHalo.alpha = isOnCross ? screen.opacity : 0;
+        if (isOnCross) return;
         const selected = geometry.columns[screen.selected];
         const x = Math.max(view.x, Math.min(view.x + view.w - selected.w, selected.x - screen.scroll));
         drawn.place(screen.halo, haloRectOf({ ...selected, x }));
@@ -247,17 +259,20 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         closedListeners.tell();
     }
 
-    // direction: 1 for Next, -1 for Prev. Brings the selected column into
-    // view, gliding unless it wrapped.
+    // direction: 1 for Next, -1 for Prev, through the cross then each
+    // column. Brings the selected column into view, gliding unless it comes
+    // from the cross: the columns then stay where they were.
     function move(direction) {
         navigationSound.play();
         const screen = shown;
         const { columns, view } = screen.geometry;
         const previous = screen.selected;
-        screen.selected = (previous + direction + columns.length) % columns.length;
+        // The loop's places: the cross at 0, then the columns.
+        const places = columns.length + 1;
+        screen.selected = ((previous + 1 + direction + places) % places) - 1;
+        if (screen.selected === CROSS) return placeColumns(screen);
         screen.first = Math.min(screen.selected, Math.max(screen.first, screen.selected - view.count + 1));
-        const wrapped = direction > 0 ? screen.selected < previous : screen.selected > previous;
-        if (wrapped) {
+        if (previous === CROSS) {
             stopGlide(screen);
             screen.scroll = targetScroll(screen);
         } else if (screen.glideTimer === null && screen.scroll !== targetScroll(screen)) {
@@ -274,9 +289,10 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
     }
 
     // Another Profile's column opens its Profile Stats, whose Exit comes
-    // back here on that column; one's own goes back as Exit does.
+    // back here on that column; one's own and the cross go back as Exit does.
     function choose() {
         const { onBack, columns, selected } = shown;
+        if (selected === CROSS) return back();
         const column = columns[selected];
         if (column.isActive) return back();
         close();
@@ -302,9 +318,9 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
 
     return {
         open,
-        // Whether the Household has two Profiles to set side by side.
+        // How many Profiles the screen sets side by side; offered from two.
         // By name only: listing the Profiles also checks their Avatars.
-        isOffered: () => householdOf(profileStore.listProfileNames()).length >= 2,
+        countProfiles: () => householdOf(profileStore.listProfileNames()).length,
         isOpen: () => shown !== null,
         onClosed: closedListeners.onClosed,
     };
