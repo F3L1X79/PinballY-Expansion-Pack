@@ -72,8 +72,8 @@ test("the Household side by side, the best of each line in gold", async () => {
     assert.equal(highlightedColumn(fake), "Bob", "and back");
     assert.deepEqual(fake.soundsPlayed(), [...soundsBefore, ...Array(4).fill(NAVIGATION_SOUND)], "PinballY's navigation sound on each move");
 
-    for (const command of ["Select", "Launch", "Info"]) assert.ok(press(fake, command).defaultPrevented, `${command} never reaches the wheel`);
-    assert.ok(isHouseholdStatsOpen(fake), "Select does nothing yet");
+    assert.ok(press(fake, "Info").defaultPrevented, "a button the screen does not use never reaches the wheel");
+    assert.ok(isHouseholdStatsOpen(fake), "and does nothing");
     assert.equal(highlightedColumn(fake), "Bob");
     assert.deepEqual(errorLines(fake), []);
 });

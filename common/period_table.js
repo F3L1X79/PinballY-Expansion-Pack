@@ -89,7 +89,9 @@ export function createPeriodTable(host, definition, profileStore) {
         return Array.isArray(lock.adultPeriods) ? lock : { ...lock, adultPeriods: [] };
     };
     const streakRecordOf = data => ({ ...NO_STREAK, ...data.streaks[name] });
-    const getStreakRecord = () => streakRecordOf(profileStore.getProfileData());
+    // The named Profile's (the active one by default).
+    const getStreakRecord = profileName =>
+        streakRecordOf(profileName === undefined ? profileStore.getProfileData() : profileStore.getProfileDataOf(profileName));
 
     // Also keeps the Period among the adult Periods exactly while its table
     // is an Adult Table, which follows a table tagged or untagged mid-Period.
@@ -182,7 +184,7 @@ export function createPeriodTable(host, definition, profileStore) {
 
     // Whether the active Profile already played this Period's table.
     const isPlayedThisPeriod = () => getStreakRecord().lastPeriod === getPeriodKey(host.now());
-    const getLongestStreak = () => getStreakRecord().longest;
+    const getLongestStreak = profileName => getStreakRecord(profileName).longest;
     const getPeriodsPlayed = () => getStreakRecord().periodsPlayed;
 
     function recordPeriodPlayed(playedPeriod, profileName) {
@@ -199,13 +201,14 @@ export function createPeriodTable(host, definition, profileStore) {
         }, profileName);
     }
 
-    function getStreak() {
+    // The named Profile's (the active one by default).
+    function getStreak(profileName) {
         const currentPeriod = getPeriodKey(host.now());
-        const { current, lastPeriod } = getStreakRecord();
+        const { current, lastPeriod } = getStreakRecord(profileName);
 
         // The stored counter is only reset on the next play, so a Streak whose
         // last Period is older than the previous one is already broken.
-        if (lastPeriod !== currentPeriod && !followsInStreak(lastPeriod, currentPeriod)) return 0;
+        if (lastPeriod !== currentPeriod && !followsInStreak(lastPeriod, currentPeriod, profileName)) return 0;
         return current;
     }
 

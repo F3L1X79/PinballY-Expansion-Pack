@@ -160,9 +160,10 @@ const collectionBlockH = () => LOOK.collection.titleH + LOOK.collection.h;
 
 function cardHeight(screen, avatar) {
     const { button } = LOOK;
-    const buttonsH = screen.buttons.length * (button.h + button.gap) - button.gap;
+    // Another Profile's read-only card has no button, nor their gap.
+    const buttonsH = screen.buttons.length === 0 ? 0 : LOOK.buttonsGap + screen.buttons.length * (button.h + button.gap) - button.gap;
     const blocksH = playerLevelBlockH() + LOOK.ruleH + collectionBlockH();
-    return LOOK.cardInset + avatar.size + 2 * avatar.inset + LOOK.avatarGap + LOOK.nameH + blocksH + LOOK.buttonsGap + buttonsH + LOOK.cardInset;
+    return LOOK.cardInset + avatar.size + 2 * avatar.inset + LOOK.avatarGap + LOOK.nameH + blocksH + buttonsH + LOOK.cardInset;
 }
 
 // The panel, the card and the column in a window referenceWidth wide; the
@@ -330,7 +331,7 @@ function drawSection(host, dc, blocks, top, columnW) {
 // screen: { name, avatarPath, framePath (the worn Avatar Frame's image,
 // null for none), playerLevel ({ title, number, color (the
 // level's metal), share (0 to 1), current }), collectionTitle, collection (as drawCollection's), buttons (each { choice, label, count: null
-// or a string }), sections (each { title, rows: [[{ label, value, pill
+// or a string }; none on another Profile's read-only card), sections (each { title, rows: [[{ label, value, pill
 // (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]],
 // strips (optional: [{ label, hasTable, title, logoPath, pill (null or as a stat's) }]) }),
 // closeLabel }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn

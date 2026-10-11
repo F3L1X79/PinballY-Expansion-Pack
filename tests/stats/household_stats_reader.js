@@ -4,8 +4,8 @@
 // columns from left to right (the Profile's name, its Avatar image, and
 // each line's cell: its texts and whether its value is gold), the
 // highlighted column (the one the gold halo surrounds), the columns in
-// view and those faded at the edges while gliding, and opens them
-// from the Profile Stats' "Household" button as a player would.
+// view and those faded at the edges while gliding, opens them from the
+// Profile Stats' "Household" button and picks a column as a player would.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -98,4 +98,15 @@ export function highlightedColumn(fake) {
     const same = (a, b) => Math.abs(a - b) < 1e-9;
     const column = columnLayers(fake).find(layer => same(layer.position().x, lit[0].position().x) && same(layer.position().y, lit[0].position().y));
     return column ? textStrokes(column)[0].text : null;
+}
+
+// Moves the halo with Next to the column of that name, letting each glide
+// end, then presses Select.
+export function chooseColumn(fake, name) {
+    for (let guard = 0; guard < 20 && highlightedColumn(fake) !== name; guard++) {
+        press(fake, "Next");
+        fake.advanceTime(GLIDE_OVER_MS);
+    }
+    assert.equal(highlightedColumn(fake), name, `the Household Stats show "${name}"`);
+    return press(fake, "Select");
 }

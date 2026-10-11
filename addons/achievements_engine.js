@@ -141,9 +141,13 @@ export default function init() {
     const frameList = createAvatarFrameList(createPinballYHost(), {
         profileStore, profileRewards, drawingAhead: getDrawingAhead(),
     });
-    // Its values read through the Profile Stats' reader, created just after.
+    // Its values read through the Profile Stats' reader, and its columns
+    // opening the Profile Stats, created just after.
     const householdStats = createHouseholdStats(createPinballYHost(), {
-        profileStore, readStats: profileName => profileStats.readStats(profileName), hasCollectionMastery: config.addOns.tableMastery !== false,
+        profileStore,
+        readStats: profileName => profileStats.readStats(profileName),
+        openProfileStats: (profileName, onBack) => profileStats.openReadOnly(profileName, onBack),
+        hasCollectionMastery: config.addOns.tableMastery !== false,
     });
     const profileStats = createProfileStats(createPinballYHost(), {
         profileStore,

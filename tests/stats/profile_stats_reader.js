@@ -2,7 +2,7 @@
 // Reads the drawn Profile Stats the way the player sees it, on the fake
 // PinballY host: whether they are open, the card's texts (the Profile's
 // name first) and Avatar, its Player Level and Collection Mastery blocks,
-// the buttons at the card's foot (label and grey count), a section of the
+// the buttons at the card's foot (label and grey count; none read-only), a section of the
 // right column by its title (each stat's label with the texts drawn after
 // it, and its images), the highlighted choice (the button under the gold
 // halo, or the cross's tooltip), and picks a choice with Next and Select
@@ -77,6 +77,9 @@ export const buttons = fake => buttonLayers(fake).map(layer => {
     const [label, count = null] = layer.texts();
     return { label, count };
 });
+
+// Another Profile's Profile Stats, to look at only: no button at the card's foot.
+export const isReadOnly = fake => isProfileStatsOpen(fake) && buttons(fake).length === 0;
 
 // A section of the right column by its title: { [label]: texts drawn
 // after it, up to the next label }; null when it is not shown. labels: the

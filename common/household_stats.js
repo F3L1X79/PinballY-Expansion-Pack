@@ -12,10 +12,12 @@
 // looping, with PinballY's navigation sound. Past five columns (fewer in a
 // narrow window), the columns glide sideways to keep the halo in view, the
 // ones cut by the view's edges faded, and a wrap jumps instead of gliding
-// across them all. Exit closes it and calls the
-// return given to open(); attract mode only closes it. Opens directly, not
-// through the wheel dialog module: the player asked for it. isOpen() and
-// onClosed() let the wheel dialogs wait for it.
+// across them all. Select or Launch on another Profile's column opens its
+// Profile Stats read-only, whose Exit shows this screen again on that
+// column; on one's own column it goes back as Exit does. Exit closes it
+// and calls the return given to open(); attract mode only closes it.
+// Opens directly, not through the wheel dialog module: the player asked
+// for it. isOpen() and onClosed() let the wheel dialogs wait for it.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -23,7 +25,7 @@ import { displayNameOf } from "./profile_name.js";
 import { safeHandler } from "./safe_handler.js";
 import { createClosedListeners } from "./closed_listeners.js";
 import { createNavigationSound } from "./navigation_sound.js";
-import { STEAMBALL_COLORS } from "./steamball_palette.js";
+import { openDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import { drawBackdrop } from "./steamball_drawing.js";
 import {
@@ -33,17 +35,17 @@ import {
 const SCRIPT_NAME = "HouseholdStats";
 const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
-const FADE_MS = 220;
-const FRAME_MS = 16;
 // The sideways glide slows down as it arrives (exponential ease-out), as
 // the Achievement List's does.
 const GLIDE_TIME_CONSTANT_MS = 40;
 const GLIDE_SNAP_PX = 0.5;
 
 // readStats(profileName): the Profile Stats' values for that Profile
-// (common/profile_stats.js); hasCollectionMastery: false without the
-// Table Mastery Add-on, which takes the Collection Mastery line away.
-export function createHouseholdStats(host, { profileStore, readStats, hasCollectionMastery = true }) {
+// (common/profile_stats.js); openProfileStats(profileName, onBack): opens
+// that Profile's Profile Stats, read-only, onBack called on its Exit;
+// hasCollectionMastery: false without the Table Mastery Add-on, which
+// takes the Collection Mastery line away.
+export function createHouseholdStats(host, { profileStore, readStats, openProfileStats, hasCollectionMastery = true }) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
@@ -127,6 +129,8 @@ export function createHouseholdStats(host, { profileStore, readStats, hasCollect
             title: TEXT.household.title,
             labels: lines.map(line => line.label),
             columns: profiles.map((profile, column) => ({
+                profileName: profile.name,
+                isActive: isActive(profile),
                 name: displayNameOf(profile),
                 avatarPath: avatarOf(profile),
                 cells: lines.map((line, index) => ({ ...line.cellOf(allStats[column]), isGold: goldByLine[index][column] })),
@@ -134,65 +138,48 @@ export function createHouseholdStats(host, { profileStore, readStats, hasCollect
         };
     }
 
-    function place(layer, rect, referenceWidth) {
-        layer.setScale({ ySpan: rect.h / REFERENCE_HEIGHT });
-        layer.setPos((rect.x + rect.w / 2) / referenceWidth - 0.5, 0.5 - (rect.y + rect.h / 2) / REFERENCE_HEIGHT);
-    }
-
-    function hiddenLayer(zIndex) {
-        const layer = host.createDrawingLayer(zIndex);
-        layer.alpha = 0;
-        layer.clear(STEAMBALL_COLORS.transparent);
-        return layer;
-    }
-
-    // onBack: what Exit returns to, called once the screen is closed. Draws
-    // every layer at once, hidden, then fades them in together, like the
-    // Profile Stats: it never shows up half drawn.
-    function open(onBack = () => {}) {
+    // onBack: what Exit returns to, called once the screen is closed;
+    // selectedName: the Profile whose column is under the halo, brought
+    // into view (the first column when null or no longer there). Draws every
+    // layer at once, hidden, then fades them in together, like the Profile
+    // Stats: it never shows up half drawn.
+    function open(onBack = () => {}, selectedName = null) {
         if (shown) return;
         const openedAt = host.now().getTime();
         const screen = readScreen();
-        const layers = [];
-        // The backdrop first: it measures the window and dims the wheel.
-        const backdrop = hiddenLayer(HOUSEHOLD_STATS_Z_INDEX.backdrop);
-        let referenceWidth = 0;
         let geometry = null;
-        backdrop.draw(dc => {
-            const size = dc.getSize();
-            referenceWidth = REFERENCE_HEIGHT * size.width / size.height;
-            geometry = layoutHouseholdStats(referenceWidth, screen.columns.length, screen.labels.length);
-            drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);
+        const drawn = openDrawnScreen(host, SCRIPT_NAME, {
+            referenceHeight: REFERENCE_HEIGHT,
+            backdropZIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop,
+            drawBackdrop(dc, size, referenceWidth) {
+                geometry = layoutHouseholdStats(referenceWidth, screen.columns.length, screen.labels.length);
+                drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);
+            },
         });
-        layers.push(backdrop);
-        const drawPiece = (zIndex, rect, draw, into = layers) => {
-            const layer = hiddenLayer(zIndex);
-            place(layer, rect, referenceWidth);
-            layer.draw(draw, rect.w, rect.h);
-            into.push(layer);
-            return layer;
-        };
-        drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
-        drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
+        drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
+        drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
         // Apart from the other layers: their alpha also fades them at the view's edges.
         const columnLayers = [];
         screen.columns.forEach((column, index) => {
             const rect = geometry.columns[index];
-            drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, rect, dc => drawColumn(host, dc, column, rect.w), columnLayers);
+            drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, rect, dc => drawColumn(host, dc, column, rect.w), columnLayers);
         });
         // Drawn once for the columns' size and only moved.
         const haloRect = haloRectOf(geometry.columns[0]);
-        const halo = drawPiece(HOUSEHOLD_STATS_Z_INDEX.highlight, haloRect, dc => drawHalo(dc, haloRect.w, haloRect.h));
+        const halo = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.highlight, haloRect, dc => drawHalo(dc, haloRect.w, haloRect.h));
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
+        const column = Math.max(0, screen.columns.findIndex(entry => entry.profileName === selectedName));
+        const first = Math.max(0, column - geometry.view.count + 1);
         // first: the first column in view once the glide is over; scroll:
         // how far the columns have glided, in reference pixels.
-        shown = {
-            onBack, layers, columnLayers, halo, geometry, referenceWidth, selected: 0, first: 0, scroll: 0,
-            opacity: 0, fadeTimer: null, glideTimer: null, glideMs: 0,
+        const opened = {
+            onBack, columns: screen.columns, drawn, columnLayers, halo, geometry, selected: column, first, scroll: first * geometry.pitch,
+            opacity: 0, glideTimer: null, glideMs: 0,
         };
-        placeColumns(shown);
-        fadeIn(shown);
+        shown = opened;
+        placeColumns(opened);
+        drawn.fadeIn(opacity => setOpacity(opened, opacity));
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
     }
 
@@ -211,38 +198,23 @@ export function createHouseholdStats(host, { profileStore, readStats, hasCollect
     // halo on the selected column, held inside the view while that column
     // glides into it.
     function placeColumns(screen) {
-        const { geometry, referenceWidth } = screen;
+        const { geometry, drawn } = screen;
         const { view } = geometry;
         screen.columnLayers.forEach((layer, index) => {
             const rect = geometry.columns[index];
             const x = rect.x - screen.scroll;
-            place(layer, { ...rect, x }, referenceWidth);
+            drawn.place(layer, { ...rect, x });
             layer.alpha = screen.opacity * edgeAlpha(geometry, x, rect.w);
         });
         const selected = geometry.columns[screen.selected];
         const x = Math.max(view.x, Math.min(view.x + view.w - selected.w, selected.x - screen.scroll));
-        place(screen.halo, haloRectOf({ ...selected, x }), referenceWidth);
+        drawn.place(screen.halo, haloRectOf({ ...selected, x }));
     }
 
     function setOpacity(screen, opacity) {
         screen.opacity = opacity;
-        for (const layer of screen.layers) layer.alpha = opacity;
+        for (const layer of screen.drawn.layers) layer.alpha = opacity;
         placeColumns(screen);
-    }
-
-    function fadeIn(screen) {
-        const startMs = host.now().getTime();
-        // Timed on the clock: Windows timers fire late.
-        screen.fadeTimer = host.setInterval(safeHandler(SCRIPT_NAME, () => {
-            const opacity = Math.min(1, (host.now().getTime() - startMs) / FADE_MS);
-            setOpacity(screen, opacity);
-            if (opacity >= 1) stopFade(screen);
-        }), FRAME_MS);
-    }
-
-    function stopFade(screen) {
-        host.clearInterval(screen.fadeTimer);
-        screen.fadeTimer = null;
     }
 
     function stopGlide(screen) {
@@ -266,9 +238,8 @@ export function createHouseholdStats(host, { profileStore, readStats, hasCollect
 
     function close() {
         if (!shown) return;
-        stopFade(shown);
         stopGlide(shown);
-        for (const layer of [...shown.layers, ...shown.columnLayers]) host.removeDrawingLayer(layer);
+        shown.drawn.close(shown.columnLayers);
         shown = null;
         closedListeners.tell();
     }
@@ -299,14 +270,26 @@ export function createHouseholdStats(host, { profileStore, readStats, hasCollect
         onBack();
     }
 
+    // Another Profile's column opens its Profile Stats, whose Exit comes
+    // back here on that column; one's own goes back as Exit does.
+    function choose() {
+        const { onBack, columns, selected } = shown;
+        const column = columns[selected];
+        if (column.isActive) return back();
+        close();
+        openProfileStats(column.profileName, () => open(onBack, column.profileName));
+    }
+
     // Fires on every mapped button press; drives the screen while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        // Already handled: the Profile Stats' button opened this screen
-        // within the same press, which must not act here too.
+        // Already handled: the Profile Stats' button or Exit opened this
+        // screen within the same press, which must not act here too.
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
         if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
+        // Launch is the plunger, which selects in PinballY's own menus too.
+        else if (ev.command === "Select" || ev.command === "Launch") choose();
         else if (ev.command === "Exit") back();
     }));
 

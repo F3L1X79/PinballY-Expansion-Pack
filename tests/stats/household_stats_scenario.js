@@ -16,14 +16,16 @@ export const DEFAULT_AVATAR = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\ima
 // Past every startup toast.
 const ALL_TOASTS_MS = 600000;
 
-const table = (id, title, manufacturer, year) => ({
-    id, configId: `${title} (${manufacturer} ${year})`, title, manufacturer, year, categories: [],
+const table = (id, title, manufacturer, year, categories = []) => ({
+    id, configId: `${title} (${manufacturer} ${year})`, title, manufacturer, year, categories,
     playCount: 0, playTime: 0, lastPlayed: null, rating: -1, isHidden: false, isConfigured: true,
 });
 export const MEDIEVAL = table(1, "Medieval Madness", "Williams", 1997);
 export const MARS = table(2, "Attack from Mars", "Bally", 1995);
 export const THEATRE = table(3, "Theatre of Magic", "Bally", 1995);
 export const TWILIGHT = table(4, "Twilight Zone", "Bally", 1993);
+// In the default adult category, left out of the cabinet unless asked for.
+export const PLAYBOY = table(5, "Playboy", "Stern", 2002, ["NSFW"]);
 
 export const played = (count, seconds) => ({ count, seconds, lastPlayed: "2026-09-22T20:00:00" });
 
@@ -31,17 +33,22 @@ const playLogJson = starts => JSON.stringify({
     version: 1, plays: starts.map(start => ({ start, configId: MEDIEVAL.configId, seconds: 600 })),
 });
 
-// profiles: { [name]: { plays, challenge, playLog (Play starts), isChild,
+// profiles: { [name]: { plays, challenge, streaks, playLog (Play starts), isChild,
 // avatar (true: its own avatar.png) } }, Guest always there; active: the
 // Profile switched to once started (Guest otherwise); addOns: the Add-ons on;
-// hasDefaultAvatar: false leaves the default Avatar image out of the install.
-export async function startHousehold({ profiles = {}, active = null, addOns = ["achievements", "challenges", "tableMastery"], hasDefaultAvatar = true } = {}) {
-    const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables: [MEDIEVAL, MARS, THEATRE, TWILIGHT] });
+// hasDefaultAvatar: false leaves the default Avatar image out of the install;
+// hasAdultTable: the cabinet also has PLAYBOY.
+export async function startHousehold({
+    profiles = {}, active = null, addOns = ["achievements", "challenges", "tableMastery"], hasDefaultAvatar = true, hasAdultTable = false,
+} = {}) {
+    const tables = [MEDIEVAL, MARS, THEATRE, TWILIGHT, ...(hasAdultTable ? [PLAYBOY] : [])];
+    const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables });
     const all = { guest: {}, ...profiles };
     for (const [name, profile] of Object.entries(all)) {
         fake.addFile(`${PROFILES}\\${name}\\profile.json`, JSON.stringify({
             version: 1, plays: profile.plays || {}, notified: [], isChild: profile.isChild === true,
             ...(profile.challenge ? { challenge: profile.challenge } : {}),
+            ...(profile.streaks ? { streaks: profile.streaks } : {}),
         }));
         if (profile.playLog) fake.addFile(`${PROFILES}\\${name}\\play-log-2026.json`, playLogJson(profile.playLog));
         if (profile.avatar) fake.addFile(`${PROFILES}\\${name}\\avatar.png`, "png");

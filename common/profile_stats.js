@@ -25,9 +25,12 @@
 // the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
 // the player asked for it. Can also open the frame list straight away, for
-// the Reward Prompt. isOpen() and onClosed() let the wheel dialogs wait
-// for it. readStats() reads the values it shows for any named Profile,
-// writing nothing.
+// the Reward Prompt. openReadOnly() opens another Profile's screen from its
+// Household Stats column: its own values and tables (Adult Tables
+// included, whoever looks), no button at the card's foot, Exit or Select
+// on the cross going back there. isOpen() and onClosed() let the wheel
+// dialogs wait for it. readStats() reads the values it shows for any
+// named Profile, writing nothing.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -43,16 +46,15 @@ import { collectionTextsOf } from "./mastery_bar.js";
 import { getHallOfFame } from "./hall_of_fame.js";
 import { getTablesToDiscover } from "./tables_to_discover.js";
 import { createNavigationSound } from "./navigation_sound.js";
-import { STEAMBALL_COLORS } from "./steamball_palette.js";
+import { openDrawnScreen } from "./drawn_screen.js";
 import { playerLevelColorOf } from "./steamball_drawing.js";
 import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
 
 const SCRIPT_NAME = "ProfileStats";
 const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
-const FADE_MS = 220;
-const FRAME_MS = 16;
 const MISSING_IMAGE_FILE = "assets\\images\\missing_image.png";
+const NO_PLAY = Object.freeze({ count: 0, seconds: 0 });
 
 export function createProfileStats(host, {
     profileStore, readPlayerLevel, countAchievements, achievementList, profileRewards = null, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
@@ -146,7 +148,8 @@ export function createProfileStats(host, {
         };
     }
 
-    const periodTableStreakOf = periodTable => ({ current: periodTable.getStreak(), longest: periodTable.getLongestStreak() });
+    const periodTableStreakOf = (periodTable, profileName) =>
+        ({ current: periodTable.getStreak(profileName), longest: periodTable.getLongestStreak(profileName) });
 
     // Absent without the Challenges Add-on: Collection then takes the row.
     function challengesStats(record) {
@@ -160,11 +163,11 @@ export function createProfileStats(host, {
     // The group of the Profile's tables (by getKey, null for none) with the
     // most play seconds, then games, then the first in alphabetical order,
     // so it never changes at random; null before any Play.
-    function findFavourite(profileTables, getKey) {
+    function findFavourite(profileTables, getPlay, getKey) {
         const groups = new Map();
         for (const game of profileTables) {
             const key = getKey(game);
-            const play = profileStore.getPlay(game.configId);
+            const play = getPlay(game.configId);
             if (key === null || play.count === 0) continue;
             const group = groups.get(key) || { key, count: 0, seconds: 0 };
             group.count += play.count;
@@ -218,31 +221,42 @@ export function createProfileStats(host, {
         return { title: game ? game.title : configId, logoPath: logoOrMissingImage(game) };
     }
 
-    function tastesSection(profile, profileTables, hallOfFame) {
+    function tastesSection(profile, profileTables, getPlay, hallOfFame) {
         const favouriteGame = hallOfFame[0] || null;
         const firstPlay = readFirstPlay(profile.name);
         const [year, month, day] = firstPlay ? firstPlay.start.slice(0, 10).split("-") : [];
         return {
             title: TEXT.sections.tastes,
             rows: [[
-                favouriteStat(TEXT.stats.favouriteManufacturer, findFavourite(profileTables, manufacturerOf), name => name),
-                favouriteStat(TEXT.stats.favouriteDecade, findFavourite(profileTables, game => getDecadeStartYear(game.year)), TEXT.decade),
+                favouriteStat(TEXT.stats.favouriteManufacturer, findFavourite(profileTables, getPlay, manufacturerOf), name => name),
+                favouriteStat(TEXT.stats.favouriteDecade, findFavourite(profileTables, getPlay, game => getDecadeStartYear(game.year)), TEXT.decade),
             ]],
             strips: [
                 tableStrip(TEXT.stats.favouriteTable, favouriteGame && tableOf(favouriteGame.configId),
-                    favouriteGame && playTimeOf(profileStore.getPlay(favouriteGame.configId).seconds)),
+                    favouriteGame && playTimeOf(getPlay(favouriteGame.configId).seconds)),
                 tableStrip(TEXT.stats.firstTablePlayed, firstPlay && tableOf(firstPlay.configId), firstPlay && TEXT.playedOn(day, month, year)),
             ],
         };
     }
 
-    function readScreen() {
-        const profile = profileStore.getActiveProfile();
-        const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore);
+    const isActiveName = profileName => profileName.toLowerCase() === profileStore.getActiveProfile().name.toLowerCase();
+
+    // The named Profile's record, with its Avatar.
+    const profileNamed = profileName => (isActiveName(profileName)
+        ? profileStore.getActiveProfile()
+        : profileStore.listProfiles().find(profile => profile.name.toLowerCase() === profileName.toLowerCase()));
+
+    // isReadOnly: another Profile's screen, to look at only, with no button.
+    // Its tables as that Profile sees them, whoever looks: looking is not
+    // picking a table.
+    function readScreen(profile, isReadOnly) {
+        const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore, profile.name);
+        const profilePlays = profileStore.getPlaysOf(profile.name);
+        const getPlay = configId => profilePlays[configId] || NO_PLAY;
         const stats = readStats(profile.name);
         const { plays, achievements, playerLevel } = stats;
-        const hallOfFame = getHallOfFame(profileTables, profileStore.getPlay);
-        const buttons = [
+        const hallOfFame = getHallOfFame(profileTables, getPlay);
+        const buttons = isReadOnly ? [] : [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
             ...frameButton(),
             ...selectionButton(CHOICE.MOST_PLAYED, TEXT.buttons.mostPlayedTables, hallOfFameFilter, hallOfFame),
@@ -276,60 +290,46 @@ export function createProfileStats(host, {
                     [collectionStat(stats.collection), ...challengesStats(stats.challenges)],
                     [
                         streakStat(TEXT.stats.cabinetStreak, stats.dailyStreak),
-                        streakStat(TEXT.stats.dayStreak, periodTableStreakOf(tableOfTheDay)),
-                        streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek)),
+                        streakStat(TEXT.stats.dayStreak, periodTableStreakOf(tableOfTheDay, profile.name)),
+                        streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek, profile.name)),
                     ],
                 ],
-            }, tastesSection(profile, profileTables, hallOfFame)],
+            }, tastesSection(profile, profileTables, getPlay, hallOfFame)],
             closeLabel: TEXT.closeTooltip,
             // The flippers' loop, the cross first.
             choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],
         };
     }
 
-    function place(layer, rect, referenceWidth) {
-        layer.setScale({ ySpan: rect.h / REFERENCE_HEIGHT });
-        layer.setPos((rect.x + rect.w / 2) / referenceWidth - 0.5, 0.5 - (rect.y + rect.h / 2) / REFERENCE_HEIGHT);
-    }
-
-    function hiddenLayer(zIndex) {
-        const layer = host.createDrawingLayer(zIndex);
-        layer.alpha = 0;
-        layer.clear(STEAMBALL_COLORS.transparent);
-        return layer;
-    }
-
-    // Draws every layer at once, hidden, then fades them in together, like
-    // the Welcome Screen: it never shows up half drawn.
-    function open(selectedChoice = CHOICE.CLOSE) {
+    // viewed: another Profile's screen, read-only, as { profileName, onBack
+    // (what Exit returns to, called once the screen is closed) }; null:
+    // the active Profile's. Draws every layer at once, hidden, then fades
+    // them in together, like the Welcome Screen: it never shows up half drawn.
+    function open(selectedChoice = CHOICE.CLOSE, viewed = null) {
         if (shown) return;
         const openedAt = host.now().getTime();
-        const screen = readScreen();
-        const layers = [];
-        // The backdrop first: it measures the window and dims the wheel.
-        const backdrop = hiddenLayer(PROFILE_STATS_Z_INDEX.backdrop);
-        let referenceWidth = 0;
-        backdrop.draw(dc => {
-            const size = dc.getSize();
-            referenceWidth = REFERENCE_HEIGHT * size.width / size.height;
-            drawBackdrop(host, dc, size, referenceWidth, screen);
+        const profile = viewed ? profileNamed(viewed.profileName) : profileStore.getActiveProfile();
+        if (!profile) {
+            log(`No Profile named ${viewed.profileName} any more; back where its screen was opened from.`);
+            viewed.onBack();
+            return;
+        }
+        const screen = readScreen(profile, viewed !== null);
+        const drawn = openDrawnScreen(host, SCRIPT_NAME, {
+            referenceHeight: REFERENCE_HEIGHT,
+            backdropZIndex: PROFILE_STATS_Z_INDEX.backdrop,
+            drawBackdrop: (dc, size, referenceWidth) => drawBackdrop(host, dc, size, referenceWidth, screen),
         });
-        layers.push(backdrop);
-        const drawPiece = piece => {
-            const layer = hiddenLayer(piece.zIndex);
-            place(layer, piece.rect, referenceWidth);
-            layer.draw(piece.draw, piece.rect.w, piece.rect.h);
-            layers.push(layer);
-            return layer;
-        };
-        const { pieces, highlights } = layoutProfileStats(host, screen, referenceWidth);
+        const drawPiece = piece => drawn.drawPiece(piece.zIndex, piece.rect, piece.draw);
+        const { pieces, highlights } = layoutProfileStats(host, screen, drawn.referenceWidth);
         pieces.forEach(drawPiece);
         const highlightLayers = screen.choices.map(choice => drawPiece(highlights[choice]));
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         const selected = Math.max(0, screen.choices.indexOf(selectedChoice));
-        shown = { screen, layers, highlightLayers, choices: screen.choices, selected, opacity: 0, fadeTimer: null };
-        fadeIn(shown);
+        const opened = { screen, viewed, drawn, highlightLayers, choices: screen.choices, selected, opacity: 0 };
+        shown = opened;
+        drawn.fadeIn(opacity => setOpacity(opened, opacity));
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
     }
 
@@ -337,28 +337,12 @@ export function createProfileStats(host, {
     function setOpacity(screen, opacity) {
         screen.opacity = opacity;
         const unselected = screen.highlightLayers.filter((layer, index) => index !== screen.selected);
-        for (const layer of screen.layers) layer.alpha = unselected.includes(layer) ? 0 : opacity;
-    }
-
-    function fadeIn(screen) {
-        const startMs = host.now().getTime();
-        // Timed on the clock: Windows timers fire late.
-        screen.fadeTimer = host.setInterval(safeHandler(SCRIPT_NAME, () => {
-            const opacity = Math.min(1, (host.now().getTime() - startMs) / FADE_MS);
-            setOpacity(screen, opacity);
-            if (opacity >= 1) stopFade(screen);
-        }), FRAME_MS);
-    }
-
-    function stopFade(screen) {
-        host.clearInterval(screen.fadeTimer);
-        screen.fadeTimer = null;
+        for (const layer of screen.drawn.layers) layer.alpha = unselected.includes(layer) ? 0 : opacity;
     }
 
     function close() {
         if (!shown) return;
-        stopFade(shown);
-        for (const layer of shown.layers) host.removeDrawingLayer(layer);
+        shown.drawn.close();
         shown = null;
         closedListeners.tell();
     }
@@ -371,9 +355,17 @@ export function createProfileStats(host, {
         setOpacity(shown, shown.opacity);
     }
 
+    // Closes; another Profile's screen then goes back where it was opened from.
+    function back() {
+        const { viewed } = shown;
+        close();
+        if (viewed) viewed.onBack();
+    }
+
     function choose() {
         const choice = shown.choices[shown.selected];
         const entry = shown.screen.buttons.find(button => button.choice === choice);
+        if (choice === CHOICE.CLOSE) return back();
         close();
         // Exit from the list comes back here, on its button.
         if (choice === CHOICE.ACHIEVEMENTS) achievementList.open(() => open(CHOICE.ACHIEVEMENTS));
@@ -384,15 +376,16 @@ export function createProfileStats(host, {
 
     // Fires on every mapped button press; drives the screen while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        // Already handled: the Achievement List's, Avatar Frame list's or Household Stats' Exit reopens this screen
-        // within the same press, which must not close it again.
+        // Already handled: the Achievement List's, Avatar Frame list's or
+        // Household Stats' Exit (or Select) opens this screen within the
+        // same press, which must not act on it again.
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing choice still never reaches the wheel.
         ev.preventDefault();
         if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
         // Launch is the plunger, which selects in PinballY's own menus too.
         else if (ev.command === "Select" || ev.command === "Launch") choose();
-        else if (ev.command === "Exit") close();
+        else if (ev.command === "Exit") back();
     }));
 
     // Fires when the cabinet sits idle: the screen must not stay over
@@ -401,6 +394,8 @@ export function createProfileStats(host, {
 
     return {
         open: () => open(),
+        // Another Profile's screen, read-only; onBack: what Exit returns to.
+        openReadOnly: (profileName, onBack) => open(CHOICE.CLOSE, { profileName, onBack }),
         readStats,
         isOpen: () => shown !== null,
         onClosed: closedListeners.onClosed,
