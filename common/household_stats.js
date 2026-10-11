@@ -3,21 +3,22 @@
 // Profile Stats' "Household" button to set the Household's Profiles (every
 // Profile but Guest) side by side: a centred Steamball panel over the
 // dimmed wheel, laid out by the Household Stats painter, with one column
-// per Profile (the active one first unless it is Guest, then the Profile
-// picker's order) and one line per stat where more is better, the best of
-// each line in gold. Every value is read again on each opening, through
-// the Profile Stats' reader; the screen is drawn at once on all its
-// layers, then faded in. While open it swallows every button through
-// "commandbuttondown": Next / Prev move a gold halo from column to column,
-// looping, with PinballY's navigation sound. Past five columns (fewer in a
-// narrow window), the columns glide sideways to keep the halo in view, the
-// ones cut by the view's edges faded, and a wrap jumps instead of gliding
-// across them all. Select or Launch on another Profile's column opens its
-// Profile Stats read-only, whose Exit shows this screen again on that
-// column; on one's own column it goes back as Exit does. Exit closes it
-// and calls the return given to open(); attract mode only closes it.
-// Opens directly, not through the wheel dialog module: the player asked
-// for it. isOpen() and onClosed() let the wheel dialogs wait for it.
+// per Profile (its Avatar in the Avatar Frame it wears; the active one
+// first unless it is Guest, then the Profile picker's order) and one line
+// per stat where more is better, the best of each line in gold. Every
+// value is read again on each opening, through the Profile Stats' reader;
+// the screen is drawn at once on all its layers, then faded in. While open
+// it swallows every button through "commandbuttondown": Next / Prev move a
+// gold halo from column to column, looping, with PinballY's navigation
+// sound. Past five columns (fewer in a narrow window), the columns glide
+// sideways to keep the halo in view, the ones cut by the view's edges
+// faded, and a wrap jumps instead of gliding across them all. Select or
+// Launch on another Profile's column opens its Profile Stats read-only,
+// whose Exit shows this screen again on that column; on one's own column
+// it goes back as Exit does. Exit closes it and calls the return given to
+// open(); attract mode only closes it. Opens directly, not through the
+// wheel dialog module: the player asked for it. isOpen() and onClosed()
+// let the wheel dialogs wait for it.
 // ============================================================
 
 import lang from "./i18n.js";
@@ -29,7 +30,7 @@ import { openDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "./table_mastery.js";
 import { drawBackdrop } from "./steamball_drawing.js";
 import {
-    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, layoutHouseholdStats, haloRectOf, drawTitle, drawLabels, drawColumn, drawHalo,
+    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, haloRectOf, drawTitle, drawLabels, drawColumn, drawHalo,
 } from "./household_stats_painter.js";
 
 const SCRIPT_NAME = "HouseholdStats";
@@ -43,9 +44,10 @@ const GLIDE_SNAP_PX = 0.5;
 // readStats(profileName): the Profile Stats' values for that Profile
 // (common/profile_stats.js); openProfileStats(profileName, onBack): opens
 // that Profile's Profile Stats, read-only, onBack called on its Exit;
+// profileRewards: the worn Avatar Frames (null: none);
 // hasCollectionMastery: false without the Table Mastery Add-on, which
 // takes the Collection Mastery line away.
-export function createHouseholdStats(host, { profileStore, readStats, openProfileStats, hasCollectionMastery = true }) {
+export function createHouseholdStats(host, { profileStore, readStats, openProfileStats, profileRewards = null, hasCollectionMastery = true }) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
@@ -133,6 +135,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
                 isActive: isActive(profile),
                 name: displayNameOf(profile),
                 avatarPath: avatarOf(profile),
+                framePath: profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
                 cells: lines.map((line, index) => ({ ...line.cellOf(allStats[column]), isGold: goldByLine[index][column] })),
             })),
         };

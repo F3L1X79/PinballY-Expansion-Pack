@@ -8,7 +8,9 @@ import { pipColor } from "../levels/level_pip_reader.js";
 
 const FRAME_IMAGE = /\\avatar_frames\\frame_(\d+)_(192|384)(_locked)?\.png$/;
 
-const frameStrokes = layer => layer.strokes().filter(stroke => "image" in stroke && FRAME_IMAGE.test(stroke.image));
+export const isFrameImage = path => FRAME_IMAGE.test(path);
+
+const frameStrokes = layer => layer.strokes().filter(stroke => "image" in stroke && isFrameImage(stroke.image));
 
 // { tier, size (192 or 384), rect (where it is drawn) }, null when the
 // layer is hidden or draws no frame.

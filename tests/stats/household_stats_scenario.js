@@ -8,6 +8,7 @@
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/config.js";
+import { AVATAR_FRAME_IMAGES } from "../mastery/mastery_bar_scenario.js";
 
 export const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 export const HOUR = 3600;
@@ -34,12 +35,15 @@ const playLogJson = starts => JSON.stringify({
 });
 
 // profiles: { [name]: { plays, challenge, streaks, playLog (Play starts), isChild,
-// avatar (true: its own avatar.png) } }, Guest always there; active: the
+// avatar (true: its own avatar.png), collectionTier, avatarFrame (the worn
+// frame's tier) } }, Guest always there; active: the
 // Profile switched to once started (Guest otherwise); addOns: the Add-ons on;
 // hasDefaultAvatar: false leaves the default Avatar image out of the install;
-// hasAdultTable: the cabinet also has PLAYBOY.
+// hasAdultTable: the cabinet also has PLAYBOY; frameImages: whether the
+// Avatar Frame images exist.
 export async function startHousehold({
     profiles = {}, active = null, addOns = ["achievements", "challenges", "tableMastery"], hasDefaultAvatar = true, hasAdultTable = false,
+    frameImages = false,
 } = {}) {
     const tables = [MEDIEVAL, MARS, THEATRE, TWILIGHT, ...(hasAdultTable ? [PLAYBOY] : [])];
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables });
@@ -49,11 +53,14 @@ export async function startHousehold({
             version: 1, plays: profile.plays || {}, notified: [], isChild: profile.isChild === true,
             ...(profile.challenge ? { challenge: profile.challenge } : {}),
             ...(profile.streaks ? { streaks: profile.streaks } : {}),
+            ...(profile.collectionTier ? { collectionTier: profile.collectionTier } : {}),
+            ...("avatarFrame" in profile ? { avatarFrame: profile.avatarFrame } : {}),
         }));
         if (profile.playLog) fake.addFile(`${PROFILES}\\${name}\\play-log-2026.json`, playLogJson(profile.playLog));
         if (profile.avatar) fake.addFile(`${PROFILES}\\${name}\\avatar.png`, "png");
     }
     if (hasDefaultAvatar) fake.addFile(DEFAULT_AVATAR, "png");
+    if (frameImages) for (const file of AVATAR_FRAME_IMAGES) fake.addFile(file);
     fake.addFile(NAVIGATION_SOUND);
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);

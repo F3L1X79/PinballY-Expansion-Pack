@@ -3,16 +3,17 @@
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // in the Profile Stats' look: the centred Steamball panel (drawn by
 // steamball_drawing.js's backdrop), its title, the line labels in a column
-// on the left, then one column per Profile (its Avatar and name as a
-// header, then one cell per line, the best values in gold, the Collection
-// Mastery with its Collection Tier square) and the gold halo of the
-// highlighted column. Past five columns, or fewer in a narrow window, the
-// layout also gives the view the columns show through and their pitch,
-// for the module to glide them sideways. Only drawing: no layer, no event, no side effect.
+// on the left, then one column per Profile (its Avatar in its worn Avatar
+// Frame, with no Player Level pip, and its name as a header, then one cell
+// per line, the best values in gold, the Collection Mastery with its
+// Collection Tier square) and the gold halo of the highlighted column.
+// Past five columns, or fewer in a narrow window, the layout also gives
+// the view the columns show through and their pitch, for the module to
+// glide them sideways. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "./steamball_palette.js";
-import { oneLine, drawAvatar, selectionHalo } from "./steamball_drawing.js";
+import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, selectionHalo } from "./steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "./mastery_square.js";
 
 // Above the Avatar Frame list's band, which never shows at the same time,
@@ -31,12 +32,21 @@ const LOOK = Object.freeze({
     titleH: 72, titleSize: 30, titleGap: 24,
     // The labels' column, then each Profile's, columnMinW to columnMaxW wide.
     labelsW: 300, labelSize: 21, minLabelSize: 15, columnGap: 20, columnMinW: 160, columnMaxW: 230,
-    // A column's header: the Avatar, then the name under it.
-    avatar: 112, avatarY: 16, nameY: 140, nameH: 40, nameSize: 24, minNameSize: 16, headerH: 196,
+    // A column's header: the Avatar, room for its frame on every side
+    // whether worn or not (so the columns line up), small enough for the
+    // frame to fit the narrowest column, then the name under it.
+    avatar: 104, nameGap: 4, nameH: 40, nameSize: 24, minNameSize: 16, headerH: 212,
     // Each line: its height, its value at valueSize, a thin rule under it.
     lineH: 76, valueSize: 28, minValueSize: 18, squareK: 0.6, squareGap: 10,
     haloMargin: 16,
 });
+
+// How wide a column's Avatar Frame is drawn, for its image's size.
+export const AVATAR_FRAME_WIDTH = avatarFrameSide(LOOK.avatar);
+
+// The Avatar's top, below its frame's room; the name's, below the frame.
+const AVATAR_Y = LOOK.avatar * AVATAR_FRAME_MARGIN;
+const NAME_Y = AVATAR_FRAME_WIDTH + LOOK.nameGap;
 
 // The panel, its title, the labels' column, each column as if none were
 // scrolled (the first ones in view, the others lined up after them), the
@@ -103,14 +113,16 @@ function drawCell(host, dc, cell, y, w) {
     if (hasSquare) drawMasterySquare(host, dc, cell.tier, 0, y + Math.round((LOOK.lineH - size) / 2), LOOK.squareK, Math.max(1, cell.tier));
 }
 
-// column: { name, avatarPath (null: none), cells: [{ value, isGold, tier
-// (the Collection Tier, only on the Collection Mastery's line) }] }. The
-// name first, then the cells top down.
+// column: { name, avatarPath (null: none), framePath (the worn Avatar
+// Frame's image, null: none), cells: [{ value, isGold, tier (the
+// Collection Tier, only on the Collection Mastery's line) }] }. The name
+// first, then the cells top down.
 export function drawColumn(host, dc, column, w) {
     const avatarX = Math.round((w - LOOK.avatar) / 2);
-    drawAvatar(dc, column.avatarPath, avatarX, LOOK.avatarY, LOOK.avatar);
+    drawAvatar(dc, column.avatarPath, avatarX, AVATAR_Y, LOOK.avatar);
+    drawAvatarFrame(dc, column.framePath, avatarX, AVATAR_Y, LOOK.avatar);
     oneLine(host, dc, column.name, {
-        x: 0, y: LOOK.nameY, width: w, height: LOOK.nameH, size: LOOK.nameSize, minSize: LOOK.minNameSize, weight: 700, font: FONTS.display, align: "center",
+        x: 0, y: NAME_Y, width: w, height: LOOK.nameH, size: LOOK.nameSize, minSize: LOOK.minNameSize, weight: 700, font: FONTS.display, align: "center",
     });
     column.cells.forEach((cell, index) => drawCell(host, dc, cell, lineY(index), w));
     drawRules(dc, w, column.cells.length);

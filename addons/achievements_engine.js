@@ -147,6 +147,7 @@ export default function init() {
         profileStore,
         readStats: profileName => profileStats.readStats(profileName),
         openProfileStats: (profileName, onBack) => profileStats.openReadOnly(profileName, onBack),
+        profileRewards,
         hasCollectionMastery: config.addOns.tableMastery !== false,
     });
     const profileStats = createProfileStats(createPinballYHost(), {

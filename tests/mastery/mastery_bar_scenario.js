@@ -23,7 +23,7 @@ const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 export const profileFile = name => `${PROFILES_FOLDER}\\${name}\\profile.json`;
 // The thirty Avatar Frame images, as the pack ships them.
 export const AVATAR_FRAMES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\avatar_frames";
-const AVATAR_FRAME_IMAGES = Array.from({ length: 10 }, (_, index) => `${AVATAR_FRAMES_FOLDER}\\frame_${String(index + 1).padStart(2, "0")}`)
+export const AVATAR_FRAME_IMAGES = Array.from({ length: 10 }, (_, index) => `${AVATAR_FRAMES_FOLDER}\\frame_${String(index + 1).padStart(2, "0")}`)
     .flatMap(base => [`${base}_384.png`, `${base}_192.png`, `${base}_192_locked.png`]);
 
 const table = (id, title, manufacturer, year) => ({

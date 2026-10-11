@@ -1,18 +1,19 @@
 // ============================================================
 // Reads the drawn Household Stats the way the player sees it, on the fake
 // PinballY host: whether they are open, the title, the line labels, the
-// columns from left to right (the Profile's name, its Avatar image, and
-// each line's cell: its texts and whether its value is gold), the
-// highlighted column (the one the gold halo surrounds), the columns in
-// view and those faded at the edges while gliding, opens them from the
-// Profile Stats' "Household" button and picks a column as a player would.
-// Never loaded by PinballY.
+// columns from left to right (the Profile's name, its Avatar image, the
+// Avatar Frame around it, and each line's cell: its texts and whether its
+// value is gold), the highlighted column (the one the gold halo
+// surrounds), the columns in view and those faded at the edges while
+// gliding, opens them from the Profile Stats' "Household" button and picks
+// a column as a player would. Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";
 import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/household_stats_painter.js";
 import { STEAMBALL_COLORS } from "../../common/steamball_palette.js";
 import { openProfileStats, choose, press, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
+import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
 
 export { press };
 
@@ -50,7 +51,8 @@ const textStrokes = layer => layer.strokes().filter(stroke => "text" in stroke);
 const middleOf = rect => rect.y + rect.height / 2;
 
 // Each column left to right: { name, avatar (the Avatar image drawn, null
-// without one), cells: { [label]: { texts, isGold } } }. The labels and
+// without one), frame (the Avatar Frame drawn around it, { tier, size,
+// rect }, null without one), cells: { [label]: { texts, isGold } } }. The labels and
 // the columns share their top, so a cell is on the line of the label
 // nearest its middle.
 export function columns(fake) {
@@ -65,8 +67,9 @@ export function columns(fake) {
             if (!cells[line]) cells[line] = { texts: [], isGold: stroke.color === STEAMBALL_COLORS.gold };
             cells[line].texts.push(stroke.text);
         }
-        const [avatar = null] = layer.images();
-        return { name: nameStroke.text, avatar, cells };
+        const frame = shownFrame(layer);
+        const [avatar = null] = layer.images().filter(image => !isFrameImage(image));
+        return { name: nameStroke.text, avatar, frame, cells };
     });
 }
 

@@ -1,3 +1,6 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
 # Left out of the downloaded zip (GitHub "Download ZIP" and release archives):
 # the players only need the pack itself. docs/images stays for the README.
 maintainer/ export-ignore
