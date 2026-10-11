@@ -363,7 +363,7 @@
           </div>
           <p>Lire nous-mêmes les tableaux des tables électromécaniques et originales, que PINemHi ignore : <code>VPReg.stg</code> (lecteur du format en JS, octets lus par kernel32), <code>VPReg.ini</code> quand VPX 10.8.1 sortira, et les fichiers texte des tables électromécaniques. Ces tables entrent alors dans les records par Profile et le tableau dessiné, et leur tableau peut passer à PinballY par <code>setHighScores()</code>.</p>
           <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : gardé ou abandonné selon le comptage du prototype des <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
+          <div class="links">Flow Matt : gardé après le prototype des <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
           <details>
             <summary>Questions ouvertes (3)</summary>
             <ul>
@@ -372,6 +372,7 @@
               <li>Quand lire <code>VPReg.stg</code> sans gêner VPX, qui l'ouvre en exclusif ?</li>
             </ul>
             <p class="ctx">Décidé le 11/10/2026 : un score fait sur une de ces tables avant ce chantier ne sera jamais attribué (accepté).</p>
+            <p class="ctx">Prototype du 11/10/2026 : 28 originales sans ROM sur la borne, aucune électromécanique. VPX écrit bien <code>User\VPReg.stg</code> pendant une Play d'originale (Zelda) : c'est la source à lire en premier.</p>
           </details>
         </div>
       </li>
@@ -739,8 +740,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>11/10 <span class="count">(3)</span></summary>
+          <summary>11/10 <span class="count">(4)</span></summary>
           <ol>
+            <li><strong>Records par Profile : les tables à ROM d'abord</strong>
+              <span>Verdict du prototype : l'attribution marche (Pac-Man, 163 090 → 164 090, Table Record). Le premier chantier ne couvre que les tables dont PinballY lit le tableau (50 aujourd'hui) ; les originales attendent le lecteur de <code>VPReg.stg</code>.</span></li>
             <li><strong>La ROM de chaque table trouvée toute seule, avant les records</strong>
               <span>Le prototype montre qu'aucune ROM n'est saisie dans PinballY : 21 vraies machines restent sans tableau. Lire la ROM dans le script de chaque table passe en 2ᵉ position, à trancher avant la spec des records.</span></li>
             <li><strong>Les records par Profile en trois chantiers or, sur une branche</strong>
