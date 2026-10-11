@@ -75,8 +75,8 @@ const LOOK = Object.freeze({
     // A stat's thin bar under its value (or its pill), short of the
     // column's right edge by inset.
     shareBar: Object.freeze({ h: 6, gap: 8, inset: 24 }),
-    // A wide strip under a section's rows (gapAbove), the next one gap
-    // below: the wheel logo in a box at the left (a share of the column, at
+    // A wide strip under a section's rows (gapAbove, plus its share of the
+    // spare height), the next one a fixed gap below: the wheel logo in a box at the left (a share of the column, at
     // most logoMaxW, inset from the strip's edges), the label, the name
     // and the pill beside it, from their tops.
     strip: Object.freeze({
@@ -129,8 +129,10 @@ function columnBlocks(host, screen, columnW, statGap) {
             if (rowIndex > 0) blocks.push({ kind: "gap", h: LOOK.rowGap, isSpread: true });
             blocks.push(rowBlock(host, section, stats, columnW, statGap));
         });
+        // The spare height goes above the strips, never between them: they
+        // stay stacked as one group.
         (section.strips || []).forEach((strip, stripIndex) => {
-            blocks.push({ kind: "gap", h: stripIndex === 0 ? LOOK.strip.gapAbove : LOOK.strip.gap, isSpread: true });
+            blocks.push(stripIndex === 0 ? { kind: "gap", h: LOOK.strip.gapAbove, isSpread: true } : { kind: "gap", h: LOOK.strip.gap });
             blocks.push({ kind: "strip", h: LOOK.strip.h, section, strip });
         });
     });
