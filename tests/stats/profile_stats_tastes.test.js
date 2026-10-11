@@ -2,10 +2,11 @@
 // The Profile Stats' TASTES section in French, through main.js on the fake
 // PinballY globals: the favourite manufacturer and decade with their play
 // time in a pill (by play seconds, then games, then alphabetical order,
-// never the community tables manufacturer), the favourite table strip (the
-// Hall of Fame's first table) and the first table played strip (the
-// earliest Play across the Play Log's years, reset copies left out, with
-// its date), each with its wheel logo, or else the scrambled TV of the
+// never the community tables manufacturer), then the first table played
+// strip (the earliest Play across the Play Log's years, reset copies left
+// out, with its date), the last table played strip (the latest lastPlayed
+// of the Profile's plays, with its date) and the favourite table strip (the
+// Hall of Fame's first table), each with its wheel logo, or else the scrambled TV of the
 // missing image (its cleaned title when that asset is unreadable), next to
 // its cleaned name; "—" everywhere for a Profile with no Play and an empty
 // Play Log.
@@ -34,11 +35,11 @@ const MARS = table(2, "Attack from Mars\uFFFD \u00EF\u00BF\u00BD (Remake)", "Bal
 const GODZILLA = table(3, "Godzilla", "Stern", 2021);
 const COMMUNITY = table(4, "Homemade Table", config.communityTablesManufacturer, 2023);
 
-const play = (count, seconds) => ({ count, seconds, lastPlayed: "2026-09-20T20:00:00" });
+const play = (count, seconds, lastPlayed = "2026-09-20T20:00:00") => ({ count, seconds, lastPlayed });
 const playLog = plays => JSON.stringify({ version: 1, plays });
 const logged = (start, configId) => ({ start, configId, seconds: 600 });
 
-test("the TASTES section shows the favourites and the favourite and first table strips", async () => {
+test("the TASTES section shows the favourites and the first, last and favourite table strips", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 9, 7, 10, 0, 0), tables: [MEDIEVAL, MARS, GODZILLA, COMMUNITY] });
     fake.addFile(MEDIEVAL_LOGO);
     // Nothing played: no Play Log either.
@@ -51,7 +52,7 @@ test("the TASTES section shows the favourites and the favourite and first table 
         plays: {
             [MEDIEVAL.configId]: play(2, 3600),
             [MARS.configId]: play(2, 3600),
-            [GODZILLA.configId]: play(3, 3600),
+            [GODZILLA.configId]: play(3, 3600, "2026-10-01T19:00:00"),
             [COMMUNITY.configId]: play(10, 9000),
         },
     }));
@@ -59,7 +60,7 @@ test("the TASTES section shows the favourites and the favourite and first table 
     // from Mars leads the Hall of Fame by its title.
     fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({
         version: 1, notified: [],
-        plays: { [MEDIEVAL.configId]: play(3, 4500), [MARS.configId]: play(3, 4500) },
+        plays: { [MEDIEVAL.configId]: play(3, 4500, "2026-01-04T21:00:00"), [MARS.configId]: play(3, 4500, "2026-02-14T22:15:00") },
     }));
     // Logged out of order; the reset copy's older Play is gone with the reset.
     fake.addFile(`${PROFILES}\\Bob\\play-log-2026.json`, playLog([logged("2026-01-04T21:00:00", MARS.configId)]));
@@ -82,8 +83,9 @@ test("the TASTES section shows the favourites and the favourite and first table 
     assert.deepEqual(section(fake, "GOÛTS", TEXT.stats), {
         "Constructeur favori": ["—"],
         "Décennie favorite": ["—"],
-        "Table préférée": ["—"],
         "Première table jouée": ["—"],
+        "Dernière table jouée": ["—"],
+        "Table préférée": ["—"],
     }, "no Play, an empty Play Log");
     assert.deepEqual(sectionImages(fake, "GOÛTS"), [], "no logo");
     press(fake, "Exit");
@@ -96,6 +98,8 @@ test("the TASTES section shows the favourites and the favourite and first table 
     assert.deepEqual(alice["Table préférée"], ["Homemade Table", "Homemade Table", "2 h 30 de jeu"],
         "no logo and no readable missing image: its title in the logo's place");
     assert.deepEqual(alice["Première table jouée"], ["—"], "Plays known only by their totals");
+    assert.deepEqual(alice["Dernière table jouée"], ["Godzilla", "Godzilla", "le 01/10/2026"],
+        "known from the plays' totals, without a Play Log");
     press(fake, "Exit");
 
     fake.addFile(MISSING_IMAGE);
@@ -104,10 +108,11 @@ test("the TASTES section shows the favourites and the favourite and first table 
     assert.deepEqual(section(fake, "GOÛTS", TEXT.stats), {
         "Constructeur favori": ["Bally", "1 h 15 de jeu"],
         "Décennie favorite": ["Années 1990", "2 h 30 de jeu"],
-        "Table préférée": ["Attack from Mars", "1 h 15 de jeu"],
         "Première table jouée": ["Medieval Madness", "le 12/03/2025"],
+        "Dernière table jouée": ["Attack from Mars", "le 14/02/2026"],
+        "Table préférée": ["Attack from Mars", "1 h 15 de jeu"],
     });
-    assert.deepEqual(sectionImages(fake, "GOÛTS"), [MISSING_IMAGE, MEDIEVAL_LOGO],
-        "the missing image for the favourite table without a logo, the first table's wheel logo");
+    assert.deepEqual(sectionImages(fake, "GOÛTS"), [MEDIEVAL_LOGO, MISSING_IMAGE, MISSING_IMAGE],
+        "the first table's wheel logo, the missing image for the last and favourite tables without a logo");
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

@@ -5,8 +5,8 @@
 // with the Avatar, the Profile's name, the Player Level and the
 // Collection Mastery on a card whose foot holds the Achievements, Frame,
 // Most Played Tables, Tables to Discover and Household buttons, and the GAME, PROGRESSION
-// and TASTES sections on its right (the last with the favourite and first
-// table strips, read from the Hall of Fame and the Play Log). Every stat is read again on each
+// and TASTES sections on its right (the last with the first, last and
+// favourite table strips, read from the Play Log, the plays and the Hall of Fame). Every stat is read again on each
 // opening; the screen is drawn at once on all its layers, then faded in.
 // Created from the PinballY host, the Profile store, readers of a named
 // Profile's Player Level and Achievements Unlocked, the Achievement List
@@ -201,6 +201,21 @@ export function createProfileStats(host, {
         return null;
     }
 
+    // The table of the Profile's latest Play, by its plays' lastPlayed (local
+    // ISO strings, so they sort as text), hidden tables included; null before
+    // any Play.
+    function findLastPlay(profilePlays) {
+        return Object.entries(profilePlays)
+            .filter(([, play]) => play.lastPlayed)
+            .reduce((latest, [configId, play]) => (!latest || play.lastPlayed > latest.lastPlayed ? { configId, lastPlayed: play.lastPlayed } : latest), null);
+    }
+
+    // A local ISO string's date, through playedOn.
+    function playedOnOf(isoString) {
+        const [year, month, day] = isoString.slice(0, 10).split("-");
+        return TEXT.playedOn(day, month, year);
+    }
+
     // A strip: its label, the table's wheel logo and cleaned title, and its
     // detail in a pill; "—" alone without a table.
     function tableStrip(label, game, detail) {
@@ -224,10 +239,10 @@ export function createProfileStats(host, {
         return { title: game ? game.title : configId, logoPath: logoOrMissingImage(game) };
     }
 
-    function tastesSection(profile, profileTables, getPlay, hallOfFame) {
+    function tastesSection(profile, profileTables, profilePlays, getPlay, hallOfFame) {
         const favouriteGame = hallOfFame[0] || null;
         const firstPlay = readFirstPlay(profile.name);
-        const [year, month, day] = firstPlay ? firstPlay.start.slice(0, 10).split("-") : [];
+        const lastPlay = findLastPlay(profilePlays);
         return {
             title: TEXT.sections.tastes,
             rows: [[
@@ -235,9 +250,10 @@ export function createProfileStats(host, {
                 favouriteStat(TEXT.stats.favouriteDecade, findFavourite(profileTables, getPlay, game => getDecadeStartYear(game.year)), TEXT.decade),
             ]],
             strips: [
+                tableStrip(TEXT.stats.firstTablePlayed, firstPlay && tableOf(firstPlay.configId), firstPlay && playedOnOf(firstPlay.start)),
+                tableStrip(TEXT.stats.lastTablePlayed, lastPlay && tableOf(lastPlay.configId), lastPlay && playedOnOf(lastPlay.lastPlayed)),
                 tableStrip(TEXT.stats.favouriteTable, favouriteGame && tableOf(favouriteGame.configId),
                     favouriteGame && playTimeOf(getPlay(favouriteGame.configId).seconds)),
-                tableStrip(TEXT.stats.firstTablePlayed, firstPlay && tableOf(firstPlay.configId), firstPlay && TEXT.playedOn(day, month, year)),
             ],
         };
     }
@@ -297,7 +313,7 @@ export function createProfileStats(host, {
                         streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek, profile.name)),
                     ],
                 ],
-            }, tastesSection(profile, profileTables, getPlay, hallOfFame)],
+            }, tastesSection(profile, profileTables, profilePlays, getPlay, hallOfFame)],
             // Another Profile's screen goes back to the Household Stats.
             closeLabel: isReadOnly ? TEXT.backTooltip : TEXT.closeTooltip,
             // The flippers' loop, the cross first.

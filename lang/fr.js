@@ -492,6 +492,7 @@ export default {
             favouriteDecade: "Décennie favorite",
             favouriteTable: "Table préférée",
             firstTablePlayed: "Première table jouée",
+            lastTablePlayed: "Dernière table jouée",
         },
         // Thousands separated by a no-break space: "1 206".
         number: (count) => String(count).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0"),
@@ -507,7 +508,7 @@ export default {
         playTime: (time) => `${time} de jeu`,
         // The favourite decade, by its start year: 1990 for 1990 to 1999.
         decade: (decadeStartYear) => `Années ${decadeStartYear}`,
-        // The first table played's date, day and month on two digits.
+        // The first or last table played's date, day and month on two digits.
         playedOn: (day, month, year) => `le ${day}/${month}/${year}`,
         // A stat without a value, such as the average before any Play.
         none: "—",
