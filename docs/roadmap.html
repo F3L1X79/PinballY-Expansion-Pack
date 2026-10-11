@@ -225,7 +225,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 10.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 11.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -234,7 +234,7 @@
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
       <p><strong>Récompenses de profil</strong> (dix Avatar Frames à débloquer par Collection Tier, liste de choix dans les Profile Stats, Reward Prompt du premier cadre) livrées le 10/10 : reste la vérification sur la borne, comme pour les réglages par défaut, la Daily Streak (ticket #173) et les extras du Player Level (ticket #168)</p>
-      <span class="next">Ensuite : <a href="#steamball-menus">tous les menus en design Steamball</a>, tickets #183 à #188 publiés, à passer au <code>/implement</code></span>
+      <span class="next">Ensuite : <a href="#profile-records">records par Profile</a>, <code>/grill-with-docs</code> à reprendre</span>
     </div>
   </section>
 
@@ -258,42 +258,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="steamball-menus" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Tous les menus en design Steamball</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">gros</span></div>
-          </div>
-          <p>Les menus que voit le joueur (menu principal, menu Exit, choix de filtres, power off, configuration et catégories de la table, menu opérateur) et ceux qu'ouvrent les Add-ons (invites, Profile Reset) deviennent des Drawn Menus dans la palette Steamball, comme le Welcome Screen, l'Achievement List et les Profile Stats.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>proto</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec : ticket #182, tickets #183 à #188. Flow Matt : <code>/implement</code> par ticket. S'appuie sur le kit de peinture PNG des Avatar Frames (livré)</div>
-          <details>
-            <summary>Décisions (grill du 07/10/2026)</summary>
-            <ul>
-              <li>Terme du glossaire : Drawn Menu (« menu » à l'écran). Un Add-on propre, activé par défaut et désactivable par <code>ADD_ON_…</code>.</li>
-              <li>Interception de <code>menuopen</code>, en dernier après les Add-ons qui modifient les items : <code>preventDefault()</code>, mêmes entrées dessinées, commande relancée. Si le dessin échoue, l'erreur est journalisée et le menu natif s'affiche. Les menus du pack passent par le composant commun, sans <code>showMenu</code>. ADR probable à la spec.</li>
-              <li>Restent natifs : les menus d'entretien (operator, game setup, game categories, capture, media drop, élévation, confirmations), le menu pause d'une partie, tous les popups (Game Info, High Scores, Flyer…). Rien de tout ça n'est ajouté à la roadmap.</li>
-              <li>Comportement natif : mêmes boutons (flippers, Select / Launch, Exit), mêmes items, « Retour » des sous-menus compris ; coche ou choix actif en doré ; le mode attract ferme le menu ; sons de PinballY. Toasts, confettis et Fireworks passent par-dessus, un dialogue du wheel dialog attend la fermeture.</li>
-              <li>Rien que les entrées (et le message d'un dialogue), mais un beau design. Effets permis tant que le menu s'ouvre en moins de 100 ms ; au-delà, chaque entrée sur son calque, préparé au démarrage.</li>
-            </ul>
-          </details>
-          <details>
-            <summary>Décisions (prototypes des 08 et 09/10/2026)</summary>
-            <ul>
-              <li>Forme : une liste centrée dans un panneau, les dialogues avec leur message au-dessus de la même liste. Écartées sur la borne : roue verticale en arc, carrousel horizontal, boutons côte à côte.</li>
-              <li>Look : le panneau des autres écrans (ardoise en dégradé, bordure fine, cadre doré fin, coins dorés en équerre, Segoe UI, entrées en blanc), séparateurs en trait doré qui s'efface aux bouts. Une lueur dorée douce tombe du haut du cadre.</li>
-              <li>Entrée choisie : un contour doré en pointe qui luit, texte en or, qui glisse d'une entrée à l'autre.</li>
-              <li>Vitre posée sur tout le panneau, texte compris : les lumières de la salle s'y reflètent, floues (deux taches chaudes en haut à gauche, une froide à droite, un néon le long du bord haut).</li>
-              <li>Aucune animation en boucle : un fondu court à l'ouverture et le glissement de la sélection, c'est tout.</li>
-              <li>Fabrication : panneau, contour lumineux et vitre en PNG dessinés d'avance par un script Node (comme les Avatar Frames), texte en direct, sélection déplacée avec <code>setPos</code>, l'entrée choisie sur un petit calque redessiné à chaque déplacement. Le temps d'ouverture (moins de 100 ms) se vérifie sur la borne à l'implémentation.</li>
-              <li>Prototype : branche <code>prototype/drawn-menu-styles</code> (<code>docs/prototypes/drawn_menu_styles.html</code>, tour 4, variante V4 « Reflets de salle »).</li>
-            </ul>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-play" id="profile-records" data-track="play" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -866,7 +830,6 @@
             <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
           </div>
           <div class="cell">
-            <a class="chip tr-share" href="#steamball-menus"><b></b>Menus Steamball</a>
             <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
             <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
           </div>

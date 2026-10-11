@@ -38,7 +38,7 @@ Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran
 - le cadre que porte votre Avatar ;
 - et le chemin vers vos tables les plus jouées et celles qui restent à découvrir.
 
-Dès que vous êtes deux à avoir un Profil, **La maison** montre tous les Profils côte à côte, sauf Invité, chaque Avatar dans son cadre, le meilleur de chaque ligne en doré ; choisissez une colonne pour voir les statistiques de ce Profil.
+Dès que vous êtes deux à avoir un Profil, **Stats de la maison** montre tous les Profils côte à côte, sauf Invité, chaque Avatar dans son cadre, le meilleur de chaque ligne en doré ; choisissez une colonne pour voir les statistiques de ce Profil.
 
 ### Écran d'accueil : table du jour, table de la semaine
 
@@ -83,6 +83,7 @@ Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son ra
 Tout tient dans un seul dossier, sans modifier PinballY.
 
 **Et aussi** :
+- les menus de PinballY (menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur) dessinés dans le style Steamball du pack, mêmes entrées et mêmes boutons ;
 - une table au hasard sur une roue de la fortune ;
 - « Tables à découvrir », « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
 - une horloge, l'arc doré de la roue et une ligne d'état enrichie ;
