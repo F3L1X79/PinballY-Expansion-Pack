@@ -298,6 +298,38 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="auto-rom" data-track="play" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>ROM des tables trouvée toute seule</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Ne plus saisir la ROM de chaque table à la main dans PinballY : la lire dans le script de la table (<code>cGameName</code> du <code>.vpx</code> ou du <code>.vbs</code> à côté), la confirmer par le <code>.nv</code> modifié pendant une Play (ce qui règle les ROM alternatives, free play par exemple), puis remplir le champ ROM de PinballY par <code>game.update({ rom })</code>. Le lecteur du format des <code>.vpx</code> est le même que celui de <code>VPReg.stg</code>, prévu pour les <a href="#romless-high-scores">tables sans ROM (n° <span data-ref="romless-high-scores"></span>)</a>.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> court après le verdict du prototype des <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a>, à trancher avant leur <code>/to-spec</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Faits du prototype (11/10/2026)</summary>
+            <ul>
+              <li>Aucune des 107 tables de la borne n'a sa ROM saisie dans PinballY : 57 sont devinées d'après le titre, 21 vraies machines n'ont aucune ROM trouvée.</li>
+              <li><code>vpxtool romname</code> lancé une fois à la main donne la ROM de 22 de ces tables, et une devinette fausse (Twilight Zone : <code>tz_94h</code> au lieu de <code>tz_94ch</code>).</li>
+              <li>Des tables « VPX Community » tournent sur une ROM (Mass Effect sur <code>afm_113b_me</code>, Spiderman sur <code>smanve_101</code>) : la sorte d'une table se lit dans son script, pas dans son fabricant.</li>
+              <li>Deux tables peuvent partager le même <code>.nv</code> (Teenage Mutant Ninja Turtles et son remix, <code>tmnt_104</code>), donc le même tableau.</li>
+            </ul>
+          </details>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Écrire dans la base de PinballY : seulement les ROM vides, ou corriger aussi une devinette fausse ? Toujours journalisé.</li>
+              <li>Lire le script en JS (lecteur du format des <code>.vpx</code>) ou appeler <code>vpxtool</code> (outil externe, accord de Félix) ?</li>
+              <li>Quand : un relevé au démarrage, ou table par table à sa première Play ?</li>
+            </ul>
+            <p class="ctx">Proposé par Félix le 11/10/2026 pendant le prototype des Records par Profile.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-play" id="high-score-board" data-track="play" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -676,6 +708,28 @@
           </details>
         </div>
       </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="hidden-tables-filter" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Filtre « Tables masquées »</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Une entrée « Tables masquées » sous les Tables favorites, pour retrouver les tables cachées sans passer par Quitter › Menu opérateur › Afficher les tables masquées (le filtre <code>Hidden</code> de PinballY).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Qui la voit : tout le monde, ou seulement les Admin Profiles comme le Menu opérateur ? Un filtre PinballY est le même pour tous les Profiles.</li>
+              <li>Une Child Profile y voit-elle les Adult Tables masquées ? (Le filtre de la roue des Child Profiles les retire déjà.)</li>
+            </ul>
+            <p class="ctx">Proposé par Félix le 11/10/2026 : Pac-Man et Seawitch, masquées, n'étaient plus accessibles depuis les nouveaux menus.</p>
+          </details>
+        </div>
+      </li>
     </ol>
   </section>
 
@@ -685,8 +739,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>11/10 <span class="count">(2)</span></summary>
+          <summary>11/10 <span class="count">(3)</span></summary>
           <ol>
+            <li><strong>La ROM de chaque table trouvée toute seule, avant les records</strong>
+              <span>Le prototype montre qu'aucune ROM n'est saisie dans PinballY : 21 vraies machines restent sans tableau. Lire la ROM dans le script de chaque table passe en 2ᵉ position, à trancher avant la spec des records.</span></li>
             <li><strong>Les records par Profile en trois chantiers or, sur une branche</strong>
               <span>Choix de Félix : tables à ROM d'abord, puis un tableau des meilleurs scores dessiné qui remplace celui de PinballY, puis les tables sans ROM si le prototype dit qu'elles en valent la peine. Rien ne va sur <code>main</code> avant la fin des trois.</span></li>
             <li><strong>Pas d'outil externe sans vrai besoin</strong>
@@ -865,8 +921,10 @@
           <div class="cell sweet">
             <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
             <a class="chip tr-play" href="#my-records-filter"><b></b>Filtre « Mes records »</a>
+            <a class="chip tr-play" href="#hidden-tables-filter"><b></b>Tables masquées</a>
           </div>
           <div class="cell">
+            <a class="chip tr-play" href="#auto-rom"><b></b>ROM automatique</a>
             <a class="chip tr-profiles" href="#profile-rivalries"><b></b>Rivalités</a>
             <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
             <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
