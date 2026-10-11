@@ -67,7 +67,7 @@ test("the Welcome Screen shows a card per Period Table and launches the day's", 
     assert.deepEqual(periodCardLogos(fake), [MEDIEVAL_LOGO, "Attack from Mars Special"], "the title stands in for a missing logo");
 
     assert.deepEqual(readChoices(fake), [
-        lang.profiles.menuEntry, TEXT.closeTooltip, CARDS.day.period, CARDS.week.period, TEXT.stayOn("Medieval Madness"), TEXT.randomTable,
+        lang.profiles.menuEntry, TEXT.closeTooltip, CARDS.day.period, CARDS.week.period, TEXT.randomTable, TEXT.stayOn("Medieval Madness"),
     ]);
 
     choose(fake, CARDS.day.period);

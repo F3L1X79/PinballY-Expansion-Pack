@@ -29,7 +29,7 @@ test("without the Profile picker, the Welcome Screen shows no Avatar nor name an
     assert.equal(greeting(fake), TEXT.greetingAlone(TEXT.greetings.afternoon));
     assert.deepEqual(headerImages(fake), []);
     assert.deepEqual(highlighted(fake), { label: null, tooltip: TEXT.closeTooltip }, "the cross is selected on opening");
-    assert.deepEqual(readChoices(fake), [TEXT.closeTooltip, TEXT.stayOnWheel, TEXT.randomTable]);
+    assert.deepEqual(readChoices(fake), [TEXT.closeTooltip, TEXT.randomTable, TEXT.stayOnWheel]);
 
     press(fake, "Select");
     assert.equal(isWelcomeScreenOpen(fake), false);

@@ -8,7 +8,7 @@
 // tables no longer reach it) and offers to close, to play the Table of the Day or of the Week
 // (one card each, with its Table Mastery and the active Profile's Streak;
 // reading them picks and locks this Period's tables, and Select launches
-// one, selected on the wheel first), to stay on the table selected on the wheel or to launch a Random Game. It
+// one, selected on the wheel first), to launch a Random Game or to stay on the table selected on the wheel. It
 // is a drawn dialog of the wheel dialog module (docs/adr/0011), submitted
 // at init with the startup priority, so it comes before any other dialog and the
 // toasts wait for it. It opens 500 ms after its turn comes, drawn at once
@@ -154,7 +154,7 @@ export default function init() {
             cards,
             // The flippers' loop; the first one is selected on opening,
             // unless firstChoice is one of them.
-            choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, ...cards.map(card => card.choice), CHOICE.STAY, CHOICE.RANDOM],
+            choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, ...cards.map(card => card.choice), CHOICE.RANDOM, CHOICE.STAY],
             labels: {
                 [CHOICE.AVATAR]: lang.profiles.menuEntry,
                 [CHOICE.CLOSE]: TEXT.closeTooltip,

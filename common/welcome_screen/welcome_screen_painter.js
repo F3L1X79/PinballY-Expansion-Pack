@@ -7,7 +7,7 @@
 // Profile's name in gold, Daily Streak line, Collection Mastery on the Mastery Bar's card), one card
 // per Period Table (logo, period, name on one line, Table Mastery card
 // around the Mastery Bar's square, grey line, "Go" button),
-// the bottom row ("stay" and "random") and one highlight per choice (a
+// the bottom row ("random" and "stay") and one highlight per choice (a
 // gold halo, with a tooltip for the Avatar and the cross). Only drawing:
 // no layer, no event, no side effect.
 // ============================================================
@@ -35,12 +35,12 @@ const LOOK = Object.freeze({
     // The Daily Streak line, when there is one, between the greeting and
     // Collection Mastery.
     dailyStreakGap: 4,
-    rowH: 90, rowSize: 21, rowIcon: 60,
+    rowH: 120, rowSize: 26, rowIcon: 76,
     // A Period Table card, from its top: period, name, Mastery card (the
     // Mastery Bar's, scaled by cardK), then the grey line, if any.
     cardTop: 30, nameY: 78, masteryY: 134, lineGap: 18, lineH: 34, cardBottom: 34,
     periodSize: 21, nameSize: 22, minNameSize: 18, lineSize: 18, minLineSize: 15, lineTile: 28,
-    cardK: 0.95, masteryCardH: 74,
+    cardK: 1.25, masteryCardH: 74,
     button: Object.freeze({ w: 140, h: 52, size: 22 }),
     // The logo column, narrower inside a window under narrowBelow (a
     // portrait playfield), then the details at most detailsMaxW wide.
@@ -326,18 +326,18 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
     const cards = layoutCards(host, screen, layout, cardsTop, haloAround);
     pieces.push(...cards.pieces);
 
-    // "stay" and "random", side by side.
+    // "random" and "stay", side by side.
     const rowsTop = cardsTop + cardsH;
     const rowW = Math.round((inner.w - LOOK.gap) / 2);
     const rowRect = {
-        [CHOICE.STAY]: { x: inner.x, y: rowsTop, w: rowW, h: LOOK.rowH },
-        [CHOICE.RANDOM]: { x: inner.x + rowW + LOOK.gap, y: rowsTop, w: rowW, h: LOOK.rowH },
+        [CHOICE.RANDOM]: { x: inner.x, y: rowsTop, w: rowW, h: LOOK.rowH },
+        [CHOICE.STAY]: { x: inner.x + rowW + LOOK.gap, y: rowsTop, w: rowW, h: LOOK.rowH },
     };
     pieces.push({
         zIndex: WELCOME_SCREEN_Z_INDEX.rows,
         rect: { x: inner.x, y: rowsTop, w: inner.w, h: LOOK.rowH },
         draw: dc => {
-            for (const choice of [CHOICE.STAY, CHOICE.RANDOM]) {
+            for (const choice of [CHOICE.RANDOM, CHOICE.STAY]) {
                 const r = rowRect[choice];
                 const x = r.x - inner.x;
                 fillGradient(dc, x, 0, r.w, r.h, COLORS.rowUnlocked, COLORS.tile);

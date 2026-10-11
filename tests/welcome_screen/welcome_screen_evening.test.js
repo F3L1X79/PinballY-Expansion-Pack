@@ -37,7 +37,7 @@ test("the Welcome Screen waits for a menu to close, greets in the evening and cl
     assert.equal(isWelcomeScreenOpen(fake), true);
 
     assert.equal(greeting(fake), `${lang.welcomeScreen.greetings.evening}, Chloé !`);
-    assert.deepEqual(bottomRowLabels(fake), ["Rester sur la roue", "Lancer une table au hasard"]);
+    assert.deepEqual(bottomRowLabels(fake), ["Lancer une table au hasard", "Rester sur la roue"]);
     assert.deepEqual(highlighted(fake), { label: null, tooltip: "Changer de joueur" });
 
     press(fake, "Exit");

@@ -59,17 +59,17 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
 
     assert.equal(greeting(fake), TEXT.greetingWithName(TEXT.greetings.morning, "Alice").join(""));
     assert.deepEqual(headerImages(fake), [getProfileStore().getActiveProfile().avatarPath], "the active Profile's Avatar");
-    assert.deepEqual(bottomRowLabels(fake), [TEXT.stayOn("Attack from Mars Special"), TEXT.randomTable]);
+    assert.deepEqual(bottomRowLabels(fake), [TEXT.randomTable, TEXT.stayOn("Attack from Mars Special")]);
     assert.deepEqual(highlighted(fake), { label: null, tooltip: lang.profiles.menuEntry }, "the Avatar is selected on opening");
 
     const CARDS = TEXT.periodCards;
     assert.deepEqual(periodCards(fake).map(card => card.line), [null, null], "no grey line without a Streak, nor a Play this Period");
     assert.deepEqual(readChoices(fake), [
-        lang.profiles.menuEntry, TEXT.closeTooltip, CARDS.day.period, CARDS.week.period, TEXT.stayOn("Attack from Mars Special"), TEXT.randomTable,
+        lang.profiles.menuEntry, TEXT.closeTooltip, CARDS.day.period, CARDS.week.period, TEXT.randomTable, TEXT.stayOn("Attack from Mars Special"),
     ]);
     assert.deepEqual(fake.soundsPlayed(), Array(6).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
     press(fake, "Prev");
-    assert.deepEqual(highlighted(fake), { label: TEXT.randomTable, tooltip: null }, "Prev loops back to the last choice");
+    assert.deepEqual(highlighted(fake), { label: TEXT.stayOn("Attack from Mars Special"), tooltip: null }, "Prev loops back to the last choice");
 
     for (const button of ["Next", "Prev", "Info", "Coin"]) {
         assert.equal(press(fake, button).defaultPrevented, true, `${button} is swallowed`);
