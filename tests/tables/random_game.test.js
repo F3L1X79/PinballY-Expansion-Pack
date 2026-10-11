@@ -9,8 +9,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createProfileStore } from "../../common/profile_store.js";
-import { createRandomGame } from "../../common/random_game.js";
+import { createProfileStore } from "../../common/profiles/profile_store.js";
+import { createRandomGame } from "../../common/tables/random_game.js";
 
 const LAUNCH_COUNT = 200;
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";

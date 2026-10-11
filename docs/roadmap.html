@@ -407,7 +407,7 @@
             <h3>Choix de la langue dans un menu</h3>
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
           </div>
-          <p>Choisir la langue de l'interface depuis un menu du cabinet, sans éditer <code>.env.local</code> ni <code>common/config.js</code>. Aujourd'hui, <code>common/i18n.js</code> fige la langue au chargement, à partir de <code>config.language</code>.</p>
+          <p>Choisir la langue de l'interface depuis un menu du cabinet, sans éditer <code>.env.local</code> ni <code>common/core/config.js</code>. Aujourd'hui, <code>common/i18n.js</code> fige la langue au chargement, à partir de <code>config.language</code>.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
@@ -432,7 +432,7 @@
           </div>
           <p>Calculer l'objectif du Challenge d'après ce que la maison a joué les dernières semaines (la mesure du modèle appliquée aux Plays du Play Log, un peu au-dessus de la semaine typique), avec les plages fixes comme plancher et comme repli tant que le journal est trop court.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Lit le Play Log (livré) ; part des plages fixes par modèle de <code>common/challenge.js</code> (livrées, ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/119">#119</a>)</div>
+          <div class="links">Lit le Play Log (livré) ; part des plages fixes par modèle de <code>common/challenges/challenge.js</code> (livrées, ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/119">#119</a>)</div>
           <details>
             <summary>Questions ouvertes (3)</summary>
             <ul>
@@ -564,11 +564,11 @@
             <summary>Questions ouvertes (4)</summary>
             <ul>
               <li>Quels thèmes, et combien pour commencer ?</li>
-              <li>Ce que couvre un thème : seulement les couleurs et les polices de <code>common/steamball_palette.js</code>, ou aussi les images peintes d'avance (cadres, panneau et verre des Drawn Menus, blasons), à repeindre une fois par thème par les scripts de <code>maintainer/</code> ?</li>
+              <li>Ce que couvre un thème : seulement les couleurs et les polices de <code>common/drawing/steamball_palette.js</code>, ou aussi les images peintes d'avance (cadres, panneau et verre des Drawn Menus, blasons), à repeindre une fois par thème par les scripts de <code>maintainer/</code> ?</li>
               <li>Où le choisir : un réglage dans <code>.env.local</code>, un choix par Profile, ou une entrée de menu ?</li>
               <li>Les confettis et les feux d'artifice suivent-ils le thème ?</li>
             </ul>
-            <p class="ctx">Idée du 10/10/2026. Aujourd'hui, les couleurs passent déjà presque toutes par <code>common/steamball_palette.js</code>, mais les images PNG sont peintes en Steamball.</p>
+            <p class="ctx">Idée du 10/10/2026. Aujourd'hui, les couleurs passent déjà presque toutes par <code>common/drawing/steamball_palette.js</code>, mais les images PNG sont peintes en Steamball.</p>
           </details>
         </div>
       </li>
@@ -592,7 +592,7 @@
               <li>Quelles données : tout ce qu'affichent les Profile Stats, ou aussi le Play Log brut ?</li>
               <li>Comment garantir la compatibilité d'une version à l'autre (numéro de version de l'API, données figées comme dans <code>tests/project/persisted_data_pinning.test.js</code>) ?</li>
             </ul>
-            <p class="ctx">Idée du 10/10/2026. Les données existent déjà dans le Profile Store, le Play Log et <code>common/profile_stats.js</code> ; le travail est surtout de choisir une surface stable et de la documenter.</p>
+            <p class="ctx">Idée du 10/10/2026. Les données existent déjà dans le Profile Store, le Play Log et <code>common/stats/profile_stats.js</code> ; le travail est surtout de choisir une surface stable et de la documenter.</p>
           </details>
         </div>
       </li>

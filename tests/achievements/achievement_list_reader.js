@@ -10,8 +10,8 @@
 // ============================================================
 
 import assert from "node:assert/strict";
-import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievement_list.js";
-import { RANK_COLORS } from "../../common/steamball_palette.js";
+import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
+import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
 
 // Past the glide from one line to the next.
 export const GLIDE_OVER_MS = 400;

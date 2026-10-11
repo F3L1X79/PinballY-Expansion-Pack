@@ -13,7 +13,7 @@ const [FIRST] = TABLES;
 test("after a Profile Reset, the level is announced again once reached again", async () => {
     pickLastTables();
     const fake = await startScenario({ addOns: ["achievements"], profiles: { guest: {} } });
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
 
     // The Play is announced while the game exits: its toasts wait for the wheel.
     fake.playGame(FIRST);

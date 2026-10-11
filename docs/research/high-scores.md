@@ -163,7 +163,7 @@ Not checked: the vpforums and vpuniverse PINemHi threads (HTTP 403), the content
 ### B5. Reading these files from a PinballY add-on
 
 **Facts**
-- Text: `Scripting.FileSystemObject` + `ADODB.Stream` already read UTF-8 files in this repo (`common/pinbally_host.js#L32-L79`, `common/config.js#L117-L128`). That covers `VPReg.ini` and the EM `.txt` files.
+- Text: `Scripting.FileSystemObject` + `ADODB.Stream` already read UTF-8 files in this repo (`common/core/pinbally_host.js#L32-L79`, `common/core/config.js#L117-L128`). That covers `VPReg.ini` and the EM `.txt` files.
 - COM automation cannot pass arrays (`Help/OLEAutomation.html` § Limitations "Arrays"; `Help/Variant.html`: `VT_ARRAY` "Not supported"). So `ADODB.Stream` in binary mode cannot hand bytes to JS (Inference).
 - `dllImport` can define COM interfaces in IDL-like syntax, with `COMPointer` out-parameters and `IID_PPV_ARGS` handling (`Help/DllImport.html` § "COM and OLE objects"; `Help/COMPointer.html`). It can fill `Uint8Array` buffers, and it reads wide strings with `NativePointer.toStringZ()` (`Help/DllImport.html`, `Help/NativePointer.html`). Only `IUnknown` is predefined. Mistakes can crash PinballY (`Help/DllImport.html`), and a definition string must not end with a `//` comment (`.claude/rules/conventions.md`, CParser C6).
 

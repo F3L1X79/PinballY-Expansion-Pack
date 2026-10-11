@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation"];
 const UNKNOWN_TITLE = "A title no PinballY version has";

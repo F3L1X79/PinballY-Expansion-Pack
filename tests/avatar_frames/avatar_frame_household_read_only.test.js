@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { startHousehold, errorLines } from "../stats/household_stats_scenario.js";
 import { PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
 import { openHouseholdStats, chooseColumn } from "../stats/household_stats_reader.js";
-import { PROFILE_STATS_Z_INDEX } from "../../common/profile_stats_painter.js";
+import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { shownFrame } from "./avatar_frame_reader.js";
 
 const HOUSEHOLD = {

@@ -1,6 +1,6 @@
 # Achievements are announced by a toast on a drawing layer
 
-Achievements used to be announced by a dialog from `common/wheel_dialog.js`, which blocked the wheel until the player pressed a button. We decided to announce them with an Achievement Toast instead: a small card in the bottom-right corner of the playfield screen, drawn on reusable `mainWindow` drawing layers (one per toast on screen, so stacked toasts move and fade independently) at a Z index above everything (menus included), slid in and faded out with timers. It is the only PinballY surface that can sit in a corner, take no input and disappear on its own. Dialogs that expect an answer (startup prompt, rating prompt) stay in the wheel dialog module.
+Achievements used to be announced by a dialog from `common/core/wheel_dialog.js`, which blocked the wheel until the player pressed a button. We decided to announce them with an Achievement Toast instead: a small card in the bottom-right corner of the playfield screen, drawn on reusable `mainWindow` drawing layers (one per toast on screen, so stacked toasts move and fade independently) at a Z index above everything (menus included), slid in and faded out with timers. It is the only PinballY surface that can sit in a corner, take no input and disappear on its own. Dialogs that expect an answer (startup prompt, rating prompt) stay in the wheel dialog module.
 
 ## Considered Options
 

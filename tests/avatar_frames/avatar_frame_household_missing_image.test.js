@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { startHousehold, errorLines, DEFAULT_AVATAR } from "../stats/household_stats_scenario.js";
 import { openHouseholdStats, columns, chooseColumn, isHouseholdStatsOpen } from "../stats/household_stats_reader.js";
 import { cardImages, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
-import { PROFILE_STATS_Z_INDEX } from "../../common/profile_stats_painter.js";
+import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { AVATAR_FRAMES_FOLDER } from "../mastery/mastery_bar_scenario.js";
 
 const HOUSEHOLD = {

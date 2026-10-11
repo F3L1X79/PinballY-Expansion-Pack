@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import {
     WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen, periodCards, periodCardLogos, readChoices, choose,
 } from "./welcome_screen_reader.js";
@@ -51,7 +51,7 @@ test("the Welcome Screen shows a card per Period Table and launches the day's", 
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.welcomeScreen;
     const CARDS = TEXT.periodCards;
     await import("../../main.js");

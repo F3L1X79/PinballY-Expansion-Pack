@@ -7,8 +7,8 @@
 // covers the whole playfield.
 // ============================================================
 
-import { safeHandler } from "../common/safe_handler.js";
-import { createPinballYHost } from "../common/pinbally_host.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
 
 const SCRIPT_NAME = "ForceBackglass";
 

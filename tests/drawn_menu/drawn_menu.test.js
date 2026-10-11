@@ -12,11 +12,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import {
     isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, press, openMainMenu, chooseEntry, GLIDE_OVER_MS,
 } from "./drawn_menu_reader.js";
-import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu_painter.js";
+import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu/drawn_menu_painter.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "drawnMenus"];
 const BUTTON_SOUNDS = "C:\\PinballY\\Assets\\Button Sounds";
@@ -37,7 +37,7 @@ test("setup", async () => {
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "en";
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     LABELS = lang.customMenuLabels;
     await import("../../main.js");
     await settle();

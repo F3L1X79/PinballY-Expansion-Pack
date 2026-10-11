@@ -18,7 +18,10 @@ const OPTIONAL_CHAINING = /\?\.(?=[\w$([])/;
 
 const loadedScripts = () => [
     "main.js",
-    ...FOLDERS.flatMap(folder => readdirSync(ROOT + folder).filter(name => name.endsWith(".js")).map(name => `${folder}/${name}`)),
+    ...FOLDERS.flatMap(folder => readdirSync(ROOT + folder, { recursive: true })
+        .map(name => name.replace(/\\/g, "/"))
+        .filter(name => name.endsWith(".js"))
+        .map(name => `${folder}/${name}`)),
 ];
 
 // Comments may mention the syntax they avoid.

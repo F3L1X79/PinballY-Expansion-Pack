@@ -10,9 +10,9 @@
 // is deferred with setTimeout(fn, 0).
 // ============================================================
 
-import { safeHandler } from "../common/safe_handler.js";
-import { TABLE_OF_THE_DAY } from "../common/period_table.js";
-import { getProfileStore } from "../common/profile_store.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { TABLE_OF_THE_DAY } from "../common/tables/period_table.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
 
 // A game from RAGE_QUIT_MIN_SECONDS to under RAGE_QUIT_MAX_SECONDS, Play or
 // not, sets the "rage quit" flag: long enough to have really played, short

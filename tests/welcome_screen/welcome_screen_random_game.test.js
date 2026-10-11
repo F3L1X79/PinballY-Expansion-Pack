@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen, greeting, choose } from "./welcome_screen_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -32,7 +32,7 @@ test("late at night, the Welcome Screen's random choice launches a Random Game",
     config.language = "en";
     config.skipRandomGameAnimation = true;
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.welcomeScreen;
     await import("../../main.js");
     await settle();

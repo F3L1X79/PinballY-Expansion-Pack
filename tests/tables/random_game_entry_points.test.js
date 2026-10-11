@@ -11,9 +11,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
-import { getRandomGame } from "../../common/random_game.js";
+import { getRandomGame } from "../../common/tables/random_game.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const MENU_LAUNCH_COUNT = 50;
@@ -51,7 +51,7 @@ test("the Welcome Screen and the main menu never launch the Last Played Table, a
     config.language = "en";
     config.skipRandomGameAnimation = true;
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
 

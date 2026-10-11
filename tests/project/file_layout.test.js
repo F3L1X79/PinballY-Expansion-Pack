@@ -1,9 +1,9 @@
 ﻿// ============================================================
 // Checks the file layout rule: the root holds main.js as its only script,
 // addons/ holds exactly one file per Add-on imported and registered in
-// SCRIPTS by main.js, common/ holds no Add-on (no module whose default
-// export is a function), and tests/ holds only subfolders. Reads the files
-// only; runs nothing.
+// SCRIPTS by main.js, common/ holds only subfolders and no Add-on in them
+// (no module whose default export is a function), and tests/ holds only
+// subfolders. Reads the files only; runs nothing.
 // ============================================================
 
 import { test } from "node:test";
@@ -34,8 +34,16 @@ test("every script in addons/ is an Add-on registered in main.js", () => {
     assert.deepEqual(jsFilesIn(ADDONS), registeredAddOns);
 });
 
+test("common/ holds only subfolders, no script at its root", () => {
+    const filesAtRoot = readdirSync(COMMON, { withFileTypes: true })
+        .filter(entry => !entry.isDirectory())
+        .map(entry => entry.name);
+    assert.deepEqual(filesAtRoot, []);
+});
+
 test("the common folder contains no Add-on", () => {
-    const addOnsInCommon = jsFilesIn(COMMON)
+    const addOnsInCommon = readdirSync(COMMON, { recursive: true })
+        .filter(name => name.endsWith(".js"))
         .filter(name => DEFAULT_FUNCTION_EXPORT.test(readFileSync(COMMON + name, "utf8")));
     assert.deepEqual(addOnsInCommon, []);
 });

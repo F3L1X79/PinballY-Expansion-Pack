@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -42,7 +42,7 @@ test("the Hall of Fame shows the active Profile's ranking and follows a switch",
     }
     config.language = "en";
 
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
     await settle();
 

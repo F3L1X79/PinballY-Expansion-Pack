@@ -33,7 +33,7 @@ test("a Play that raises the Collection Tier keeps it and announces it with one 
     fake.advanceTime(ONE_TOAST_MS);
     assert.equal(collectionToasts(fake).length, 1, "a tier is announced once");
 
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     getProfileStore().resetProfile("guest");
     assert.equal(savedCollectionTier(fake, "guest"), undefined, "a Profile Reset drops it");
     assert.deepEqual(errorLines(fake), []);

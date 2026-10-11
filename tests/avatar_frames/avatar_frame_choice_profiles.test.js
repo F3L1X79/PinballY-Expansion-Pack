@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, errorLines, profileFile, DRAWN_AHEAD_MS } from "../mastery/mastery_bar_scenario.js";
 import { openProfileStats, choose, frameRows, pickRow, press, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
-import { getProfileStore } from "../../common/profile_store.js";
+import { getProfileStore } from "../../common/profiles/profile_store.js";
 
 const ADD_ONS = ["tableMastery", "achievements", "customMenuCommands", "profilePicker"];
 const savedData = (fake, name) => JSON.parse(fake.readFile(profileFile(name)));
@@ -21,7 +21,7 @@ test("a Child Profile's choice stays in its own profile.json, and a Profile Rese
         profiles: { guest: { collectionTier: 3, avatarFrame: 2 }, mia: { collectionTier: 2, isChild: true } },
     });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
 
     openProfileStats(fake, lang);
     choose(fake, "Frame");

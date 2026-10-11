@@ -9,7 +9,7 @@
 // those screens.
 // ============================================================
 
-import { safeHandler } from "../common/safe_handler.js";
+import { safeHandler } from "../common/core/safe_handler.js";
 
 const SCRIPT_NAME = "MenuCleanup";
 

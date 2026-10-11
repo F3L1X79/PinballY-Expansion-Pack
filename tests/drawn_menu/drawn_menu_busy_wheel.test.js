@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import { isDrawnMenuShown, drawnMenuLines, press, chooseEntry, openMainMenu, OPEN_OVER_MS } from "./drawn_menu_reader.js";
 
@@ -25,8 +25,8 @@ test("setup", async () => {
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "en";
-    ({ getWheelDialogs: wheelDialogs, DIALOG_PRIORITY } = await import("../../common/wheel_dialog.js"));
-    ({ getAchievementToasts: achievementToasts } = await import("../../common/achievement_toast.js"));
+    ({ getWheelDialogs: wheelDialogs, DIALOG_PRIORITY } = await import("../../common/core/wheel_dialog.js"));
+    ({ getAchievementToasts: achievementToasts } = await import("../../common/achievements/achievement_toast.js"));
     await import("../../main.js");
     await settle();
 });

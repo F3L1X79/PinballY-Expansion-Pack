@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const PLAYER_UNDERLAY = "C:\\PinballY\\Media\\Images\\underlay.png";
 const SYSTEM_UNDERLAY = "C:\\PinballY\\Media\\System Underlays\\Visual Pinball X.png";

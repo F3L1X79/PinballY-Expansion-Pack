@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 test("off by default, PinballY's native menu entries stay", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 30, 20, 0, 0) });

@@ -8,7 +8,7 @@ After the Period Table and wheel dialog modules were deepened behind the Pinball
 
 ## Considered Options
 
-- **Achievements module behind the host.** It would have absorbed `achievements_engine.js`, `common/achievements.js` and `common/visible_tables.js`, and made the unlock thresholds testable. Rejected: the gain is testability, not readability.
+- **Achievements module behind the host.** It would have absorbed `achievements_engine.js`, `common/achievements/achievements.js` and `common/tables/visible_tables.js`, and made the unlock thresholds testable. Rejected: the gain is testability, not readability.
 - **Play Session module.** It would have replaced the three separate trackings of a play (stats tracker, rating prompt, Period Table) and the `setTimeout(0)` ordering between them. Rejected for the same reason. The ordering constraint is documented in `main.js` and in the wheel dialog module.
 
 ## Consequences

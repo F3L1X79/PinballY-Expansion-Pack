@@ -12,7 +12,7 @@ const [TABLE] = TABLES;
 
 test("a Mastery Toast still waiting when its Profile is reset is dropped", async () => {
     const fake = await startScenario();
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
 
     fake.playGame(TABLE);
     fake.gameStarted(TABLE);

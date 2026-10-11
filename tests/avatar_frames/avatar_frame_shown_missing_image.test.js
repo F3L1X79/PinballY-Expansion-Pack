@@ -21,7 +21,7 @@ test("a missing frame image is logged once and the Avatar shows plain", async ()
     assert.equal(shownFrame(badge), null);
     assert.ok(badge.images().some(path => path.endsWith("default_avatar.png")), "the Avatar still shows");
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     for (let opening = 0; opening < 2; opening++) {
         fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
         fake.selectMenuItem(lang.profiles.menuEntry);

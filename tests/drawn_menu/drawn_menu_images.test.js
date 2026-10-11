@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
-import { DRAWN_MENU_IMAGES } from "../../common/drawn_menu_images.js";
+import { DRAWN_MENU_IMAGES } from "../../common/drawn_menu/drawn_menu_images.js";
 
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 

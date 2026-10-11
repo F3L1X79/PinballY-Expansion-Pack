@@ -7,12 +7,12 @@
 // Periods Played and Streaks show those counters as Achievement Progress,
 // the current Streak for a Streak; a Streak Achievement is unlocked by the
 // longest Streak, so a broken Streak never takes it back. Reads the
-// counters kept by common/period_table.js; writes nothing.
+// counters kept by common/tables/period_table.js; writes nothing.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
+import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { getTableOfTheDay, getTableOfTheWeek } from "../common/tables/period_table.js";
 
 export function buildPeriodTableAchievements() {
     const { achievements: TEXT } = lang;

@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 
@@ -23,7 +23,7 @@ test("with the option empty, the lower status line shows only the table info", a
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
 

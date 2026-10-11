@@ -14,7 +14,7 @@ test("with Table Mastery off, the Profile Stats offer no Frame button", async ()
         addOns: ["achievements", "customMenuCommands"], frameImages: true, profiles: { guest: { collectionTier: 4, avatarFrame: 2 } },
     });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
 
     assert.deepEqual(buttons(fake).map(button => button.label), ["Achievements"]);

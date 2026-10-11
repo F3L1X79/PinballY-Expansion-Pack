@@ -15,11 +15,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createAchievementToasts, TOAST_KIND } from "../../common/achievement_toast.js";
-import lang from "../../common/i18n.js";
-import { ACHIEVEMENT_RANK } from "../../common/achievements.js";
-import { RANK_COLORS, STEAMBALL_COLORS } from "../../common/steamball_palette.js";
-import { playerLevelColorOf } from "../../common/steamball_drawing.js";
+import { createAchievementToasts, TOAST_KIND } from "../../common/achievements/achievement_toast.js";
+import lang from "../../common/core/i18n.js";
+import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
+import { RANK_COLORS, STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
+import { playerLevelColorOf } from "../../common/drawing/steamball_drawing.js";
 
 const ARRIVAL_GAP_MS = 350;
 const MAX_CARDS = 5;

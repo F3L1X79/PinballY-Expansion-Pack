@@ -18,7 +18,7 @@ test("switching to a Profile whose first frame is pending gives it its own promp
     const fake = await startScenario({
         addOns: ADD_ONS, profiles: { guest: { collectionTier: 3, avatarFrame: null }, alice: { collectionTier: 1 } },
     });
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     fake.advanceTime(ALL_TOASTS_MS);
     await settle();
     assert.deepEqual(rewardPrompts(fake), [], "Guest was already prompted");

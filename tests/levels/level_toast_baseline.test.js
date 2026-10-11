@@ -26,7 +26,7 @@ test("no Level Toast at startup or after Change Player, and a Guest gets its own
     assert.ok(allToasts(fake).length > 0, "Alice's Achievement Toasts at startup");
     assert.deepEqual(levelToasts(fake), [], "no Level Toast at startup");
 
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const shownBefore = allToasts(fake).length;
     getProfileStore().switchTo("guest");
     fake.advanceTime(ALL_TOASTS_MS);

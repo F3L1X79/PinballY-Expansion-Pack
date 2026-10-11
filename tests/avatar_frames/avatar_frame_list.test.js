@@ -16,7 +16,7 @@ const DEFAULT_AVATAR = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\de
 test("the Frame button opens the ten frames then None, the locked ones greyed with their condition", async () => {
     const fake = await startScenario({ addOns: ADD_ONS, frameImages: true, profiles: { guest: { collectionTier: 3 } } });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
 
     assert.deepEqual(buttons(fake).slice(0, 2), [

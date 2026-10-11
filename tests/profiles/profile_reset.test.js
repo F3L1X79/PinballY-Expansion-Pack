@@ -13,7 +13,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 // Thursday 1 October 2026, 20:15:30.
 const NOW = new Date(2026, 9, 1, 20, 15, 30);
@@ -66,8 +66,8 @@ test("an Admin Profile resets another Profile from the Exit menu, after one conf
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.profileReset;
     await import("../../main.js");
     await settle();

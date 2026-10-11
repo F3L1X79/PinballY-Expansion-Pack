@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createProfileStore, MIN_PLAY_SECONDS } from "../../common/profile_store.js";
+import { createProfileStore, MIN_PLAY_SECONDS } from "../../common/profiles/profile_store.js";
 
 const NOW = new Date(2026, 8, 24, 21, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";

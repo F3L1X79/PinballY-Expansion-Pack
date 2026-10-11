@@ -7,7 +7,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { collectionMasteryOf } from "../../common/table_mastery.js";
+import { collectionMasteryOf } from "../../common/mastery/table_mastery.js";
 
 const times = (count, level) => Array(count).fill(level);
 

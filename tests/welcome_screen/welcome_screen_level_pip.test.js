@@ -25,7 +25,7 @@ test("the Welcome Screen's Avatar carries the active Profile's level", async () 
     press(fake, "Exit");
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
 
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     getProfileStore().switchTo("guest");
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);

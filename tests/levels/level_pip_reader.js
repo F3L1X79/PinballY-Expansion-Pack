@@ -3,7 +3,7 @@
 // over the level's metal) and its width. Never loaded by PinballY.
 // ============================================================
 
-import { playerLevelColorOf } from "../../common/steamball_drawing.js";
+import { playerLevelColorOf } from "../../common/drawing/steamball_drawing.js";
 
 // The fills in the metal of the level the layer's digits show.
 function pipFills(layer) {

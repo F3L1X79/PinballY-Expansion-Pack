@@ -13,7 +13,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, section, press } from "../stats/profile_stats_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 // Wednesday 23 September 2026: its week is keyed "2026-09-21".
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -50,8 +50,8 @@ test("Guest follows the week's Challenge, completes it and earns its record, apa
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
     await settle();
     const TEXT = lang.challenges;

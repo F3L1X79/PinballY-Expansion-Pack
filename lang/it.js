@@ -549,7 +549,7 @@ export default {
         time: (hours, minutes) => `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`,
     },
 
-    // The Challenge Card, at the top right of the wheel screen (see common/challenge_card.js).
+    // The Challenge Card, at the top right of the wheel screen (see common/challenges/challenge_card.js).
     challenges: {
         cardHeader: "Sfida della settimana",
         titles: {
@@ -578,7 +578,7 @@ export default {
         toastDescription: (count) => (count === 1 ? "Prima sfida completata" : `${count} sfide completate`),
     },
 
-    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js), and the
+    // The Mastery Bar, under the Challenge Card (see common/mastery/mastery_bar.js), and the
     // Collection Mastery's texts.
     tableMastery: {
         // Collection Mastery: the goal toward the next Collection Tier

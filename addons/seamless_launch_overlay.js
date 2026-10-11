@@ -4,7 +4,7 @@
 // own loading screen. Listens to "launchoverlayshow" and "launchoverlayhide".
 // ============================================================
 
-import { safeHandler } from "../common/safe_handler.js";
+import { safeHandler } from "../common/core/safe_handler.js";
 
 const SCRIPT_NAME = "SeamlessLaunchOverlay";
 

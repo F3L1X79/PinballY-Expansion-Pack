@@ -10,10 +10,10 @@
 // is unlocked by the longest, so a broken Daily Streak never takes it back.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getDailyStreak } from "../common/daily_streak.js";
+import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getDailyStreak } from "../common/achievements/daily_streak.js";
 import {
     RAGE_QUIT_MIN_SECONDS,
     RAGE_QUIT_MAX_SECONDS,

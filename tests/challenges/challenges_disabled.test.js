@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, isProfileStatsOpen, section } from "../stats/profile_stats_reader.js";
 
@@ -28,7 +28,7 @@ test("no Challenge, Challenge Card or Challenges Achievements when the Challenge
     for (const key of Object.keys(config.addOns)) config.addOns[key] = !["challenges", "drawnMenus"].includes(key);
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
 

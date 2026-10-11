@@ -8,9 +8,9 @@
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import { MASTERY_BAR_Z_INDEX } from "../../common/mastery_bar.js";
+import { MASTERY_BAR_Z_INDEX } from "../../common/mastery/mastery_bar.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 export const NOW = new Date(2026, 8, 23, 10, 0, 0);
 export const MINUTE = 60;

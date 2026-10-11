@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -35,8 +35,8 @@ test("only a tour of the wheel the Profile sees on All Tables unlocks the World 
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.achievements;
     await import("../../main.js");
     await settle();

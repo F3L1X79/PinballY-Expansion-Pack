@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -30,8 +30,8 @@ test("the Welcome Screen and the main menu launch the same Table of the Day", as
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getTableOfTheDay } = await import("../../common/period_table.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getTableOfTheDay } = await import("../../common/tables/period_table.js");
     await import("../../main.js");
     await settle();
 

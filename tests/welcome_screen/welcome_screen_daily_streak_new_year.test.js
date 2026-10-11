@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, dailyStreakLine } from "./welcome_screen_reader.js";
 
 const NEW_YEARS_EVE = new Date(2026, 11, 31, 23, 50, 0);
@@ -32,8 +32,8 @@ test("the Daily Streak survives New Year's Eve and a Play started before midnigh
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "startupChoicePrompt";
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.welcomeScreen.cabinetStreak;
     const store = getProfileStore();
     await import("../../main.js");

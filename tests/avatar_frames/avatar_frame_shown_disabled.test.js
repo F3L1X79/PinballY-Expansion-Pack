@@ -19,7 +19,7 @@ test("no frame on the badge nor in the carousel with Table Mastery off", async (
     fake.advanceTime(DRAWN_AHEAD_MS);
     assert.equal(shownFrame(fake.drawingLayers().find(layer => layer.zIndex === BADGE_Z)), null);
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
     fake.selectMenuItem(lang.profiles.menuEntry);
     const avatars = fake.drawingLayers().filter(layer => layer.zIndex === AVATAR_Z && layer.alpha > 0);

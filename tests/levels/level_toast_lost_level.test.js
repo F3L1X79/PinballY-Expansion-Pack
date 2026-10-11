@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, levelToasts, play, errorLines, TABLES, MINUTE, ALL_TOASTS_MS, levelToastOf, pickLastTables } from "../mastery/mastery_bar_scenario.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const [FIRST] = TABLES;
 

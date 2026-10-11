@@ -5,8 +5,8 @@
 // Registered once at init; no event listeners.
 // ============================================================
 
-import lang from "../common/i18n.js";
-import config from "../common/config.js";
+import lang from "../common/core/i18n.js";
+import config from "../common/core/config.js";
 
 export default function init() {
     const COMMUNITY_MANUFACTURER_NAME = config.communityTablesManufacturer;

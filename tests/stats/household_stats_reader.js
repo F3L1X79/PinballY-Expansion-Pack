@@ -10,8 +10,8 @@
 // ============================================================
 
 import assert from "node:assert/strict";
-import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/household_stats_painter.js";
-import { STEAMBALL_COLORS } from "../../common/steamball_palette.js";
+import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/stats/household_stats_painter.js";
+import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { openProfileStats, choose, press, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
 

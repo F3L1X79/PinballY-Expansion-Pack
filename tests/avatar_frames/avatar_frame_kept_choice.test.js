@@ -11,7 +11,7 @@ import {
     startScenario, collectionToasts, play, errorLines, playedFor, profileFile, TABLES, MINUTE, ONE_TOAST_MS, DRAWN_AHEAD_MS,
 } from "../mastery/mastery_bar_scenario.js";
 import { openProfileStats, choose, frameRows, press } from "../stats/profile_stats_reader.js";
-import { getProfileStore } from "../../common/profile_store.js";
+import { getProfileStore } from "../../common/profiles/profile_store.js";
 
 const [FIRST, SECOND, THIRD, FOURTH] = TABLES;
 const ADD_ONS = ["tableMastery", "achievements", "customMenuCommands", "profilePicker"];
@@ -30,7 +30,7 @@ test("a new Collection Tier announces its frame but keeps the recorded choice, N
         profiles: { guest: { ...NEAR_TIER_TWO, avatarFrame: 1 }, mia: { ...NEAR_TIER_TWO, avatarFrame: null } },
     });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
 
     await play(fake, FOURTH, 30 * MINUTE);
     fake.advanceTime(2 * ONE_TOAST_MS);

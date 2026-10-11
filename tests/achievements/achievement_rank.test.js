@@ -8,8 +8,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
-import { ACHIEVEMENT_RANK } from "../../common/achievements.js";
+import config from "../../common/core/config.js";
+import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const ADD_ONS_UNDER_TEST = ["customMenuCommands", "sessionStatsTracker", "achievements", "challenges", "profilePicker"];

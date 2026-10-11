@@ -9,10 +9,10 @@
 // scaling), profileName as that Profile would. Called by achievements_engine.js; no side effects.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { getActiveProfileTables } from "../common/visible_tables.js";
-import { getProfileStore } from "../common/profile_store.js";
+import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { getActiveProfileTables } from "../common/tables/visible_tables.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
 
 export function buildManufacturerCompletionAchievements({ asNonChild = false, profileName } = {}) {
     const { achievements: TEXT } = lang;

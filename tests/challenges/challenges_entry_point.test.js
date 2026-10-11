@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CARD_Z_INDEX = 4500;
@@ -33,7 +33,7 @@ test("the Challenges Add-on draws the week's Challenge, shows the card and count
     const { challenge } = JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\cabinet.json`));
     assert.equal(challenge.current.week, "2026-09-21");
     // The badge shares the card's Z index; only the card shows the Challenge's title.
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const { template, target, param } = challenge.current;
     const title = lang.challenges.titles[template](target, param);
     const card = fake.drawingLayers().find(layer => layer.zIndex === CARD_Z_INDEX && layer.texts().includes(title));

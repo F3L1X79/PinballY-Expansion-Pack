@@ -8,11 +8,11 @@
 // Profile while the filter is on the wheel.
 // ============================================================
 
-import lang from "../common/i18n.js";
-import { getHallOfFame, HALL_OF_FAME_FILTER_ID, HALL_OF_FAME_FULL_FILTER_ID } from "../common/hall_of_fame.js";
-import { safeHandler } from "../common/safe_handler.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getActiveProfileTables } from "../common/visible_tables.js";
+import lang from "../common/core/i18n.js";
+import { getHallOfFame, HALL_OF_FAME_FILTER_ID, HALL_OF_FAME_FULL_FILTER_ID } from "../common/stats/hall_of_fame.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getActiveProfileTables } from "../common/tables/visible_tables.js";
 
 const SCRIPT_NAME = "HallOfFame";
 

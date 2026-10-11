@@ -8,8 +8,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
-import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu_painter.js";
+import config from "../../common/core/config.js";
+import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu/drawn_menu_painter.js";
 
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 10, 20, 0, 0) });
 const isMenuLayer = layer => Object.values(DRAWN_MENU_Z_INDEX).includes(layer.zIndex);
@@ -20,7 +20,7 @@ test("setup", async () => {
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key !== "drawnMenus";
     config.language = "en";
-    ({ default: lang } = await import("../../common/i18n.js"));
+    ({ default: lang } = await import("../../common/core/i18n.js"));
     await import("../../main.js");
     await settle();
 });
@@ -35,7 +35,7 @@ test("turned off, the main menu is native", () => {
 });
 
 test("turned off, the wheel dialogs are native and their queue advances", async () => {
-    const { getWheelDialogs, DIALOG_PRIORITY } = await import("../../common/wheel_dialog.js");
+    const { getWheelDialogs, DIALOG_PRIORITY } = await import("../../common/core/wheel_dialog.js");
     // Past the Welcome Screen, which holds the queue at startup.
     while (fake.currentMenu() === null && !getWheelDialogs().isIdle()) {
         fake.fire("commandbuttondown", { command: "Exit", repeat: false });

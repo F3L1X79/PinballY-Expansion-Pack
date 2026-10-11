@@ -12,7 +12,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import {
     WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, greeting, periodCards, headerImages, bottomRowLabels, highlighted, readChoices, choose,
     welcomeScreenLayerCount,
@@ -45,8 +45,8 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.welcomeScreen;
     await import("../../main.js");
     await settle();

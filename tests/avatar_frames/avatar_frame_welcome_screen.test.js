@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, errorLines } from "../mastery/mastery_bar_scenario.js";
 import { WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
-import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen_painter.js";
+import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
 import { shownFrame, isPipOverFrame } from "./avatar_frame_reader.js";
 
 const ADD_ONS = ["tableMastery", "achievements", "profilePicker", "startupChoicePrompt"];

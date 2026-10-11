@@ -5,7 +5,7 @@
 // Never loaded by PinballY.
 // ============================================================
 
-import { ACHIEVEMENT_TOAST_Z_INDEX } from "../../common/achievement_toast.js";
+import { ACHIEVEMENT_TOAST_Z_INDEX } from "../../common/achievements/achievement_toast.js";
 
 // Every toast draw so far, in order: { zIndex, texts }.
 export const toastDrawings = fake => fake.drawings().filter(drawing => drawing.zIndex === ACHIEVEMENT_TOAST_Z_INDEX);

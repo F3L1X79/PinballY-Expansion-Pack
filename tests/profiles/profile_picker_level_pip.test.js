@@ -12,7 +12,7 @@ import { shownPip } from "../levels/level_pip_reader.js";
 const PIP_Z = 6503;
 
 async function openCarousel(fake) {
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
     fake.selectMenuItem(lang.profiles.menuEntry);
 }

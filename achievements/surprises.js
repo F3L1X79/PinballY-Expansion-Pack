@@ -1,7 +1,7 @@
 // ============================================================
 // The Surprises family: Secret Achievements that hang on no Add-on but the
 // Achievements themselves. Each one is unlocked by what the Surprises
-// tracker (common/surprises.js) recorded in the active Profile's
+// tracker (common/achievements/surprises.js) recorded in the active Profile's
 // "surprises" part: a flag, or for Four Seasons every season seen. Night
 // Owl and Full Moon Night are absent for a Child Profile, whatever their
 // flags say; Time Travel is absent while the active Profile's tables cover
@@ -11,16 +11,16 @@
 // achievements_engine.js at each check; no side effects.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, standaloneAchievement } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getActiveProfileTables } from "../common/visible_tables.js";
-import { getDecadeStartYear } from "../common/decade.js";
+import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, standaloneAchievement } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getActiveProfileTables } from "../common/tables/visible_tables.js";
+import { getDecadeStartYear } from "../common/achievements/decade.js";
 import {
     NIGHT_OWL_FIRST_HOUR, NIGHT_OWL_LAST_HOUR, FULL_MOON_NIGHT_FIRST_HOUR, FULL_MOON_NIGHT_LAST_HOUR, FULL_MOON_MIN_LIT_PERCENT,
     LUNCH_BREAK_FIRST_HOUR, LUNCH_BREAK_LAST_HOUR, SEASON_COUNT, ONE_MORE_GAME_PLAYS, TIME_TRAVEL_PLAYS,
     surprisesOf,
-} from "../common/surprises.js";
+} from "../common/achievements/surprises.js";
 
 // "03:00" for 3.
 const hourStart = hour => `${String(hour).padStart(2, "0")}:00`;

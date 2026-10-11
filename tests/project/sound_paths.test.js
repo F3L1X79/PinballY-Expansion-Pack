@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
-import { resolveSoundFiles, SHIPPED_SOUNDS } from "../../common/config.js";
+import { resolveSoundFiles, SHIPPED_SOUNDS } from "../../common/core/config.js";
 
 const PACK = "C:\\PinballY\\Scripts\\ExpansionPack";
 

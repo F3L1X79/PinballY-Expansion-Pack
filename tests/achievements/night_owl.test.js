@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
 import { readRows, press } from "./achievement_list_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 // Wednesday 23 September 2026, one minute before midnight.
 const NOW = new Date(2026, 8, 23, 23, 59, 0);
@@ -46,8 +46,8 @@ test("only a Play started from 00:00 to 03:59 unlocks Night Owl, never for a Chi
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.achievements;
     const LIST_TEXT = lang.achievementList;
     await import("../../main.js");

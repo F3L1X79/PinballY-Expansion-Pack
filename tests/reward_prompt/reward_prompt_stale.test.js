@@ -22,7 +22,7 @@ test("a toast gone stale by its turn submits no prompt", async () => {
             alice: {},
         },
     });
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     fake.advanceTime(ALL_TOASTS_MS);
 
     fake.playGame(FOURTH);

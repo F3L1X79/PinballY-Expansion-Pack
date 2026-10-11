@@ -7,8 +7,8 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { getPlayerLevel, playerLevelOf } from "../../common/player_level.js";
-import { ACHIEVEMENT_RANK } from "../../common/achievements.js";
+import { getPlayerLevel, playerLevelOf } from "../../common/levels/player_level.js";
+import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
 
 const achievement = (id, rank) => ({ id, rank });
 const BRONZE = achievement("bronze", ACHIEVEMENT_RANK.BRONZE);

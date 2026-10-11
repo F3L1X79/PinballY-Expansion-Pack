@@ -7,13 +7,13 @@
 // active Profile while the filter is on the wheel.
 // ============================================================
 
-import lang from "../common/i18n.js";
-import { safeHandler } from "../common/safe_handler.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getActiveProfileTables } from "../common/visible_tables.js";
+import lang from "../common/core/i18n.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getActiveProfileTables } from "../common/tables/visible_tables.js";
 import {
     getTablesToDiscover, TABLES_TO_DISCOVER_FILTER_ID, TABLES_TO_DISCOVER_FULL_FILTER_ID,
-} from "../common/tables_to_discover.js";
+} from "../common/tables/tables_to_discover.js";
 
 const SCRIPT_NAME = "TablesToDiscover";
 

@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { readRows } from "../achievements/achievement_list_reader.js";
 
 const TABLE = {
@@ -25,7 +25,7 @@ test("no Random Game Achievement when neither the main menu commands nor the sta
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.achievementList;
     await import("../../main.js");
     await settle();

@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, highlighted } from "./welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -26,7 +26,7 @@ test("the Welcome Screen highlights Change Player at startup and Close after a c
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);

@@ -7,9 +7,9 @@
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import { CONFETTI_Z_INDEX } from "../../common/confetti_shower.js";
+import { CONFETTI_Z_INDEX } from "../../common/celebrations/confetti_shower.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -30,7 +30,7 @@ export const TABLES = Array.from({ length: TABLE_COUNT }, (_, index) => ({
 export const LAST_TABLE = TABLES[TABLE_COUNT - 1];
 // Imported late: i18n reads the language the scenario sets.
 export async function challengeTitle() {
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     return lang.challenges.titles.manufacturerTables(WILLIAMS_CHALLENGE.target, WILLIAMS_CHALLENGE.param);
 }
 // Already played: playing it again unlocks no Platinum.

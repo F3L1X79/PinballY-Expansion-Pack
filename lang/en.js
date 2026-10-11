@@ -264,7 +264,7 @@ export default {
         toastHeader: "Achievement unlocked",
     },
 
-    // The Achievement List screen (see common/achievement_list.js).
+    // The Achievement List screen (see common/achievements/achievement_list.js).
     achievementList: {
         menuEntry: "Your Achievements",
         // The header's title, the section titles, the key caps and the
@@ -429,7 +429,7 @@ export default {
         time: (hours, minutes) => `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${hours < 12 ? "AM" : "PM"}`,
     },
 
-    // The Challenge Card, at the top right of the wheel screen (see common/challenge_card.js).
+    // The Challenge Card, at the top right of the wheel screen (see common/challenges/challenge_card.js).
     challenges: {
         cardHeader: "Challenge of the week",
         // One title per Challenge template, from its target and parameter.
@@ -459,7 +459,7 @@ export default {
         toastDescription: (count) => (count === 1 ? "First Challenge completed" : `${count} Challenges completed`),
     },
 
-    // The Mastery Bar, under the Challenge Card (see common/mastery_bar.js), the Mastery Toast
+    // The Mastery Bar, under the Challenge Card (see common/mastery/mastery_bar.js), the Mastery Toast
     // and the Collection Mastery's texts.
     tableMastery: {
         // Collection Mastery: the goal toward the next Collection Tier

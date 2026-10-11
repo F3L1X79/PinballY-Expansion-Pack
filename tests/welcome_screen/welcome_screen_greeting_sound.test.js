@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen } from "./welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -30,7 +30,7 @@ test("the Welcome Screen plays the greeting sound as it appears, at startup and 
     config.language = "en";
     config.profileGreetingSoundFile = GREETING_SOUND;
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
     const greetingSounds = () => fake.soundsPlayed().filter(path => path === GREETING_SOUND).length;

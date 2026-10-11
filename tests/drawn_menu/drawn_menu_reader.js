@@ -8,7 +8,7 @@
 // Never loaded by PinballY.
 // ============================================================
 
-import { DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, DRAWN_MENU_MARKS } from "../../common/drawn_menu_painter.js";
+import { DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, DRAWN_MENU_MARKS } from "../../common/drawn_menu/drawn_menu_painter.js";
 
 // Past the fade in, and past the glide from one entry to the next.
 export const OPEN_OVER_MS = 300;

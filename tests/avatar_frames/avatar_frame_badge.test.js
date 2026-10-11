@@ -25,7 +25,7 @@ test("the badge wears the frame the player equips, above the name and under the 
     fake.advanceTime(DRAWN_AHEAD_MS);
     assert.equal(badgeFrame(fake), null, "nothing worn before the player equips a frame");
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
     choose(fake, "Frame");
     pickRow(fake, "Steam and Gears");

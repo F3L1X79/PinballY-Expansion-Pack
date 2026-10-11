@@ -1,6 +1,6 @@
 # The Welcome Screen is a drawn dialog in the wheel dialog queue
 
-The startup prompt was a native PinballY menu submitted to `common/wheel_dialog.js` with the `STARTUP_PROMPT` priority, so that every other dialog waiting at startup (the rating prompt) came after it. It becomes the Welcome Screen, drawn on `mainWindow` drawing layers like the Achievement List, and taking the flippers' input itself. We decided to teach the wheel dialog module a second kind of dialog, a drawn one, that keeps its priority and holds the queue until it closes, instead of showing the Welcome Screen outside the queue with a rule of its own.
+The startup prompt was a native PinballY menu submitted to `common/core/wheel_dialog.js` with the `STARTUP_PROMPT` priority, so that every other dialog waiting at startup (the rating prompt) came after it. It becomes the Welcome Screen, drawn on `mainWindow` drawing layers like the Achievement List, and taking the flippers' input itself. We decided to teach the wheel dialog module a second kind of dialog, a drawn one, that keeps its priority and holds the queue until it closes, instead of showing the Welcome Screen outside the queue with a rule of its own.
 
 ## Considered Options
 

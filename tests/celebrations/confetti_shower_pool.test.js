@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createConfettiShower, CONFETTI_Z_INDEX } from "../../common/confetti_shower.js";
+import { createConfettiShower, CONFETTI_Z_INDEX } from "../../common/celebrations/confetti_shower.js";
 
 const SHOWER_MS = 10000;
 

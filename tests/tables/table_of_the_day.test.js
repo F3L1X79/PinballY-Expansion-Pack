@@ -9,8 +9,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createPeriodTable, TABLE_OF_THE_DAY } from "../../common/period_table.js";
-import { createProfileStore } from "../../common/profile_store.js";
+import { createPeriodTable, TABLE_OF_THE_DAY } from "../../common/tables/period_table.js";
+import { createProfileStore } from "../../common/profiles/profile_store.js";
 
 // Wednesday 23 September 2026, 10:00 local time.
 const NOW = new Date(2026, 8, 23, 10, 0, 0);

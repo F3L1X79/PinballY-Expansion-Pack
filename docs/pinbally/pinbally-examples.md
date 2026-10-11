@@ -136,7 +136,7 @@ mainWindow.on("launchoverlayhide", () => mainWindow.showWheel(true));
 
 ### 2.1 Script structure
 - The official examples are top-level scripts: code runs at `import` time and registers listeners directly. Helper modules use `export function` plus `import {x} from '../file.js'` (wheel-actions, two-tables). Our project's `export default init()` + `main.js` loop is stricter and fine.
-- Put user-tunable constants at the top of the file (every community example does this). Our `common/config.js` centralises it.
+- Put user-tunable constants at the top of the file (every community example does this). Our `common/core/config.js` centralises it.
 - Keep one concern per file. FlexDMD.js shows what goes wrong otherwise: 4 features, duplicated `menuopen`/`command` handlers, and conflicting command names.
 
 ### 2.2 Events

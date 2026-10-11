@@ -21,17 +21,17 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
-import { createProfileStore } from "../../common/profile_store.js";
-import { createPeriodTable, formatDateKey, TABLE_OF_THE_DAY, TABLE_OF_THE_WEEK } from "../../common/period_table.js";
-import { createRandomGame } from "../../common/random_game.js";
-import { createChallenges, CHALLENGE_TEMPLATE_IDS } from "../../common/challenge.js";
+import config from "../../common/core/config.js";
+import { createProfileStore } from "../../common/profiles/profile_store.js";
+import { createPeriodTable, formatDateKey, TABLE_OF_THE_DAY, TABLE_OF_THE_WEEK } from "../../common/tables/period_table.js";
+import { createRandomGame } from "../../common/tables/random_game.js";
+import { createChallenges, CHALLENGE_TEMPLATE_IDS } from "../../common/challenges/challenge.js";
 import { buildChallengeAchievements } from "../../achievements/challenges.js";
 import { buildWorldTourAchievements } from "../../achievements/world_tour.js";
-import { createWorldTour } from "../../common/world_tour.js";
-import { createProfileRewards } from "../../common/profile_rewards.js";
+import { createWorldTour } from "../../common/achievements/world_tour.js";
+import { createProfileRewards } from "../../common/avatar_frames/profile_rewards.js";
 import { buildSurprisesAchievements } from "../../achievements/surprises.js";
-import { createSurprises } from "../../common/surprises.js";
+import { createSurprises } from "../../common/achievements/surprises.js";
 import { WELCOME_SCREEN_PAUSE_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
@@ -202,7 +202,7 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
     fake.installGlobals();
 
     useFixtureConfig();
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
 

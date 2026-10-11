@@ -10,10 +10,10 @@
 // no side effects.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { countPlayedTables, getActiveProfileTables } from "../common/visible_tables.js";
-import { getProfileStore } from "../common/profile_store.js";
+import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { countPlayedTables, getActiveProfileTables } from "../common/tables/visible_tables.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
 
 // Each value is part of an Achievement ID: changing one would announce the
 // Achievement again to players who already earned it. Each one also needs

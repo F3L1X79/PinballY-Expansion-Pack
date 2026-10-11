@@ -22,28 +22,28 @@
 // pause drops it. Its layers are removed once it closes.
 // ============================================================
 
-import lang from "../common/i18n.js";
-import config from "../common/config.js";
-import { safeHandler } from "../common/safe_handler.js";
-import { createPinballYHost } from "../common/pinbally_host.js";
-import { getWheelDialogs, DIALOG_PRIORITY } from "../common/wheel_dialog.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getProfileRewards } from "../common/profile_rewards.js";
-import { getShownPlayerLevel } from "../common/shown_player_level.js";
-import { displayNameOf } from "../common/profile_name.js";
-import { cleanTitle } from "../common/table_title.js";
-import { getChangePlayer } from "../common/change_player.js";
-import { getRandomGame } from "../common/random_game.js";
-import { getDailyStreak } from "../common/daily_streak.js";
-import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
-import { masteryOf, collectionMasteryOfProfile } from "../common/table_mastery.js";
-import { tablesVisibleTo } from "../common/visible_tables.js";
-import { masteryHeadOf, collectionTextsOf } from "../common/mastery_bar.js";
-import { createNavigationSound } from "../common/navigation_sound.js";
-import { STEAMBALL_COLORS } from "../common/steamball_palette.js";
+import lang from "../common/core/i18n.js";
+import config from "../common/core/config.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import { getWheelDialogs, DIALOG_PRIORITY } from "../common/core/wheel_dialog.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
+import { getShownPlayerLevel } from "../common/levels/shown_player_level.js";
+import { displayNameOf } from "../common/profiles/profile_name.js";
+import { cleanTitle } from "../common/tables/table_title.js";
+import { getChangePlayer } from "../common/profiles/change_player.js";
+import { getRandomGame } from "../common/tables/random_game.js";
+import { getDailyStreak } from "../common/achievements/daily_streak.js";
+import { getTableOfTheDay, getTableOfTheWeek } from "../common/tables/period_table.js";
+import { masteryOf, collectionMasteryOfProfile } from "../common/mastery/table_mastery.js";
+import { tablesVisibleTo } from "../common/tables/visible_tables.js";
+import { masteryHeadOf, collectionTextsOf } from "../common/mastery/mastery_bar.js";
+import { createNavigationSound } from "../common/core/navigation_sound.js";
+import { STEAMBALL_COLORS } from "../common/drawing/steamball_palette.js";
 import {
     WELCOME_SCREEN_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutWelcomeScreen,
-} from "../common/welcome_screen_painter.js";
+} from "../common/welcome_screen/welcome_screen_painter.js";
 
 const SCRIPT_NAME = "WelcomeScreen";
 

@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, dailyStreakLine } from "./welcome_screen_reader.js";
 
 // Wednesday 7 October 2026, in the evening.
@@ -31,8 +31,8 @@ test("a Profile Reset brings the Daily Streak back to 0", async () => {
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.profileReset;
     const store = getProfileStore();
     await import("../../main.js");

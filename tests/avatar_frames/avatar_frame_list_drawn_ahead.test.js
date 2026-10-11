@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, errorLines, DRAWN_AHEAD_MS } from "../mastery/mastery_bar_scenario.js";
 import { openProfileStats, choose, pickRow, press, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
-import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frame_list_painter.js";
+import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 
 const rowDrawings = fake => fake.drawings().filter(drawing => drawing.zIndex === AVATAR_FRAME_LIST_Z_INDEX.rows);
 
@@ -18,7 +18,7 @@ test("the list's rows are drawn ahead, and redrawn ahead after a choice", async 
         addOns: ["tableMastery", "achievements", "customMenuCommands"], frameImages: true, profiles: { guest: { collectionTier: 2 } },
     });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     assert.equal(rowDrawings(fake).length, 11, "every row drawn once at startup");
 
     openProfileStats(fake, lang);

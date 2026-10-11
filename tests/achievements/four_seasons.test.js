@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { SEASON_COUNT } from "../../common/surprises.js";
+import { SEASON_COUNT } from "../../common/achievements/surprises.js";
 import { startSurprisesScenario, showsMissing, showsUnlocked, profileFile, PROFILES, SHORT_GAME_MS } from "./surprises_scenario.js";
 
 const SCENARIO_URL = new URL("./surprises_scenario.js", import.meta.url).href;

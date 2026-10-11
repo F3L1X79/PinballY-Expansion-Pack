@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { pressAndGlide, readRows, isListOpen } from "./achievement_list_reader.js";
 import { openProfileStats, buttons, choose, isProfileStatsOpen } from "../stats/profile_stats_reader.js";
 
@@ -57,7 +57,7 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.achievementList;
     const ACHIEVEMENT = lang.achievements;
     const MENU_LABELS = lang.customMenuLabels;

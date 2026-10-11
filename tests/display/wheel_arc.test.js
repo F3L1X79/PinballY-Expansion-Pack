@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const PINBALLY_DEFAULT = "C:\\PinballY\\Assets\\Images\\underlay.png";
 const WHEEL_ARC = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\wheel_arc.png";

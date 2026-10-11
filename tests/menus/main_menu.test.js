@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createMainMenu, MAIN_MENU_POSITION } from "../../common/main_menu.js";
+import { createMainMenu, MAIN_MENU_POSITION } from "../../common/menus/main_menu.js";
 
 function setUp() {
     const fake = createFakePinballYHost();

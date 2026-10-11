@@ -10,9 +10,9 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import { startScenario, errorLines, ALL_TOASTS_MS } from "../mastery/mastery_bar_scenario.js";
 import { shownPip, pipWidth, pipColor } from "./level_pip_reader.js";
-import { drawLevelPip, levelPipOn } from "../../common/steamball_drawing.js";
-import { RANK_COLORS } from "../../common/steamball_palette.js";
-import { ACHIEVEMENT_RANK } from "../../common/achievements.js";
+import { drawLevelPip, levelPipOn } from "../../common/drawing/steamball_drawing.js";
+import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
+import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
 
 const BADGE_Z = 4500;
 

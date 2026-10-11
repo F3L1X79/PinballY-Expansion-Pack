@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createProfileStore, MIN_PLAY_SECONDS } from "../../common/profile_store.js";
+import { createProfileStore, MIN_PLAY_SECONDS } from "../../common/profiles/profile_store.js";
 
 const NOW = new Date(2026, 9, 1, 21, 10, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";

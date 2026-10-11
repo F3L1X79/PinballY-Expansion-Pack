@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 9, 1, 20, 15, 30);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -26,8 +26,8 @@ test("Every Profile resets them all, and a failing one does not stop the others"
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.profileReset;
     const GUEST = lang.profiles.guestName;
     await import("../../main.js");
@@ -49,8 +49,8 @@ test("Every Profile resets them all, and a failing one does not stop the others"
 
     // The Exit menu offers the Profile Reset only once an Admin Profile
     // exists, so never with Guest alone: its list is opened directly.
-    const { createPinballYHost } = await import("../../common/pinbally_host.js");
-    const { createProfileResetMenu } = await import("../../common/profile_reset_menu.js");
+    const { createPinballYHost } = await import("../../common/core/pinbally_host.js");
+    const { createProfileResetMenu } = await import("../../common/menus/profile_reset_menu.js");
     createProfileResetMenu(createPinballYHost(), getProfileStore()).open();
     assert.deepEqual(fake.currentMenu().items.map(item => item.title ?? ""),
         [TEXT.listTitle, "", GUEST, "", TEXT.cancel], "with Guest alone, no Every Profile line");

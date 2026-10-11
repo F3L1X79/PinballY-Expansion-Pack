@@ -19,7 +19,7 @@ test("a Profile switch shows the new Profile's Mastery Levels, Guest and a Child
             Kid: { isChild: true, plays: { [SECOND.configId]: playedFor(HOUR) } },
         },
     });
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const store = getProfileStore();
     assert.deepEqual(shownMastery(fake), { head: "Specialist", number: "5", fill: 0.5 });
 

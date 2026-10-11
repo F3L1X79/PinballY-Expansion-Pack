@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, squeezed, press, chooseEntry, OPEN_OVER_MS } from "./drawn_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["ratingPrompt", "drawnMenus"];
@@ -31,9 +31,9 @@ test("setup", async () => {
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "en";
     config.askToRateAfterMinutesPlayed = THRESHOLD_MINUTES;
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     TEXT = lang.ratingPrompt;
-    ({ getWheelDialogs: wheelDialogs, DIALOG_PRIORITY } = await import("../../common/wheel_dialog.js"));
+    ({ getWheelDialogs: wheelDialogs, DIALOG_PRIORITY } = await import("../../common/core/wheel_dialog.js"));
     await import("../../main.js");
     await settle();
 });

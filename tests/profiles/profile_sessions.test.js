@@ -10,7 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 // Longer than a toast's whole life (rise, hold, fade).
@@ -61,7 +61,7 @@ test("session stats and their Achievements belong to the active Profile", async 
     }
     config.language = "en";
 
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
     await settle();
 

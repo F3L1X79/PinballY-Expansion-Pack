@@ -5,10 +5,10 @@
 // changes; hidden on "gamestarted", shown again (on time) on "wheelmode".
 // ============================================================
 
-import lang from "../common/i18n.js";
-import { safeHandler } from "../common/safe_handler.js";
-import { createPinballYHost } from "../common/pinbally_host.js";
-import { drawShadowedText } from "../common/shadowed_text.js";
+import lang from "../common/core/i18n.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import { drawShadowedText } from "../common/drawing/shadowed_text.js";
 
 const SCRIPT_NAME = "Clock";
 

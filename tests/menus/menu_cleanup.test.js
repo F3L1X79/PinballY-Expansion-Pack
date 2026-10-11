@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const markAdmin = (fake, name) =>
@@ -49,8 +49,8 @@ test("turned on, Menu Cleanup lightens the menus for every Profile, Admin includ
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const LABELS = lang.customMenuLabels;
     await import("../../main.js");
     const store = getProfileStore();
@@ -73,7 +73,7 @@ test("turned on, Menu Cleanup lightens the menus for every Profile, Admin includ
 
 test("no doubled, leading or trailing separator is left, titled or not", async () => {
     // Not an Admin Profile: no Reset profile entry at the end.
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     getProfileStore().switchTo("Alice");
     const { Help, AboutBox, Quit } = globalThis.command;
     fake.openMenu("exit", [

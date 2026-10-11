@@ -21,7 +21,7 @@ Date: 2026-09-24. Sources: local PinballY help (`C:\vPinball\PinballY\Help\*.htm
 - Scripts can define a custom media type with a "Drop File Here" button in the main window: `gameList.createMediaType({ ..., format: "Image", extensions: ".jpg .jpeg .png", hasDropButton: true })` (`Help/MediaTypes.html` § "Custom media types", `hasDropButton` l.173).
 - What a script can observe: `menuopen` for `"media drop confirm"`, `"media drop confirm replace"`, `"media drop rename"`, `"media drop needs gameinfo"` (`Help/Menus.html` l.282-289), plus `command` events `MediaDropFirst..Last` and `MediaDropGo` (`Help/Commands.html` #MediaDropFirst). **But** when a single new file is dropped, `MediaDropGo()` runs directly with no menu and no command (`PlayfieldView.cpp#L18990-L19013`). The only trace is the success message, a popup whose `popupopen` name is the generic `"message"` (`PlayfieldView.cpp#L10822-L10842`).
 - `dllImport` can bind any Win32 function, define C structs, and pass `Uint16Array` buffers that native code writes into (`Help/DllImport.html` § "An example", § "Defining C struct types", § "Strings"). Automatic `cbSize` filling only works for a member named exactly `cbSize` (§ "Auto "cbSize" struct elements"). `OPENFILENAMEW` uses `lStructSize`, so it must be set by hand with `dllImport.sizeof(...)` (§ "Getting the size of a native type"). A window handle for the dialog owner is available as `mainWindow.hwndFrame` (`Help/WindowObjects.html` l.110). COM interfaces can be used through `COMPointer` (`Help/COMPointer.html`).
-- `createAutomationObject("ProgID")` is the equivalent of VB `CreateObject` (`Help/OLEAutomation.html`). `Scripting.FileSystemObject` is the documented example. This repo already reads files through `Scripting.FileSystemObject` + `ADODB.Stream` (`common/config.js`, `readEnvLocal`).
+- `createAutomationObject("ProgID")` is the equivalent of VB `CreateObject` (`Help/OLEAutomation.html`). `Scripting.FileSystemObject` is the documented example. This repo already reads files through `Scripting.FileSystemObject` + `ADODB.Stream` (`common/core/config.js`, `readEnvLocal`).
 
 **Options, best first (inference)**
 1. **Folder convention**: the player drops a PNG/JPG into e.g. `<PinballY>\Scripts\accounts\` (or names it after the account) using Windows Explorer; the add-on lists it with `FileSystemObject`. No native code. Weakness: not done from inside PinballY.
@@ -36,7 +36,7 @@ Date: 2026-09-24. Sources: local PinballY help (`C:\vPinball\PinballY\Help\*.htm
 - Inside a drawing function: `dc.drawImage(file, x, y, width, height)`, "JPEG and PNG formats are supported; absolute path, or path relative to the PinballY program folder" (`Help/CustomDrawing.html` l.260), and `dc.getImageSize(filename)` (l.301). Drawing functions also run in popups (`showPopup({ draw })`) and launch overlays (`Help/CustomDrawing.html` intro).
 - Popups accept `backgroundImage` (JPEG or PNG) and `draw` (`Help/Popups.html` l.80-101).
 - Menu items only have `title`, `cmd`, `selected`, `checked`, `radio`, `hasSubmenu`, `stayOpen` (`Help/Menus.html`, item descriptor list). **No image in menus.**
-- Paths: `systemInfo.programDir` (`Help/SystemInfoObject.html`), `gameList.getMediaDir()` (`Help/GameList.html`). The repo already builds `programDir + "\\Scripts\\..."` (`common/config.js`).
+- Paths: `systemInfo.programDir` (`Help/SystemInfoObject.html`), `gameList.getMediaDir()` (`Help/GameList.html`). The repo already builds `programDir + "\\Scripts\\..."` (`common/core/config.js`).
 - The repo's Achievement Toast already draws on a `mainWindow` drawing layer above menus (`docs/adr/0003-...`), so an avatar layer next to an account menu follows an existing pattern.
 
 **Inference**: an account picker = a `showMenu` list of names + a drawing layer showing the highlighted account's avatar. Following the highlight needs the menu's current item; the help documents no "menu item highlighted" event (see Open questions). Showing all avatars at once in a custom-drawn popup is the safe option.
@@ -50,9 +50,9 @@ Date: 2026-09-24. Sources: local PinballY help (`C:\vPinball\PinballY\Help\*.htm
 - `gameInfo.update()` can write `playCount`, `playTime`, `lastPlayed`, `rating`, `isFavorite`, `isHidden` (`Help/GameInfo.html` § "Updating metadata").
 
 **Facts: this repo**
-- All progress is in `optionSettings` under `custom.*`: Period Table locks, Streaks, Periods Played, Random Game count, session stats, `custom.achievements.notified.<id>` (`tests/project/persisted_data_pinning.test.js`, `EXPECTED_FIXED_KEYS`; `common/achievements.js` l.26-30; `session_stats_tracker.js`).
-- Player preferences are in `.env.local`, read synchronously through COM when modules load (`docs/adr/0002-user-settings-in-env-local.md`, `common/config.js`).
-- Many Achievements are **computed from PinballY's global stats**, not stored: collection / manufacturer / decade / category completion use `game.playCount > 0` (`achievements/collection_completion.js` l.23, `manufacturer_completion.js` l.32), play-time milestones sum `game.playTime` (`achievements/play_time_totals.js` l.22). Period Table and Random Game use `game.lastPlayed` (`common/period_table.js` l.43-49, `common/random_game.js` l.36-38). Only the Notified flags and the session / period counters are the add-on's own data.
+- All progress is in `optionSettings` under `custom.*`: Period Table locks, Streaks, Periods Played, Random Game count, session stats, `custom.achievements.notified.<id>` (`tests/project/persisted_data_pinning.test.js`, `EXPECTED_FIXED_KEYS`; `common/achievements/achievements.js` l.26-30; `session_stats_tracker.js`).
+- Player preferences are in `.env.local`, read synchronously through COM when modules load (`docs/adr/0002-user-settings-in-env-local.md`, `common/core/config.js`).
+- Many Achievements are **computed from PinballY's global stats**, not stored: collection / manufacturer / decade / category completion use `game.playCount > 0` (`achievements/collection_completion.js` l.23, `manufacturer_completion.js` l.32), play-time milestones sum `game.playTime` (`achievements/play_time_totals.js` l.22). Period Table and Random Game use `game.lastPlayed` (`common/tables/period_table.js` l.43-49, `common/tables/random_game.js` l.36-38). Only the Notified flags and the session / period counters are the add-on's own data.
 - `tests/project/persisted_data_pinning.test.js` fixes the exact key strings and Achievement IDs and "must keep passing unchanged" (header; `.claude/rules/conventions.md` § Tests).
 
 **Inference**
@@ -81,7 +81,7 @@ Date: 2026-09-24. Sources: local PinballY help (`C:\vPinball\PinballY\Help\*.htm
 - Events usable for "who is playing?": `wheelmode` on return to the wheel (`Help/WheelModeEvent.html`), `attractmodestart` / `attractmodeend` (`Help/AttractModeEvent.html`), `gamestarted` / `gameover` (already used in the repo).
 - Text input: no text field, input box or on-screen keyboard in the API (no hits in `Help/*.html`). `keydown` gives `key` as the typed character, Shift/CapsLock applied (`Help/KeyEvent.html` § Properties), so a keyboard is required for free typing.
 
-**This repo**: spontaneous dialogs go through `getWheelDialogs().submit(...)` with a `DIALOG_PRIORITY` (`common/wheel_dialog.js` l.17-20; startup prompt `startup_choice_prompt.js`). Main-menu entries go through `getMainMenu().add(...)` with a `MAIN_MENU_POSITION` (`common/main_menu.js` l.15-21).
+**This repo**: spontaneous dialogs go through `getWheelDialogs().submit(...)` with a `DIALOG_PRIORITY` (`common/core/wheel_dialog.js` l.17-20; startup prompt `startup_choice_prompt.js`). Main-menu entries go through `getMainMenu().add(...)` with a `MAIN_MENU_POSITION` (`common/menus/main_menu.js` l.15-21).
 
 **Inference**
 - Startup "Who is playing?" = a new top-priority wheel dialog (before `STARTUP_PROMPT`), one button per account. "Switch player" = a main-menu entry. On attract mode end, optionally ask again.
@@ -89,7 +89,7 @@ Date: 2026-09-24. Sources: local PinballY help (`C:\vPinball\PinballY\Help\*.htm
 
 ## 6. Project constraints
 
-- New Add-on at root, registered in `SCRIPTS` of `main.js`, switchable via `addOns` in `common/config.js`; shared code in `common/`; host seam `common/pinbally_host.js` for testable shared modules (`.claude/rules/conventions.md`).
+- New Add-on at root, registered in `SCRIPTS` of `main.js`, switchable via `addOns` in `common/core/config.js`; shared code in `common/`; host seam `common/core/pinbally_host.js` for testable shared modules (`.claude/rules/conventions.md`).
 - Every visible text through `common/i18n.js` in all six `lang/` files; account *names* are user data, not i18n.
 - No `optionSettings.save()` (conventions § Modules et globales), which limits per-account PinballY settings (§4).
 - Handlers and file I/O wrapped in `safeHandler`.

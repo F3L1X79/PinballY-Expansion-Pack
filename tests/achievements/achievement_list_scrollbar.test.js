@@ -10,11 +10,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createAchievementList, ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievement_list.js";
-import { createDrawingAhead } from "../../common/drawing_ahead.js";
-import { createProfileStore } from "../../common/profile_store.js";
-import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK } from "../../common/achievements.js";
-import { LIST_LOOK, computeGeometry } from "../../common/achievement_list_painter.js";
+import { createAchievementList, ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
+import { createDrawingAhead } from "../../common/core/drawing_ahead.js";
+import { createProfileStore } from "../../common/profiles/profile_store.js";
+import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
+import { LIST_LOOK, computeGeometry } from "../../common/achievements/achievement_list_painter.js";
 import { GLIDE_OVER_MS, press, pressAndGlide, scrollbarThumb, highlightedTexts } from "./achievement_list_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";

@@ -25,7 +25,7 @@ test("a switch shows the new Profile's frame, or none, and a Profile Reset takes
     fake.advanceTime(DRAWN_AHEAD_MS);
     assert.deepEqual(badgeFrame(fake), { tier: 3, size: 192 });
 
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     getProfileStore().switchTo("Alice");
     assert.deepEqual(badgeFrame(fake), { tier: 1, size: 192 });
     getProfileStore().switchTo("Bob");

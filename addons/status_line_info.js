@@ -9,11 +9,11 @@
 // and on a Profile switch.
 // ============================================================
 
-import lang from "../common/i18n.js";
-import config from "../common/config.js";
-import { safeHandler } from "../common/safe_handler.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { displayNameOf } from "../common/profile_name.js";
+import lang from "../common/core/i18n.js";
+import config from "../common/core/config.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { displayNameOf } from "../common/profiles/profile_name.js";
 
 const SCRIPT_NAME = "StatusLineInfo";
 const SECONDS_PER_MINUTE = 60;

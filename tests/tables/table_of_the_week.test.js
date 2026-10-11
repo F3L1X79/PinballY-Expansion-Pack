@@ -10,8 +10,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createPeriodTable, TABLE_OF_THE_WEEK } from "../../common/period_table.js";
-import { createProfileStore } from "../../common/profile_store.js";
+import { createPeriodTable, TABLE_OF_THE_WEEK } from "../../common/tables/period_table.js";
+import { createProfileStore } from "../../common/profiles/profile_store.js";
 
 // Monday 21 September 2026, 00:00:01 local time.
 const MONDAY = new Date(2026, 8, 21, 0, 0, 1);

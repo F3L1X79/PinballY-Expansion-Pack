@@ -8,9 +8,9 @@
 // others still load; LOG_STARTUP_TIMING logs each init time.
 // ============================================================
 
-import config from "./common/config.js";
-import { getProfileStore } from "./common/profile_store.js";
-import { installChildWheelFilter } from "./common/adult_tables.js";
+import config from "./common/core/config.js";
+import { getProfileStore } from "./common/profiles/profile_store.js";
+import { installChildWheelFilter } from "./common/tables/adult_tables.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;

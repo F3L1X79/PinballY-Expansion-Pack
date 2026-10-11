@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, table } from "./surprises_scenario.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 test("Time Travel is absent when the visible tables cover fewer than three decades", async () => {
     const { fake, TEXT, listRows, switchTo } = await startSurprisesScenario({

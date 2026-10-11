@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, showsMissing, showsUnlocked, table, SHORT_GAME_MS } from "./surprises_scenario.js";
-import { TIME_TRAVEL_PLAYS } from "../../common/surprises.js";
+import { TIME_TRAVEL_PLAYS } from "../../common/achievements/surprises.js";
 
 const T2005 = table(1, "Table 2005", { year: 2005 });
 const T1985 = table(2, "Table 1985", { year: 1985 });

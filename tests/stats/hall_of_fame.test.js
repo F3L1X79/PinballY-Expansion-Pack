@@ -6,7 +6,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { getHallOfFame } from "../../common/hall_of_fame.js";
+import { getHallOfFame } from "../../common/stats/hall_of_fame.js";
 
 const HOUR = 3600;
 

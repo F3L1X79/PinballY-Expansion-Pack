@@ -3,7 +3,7 @@
 // how many show, and their log lines. Never loaded by PinballY.
 // ============================================================
 
-import { FIREWORKS_Z_INDEX } from "../../common/fireworks.js";
+import { FIREWORKS_Z_INDEX } from "../../common/celebrations/fireworks.js";
 
 export const fireworksLayers = fake => fake.drawingLayers().filter(layer => layer.zIndex === FIREWORKS_Z_INDEX);
 export const visibleFireworksCount = fake => fireworksLayers(fake).filter(layer => layer.alpha > 0).length;

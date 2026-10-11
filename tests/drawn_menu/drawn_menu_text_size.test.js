@@ -9,9 +9,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
-import { DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, DRAWN_MENU_MARKS } from "../../common/drawn_menu_painter.js";
-import { DRAWN_MENU_PANEL_WIDTH } from "../../common/drawn_menu_images.js";
+import config from "../../common/core/config.js";
+import { DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, DRAWN_MENU_MARKS } from "../../common/drawn_menu/drawn_menu_painter.js";
+import { DRAWN_MENU_PANEL_WIDTH } from "../../common/drawn_menu/drawn_menu_images.js";
 import { openMainMenu } from "./drawn_menu_reader.js";
 
 const WINDOW = { width: 1080, height: 1920 };

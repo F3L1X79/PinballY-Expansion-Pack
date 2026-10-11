@@ -141,7 +141,7 @@ Two ways to get crisp text in a corner:
 
 ## Recommendation
 
-Build a shared **toast module**, for example `common/achievement_toast.js`, that owns **one** `mainWindow` drawing layer at **Z 4500**: above the wheel and info box, below popups and menus, so a menu or wheel dialog covers it instead of fighting it. For each toast:
+Build a shared **toast module**, for example `common/achievements/achievement_toast.js`, that owns **one** `mainWindow` drawing layer at **Z 4500**: above the wheel and info box, below popups and menus, so a menu or wheel dialog covers it instead of fighting it. For each toast:
 
 1. If the UI isn't in plain wheel mode, or a game is running, queue the toast and flush the queue on `wheelmode`.
 2. `draw()` the card **once** with a default-size canvas. `dc.getSize()` gives the rotated layout size in pixels. Place a `StyledText` card at the bottom-right corner in pixels, which gives pixel-exact text on rotated cabs too.
@@ -246,7 +246,7 @@ export function createAchievementToast(host) {
 
 Notes on the sketch:
 - The title and detail come from `common/i18n.js`, never hard-coded.
-- `host.StyledText` assumes the `common/pinbally_host.js` seam exposes PinballY's `StyledText` class. `StyledText` is **not** in the list of allowed globals in `.claude/rules/conventions.md`, so that needs a decision (see open questions).
+- `host.StyledText` assumes the `common/core/pinbally_host.js` seam exposes PinballY's `StyledText` class. `StyledText` is **not** in the list of allowed globals in `.claude/rules/conventions.md`, so that needs a decision (see open questions).
 - A toast already showing when a menu opens keeps its timers. It is simply covered at Z 4500.
 
 ## Open questions to test in PinballY

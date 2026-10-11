@@ -12,7 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { readRows } from "./achievement_list_reader.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -59,7 +59,7 @@ test("three manufacturers in one calendar day unlock the first multi-manufacture
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.achievements;
     await import("../../main.js");
     await settle();

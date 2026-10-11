@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen } from "./welcome_screen_reader.js";
 
 const TABLES = [{ id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness" }];
@@ -19,7 +19,7 @@ test("a game started during the startup pause drops the Welcome Screen", async (
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "startupChoicePrompt";
     config.language = "en";
 
-    const { getWheelDialogs } = await import("../../common/wheel_dialog.js");
+    const { getWheelDialogs } = await import("../../common/core/wheel_dialog.js");
     await import("../../main.js");
     await settle();
 

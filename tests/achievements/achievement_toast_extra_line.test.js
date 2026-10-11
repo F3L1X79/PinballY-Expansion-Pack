@@ -6,7 +6,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createAchievementToasts, TOAST_KIND } from "../../common/achievement_toast.js";
+import { createAchievementToasts, TOAST_KIND } from "../../common/achievements/achievement_toast.js";
 import { toastDrawings, shownCardHeights } from "./achievement_toast_reader.js";
 
 // Enough for both cards to rise into place, shorter than any hold.

@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, errorLines, DRAWN_AHEAD_MS } from "../mastery/mastery_bar_scenario.js";
 import { openProfileStats, choose, pickRow, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
-import { PROFILE_STATS_Z_INDEX } from "../../common/profile_stats_painter.js";
+import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { shownFrame } from "./avatar_frame_reader.js";
 
 const card = fake => fake.drawingLayers().find(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.card && layer.alpha > 0);
@@ -24,7 +24,7 @@ test("the Profile Stats card wears the frame, and a new choice once back from th
         profiles: { guest: { collectionTier: 3, avatarFrame: 3 } },
     });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     assert.deepEqual(cardFrame(fake), { tier: 3, size: 384 });

@@ -9,7 +9,7 @@
 // ============================================================
 
 import assert from "node:assert/strict";
-import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen_painter.js";
+import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
 import { shownPip } from "../levels/level_pip_reader.js";
 
 // The startup pause: the screen is drawn then, and starts fading in.

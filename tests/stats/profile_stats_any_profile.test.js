@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { openProfileStats, playerLevel, press } from "./profile_stats_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -50,8 +50,8 @@ async function start() {
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["achievements", "challenges", "tableMastery"].includes(key);
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const { readProfileStats } = await import("../../addons/achievements_engine.js");
     await import("../../main.js");
     await settle();

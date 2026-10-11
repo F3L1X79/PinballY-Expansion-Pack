@@ -11,7 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 // Wednesday 30 September 2026: its week is keyed "2026-09-28".
 const NOW = new Date(2026, 8, 30, 21, 0, 0);
@@ -43,10 +43,10 @@ test("an Admin Profile resetting itself starts over at once, without replaying a
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.profileReset;
     const CHALLENGES = lang.challenges;
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
     await settle();
     getProfileStore().switchTo("Alice");

@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { isWelcomeScreenOpen } from "../welcome_screen/welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -29,7 +29,7 @@ test("without the Welcome Screen, the active Profile is greeted once at startup"
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "profilePicker";
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
     fake.advanceTime(0);

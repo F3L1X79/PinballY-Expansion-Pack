@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { isDrawnMenuShown, drawnMenuLines, highlightedEntry, openMainMenu, chooseEntry } from "./drawn_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "achievements", "menuCleanup", "drawnMenus"];
@@ -27,9 +27,9 @@ test("setup", async () => {
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "fr";
-    ({ default: lang } = await import("../../common/i18n.js"));
+    ({ default: lang } = await import("../../common/core/i18n.js"));
     listReader = await import("../achievements/achievement_list_reader.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
     await settle();
     getProfileStore().switchTo("Alice");

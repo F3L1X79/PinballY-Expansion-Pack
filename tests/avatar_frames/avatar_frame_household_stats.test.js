@@ -10,7 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHousehold, errorLines, DEFAULT_AVATAR } from "../stats/household_stats_scenario.js";
 import { openHouseholdStats, columns } from "../stats/household_stats_reader.js";
-import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/household_stats_painter.js";
+import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/stats/household_stats_painter.js";
 import { shownFrame } from "./avatar_frame_reader.js";
 import { pipColor } from "../levels/level_pip_reader.js";
 

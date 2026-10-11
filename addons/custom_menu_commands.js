@@ -11,15 +11,15 @@
 // Profile Reset menus.
 // ============================================================
 
-import { safeHandler } from "../common/safe_handler.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getRandomGame } from "../common/random_game.js";
-import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
-import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
-import { createProfileResetMenu } from "../common/profile_reset_menu.js";
-import { getDrawnMenus } from "../common/drawn_menu.js";
-import { createPinballYHost } from "../common/pinbally_host.js";
-import lang from "../common/i18n.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getRandomGame } from "../common/tables/random_game.js";
+import { getTableOfTheDay, getTableOfTheWeek } from "../common/tables/period_table.js";
+import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
+import { createProfileResetMenu } from "../common/menus/profile_reset_menu.js";
+import { getDrawnMenus } from "../common/drawn_menu/drawn_menu.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import lang from "../common/core/i18n.js";
 
 const SCRIPT_NAME = "CustomMenuCommands";
 

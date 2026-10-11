@@ -20,7 +20,7 @@ const wornRow = fake => frameRows(fake).find(row => row.status === "Worn").name;
 test("Select saves an unlocked frame and goes back on the Frame button; a locked row stays; Exit changes nothing", async () => {
     const fake = await startScenario({ addOns: ADD_ONS, frameImages: true, profiles: { guest: { collectionTier: 3, avatarFrame: null } } });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
     choose(fake, "Frame");
 

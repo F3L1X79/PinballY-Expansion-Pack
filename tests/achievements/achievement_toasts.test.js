@@ -11,8 +11,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import config from "../../common/config.js";
-import { ACHIEVEMENT_RANK } from "../../common/achievements.js";
+import config from "../../common/core/config.js";
+import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SECONDS_PER_HOUR = 3600;

@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The carousel's background, its Avatars, then the gold frame and names.
@@ -33,7 +33,7 @@ test("once drawn ahead, the carousel opens and moves without drawing", async () 
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "profilePicker";
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
     // The startup greeting over, and everything drawn ahead.

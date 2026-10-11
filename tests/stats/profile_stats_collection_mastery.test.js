@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { tableNumbered } from "../welcome_screen/welcome_screen_collection_scenario.js";
 import { openProfileStats, collectionMastery, press } from "./profile_stats_reader.js";
 
@@ -42,8 +42,8 @@ test("the card shows the Collection Mastery's goal, count and tier", async () =>
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "achievements";
     config.language = "fr";
 
-    const { default: lang } = await import("../../common/i18n.js");
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
     await settle();
     const collectionOf = name => {

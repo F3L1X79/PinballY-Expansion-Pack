@@ -11,7 +11,7 @@ import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import { startScenario, levelToasts, play, errorLines, TABLES, MINUTE, ALL_TOASTS_MS, levelToastOf, pickLastTables } from "../mastery/mastery_bar_scenario.js";
 import { fireworksLayers } from "./fireworks_reader.js";
 import { confettiLayers } from "./confetti_shower_scenario.js";
-import { createFireworks } from "../../common/fireworks.js";
+import { createFireworks } from "../../common/celebrations/fireworks.js";
 
 const FIREWORKS_SOUND_FILE = "C:\\Sounds\\fireworks.wav";
 

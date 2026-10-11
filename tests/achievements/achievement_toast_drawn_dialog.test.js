@@ -9,9 +9,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createAchievementToasts, TOAST_KIND } from "../../common/achievement_toast.js";
-import { createWheelDialogs, DIALOG_PRIORITY } from "../../common/wheel_dialog.js";
-import { STEAMBALL_COLORS } from "../../common/steamball_palette.js";
+import { createAchievementToasts, TOAST_KIND } from "../../common/achievements/achievement_toast.js";
+import { createWheelDialogs, DIALOG_PRIORITY } from "../../common/core/wheel_dialog.js";
+import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 
 // Enough for a batch to rise into place, shorter than any hold.
 const RISE_MS = 1000;

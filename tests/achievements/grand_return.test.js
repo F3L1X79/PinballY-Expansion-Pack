@@ -10,7 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SESSION_MS = 5 * 60 * 1000;
@@ -56,7 +56,7 @@ test("the grand return needs a 31-day break and says so", async () => {
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.achievements;
     await import("../../main.js");
     await settle();

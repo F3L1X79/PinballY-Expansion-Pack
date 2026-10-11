@@ -6,8 +6,8 @@
 // is disabled.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements.js";
-import lang from "../common/i18n.js";
+import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
 
 // Each value is part of an Achievement ID: changing one would announce the
 // Achievement again to players who already earned it. Each one also needs

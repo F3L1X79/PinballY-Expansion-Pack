@@ -3,7 +3,7 @@
 // (prototype V4, "room lights", branch prototype/drawn-menu-styles) with
 // the Avatar Frames' painting kit, at twice the size then halved, and
 // writes, in assets/images/drawn_menu/, the images and sizes listed by
-// common/drawn_menu_images.js: the panel (slate gradient, thin border,
+// common/drawn_menu/drawn_menu_images.js: the panel (slate gradient, thin border,
 // thin gold frame, square gold corners, soft gold glow from the top) and
 // the glass laid over it (the room's lights out of focus: two warm spots
 // top left, a cold one on the right, a neon along the top, a faint warm
@@ -21,8 +21,8 @@ import { Canvas, clamp, mix, hex, sdPolygon } from "../avatar_frames/frame_kit.m
 import {
     DRAWN_MENU_IMAGES, DRAWN_MENU_FACE_INSET, DRAWN_MENU_LIST_INSET, DRAWN_MENU_LIST_WIDTH, DRAWN_MENU_SELECTION_MARGIN,
     DRAWN_MENU_ENTRY_HEIGHT,
-} from "../../common/drawn_menu_images.js";
-import { STEAMBALL_COLORS } from "../../common/steamball_palette.js";
+} from "../../common/drawn_menu/drawn_menu_images.js";
+import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 
 const OUTPUT = fileURLToPath(new URL("../../assets/images/drawn_menu/", import.meta.url));
 const SCALE = 2;

@@ -3,12 +3,12 @@
 // built ones matched by DYNAMIC_TITLE_RULES) and launch-overlay status
 // messages into the active project language. Listens to "menuopen" and
 // "launchoverlaymessage"; logs untranslated titles when
-// logUntranslatedMenuTitles is on in common/config.js.
+// logUntranslatedMenuTitles is on in common/core/config.js.
 // ============================================================
 
-import lang from "../common/i18n.js";
-import { safeHandler } from "../common/safe_handler.js";
-import config from "../common/config.js";
+import lang from "../common/core/i18n.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import config from "../common/core/config.js";
 
 const SCRIPT_NAME = "UITranslation";
 

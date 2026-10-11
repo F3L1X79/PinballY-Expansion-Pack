@@ -10,9 +10,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, errorLines, DRAWN_AHEAD_MS } from "../mastery/mastery_bar_scenario.js";
-import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievement_list.js";
-import { LIST_LOOK } from "../../common/achievement_list_painter.js";
-import { STEAMBALL_COLORS } from "../../common/steamball_palette.js";
+import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
+import { LIST_LOOK } from "../../common/achievements/achievement_list_painter.js";
+import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { readRows, pressAndGlide } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, choose, pickRow, press, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
 import { shownFrame } from "./avatar_frame_reader.js";
@@ -26,7 +26,7 @@ test("the header wears the frame instead of its gold frame, a new choice include
             Bob: { collectionTier: 1, avatarFrame: 1, notified: NOTIFIED } },
     });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
     fake.selectMenuItem(lang.achievementList.menuEntry);
 

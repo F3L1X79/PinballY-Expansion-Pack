@@ -7,8 +7,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
-import { ACHIEVEMENT_FAMILY } from "../../common/achievements.js";
+import config from "../../common/core/config.js";
+import { ACHIEVEMENT_FAMILY } from "../../common/achievements/achievements.js";
 
 test("no Sessions Achievement without the session stats tracker Add-on", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 9, 8, 10, 0, 0) });

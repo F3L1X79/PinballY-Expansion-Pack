@@ -6,7 +6,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { computeGeometry, DRAWN_MENU_LOOK, ROW_KIND } from "../../common/drawn_menu_painter.js";
+import { computeGeometry, DRAWN_MENU_LOOK, ROW_KIND } from "../../common/drawn_menu/drawn_menu_painter.js";
 
 const WINDOW = { width: 1080, height: 1920 };
 const menuOf = count => ({ message: null, rows: Array.from({ length: count }, (_, i) => ({ kind: ROW_KIND.ENTRY, title: `Entry ${i}` })) });

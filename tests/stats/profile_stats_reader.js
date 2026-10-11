@@ -14,8 +14,8 @@
 // ============================================================
 
 import assert from "node:assert/strict";
-import { PROFILE_STATS_Z_INDEX } from "../../common/profile_stats_painter.js";
-import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frame_list_painter.js";
+import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
+import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 
 // Past the fade in.
 export const PROFILE_STATS_OPEN_MS = 300;

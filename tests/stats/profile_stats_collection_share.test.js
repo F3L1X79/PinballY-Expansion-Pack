@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { openProfileStats, section, press } from "./profile_stats_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -28,7 +28,7 @@ test("the Collection shows 100% only once every table was played", async () => {
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["achievements", "profilePicker"].includes(key);
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const STATS = lang.profileStats;
     await import("../../main.js");
     await settle();

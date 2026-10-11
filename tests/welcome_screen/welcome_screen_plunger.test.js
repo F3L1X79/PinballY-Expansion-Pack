@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, highlightedCard } from "./welcome_screen_reader.js";
 import { isProfileStatsOpen, openProfileStats, highlighted } from "../stats/profile_stats_reader.js";
 
@@ -28,7 +28,7 @@ test("the plunger runs the highlighted choice of the Welcome Screen and of the P
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
 

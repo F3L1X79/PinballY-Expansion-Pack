@@ -8,10 +8,10 @@
 import assert from "node:assert/strict";
 import { WELCOME_SCREEN_OPEN_MS, press } from "../welcome_screen/welcome_screen_reader.js";
 import { openProfileStats, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
-import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen_painter.js";
-import { PROFILE_STATS_Z_INDEX } from "../../common/profile_stats_painter.js";
-import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievement_list.js";
-import { STEAMBALL_COLORS } from "../../common/steamball_palette.js";
+import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
+import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
+import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
+import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { shownFrame } from "./avatar_frame_reader.js";
 
 // The screen's layer at that z-index, which must be shown.
@@ -31,7 +31,7 @@ function hasGoldFrame(layer) {
 // its Avatar's layer, and listGoldFrame: whether the list header keeps its
 // double gold frame.
 export async function walkDrawnScreens(fake) {
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     const welcomeScreen = shownFrame(shownLayer(fake, WELCOME_SCREEN_Z_INDEX.header));
     press(fake, "Exit");

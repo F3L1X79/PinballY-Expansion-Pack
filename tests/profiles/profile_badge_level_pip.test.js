@@ -10,7 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, levelToasts, play, errorLines, TABLES, MINUTE, ALL_TOASTS_MS, pickLastTables } from "../mastery/mastery_bar_scenario.js";
 import { shownPip } from "../levels/level_pip_reader.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const [FIRST] = TABLES;
 const BADGE_Z = 4500;
@@ -36,7 +36,7 @@ test("the badge's pip follows the Level Toast, switches and Profile Resets", asy
     assert.equal(badgePip(fake), "2", "the new level as the Level Toast starts");
     fake.advanceTime(ALL_TOASTS_MS);
 
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const store = getProfileStore();
     store.resetProfile("guest");
     assert.equal(badgePip(fake), "1", "back to 1 after a Profile Reset");

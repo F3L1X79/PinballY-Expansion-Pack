@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createFireworks } from "../../common/fireworks.js";
+import { createFireworks } from "../../common/celebrations/fireworks.js";
 import { fireworksLayers, visibleFireworksCount, fireworksStartLogs, fireworksSchemes } from "./fireworks_reader.js";
 
 const SHOW_MS = 10000;

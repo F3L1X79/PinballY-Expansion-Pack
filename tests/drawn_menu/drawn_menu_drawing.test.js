@@ -11,9 +11,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
-import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu_painter.js";
-import { DRAWN_MENU_IMAGES } from "../../common/drawn_menu_images.js";
+import config from "../../common/core/config.js";
+import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu/drawn_menu_painter.js";
+import { DRAWN_MENU_IMAGES } from "../../common/drawn_menu/drawn_menu_images.js";
 import { isDrawnMenuShown, drawnMenuLines, openMainMenu, press, OPEN_OVER_MS } from "./drawn_menu_reader.js";
 
 const IMAGES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\drawn_menu";

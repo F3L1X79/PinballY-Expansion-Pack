@@ -11,8 +11,8 @@
 // on the entry that opened it.
 // ============================================================
 
-import { safeHandler } from "../common/safe_handler.js";
-import { getDrawnMenus } from "../common/drawn_menu.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { getDrawnMenus } from "../common/drawn_menu/drawn_menu.js";
 
 const SCRIPT_NAME = "DrawnMenus";
 

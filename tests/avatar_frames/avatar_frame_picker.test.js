@@ -41,7 +41,7 @@ test("each Avatar of the carousel wears its own frame, drawn ahead, inside the g
     const avatarDrawings = () => fake.drawings().filter(drawing => drawing.zIndex === AVATAR_Z).length;
     const drawnAhead = avatarDrawings();
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
     fake.selectMenuItem(lang.profiles.menuEntry);
     assert.equal(avatarDrawings(), drawnAhead, "no Avatar drawn on opening");

@@ -26,7 +26,7 @@
 // records each Play for the Surprises family.
 // ============================================================
 
-import { evaluateAchievements, markNotified, ACHIEVEMENT_RANK } from "../common/achievements.js";
+import { evaluateAchievements, markNotified, ACHIEVEMENT_RANK } from "../common/achievements/achievements.js";
 import { buildDayManufacturersAchievements } from "../achievements/day_manufacturers.js";
 import { buildManufacturerCompletionAchievements } from "../achievements/manufacturer_completion.js";
 import { buildCollectionCompletionAchievements } from "../achievements/collection_completion.js";
@@ -38,30 +38,30 @@ import { buildSessionMilestoneAchievements } from "../achievements/session_miles
 import { buildRandomGameFanAchievements } from "../achievements/random_game_fans.js";
 import { buildChallengeAchievements } from "../achievements/challenges.js";
 import { buildWorldTourAchievements } from "../achievements/world_tour.js";
-import { createWorldTour } from "../common/world_tour.js";
+import { createWorldTour } from "../common/achievements/world_tour.js";
 import { buildSurprisesAchievements } from "../achievements/surprises.js";
-import { createSurprises } from "../common/surprises.js";
-import { getAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
-import { getPlayerLevel, playerLevelOf } from "../common/player_level.js";
-import { getShownPlayerLevel } from "../common/shown_player_level.js";
-import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
-import { createAchievementList } from "../common/achievement_list.js";
-import { createProfileStats } from "../common/profile_stats.js";
-import { createAvatarFrameList } from "../common/avatar_frame_list.js";
-import { createHouseholdStats } from "../common/household_stats.js";
-import { getWheelDialogs } from "../common/wheel_dialog.js";
-import { getProfileRewards } from "../common/profile_rewards.js";
-import { getDailyStreak } from "../common/daily_streak.js";
-import { HALL_OF_FAME_FULL_FILTER_ID } from "../common/hall_of_fame.js";
-import { TABLES_TO_DISCOVER_FULL_FILTER_ID } from "../common/tables_to_discover.js";
-import { getDrawingAhead } from "../common/drawing_ahead.js";
-import { getTableOfTheDay, getTableOfTheWeek } from "../common/period_table.js";
-import { createPinballYHost } from "../common/pinbally_host.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getChallenges } from "../common/challenge.js";
-import config from "../common/config.js";
-import lang from "../common/i18n.js";
-import { safeHandler } from "../common/safe_handler.js";
+import { createSurprises } from "../common/achievements/surprises.js";
+import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
+import { getPlayerLevel, playerLevelOf } from "../common/levels/player_level.js";
+import { getShownPlayerLevel } from "../common/levels/shown_player_level.js";
+import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
+import { createAchievementList } from "../common/achievements/achievement_list.js";
+import { createProfileStats } from "../common/stats/profile_stats.js";
+import { createAvatarFrameList } from "../common/avatar_frames/avatar_frame_list.js";
+import { createHouseholdStats } from "../common/stats/household_stats.js";
+import { getWheelDialogs } from "../common/core/wheel_dialog.js";
+import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
+import { getDailyStreak } from "../common/achievements/daily_streak.js";
+import { HALL_OF_FAME_FULL_FILTER_ID } from "../common/stats/hall_of_fame.js";
+import { TABLES_TO_DISCOVER_FULL_FILTER_ID } from "../common/tables/tables_to_discover.js";
+import { getDrawingAhead } from "../common/core/drawing_ahead.js";
+import { getTableOfTheDay, getTableOfTheWeek } from "../common/tables/period_table.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getChallenges } from "../common/challenges/challenge.js";
+import config from "../common/core/config.js";
+import lang from "../common/core/i18n.js";
+import { safeHandler } from "../common/core/safe_handler.js";
 
 const SCRIPT_NAME = "AchievementsEngine";
 const ACHIEVEMENT_LIST_ENTRY = "achievementList";

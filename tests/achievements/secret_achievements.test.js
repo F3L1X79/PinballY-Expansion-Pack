@@ -13,8 +13,8 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
 import { chromeTexts, headerRankCounts, press, readRows } from "./achievement_list_reader.js";
-import { RANK_COLORS } from "../../common/steamball_palette.js";
-import config from "../../common/config.js";
+import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
+import config from "../../common/core/config.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -61,7 +61,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const { RAGE_QUIT_MIN_SECONDS, RAGE_QUIT_MAX_SECONDS, GRAND_RETURN_THRESHOLD_DAYS } = await import("../../addons/session_stats_tracker.js");
     const TEXT = lang.achievements;
     const LIST_TEXT = lang.achievementList;

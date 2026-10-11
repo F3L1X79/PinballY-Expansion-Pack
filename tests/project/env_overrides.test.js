@@ -8,8 +8,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { applyEnvOverrides } from "../../common/env_overrides.js";
-import config from "../../common/config.js";
+import { applyEnvOverrides } from "../../common/core/env_overrides.js";
+import config from "../../common/core/config.js";
 
 function defaults() {
     return {

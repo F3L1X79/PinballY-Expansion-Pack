@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // In-memory fake PinballY host for the node tests. Offers the same
-// interface as common/pinbally_host.js, plus controls for the tests: set
+// interface as common/core/pinbally_host.js, plus controls for the tests: set
 // the date (a manual clock that also runs the host's timers), the monitor
 // count, the table list, the wheel selection (and its filter, and the
 // player's wheel moves) and the
@@ -23,7 +23,7 @@
 // Never loaded by PinballY.
 // ============================================================
 
-import { projectFolderOf } from "../../common/pinbally_host.js";
+import { projectFolderOf } from "../../common/core/pinbally_host.js";
 
 const RealDate = Date;
 const realSetTimeout = setTimeout;
@@ -1023,7 +1023,7 @@ export function createFakePinballYHost({
                 },
                 // Only Windows Media Player, and the file objects over the
                 // in-memory file system (no .env.local unless a test adds
-                // one, so common/config.js imported after this keeps its
+                // one, so common/core/config.js imported after this keeps its
                 // defaults). Any other COM object throws.
                 createAutomationObject: (progId) => {
                     if (progId === "WMPlayer.OCX.7") return createComMediaPlayer();

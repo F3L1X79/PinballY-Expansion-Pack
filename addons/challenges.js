@@ -8,12 +8,12 @@
 // Profile switches, hides on "gamestarted" and comes back on "wheelmode".
 // ============================================================
 
-import { createPinballYHost } from "../common/pinbally_host.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getChallenges } from "../common/challenge.js";
-import { createChallengeCard } from "../common/challenge_card.js";
-import { createChallengeTables } from "../common/challenge_tables.js";
-import config from "../common/config.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getChallenges } from "../common/challenges/challenge.js";
+import { createChallengeCard } from "../common/challenges/challenge_card.js";
+import { createChallengeTables } from "../common/challenges/challenge_tables.js";
+import config from "../common/core/config.js";
 
 export default function init() {
     const host = createPinballYHost();

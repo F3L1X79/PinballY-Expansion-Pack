@@ -11,7 +11,7 @@ import {
     startScenario, levelToasts, play, errorLines, TABLES, ADULT_TABLES, ALL_TOASTS_MS, pickLastTables,
 } from "../mastery/mastery_bar_scenario.js";
 import { openProfileStats, playerLevel, press } from "../stats/profile_stats_reader.js";
-import lang from "../../common/i18n.js";
+import lang from "../../common/core/i18n.js";
 
 const [FIRST] = TABLES;
 // Shorter than a Play: a launch by mistake, which still runs a check.

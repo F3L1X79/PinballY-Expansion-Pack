@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 const CLOCK_Z = 4500;
 const GAME = { id: 1, configId: "mm", title: "Medieval Madness" };
@@ -28,7 +28,7 @@ test("the clock shows the time, follows the minutes and hides during a game", as
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "clock";
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
 

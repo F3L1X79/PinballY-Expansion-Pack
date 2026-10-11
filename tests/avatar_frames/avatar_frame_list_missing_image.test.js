@@ -14,7 +14,7 @@ const DEFAULT_AVATAR = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\de
 test("a missing frame image is logged and its row shows the plain Avatar", async () => {
     const fake = await startScenario({ addOns: ["tableMastery", "achievements", "customMenuCommands"], profiles: { guest: { collectionTier: 1 } } });
     fake.advanceTime(DRAWN_AHEAD_MS);
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
     choose(fake, "Frame");
 

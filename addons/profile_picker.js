@@ -1,16 +1,16 @@
 // ============================================================
 // Profile picker: a "Change Player" entry, right after "Play" in the main
 // menu and right after "Quit" in the exit menu (and on the Welcome Screen,
-// through common/change_player.js), opens a drawn carousel of
+// through common/profiles/change_player.js), opens a drawn carousel of
 // the Profiles' Avatars above the menus, starting on the active Profile.
 // The flipper buttons move through it and wrap, with PinballY's navigation
-// sound (common/navigation_sound.js), Select or Launch switches
+// sound (common/core/navigation_sound.js), Select or Launch switches
 // to the highlighted Profile, Exit closes it; while it is open every
 // button is swallowed through "commandbuttondown", so the wheel never moves
 // under it; attract mode closes it too. The Avatars glide to their new
 // places on each move, and the name shows once they arrive. The background,
 // each Avatar, each name and the gold frame have their own layer, drawn
-// ahead (common/drawing_ahead.js) and kept for the whole session, so opening
+// ahead (common/core/drawing_ahead.js) and kept for the whole session, so opening
 // and moving only show, move, scale and dim layers: on the cabinet each draw
 // blocks PinballY for 20 to 45 ms. The Profiles are read again each time it
 // opens, and anything not drawn ahead yet is drawn on the spot.
@@ -20,7 +20,7 @@
 // shown level or the worn Avatar Frame changes, hidden on "gamestarted"
 // and shown again on "wheelmode".
 // Each Avatar, on the badge, in the carousel and on the greeting, wears
-// its own Profile's Avatar Frame (common/profile_rewards.js), under the
+// its own Profile's Avatar Frame (common/avatar_frames/profile_rewards.js), under the
 // pip; while one is worn in the carousel, its Avatars spread out and the
 // texts under them move down, to leave each frame its room.
 // When the Welcome Screen Add-on is on, a pick closes the carousel and the
@@ -33,21 +33,21 @@
 // (drawn or native), drawn screens and dialogs; a game or the carousel started first cancels it.
 // ============================================================
 
-import lang from "../common/i18n.js";
-import { safeHandler } from "../common/safe_handler.js";
-import { createPinballYHost } from "../common/pinbally_host.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { displayNameOf } from "../common/profile_name.js";
-import { getMainMenu, MAIN_MENU_POSITION } from "../common/main_menu.js";
-import { getWheelDialogs } from "../common/wheel_dialog.js";
-import { registerChangePlayer } from "../common/change_player.js";
-import { drawShadowedText } from "../common/shadowed_text.js";
-import { getDrawingAhead } from "../common/drawing_ahead.js";
-import { getShownPlayerLevel } from "../common/shown_player_level.js";
-import { drawLevelPip, levelPipOn, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN } from "../common/steamball_drawing.js";
-import { getProfileRewards } from "../common/profile_rewards.js";
-import { createNavigationSound } from "../common/navigation_sound.js";
-import config from "../common/config.js";
+import lang from "../common/core/i18n.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { displayNameOf } from "../common/profiles/profile_name.js";
+import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
+import { getWheelDialogs } from "../common/core/wheel_dialog.js";
+import { registerChangePlayer } from "../common/profiles/change_player.js";
+import { drawShadowedText } from "../common/drawing/shadowed_text.js";
+import { getDrawingAhead } from "../common/core/drawing_ahead.js";
+import { getShownPlayerLevel } from "../common/levels/shown_player_level.js";
+import { drawLevelPip, levelPipOn, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN } from "../common/drawing/steamball_drawing.js";
+import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
+import { createNavigationSound } from "../common/core/navigation_sound.js";
+import config from "../common/core/config.js";
 
 const SCRIPT_NAME = "ProfilePicker";
 

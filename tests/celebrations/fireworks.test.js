@@ -10,8 +10,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, levelToasts, allToasts, play, errorLines, TABLES, MINUTE, ALL_TOASTS_MS, pickLastTables } from "../mastery/mastery_bar_scenario.js";
 import { fireworksLayers, visibleFireworksCount, fireworksStartLogs } from "./fireworks_reader.js";
-import { CONFETTI_Z_INDEX } from "../../common/confetti_shower.js";
-import { ACHIEVEMENT_TOAST_Z_INDEX } from "../../common/achievement_toast.js";
+import { CONFETTI_Z_INDEX } from "../../common/celebrations/confetti_shower.js";
+import { ACHIEVEMENT_TOAST_Z_INDEX } from "../../common/achievements/achievement_toast.js";
 
 const [FIRST, SECOND] = TABLES;
 // About 8 s, plus a margin.

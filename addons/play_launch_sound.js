@@ -6,8 +6,8 @@
 // config.launchSoundFile is empty.
 // ============================================================
 
-import config from "../common/config.js";
-import { safeHandler } from "../common/safe_handler.js";
+import config from "../common/core/config.js";
+import { safeHandler } from "../common/core/safe_handler.js";
 
 // Playback volume, 0-100.
 const VOLUME_PERCENT = 100;
@@ -33,7 +33,7 @@ const SCRIPT_NAME = "LaunchSound";
 export default function init() {
     const filePath = config.launchSoundFile;
     if (typeof filePath !== "string" || filePath.length === 0) {
-        logfile.log("[LaunchSound] launchSoundFile is not set in common/config.js; launch sound disabled.");
+        logfile.log("[LaunchSound] launchSoundFile is not set in common/core/config.js; launch sound disabled.");
         return;
     }
 

@@ -7,10 +7,10 @@
 // Called by achievements_engine.js at each check; no side effects.
 // ============================================================
 
-import { buildGroupedCompletionAchievements } from "../common/grouped_completion.js";
-import { ACHIEVEMENT_FAMILY } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { getDecadeStartYear } from "../common/decade.js";
+import { buildGroupedCompletionAchievements } from "../common/achievements/grouped_completion.js";
+import { ACHIEVEMENT_FAMILY } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { getDecadeStartYear } from "../common/achievements/decade.js";
 
 export function buildDecadeCompletionAchievements({ asNonChild = false, profileName } = {}) {
     const { achievements: TEXT } = lang;

@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { readDrawnMenu, highlightedEntry, press, OPEN_OVER_MS } from "./drawn_menu_reader.js";
 
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 10, 20, 0, 0) });

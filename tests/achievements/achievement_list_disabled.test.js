@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 
 test("no Achievement List or Profile Stats entry when the achievements Add-on is disabled", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0) });
@@ -18,7 +18,7 @@ test("no Achievement List or Profile Stats entry when the achievements Add-on is
     }
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     const MENU_LABELS = lang.customMenuLabels;
     await import("../../main.js");
 

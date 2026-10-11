@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
-import { ACHIEVEMENT_TOAST_Z_INDEX } from "../../common/achievement_toast.js";
+import { ACHIEVEMENT_TOAST_Z_INDEX } from "../../common/achievements/achievement_toast.js";
 import {
     startScenario, playLastTable, advanceUntil, confettiLayers, visibleConfettiCount, showerStartLogs,
 } from "./confetti_shower_scenario.js";

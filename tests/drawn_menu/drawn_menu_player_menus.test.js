@@ -16,7 +16,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import {
     OPEN_OVER_MS, isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, press, openMainMenu, openExitMenu, openMenu, chooseEntry,
 } from "./drawn_menu_reader.js";
@@ -59,8 +59,8 @@ test("setup", async () => {
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "en";
-    ({ default: lang } = await import("../../common/i18n.js"));
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    ({ default: lang } = await import("../../common/core/i18n.js"));
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
     await settle();
     COMMAND = globalThis.command;

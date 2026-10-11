@@ -28,7 +28,7 @@ test("Exit closes the prompt for good, until a Profile Reset brings it again wit
     const fake = await startScenario({
         addOns: ADD_ONS, profiles: { guest: { plays: { [FIRST.configId]: levelOne, [SECOND.configId]: levelOne, [THIRD.configId]: levelOne } } },
     });
-    const { getProfileStore } = await import("../../common/profile_store.js");
+    const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     fake.advanceTime(ALL_TOASTS_MS);
     await playEach(fake, [FOURTH]);
     assert.equal(rewardPrompts(fake).length, 1);

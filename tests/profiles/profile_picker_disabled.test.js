@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/config.js";
+import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, readChoices } from "../welcome_screen/welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -24,7 +24,7 @@ test("turning the Profile picker off removes its main-menu entry and Welcome Scr
     for (const key of Object.keys(config.addOns)) config.addOns[key] = !["profilePicker", "challenges", "drawnMenus"].includes(key);
     config.language = "en";
 
-    const { default: lang } = await import("../../common/i18n.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
 

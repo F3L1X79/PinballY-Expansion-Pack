@@ -11,14 +11,14 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
-import { createProfileStore } from "../../common/profile_store.js";
-import { createPeriodTable, TABLE_OF_THE_DAY, TABLE_OF_THE_WEEK } from "../../common/period_table.js";
-import { createRandomGame } from "../../common/random_game.js";
-import { createChallenges, CHALLENGE_TEMPLATE_IDS } from "../../common/challenge.js";
-import { createChallengeCard, CHALLENGE_CARD_Z_INDEX, CHALLENGE_VERDICT_MS } from "../../common/challenge_card.js";
-import { createAchievementToasts } from "../../common/achievement_toast.js";
-import config from "../../common/config.js";
-import lang from "../../common/i18n.js";
+import { createProfileStore } from "../../common/profiles/profile_store.js";
+import { createPeriodTable, TABLE_OF_THE_DAY, TABLE_OF_THE_WEEK } from "../../common/tables/period_table.js";
+import { createRandomGame } from "../../common/tables/random_game.js";
+import { createChallenges, CHALLENGE_TEMPLATE_IDS } from "../../common/challenges/challenge.js";
+import { createChallengeCard, CHALLENGE_CARD_Z_INDEX, CHALLENGE_VERDICT_MS } from "../../common/challenges/challenge_card.js";
+import { createAchievementToasts } from "../../common/achievements/achievement_toast.js";
+import config from "../../common/core/config.js";
+import lang from "../../common/core/i18n.js";
 
 // Monday 21 September 2026, 20:00; its week is keyed "2026-09-21".
 const MONDAY = new Date(2026, 8, 21, 20, 0, 0);

@@ -10,7 +10,7 @@ The project's words (Profile, Avatar, Table of the Day, Challenge, Achievement, 
 
 ## Layout
 
-The repository is the pack's folder, installed as `PinballY\Scripts\ExpansionPack` under that fixed name and started by one `import` line in the player's own `Scripts\main.js` ([ADR 0009](docs/adr/0009-the-project-lives-in-its-own-scripts-subfolder.md)). The folder name is written once, in `common/pinbally_host.js`.
+The repository is the pack's folder, installed as `PinballY\Scripts\ExpansionPack` under that fixed name and started by one `import` line in the player's own `Scripts\main.js` ([ADR 0009](docs/adr/0009-the-project-lives-in-its-own-scripts-subfolder.md)). The folder name is written once, in `common/core/pinbally_host.js`.
 
 - `main.js` is the only script at the root. It starts the Add-ons listed in `SCRIPTS`, each one isolated so that a failing Add-on does not stop the others.
 - `addons/` holds exactly one file per Add-on started by `main.js`. Each exports a default initialisation function, and each can be turned off with its `ADD_ON_*` setting.
@@ -87,7 +87,7 @@ To reset by hand, close PinballY first, then:
 
 ## Upgrading from an edited `config.js`
 
-Older versions were set up by editing `common/config.js`. Move your values into `.env.local` (see [.env.example](.env.example)), then run `git checkout common/config.js` before pulling.
+Older versions were set up by editing `common/core/config.js`. Move your values into `.env.local` (see [.env.example](.env.example)), then run `git checkout common/core/config.js` before pulling.
 
 ## PinballY scripting
 

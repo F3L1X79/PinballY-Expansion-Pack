@@ -16,21 +16,21 @@
 // followed by the Reward Prompt when it brings the Profile's first frame.
 // ============================================================
 
-import { createPinballYHost } from "../common/pinbally_host.js";
-import { getProfileStore } from "../common/profile_store.js";
-import { getDrawingAhead } from "../common/drawing_ahead.js";
-import { getChallenges } from "../common/challenge.js";
-import { BADGE_HEIGHT, challengeCardCanvasHeight } from "../common/challenge_card.js";
-import { createMasteryBar } from "../common/mastery_bar.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getDrawingAhead } from "../common/core/drawing_ahead.js";
+import { getChallenges } from "../common/challenges/challenge.js";
+import { BADGE_HEIGHT, challengeCardCanvasHeight } from "../common/challenges/challenge_card.js";
+import { createMasteryBar } from "../common/mastery/mastery_bar.js";
 import {
     masteryOf, movedByPlay, levelReachedByPlay, metalOf, collectionMasteryOfProfile, MAX_MASTERY_LEVEL,
-} from "../common/table_mastery.js";
-import { tablesVisibleTo } from "../common/visible_tables.js";
-import { getAchievementToasts, TOAST_KIND } from "../common/achievement_toast.js";
-import { getProfileRewards } from "../common/profile_rewards.js";
-import lang from "../common/i18n.js";
-import { safeHandler } from "../common/safe_handler.js";
-import config from "../common/config.js";
+} from "../common/mastery/table_mastery.js";
+import { tablesVisibleTo } from "../common/tables/visible_tables.js";
+import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
+import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
+import lang from "../common/core/i18n.js";
+import { safeHandler } from "../common/core/safe_handler.js";
+import config from "../common/core/config.js";
 
 const SCRIPT_NAME = "TableMastery";
 

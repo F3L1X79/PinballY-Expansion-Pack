@@ -6,10 +6,10 @@
 // Called by achievements_engine.js at each check; no side effects.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { createPinballYHost } from "../common/pinbally_host.js";
-import { getProfileStore } from "../common/profile_store.js";
+import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { createPinballYHost } from "../common/core/pinbally_host.js";
+import { getProfileStore } from "../common/profiles/profile_store.js";
 
 // Each value is part of an Achievement ID: changing one would announce the
 // Achievement again to players who already earned it. Each one also needs

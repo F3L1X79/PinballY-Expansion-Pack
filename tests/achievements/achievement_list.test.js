@@ -19,12 +19,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
-import { createAchievementList, ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievement_list.js";
-import { createDrawingAhead } from "../../common/drawing_ahead.js";
-import { createProfileStore } from "../../common/profile_store.js";
-import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, PROGRESS_UNIT } from "../../common/achievements.js";
-import { RANK_COLORS, STEAMBALL_COLORS } from "../../common/steamball_palette.js";
-import lang from "../../common/i18n.js";
+import { createAchievementList, ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
+import { createDrawingAhead } from "../../common/core/drawing_ahead.js";
+import { createProfileStore } from "../../common/profiles/profile_store.js";
+import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, PROGRESS_UNIT } from "../../common/achievements/achievements.js";
+import { RANK_COLORS, STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
+import lang from "../../common/core/i18n.js";
 import {
     press, pressAndGlide, chromeTexts, headerRankCounts, headerEmblemImages, isListOpen, shownItems, highlightedTexts, readSections,
     readRows, readWholeList,

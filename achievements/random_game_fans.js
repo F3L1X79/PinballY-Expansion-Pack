@@ -1,14 +1,14 @@
 // ============================================================
 // Random Game family: Achievements for playing 10, 25, 50 and 100 Random Games.
-// Reads the count kept by common/random_game.js, also shown as Achievement
+// Reads the count kept by common/tables/random_game.js, also shown as Achievement
 // Progress; writes nothing. None when both Add-ons that offer a Random Game
 // are disabled.
 // ============================================================
 
-import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements.js";
-import lang from "../common/i18n.js";
-import { getRandomGame } from "../common/random_game.js";
-import config from "../common/config.js";
+import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";
+import lang from "../common/core/i18n.js";
+import { getRandomGame } from "../common/tables/random_game.js";
+import config from "../common/core/config.js";
 
 // Each value is part of an Achievement ID: changing one would announce the
 // Achievement again to players who already earned it. Each one also needs
