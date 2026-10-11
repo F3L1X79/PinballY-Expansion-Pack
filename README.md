@@ -16,7 +16,7 @@ With Change Player, each of you picks your own Profile and Avatar, and the Welco
 
 <img src="docs/images/profile_stats.png" alt="The Profile Stats of Guest" width="480">
 
-**Your Stats**, in the main menu, sums up your pinball life: games played and total time, your Player Level and Collection Mastery, average game length, favourite manufacturer, decade and table, the first table you ever played, how much of the collection you have tried, your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, the Challenges you completed, the Avatar Frame you wear, and the way to your most played tables and to the ones still to discover.
+**Your Stats**, in the main menu, sums up your pinball life: games played and total time, your Player Level and Collection Mastery, average game length, favourite manufacturer, decade and table, the first table you ever played, how much of the collection you have tried, your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, the Challenges you completed, the Avatar Frame you wear, and the way to your most played tables and to the ones still to discover. Once two of you have a Profile, **Household** sets every Profile but Guest side by side, Avatars in their frames, the best of each line in gold; pick a column to see that Profile's own stats.
 
 ### Welcome Screen: Table of the Day, Table of the Week
 

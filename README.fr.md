@@ -38,6 +38,8 @@ Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran
 - le cadre que porte votre Avatar ;
 - et le chemin vers vos tables les plus jouées et celles qui restent à découvrir.
 
+Dès que vous êtes deux à avoir un Profil, **La maison** montre tous les Profils côte à côte, sauf Invité, chaque Avatar dans son cadre, le meilleur de chaque ligne en doré ; choisissez une colonne pour voir les statistiques de ce Profil.
+
 ### Écran d'accueil : table du jour, table de la semaine
 
 <img src="docs/images/welcome_screen.png" alt="L'écran d'accueil avec la table du jour et la table de la semaine" width="480">
