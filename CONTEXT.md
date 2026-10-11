@@ -189,8 +189,12 @@ _Avoid_: level-up popup, mastery achievement (Table Mastery has no Achievement)
 ### High Scores
 
 **High Score**:
-A place on a table's own high score board that a Profile won with a Play: a score that was not on the board before the Play goes to the Profile active when the Play started, Guest and Child Profiles included, whatever initials were typed and even when several players shared the game. Only a score counts, not a feat such as a number of combos or castles. The scores already on the board when the pack first reads it belong to no one, for good. A High Score once won stays won even when better scores push it off the board, and a Profile Reset does not take it away; only removing the Profile does, and the score then belongs to no one. Shown as "meilleur score" in French.
+A place on a table's own high score board that a Profile won with a Play: a score that was not on the board before the Play goes to the Profile active when the Play started, Guest and Child Profiles included, whatever initials were typed and even when several players shared the game. Only a score counts, not a feat such as a number of combos or castles. The scores already on the board when the pack first reads it are Default Scores, for good. A High Score once won stays won even when better scores push it off the board, and a Profile Reset does not take it away; only removing the Profile does, and the score then becomes a Default Score. Shown as "meilleur score" in French.
 _Avoid_: record (the Table Record is only the best one), hi-score, score (the score of a game that did not reach the board is never known)
+
+**Default Score**:
+A score that was already on a table's high score board when the pack first read it, whoever really set it, or a High Score whose Profile was removed since: it belongs to no Profile, for good, and only its initials are shown. Shown as "score par défaut" in French.
+_Avoid_: original score (confused with original tables), anonymous score, factory score (not all of them come from the factory)
 
 **Table Record**:
 The best score on a table's high score board, whoever holds it, an anonymous one included. Shown as "record" in French.
