@@ -4,9 +4,9 @@
 // time in a pill (by play seconds, then games, then alphabetical order,
 // never the community tables manufacturer), then the first table played
 // strip (the earliest Play across the Play Log's years, reset copies left
-// out, with its date), the last table played strip (the latest lastPlayed
-// of the Profile's plays, with its date) and the favourite table strip (the
-// Hall of Fame's first table), each with its wheel logo, or else the scrambled TV of the
+// out, with its date), the favourite table strip (the Hall of Fame's first
+// table) and the last table played strip (the latest lastPlayed of the
+// Profile's plays, with its date), each with its wheel logo, or else the scrambled TV of the
 // missing image (its cleaned title when that asset is unreadable), next to
 // its cleaned name; "—" everywhere for a Profile with no Play and an empty
 // Play Log.
@@ -39,7 +39,7 @@ const play = (count, seconds, lastPlayed = "2026-09-20T20:00:00") => ({ count, s
 const playLog = plays => JSON.stringify({ version: 1, plays });
 const logged = (start, configId) => ({ start, configId, seconds: 600 });
 
-test("the TASTES section shows the favourites and the first, last and favourite table strips", async () => {
+test("the TASTES section shows the favourites and the first, favourite and last table strips", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 9, 7, 10, 0, 0), tables: [MEDIEVAL, MARS, GODZILLA, COMMUNITY] });
     fake.addFile(MEDIEVAL_LOGO);
     // Nothing played: no Play Log either.
@@ -60,7 +60,7 @@ test("the TASTES section shows the favourites and the first, last and favourite 
     // from Mars leads the Hall of Fame by its title.
     fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({
         version: 1, notified: [],
-        plays: { [MEDIEVAL.configId]: play(3, 4500, "2026-01-04T21:00:00"), [MARS.configId]: play(3, 4500, "2026-02-14T22:15:00") },
+        plays: { [MEDIEVAL.configId]: play(3, 4500, "2026-02-14T22:15:00"), [MARS.configId]: play(3, 4500, "2026-01-04T21:00:00") },
     }));
     // Logged out of order; the reset copy's older Play is gone with the reset.
     fake.addFile(`${PROFILES}\\Bob\\play-log-2026.json`, playLog([logged("2026-01-04T21:00:00", MARS.configId)]));
@@ -84,8 +84,8 @@ test("the TASTES section shows the favourites and the first, last and favourite 
         "Constructeur favori": ["—"],
         "Décennie favorite": ["—"],
         "Première table jouée": ["—"],
-        "Dernière table jouée": ["—"],
         "Table préférée": ["—"],
+        "Dernière table jouée": ["—"],
     }, "no Play, an empty Play Log");
     assert.deepEqual(sectionImages(fake, "GOÛTS"), [], "no logo");
     press(fake, "Exit");
@@ -109,10 +109,10 @@ test("the TASTES section shows the favourites and the first, last and favourite 
         "Constructeur favori": ["Bally", "1 h 15 de jeu"],
         "Décennie favorite": ["Années 1990", "2 h 30 de jeu"],
         "Première table jouée": ["Medieval Madness", "le 12/03/2025"],
-        "Dernière table jouée": ["Attack from Mars", "le 14/02/2026"],
         "Table préférée": ["Attack from Mars", "1 h 15 de jeu"],
+        "Dernière table jouée": ["Medieval Madness", "le 14/02/2026"],
     });
-    assert.deepEqual(sectionImages(fake, "GOÛTS"), [MEDIEVAL_LOGO, MISSING_IMAGE, MISSING_IMAGE],
-        "the first table's wheel logo, the missing image for the last and favourite tables without a logo");
+    assert.deepEqual(sectionImages(fake, "GOÛTS"), [MEDIEVAL_LOGO, MISSING_IMAGE, MEDIEVAL_LOGO],
+        "the first and last tables' wheel logo, the missing image for the favourite table without a logo");
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

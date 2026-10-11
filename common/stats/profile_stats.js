@@ -5,8 +5,8 @@
 // with the Avatar, the Profile's name, the Player Level and the
 // Collection Mastery on a card whose foot holds the Achievements, Frame,
 // Most Played Tables, Tables to Discover and Household buttons, and the GAME, PROGRESSION
-// and TASTES sections on its right (the last with the first, last and
-// favourite table strips, read from the Play Log, the plays and the Hall of Fame). Every stat is read again on each
+// and TASTES sections on its right (the last with the first, favourite and
+// last table strips, read from the Play Log, the Hall of Fame and the plays). Every stat is read again on each
 // opening; the screen is drawn at once on all its layers, then faded in.
 // Created from the PinballY host, the Profile store, readers of a named
 // Profile's Player Level and Achievements Unlocked, the Achievement List
@@ -251,9 +251,9 @@ export function createProfileStats(host, {
             ]],
             strips: [
                 tableStrip(TEXT.stats.firstTablePlayed, firstPlay && tableOf(firstPlay.configId), firstPlay && playedOnOf(firstPlay.start)),
-                tableStrip(TEXT.stats.lastTablePlayed, lastPlay && tableOf(lastPlay.configId), lastPlay && playedOnOf(lastPlay.lastPlayed)),
                 tableStrip(TEXT.stats.favouriteTable, favouriteGame && tableOf(favouriteGame.configId),
                     favouriteGame && playTimeOf(getPlay(favouriteGame.configId).seconds)),
+                tableStrip(TEXT.stats.lastTablePlayed, lastPlay && tableOf(lastPlay.configId), lastPlay && playedOnOf(lastPlay.lastPlayed)),
             ],
         };
     }
