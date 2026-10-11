@@ -99,7 +99,7 @@ Not checked: the vpforums and vpuniverse PINemHi threads (HTTP 403), the content
 - Ways to run a program from JS: `ShellExecuteW` through `dllImport` (fire-and-forget), or `CreateProcess` (`Help/RunProgramExample.html`; `docs/pinbally/pinbally-examples.md` §2.9). `WScript.Shell` through `createAutomationObject` would also work (Inference: `.Run(cmd, 0, false)` hides the window and does not wait; the output goes through a temp file that a `setTimeout` loop polls).
 
 **Inference**
-- **Drop-in**: replace the files in `<PinballY>\PINemHi\` with 3.6.8. That needs no code and adds the 317 ROMs, but nothing for ROM-less tables. **Verify**: does PinballY's ini rewrite keep 3.6.8's extra sections, does `<rom>.nv` still work as the argument, and does the output look the same?
+- **Drop-in**: replace the files in `<PinballY>\PINemHi\` with 3.6.8. That needs no code and adds the 317 ROMs, but nothing for ROM-less tables. **Checked on the cabinet (2026-10-11, prototype branch `prototype/high-scores-probe`)**: the output format is the same, and the board rule reads it unchanged. But the 3.6.8 `pinemhi.ini` has no `[romfind]` section: it ships the list in a separate `romfind.ini`, which PinballY never reads (`HighScores.cpp` loads `[romfind]` from `PINemHi\PINemHi.ini` only). With a plain drop-in, every table without a `rom` field loses its ROM, and no board is read at all. Fix: append `romfind.ini` to `pinemhi.ini`, set `USER=` to the VPX `User` folder, and restart PinballY.
 - **Add-on fallback**: on `highscoresready` with a failed or "Not supported" result, run a user-installed 3.6.8 hidden, then `setHighScores(lines)`. For ROM-less tables the add-on must already know the `VPReg` storage name (B4) and have `7z\7z.exe` beside PINemHi. That covers the same ground as our own `VPReg` reader (B5), with an extra external dependency. It is worth it for the ROM gap only.
 
 ### A6. Reading raw `.nv` files ourselves
@@ -249,7 +249,7 @@ One throwaway add-on, every entry through `logfile.log` with a single string, wi
 1. Does PINemHi 1.3.1 exit normally after "Not supported rom : …", so that PinballY reports `success: true`? What exact text does it print? (A1, A3)
 2. Which thousands separator reaches JS on the French cabinet (` `, ` `, `ÿ`, `�`, `.`)? (A3)
 3. Which VPX build and file layout does the cabinet run, and where are `VPReg.stg` and the EM text files really written? (B1)
-4. Does a drop-in PINemHi 3.6.8 work inside PinballY's folder (ini rewrite, `<rom>.nv` argument, output format)? Does the 3.6.8 zip ship `7z\7z.exe`? (A5)
+4. ~~Does a drop-in PINemHi 3.6.8 work inside PinballY's folder?~~ Yes, once `romfind.ini` is appended to `pinemhi.ini` (A5). Still open: does the 3.6.8 zip ship `7z\7z.exe`?
 5. Which `dllImport` route is safer in practice: the `IStorage` vtable, or `ReadFile` + a JS compound-file parser? How long does a whole-file snapshot take? (B5)
 6. How long does a normal VPX shutdown take on the cabinet (B2S, PUP)? Does it stay under `closeWindowTimeout`? (C)
 7. Product decisions, not API questions: do buy-in boards count? How should a high score auto-reset be detected (many "new" factory entries at once)? Should the first read of a table that never had a board give its scores to no one, as the CONTEXT rule implies? (A3, D)
