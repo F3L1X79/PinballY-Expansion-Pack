@@ -96,7 +96,7 @@ Date: 2026-09-24. Sources: local PinballY help (`C:\vPinball\PinballY\Help\*.htm
 - Pinning test keys and Achievement IDs frozen: see §3 default-account strategy. Achievement IDs themselves need not change; only the storage key does.
 - `docs/adr/0001` keeps Achievements reading PinballY globals directly. Per-account play stats would reopen that decision, since the definitions would read an account-aware source instead of `game.playCount` / `playTime`.
 - The Achievement Toast and the Achievement List would need to know the active account (whose Notified flags, whose list).
-- Glossary: "Account" / "Player" is not in `CONTEXT.md` yet.
+- Glossary: "Account" / "Player" is not in `GLOSSARY.md` yet.
 
 ## Open questions / unknowns (not verified from a primary source)
 

@@ -12,5 +12,5 @@ docs/research/ export-ignore
 docs/roadmap/ export-ignore
 docs/roadmap.html export-ignore
 CONTRIBUTING.md export-ignore
-CONTEXT.md export-ignore
+GLOSSARY.md export-ignore
 .gitattributes export-ignore

@@ -6,7 +6,7 @@ Bugs and ideas: [GitHub issues](https://github.com/F3L1X79/PinballY-Expansion-Pa
 
 ## Vocabulary
 
-The project's words (Profile, Avatar, Table of the Day, Challenge, Achievement, Achievement Rank…) are defined in the glossary, [CONTEXT.md](CONTEXT.md). Use them in code, comments, issues and user-facing texts. Design decisions are recorded in [docs/adr/](docs/adr/).
+The project's words (Profile, Avatar, Table of the Day, Challenge, Achievement, Achievement Rank…) are defined in the glossary, [GLOSSARY.md](GLOSSARY.md). Use them in code, comments, issues and user-facing texts. Design decisions are recorded in [docs/adr/](docs/adr/).
 
 ## Layout
 
@@ -22,7 +22,7 @@ The repository is the pack's folder, installed as `PinballY\Scripts\ExpansionPac
 
 `tests/project/file_layout.test.js` checks this layout.
 
-`.gitattributes` leaves `maintainer/`, `tests/`, the docs (except `docs/images/`, shown by the README), `CONTEXT.md` and this file out of the downloaded zip: the players only get the pack.
+`.gitattributes` leaves `maintainer/`, `tests/`, the docs (except `docs/images/`, shown by the README), `GLOSSARY.md` and this file out of the downloaded zip: the players only get the pack.
 
 ### Shared modules
 

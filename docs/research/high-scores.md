@@ -1,6 +1,6 @@
 # Research: reading each table's high score board before and after a Play
 
-Date: 2026-10-10. Question: how can an add-on read a table's high score board **before** and **after** a Play, so that a score that appeared during the Play can be credited to the active Profile (glossary: High Score, Table Record in `CONTEXT.md`)? The cabinet has about 100 tables: (1) VPX re-creations of solid-state machines with a VPinMAME ROM, (2) VPX re-creations of EM machines without a ROM, (3) VPX originals without a ROM, maybe some Future Pinball.
+Date: 2026-10-10. Question: how can an add-on read a table's high score board **before** and **after** a Play, so that a score that appeared during the Play can be credited to the active Profile (glossary: High Score, Table Record in `GLOSSARY.md`)? The cabinet has about 100 tables: (1) VPX re-creations of solid-state machines with a VPinMAME ROM, (2) VPX re-creations of EM machines without a ROM, (3) VPX originals without a ROM, maybe some Future Pinball.
 
 Sources (all read on 2026-10-10):
 - **PinballY** at master `d84763e` (2026-02-23), cited `HighScores.cpp#Lnn` = `https://github.com/mjrgh/PinballY/blob/d84763e/PinballY/HighScores.cpp#Lnn` (same for `PlayfieldView.cpp`, `Application.cpp`, `GameList.cpp`, `GameList.h`, `PINemHi/...`). The high score code is the same in tag `1.1.0-Beta10` (no diff in `HighScores.cpp`, `PINemHi/pinemhi.exe` or the high score lines of `PlayfieldView.cpp`).
