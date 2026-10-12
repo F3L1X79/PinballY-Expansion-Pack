@@ -24,8 +24,10 @@ const IMAGE_PROBE_Z_INDEX = -1000;
 const SM_CMONITORS = 80;
 // Scripting.FileSystemObject's GetSpecialFolder id of the user's temporary folder.
 const TEMPORARY_FOLDER = 2;
-// WScript.Shell's Run window style: hidden.
+// ShellExecuteW's show command: hidden.
 const SW_HIDE = 0;
+// ShellExecuteW returns a number above this on success, an error code otherwise.
+const SHELL_EXECUTE_MAX_ERROR = 32;
 // Under the user's temporary folder: the wrapper script and each run's files.
 const RUN_FOLDER_NAME = "PinballYExpansionPack";
 // Given "<output file>" "<exit code file>" "<program>" "<args>"..., runs the
@@ -151,11 +153,15 @@ function createFileSystem() {
 const RUN_SESSION = Date.now();
 let nextRunNumber = 1;
 
-// Runs programs hidden, without waiting: WScript.Shell's Run returns at once
-// and cmd.exe shows no window with SW_HIDE; the output and exit code go
-// through files that result() reads once the run is over.
+// Runs programs hidden, without waiting: ShellExecuteW returns at once and
+// cmd.exe shows no window with SW_HIDE; the output and exit code go
+// through files that result() reads once the run is over. Not WScript.Shell's
+// Run: PinballY's COM bridge does not offer it ("Object doesn't support
+// property or method 'Run'" on the cabinet).
 function createProgramRunner(files) {
     let runFolder = null;
+    // Bound on the first run, then kept.
+    let shell32 = null;
 
     function prepareRunFolder() {
         if (runFolder) return runFolder;
@@ -181,8 +187,14 @@ function createProgramRunner(files) {
         const outputPath = `${basePath}.out`;
         const codePath = `${basePath}.code`;
         const quoted = [`${folder}\\run.cmd`, outputPath, codePath, programPath, ...args].map(text => `"${text}"`).join(" ");
+        if (!shell32) {
+            shell32 = dllImport.bind("Shell32.dll", `
+                HINSTANCE WINAPI ShellExecuteW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile, LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd);
+            `);
+        }
         // cmd.exe strips the outer quotes and keeps each quoted argument.
-        createAutomationObject("WScript.Shell").Run(`cmd.exe /d /c "${quoted}"`, SW_HIDE, false);
+        const instance = shell32.ShellExecuteW(null, "open", "cmd.exe", `/d /c "${quoted}"`, null, SW_HIDE).toNumber();
+        if (instance <= SHELL_EXECUTE_MAX_ERROR) throw new Error(`ShellExecuteW could not start cmd.exe for ${programPath} (error ${instance}).`);
 
         let result = null;
         return {
@@ -362,6 +374,9 @@ export function createPinballYHost() {
             try {
                 value = shell.RegRead(path);
             } catch (error) {
+                // A method PinballY's COM bridge does not offer throws a
+                // TypeError, which must not pass for a missing value.
+                if (error instanceof TypeError) throw error;
                 // RegRead throws on a missing value: that is the answer.
                 return null;
             }

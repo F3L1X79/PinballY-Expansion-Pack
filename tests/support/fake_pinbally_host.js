@@ -594,26 +594,34 @@ export function createFakePinballYHost({
         return { result: () => result };
     }
 
-    // WScript.Shell, as the production host runs a program: hidden and
-    // without waiting, through cmd.exe and its wrapper script, given
+    // Starts "cmd.exe /d /c" as the production host does, given
     // "<wrapper>" "<output file>" "<exit code file>" "<program>" "<args>"...
     // The wrapper's files are written when the program ends.
+    function runWrapper(parameters) {
+        const inner = /^\/d \/c "(.*)"$/.exec(parameters);
+        if (!inner) throw new Error(`The fake host cannot run: cmd.exe ${parameters}`);
+        const [wrapper, outputPath, codePath, program, ...args] = [...inner[1].matchAll(/"([^"]*)"/g)].map(match => match[1]);
+        requireFile(wrapper);
+        startProgram(program, args, ({ exitCode, output }) => {
+            fileSystem.writeText(outputPath, output);
+            fileSystem.writeText(codePath, `${exitCode}\r\n`);
+        });
+    }
+
+    // Shell32's ShellExecuteW: only "open" on cmd.exe, hidden (SW_HIDE). Like
+    // the native one, it returns a handle whose number is above 32 on success.
+    function shellExecute(hwnd, operation, file, parameters, directory, showCommand) {
+        if (operation !== "open" || file !== "cmd.exe" || showCommand !== 0) {
+            throw new Error(`The fake host runs cmd.exe hidden only: ${operation} ${file} ${parameters} (show ${showCommand})`);
+        }
+        runWrapper(parameters);
+        return { toNumber: () => 42 };
+    }
+
+    // WScript.Shell as PinballY's COM bridge offers it on the cabinet: no
+    // Run (calling it throws "Object doesn't support property or method").
     function createComShell() {
         return {
-            Run(commandLine, windowStyle, waitOnReturn) {
-                if (windowStyle !== 0 || waitOnReturn !== false) {
-                    throw new Error(`The fake host runs programs hidden and without waiting only: ${commandLine}`);
-                }
-                const inner = /^cmd\.exe \/d \/c "(.*)"$/.exec(commandLine);
-                if (!inner) throw new Error(`The fake host cannot run: ${commandLine}`);
-                const [wrapper, outputPath, codePath, program, ...args] = [...inner[1].matchAll(/"([^"]*)"/g)].map(match => match[1]);
-                requireFile(wrapper);
-                startProgram(program, args, ({ exitCode, output }) => {
-                    fileSystem.writeText(outputPath, output);
-                    fileSystem.writeText(codePath, `${exitCode}\r\n`);
-                });
-                return 0;
-            },
             // Like WScript.Shell: a missing value throws.
             RegRead(path) {
                 if (!registryValues.has(path)) throw new Error(`Invalid root in registry key "${path}".`);
@@ -1149,14 +1157,16 @@ export function createFakePinballYHost({
                 systemInfo: { programDir: programFolder },
                 backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
                 // Only User32's GetSystemMetrics, for the monitor count
-                // (SM_CMONITORS); any other DLL throws.
+                // (SM_CMONITORS), and Shell32's ShellExecuteW, for cmd.exe
+                // run hidden; any other DLL throws.
                 dllImport: {
                     bind: (dllName) => {
-                        if (dllName.toLowerCase() !== "user32.dll") throw new Error(`The fake host has no DLL "${dllName}".`);
-                        return { GetSystemMetrics: (index) => (index === 80 ? monitorCount : 0) };
+                        if (dllName.toLowerCase() === "user32.dll") return { GetSystemMetrics: (index) => (index === 80 ? monitorCount : 0) };
+                        if (dllName.toLowerCase() === "shell32.dll") return { ShellExecuteW: shellExecute };
+                        throw new Error(`The fake host has no DLL "${dllName}".`);
                     },
                 },
-                // Only Windows Media Player, WScript.Shell's Run and RegRead, and the file objects over the
+                // Only Windows Media Player, WScript.Shell's RegRead, and the file objects over the
                 // in-memory file system (no .env.local unless a test adds
                 // one, so common/core/config.js imported after this keeps its
                 // defaults). Any other COM object throws.
