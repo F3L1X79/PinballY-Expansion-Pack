@@ -80,7 +80,7 @@ Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows 
    ```
    Your own scripts keep running: nothing else in `Scripts` is touched.
 3. **Copy `ExpansionPack\.env.example` to `ExpansionPack\.env.local`** and set what you need, one `KEY=value` per line (UTF-8). Missing settings keep their default; `.env.local` is ignored by git.
-4. **Optional: install vpxtool**, so each table's ROM is filled in by itself (Table ROMs). Download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools` (create the folder). Without it, nothing else changes.
+4. **Optional: install vpxtool**, so each table's ROM is filled in by itself (Table ROMs). Download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools` (create the folder). Without it, a table's ROM is still found, after its first Play.
 5. **Restart PinballY** and check `PinballY.log`: it lists your overrides, one "initialized" line per add-on, and `ERROR` lines naming the add-on at fault.
 
 Everything the pack keeps stays in `Scripts\ExpansionPack`: your settings (`.env.local`) and each Profile's progress (`profiles`). **To back up**, copy that folder. **To uninstall**, delete it and remove the import line from `Scripts\main.js`.
