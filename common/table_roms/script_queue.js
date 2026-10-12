@@ -6,7 +6,9 @@
 // polling for its answer on a timer so PinballY never waits. A failure
 // (exit code, no answer in time, output that is no ROM name) is logged and
 // not recorded, so the table is read again at the next startup. Without
-// vpxtool, one line is logged and nothing is read.
+// vpxtool, one line is logged and nothing is read. No run starts from a
+// table's launch ("prelaunch") until PinballY is back on the wheel; the run
+// already started then finishes, its time limit waiting for the game.
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";
@@ -62,21 +64,35 @@ export function createScriptQueue(host, record) {
         record.applyScriptRead(table.configId, table.state, answer.rom);
     }
 
+    // True from a table's launch until PinballY is back on the wheel.
+    let gameUnderWay = false;
+    // The tables left when the next one waits for the game to end.
+    let waitingTables = null;
+    // The run in progress: { startMs }, its time limit counted from startMs.
+    let currentRun = null;
+
     function readNext(queue) {
+        currentRun = null;
+        if (gameUnderWay) {
+            waitingTables = queue;
+            return;
+        }
         const table = queue.shift();
         if (!table) return;
         // A run that cannot even start would fail for every table: the
         // queue stops, to start over at the next startup.
         const run = host.runHiddenProgram(vpxtoolPath, ["romname", table.path]);
-        const startMs = host.now().getTime();
+        const thisRun = { startMs: host.now().getTime() };
+        currentRun = thisRun;
 
-        // Fires every POLL_MS until vpxtool answers or the time is up. A
-        // vpxtool that never answers is left running: the next table starts.
+        // Fires every POLL_MS until vpxtool answers or the time is up, which
+        // never comes during a game. A vpxtool that never answers is left
+        // running: the next table starts.
         const poll = safeHandler(SCRIPT_NAME, () => {
             // One table's trouble never stops the others.
             try {
                 const result = run.result();
-                if (result === null && host.now().getTime() - startMs < SCRIPT_READ_TIMEOUT_MS) {
+                if (result === null && (gameUnderWay || host.now().getTime() - thisRun.startMs < SCRIPT_READ_TIMEOUT_MS)) {
                     host.setTimeout(poll, POLL_MS);
                     return;
                 }
@@ -89,6 +105,33 @@ export function createScriptQueue(host, record) {
         });
         host.setTimeout(poll, POLL_MS);
     }
+
+    function endGame() {
+        if (!gameUnderWay) return;
+        gameUnderWay = false;
+        // The game slowed the run in progress: it gets its full time again.
+        if (currentRun) currentRun.startMs = host.now().getTime();
+        const queue = waitingTables;
+        waitingTables = null;
+        if (queue) readNext(queue);
+    }
+
+    host.on("prelaunch", safeHandler(SCRIPT_NAME, () => {
+        gameUnderWay = true;
+        // A tick later, a launch another script cancelled shows no runMode:
+        // PinballY stayed on the wheel and fires no other launch event.
+        host.setTimeout(safeHandler(SCRIPT_NAME, () => {
+            if (host.getFullUIMode().runMode === undefined) endGame();
+        }), 0);
+    }));
+    // Pauses again should PinballY report the launch only after that tick.
+    host.on("gamestarted", safeHandler(SCRIPT_NAME, () => { gameUnderWay = true; }));
+    // A failed launch fires "launcherror" instead of the game's events.
+    for (const eventName of ["postlaunch", "launcherror"]) host.on(eventName, safeHandler(SCRIPT_NAME, endGame));
+    // Fires on every return to the wheel, also after a menu opened during a game.
+    host.on("wheelmode", safeHandler(SCRIPT_NAME, () => {
+        if (host.getFullUIMode().runMode === undefined) endGame();
+    }));
 
     return {
         start: () => {
