@@ -30,6 +30,9 @@ profiles/*
 profiles/guest/*
 !profiles/guest/avatar.png
 
+# vpxtool, installed by each owner (see the README)
+tools/
+
 # Personal sounds, not published (see .env.example)
 assets/sounds/local/
 

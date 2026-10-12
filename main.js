@@ -33,6 +33,7 @@ import * as achievementsEngine from "./addons/achievements_engine.js";
 import * as challenges from "./addons/challenges.js";
 import * as tableMastery from "./addons/table_mastery.js";
 import * as ratingPrompt from "./addons/rating_prompt.js";
+import * as tableRoms from "./addons/table_roms.js";
 import * as welcomeScreen from "./addons/welcome_screen.js";
 import * as drawnMenus from "./addons/drawn_menus.js";
 
@@ -47,6 +48,9 @@ import * as drawnMenus from "./addons/drawn_menus.js";
 //   this session).
 // - profilePicker must come before the Welcome Screen, which offers
 //   "Change Player" only when the picker registered itself at init.
+// - tableRoms must come before the High Scores Add-on (to come): a ROM it
+//   confirms after a game must be in PinballY before the High Scores read
+//   the board again.
 // - drawnMenus must come last, so its "menuopen" listener draws the final
 //   entries, after every Add-on and shared module edited them.
 // The other scripts don't depend on each other's order. In particular, the
@@ -77,6 +81,9 @@ const SCRIPTS = [
     { key: "challenges", module: challenges },
     { key: "tableMastery", module: tableMastery },
     { key: "ratingPrompt", module: ratingPrompt },
+
+    // Table ROMs, before the High Scores.
+    { key: "tableRoms", module: tableRoms },
 
     // Welcome Screen, under the startup prompt's former key, which owners'
     // env.local overrides still use.

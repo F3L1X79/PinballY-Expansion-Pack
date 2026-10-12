@@ -13,9 +13,10 @@
 // backglass window shown or hidden, and the lower status line (which can
 // start with the player's own messages, and get a temporary one as
 // PinballY's show() puts it); script filters are shown with selectFilter().
-// Its in-memory file system is seeded with files and folders (and
-// unreadable images) and inspected (file contents, reads, writes, renames
-// and deletes).
+// Its in-memory file system is seeded with files (with their modified
+// date) and folders (and unreadable images) and inspected (file contents,
+// reads, writes, renames and deletes). Programs run hidden are described by
+// the tests (output, exit code, run time) and their runs inspected.
 // installGlobals() also exposes it as PinballY's globals (and the global
 // Date and timers, and the COM file objects over the same file system), so
 // code not yet on the host runs too. settle() waits on a real timer for
@@ -56,6 +57,12 @@ function toStoredString(value) {
     if (typeof value === "boolean") return value ? "1" : "0";
     return String(value);
 }
+
+// The user's temporary folder, as Scripting.FileSystemObject gives it.
+const TEMPORARY_FOLDER = "C:\\Users\\Cabinet\\AppData\\Local\\Temp";
+// What cmd.exe answers when the program to run does not exist.
+const PROGRAM_NOT_FOUND_EXIT_CODE = 9009;
+const DEFAULT_PROGRAM_MS = 100;
 
 const withoutTrailingSlash = path => path.replace(/\\+$/, "");
 const parentFolder = path => path.slice(0, path.lastIndexOf("\\"));
@@ -151,6 +158,8 @@ export function createFakePinballYHost({
     // program folder, its Scripts folder and the pack's folder exist, as in PinballY.
     const folders = new Set();
     const files = new Map();
+    // The modified date of each file, in ms.
+    const modifiedDates = new Map();
     // Files another program holds open: writing, renaming or deleting them throws.
     const lockedFiles = new Set();
     // Image files that exist but cannot be decoded (broken or half-written).
@@ -160,19 +169,47 @@ export function createFakePinballYHost({
     // Every file read, in order, by path.
     const fileReadList = [];
     addFolder(projectFolderOf(programFolder));
+    addFolder(TEMPORARY_FOLDER);
+    // What each program does when run, by path: args => { output, errorOutput, exitCode, durationMs }.
+    const programs = new Map();
+    // Every program run, in order: { program, args }.
+    const programRunList = [];
     // Pending timers, run in due order by advanceTime(): { id, dueMs, callback, intervalMs }.
     let timers = [];
     let nextTimerId = 1;
-    // A table's wheel logo is its "wheelImage" path, when that file exists.
-    // PinballY's resolveMedia is left out of the table's own keys, so tests
-    // still compare tables with their plain description.
+    // A table's wheel logo is its "wheelImage" path, when that file exists,
+    // and its game file its "gameFile" path. PinballY's methods are left out
+    // of the table's own keys, so tests still compare tables with their
+    // plain description.
     const wheelImageOf = game => (game.wheelImage && files.has(game.wheelImage) ? game.wheelImage : null);
-    const withMedia = table => Object.defineProperty({ ...table }, "resolveMedia", {
-        value: (type) => {
-            const found = type === "wheel image" ? wheelImageOf(table) : null;
-            return found ? [found] : [];
-        },
-    });
+    // Every GameInfo update(), in order: { configId, changes }.
+    const gameUpdateList = [];
+    const withMedia = (table) => {
+        const game = { ...table };
+        return Object.defineProperties(game, {
+            resolveMedia: {
+                value: (type) => {
+                    const found = type === "wheel image" ? wheelImageOf(table) : null;
+                    return found ? [found] : [];
+                },
+            },
+            resolveGameFile: {
+                value: () => {
+                    const path = table.gameFile || "";
+                    const separator = path.lastIndexOf("\\");
+                    return { exists: files.has(path), filename: path.slice(separator + 1), folder: path.slice(0, Math.max(separator, 0)), path };
+                },
+            },
+            // Like PinballY: saves the changed fields, seen at once by every reader.
+            update: {
+                value: (changes) => {
+                    gameUpdateList.push({ configId: game.configId, changes: { ...changes } });
+                    Object.assign(game, changes);
+                    return {};
+                },
+            },
+        });
+    };
     let allTables = tables.map(withMedia);
     // null = the wheel shows every visible table, in collection order.
     let wheelConfigIds = null;
@@ -498,6 +535,7 @@ export function createFakePinballYHost({
             requireParentFolder(path);
             requireUnlocked(path);
             files.set(path, text);
+            modifiedDates.set(path, nowMs);
             fileOperationList.push({ operation: "write", path });
         },
         renameFile(fromPath, toPath) {
@@ -506,13 +544,16 @@ export function createFakePinballYHost({
             requireParentFolder(toPath);
             if (files.has(toPath)) throw new Error(`File already exists: ${toPath}`);
             files.set(toPath, files.get(fromPath));
+            modifiedDates.set(toPath, modifiedDates.get(fromPath));
             files.delete(fromPath);
+            modifiedDates.delete(fromPath);
             fileOperationList.push({ operation: "rename", path: fromPath, to: toPath });
         },
         deleteFile(path) {
             requireFile(path);
             requireUnlocked(path);
             files.delete(path);
+            modifiedDates.delete(path);
             fileOperationList.push({ operation: "delete", path });
         },
         createFolder(folderPath) {
@@ -520,7 +561,52 @@ export function createFakePinballYHost({
             folders.add(withoutTrailingSlash(folderPath));
         },
         isImageReadable,
+        // The size counts the UTF-8 bytes of the file's text.
+        getFileInfo: (path) => (files.has(path)
+            ? { modified: modifiedDates.get(path), size: Buffer.byteLength(files.get(path), "utf8") }
+            : null),
     };
+
+    // Starts the program as the test described it; onEnd({ exitCode, output })
+    // runs once its run time has passed on the manual clock. Its standard
+    // error is never part of the output.
+    function startProgram(program, args, onEnd) {
+        programRunList.push({ program, args: [...args] });
+        const describe = programs.get(program);
+        const { output = "", exitCode = 0, durationMs = DEFAULT_PROGRAM_MS } = files.has(program) && describe
+            ? describe(args)
+            : { exitCode: PROGRAM_NOT_FOUND_EXIT_CODE, durationMs: 0 };
+        addTimer(() => onEnd({ exitCode, output }), durationMs);
+    }
+
+    function runHiddenProgram(program, args) {
+        let result = null;
+        startProgram(program, args, (ended) => { result = ended; });
+        return { result: () => result };
+    }
+
+    // WScript.Shell, as the production host runs a program: hidden and
+    // without waiting, through cmd.exe and its wrapper script, given
+    // "<wrapper>" "<output file>" "<exit code file>" "<program>" "<args>"...
+    // The wrapper's files are written when the program ends.
+    function createComShell() {
+        return {
+            Run(commandLine, windowStyle, waitOnReturn) {
+                if (windowStyle !== 0 || waitOnReturn !== false) {
+                    throw new Error(`The fake host runs programs hidden and without waiting only: ${commandLine}`);
+                }
+                const inner = /^cmd\.exe \/d \/c "(.*)"$/.exec(commandLine);
+                if (!inner) throw new Error(`The fake host cannot run: ${commandLine}`);
+                const [wrapper, outputPath, codePath, program, ...args] = [...inner[1].matchAll(/"([^"]*)"/g)].map(match => match[1]);
+                requireFile(wrapper);
+                startProgram(program, args, ({ exitCode, output }) => {
+                    fileSystem.writeText(outputPath, output);
+                    fileSystem.writeText(codePath, `${exitCode}\r\n`);
+                });
+                return 0;
+            },
+        };
+    }
 
     // Scripting.FileSystemObject over the in-memory file system, for code
     // that uses the COM object directly (the production host, config.js).
@@ -541,6 +627,23 @@ export function createFakePinballYHost({
             },
             MoveFile: fileSystem.renameFile,
             DeleteFile: fileSystem.deleteFile,
+            GetFile: (path) => {
+                requireFile(path);
+                const { modified, size } = fileSystem.getFileInfo(path);
+                return { DateLastModified: new RealDate(modified), Size: size };
+            },
+            GetSpecialFolder: (folderId) => {
+                if (folderId !== 2) throw new Error(`The fake host has no special folder ${folderId}.`);
+                return { Path: TEMPORARY_FOLDER };
+            },
+            // An ANSI text file, written on Close().
+            CreateTextFile: (path) => {
+                let text = "";
+                return {
+                    Write(newText) { text += newText; },
+                    Close() { fileSystem.writeText(path, text); },
+                };
+            },
         };
     }
 
@@ -678,6 +781,7 @@ export function createFakePinballYHost({
         setInterval: (callback, ms) => addTimer(callback, ms, ms),
         clearInterval: removeTimer,
         getVisibleTables: () => allTables.filter(table => !table.isHidden),
+        getAllTables: () => [...allTables],
         getWheelTables: () => unfilteredWheel()
             .filter(configId => !ruledOutConfigIds.has(configId))
             .map(getGameInfo),
@@ -731,6 +835,7 @@ export function createFakePinballYHost({
         showBackglass: (visible) => { backglassShowCalls.push(visible); },
         playSound,
         createSoundRotation,
+        runHiddenProgram,
         files: fileSystem,
         log: (text) => { logLines.push(text); },
 
@@ -746,11 +851,20 @@ export function createFakePinballYHost({
         soundsPlayed: () => sounds.map(sound => sound.filePath),
         // The id of the player each sound played on, in the same order.
         soundPlayers: () => sounds.map(sound => sound.playerId),
-        // Seeds a file (and its folders) without recording a write.
-        addFile(filePath, content = "") {
+        // Seeds a file (and its folders) without recording a write, modified
+        // now unless a date is given.
+        addFile(filePath, content = "", { modified = new RealDate(nowMs) } = {}) {
             addFolder(parentFolder(filePath));
             files.set(filePath, content);
+            modifiedDates.set(filePath, modified.getTime());
         },
+        // Seeds a program file and what it does when run: describe(args)
+        // gives { output, errorOutput, exitCode, durationMs }, all optional.
+        addProgram(filePath, describe) {
+            host.addFile(filePath, "program");
+            programs.set(filePath, describe);
+        },
+        programRuns: () => programRunList.map(run => ({ program: run.program, args: [...run.args] })),
         // Seeds an image file that exists but cannot be decoded.
         addUnreadableImage(filePath) {
             host.addFile(filePath, "not an image");
@@ -772,6 +886,7 @@ export function createFakePinballYHost({
         fileOperations: () => fileOperationList.map(operation => ({ ...operation })),
         fileReads: () => [...fileReadList],
         setTables(newTables) { allTables = newTables.map(withMedia); },
+        gameUpdates: () => gameUpdateList.map(update => ({ configId: update.configId, changes: { ...update.changes } })),
         // The current wheel selection, in wheel order (index 0 is the current
         // table), optionally under a filter id such as "Favorites".
         setWheelTables(configIds, { filterId = currentFilterId } = {}) {
@@ -1021,7 +1136,7 @@ export function createFakePinballYHost({
                         return { GetSystemMetrics: (index) => (index === 80 ? monitorCount : 0) };
                     },
                 },
-                // Only Windows Media Player, and the file objects over the
+                // Only Windows Media Player, WScript.Shell's Run, and the file objects over the
                 // in-memory file system (no .env.local unless a test adds
                 // one, so common/core/config.js imported after this keeps its
                 // defaults). Any other COM object throws.
@@ -1029,6 +1144,7 @@ export function createFakePinballYHost({
                     if (progId === "WMPlayer.OCX.7") return createComMediaPlayer();
                     if (progId === "Scripting.FileSystemObject") return createComFileSystem();
                     if (progId === "ADODB.Stream") return createComTextStream();
+                    if (progId === "WScript.Shell") return createComShell();
                     throw new Error(`The fake host has no COM object "${progId}".`);
                 },
             });

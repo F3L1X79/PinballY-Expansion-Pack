@@ -18,7 +18,9 @@
 // profile.json, read only when a Play is added or asked for. At startup,
 // creates the Guest folder and writes cabinet.json when they are missing.
 // Tells its listeners of every switch (onSwitch), every saved change of a
-// Profile's data (onUpdate) and every Play (onPlay, ADR 0008).
+// Profile's data (onUpdate) and every Play (onPlay, ADR 0008). Another
+// module's cabinet-level file (such as table_roms.json) sits next to
+// cabinet.json, read and saved the same way, and no Profile Reset touches it.
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";
@@ -460,6 +462,10 @@ export function createProfileStore(host) {
         // Whether the named Profile (the active one by default) is a Child Profile.
         isChild,
         getCabinetData: () => cabinet,
+        // Another module's cabinet-level file, "<baseName>.json" next to
+        // cabinet.json: its data, or null when it was never saved.
+        readCabinetFile: (baseName) => loadJson(profilesFolder, baseName, `${baseName}.json`),
+        saveCabinetFile: (baseName, data) => saveJson(profilesFolder, baseName, data),
         updateCabinetData: (change) => {
             change(cabinet);
             saveCabinet();

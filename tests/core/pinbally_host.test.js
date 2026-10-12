@@ -74,10 +74,15 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             assert.equal(host.now().getTime(), new Date(2026, 8, 28, 0, 0, 1).getTime());
         });
 
-        test("lists the visible tables and finds a table by config ID", () => {
+        test("lists the visible tables, every table, and finds a table by config ID", () => {
             assert.deepEqual(host.getVisibleTables().map(game => game.configId), [
                 "Medieval Madness (Williams 1997)",
                 "Attack from Mars (Bally 1995)",
+            ]);
+            assert.deepEqual(host.getAllTables().map(game => game.configId), [
+                "Medieval Madness (Williams 1997)",
+                "Attack from Mars (Bally 1995)",
+                "Hidden Table (Gottlieb 1978)",
             ]);
             assert.equal(host.getGameInfo("Attack from Mars (Bally 1995)").title, "Attack from Mars");
             assert.equal(host.getGameInfo("No Such Table"), null);
@@ -372,6 +377,50 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             fake.addFile(`${alice}\\old\\play-log-2025.json`, "{}");
 
             assert.deepEqual(host.files.listFiles(alice).sort(), ["play-log-2026.json", "profile.json"]);
+        });
+
+        test("gives a file's modified date and size in bytes, and null for a missing file", () => {
+            const table = "C:\\Visual Pinball\\Tables\\Attack from Mars (Bally 1995).vpx";
+            fake.addFile(table, "Chloé", { modified: new Date(2026, 0, 2, 3, 4, 5) });
+
+            assert.deepEqual(host.files.getFileInfo(table), { modified: new Date(2026, 0, 2, 3, 4, 5).getTime(), size: 6 });
+            assert.equal(host.files.getFileInfo("C:\\Visual Pinball\\Tables\\missing.vpx"), null);
+
+            fake.advanceTime(1000);
+            fake.addFolder("C:\\PinballY\\Scripts\\profiles");
+            const written = "C:\\PinballY\\Scripts\\profiles\\cabinet.json";
+            host.files.writeText(written, "{}");
+            assert.deepEqual(host.files.getFileInfo(written), { modified: NOW.getTime() + 1000, size: 2 });
+        });
+
+        test("runs a program hidden without waiting, its standard output and exit code read once it ends", () => {
+            const program = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe";
+            fake.addProgram(program, args => ({
+                output: `first line\n${args.join("|")}\n`, errorOutput: "warning: NaN", exitCode: 0, durationMs: 300,
+            }));
+
+            const run = host.runHiddenProgram(program, ["romname", "C:\\Tables\\Attack & Revenge (Bally 1999).vpx"]);
+            assert.equal(run.result(), null, "still running");
+            fake.advanceTime(299);
+            assert.equal(run.result(), null, "still running");
+            fake.advanceTime(1);
+
+            const finished = { exitCode: 0, output: "first line\nromname|C:\\Tables\\Attack & Revenge (Bally 1999).vpx\n" };
+            assert.deepEqual(run.result(), finished, "standard error left out");
+            assert.deepEqual(run.result(), finished, "the same result when asked again");
+            assert.deepEqual(fake.programRuns(), [{ program, args: ["romname", "C:\\Tables\\Attack & Revenge (Bally 1999).vpx"] }]);
+        });
+
+        test("a program that fails gives its exit code, and a missing program fails too", () => {
+            const program = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe";
+            fake.addProgram(program, () => ({ output: "", exitCode: 1 }));
+
+            const failed = host.runHiddenProgram(program, ["romname", "C:\\Tables\\Broken.vpx"]);
+            const missing = host.runHiddenProgram("C:\\PinballY\\Scripts\\ExpansionPack\\tools\\missing.exe", []);
+            fake.advanceTime(1000);
+
+            assert.deepEqual(failed.result(), { exitCode: 1, output: "" });
+            assert.notEqual(missing.result().exitCode, 0);
         });
 
         test("writing into a missing folder fails", () => {

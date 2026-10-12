@@ -15,7 +15,8 @@
 // World Tour's key in profile.json and its Achievement ID, and one the
 // Surprises part's key, its flags, seasons, runs and Achievement IDs. These
 // strings are players' saved progress: this test must keep passing unchanged.
-// The last test locks the Avatar Frame choice's key in profile.json.
+// Another test locks the Avatar Frame choice's key in profile.json, and the
+// last one the Table ROM record's file name and keys.
 // ============================================================
 
 import { test } from "node:test";
@@ -32,6 +33,8 @@ import { createWorldTour } from "../../common/achievements/world_tour.js";
 import { createProfileRewards } from "../../common/avatar_frames/profile_rewards.js";
 import { buildSurprisesAchievements } from "../../achievements/surprises.js";
 import { createSurprises } from "../../common/achievements/surprises.js";
+import { createTableRomRecord } from "../../common/table_roms/table_rom_record.js";
+import { createScriptQueue } from "../../common/table_roms/script_queue.js";
 import { WELCOME_SCREEN_PAUSE_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
@@ -530,4 +533,41 @@ test("the Avatar Frame choice keeps its key in profile.json", () => {
     assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).avatarFrame, 2);
     profileRewards.choose(null);
     assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).avatarFrame, null);
+});
+
+test("the Table ROM record keeps its file name and keys", () => {
+    const vpx = "C:\\Visual Pinball\\Tables\\Attack from Mars (Bally 1995).vpx";
+    const vbs = "C:\\Visual Pinball\\Tables\\Attack from Mars (Bally 1995).vbs";
+    const noRom = "C:\\Visual Pinball\\Tables\\Space Trip (VPX Community 2021).vpx";
+    const fake = createFakePinballYHost({
+        now: NOW,
+        tables: [
+            { configId: "Attack from Mars (Bally 1995)", title: "Attack from Mars", gameFile: vpx, isHidden: false },
+            { configId: "Space Trip (VPX Community 2021)", title: "Space Trip", gameFile: noRom, isHidden: false },
+        ],
+    });
+    fake.addFile(vpx, "table", { modified: new Date(2026, 5, 1, 12, 0, 0) });
+    fake.addFile(vbs, "patched", { modified: new Date(2026, 5, 2, 12, 0, 0) });
+    fake.addFile(noRom, "table", { modified: new Date(2026, 5, 3, 12, 0, 0) });
+    fake.addProgram("C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe", args => ({ output: args[1] === vpx ? "afm_113\n" : "" }));
+
+    createScriptQueue(fake, createTableRomRecord(fake, createProfileStore(fake))).start();
+    fake.advanceTime(60 * 1000);
+
+    assert.deepEqual(JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\table_roms.json`)), {
+        version: 1,
+        tables: {
+            "Attack from Mars (Bally 1995)": {
+                script: {
+                    vpx: { modified: new Date(2026, 5, 1, 12, 0, 0).getTime(), size: 5 },
+                    vbs: { modified: new Date(2026, 5, 2, 12, 0, 0).getTime(), size: 7 },
+                    rom: "afm_113",
+                },
+                written: { rom: "afm_113", source: "script" },
+            },
+            "Space Trip (VPX Community 2021)": {
+                script: { vpx: { modified: new Date(2026, 5, 3, 12, 0, 0).getTime(), size: 5 }, vbs: null, rom: null },
+            },
+        },
+    });
 });

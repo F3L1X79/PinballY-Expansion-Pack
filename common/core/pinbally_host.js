@@ -6,8 +6,9 @@
 // window menus / UI mode / events / drawing layers,
 // StyledText, commands and running them, table launch, program and pack folders,
 // monitor count, backglass window, sound playback (one-off or on players
-// in turn), logfile.log, and the few file operations the Profile store
-// needs).
+// in turn), logfile.log, the few file operations the Profile store
+// needs, a file's modified date and size, and a program run hidden without
+// waiting, whose output is read later).
 // Every call passes straight through to PinballY's globals; tests use the
 // in-memory fake host from tests/support/fake_pinbally_host.js instead. No side
 // effects on import.
@@ -20,6 +21,21 @@ const ADODB_SAVE_OVERWRITE = 2;
 const IMAGE_PROBE_Z_INDEX = -1000;
 // GetSystemMetrics index: the number of display monitors on the desktop.
 const SM_CMONITORS = 80;
+// Scripting.FileSystemObject's GetSpecialFolder id of the user's temporary folder.
+const TEMPORARY_FOLDER = 2;
+// WScript.Shell's Run window style: hidden.
+const SW_HIDE = 0;
+// Under the user's temporary folder: the wrapper script and each run's files.
+const RUN_FOLDER_NAME = "PinballYExpansionPack";
+// Given "<output file>" "<exit code file>" "<program>" "<args>"..., runs the
+// program with its standard output in the first file and its standard error
+// dropped, then writes its exit code to the second, through a .tmp file
+// renamed once closed: that file appearing whole tells the run is over.
+// The redirection comes first, since "echo 0> file" would redirect handle 0
+// instead of writing "0".
+const RUN_WRAPPER = "@echo off\r\n%3 %4 %5 %6 %7 %8 %9 > %1 2> nul\r\n"
+    + "> \"%~2.tmp\" echo %errorlevel%\r\nmove /y \"%~2.tmp\" %2 > nul\r\n";
+const MAX_PROGRAM_ARGS = 6;
 // The pack's fixed folder under Scripts (ADR 0009): never detected at run time.
 const PROJECT_FOLDER_NAME = "ExpansionPack";
 
@@ -88,6 +104,13 @@ function createFileSystem() {
         createFolder: (folderPath) => {
             if (!fso().FolderExists(folderPath)) fso().CreateFolder(folderPath);
         },
+        // The file's modified date (ms) and size in bytes; null when it doesn't exist.
+        getFileInfo: (path) => {
+            if (!fso().FileExists(path)) return null;
+            const file = fso().GetFile(path);
+            // PinballY hands a COM date over as a Date.
+            return { modified: new Date(file.DateLastModified).getTime(), size: Number(file.Size) };
+        },
         // dc.getImageSize is the only check that decodes the image: it throws
         // on a missing or unreadable file, where drawImage draws nothing
         // without an error. It exists only inside a draw callback, so a
@@ -112,6 +135,62 @@ function createFileSystem() {
     };
 }
 
+// Numbered across hosts, so two runs never share their files, and named
+// after the session's start, so a run of an earlier session never does either.
+const RUN_SESSION = Date.now();
+let nextRunNumber = 1;
+
+// Runs programs hidden, without waiting: WScript.Shell's Run returns at once
+// and cmd.exe shows no window with SW_HIDE; the output and exit code go
+// through files that result() reads once the run is over.
+function createProgramRunner(files) {
+    let runFolder = null;
+
+    function prepareRunFolder() {
+        if (runFolder) return runFolder;
+        const fso = createAutomationObject("Scripting.FileSystemObject");
+        const folder = `${fso.GetSpecialFolder(TEMPORARY_FOLDER).Path}\\${RUN_FOLDER_NAME}`;
+        files.createFolder(folder);
+        // In ANSI through FileSystemObject: the UTF-8 byte order mark
+        // ADODB.Stream writes would break the script's first line.
+        const wrapper = fso.CreateTextFile(`${folder}\\run.cmd`, true, false);
+        try {
+            wrapper.Write(RUN_WRAPPER);
+        } finally {
+            wrapper.Close();
+        }
+        runFolder = folder;
+        return folder;
+    }
+
+    return (programPath, args) => {
+        if (args.length > MAX_PROGRAM_ARGS) throw new Error(`At most ${MAX_PROGRAM_ARGS} program arguments, not ${args.length}.`);
+        const folder = prepareRunFolder();
+        const basePath = `${folder}\\run-${RUN_SESSION}-${nextRunNumber++}`;
+        const outputPath = `${basePath}.out`;
+        const codePath = `${basePath}.code`;
+        const quoted = [`${folder}\\run.cmd`, outputPath, codePath, programPath, ...args].map(text => `"${text}"`).join(" ");
+        // cmd.exe strips the outer quotes and keeps each quoted argument.
+        createAutomationObject("WScript.Shell").Run(`cmd.exe /d /c "${quoted}"`, SW_HIDE, false);
+
+        let result = null;
+        return {
+            // null while the program runs, then { exitCode, output }.
+            result: () => {
+                if (result) return result;
+                if (!files.fileExists(codePath)) return null;
+                const code = files.readText(codePath).trim();
+                if (!/^-?\d+$/.test(code)) throw new Error(`Not an exit code in ${codePath}: "${code}"`);
+                const output = files.fileExists(outputPath) ? files.readText(outputPath) : "";
+                result = { exitCode: Number(code), output };
+                files.deleteFile(codePath);
+                if (files.fileExists(outputPath)) files.deleteFile(outputPath);
+                return result;
+            },
+        };
+    };
+}
+
 // The sound rotations by file path, one set per PinballY session (its COM
 // factory): every screen playing Next.wav shares the same players instead
 // of creating its own.
@@ -128,6 +207,7 @@ export function createPinballYHost() {
     let mediaPlayer = null;
     // Bound on the first monitor count, then kept.
     let user32 = null;
+    const files = createFileSystem();
 
     return {
         settings: {
@@ -147,6 +227,8 @@ export function createPinballYHost() {
         clearInterval: (id) => { clearInterval(id); },
 
         getVisibleTables: () => gameList.getAllGames().filter(game => !game.isHidden),
+        // Hidden tables included.
+        getAllTables: () => gameList.getAllGames(),
         // The current wheel selection in wheel order: index 0 is the current table.
         getWheelTables: () => gameList.getAllWheelGames(),
         // The current table alone, without listing the whole selection; null
@@ -257,7 +339,11 @@ export function createPinballYHost() {
             rotations.set(filePath, rotation);
             return rotation;
         },
-        files: createFileSystem(),
+        // Runs the program hidden, without waiting; returns { result() },
+        // null while it runs, then { exitCode, output } (its standard output;
+        // its standard error is dropped). At most MAX_PROGRAM_ARGS arguments.
+        runHiddenProgram: createProgramRunner(files),
+        files,
         log: (text) => { logfile.log(text); },
     };
 }
