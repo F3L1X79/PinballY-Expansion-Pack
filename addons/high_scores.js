@@ -3,8 +3,10 @@
 // a Play to the Profile active when the Play started, whatever initials
 // were typed. At "prelaunch" the board is read fresh and becomes the last
 // known board; a little after "postlaunch" it is read again and the Play
-// settled against it. Only output: high_scores.json next to cabinet.json
-// and logfile.log. The rules live in common/high_scores/.
+// settled against it. A failed launch read leaves the last known board to
+// compare with; a failed read after the game credits nothing. Only
+// output: high_scores.json next to cabinet.json and logfile.log. The rules
+// live in common/high_scores/.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";

@@ -6,7 +6,9 @@
 // null for a Default Score). Every High Score ever won, kept when later
 // scores push it off the board. A board read outside a Play becomes the
 // last known board; settling a Play credits its new places to the Profile
-// active when it started. Every board change and High Score is logged.
+// active when it started, unless there are more than a 4-player game can
+// make (a ROM reset: they become Default Scores). Every board change and
+// High Score is logged.
 // ============================================================
 
 import { newPlaces, placeKey } from "./board_reader.js";
@@ -14,6 +16,9 @@ import { toLocalIsoString } from "../profiles/profile_store.js";
 
 const RECORD_NAME = "high_scores";
 const RECORD_VERSION = 1;
+// More new places than a 4-player game can make: the ROM went back to its
+// factory scores, which stay on the board as the scores to beat.
+const MAX_NEW_PLACES_PER_PLAY = 4;
 // The High Scores Add-on's name in logfile.log, for its shared modules too.
 export const SCRIPT_NAME = "HighScores";
 
@@ -72,7 +77,8 @@ export function createHighScoreStore(host, profileStore) {
         },
         // The board read after a game, compared with the last known board;
         // play: the Play the Profile store announced ({ profileName, start, ... }),
-        // or null for a game under a minute, whose new places are Default Scores.
+        // or null for a game under a minute. The new places are Default
+        // Scores after a game under a minute or a ROM reset.
         settlePlay(configId, places, play) {
             const known = knownBoardOf(configId);
             if (!known) {
@@ -80,12 +86,16 @@ export function createHighScoreStore(host, profileStore) {
                 return;
             }
             const added = newPlaces(known, places);
-            const board = withOwners(places, known, play ? play.profileName : null);
+            const romReset = added.length > MAX_NEW_PLACES_PER_PLAY;
+            const credited = play !== null && !romReset;
+            const board = withOwners(places, known, credited ? play.profileName : null);
             const changed = JSON.stringify(board) !== JSON.stringify(known);
             setBoard(configId, board);
-            if (!play) {
+            if (!credited) {
                 save();
-                if (changed) log(`"${configId}": ${countPlaces(added.length)} after a game under a minute, as Default Scores.`);
+                const game = play ? `a Play by ${play.profileName}` : "a game under a minute";
+                if (romReset) log(`"${configId}": ${countPlaces(added.length)} after ${game}, more than a ${MAX_NEW_PLACES_PER_PLAY}-player game can make: a ROM reset, nothing credited, the new places are Default Scores.`);
+                else if (changed) log(`"${configId}": ${countPlaces(added.length)} after ${game}, as Default Scores.`);
                 return;
             }
             const formerOwner = known.length > 0 ? known[0].owner : null;

@@ -25,6 +25,9 @@ export const TABLES = [
     { id: 2, configId: AFM, title: "Attack from Mars", manufacturer: "Bally", year: 1995, isHidden: false, rom: "afm_113b" },
 ];
 
+// What PINemHi prints for a ROM it does not support.
+export const NOT_SUPPORTED = ["Not supported rom : C:\\vPinball\\VisualPinball\\VPinMAME\\nvram\\mm_109c.nv", ""];
+
 // A board as PINemHi prints it: a Grand Champion, then numbered places;
 // each entry is [initials, score].
 export function boardLines(champion, places) {
@@ -74,8 +77,9 @@ export async function startHighScores({ addOns = ["highScores"], profiles = {}, 
         setBoard: (configId, lines, options) => fake.setNvramBoard(configId, lines, options),
         switchTo: (name) => getProfileStore().switchTo(name),
         // Plays the table as PinballY launches it; VPinMAME saves the board
-        // after (raw lines) as the game ends.
-        play: async (configId, { after, durationMs = GAME_MS } = {}) => {
+        // after (raw lines) as the game ends, read as afterRead says
+        // (setBoard's options).
+        play: async (configId, { after, afterRead, durationMs = GAME_MS } = {}) => {
             const game = fake.getGameInfo(configId);
             fake.playGame(game);
             fake.fire("prelaunch", { game });
@@ -84,11 +88,12 @@ export async function startHighScores({ addOns = ["highScores"], profiles = {}, 
             await finishReads();
             fake.advanceTime(Math.max(durationMs - READS_STEPS * 1000, 0));
             await settle();
-            if (after) fake.setNvramBoard(configId, after);
+            if (after) fake.setNvramBoard(configId, after, afterRead);
             fake.gameOver(game);
             fake.fire("postlaunch", { game });
             await finishReads();
         },
+        pendingTimerCount: () => fake.pendingTimerCount(),
         log: () => fake.logLines().filter(line => line.startsWith("[HighScores]")),
         saved: () => {
             const text = fake.readFile(HIGH_SCORES_FILE);

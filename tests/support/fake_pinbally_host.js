@@ -192,7 +192,7 @@ export function createFakePinballYHost({
     // Every GameInfo update(), in order: { configId, changes }.
     const gameUpdateList = [];
     // What PINemHi reads in each NVRAM, by board key (the table's ROM, or
-    // its config ID without one): { lines, durationMs, fails }.
+    // its config ID without one): { lines, durationMs, fails, hangs }.
     const nvramBoards = new Map();
     // The board PinballY keeps after a read, by config ID, until a launch or setHighScores(null).
     const highScoreCache = new Map();
@@ -201,7 +201,8 @@ export function createFakePinballYHost({
     // Like PinballY's getHighScores(): the cached board, or a PINemHi run
     // (after highscoresrequest, unless a listener cancels it) that fires
     // highscoresready and fails on a failed run or one killed after
-    // PINEMHI_KILL_MS. The board is read as it is when the run starts.
+    // PINEMHI_KILL_MS, or never answers (a run stuck behind another one).
+    // The board is read as it is when the run starts.
     function getHighScoresOf(game) {
         if (highScoreCache.has(game.configId)) return Promise.resolve(withSource(highScoreCache.get(game.configId), "cache"));
         return new Promise((resolve, reject) => {
@@ -214,6 +215,7 @@ export function createFakePinballYHost({
             const nvram = nvramBoards.get(boardKeyOf(game));
             const killed = Boolean(nvram) && nvram.durationMs > PINEMHI_KILL_MS;
             const lines = nvram ? [...nvram.lines] : [];
+            if (nvram && nvram.hangs) return;
             addTimer(() => {
                 if (!nvram || nvram.fails || killed) {
                     fire("highscoresready", { game, success: false, scores: [], source: "none" });
@@ -918,6 +920,8 @@ export function createFakePinballYHost({
         advanceTime,
         // Intervals still running (a frame timer left on keeps redrawing).
         runningIntervalCount: () => timers.filter(timer => timer.intervalMs !== undefined).length,
+        // Timers and intervals not run or cleared yet.
+        pendingTimerCount: () => timers.length,
         setLayoutSize(size) { currentLayoutSize = { ...size }; },
         drawingLayers: () => [...layers],
         underlay: () => underlayFile,
@@ -940,9 +944,10 @@ export function createFakePinballYHost({
         },
         // The board PINemHi reads now in the table's NVRAM (shared by the
         // tables of the same ROM), as raw lines; a run takes durationMs,
-        // and fails when fails is set or PinballY kills it.
-        setNvramBoard(configId, lines, { durationMs = 1000, fails = false } = {}) {
-            nvramBoards.set(boardKeyOf(getGameInfo(configId)), { lines: [...lines], durationMs, fails });
+        // fails when fails is set or PinballY kills it, never answers when
+        // hangs is set.
+        setNvramBoard(configId, lines, { durationMs = 1000, fails = false, hangs = false } = {}) {
+            nvramBoards.set(boardKeyOf(getGameInfo(configId)), { lines: [...lines], durationMs, fails, hangs });
         },
         // Seeds a registry value, by its full path ("HKCU\\Software\\...\\name").
         setRegistryValue(path, value) { registryValues.set(path, value); },
