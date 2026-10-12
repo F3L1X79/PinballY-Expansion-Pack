@@ -34,6 +34,7 @@ import * as challenges from "./addons/challenges.js";
 import * as tableMastery from "./addons/table_mastery.js";
 import * as ratingPrompt from "./addons/rating_prompt.js";
 import * as tableRoms from "./addons/table_roms.js";
+import * as highScores from "./addons/high_scores.js";
 import * as welcomeScreen from "./addons/welcome_screen.js";
 import * as drawnMenus from "./addons/drawn_menus.js";
 
@@ -46,11 +47,11 @@ import * as drawnMenus from "./addons/drawn_menus.js";
 //   achievement checks after a game are deferred by one tick, so the stats
 //   are recorded first either way (the startup check needs no stats from
 //   this session).
+// - highScores comes after sessionStatsTracker and tableRoms, and before
+//   achievements: a ROM Table ROMs confirms after a game must be in
+//   PinballY before the High Scores read the board again.
 // - profilePicker must come before the Welcome Screen, which offers
 //   "Change Player" only when the picker registered itself at init.
-// - tableRoms must come before the High Scores Add-on (to come): a ROM it
-//   confirms after a game must be in PinballY before the High Scores read
-//   the board again.
 // - drawnMenus must come last, so its "menuopen" listener draws the final
 //   entries, after every Add-on and shared module edited them.
 // The other scripts don't depend on each other's order. In particular, the
@@ -72,18 +73,17 @@ const SCRIPTS = [
     { key: "wheelArc", module: wheelArc },
     { key: "seamlessLaunchOverlay", module: seamlessLaunchOverlay },
 
-    // Game session: windows, sound, stats, achievements, Challenges, Table
-    // Mastery, rating.
+    // Game session: windows, sound, stats, Table ROMs, High Scores,
+    // achievements, Challenges, Table Mastery, rating.
     { key: "forceBackglass", module: forceBackglass },
     { key: "playLaunchSound", module: playLaunchSound },
     { key: "sessionStatsTracker", module: sessionStatsTracker },
+    { key: "tableRoms", module: tableRoms },
+    { key: "highScores", module: highScores },
     { key: "achievements", module: achievementsEngine },
     { key: "challenges", module: challenges },
     { key: "tableMastery", module: tableMastery },
     { key: "ratingPrompt", module: ratingPrompt },
-
-    // Table ROMs, before the High Scores.
-    { key: "tableRoms", module: tableRoms },
 
     // Welcome Screen, under the startup prompt's former key, which owners'
     // env.local overrides still use.

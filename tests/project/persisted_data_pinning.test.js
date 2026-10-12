@@ -16,7 +16,8 @@
 // Surprises part's key, its flags, seasons, runs and Achievement IDs. These
 // strings are players' saved progress: this test must keep passing unchanged.
 // Another test locks the Avatar Frame choice's key in profile.json, and the
-// last one the Table ROM record's file name and keys.
+// Table ROM record's file name and keys, and the last one the High Score
+// store's file name and keys.
 // ============================================================
 
 import { test } from "node:test";
@@ -36,6 +37,7 @@ import { createSurprises } from "../../common/achievements/surprises.js";
 import { createTableRomRecord } from "../../common/table_roms/table_rom_record.js";
 import { createScriptQueue } from "../../common/table_roms/script_queue.js";
 import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js";
+import { createHighScoreStore } from "../../common/high_scores/high_score_store.js";
 import { WELCOME_SCREEN_PAUSE_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
@@ -593,5 +595,34 @@ test("the Table ROM record keeps the source of a ROM a .nv confirmed", () => {
     assert.deepEqual(JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\table_roms.json`)), {
         version: 1,
         tables: { "Attack from Mars (Bally 1995)": { written: { rom: "afm_113b", source: "nv" } } },
+    });
+});
+
+test("the High Score store keeps its file name and keys", () => {
+    const configId = "Medieval Madness (Williams 1997)";
+    const fake = createFakePinballYHost({ now: NOW, tables: [{ configId, title: "Medieval Madness", isHidden: false }] });
+    fake.addFile(`${PROFILES_FOLDER}\\Bob\\profile.json`, JSON.stringify({ version: 1 }));
+    const highScores = createHighScoreStore(fake, createProfileStore(fake));
+
+    highScores.recordBoard(configId, [{ rank: 1, initials: "SLL", score: 52000000 }]);
+    highScores.settlePlay(configId, [{ rank: 1, initials: "BOB", score: 60000000 }, { rank: 2, initials: "SLL", score: 52000000 }],
+        { profileName: "Bob", start: new Date(2026, 8, 23, 9, 0, 0) });
+    highScores.settlePlay(configId, [{ rank: 1, initials: "", score: 70000000 }, { rank: 2, initials: "BOB", score: 60000000 }],
+        { profileName: "guest", start: new Date(2026, 8, 23, 9, 30, 0) });
+
+    assert.deepEqual(JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\high_scores.json`)), {
+        version: 1,
+        tables: {
+            [configId]: {
+                board: [
+                    { rank: 1, initials: "", score: 70000000, owner: "guest" },
+                    { rank: 2, initials: "BOB", score: 60000000, owner: "Bob" },
+                ],
+            },
+        },
+        highScores: [
+            { profile: "Bob", configId, score: 60000000, initials: "BOB", place: 1, date: "2026-09-23T09:00:00", tableRecord: true, takenFrom: null },
+            { profile: "guest", configId, score: 70000000, initials: "", place: 1, date: "2026-09-23T09:30:00", tableRecord: true, takenFrom: "Bob" },
+        ],
     });
 });

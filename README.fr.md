@@ -104,7 +104,8 @@ Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fo
    Vos propres scripts continuent de fonctionner : rien d'autre n'est touché dans `Scripts`.
 3. **Copiez `ExpansionPack\.env.example` en `ExpansionPack\.env.local`** et réglez ce qu'il vous faut, un `CLÉ=valeur` par ligne (UTF-8). Les réglages absents gardent leur valeur par défaut ; `.env.local` est ignoré par git.
 4. **Facultatif : installez vpxtool**, pour que la ROM de chaque table soit remplie toute seule (Table ROMs). Téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools` (créez le dossier). Sans lui, la ROM d'une table est quand même trouvée, après sa première Play.
-5. **Redémarrez PinballY** et consultez `PinballY.log` : il liste vos réglages, une ligne « initialized » par add-on, et des lignes `ERROR` qui désignent l'add-on en cause.
+5. **Facultatif : passez PINemHi en 3.6.8**, pour que les High Scores lisent les tableaux d'environ 300 ROM de plus. Remplacez les fichiers de `PinballY\PINemHi` par ceux de PINemHi 3.6.8, puis **ajoutez toute la section `[romfind]` de son `romfind.ini` à la fin de son `pinemhi.ini`** (PinballY ne lit cette section que dans `pinemhi.ini` : sans elle, une table au champ ROM vide n'a plus aucun tableau), et réglez `USER=` dans `pinemhi.ini` sur le dossier `User` de Visual Pinball X.
+6. **Redémarrez PinballY** et consultez `PinballY.log` : il liste vos réglages, une ligne « initialized » par add-on, et des lignes `ERROR` qui désignent l'add-on en cause.
 
 Tout ce que le pack conserve reste dans `Scripts\ExpansionPack` : vos réglages (`.env.local`) et la progression de chaque Profil (`profiles`). **Pour sauvegarder**, copiez ce dossier. **Pour désinstaller**, supprimez-le et retirez la ligne d'import de `Scripts\main.js`.
 

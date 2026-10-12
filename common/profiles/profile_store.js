@@ -46,7 +46,7 @@ const sameName = (a, b) => a.toLowerCase() === b.toLowerCase();
 const pad = number => String(number).padStart(2, "0");
 
 // Local time, readable in the file: "2026-09-24T21:10:00".
-function toLocalIsoString(date) {
+export function toLocalIsoString(date) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
         + `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }

@@ -36,7 +36,7 @@ const normalizeLine = raw => String(raw).replace(/[\u00A0\u202F\u00FF\uFFFD\t]/g
 const normalizeTitle = text => text.trim().replace(/\s+/g, " ").toUpperCase();
 
 // Two places are the same when their initials (in any case) and score are.
-const placeKey = place => `${place.initials.toUpperCase()}|${place.score}`;
+export const placeKey = place => `${place.initials.toUpperCase()}|${place.score}`;
 
 function parseScore(text) {
     const match = SCORE_PATTERN.exec(text.trim());

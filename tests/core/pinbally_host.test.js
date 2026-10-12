@@ -256,6 +256,62 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             ]);
         });
 
+        test("reads a table's high scores through PINemHi once, then from the cache until forgotten or launched", async () => {
+            const events = [];
+            host.onGameListEvent("highscoresrequest", ev => events.push(`request:${ev.game.configId}`));
+            host.onGameListEvent("highscoresready", ev => events.push(`ready:${ev.success}:${ev.source}:${ev.scores.join("/")}`));
+            fake.setNvramBoard("Medieval Madness (Williams 1997)", ["GRAND CHAMPION", "SLL 52.000.000"]);
+            const game = host.getGameInfo("Medieval Madness (Williams 1997)");
+
+            const fresh = game.getHighScores();
+            fake.advanceTime(1000);
+            const lines = await fresh;
+            assert.deepEqual([...lines], ["GRAND CHAMPION", "SLL 52.000.000"]);
+            assert.equal(lines.source, "pinemhi");
+            assert.deepEqual(events, ["request:Medieval Madness (Williams 1997)", "ready:true:pinemhi:GRAND CHAMPION/SLL 52.000.000"]);
+
+            // A board VPinMAME saved since is seen only once the cache is forgotten.
+            fake.setNvramBoard("Medieval Madness (Williams 1997)", ["GRAND CHAMPION", "FC 60.000.000"]);
+            assert.equal((await game.getHighScores()).source, "cache");
+            game.setHighScores(null);
+            const forgotten = game.getHighScores();
+            fake.advanceTime(1000);
+            assert.deepEqual([...await forgotten], ["GRAND CHAMPION", "FC 60.000.000"]);
+
+            // A launch clears the cached board too.
+            fake.setNvramBoard("Medieval Madness (Williams 1997)", ["GRAND CHAMPION", "AAA 70.000.000"]);
+            host.playGame(game);
+            const afterLaunch = game.getHighScores();
+            fake.advanceTime(1000);
+            assert.equal((await afterLaunch).source, "pinemhi");
+        });
+
+        test("a table's high scores read fails when PINemHi fails or is killed after 7.5 s", async () => {
+            const ready = [];
+            host.onGameListEvent("highscoresready", ev => ready.push(`${ev.game.configId}:${ev.success}:${ev.source}`));
+            fake.setNvramBoard("Medieval Madness (Williams 1997)", ["SLL 52.000.000"], { fails: true });
+            fake.setNvramBoard("Attack from Mars (Bally 1995)", ["1) SLL 8.000.000"], { durationMs: 9000 });
+
+            const failed = host.getGameInfo("Medieval Madness (Williams 1997)").getHighScores();
+            const killed = host.getGameInfo("Attack from Mars (Bally 1995)").getHighScores();
+            fake.advanceTime(7500);
+            await assert.rejects(failed);
+            await assert.rejects(killed);
+            assert.deepEqual(ready, ["Medieval Madness (Williams 1997):false:none", "Attack from Mars (Bally 1995):false:none"]);
+        });
+
+        test("tables sharing a ROM read the same NVRAM board", async () => {
+            fake.setTables([
+                { configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", isHidden: false, rom: "mm_109c" },
+                { configId: "Medieval Madness Remake (VPX Community 2024)", title: "Medieval Madness Remake", isHidden: false, rom: "mm_109c" },
+            ]);
+            fake.setNvramBoard("Medieval Madness (Williams 1997)", ["1) SLL 52.000.000"]);
+
+            const read = host.getGameInfo("Medieval Madness Remake (VPX Community 2024)").getHighScores();
+            fake.advanceTime(1000);
+            assert.deepEqual([...await read], ["1) SLL 52.000.000"]);
+        });
+
         test("draws styled text on a main-window drawing layer and records its position and alpha", () => {
             fake.setLayoutSize({ width: 1080, height: 1920 });
             const layer = host.createDrawingLayer(6500);
