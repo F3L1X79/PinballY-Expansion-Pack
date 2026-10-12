@@ -15,8 +15,9 @@
 // PinballY's show() puts it); script filters are shown with selectFilter().
 // Its in-memory file system is seeded with files (with their modified
 // date) and folders (and unreadable images) and inspected (file contents,
-// reads, writes, renames and deletes). Programs run hidden are described by
-// the tests (output, exit code, run time) and their runs inspected.
+// reads, writes, renames and deletes), and registry values seeded.
+// Programs run hidden are described by the tests (output, exit code, run
+// time) and their runs inspected.
 // installGlobals() also exposes it as PinballY's globals (and the global
 // Date and timers, and the COM file objects over the same file system), so
 // code not yet on the host runs too. settle() waits on a real timer for
@@ -174,6 +175,8 @@ export function createFakePinballYHost({
     const programs = new Map();
     // Every program run, in order: { program, args }.
     const programRunList = [];
+    // Registry values by full path ("HKCU\\Software\\...\\name").
+    const registryValues = new Map();
     // Pending timers, run in due order by advanceTime(): { id, dueMs, callback, intervalMs }.
     let timers = [];
     let nextTimerId = 1;
@@ -560,6 +563,12 @@ export function createFakePinballYHost({
             requireParentFolder(withoutTrailingSlash(folderPath));
             folders.add(withoutTrailingSlash(folderPath));
         },
+        // Each file of the folder with its modified date and size; null when
+        // the folder doesn't exist.
+        listFileInfos(folderPath) {
+            if (!folders.has(withoutTrailingSlash(folderPath))) return null;
+            return fileSystem.listFiles(folderPath).map(name => ({ name, ...fileSystem.getFileInfo(`${withoutTrailingSlash(folderPath)}\\${name}`) }));
+        },
         isImageReadable,
         // The size counts the UTF-8 bytes of the file's text.
         getFileInfo: (path) => (files.has(path)
@@ -605,6 +614,11 @@ export function createFakePinballYHost({
                 });
                 return 0;
             },
+            // Like WScript.Shell: a missing value throws.
+            RegRead(path) {
+                if (!registryValues.has(path)) throw new Error(`Invalid root in registry key "${path}".`);
+                return registryValues.get(path);
+            },
         };
     }
 
@@ -618,7 +632,10 @@ export function createFakePinballYHost({
                 if (!folders.has(withoutTrailingSlash(path))) throw new Error(`Folder not found: ${path}`);
                 return {
                     SubFolders: fileSystem.listFolders(path).map(name => ({ Name: name })),
-                    Files: fileSystem.listFiles(path).map(name => ({ Name: name })),
+                    Files: fileSystem.listFiles(path).map((name) => {
+                        const { modified, size } = fileSystem.getFileInfo(`${withoutTrailingSlash(path)}\\${name}`);
+                        return { Name: name, DateLastModified: new RealDate(modified), Size: size };
+                    }),
                 };
             },
             CreateFolder: (path) => {
@@ -836,6 +853,7 @@ export function createFakePinballYHost({
         playSound,
         createSoundRotation,
         runHiddenProgram,
+        readRegistryValue: (path) => (registryValues.has(path) ? registryValues.get(path) : null),
         files: fileSystem,
         log: (text) => { logLines.push(text); },
 
@@ -864,6 +882,8 @@ export function createFakePinballYHost({
             host.addFile(filePath, "program");
             programs.set(filePath, describe);
         },
+        // Seeds a registry value, by its full path ("HKCU\\Software\\...\\name").
+        setRegistryValue(path, value) { registryValues.set(path, value); },
         programRuns: () => programRunList.map(run => ({ program: run.program, args: [...run.args] })),
         // Seeds an image file that exists but cannot be decoded.
         addUnreadableImage(filePath) {
@@ -1136,7 +1156,7 @@ export function createFakePinballYHost({
                         return { GetSystemMetrics: (index) => (index === 80 ? monitorCount : 0) };
                     },
                 },
-                // Only Windows Media Player, WScript.Shell's Run, and the file objects over the
+                // Only Windows Media Player, WScript.Shell's Run and RegRead, and the file objects over the
                 // in-memory file system (no .env.local unless a test adds
                 // one, so common/core/config.js imported after this keeps its
                 // defaults). Any other COM object throws.

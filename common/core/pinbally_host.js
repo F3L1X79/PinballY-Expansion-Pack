@@ -7,8 +7,9 @@
 // StyledText, commands and running them, table launch, program and pack folders,
 // monitor count, backglass window, sound playback (one-off or on players
 // in turn), logfile.log, the few file operations the Profile store
-// needs, a file's modified date and size, and a program run hidden without
-// waiting, whose output is read later).
+// needs, a file's modified date and size, a folder's files with theirs,
+// a program run hidden without waiting, whose output is read later, and a
+// registry value).
 // Every call passes straight through to PinballY's globals; tests use the
 // in-memory fake host from tests/support/fake_pinbally_host.js instead. No side
 // effects on import.
@@ -76,6 +77,16 @@ function createFileSystem() {
             const names = [];
             for (const file of fso().GetFolder(folderPath).Files) names.push(file.Name);
             return names;
+        },
+        // Each file of the folder as { name, modified (ms), size }; null when
+        // the folder doesn't exist.
+        listFileInfos: (folderPath) => {
+            if (!fso().FolderExists(folderPath)) return null;
+            const infos = [];
+            for (const file of fso().GetFolder(folderPath).Files) {
+                infos.push({ name: file.Name, modified: new Date(file.DateLastModified).getTime(), size: Number(file.Size) });
+            }
+            return infos;
         },
         fileExists: (path) => fso().FileExists(path),
         readText: (path) => {
@@ -343,6 +354,19 @@ export function createPinballYHost() {
         // null while it runs, then { exitCode, output } (its standard output;
         // its standard error is dropped). At most MAX_PROGRAM_ARGS arguments.
         runHiddenProgram: createProgramRunner(files),
+        // A registry value by its full path ("HKCU\\Software\\...\\name");
+        // null when it is missing.
+        readRegistryValue: (path) => {
+            const shell = createAutomationObject("WScript.Shell");
+            let value;
+            try {
+                value = shell.RegRead(path);
+            } catch (error) {
+                // RegRead throws on a missing value: that is the answer.
+                return null;
+            }
+            return String(value);
+        },
         files,
         log: (text) => { logfile.log(text); },
     };

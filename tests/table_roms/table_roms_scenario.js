@@ -3,7 +3,8 @@
 // PinballY globals with only the Table ROMs Add-on on, over tables whose
 // game files, record file and fake vpxtool the test describes; then lets
 // the script reading queue run, and reads back the ROM fields, the
-// Add-on's log lines, its record file and the tables vpxtool read.
+// Add-on's log lines, its record file and the tables vpxtool read. A
+// Play can change the dates of the fake NVRAM folder's .nv files.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
@@ -14,6 +15,10 @@ export const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 export const RECORD_FILE = `${PROFILES_FOLDER}\\table_roms.json`;
 export const VPXTOOL = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe";
 export const TABLES_FOLDER = "C:\\Visual Pinball\\Tables";
+export const NVRAM_FOLDER = "C:\\Visual Pinball\\VPinMAME\\nvram";
+export const NVRAM_REGISTRY_KEY = "HKCU\\Software\\Freeware\\Visual PinMame\\globals\\nvram_directory";
+// Before the game's .nv files are written.
+const GAME_MS = 5 * 60 * 1000;
 // Long enough for the queue to read every table, slow ones included.
 const LONG_ENOUGH_MS = 60 * 60 * 1000;
 
@@ -22,9 +27,11 @@ export const vbsFile = configId => `${TABLES_FOLDER}\\${configId}.vbs`;
 
 // A table in PinballY's game list, its game file a .vpx by default; no
 // rom when its ROM field is empty.
-export function table(configId, { rom, gameFile = vpxFile(configId), isHidden = false } = {}) {
+// system: its system's settings, such as { nvramPath }.
+export function table(configId, { rom, gameFile = vpxFile(configId), isHidden = false, system } = {}) {
     const game = { configId, title: configId, gameFile, isHidden };
     if (rom !== undefined) game.rom = rom;
+    if (system !== undefined) game.system = system;
     return game;
 }
 
@@ -42,9 +49,15 @@ export const fakeVpxtool = answers => (args) => {
 
 // files: { path: { content, modified (a date, or its ms) } } seeded before startup (table
 // files, the record file); vpxtool: the fake's answers, or none when it
-// is not installed.
-export async function startTableRoms({ tables, files = {}, vpxtool, enabled = true }) {
+// is not installed; nvramFolder: VPinMAME's NVRAM folder in the registry,
+// none when null; nvFiles: the ROM names of the .nv files already in it.
+export async function startTableRoms({ tables, files = {}, vpxtool, enabled = true, nvramFolder = NVRAM_FOLDER, nvFiles = [] }) {
     const fake = createFakePinballYHost({ now: NOW, tables });
+    if (nvramFolder !== null) {
+        fake.setRegistryValue(NVRAM_REGISTRY_KEY, nvramFolder);
+        fake.addFolder(nvramFolder);
+    }
+    for (const rom of nvFiles) fake.addFile(`${nvramFolder}\\${rom}.nv`, "nvram", { modified: new Date(2026, 0, 1) });
     for (const [path, { content = "script", modified = NOW }] of Object.entries(files)) fake.addFile(path, content, { modified: new Date(modified) });
     if (vpxtool) fake.addProgram(VPXTOOL, fakeVpxtool(vpxtool));
     // Never uninstalled: node --test runs each test file in its own process.
@@ -63,6 +76,20 @@ export async function startTableRoms({ tables, files = {}, vpxtool, enabled = tr
         record: () => {
             const text = fake.readFile(RECORD_FILE);
             return text === undefined ? undefined : JSON.parse(text);
+        },
+        // Plays the table as PinballY launches it; VPinMAME writes the .nv
+        // of each ROM in nvWritten (in folder, the NVRAM folder by default)
+        // as the game ends.
+        play: async (configId, { nvWritten = [], folder = nvramFolder, durationMs = GAME_MS } = {}) => {
+            const game = fake.getAllTables().find(candidate => candidate.configId === configId);
+            fake.fire("prelaunch", { game });
+            fake.playGame(game);
+            await settle();
+            fake.gameStarted(game);
+            fake.advanceTime(durationMs);
+            for (const rom of nvWritten) fake.addFile(`${folder}\\${rom}.nv`, "nvram");
+            fake.gameOver(game);
+            fake.fire("postlaunch", { game });
         },
         // The table files vpxtool was asked to read, in order.
         scriptsRead: () => fake.programRuns().map(run => run.args[1]),

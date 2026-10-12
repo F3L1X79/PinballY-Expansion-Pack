@@ -393,6 +393,31 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             assert.deepEqual(host.files.getFileInfo(written), { modified: NOW.getTime() + 1000, size: 2 });
         });
 
+        test("lists a folder's files with their modified dates and sizes, and null for a missing folder", () => {
+            const nvram = "C:\\Visual Pinball\\VPinMAME\\nvram";
+            assert.equal(host.files.listFileInfos(nvram), null);
+
+            fake.addFile(`${nvram}\\afm_113.nv`, "Chloé", { modified: new Date(2026, 0, 2, 3, 4, 5) });
+            fake.addFile(`${nvram}\\mm_109c.nv`, "nv", { modified: new Date(2026, 0, 3, 3, 4, 5) });
+            fake.addFile(`${nvram}\\old\\tz_94h.nv`, "nv");
+
+            const byName = (a, b) => a.name.localeCompare(b.name);
+            assert.deepEqual(host.files.listFileInfos(nvram).sort(byName), [
+                { name: "afm_113.nv", modified: new Date(2026, 0, 2, 3, 4, 5).getTime(), size: 6 },
+                { name: "mm_109c.nv", modified: new Date(2026, 0, 3, 3, 4, 5).getTime(), size: 2 },
+            ]);
+            assert.deepEqual(host.files.listFileInfos(`${nvram}\\old\\`).map(file => file.name), ["tz_94h.nv"]);
+        });
+
+        test("reads a registry value, and null when it is missing", () => {
+            const nvramDirectory = "HKCU\\Software\\Freeware\\Visual PinMame\\globals\\nvram_directory";
+            assert.equal(host.readRegistryValue(nvramDirectory), null);
+
+            fake.setRegistryValue(nvramDirectory, "C:\\Visual Pinball\\VPinMAME\\nvram");
+            assert.equal(host.readRegistryValue(nvramDirectory), "C:\\Visual Pinball\\VPinMAME\\nvram");
+            assert.equal(host.readRegistryValue("HKLM\\Software\\Freeware\\Visual PinMame\\globals\\nvram_directory"), null);
+        });
+
         test("runs a program hidden without waiting, its standard output and exit code read once it ends", () => {
             const program = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe";
             fake.addProgram(program, args => ({

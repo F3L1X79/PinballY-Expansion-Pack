@@ -35,6 +35,7 @@ import { buildSurprisesAchievements } from "../../achievements/surprises.js";
 import { createSurprises } from "../../common/achievements/surprises.js";
 import { createTableRomRecord } from "../../common/table_roms/table_rom_record.js";
 import { createScriptQueue } from "../../common/table_roms/script_queue.js";
+import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js";
 import { WELCOME_SCREEN_PAUSE_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
@@ -569,5 +570,28 @@ test("the Table ROM record keeps its file name and keys", () => {
                 script: { vpx: { modified: new Date(2026, 5, 3, 12, 0, 0).getTime(), size: 5 }, vbs: null, rom: null },
             },
         },
+    });
+});
+
+test("the Table ROM record keeps the source of a ROM a .nv confirmed", () => {
+    const vpx = "C:\\Visual Pinball\\Tables\\Attack from Mars (Bally 1995).vpx";
+    const nvram = "C:\\Visual Pinball\\VPinMAME\\nvram";
+    const fake = createFakePinballYHost({
+        now: NOW,
+        tables: [{ configId: "Attack from Mars (Bally 1995)", title: "Attack from Mars", gameFile: vpx, isHidden: false }],
+    });
+    fake.addFile(vpx, "table");
+    fake.addFolder(nvram);
+    fake.setRegistryValue("HKCU\\Software\\Freeware\\Visual PinMame\\globals\\nvram_directory", nvram);
+    createNvConfirmation(fake, createTableRomRecord(fake, createProfileStore(fake)));
+
+    const [game] = fake.getAllTables();
+    fake.fire("prelaunch", { game });
+    fake.addFile(`${nvram}\\afm_113b.nv`, "nvram");
+    fake.fire("postlaunch", { game });
+
+    assert.deepEqual(JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\table_roms.json`)), {
+        version: 1,
+        tables: { "Attack from Mars (Bally 1995)": { written: { rom: "afm_113b", source: "nv" } } },
     });
 });
