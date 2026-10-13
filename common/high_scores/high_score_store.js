@@ -78,12 +78,13 @@ export function createHighScoreStore(host, profileStore) {
         // The board read after a game, compared with the last known board;
         // play: the Play the Profile store announced ({ profileName, start, ... }),
         // or null for a game under a minute. The new places are Default
-        // Scores after a game under a minute or a ROM reset.
+        // Scores after a game under a minute or a ROM reset. Returns the
+        // best place credited ({ rank, initials, score }), or null.
         settlePlay(configId, places, play) {
             const known = knownBoardOf(configId);
             if (!known) {
                 takeBaseline(configId, places, "no board known before the game; the board after it is the baseline, nothing credited.");
-                return;
+                return null;
             }
             const added = newPlaces(known, places);
             const romReset = added.length > MAX_NEW_PLACES_PER_PLAY;
@@ -96,7 +97,7 @@ export function createHighScoreStore(host, profileStore) {
                 const game = play ? `a Play by ${play.profileName}` : "a game under a minute";
                 if (romReset) log(`"${configId}": ${countPlaces(added.length)} after ${game}, more than a ${MAX_NEW_PLACES_PER_PLAY}-player game can make: a ROM reset, nothing credited, the new places are Default Scores.`);
                 else if (changed) log(`"${configId}": ${countPlaces(added.length)} after ${game}, as Default Scores.`);
-                return;
+                return null;
             }
             const formerOwner = known.length > 0 ? known[0].owner : null;
             for (const place of added) {
@@ -112,6 +113,7 @@ export function createHighScoreStore(host, profileStore) {
             }
             save();
             if (added.length === 0) log(`"${configId}": Play by ${play.profileName}, no new place${changed ? " (board changed)" : ""}.`);
+            return added.reduce((best, place) => (best === null || place.rank < best.rank ? place : best), null);
         },
     };
 }

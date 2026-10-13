@@ -615,4 +615,10 @@ export default {
         toastTitle: (level) => `Niveau ${level}`,
         toastDescription: "Vos succès vous font passer au niveau supérieur.",
     },
+    highScores: {
+        toastHeader: "Meilleur score",
+        toastTitle: (table, place) => `Meilleur score sur ${table} : ${place === 1 ? "1re" : `${place}e`} place`,
+        tableRecordTitle: (table) => `Record sur ${table} !`,
+        toastScore: (score) => `${score} points`,
+    },
 };

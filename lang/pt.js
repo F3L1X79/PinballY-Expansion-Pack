@@ -625,4 +625,15 @@ export default {
         toastTitle: (level) => `Level ${level}`,
         toastDescription: "Your Achievements took you to a new level.",
     },
+    // TODO: translation pass
+    highScores: {
+        toastHeader: "High Score",
+        toastTitle: (table, place) => {
+            const teen = place % 100 >= 11 && place % 100 <= 13;
+            const suffix = teen ? "th" : (["th", "st", "nd", "rd"][place % 10] || "th");
+            return `High score on ${table}: ${place}${suffix} place`;
+        },
+        tableRecordTitle: (table) => `Table Record on ${table}!`,
+        toastScore: (score) => `${score} points`,
+    },
 };

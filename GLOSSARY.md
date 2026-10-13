@@ -200,6 +200,10 @@ _Avoid_: original score (confused with original tables), anonymous score, factor
 The best score on a table's high score board, whoever holds it, an anonymous one included. Shown as "record" in French.
 _Avoid_: Grand Champion (the name only some tables give it), world record
 
+**High Score Toast**:
+A toast like the Mastery Toast, with its own colour and no trophy, the place won in its tile, that announces the best place a Play won on a table's high score board, or the Table Record when that place is the first; one only per Play, after the other toasts of that Play. No board opens by itself. Shown as "Meilleur score" in French.
+_Avoid_: high score popup, record toast
+
 ### Achievements
 
 **Achievement**:

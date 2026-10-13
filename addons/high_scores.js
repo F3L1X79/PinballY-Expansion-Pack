@@ -4,9 +4,10 @@
 // were typed. At "prelaunch" the board is read fresh and becomes the last
 // known board; a little after "postlaunch" it is read again and the Play
 // settled against it. A failed launch read leaves the last known board to
-// compare with; a failed read after the game credits nothing. Only
-// output: high_scores.json next to cabinet.json and logfile.log. The rules
-// live in common/high_scores/.
+// compare with; a failed read after the game credits nothing. A Play that
+// won places submits one High Score Toast, for the best place. Writes
+// high_scores.json next to cabinet.json and logfile.log. The rules live in
+// common/high_scores/.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";
@@ -14,6 +15,8 @@ import { safeHandler, logHandlerError } from "../common/core/safe_handler.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { readBoard } from "../common/high_scores/board_reader.js";
 import { createHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score_store.js";
+import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
+import lang from "../common/core/i18n.js";
 
 // PinballY's own read after the game returns the board cached at launch
 // (seen on the cabinet): the Add-on reads again a little later, fresh.
@@ -25,6 +28,7 @@ export default function init() {
     const host = createPinballYHost();
     const profileStore = getProfileStore();
     const highScores = createHighScoreStore(host, profileStore);
+    const toasts = getAchievementToasts();
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
     // From "prelaunch" to "postlaunch": { configId, launchRead (a promise) }.
     let launched = null;
@@ -72,6 +76,21 @@ export default function init() {
         });
     }
 
+    // One toast per Play, for the best place won; the toast module holds
+    // it until the wheel is back and the toasts before it have shown.
+    function announce(configId, place) {
+        const TEXT = lang.highScores;
+        const game = host.getGameInfo(configId);
+        const table = game ? game.title : configId;
+        toasts.submit({
+            kind: TOAST_KIND.HIGH_SCORE,
+            tileNumber: place.rank,
+            title: place.rank === 1 ? TEXT.tableRecordTitle(table) : TEXT.toastTitle(table, place.rank),
+            description: TEXT.toastScore(lang.profileStats.number(place.score)),
+            onShown: () => {},
+        });
+    }
+
     // Fires as a table launches: PinballY just cleared its cached board.
     host.on("prelaunch", safeHandler(SCRIPT_NAME, (ev) => {
         announcedPlay = null;
@@ -101,6 +120,7 @@ export default function init() {
             log(`"${bracket.configId}": no board after the game; nothing credited, the last known board kept.`);
             return;
         }
-        highScores.settlePlay(bracket.configId, places, play);
+        const best = highScores.settlePlay(bracket.configId, places, play);
+        if (best) announce(bracket.configId, best);
     }));
 }

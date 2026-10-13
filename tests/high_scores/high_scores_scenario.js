@@ -3,8 +3,8 @@
 // the chosen Add-ons and Profiles. Sets what PINemHi reads in each
 // table's NVRAM before and after a Play, plays a table as PinballY
 // launches it (the reads after "postlaunch" included), switches the
-// active Profile, and reads back the High Scores file and the Add-on's
-// log lines. Never loaded by PinballY.
+// active Profile, and reads back the High Scores file, the toasts drawn
+// and the Add-on's log lines. Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
@@ -43,10 +43,17 @@ export function boardLines(champion, places) {
     ];
 }
 
+// boardLines from a list of entries, the first place first.
+export const board = (...entries) => boardLines(entries[0], entries.slice(1));
+// A factory board of five places.
+export const FACTORY = board(["SLL", "52000000"], ["BRE", "40000000"], ["LFS", "30000000"], ["ZAP", "20000000"], ["RCF", "10000000"]);
+
 // addOns: the Add-ons on; profiles: { name: { isChild } }, Guest's under
 // "guest"; active: the Profile in cabinet.json; files: { path: content }
-// seeded before startup.
-export async function startHighScores({ addOns = ["highScores"], profiles = {}, active = "guest", tables = TABLES, files = {} } = {}) {
+// seeded before startup; language: the interface language.
+export async function startHighScores({
+    addOns = ["highScores"], profiles = {}, active = "guest", tables = TABLES, files = {}, language = "en",
+} = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
     for (const [name, { isChild = false } = {}] of Object.entries(profiles)) {
         fake.addFile(`${PROFILES_FOLDER}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified: [], ...(isChild ? { isChild } : {}) }));
@@ -56,7 +63,10 @@ export async function startHighScores({ addOns = ["highScores"], profiles = {}, 
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
+    config.language = language;
 
+    // Imported once the language is set: the toast module reads the texts.
+    const { toastDrawings } = await import("../achievements/achievement_toast_reader.js");
     await import("../../main.js");
     await settle();
     // With the Profile picker off, main.js switched to Guest.
@@ -94,6 +104,8 @@ export async function startHighScores({ addOns = ["highScores"], profiles = {}, 
             await finishReads();
         },
         pendingTimerCount: () => fake.pendingTimerCount(),
+        // Every toast drawn so far, its texts joined with " | ".
+        toasts: () => toastDrawings(fake).map(drawing => drawing.texts.join(" | ")),
         log: () => fake.logLines().filter(line => line.startsWith("[HighScores]")),
         saved: () => {
             const text = fake.readFile(HIGH_SCORES_FILE);

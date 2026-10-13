@@ -506,4 +506,17 @@ export default {
         toastTitle: (level) => `Level ${level}`,
         toastDescription: "Your Achievements took you to a new level.",
     },
+    // The High Score toast, after a Play that won places on a table's
+    // board: for the best place won, or the Table Record when it is first.
+    highScores: {
+        toastHeader: "High Score",
+        toastTitle: (table, place) => {
+            const teen = place % 100 >= 11 && place % 100 <= 13;
+            const suffix = teen ? "th" : (["th", "st", "nd", "rd"][place % 10] || "th");
+            return `High score on ${table}: ${place}${suffix} place`;
+        },
+        tableRecordTitle: (table) => `Table Record on ${table}!`,
+        // The score, thousands separated.
+        toastScore: (score) => `${score} points`,
+    },
 };

@@ -1,7 +1,8 @@
 // ============================================================
 // The High Scores Add-on turned off in config.addOns, through main.js on
 // the fake PinballY globals: no board is read and its file is never
-// written, the boards and High Scores it knew left as they were.
+// written, no toast shows, the boards and High Scores it knew left as
+// they were.
 // ============================================================
 
 import { test } from "node:test";
@@ -14,8 +15,8 @@ const KNOWN = JSON.stringify({
     highScores: [],
 });
 
-test("with the Add-on off, nothing is read or written", async () => {
-    const { fake, setBoard, play, log } = await startHighScores({
+test("with the Add-on off, nothing is read, written or shown", async () => {
+    const { fake, setBoard, play, log, toasts } = await startHighScores({
         addOns: [], profiles: { Alice: {} }, active: "Alice", files: { [HIGH_SCORES_FILE]: KNOWN },
     });
     const requests = [];
@@ -27,4 +28,5 @@ test("with the Add-on off, nothing is read or written", async () => {
     assert.deepEqual(requests, []);
     assert.equal(fake.readFile(HIGH_SCORES_FILE), KNOWN);
     assert.deepEqual(log(), []);
+    assert.deepEqual(toasts(), []);
 });

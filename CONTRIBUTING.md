@@ -32,7 +32,7 @@ The repository is the pack's folder, installed as `PinballY\Scripts\ExpansionPac
 - `period_table`: the Table of the Day and the Table of the Week, and their Streaks.
 - `random_game`: the Random Game.
 - `wheel_dialog`: spontaneous dialogs from Add-ons, shown one at a time when the wheel is free, by priority.
-- `achievement_toast`: Achievement Toasts, Challenge Toasts, Mastery Toasts and Level Toasts, drawn in the bottom-right corner of the playfield screen, never as a dialog.
+- `achievement_toast`: Achievement Toasts, Challenge Toasts, Mastery Toasts, Level Toasts and High Score Toasts, drawn in the bottom-right corner of the playfield screen, never as a dialog.
 - `player_level`: the Player Level worked out from a Profile's Notified Achievements, never persisted.
 - `steamball_palette`: the colours and fonts shared by the Achievement List, the Achievement Toast and the Challenge Card, so that they look like one product.
 - `high_score_store`: the boards the High Scores know and every High Score won, in `profiles\high_scores.json`; the rule that turns PINemHi's lines into a board is `board_reader`'s alone.
