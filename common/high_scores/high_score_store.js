@@ -156,7 +156,8 @@ export function createHighScoreStore(host, profileStore) {
         // counted in tables: those where it has a place, and those whose
         // first place is its own. A removed Profile's places read as
         // Default Scores, nothing rewritten: a Profile re-created under its
-        // name gets them back.
+        // name gets them back. Every known board counts, a hidden or
+        // removed table's too: hiding a table never erases a record.
         heldBy(profileName) {
             if (!profileExists(profileName)) return { highScores: 0, tableRecords: 0 };
             const isOwn = place => typeof place.owner === "string" && profileKeyOf(place.owner) === profileKeyOf(profileName);
