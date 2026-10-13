@@ -40,10 +40,10 @@ const playLogJson = starts => JSON.stringify({
 // Profile switched to once started (Guest otherwise); addOns: the Add-ons on;
 // hasDefaultAvatar: false leaves the default Avatar image out of the install;
 // hasAdultTable: the cabinet also has PLAYBOY; frameImages: whether the
-// Avatar Frame images exist.
+// Avatar Frame images exist; files: { path: content } seeded before startup.
 export async function startHousehold({
     profiles = {}, active = null, addOns = ["achievements", "challenges", "tableMastery"], hasDefaultAvatar = true, hasAdultTable = false,
-    frameImages = false,
+    frameImages = false, files = {},
 } = {}) {
     const tables = [MEDIEVAL, MARS, THEATRE, TWILIGHT, ...(hasAdultTable ? [PLAYBOY] : [])];
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables });
@@ -62,6 +62,7 @@ export async function startHousehold({
     if (hasDefaultAvatar) fake.addFile(DEFAULT_AVATAR, "png");
     if (frameImages) for (const file of AVATAR_FRAME_IMAGES) fake.addFile(file);
     fake.addFile(NAVIGATION_SOUND);
+    for (const [path, content] of Object.entries(files)) fake.addFile(path, content);
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = "en";

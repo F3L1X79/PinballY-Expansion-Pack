@@ -499,6 +499,8 @@ export default {
             averageDuration: "Durée moyenne",
             collection: "Collection",
             challengesCompleted: "Défis réussis",
+            highScoresHeld: "Meilleurs scores détenus",
+            tableRecordsHeld: "Records détenus",
             cabinetStreak: "Jours d'affilée",
             dayStreak: "Série du jour",
             weekStreak: "Série de la semaine",

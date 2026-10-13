@@ -193,7 +193,7 @@ A place on a table's own high score board that a Profile won with a Play: a scor
 _Avoid_: record (the Table Record is only the best one), hi-score, score (the score of a game that did not reach the board is never known)
 
 **Default Score**:
-A score that was already on a table's high score board when the pack first read it, whoever really set it, or a High Score whose Profile was removed since: it belongs to no Profile, for good, and only its initials are shown. Shown as "score par défaut" in French.
+A score that was already on a table's high score board when the pack first read it, whoever really set it, or a High Score whose Profile was removed since: it belongs to no Profile, for good (a Profile later created under the removed one's name gets its High Scores back, accepted), and only its initials are shown. Shown as "score par défaut" in French.
 _Avoid_: original score (confused with original tables), anonymous score, factory score (not all of them come from the factory)
 
 **Table Record**:

@@ -384,6 +384,8 @@ export default {
             averageDuration: "Average game",
             collection: "Collection",
             challengesCompleted: "Challenges completed",
+            highScoresHeld: "High Scores held",
+            tableRecordsHeld: "Table Records held",
             cabinetStreak: "Days in a row",
             dayStreak: "Table of the Day streak",
             weekStreak: "Table of the Week streak",

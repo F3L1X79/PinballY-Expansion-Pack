@@ -504,6 +504,8 @@ export default {
             averageDuration: "Average game",
             collection: "Collection",
             challengesCompleted: "Challenges completed",
+            highScoresHeld: "High Scores held", // TODO: translation pass
+            tableRecordsHeld: "Table Records held", // TODO: translation pass
             // TODO: translation pass
             cabinetStreak: "Days in a row on the cabinet",
             dayStreak: "Table of the Day streak",

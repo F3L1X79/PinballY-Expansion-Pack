@@ -101,6 +101,10 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         { label: TEXT.stats.challengesCompleted, isShown: stats => stats.challenges !== null,
             cellOf: ({ challenges }) => ({ value: TEXT.fraction(challenges.completed, challenges.total) }),
             scoreOf: ({ challenges }) => [challenges.completed] },
+        // Null without the High Scores Add-on.
+        { label: TEXT.stats.tableRecordsHeld, isShown: stats => stats.boards !== null,
+            cellOf: ({ boards }) => ({ value: TEXT.number(boards.tableRecords) }),
+            scoreOf: ({ boards }) => [boards.tableRecords] },
     ];
 
     // Positive when a is the better score.

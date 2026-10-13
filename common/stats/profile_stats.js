@@ -5,7 +5,8 @@
 // with the Avatar, the Profile's name, the Player Level and the
 // Collection Mastery on a card whose foot holds the Achievements, Frame,
 // Most Played Tables, Tables to Discover and Household buttons, and the GAME, PROGRESSION
-// and TASTES sections on its right (the last with the first, favourite and
+// and TASTES sections on its right (PROGRESSION ending with the High Scores
+// and Table Records held, TASTES with the first, favourite and
 // last table strips, read from the Play Log, the Hall of Fame and the plays). Every stat is read again on each
 // opening; the screen is drawn at once on all its layers, then faded in.
 // Created from the PinballY host, the Profile store, readers of a named
@@ -16,7 +17,9 @@
 // and opening it from the Frame button, Select or Exit there showing this screen again on
 // that button; null or without frames: no button), the Daily Streak, the Table of the Day and Table
 // of the Week (their Streaks), the Challenge module (null when the
-// Challenges Add-on is disabled: no completed Challenges) and the full ids of the Hall of
+// Challenges Add-on is disabled: no completed Challenges), the High Score
+// store (null when the High Scores Add-on is disabled: no High Scores nor
+// Table Records held) and the full ids of the Hall of
 // Fame and Tables to Discover filters (null when their Add-on is
 // disabled: no button) and the Household Stats (opened from the Household
 // button, shown while the Household has two Profiles; Exit there shows
@@ -58,7 +61,7 @@ const NO_PLAY = Object.freeze({ count: 0, seconds: 0 });
 
 export function createProfileStats(host, {
     profileStore, readPlayerLevel, countAchievements, achievementList, profileRewards = null, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
-    hallOfFameFilter = null, tablesToDiscoverFilter = null, householdStats = null,
+    highScores = null, hallOfFameFilter = null, tablesToDiscoverFilter = null, householdStats = null,
 }) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
@@ -94,6 +97,8 @@ export function createProfileStats(host, {
             dailyStreak: dailyStreak.read(profileName),
             // Null without the Challenges Add-on.
             challenges: challenges ? challenges.getRecord(profileName) : null,
+            // Where it stands on the boards; null without the High Scores Add-on.
+            boards: highScores ? highScores.heldBy(profileName) : null,
         };
     }
 
@@ -159,6 +164,15 @@ export function createProfileStats(host, {
         if (!record) return [];
         const { completed, total } = record;
         return [{ label: TEXT.stats.challengesCompleted, value: TEXT.fraction(completed, total) }];
+    }
+
+    // A row of its own, absent without the High Scores Add-on.
+    function highScoresStats(held) {
+        if (!held) return [];
+        return [[
+            { label: TEXT.stats.highScoresHeld, value: TEXT.number(held.highScores) },
+            { label: TEXT.stats.tableRecordsHeld, value: TEXT.number(held.tableRecords) },
+        ]];
     }
 
     const playTimeOf = seconds => TEXT.playTime(hoursAndMinutes(Math.floor(seconds / SECONDS_PER_MINUTE)));
@@ -312,6 +326,7 @@ export function createProfileStats(host, {
                         streakStat(TEXT.stats.dayStreak, periodTableStreakOf(tableOfTheDay, profile.name)),
                         streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek, profile.name)),
                     ],
+                    ...highScoresStats(stats.boards),
                 ],
             }, tastesSection(profile, profileTables, profilePlays, getPlay, hallOfFame)],
             // Another Profile's screen goes back to the Household Stats.

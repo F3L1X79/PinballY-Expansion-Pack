@@ -22,8 +22,9 @@
 // while one of these drawn screens is open.
 // The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
-// Challenges Add-on is enabled, the High Scores family only while the
-// High Scores Add-on is. Also starts the Surprises tracker, which
+// Challenges Add-on is enabled, the High Scores family and the Profile
+// Stats and Household Stats lines on the boards only while the High
+// Scores Add-on is. Also starts the Surprises tracker, which
 // records each Play for the Surprises family.
 // ============================================================
 
@@ -73,8 +74,8 @@ const ACHIEVEMENT_LIST_ENTRY = "achievementList";
 // family nor the Profile Stats line exists.
 const getEnabledChallenges = () => (config.addOns.challenges === false ? null : getChallenges());
 
-// Null when the High Scores Add-on is disabled: then the High Scores family
-// does not exist.
+// Null when the High Scores Add-on is disabled: then neither the High Scores
+// family nor the stats lines exist.
 const getEnabledHighScores = () => (config.addOns.highScores === false ? null : getHighScoreStore());
 
 // Empty when the session stats tracker Add-on is disabled: the Sessions
@@ -179,6 +180,7 @@ export default function init() {
         tableOfTheDay: getTableOfTheDay(),
         tableOfTheWeek: getTableOfTheWeek(),
         challenges: getEnabledChallenges(),
+        highScores: getEnabledHighScores(),
         // Without its Add-on, a selection has no filter, so no button.
         hallOfFameFilter: config.addOns.hallOfFame === false ? null : HALL_OF_FAME_FULL_FILTER_ID,
         tablesToDiscoverFilter: config.addOns.tablesToDiscover === false ? null : TABLES_TO_DISCOVER_FULL_FILTER_ID,

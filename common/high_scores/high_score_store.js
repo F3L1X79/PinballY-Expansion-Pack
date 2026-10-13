@@ -11,7 +11,8 @@
 // High Score is logged. Per Profile, the date its High Score Achievements
 // count from, set when the Profile store reports its Profile Reset (its
 // High Scores stay its own); the Achievements read what each Profile won
-// since then, and hear when a Play credited High Scores.
+// since then, and hear when a Play credited High Scores; the Profile Stats
+// read the tables where each Profile still holds a place or the Table Record.
 // ============================================================
 
 import { newPlaces, placeKey } from "./board_reader.js";
@@ -151,13 +152,27 @@ export function createHighScoreStore(host, profileStore) {
                 tookTableRecord: won.some(highScore => typeof highScore.takenFrom === "string"),
             };
         },
+        // Where the named Profile stands on the last known boards today,
+        // counted in tables: those where it has a place, and those whose
+        // first place is its own. A removed Profile's places read as
+        // Default Scores, nothing rewritten: a Profile re-created under its
+        // name gets them back.
+        heldBy(profileName) {
+            if (!profileExists(profileName)) return { highScores: 0, tableRecords: 0 };
+            const isOwn = place => typeof place.owner === "string" && profileKeyOf(place.owner) === profileKeyOf(profileName);
+            const boards = Object.keys(data.tables).map(knownBoardOf).filter(board => board !== null);
+            return {
+                highScores: boards.filter(board => board.some(isOwn)).length,
+                tableRecords: boards.filter(board => board.length > 0 && isOwn(board[0])).length,
+            };
+        },
         onCredited(listener) { creditedListeners.push(listener); },
     };
 }
 
 let sharedHighScoreStore = null;
 
-// The one store the High Scores Add-on and the Achievements share.
+// The one store the High Scores Add-on, the Achievements and the stats share.
 export function getHighScoreStore() {
     if (!sharedHighScoreStore) sharedHighScoreStore = createHighScoreStore(createPinballYHost(), getProfileStore());
     return sharedHighScoreStore;
