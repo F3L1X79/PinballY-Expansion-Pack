@@ -617,7 +617,7 @@ export default {
     },
     highScores: {
         toastHeader: "Meilleur score",
-        toastTitle: (table, place) => `Meilleur score sur ${table} : ${place === 1 ? "1re" : `${place}e`} place`,
+        toastTitle: (table, place) => `Meilleur score sur ${table} : ${place === 1 ? "1ère" : `${place}e`} place`,
         tableRecordTitle: (table) => `Record sur ${table} !`,
         toastScore: (score) => `${score} points`,
     },
