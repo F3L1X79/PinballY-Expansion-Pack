@@ -1,7 +1,7 @@
-#security
+# Security
 .devcontainer/
 
-#AI-related
+# AI-related
 .claude/
 .agents/
 .scratch/
@@ -38,3 +38,6 @@ assets/sounds/local/
 
 # Drawn Menu check sheet (maintainer/drawn_menu/generate_drawn_menu.mjs --sheet)
 assets/images/drawn_menu/sheet.png
+
+# Others
+.githooks/

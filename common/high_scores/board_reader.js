@@ -1,7 +1,8 @@
 // ============================================================
 // Board reader: turns the raw lines PinballY returns for a table's high
 // scores (getHighScores() / highscoresready) into a board of places, and
-// tells which places of an "after" board are new against a "before" one.
+// tells which places of an "after" board are new against a "before" one,
+// and whether a place vanished that no new place beat (a reset).
 // Pure: reads no PinballY global, writes nothing.
 // The rule follows vpin-studio's RawScoreParser (MIT, (c) Matthias Faust /
 // syd711, github.com/syd711/vpin-studio), validated on the cabinet's 107
@@ -79,4 +80,14 @@ export function newPlaces(beforePlaces, afterPlaces) {
         remaining.splice(index, 1);
         return false;
     });
+}
+
+// Whether a "before" place is gone with no higher new place to beat it,
+// each new place beating one at most. Pairing them highest first finds
+// such a beating whenever one exists.
+export function hasUnbeatenGonePlace(beforePlaces, afterPlaces) {
+    const byScoreDown = places => places.map(place => place.score).sort((a, b) => b - a);
+    const gone = byScoreDown(newPlaces(afterPlaces, beforePlaces));
+    const added = byScoreDown(newPlaces(beforePlaces, afterPlaces));
+    return gone.some((score, index) => index >= added.length || added[index] <= score);
 }

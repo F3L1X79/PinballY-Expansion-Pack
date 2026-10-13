@@ -6,16 +6,18 @@
 // null for a Default Score). Every High Score ever won, kept when later
 // scores push it off the board. A board read outside a Play becomes the
 // last known board; settling a Play credits its new places to the Profile
-// active when it started, unless there are more than a 4-player game can
-// make (a ROM reset: they become Default Scores). Every board change and
-// High Score is logged. Per Profile, the date its High Score Achievements
-// count from, set when the Profile store reports its Profile Reset (its
-// High Scores stay its own); the Achievements read what each Profile won
-// since then, and hear when a Play credited High Scores; the Profile Stats
-// read the tables where each Profile still holds a place or the Table Record.
+// active when it started, unless the ROM was reset: more new places than
+// a 4-player game can make, or a place gone that no new place beat (in a
+// real game a place only leaves when beaten); they become Default Scores.
+// Every board change and High Score is logged. Per Profile, the date its
+// High Score Achievements count from, set when the Profile store reports
+// its Profile Reset (its High Scores stay its own); the Achievements read
+// what each Profile won since then, and hear when a Play credited High
+// Scores; the Profile Stats read the tables where each Profile still holds
+// a place or the Table Record.
 // ============================================================
 
-import { newPlaces, placeKey } from "./board_reader.js";
+import { hasUnbeatenGonePlace, newPlaces, placeKey } from "./board_reader.js";
 import { getProfileStore, toLocalIsoString } from "../profiles/profile_store.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { safeHandler } from "../core/safe_handler.js";
@@ -107,7 +109,8 @@ export function createHighScoreStore(host, profileStore) {
                 return null;
             }
             const added = newPlaces(known, places);
-            const romReset = added.length > MAX_NEW_PLACES_PER_PLAY;
+            const tooManyNew = added.length > MAX_NEW_PLACES_PER_PLAY;
+            const romReset = tooManyNew || hasUnbeatenGonePlace(known, places);
             const credited = play !== null && !romReset;
             const board = withOwners(places, known, credited ? play.profileName : null);
             const changed = JSON.stringify(board) !== JSON.stringify(known);
@@ -115,7 +118,8 @@ export function createHighScoreStore(host, profileStore) {
             if (!credited) {
                 save();
                 const game = play ? `a Play by ${play.profileName}` : "a game under a minute";
-                if (romReset) log(`"${configId}": ${countPlaces(added.length)} after ${game}, more than a ${MAX_NEW_PLACES_PER_PLAY}-player game can make: a ROM reset, nothing credited, the new places are Default Scores.`);
+                const resetSign = tooManyNew ? `more than a ${MAX_NEW_PLACES_PER_PLAY}-player game can make` : "but a place gone from the board was beaten by no new place";
+                if (romReset) log(`"${configId}": ${countPlaces(added.length)} after ${game}, ${resetSign}: a ROM reset, nothing credited, the new places are Default Scores.`);
                 else if (changed) log(`"${configId}": ${countPlaces(added.length)} after ${game}, as Default Scores.`);
                 return null;
             }
