@@ -56,6 +56,10 @@ Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq table
 
 Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis. Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Vos statistiques**, sous **Cadre**.
 
+### Meilleurs scores
+
+Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie d'au moins une minute et attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris. Un encart annonce votre meilleure place, ou le record. Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée. Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès ; **Vos statistiques** montrent les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records. Tables à ROM seulement, dont PinballY lit déjà le tableau.
+
 ### Succès
 
 <img src="docs/images/achievements.png" alt="La liste « Succès personnels »" width="380">

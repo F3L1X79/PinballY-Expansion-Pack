@@ -34,6 +34,10 @@ A new Challenge comes every Monday, the same for the whole household: five diffe
 
 Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti. Each Collection Tier also unlocks an Avatar Frame, from the Enchanted Forest to the Celestial Legend, to wear around your Avatar: pick it in **Your Stats**, under **Frame**.
 
+### High Scores
+
+When you enter a table's high score board, the place is yours: the pack reads the board before and after each game of a minute or more and credits every new score to the Profile that was playing, whatever initials were typed, the other players of a multiplayer game included. A toast announces your best place, or the Table Record. The scores already on the board at the first read, factory ones included, belong to no one, and a ROM reset that brings them back is never credited. A High Score stays won even once later scores push it off the board, and earns its own Achievements; **Your Stats** shows the High Scores and Table Records you still hold, and **Household Stats** who holds the most Table Records. Tables with a ROM only, whose board PinballY already reads.
+
 ### Achievements
 
 <img src="docs/images/achievements.png" alt="The Achievement List" width="380">
