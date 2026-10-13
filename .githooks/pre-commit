@@ -1,0 +1,7 @@
+#!/bin/sh
+# Refuses a commit while the test suite fails (about 25 s). Enabled with
+# `git config core.hooksPath .githooks`; skipped once with `git commit --no-verify`.
+if ! node --test > /dev/null 2>&1; then
+    echo "pre-commit: node --test fails; run it to see which tests, then commit again." >&2
+    exit 1
+fi
