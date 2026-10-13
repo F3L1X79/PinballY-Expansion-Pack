@@ -17,8 +17,8 @@
 // The caller marks an achievement Notified when its toast starts.
 // ============================================================
 
-// The kind of an Achievement; the Challenges one exists only while its
-// Add-on is enabled, Surprises whenever the Achievements do.
+// The kind of an Achievement; the Challenges and High Scores ones exist
+// only while their Add-on is enabled, Surprises whenever the Achievements do.
 export const ACHIEVEMENT_FAMILY = Object.freeze({
     COLLECTION: "collection",
     PLAY_TIME: "playTime",
@@ -29,6 +29,7 @@ export const ACHIEVEMENT_FAMILY = Object.freeze({
     DECADES: "decades",
     CATEGORIES: "categories",
     CHALLENGES: "challenges",
+    HIGH_SCORES: "highScores",
     SURPRISES: "surprises",
 });
 

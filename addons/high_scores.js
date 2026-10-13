@@ -14,7 +14,7 @@ import { createPinballYHost } from "../common/core/pinbally_host.js";
 import { safeHandler, logHandlerError } from "../common/core/safe_handler.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { readBoard } from "../common/high_scores/board_reader.js";
-import { createHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score_store.js";
+import { getHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score_store.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
 import lang from "../common/core/i18n.js";
 
@@ -27,7 +27,7 @@ const READ_TIMEOUT_MS = 10000;
 export default function init() {
     const host = createPinballYHost();
     const profileStore = getProfileStore();
-    const highScores = createHighScoreStore(host, profileStore);
+    const highScores = getHighScoreStore();
     const toasts = getAchievementToasts();
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
     // From "prelaunch" to "postlaunch": { configId, launchRead (a promise) }.

@@ -369,6 +369,20 @@ export default {
             100: "Légende de la semaine",
         },
         challengesCompletedDescription: (count) => (count === 1 ? "Réussir un défi." : `Réussir ${count} défis.`),
+        highScoreTablesTitles: {
+            1: "Initiales gravées dans la pierre",
+            3: "Trois bannières hissées",
+            5: "Seigneur des cinq tableaux",
+            10: "Le Kwisatz Hiscorach",
+        },
+        highScoreTablesDescription: (count) => (count === 1 ? "Faire un meilleur score sur une table." : `Faire un meilleur score sur ${count} tables différentes.`),
+        tableRecordTablesTitles: {
+            1: "Un score pour les gouverner tous",
+            3: "Seigneur de guerre des trois mondes",
+        },
+        tableRecordTablesDescription: (count) => (count === 1 ? "Battre le record d'une table." : `Battre le record de ${count} tables différentes.`),
+        tableRecordTakenTitle: "L'Usurpateur",
+        tableRecordTakenDescription: "Prendre le record d'une table à un autre profil.",
         dayManufacturersTitles: {
             3: "Tour du monde express",
             5: "Papillon du flipper",

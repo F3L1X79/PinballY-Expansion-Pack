@@ -372,6 +372,21 @@ export default {
             100: "Leggenda della settimana",
         },
         challengesCompletedDescription: (count) => (count === 1 ? "Completare una sfida." : `Completare ${count} sfide.`),
+        // TODO: translation pass, the High Scores family
+        highScoreTablesTitles: {
+            1: "Initials in Stone",
+            3: "Three Banners Raised",
+            5: "Lord of the Five Boards",
+            10: "The Kwisatz Hiscorach",
+        },
+        highScoreTablesDescription: (count) => (count === 1 ? "Win a High Score on a table." : `Win High Scores on ${count} different tables.`),
+        tableRecordTablesTitles: {
+            1: "One Score to Rule Them All",
+            3: "Warlord of Three Worlds",
+        },
+        tableRecordTablesDescription: (count) => (count === 1 ? "Set a Table Record." : `Set Table Records on ${count} different tables.`),
+        tableRecordTakenTitle: "The Usurper",
+        tableRecordTakenDescription: "Take a Table Record from another Profile.",
         dayManufacturersTitles: {
             3: "Giro del mondo express",
             5: "Farfalla del flipper",

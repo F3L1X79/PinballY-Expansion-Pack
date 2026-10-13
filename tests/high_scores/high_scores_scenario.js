@@ -3,8 +3,9 @@
 // the chosen Add-ons and Profiles. Sets what PINemHi reads in each
 // table's NVRAM before and after a Play, plays a table as PinballY
 // launches it (the reads after "postlaunch" included), switches the
-// active Profile, and reads back the High Scores file, the toasts drawn
-// and the Add-on's log lines. Never loaded by PinballY.
+// active Profile, resets a Profile, and reads back the High Scores file,
+// the toasts drawn, the Achievements Notified and shown in the Achievement
+// List, and the Add-on's log lines. Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
@@ -24,6 +25,14 @@ export const TABLES = [
     { id: 1, configId: MEDIEVAL, title: "Medieval Madness", manufacturer: "Williams", year: 1997, isHidden: false, rom: "mm_109c" },
     { id: 2, configId: AFM, title: "Attack from Mars", manufacturer: "Bally", year: 1995, isHidden: false, rom: "afm_113b" },
 ];
+
+// count tables, "Table 1 (Williams 1990)" on, each on its own ROM.
+export const romTables = count => Array.from({ length: count }, (_, index) => ({
+    id: index + 1, configId: `Table ${index + 1} (Williams 1990)`, title: `Table ${index + 1}`,
+    manufacturer: "Williams", year: 1990, isHidden: false, rom: `rom_${index + 1}`,
+}));
+// Longer than a toast's whole life (rise, hold, fade).
+const ONE_TOAST_MS = 6000;
 
 // What PINemHi prints for a ROM it does not support.
 export const NOT_SUPPORTED = ["Not supported rom : C:\\vPinball\\VisualPinball\\VPinMAME\\nvram\\mm_109c.nv", ""];
@@ -47,6 +56,10 @@ export function boardLines(champion, places) {
 export const board = (...entries) => boardLines(entries[0], entries.slice(1));
 // A factory board of five places.
 export const FACTORY = board(["SLL", "52000000"], ["BRE", "40000000"], ["LFS", "30000000"], ["ZAP", "20000000"], ["RCF", "10000000"]);
+// The factory board with a new second place.
+export const SECOND_PLACE = board(["SLL", "52000000"], ["ALI", "45000000"], ["BRE", "40000000"], ["LFS", "30000000"], ["ZAP", "20000000"]);
+// The High Scores family's IDs among these Achievement IDs.
+export const highScoreIds = ids => ids.filter(id => id.startsWith("highScoreTables:") || id.startsWith("tableRecord"));
 
 // addOns: the Add-ons on; profiles: { name: { isChild } }, Guest's under
 // "guest"; active: the Profile in cabinet.json; files: { path: content }
@@ -65,8 +78,11 @@ export async function startHighScores({
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = language;
 
-    // Imported once the language is set: the toast module reads the texts.
+    // Imported once the language is set: the toast module and the
+    // Achievement List read the texts.
     const { toastDrawings } = await import("../achievements/achievement_toast_reader.js");
+    const { pressAndGlide, readRows } = await import("../achievements/achievement_list_reader.js");
+    const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
     // With the Profile picker off, main.js switched to Guest.
@@ -81,8 +97,36 @@ export async function startHighScores({
         await settle();
     };
 
+    // Lets every waiting toast show, so each Achievement is Notified.
+    async function showEveryToast() {
+        for (let guard = 0; guard < 100; guard++) {
+            const shownCount = toastDrawings(fake).length;
+            fake.advanceTime(ONE_TOAST_MS);
+            await settle();
+            if (toastDrawings(fake).length === shownCount) break;
+        }
+    }
+
     return {
         fake,
+        showEveryToast,
+        resetProfile: (name) => getProfileStore().resetProfile(name),
+        // The IDs of the Achievements the named Profile was Notified of.
+        notified: (name) => [...getProfileStore().getNotifiedOf(name)],
+        // How the Achievement List shows each Achievement of these titles:
+        // { title, progress, unlocked }, progress the short text of its
+        // Achievement Progress or null; undefined for a title not in the
+        // list. Opened from the main menu and closed again with Exit.
+        readShown: (titles) => {
+            fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
+            fake.selectMenuItem(lang.achievementList.menuEntry);
+            const rows = readRows(fake, lang.achievementList);
+            pressAndGlide(fake, "Exit");
+            return titles.map(title => {
+                const row = rows.find(shown => shown.title === title);
+                return row && { title, progress: row.progress, unlocked: row.unlocked };
+            });
+        },
         // What PINemHi reads in the table's NVRAM from now on.
         setBoard: (configId, lines, options) => fake.setNvramBoard(configId, lines, options),
         switchTo: (name) => getProfileStore().switchTo(name),

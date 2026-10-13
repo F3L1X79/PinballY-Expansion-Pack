@@ -8,11 +8,16 @@
 // last known board; settling a Play credits its new places to the Profile
 // active when it started, unless there are more than a 4-player game can
 // make (a ROM reset: they become Default Scores). Every board change and
-// High Score is logged.
+// High Score is logged. Per Profile, the date its High Score Achievements
+// count from, set when the Profile store reports its Profile Reset (its
+// High Scores stay its own); the Achievements read what each Profile won
+// since then, and hear when a Play credited High Scores.
 // ============================================================
 
 import { newPlaces, placeKey } from "./board_reader.js";
-import { toLocalIsoString } from "../profiles/profile_store.js";
+import { getProfileStore, toLocalIsoString } from "../profiles/profile_store.js";
+import { createPinballYHost } from "../core/pinbally_host.js";
+import { safeHandler } from "../core/safe_handler.js";
 
 const RECORD_NAME = "high_scores";
 const RECORD_VERSION = 1;
@@ -22,6 +27,8 @@ const MAX_NEW_PLACES_PER_PLAY = 4;
 // The High Scores Add-on's name in logfile.log, for its shared modules too.
 export const SCRIPT_NAME = "HighScores";
 
+// Profile names ignore case.
+const profileKeyOf = name => name.toLowerCase();
 const isRecord = value => value !== null && typeof value === "object" && !Array.isArray(value);
 const countPlaces = count => (count === 1 ? "1 new place" : `${count} new places`);
 
@@ -51,7 +58,19 @@ export function createHighScoreStore(host, profileStore) {
     const setBoard = (configId, board) => {
         data.tables[configId] = { ...(isRecord(data.tables[configId]) ? data.tables[configId] : {}), board };
     };
-    const profileExists = name => profileStore.listProfileNames().some(candidate => candidate.toLowerCase() === name.toLowerCase());
+    const profileExists = name => profileStore.listProfileNames().some(candidate => profileKeyOf(candidate) === profileKeyOf(name));
+    // Called with the Profile's name after a Play credited it High Scores.
+    const creditedListeners = [];
+
+    // Fires after any change of a Profile's data: its High Score
+    // Achievements count afresh from its Profile Reset. The key is written
+    // only then, so a file without a reset keeps its first shape.
+    profileStore.onUpdate(safeHandler(SCRIPT_NAME, (profileName, { isReset }) => {
+        if (!isReset) return;
+        if (!isRecord(data.achievementsFrom)) data.achievementsFrom = {};
+        data.achievementsFrom[profileKeyOf(profileName)] = toLocalIsoString(host.now());
+        save();
+    }));
 
     // A table with no known board takes the places as its baseline, all Default Scores.
     function takeBaseline(configId, places, why) {
@@ -113,7 +132,33 @@ export function createHighScoreStore(host, profileStore) {
             }
             save();
             if (added.length === 0) log(`"${configId}": Play by ${play.profileName}, no new place${changed ? " (board changed)" : ""}.`);
+            else creditedListeners.forEach(listener => listener(play.profileName));
             return added.reduce((best, place) => (best === null || place.rank < best.rank ? place : best), null);
         },
+        // What the named Profile's High Score Achievements count, from the
+        // High Scores it won since its last Profile Reset: the tables with
+        // one, the tables with a Table Record, and whether it took a Table
+        // Record from another Profile.
+        achievementCountsOf(profileName) {
+            const profileKey = profileKeyOf(profileName);
+            const from = (isRecord(data.achievementsFrom) && data.achievementsFrom[profileKey]) || "";
+            const won = data.highScores.filter(highScore => typeof highScore.profile === "string"
+                && profileKeyOf(highScore.profile) === profileKey && highScore.date >= from);
+            const tablesOf = highScores => new Set(highScores.map(highScore => highScore.configId)).size;
+            return {
+                highScoreTables: tablesOf(won),
+                tableRecordTables: tablesOf(won.filter(highScore => highScore.tableRecord)),
+                tookTableRecord: won.some(highScore => typeof highScore.takenFrom === "string"),
+            };
+        },
+        onCredited(listener) { creditedListeners.push(listener); },
     };
+}
+
+let sharedHighScoreStore = null;
+
+// The one store the High Scores Add-on and the Achievements share.
+export function getHighScoreStore() {
+    if (!sharedHighScoreStore) sharedHighScoreStore = createHighScoreStore(createPinballYHost(), getProfileStore());
+    return sharedHighScoreStore;
 }

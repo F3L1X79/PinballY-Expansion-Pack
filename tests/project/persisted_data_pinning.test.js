@@ -38,6 +38,7 @@ import { createTableRomRecord } from "../../common/table_roms/table_rom_record.j
 import { createScriptQueue } from "../../common/table_roms/script_queue.js";
 import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js";
 import { createHighScoreStore } from "../../common/high_scores/high_score_store.js";
+import { buildHighScoreAchievements } from "../../achievements/high_scores.js";
 import { WELCOME_SCREEN_PAUSE_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
@@ -625,4 +626,27 @@ test("the High Score store keeps its file name and keys", () => {
             { profile: "guest", configId, score: 70000000, initials: "", place: 1, date: "2026-09-23T09:30:00", tableRecord: true, takenFrom: "Bob" },
         ],
     });
+});
+
+test("the High Score store keeps the key of each Profile's Achievements reset date", () => {
+    const fake = createFakePinballYHost({ now: NOW, tables: [] });
+    fake.addFile(`${PROFILES_FOLDER}\\Bob\\profile.json`, JSON.stringify({ version: 1 }));
+    const profileStore = createProfileStore(fake);
+    createHighScoreStore(fake, profileStore);
+
+    profileStore.resetProfile("Bob");
+
+    assert.deepEqual(JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\high_scores.json`)).achievementsFrom, { bob: "2026-09-23T10:00:00" });
+});
+
+test("the High Scores Achievement IDs stay byte-identical", () => {
+    assert.deepEqual(buildHighScoreAchievements({}).map(achievement => achievement.id), [
+        "highScoreTables:1",
+        "highScoreTables:3",
+        "highScoreTables:5",
+        "highScoreTables:10",
+        "tableRecordTables:1",
+        "tableRecordTables:3",
+        "tableRecordTaken",
+    ]);
 });
