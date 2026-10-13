@@ -12,8 +12,8 @@
 // profile.json, and the template ids. A third locks a verdict on the
 // previous Challenge in a Profile's history, another the Challenges
 // Achievement IDs, one the Play Log's year file name and keys, and one the
-// World Tour's key in profile.json and its Achievement ID, and one the
-// Surprises part's key, its flags, seasons, runs and Achievement IDs. These
+// World Tour's key in profile.json and its Achievement ID (the Surprises
+// part's are in persisted_data_pinning_surprises.test.js). These
 // strings are players' saved progress: this test must keep passing unchanged.
 // Another test locks the Avatar Frame choice's key in profile.json, and the
 // Table ROM record's file name and keys, and the last one the High Score
@@ -32,8 +32,6 @@ import { buildChallengeAchievements } from "../../achievements/challenges.js";
 import { buildWorldTourAchievements } from "../../achievements/world_tour.js";
 import { createWorldTour } from "../../common/achievements/world_tour.js";
 import { createProfileRewards } from "../../common/avatar_frames/profile_rewards.js";
-import { buildSurprisesAchievements } from "../../achievements/surprises.js";
-import { createSurprises } from "../../common/achievements/surprises.js";
 import { createTableRomRecord } from "../../common/table_roms/table_rom_record.js";
 import { createScriptQueue } from "../../common/table_roms/script_queue.js";
 import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js";
@@ -487,45 +485,6 @@ test("the World Tour keeps its key in profile.json and its Achievement ID", () =
 
     assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).worldTour, true);
     assert.deepEqual(buildWorldTourAchievements().map(achievement => achievement.id), ["worldTour"]);
-});
-
-test("the Surprises part keeps its key in profile.json, its flags, seasons, runs and Achievement IDs", () => {
-    // Every table shown, the hidden 1978 one included: Time Travel is built
-    // only when the visible tables cover three decades.
-    const tables = TABLES.map(game => ({ ...game, isHidden: false }));
-    // Friday 13 November 2026, 01:01: Night Owl, Friday the 13th and Mirror Hour at once.
-    const fake = createFakePinballYHost({ now: new Date(2026, 10, 13, 1, 1, 0), tables });
-    // Never uninstalled: buildSurprisesAchievements reads the shared Profile store.
-    fake.installGlobals();
-    const store = createProfileStore(fake);
-    createSurprises(fake, store);
-    const playAt = (date, table = tables[0]) => {
-        fake.setNow(date);
-        fake.gameStarted(table);
-        fake.advanceTime(5 * 60 * 1000);
-        fake.gameOver(table);
-    };
-    // The 2020s, the 1990s, then the 1970s: Time Travel.
-    playAt(new Date(2026, 10, 13, 1, 1, 0), tables[2]);
-    playAt(new Date(2026, 10, 14, 10, 0, 0), tables[0]);
-    playAt(new Date(2026, 10, 15, 10, 0, 0), tables[4]);
-    // Monday 14 December 2026, 12:30, then Wednesday 23 December at 22:00
-    // under a full moon, a Play in spring and two in summer: five Plays in
-    // a row on one table, so One More Game! too.
-    playAt(new Date(2026, 11, 14, 12, 30, 0));
-    playAt(new Date(2026, 11, 23, 22, 0, 0));
-    playAt(new Date(2027, 3, 1, 10, 0, 0));
-    playAt(new Date(2027, 6, 1, 10, 0, 0));
-    playAt(new Date(2027, 6, 2, 10, 0, 0));
-
-    assert.deepEqual(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).surprises, {
-        nightOwl: true, fridayThe13th: true, mirrorHour: true, lunchBreak: true, fullMoonNight: true,
-        seasons: ["autumn", "winter", "spring", "summer"],
-        oneMoreGame: true, oneMoreGameRun: { configId: tables[0].configId, count: 5 },
-        timeTravel: true, timeTravelRun: { decade: 1990, count: 1 },
-    });
-    assert.deepEqual(buildSurprisesAchievements().map(achievement => achievement.id),
-        ["nightOwl", "fullMoonNight", "fridayThe13th", "fourSeasons", "oneMoreGame", "lunchBreak", "mirrorHour", "timeTravel"]);
 });
 
 test("the Avatar Frame choice keeps its key in profile.json", () => {

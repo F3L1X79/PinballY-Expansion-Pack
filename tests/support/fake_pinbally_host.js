@@ -30,6 +30,8 @@
 import { projectFolderOf } from "../../common/core/pinbally_host.js";
 
 const RealDate = Date;
+// The fake whose globals are installed and not yet uninstalled, if any.
+let installedHost = null;
 const realSetTimeout = setTimeout;
 // PinballY kills a PINemHi run that lasts longer.
 const PINEMHI_KILL_MS = 7500;
@@ -309,6 +311,12 @@ export function createFakePinballYHost({
             storedSettings.set(key, toStoredString(value));
             writtenKeys.add(key);
         },
+    };
+
+    let heardThroughGlobals = false;
+    const onThroughGlobals = (eventName, handler) => {
+        heardThroughGlobals = true;
+        on(eventName, handler);
     };
 
     // PinballY accepts "event.Namespace" names; only the event part matters here.
@@ -1140,7 +1148,17 @@ export function createFakePinballYHost({
 
         // Exposes this fake as PinballY's globals; returns the function that
         // restores the previous globals.
+        // Whether code reaching PinballY through the globals (main.js and the
+        // shared modules) listens to this fake.
+        isHeardThroughGlobals: () => heardThroughGlobals,
         installGlobals() {
+            // main.js and the shared modules load once per process and listen
+            // to the first fake: a second one would never hear them.
+            if (installedHost !== null && installedHost !== host && installedHost.isHeardThroughGlobals()) {
+                throw new Error("A second fake host installs its globals while the first one's still hold PinballY listeners: "
+                    + "main.js and the shared modules load once per process, so put each scenario test in a file of its own.");
+            }
+            installedHost = host;
             const globalNames = [
                 "optionSettings", "gameList", "mainWindow", "command", "logfile", "Date",
                 "StyledText", "CommandEvent", "systemInfo", "createAutomationObject",
@@ -1171,7 +1189,7 @@ export function createFakePinballYHost({
                     getAllGames: () => [...allTables],
                     getAllWheelGames: () => host.getWheelTables(),
                     // "gameselect" and "filterselect", fired with fire() like the main window's events.
-                    on,
+                    on: onThroughGlobals,
                     getWheelGame: (offset) => host.getWheelTables()[offset] || null,
                     getWheelCount: () => host.getWheelTables().length,
                     createFilter,
@@ -1184,7 +1202,7 @@ export function createFakePinballYHost({
                     resolveMedia: (subfolder, baseName) => resolveGlobalImage(subfolder, baseName),
                 },
                 mainWindow: {
-                    on,
+                    on: onThroughGlobals,
                     showMenu,
                     getUIMode: getFullUIMode,
                     playGame: host.playGame,
@@ -1239,6 +1257,7 @@ export function createFakePinballYHost({
             });
 
             return function uninstallGlobals() {
+                if (installedHost === host) installedHost = null;
                 for (const [name, descriptor] of previous) {
                     if (descriptor) Object.defineProperty(globalThis, name, descriptor);
                     else delete globalThis[name];
