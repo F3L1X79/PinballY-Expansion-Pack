@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHousehold, errorLines, PROFILES, MEDIEVAL, MARS, THEATRE, TWILIGHT } from "./household_stats_scenario.js";
-import { openProfileStats, section, press } from "./profile_stats_reader.js";
+import { readOwnSection } from "./profile_stats_reader.js";
 import { openHouseholdStats, labels, lineValues, goldOn } from "./household_stats_reader.js";
 
 const place = (rank, owner) => ({ rank, initials: "AAA", score: 1000000 * (10 - rank), owner });
@@ -31,10 +31,8 @@ test("Table Records held after completed Challenges, the most in gold", async ()
         addOns: ["achievements", "challenges", "highScores"], files: { [`${PROFILES}\\high_scores.json`]: HIGH_SCORES },
     });
     const TEXT = lang.profileStats;
-    openProfileStats(fake, lang);
-    const progression = section(fake, TEXT.sections.progression, TEXT.stats);
+    const progression = readOwnSection(fake, lang, TEXT.sections.progression);
     assert.deepEqual([progression[TEXT.stats.highScoresHeld], progression[TEXT.stats.tableRecordsHeld]], [["3"], ["2"]]);
-    press(fake, "Exit");
 
     openHouseholdStats(fake, lang);
     assert.deepEqual(labels(fake).slice(-2), [TEXT.stats.challengesCompleted, TEXT.stats.tableRecordsHeld]);

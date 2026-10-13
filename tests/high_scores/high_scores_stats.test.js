@@ -11,8 +11,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHighScores, board, FACTORY, romTables } from "./high_scores_scenario.js";
-import { openProfileStats, section, press, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
-import { openHouseholdStats, chooseColumn, labels, lineValues, goldOn } from "../stats/household_stats_reader.js";
+import { readOwnSection, section, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
+import { openHouseholdStats, chooseColumn, backToWheel, labels, lineValues, goldOn } from "../stats/household_stats_reader.js";
 
 const [T1, T2, T3] = romTables(3).map(table => table.configId);
 
@@ -22,16 +22,8 @@ test("High Scores and Table Records held, counted in tables still on the boards,
     });
     const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.profileStats;
-    const heldLines = () => {
-        const progression = section(fake, TEXT.sections.progression, TEXT.stats);
-        return [progression[TEXT.stats.highScoresHeld], progression[TEXT.stats.tableRecordsHeld]];
-    };
-    const ownLines = () => {
-        openProfileStats(fake, lang);
-        const lines = heldLines();
-        press(fake, "Exit");
-        return lines;
-    };
+    const heldIn = progression => [progression[TEXT.stats.highScoresHeld], progression[TEXT.stats.tableRecordsHeld]];
+    const ownLines = () => heldIn(readOwnSection(fake, lang, TEXT.sections.progression));
     setBoard(T1, FACTORY);
     setBoard(T2, FACTORY);
     setBoard(T3, board(["SLL", "52000000"], ["BRE", "40000000"]));
@@ -57,12 +49,8 @@ test("High Scores and Table Records held, counted in tables still on the boards,
     assert.deepEqual(goldOn(fake, TEXT.stats.tableRecordsHeld), ["Alice"]);
     chooseColumn(fake, "Alice");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
-    const readOnly = heldLines();
-    // Back to the Household Stats, Bob's Profile Stats, the wheel.
-    for (let step = 0; step < 3; step++) {
-        press(fake, "Exit");
-        fake.advanceTime(PROFILE_STATS_OPEN_MS);
-    }
+    const readOnly = heldIn(section(fake, TEXT.sections.progression, TEXT.stats));
+    backToWheel(fake);
 
     switchTo("Alice");
     await showEveryToast();
