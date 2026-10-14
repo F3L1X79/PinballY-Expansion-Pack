@@ -636,5 +636,15 @@ export default {
         toastTitle: (table, place) => `Meilleur score sur ${table} : ${place === 1 ? "1ère" : `${place}e`} place`,
         tableRecordTitle: (table) => `Record sur ${table} !`,
         toastScore: (score) => `${score} points`,
+        // The High Score Board.
+        board: {
+            menuEntry: "Meilleurs scores",
+            record: "Record",
+            // In place of a place's owner when it belongs to no Profile.
+            defaultScore: "Score par défaut",
+            // In place of the initials when none were typed.
+            noInitials: "\u2014",
+            noScore: "Pas encore de score",
+        },
     },
 };

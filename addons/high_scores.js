@@ -6,8 +6,10 @@
 // settled against it. A failed launch read leaves the last known board to
 // compare with; a failed read after the game credits nothing. A Play that
 // won places submits one High Score Toast, for the best place. Writes
-// high_scores.json next to cabinet.json and logfile.log. The rules live in
-// common/high_scores/.
+// high_scores.json next to cabinet.json and logfile.log. Adds the "High
+// Scores" main menu entry, which opens the High Score Board on the
+// selected table, Exit there going back to the menu on that entry. The
+// rules live in common/high_scores/.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";
@@ -15,7 +17,10 @@ import { safeHandler, logHandlerError } from "../common/core/safe_handler.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { readBoard } from "../common/high_scores/board_reader.js";
 import { getHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score_store.js";
+import { createHighScoreBoard } from "../common/high_scores/high_score_board.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
+import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
+import { getWheelDialogs } from "../common/core/wheel_dialog.js";
 import lang from "../common/core/i18n.js";
 
 // PinballY's own read after the game returns the board cached at launch
@@ -23,6 +28,7 @@ import lang from "../common/core/i18n.js";
 const AFTER_READ_DELAY_MS = 2000;
 // PinballY kills PINemHi after 7.5 s; a read may also wait behind another one.
 const READ_TIMEOUT_MS = 10000;
+const BOARD_ENTRY = "highScoreBoard";
 
 export default function init() {
     const host = createPinballYHost();
@@ -34,6 +40,19 @@ export default function init() {
     let launched = null;
     // The Play the Profile store announced for the launched table, if any.
     let announcedPlay = null;
+
+    const board = createHighScoreBoard(host, { highScores });
+    const mainMenu = getMainMenu();
+    mainMenu.add({
+        name: BOARD_ENTRY,
+        label: lang.highScores.board.menuEntry,
+        position: MAIN_MENU_POSITION.HIGH_SCORE_BOARD,
+        // Exit goes back one level: the main menu, on this entry.
+        action: () => board.open(() => mainMenu.reopenOn(BOARD_ENTRY)),
+    });
+    // Drawn over the wheel without leaving its UI mode: a waiting dialog
+    // shows only once the player is back on the wheel.
+    getWheelDialogs().waitFor(board);
 
     const wait = ms => new Promise(resolve => host.setTimeout(resolve, ms));
 

@@ -204,6 +204,10 @@ _Avoid_: Grand Champion (the name only some tables give it), world record
 A toast like the Mastery Toast, with its own colour and no trophy, the place won in its tile, that announces the best place a Play won on a table's high score board, or the Table Record when that place is the first; one only per Play, after the other toasts of that Play. No board opens by itself. Shown as "Meilleur score" in French.
 _Avoid_: high score popup, record toast
 
+**High Score Board**:
+The drawn screen, opened by the player from the main menu, that shows the selected table's high score board with each place's owner: the three first places on a podium (the Table Record in the middle and highest), the others in rows below, each with its rank, score, initials, and the Profile that won it (name and Avatar) or "Default score". Not a table's own board, which it shows. Shown as "Meilleurs scores" in French.
+_Avoid_: high scores popup, leaderboard
+
 ### Achievements
 
 **Achievement**:

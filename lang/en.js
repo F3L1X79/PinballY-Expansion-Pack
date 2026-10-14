@@ -534,5 +534,15 @@ export default {
         tableRecordTitle: (table) => `Table Record on ${table}!`,
         // The score, thousands separated.
         toastScore: (score) => `${score} points`,
+        // The High Score Board.
+        board: {
+            menuEntry: "High Scores",
+            record: "Record",
+            // In place of a place's owner when it belongs to no Profile.
+            defaultScore: "Default score",
+            // In place of the initials when none were typed.
+            noInitials: "\u2014",
+            noScore: "No score yet",
+        },
     },
 };

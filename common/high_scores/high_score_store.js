@@ -14,7 +14,8 @@
 // its Profile Reset (its High Scores stay its own); the Achievements read
 // what each Profile won since then, and hear when a Play credited High
 // Scores; the Profile Stats read the tables where each Profile still holds
-// a place or the Table Record.
+// a place or the Table Record; the High Score Board reads a table's last
+// known board with each place's owner.
 // ============================================================
 
 import { hasUnbeatenGonePlace, newPlaces, placeKey } from "./board_reader.js";
@@ -170,6 +171,19 @@ export function createHighScoreStore(host, profileStore) {
                 highScores: boards.filter(board => board.some(isOwn)).length,
                 tableRecords: boards.filter(board => board.length > 0 && isOwn(board[0])).length,
             };
+        },
+        // The table's last known board as the High Score Board shows it, in
+        // board order: { rank, initials, score, owner }, the owner the
+        // Profile store's Profile ({ name, isGuest, avatarPath }) or null for
+        // a Default Score, a removed Profile's places included, nothing
+        // rewritten. Null when the table was never read.
+        boardOf(configId) {
+            const known = knownBoardOf(configId);
+            if (!known) return null;
+            const profiles = profileStore.listProfiles();
+            const ownerOf = name => (typeof name === "string"
+                && profiles.find(profile => profileKeyOf(profile.name) === profileKeyOf(name))) || null;
+            return known.map(({ rank, initials, score, owner }) => ({ rank, initials, score, owner: ownerOf(owner) }));
         },
         onCredited(listener) { creditedListeners.push(listener); },
     };

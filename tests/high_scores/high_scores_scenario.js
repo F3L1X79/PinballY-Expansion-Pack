@@ -15,6 +15,9 @@ import { getProfileStore } from "../../common/profiles/profile_store.js";
 export const NOW = new Date(2026, 9, 12, 20, 0, 0);
 export const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 export const HIGH_SCORES_FILE = `${PROFILES_FOLDER}\\high_scores.json`;
+// A Profile's own Avatar file, and files to seed for those Profiles' Avatars.
+export const avatarOf = name => `${PROFILES_FOLDER}\\${name}\\avatar.png`;
+export const avatarFiles = (...names) => Object.fromEntries(names.map(name => [avatarOf(name), "png"]));
 export const GAME_MS = 5 * 60 * 1000;
 // Covers the wait after "postlaunch" and the reads, a second at a time.
 const READS_STEPS = 15;
