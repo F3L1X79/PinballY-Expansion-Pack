@@ -103,25 +103,22 @@ export default function init() {
     // The High Score Board's read, by config ID while it runs, so a second
     // opening reuses it.
     const boardReads = new Map();
-    // From "postlaunch" until the Play is settled: { configId, settled }, a
-    // promise that never rejects.
-    let settling = null;
 
     // A fresh read for the High Score Board, recorded as a board read
     // outside a Play: resolves to its status ("read", "unsupported",
-    // "failed") once the store holds it, whether the screen is still open
-    // or not. Waits for a Play being settled on the table first: read
-    // before it, the Play's new places would be recorded as Default Scores.
+    // "failed") once the store holds it (after a Play being settled on the
+    // table, if any), whether the screen is still open or not.
     function refreshBoard(configId) {
         if (boardReads.has(configId)) return boardReads.get(configId);
-        const fresh = () => readTable(configId, { forget: true });
-        const raw = settling && settling.configId === configId ? settling.settled.then(fresh) : fresh();
-        const read = raw.then(safeHandler(SCRIPT_NAME, (result) => {
-            boardReads.delete(configId);
-            if (result.status === "read") highScores.recordBoard(configId, result.places);
-            else log(`"${configId}": no board for the High Score Board; ${highScores.boardOf(configId) === null ? "none known yet" : "the last known board kept"}.`);
-            return result.status;
-        }));
+        const read = readTable(configId, { forget: true }).then(safeHandler(SCRIPT_NAME, async (result) => {
+            try {
+                if (result.status === "read") await highScores.recordBoard(configId, result.places);
+                else log(`"${configId}": no board for the High Score Board; ${highScores.boardOf(configId) === null ? "none known yet" : "the last known board kept"}.`);
+                return result.status;
+            } finally {
+                boardReads.delete(configId);
+            }
+        })).then(status => status, () => "failed");
         boardReads.set(configId, read);
         return read;
     }
@@ -176,11 +173,7 @@ export default function init() {
         launched = null;
         announcedPlay = null;
         if (!bracket) return;
-        const settled = safeHandler(SCRIPT_NAME, settleAfterGame)(bracket, play).then(() => {}, () => {});
-        const current = { configId: bracket.configId, settled };
-        settling = current;
-        settled.then(() => {
-            if (settling === current) settling = null;
-        });
+        const release = highScores.holdBoardForPlay(bracket.configId);
+        safeHandler(SCRIPT_NAME, settleAfterGame)(bracket, play).then(release, release);
     }));
 }

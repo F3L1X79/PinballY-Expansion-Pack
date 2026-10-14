@@ -9,7 +9,10 @@
 // active when it started, unless the ROM was reset: more new places than
 // a 4-player game can make, or a place gone that no new place beat (in a
 // real game a place only leaves when beaten); they become Default Scores.
-// Every board change and High Score is logged. Per Profile, the date its
+// From the game's end until its Play is settled, a board read outside a
+// Play on that table waits, recorded after the Play: before it, it would
+// take the Play's new places as Default Scores. Every board change and
+// High Score is logged. Per Profile, the date its
 // High Score Achievements count from, set when the Profile store reports
 // its Profile Reset (its High Scores stay its own); the Achievements read
 // what each Profile won since then, and hear when a Play credited High
@@ -21,7 +24,7 @@
 import { hasUnbeatenGonePlace, newPlaces, placeKey } from "./board_reader.js";
 import { getProfileStore, toLocalIsoString } from "../profiles/profile_store.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
-import { safeHandler } from "../core/safe_handler.js";
+import { safeHandler, logHandlerError } from "../core/safe_handler.js";
 
 const RECORD_NAME = "high_scores";
 const RECORD_VERSION = 1;
@@ -65,6 +68,9 @@ export function createHighScoreStore(host, profileStore) {
     const profileExists = name => profileStore.listProfileNames().some(candidate => profileKeyOf(candidate) === profileKeyOf(name));
     // Called with the Profile's name after a Play credited it High Scores.
     const creditedListeners = [];
+    // The tables whose Play is being settled, by config ID: the board
+    // reads outside a Play waiting for it.
+    const heldBoards = new Map();
 
     // Fires after any change of a Profile's data: its High Score
     // Achievements count afresh from its Profile Reset. The key is written
@@ -83,20 +89,56 @@ export function createHighScoreStore(host, profileStore) {
         log(`"${configId}": ${why}`);
     }
 
+    // A board read outside a Play: the places it did not know are Default
+    // Scores, set outside the pack.
+    function recordOutsidePlay(configId, places) {
+        const known = knownBoardOf(configId);
+        if (!known) {
+            takeBaseline(configId, places, `first board read, ${places.length} places, all Default Scores.`);
+            return;
+        }
+        const board = withOwners(places, known, null);
+        if (JSON.stringify(board) === JSON.stringify(known)) return;
+        setBoard(configId, board);
+        save();
+        log(`"${configId}": board changed outside a Play, ${countPlaces(newPlaces(known, places).length)} as Default Scores.`);
+    }
+
     return {
-        // A board read outside a Play (places from the board reader): the
-        // places it did not know are Default Scores, set outside the pack.
+        // A board read outside a Play (places from the board reader),
+        // recorded at once or, while a Play on the table is being settled,
+        // after it. Resolves once recorded.
         recordBoard(configId, places) {
-            const known = knownBoardOf(configId);
-            if (!known) {
-                takeBaseline(configId, places, `first board read, ${places.length} places, all Default Scores.`);
-                return;
+            const waiting = heldBoards.get(configId);
+            if (!waiting) {
+                recordOutsidePlay(configId, places);
+                return Promise.resolve();
             }
-            const board = withOwners(places, known, null);
-            if (JSON.stringify(board) === JSON.stringify(known)) return;
-            setBoard(configId, board);
-            save();
-            log(`"${configId}": board changed outside a Play, ${countPlaces(newPlaces(known, places).length)} as Default Scores.`);
+            // Resolved even when recording throws (logged by the release), so no reader waits forever.
+            return new Promise(resolve => waiting.push(() => {
+                try {
+                    recordOutsidePlay(configId, places);
+                } finally {
+                    resolve();
+                }
+            }));
+        },
+        // From the game's end until its Play is settled (or given up): the
+        // board reads outside a Play on the table wait. Returns the
+        // release, to call once.
+        holdBoardForPlay(configId) {
+            const waiting = [];
+            heldBoards.set(configId, waiting);
+            return () => {
+                if (heldBoards.get(configId) === waiting) heldBoards.delete(configId);
+                for (const record of waiting) {
+                    try {
+                        record();
+                    } catch (error) {
+                        logHandlerError(SCRIPT_NAME, error);
+                    }
+                }
+            };
         },
         // The board read after a game, compared with the last known board;
         // play: the Play the Profile store announced ({ profileName, start, ... }),
