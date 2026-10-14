@@ -1,13 +1,14 @@
 // ============================================================
 // High Score Board painter: the layout and drawing of the High Score
-// Board's pieces, in reference pixels (the window's height is
-// REFERENCE_HEIGHT), on the Drawn Menu's panel and glass images: the
-// table's title and a discreet note under it, then the podium (the 2nd
-// place on the left, the 1st in the middle and highest, the 3rd on the
-// right, room kept above each for its crown), then the places from the 4th on in compact rows; or a
-// message in place of the board. Each Avatar wears its Profile's Avatar
-// Frame, if any, as on the Profile Stats. Only drawing: no layer, no event,
-// no side effect.
+// Board's pieces, in board pixels zoomed to fit the window (whose height
+// is REFERENCE_HEIGHT reference pixels), on the Drawn Menu's panel and
+// glass images: the table's title and a discreet note under it, then the
+// podium (the 2nd place on the left, the 1st in the middle and highest,
+// the 3rd on the right, room kept above each for its crown), then the
+// places from the 4th on in compact rows, as many in view as the window's
+// height leaves room for; or a message in place of the board. Each Avatar
+// wears its Profile's Avatar Frame, if any, as on the Profile Stats. Only
+// drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
@@ -49,35 +50,61 @@ export const AVATAR_FRAME_WIDTH = avatarFrameSide(Math.max(...LOOK.avatar, LOOK.
 const stepH = index => LOOK.crownH[index] + LOOK.avatar[index] + LOOK.avatarGap + LOOK.blockH[index];
 const PODIUM_H = Math.max(...Array.from({ length: PODIUM_PLACES }, (_, index) => stepH(index)));
 
-// The panel, the title, the note's line under it, then either the
-// message's box or the podium's steps (the 1st's first, those with no
-// place included) and one rect per row, in a window referenceWidth wide,
-// for placeCount places.
+// The board's fit in the window: its panel at most these shares of the
+// window's width and height, zoomed up to maxZoom in a wide window so
+// it reads from afar.
+const FIT = Object.freeze({ widthShare: 0.9, heightShare: 0.9, maxZoom: 2 });
+
+const rowsHeight = rowCount => (rowCount === 0 ? 0 : LOOK.rowsGap + rowCount * LOOK.rowH + (rowCount - 1) * LOOK.rowGap);
+const MIN_PANEL_H = Math.max(
+    DRAWN_MENU_IMAGES.panel.top.height + DRAWN_MENU_IMAGES.panel.bottom.height,
+    DRAWN_MENU_IMAGES.glass.top.height + DRAWN_MENU_IMAGES.glass.bottom.height);
+
+// The board's layout in a window referenceWidth wide, for placeCount
+// places. Its rects are in board pixels from the panel's top left, each
+// also the size its piece is drawn at; placedRect() puts one in the
+// window. Gives the panel, the title, the note's line under it, then
+// either the message's box or the podium's steps (the 1st's first, those
+// with no place included) and one rect per row as if none were scrolled.
+// zoom: board to reference pixels; rowsInView: how many rows show at
+// once (all of them when they fit), the others scrolling rowPitch apart.
 export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const w = DRAWN_MENU_PANEL_WIDTH;
     const rowCount = Math.max(0, placeCount - PODIUM_PLACES);
-    const rowsH = rowCount === 0 ? 0 : LOOK.rowsGap + rowCount * LOOK.rowH + (rowCount - 1) * LOOK.rowGap;
-    const bodyH = placeCount === 0 ? LOOK.messageH : PODIUM_H + rowsH;
-    const minH = Math.max(
-        DRAWN_MENU_IMAGES.panel.top.height + DRAWN_MENU_IMAGES.panel.bottom.height,
-        DRAWN_MENU_IMAGES.glass.top.height + DRAWN_MENU_IMAGES.glass.bottom.height);
-    const h = Math.max(minH, LOOK.topInset + LOOK.titleH + LOOK.noteH + LOOK.titleGap + bodyH + LOOK.bottomInset);
-    // Not rounded across, so the 1st place stands on the window's middle.
-    const panel = { x: (referenceWidth - w) / 2, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
-    const x = panel.x + LOOK.sideInset;
+    const panelOf = bodyH => Math.max(MIN_PANEL_H, LOOK.topInset + LOOK.titleH + LOOK.noteH + LOOK.titleGap + bodyH + LOOK.bottomInset);
+    const panelH = rowsShown => panelOf(placeCount === 0 ? LOOK.messageH : PODIUM_H + rowsHeight(rowsShown));
+    const maxH = FIT.heightShare * REFERENCE_HEIGHT;
+    // Small enough for the podium and one row at least, whatever the
+    // board holds: the "Reading..." message keeps the zoom of the board
+    // that replaces it.
+    const zoom = Math.min(FIT.maxZoom, FIT.widthShare * referenceWidth / w, maxH / panelOf(PODIUM_H + rowsHeight(1)));
+    let rowsInView = rowCount;
+    while (rowsInView > 1 && panelH(rowsInView) * zoom > maxH) rowsInView--;
+    const h = panelH(rowsInView);
+    const panel = { x: 0, y: 0, w, h };
+    // Not rounded, so the 1st place stands on the window's middle.
+    const origin = { x: (referenceWidth - w * zoom) / 2, y: (REFERENCE_HEIGHT - h * zoom) / 2 };
+    const x = LOOK.sideInset;
     const contentW = w - 2 * LOOK.sideInset;
-    const title = { x, y: panel.y + LOOK.topInset, w: contentW, h: LOOK.titleH };
+    const title = { x, y: LOOK.topInset, w: contentW, h: LOOK.titleH };
     const note = { x, y: title.y + title.h, w: contentW, h: LOOK.noteH };
     const bodyY = note.y + note.h + LOOK.titleGap;
     const message = { x, y: bodyY, w: contentW, h: LOOK.messageH };
     const stepW = Math.floor((contentW - (PODIUM_PLACES - 1) * LOOK.stepGap) / PODIUM_PLACES);
     // The 1st centred on the panel, so it stands in the middle whatever the rounding.
-    const middleX = panel.x + (w - stepW) / 2;
+    const middleX = (w - stepW) / 2;
     const stepXs = [middleX, middleX - LOOK.stepGap - stepW, middleX + stepW + LOOK.stepGap];
     const steps = stepXs.map((stepX, index) => ({ x: stepX, y: bodyY + PODIUM_H - stepH(index), w: stepW, h: stepH(index) }));
+    const rowPitch = LOOK.rowH + LOOK.rowGap;
     const rowsY = bodyY + PODIUM_H + LOOK.rowsGap;
-    const rows = Array.from({ length: rowCount }, (_, index) => ({ x, y: rowsY + index * (LOOK.rowH + LOOK.rowGap), w: contentW, h: LOOK.rowH }));
-    return { panel, title, note, message, steps, rows };
+    const rows = Array.from({ length: rowCount }, (_, index) => ({ x, y: rowsY + index * rowPitch, w: contentW, h: LOOK.rowH }));
+    return { zoom, origin, panel, title, note, message, steps, rows, rowsInView, rowPitch };
+}
+
+// A rect of the layout in reference pixels from the window's top left,
+// moved up by shiftY board pixels (a scrolled row).
+export function placedRect({ zoom, origin }, rect, shiftY = 0) {
+    return { x: origin.x + rect.x * zoom, y: origin.y + (rect.y - shiftY) * zoom, w: rect.w * zoom, h: rect.h * zoom };
 }
 
 export function drawBackdrop(dc, { width, height }) {

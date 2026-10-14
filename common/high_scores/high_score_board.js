@@ -11,7 +11,9 @@
 // board, "No score yet" when empty, a "could not be refreshed" note when
 // the read failed, or "not supported" when PINemHi says so or no board is
 // known. The screen is drawn at once on all its layers, then faded in.
-// While open it swallows every button through "commandbuttondown"; Exit
+// While open it swallows every button through "commandbuttondown"; when
+// the rows below the podium do not all fit the window, the flippers
+// (Next / Prev) scroll them, the podium staying in place; Exit
 // closes it and calls the return given to open(); attract mode only
 // closes it. Opens directly, not through the wheel dialog module: the
 // player asked for it. isOpen() and onClosed() let the wheel dialogs wait
@@ -25,7 +27,7 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
 import { SCRIPT_NAME } from "./high_score_store.js";
 import {
-    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard,
+    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard, placedRect,
     drawBackdrop, drawPanel, drawGlass, drawTitle, drawNote, drawMessage, drawStep, drawRow,
 } from "./high_score_board_painter.js";
 
@@ -36,8 +38,9 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     const projectFolder = host.getProjectFolder();
-    // The screen on show: its drawn screen, return, opacity and the layers
-    // of its content (all but the backdrop); null when closed.
+    // The screen on show: its drawn screen, return, opacity, the layers
+    // of its content (all but the backdrop), its layout, its rows' layers
+    // and the first row in view; null when closed.
     let shown = null;
 
     // The owner's Avatar; null, logged, when its image is missing.
@@ -81,14 +84,27 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
         return screen;
     }
 
+    // Sets every content layer's alpha to the screen's opacity, the rows
+    // out of view hidden, and puts each row in its scrolled place.
+    function showContent(opened) {
+        const { drawn, geometry, rowLayers, firstRow } = opened;
+        for (const layer of opened.content) layer.alpha = opened.opacity;
+        rowLayers.forEach((layer, index) => {
+            drawn.place(layer, placedRect(geometry, geometry.rows[index], firstRow * geometry.rowPitch));
+            const inView = index >= firstRow && index < firstRow + geometry.rowsInView;
+            layer.alpha = inView ? opened.opacity : 0;
+        });
+    }
+
     // Draws the panel and everything on it into opened.content, at the
-    // screen's current opacity; the backdrop stays.
+    // screen's current opacity; the backdrop stays. The first row in view
+    // stays where it was, as far as the new rows allow.
     function drawContent(opened, screen) {
         const TEXT = lang.highScores.board;
         const { drawn } = opened;
         const geometry = layoutHighScoreBoard(drawn.referenceWidth, screen.places.length);
         const content = [];
-        const piece = (zIndex, rect, draw) => drawn.drawPiece(zIndex, rect, draw, content);
+        const piece = (zIndex, rect, draw) => drawn.drawPiece(zIndex, placedRect(geometry, rect), draw, content, rect);
         const { panel } = geometry;
         piece(Z_INDEX.panel, panel, dc => drawPanel(dc, projectFolder, panel.w, panel.h));
         piece(Z_INDEX.title, geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
@@ -100,13 +116,28 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
             const rect = geometry.steps[index];
             piece(Z_INDEX.podium, rect, dc => drawStep(host, dc, place, index, TEXT.record, rect.w));
         });
-        screen.places.slice(PODIUM_PLACES).forEach((place, index) => {
+        const rowLayers = screen.places.slice(PODIUM_PLACES).map((place, index) => {
             const rect = geometry.rows[index];
-            piece(Z_INDEX.rows, rect, dc => drawRow(host, dc, place, rect.w));
+            return piece(Z_INDEX.rows, rect, dc => drawRow(host, dc, place, rect.w));
         });
         piece(Z_INDEX.glass, panel, dc => drawGlass(dc, projectFolder, panel.w, panel.h));
-        for (const layer of content) layer.alpha = opened.opacity;
         opened.content = content;
+        opened.geometry = geometry;
+        opened.rowLayers = rowLayers;
+        opened.firstRow = Math.min(opened.firstRow, lastFirstRow(opened));
+        showContent(opened);
+    }
+
+    // The first row in view once scrolled to the last place.
+    const lastFirstRow = ({ geometry }) => Math.max(0, geometry.rows.length - geometry.rowsInView);
+
+    // direction: 1 for Next, -1 for Prev; one row at a time, stopping at
+    // either end. Does nothing when every row is in view.
+    function scroll(direction) {
+        const firstRow = Math.max(0, Math.min(lastFirstRow(shown), shown.firstRow + direction));
+        if (firstRow === shown.firstRow) return;
+        shown.firstRow = firstRow;
+        showContent(shown);
     }
 
     // onBack: what Exit returns to, called once the screen is closed.
@@ -121,12 +152,13 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
             backdropZIndex: Z_INDEX.backdrop,
             drawBackdrop,
         });
-        const opened = { drawn, onBack, opacity: 0, content: [] };
+        const opened = { drawn, onBack, opacity: 0, content: [], geometry: null, rowLayers: [], firstRow: 0 };
         shown = opened;
         drawContent(opened, screenFor(game, game ? "reading" : "read"));
         drawn.fadeIn(opacity => {
             opened.opacity = opacity;
-            for (const layer of [...drawn.layers, ...opened.content]) layer.alpha = opacity;
+            for (const layer of drawn.layers) layer.alpha = opacity;
+            showContent(opened);
         });
         log(`High Score Board opened, drawn in ${host.now().getTime() - openedAt} ms.`);
         if (!game) return;
@@ -145,11 +177,13 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
         closedListeners.tell();
     }
 
-    // Fires on every mapped button press; swallows them all while the screen is open.
+    // Fires on every mapped button press; swallows them all while the
+    // screen is open, the flippers scrolling a board longer than the window.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
         // Already handled within the same press by the screen that opened this one.
         if (!shown || ev.defaultPrevented) return;
         ev.preventDefault();
+        if (ev.command === "Next" || ev.command === "Prev") scroll(ev.command === "Next" ? 1 : -1);
         if (ev.command !== "Exit") return;
         const { onBack } = shown;
         close();

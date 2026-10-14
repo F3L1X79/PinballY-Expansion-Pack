@@ -36,6 +36,8 @@ test("each owner's Avatar wears its Profile's frame on the podium and in the row
     switchTo("Alice");
     await play(MEDIEVAL, { after: board(["ALI", "70000000"], ["CAR", "60000000"], ["SLL", "50000000"], ["BOB", "45000000"], ["DAV", "42000000"], ["BRE", "40000000"]) });
 
+    // A portrait window, as the cabinet's: every row in view, none scrolled out.
+    fake.setLayoutSize({ width: 1080, height: 1920 });
     openBoard(fake, lang);
     const owners = places => places.map(place => place && { name: place.name, avatar: place.avatar });
     const { left, middle, right } = podium(fake, lang);
