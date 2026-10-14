@@ -10,7 +10,10 @@
 // Scores" main menu entry, which opens the High Score Board on the
 // selected table, Exit there going back to the menu on that entry; each
 // opening reads the board again without PinballY's cache, recorded as a
-// board read outside a Play. The rules live in common/high_scores/.
+// board read outside a Play. Replaces PinballY's own "High Scores": removes
+// its main menu entry and cancels the HighScores command, which opens the
+// board instead, Exit going back to the wheel. The rules live in
+// common/high_scores/.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";
@@ -55,6 +58,34 @@ export default function init() {
     // Drawn over the wheel without leaving its UI mode: a waiting dialog
     // shows only once the player is back on the wheel.
     getWheelDialogs().waitFor(board);
+
+    // The board replaces PinballY's own "High Scores": its window and its
+    // main menu entry, the DMD's high score text left as it is.
+    const highScoresCommand = host.getBuiltInCommand("HighScores");
+    const isSeparator = item => item.cmd < 0 && !item.title;
+
+    // Fires when any menu opens, with a fresh item list each time; removes
+    // PinballY's entry whether Menu Cleanup is on or not. The native
+    // entries around it depend on the table's media: should it stand alone
+    // between two separators, one of them goes with it.
+    host.on("menuopen", safeHandler(SCRIPT_NAME, (ev) => {
+        const at = ev.id === "main" ? ev.items.findIndex(item => item.cmd === highScoresCommand) : -1;
+        if (at === -1) return;
+        const items = ev.items.filter(item => item.cmd !== highScoresCommand);
+        if (at > 0 && at < items.length && isSeparator(items[at - 1]) && isSeparator(items[at])) items.splice(at, 1);
+        ev.items = items;
+        ev.menuUpdated = true;
+    }));
+
+    // Fires on every command; the dedicated HighScores button opens the
+    // board on the selected table, Exit going straight back to the wheel.
+    // Cancelled in any UI mode, but opened only over the wheel: Exit could
+    // not bring a menu or popup under the board back.
+    host.on("command", safeHandler(SCRIPT_NAME, (ev) => {
+        if (ev.id !== highScoresCommand || ev.defaultPrevented) return;
+        ev.preventDefault();
+        if (host.getUIMode() === "wheel") board.open();
+    }));
 
     const wait = ms => new Promise(resolve => host.setTimeout(resolve, ms));
 
