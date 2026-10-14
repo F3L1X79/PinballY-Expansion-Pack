@@ -1,12 +1,14 @@
 // ============================================================
 // The High Score Board in French, through main.js on the fake PinballY
 // globals: its entry, "Score par défaut", the scores' thousands separated
-// by a no-break space, and "Pas encore de score" on a table never read.
+// by a no-break space, "Lecture…" while the board is read and "Pas encore
+// de score" on an empty board.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { startHighScores, FACTORY, MEDIEVAL, AFM } from "./high_scores_scenario.js";
+import { settle } from "../support/fake_pinbally_host.js";
+import { startHighScores, FACTORY, EMPTY_BOARD, MEDIEVAL, AFM } from "./high_scores_scenario.js";
 import { openBoard, press, podium, message, BOARD_OPEN_MS } from "./high_score_board_reader.js";
 
 test("the board speaks French", async () => {
@@ -24,6 +26,10 @@ test("the board speaks French", async () => {
 
     fake.setWheelGame(1);
     assert.equal(fake.getCurrentTable().configId, AFM);
+    setBoard(AFM, EMPTY_BOARD, { durationMs: 2000 });
     openBoard(fake, lang);
+    assert.equal(message(fake), "Lecture\u2026");
+    fake.advanceTime(2000);
+    await settle();
     assert.equal(message(fake), "Pas encore de score");
 });

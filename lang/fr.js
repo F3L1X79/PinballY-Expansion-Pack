@@ -645,6 +645,11 @@ export default {
             // In place of the initials when none were typed.
             noInitials: "\u2014",
             noScore: "Pas encore de score",
+            // While PINemHi reads the board, as a message or a note over the last known one.
+            reading: "Lecture\u2026",
+            // Over the last known board when the fresh read failed.
+            notRefreshed: "Ces scores n'ont pas pu être actualisés",
+            notSupported: "Les meilleurs scores de cette table ne sont pas pris en charge",
         },
     },
 };

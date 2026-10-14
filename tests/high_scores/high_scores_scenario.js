@@ -59,6 +59,8 @@ export function boardLines(champion, places) {
 export const board = (...entries) => boardLines(entries[0], entries.slice(1));
 // A factory board of five places.
 export const FACTORY = board(["SLL", "52000000"], ["BRE", "40000000"], ["LFS", "30000000"], ["ZAP", "20000000"], ["RCF", "10000000"]);
+// A board with no place yet, as after a reset that cleared it.
+export const EMPTY_BOARD = ["HIGHEST SCORES", ""];
 // The factory board with a new second place.
 export const SECOND_PLACE = board(["SLL", "52000000"], ["ALI", "45000000"], ["BRE", "40000000"], ["LFS", "30000000"], ["ZAP", "20000000"]);
 // The High Scores family's IDs among these Achievement IDs.
@@ -135,8 +137,9 @@ export async function startHighScores({
         switchTo: (name) => getProfileStore().switchTo(name),
         // Plays the table as PinballY launches it; VPinMAME saves the board
         // after (raw lines) as the game ends, read as afterRead says
-        // (setBoard's options).
-        play: async (configId, { after, afterRead, durationMs = GAME_MS } = {}) => {
+        // (setBoard's options); backOnWheel() runs right after "postlaunch",
+        // before the reads after the game.
+        play: async (configId, { after, afterRead, durationMs = GAME_MS, backOnWheel = () => {} } = {}) => {
             const game = fake.getGameInfo(configId);
             fake.playGame(game);
             fake.fire("prelaunch", { game });
@@ -148,6 +151,7 @@ export async function startHighScores({
             if (after) fake.setNvramBoard(configId, after, afterRead);
             fake.gameOver(game);
             fake.fire("postlaunch", { game });
+            backOnWheel();
             await finishReads();
         },
         pendingTimerCount: () => fake.pendingTimerCount(),

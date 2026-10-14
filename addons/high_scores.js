@@ -8,8 +8,9 @@
 // won places submits one High Score Toast, for the best place. Writes
 // high_scores.json next to cabinet.json and logfile.log. Adds the "High
 // Scores" main menu entry, which opens the High Score Board on the
-// selected table, Exit there going back to the menu on that entry. The
-// rules live in common/high_scores/.
+// selected table, Exit there going back to the menu on that entry; each
+// opening reads the board again without PinballY's cache, recorded as a
+// board read outside a Play. The rules live in common/high_scores/.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";
@@ -41,7 +42,7 @@ export default function init() {
     // The Play the Profile store announced for the launched table, if any.
     let announcedPlay = null;
 
-    const board = createHighScoreBoard(host, { highScores });
+    const board = createHighScoreBoard(host, { highScores, refresh: refreshBoard });
     const mainMenu = getMainMenu();
     mainMenu.add({
         name: BOARD_ENTRY,
@@ -56,26 +57,26 @@ export default function init() {
 
     const wait = ms => new Promise(resolve => host.setTimeout(resolve, ms));
 
-    // The table's board places, read by PINemHi without PinballY's cache
-    // when forget is set; null when the read fails, times out or the ROM
-    // is not supported, logged.
-    function readPlaces(configId, { forget = false } = {}) {
+    // The table's board, read by PINemHi without PinballY's cache when
+    // forget is set: { status: "read", places }, or { status } "unsupported"
+    // or "failed" (failed, timed out), logged.
+    function readTable(configId, { forget = false } = {}) {
         return new Promise((resolve) => {
             const game = host.getGameInfo(configId);
             if (!game) {
-                resolve(null);
+                resolve({ status: "failed" });
                 return;
             }
             let finished = false;
-            const finish = (places) => {
+            const finish = (result) => {
                 if (finished) return;
                 finished = true;
                 host.clearTimeout(timer);
-                resolve(places);
+                resolve(result);
             };
             const timer = host.setTimeout(safeHandler(SCRIPT_NAME, () => {
                 log(`"${configId}": the high scores read timed out.`);
-                finish(null);
+                finish({ status: "failed" });
             }), READ_TIMEOUT_MS);
             if (forget) game.setHighScores(null);
             game.getHighScores().then((lines) => {
@@ -83,16 +84,46 @@ export default function init() {
                 try {
                     const board = readBoard(lines);
                     if (board.status === "unsupported") log(`"${configId}": PINemHi does not support its ROM.`);
-                    finish(board.status === "unsupported" ? null : board.places);
+                    finish(board.status === "unsupported" ? { status: "unsupported" } : { status: "read", places: board.places });
                 } catch (error) {
-                    finish(null);
+                    finish({ status: "failed" });
                     logHandlerError(SCRIPT_NAME, error);
                 }
             }, safeHandler(SCRIPT_NAME, (error) => {
                 log(`"${configId}": the high scores read failed (${error instanceof Error ? error.message : String(error)}).`);
-                finish(null);
+                finish({ status: "failed" });
             }));
         });
+    }
+
+    // The table's board places, or null when the read did not give a board.
+    const readPlaces = (configId, options) => readTable(configId, options)
+        .then(result => (result.status === "read" ? result.places : null));
+
+    // The High Score Board's read, by config ID while it runs, so a second
+    // opening reuses it.
+    const boardReads = new Map();
+    // From "postlaunch" until the Play is settled: { configId, settled }, a
+    // promise that never rejects.
+    let settling = null;
+
+    // A fresh read for the High Score Board, recorded as a board read
+    // outside a Play: resolves to its status ("read", "unsupported",
+    // "failed") once the store holds it, whether the screen is still open
+    // or not. Waits for a Play being settled on the table first: read
+    // before it, the Play's new places would be recorded as Default Scores.
+    function refreshBoard(configId) {
+        if (boardReads.has(configId)) return boardReads.get(configId);
+        const fresh = () => readTable(configId, { forget: true });
+        const raw = settling && settling.configId === configId ? settling.settled.then(fresh) : fresh();
+        const read = raw.then(safeHandler(SCRIPT_NAME, (result) => {
+            boardReads.delete(configId);
+            if (result.status === "read") highScores.recordBoard(configId, result.places);
+            else log(`"${configId}": no board for the High Score Board; ${highScores.boardOf(configId) === null ? "none known yet" : "the last known board kept"}.`);
+            return result.status;
+        }));
+        boardReads.set(configId, read);
+        return read;
     }
 
     // One toast per Play, for the best place won; the toast module holds
@@ -124,14 +155,8 @@ export default function init() {
         if (launched && play.configId === launched.configId) announcedPlay = play;
     }));
 
-    // Fires after the game, back on the wheel, once the Table ROMs Add-on
-    // confirmed the ROM the table ran.
-    host.on("postlaunch", safeHandler(SCRIPT_NAME, async () => {
-        const bracket = launched;
-        const play = announcedPlay;
-        launched = null;
-        announcedPlay = null;
-        if (!bracket) return;
+    // The board read after the game, settled against the last known one.
+    async function settleAfterGame(bracket, play) {
         await bracket.launchRead;
         await wait(AFTER_READ_DELAY_MS);
         const places = await readPlaces(bracket.configId, { forget: true });
@@ -141,5 +166,21 @@ export default function init() {
         }
         const best = highScores.settlePlay(bracket.configId, places, play);
         if (best) announce(bracket.configId, best);
+    }
+
+    // Fires after the game, back on the wheel, once the Table ROMs Add-on
+    // confirmed the ROM the table ran.
+    host.on("postlaunch", safeHandler(SCRIPT_NAME, () => {
+        const bracket = launched;
+        const play = announcedPlay;
+        launched = null;
+        announcedPlay = null;
+        if (!bracket) return;
+        const settled = safeHandler(SCRIPT_NAME, settleAfterGame)(bracket, play).then(() => {}, () => {});
+        const current = { configId: bracket.configId, settled };
+        settling = current;
+        settled.then(() => {
+            if (settling === current) settling = null;
+        });
     }));
 }

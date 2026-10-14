@@ -80,3 +80,6 @@ export function podium(fake, lang) {
 export const rows = (fake, lang) => shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.rows)
     .sort((a, b) => b.position().y - a.position().y)
     .map(layer => placeOf(layer, lang.highScores.board, false));
+
+// The discreet note over a known board ("Reading…", "could not be refreshed"), or null.
+export const note = fake => firstText(fake, HIGH_SCORE_BOARD_Z_INDEX.note);

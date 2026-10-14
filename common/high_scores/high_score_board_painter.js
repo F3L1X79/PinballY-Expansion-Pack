@@ -2,9 +2,9 @@
 // High Score Board painter: the layout and drawing of the High Score
 // Board's pieces, in reference pixels (the window's height is
 // REFERENCE_HEIGHT), on the Drawn Menu's panel and glass images: the
-// table's title, then the podium (the 2nd place on the left, the 1st in
-// the middle and highest, the 3rd on the right, room kept above each for
-// its crown), then the places from the 4th on in compact rows; or a
+// table's title and a discreet note under it, then the podium (the 2nd
+// place on the left, the 1st in the middle and highest, the 3rd on the
+// right, room kept above each for its crown), then the places from the 4th on in compact rows; or a
 // message in place of the board. Only drawing: no layer, no event, no side
 // effect.
 // ============================================================
@@ -16,7 +16,7 @@ import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER, DRAWN_MENU_PANEL_WIDTH, DR
 
 // Between the Household Stats and the Drawn Menus, which never show at the
 // same time, so each reader sees only its own layers.
-export const HIGH_SCORE_BOARD_Z_INDEX = Object.freeze({ backdrop: 6180, panel: 6181, title: 6182, message: 6183, podium: 6184, rows: 6185, glass: 6186 });
+export const HIGH_SCORE_BOARD_Z_INDEX = Object.freeze({ backdrop: 6180, panel: 6181, title: 6182, note: 6183, message: 6184, podium: 6185, rows: 6186, glass: 6187 });
 
 export const REFERENCE_HEIGHT = 1920;
 // The places on the podium, the others in rows below it.
@@ -30,7 +30,7 @@ const DIMMING = 0xB0080A0E;
 const LOOK = Object.freeze({
     // From the panel's edges to the content, as the Drawn Menu's entries.
     sideInset: DRAWN_MENU_FACE_INSET + DRAWN_MENU_LIST_INSET, topInset: DRAWN_MENU_FACE_INSET + 40, bottomInset: DRAWN_MENU_FACE_INSET + 40,
-    titleH: 84, titleSize: 34, minTitleSize: 22, titleGap: 16,
+    titleH: 84, titleSize: 34, minTitleSize: 22, noteH: 30, noteSize: 15, titleGap: 6,
     messageH: 200, messageSize: 26,
     // The podium's steps, the 1st's first: the crown's room, the Avatar,
     // the block under it; the steps stand on the same floor.
@@ -45,9 +45,10 @@ const LOOK = Object.freeze({
 const stepH = index => LOOK.crownH[index] + LOOK.avatar[index] + LOOK.avatarGap + LOOK.blockH[index];
 const PODIUM_H = Math.max(...Array.from({ length: PODIUM_PLACES }, (_, index) => stepH(index)));
 
-// The panel, the title, then either the message's box or the podium's
-// steps (the 1st's first, those with no place included) and one rect per
-// row, in a window referenceWidth wide, for placeCount places.
+// The panel, the title, the note's line under it, then either the
+// message's box or the podium's steps (the 1st's first, those with no
+// place included) and one rect per row, in a window referenceWidth wide,
+// for placeCount places.
 export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const w = DRAWN_MENU_PANEL_WIDTH;
     const rowCount = Math.max(0, placeCount - PODIUM_PLACES);
@@ -56,13 +57,14 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const minH = Math.max(
         DRAWN_MENU_IMAGES.panel.top.height + DRAWN_MENU_IMAGES.panel.bottom.height,
         DRAWN_MENU_IMAGES.glass.top.height + DRAWN_MENU_IMAGES.glass.bottom.height);
-    const h = Math.max(minH, LOOK.topInset + LOOK.titleH + LOOK.titleGap + bodyH + LOOK.bottomInset);
+    const h = Math.max(minH, LOOK.topInset + LOOK.titleH + LOOK.noteH + LOOK.titleGap + bodyH + LOOK.bottomInset);
     // Not rounded across, so the 1st place stands on the window's middle.
     const panel = { x: (referenceWidth - w) / 2, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     const x = panel.x + LOOK.sideInset;
     const contentW = w - 2 * LOOK.sideInset;
     const title = { x, y: panel.y + LOOK.topInset, w: contentW, h: LOOK.titleH };
-    const bodyY = title.y + title.h + LOOK.titleGap;
+    const note = { x, y: title.y + title.h, w: contentW, h: LOOK.noteH };
+    const bodyY = note.y + note.h + LOOK.titleGap;
     const message = { x, y: bodyY, w: contentW, h: LOOK.messageH };
     const stepW = Math.floor((contentW - (PODIUM_PLACES - 1) * LOOK.stepGap) / PODIUM_PLACES);
     // The 1st centred on the panel, so it stands in the middle whatever the rounding.
@@ -71,7 +73,7 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const steps = stepXs.map((stepX, index) => ({ x: stepX, y: bodyY + PODIUM_H - stepH(index), w: stepW, h: stepH(index) }));
     const rowsY = bodyY + PODIUM_H + LOOK.rowsGap;
     const rows = Array.from({ length: rowCount }, (_, index) => ({ x, y: rowsY + index * (LOOK.rowH + LOOK.rowGap), w: contentW, h: LOOK.rowH }));
-    return { panel, title, message, steps, rows };
+    return { panel, title, note, message, steps, rows };
 }
 
 export function drawBackdrop(dc, { width, height }) {
@@ -95,6 +97,12 @@ export const drawGlass = (dc, projectFolder, w, h) => drawSlices(dc, projectFold
 
 export function drawTitle(host, dc, title, w, h) {
     oneLine(host, dc, title, { x: 0, y: 0, width: w, height: h, size: LOOK.titleSize, minSize: LOOK.minTitleSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center" });
+}
+
+// A discreet line under the title, over a board shown: "Reading...", or
+// that it could not be refreshed.
+export function drawNote(host, dc, note, w, h) {
+    oneLine(host, dc, note, { x: 0, y: 0, width: w, height: h, size: LOOK.noteSize, weight: 400, color: COLORS.dim, align: "center" });
 }
 
 export function drawMessage(host, dc, message, w, h) {

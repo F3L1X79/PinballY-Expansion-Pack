@@ -543,6 +543,11 @@ export default {
             // In place of the initials when none were typed.
             noInitials: "\u2014",
             noScore: "No score yet",
+            // While PINemHi reads the board, as a message or a note over the last known one.
+            reading: "Reading\u2026",
+            // Over the last known board when the fresh read failed.
+            notRefreshed: "These scores could not be refreshed",
+            notSupported: "This table's high scores are not supported",
         },
     },
 };

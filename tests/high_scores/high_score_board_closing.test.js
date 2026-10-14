@@ -1,21 +1,24 @@
 // ============================================================
-// The High Score Board, through main.js on the fake PinballY globals: a
-// table never read shows "No score yet"; while open the board swallows
+// The High Score Board, through main.js on the fake PinballY globals: an
+// empty board shows "No score yet"; while open the board swallows
 // every button; Exit removes every layer and reopens the main menu on its
 // entry; attract mode closes it too, leaving the player on the wheel.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { startHighScores } from "./high_scores_scenario.js";
+import { settle } from "../support/fake_pinbally_host.js";
+import { startHighScores, EMPTY_BOARD, MEDIEVAL } from "./high_scores_scenario.js";
 import { openBoard, press, isBoardOpen, boardLayerCount, title, message, podium, rows, BOARD_OPEN_MS } from "./high_score_board_reader.js";
 
-test("a never-read table says so; Exit goes back to the main menu on the entry, attract mode to the wheel", async () => {
-    const { fake } = await startHighScores();
+test("an empty board says so; Exit goes back to the main menu on the entry, attract mode to the wheel", async () => {
+    const { fake, setBoard } = await startHighScores();
     const { default: lang } = await import("../../common/core/i18n.js");
     fake.setNativeCommand(globalThis.command.ShowMainMenu, () => fake.openMainMenu());
 
+    setBoard(MEDIEVAL, EMPTY_BOARD, { durationMs: 100 });
     openBoard(fake, lang);
+    await settle();
     assert.equal(title(fake), "Medieval Madness");
     assert.equal(message(fake), "No score yet");
     assert.deepEqual(podium(fake, lang), { left: null, middle: null, right: null });
