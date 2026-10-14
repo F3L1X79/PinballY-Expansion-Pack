@@ -16,6 +16,7 @@
 import { createPinballYHost } from "../common/core/pinbally_host.js";
 import { safeHandler, logHandlerError } from "../common/core/safe_handler.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
+import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
 import { readBoard } from "../common/high_scores/board_reader.js";
 import { getHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score_store.js";
 import { createHighScoreBoard } from "../common/high_scores/high_score_board.js";
@@ -42,7 +43,7 @@ export default function init() {
     // The Play the Profile store announced for the launched table, if any.
     let announcedPlay = null;
 
-    const board = createHighScoreBoard(host, { highScores, refresh: refreshBoard });
+    const board = createHighScoreBoard(host, { highScores, profileRewards: getProfileRewards(), refresh: refreshBoard });
     const mainMenu = getMainMenu();
     mainMenu.add({
         name: BOARD_ENTRY,

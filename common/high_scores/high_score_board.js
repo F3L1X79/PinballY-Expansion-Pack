@@ -3,10 +3,11 @@
 // menu to see the selected table's board, as the High Score store knows
 // it: the table's title, the podium for the three first places and
 // compact rows for the others, laid out by the High Score Board painter on
-// the Drawn Menu's panel. Each place shows its owner's name and Avatar, or
-// "Default score". Opens at once on the last known board under a
-// "Reading..." note (or a "Reading..." message for a table never read) while
-// the High Scores Add-on reads it fresh, then redraws in place: the fresh
+// the Drawn Menu's panel. Each place shows its owner's name and Avatar, in
+// the Avatar Frame its Profile wears, or "Default score". Opens at once
+// on the last known board under a "Reading..." note (or a "Reading..."
+// message for a table never read) while the High Scores Add-on reads it
+// fresh, then redraws in place: the fresh
 // board, "No score yet" when empty, a "could not be refreshed" note when
 // the read failed, or "not supported" when PINemHi says so or no board is
 // known. The screen is drawn at once on all its layers, then faded in.
@@ -24,13 +25,14 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
 import { SCRIPT_NAME } from "./high_score_store.js";
 import {
-    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, REFERENCE_HEIGHT, PODIUM_PLACES, layoutHighScoreBoard,
+    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard,
     drawBackdrop, drawPanel, drawGlass, drawTitle, drawNote, drawMessage, drawStep, drawRow,
 } from "./high_score_board_painter.js";
 
-// highScores: the High Score store; refresh(configId): reads the table's
-// board into the store, resolving to "read", "unsupported" or "failed".
-export function createHighScoreBoard(host, { highScores, refresh }) {
+// highScores: the High Score store; profileRewards: the worn Avatar
+// Frames; refresh(configId): reads the table's board into the store,
+// resolving to "read", "unsupported" or "failed".
+export function createHighScoreBoard(host, { highScores, profileRewards, refresh }) {
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     const projectFolder = host.getProjectFolder();
@@ -52,6 +54,7 @@ export function createHighScoreBoard(host, { highScores, refresh }) {
             name: owner ? displayNameOf(owner) : TEXT.defaultScore,
             isDefaultScore: owner === null,
             avatarPath: owner ? avatarOf(owner) : null,
+            framePath: owner ? profileRewards.wornImageOf(owner.name, AVATAR_FRAME_WIDTH) : null,
             initials: initials || TEXT.noInitials,
             score: lang.profileStats.number(score),
             isTableRecord: rank === 1,

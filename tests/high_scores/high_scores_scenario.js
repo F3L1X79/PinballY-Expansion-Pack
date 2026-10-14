@@ -66,15 +66,16 @@ export const SECOND_PLACE = board(["SLL", "52000000"], ["ALI", "45000000"], ["BR
 // The High Scores family's IDs among these Achievement IDs.
 export const highScoreIds = ids => ids.filter(id => id.startsWith("highScoreTables:") || id.startsWith("tableRecord"));
 
-// addOns: the Add-ons on; profiles: { name: { isChild } }, Guest's under
-// "guest"; active: the Profile in cabinet.json; files: { path: content }
-// seeded before startup; language: the interface language.
+// addOns: the Add-ons on; profiles: { name: { isChild, ...more of its
+// profile.json } }, Guest's under "guest"; active: the Profile in
+// cabinet.json; files: { path: content } seeded before startup; language:
+// the interface language.
 export async function startHighScores({
     addOns = ["highScores"], profiles = {}, active = "guest", tables = TABLES, files = {}, language = "en",
 } = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
-    for (const [name, { isChild = false } = {}] of Object.entries(profiles)) {
-        fake.addFile(`${PROFILES_FOLDER}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified: [], ...(isChild ? { isChild } : {}) }));
+    for (const [name, { isChild = false, ...data } = {}] of Object.entries(profiles)) {
+        fake.addFile(`${PROFILES_FOLDER}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified: [], ...(isChild ? { isChild } : {}), ...data }));
     }
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: active }));
     for (const [path, content] of Object.entries(files)) fake.addFile(path, content);

@@ -5,12 +5,13 @@
 // table's title and a discreet note under it, then the podium (the 2nd
 // place on the left, the 1st in the middle and highest, the 3rd on the
 // right, room kept above each for its crown), then the places from the 4th on in compact rows; or a
-// message in place of the board. Only drawing: no layer, no event, no side
-// effect.
+// message in place of the board. Each Avatar wears its Profile's Avatar
+// Frame, if any, as on the Profile Stats. Only drawing: no layer, no event,
+// no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
-import { oneLine, drawAvatar } from "../drawing/steamball_drawing.js";
+import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide } from "../drawing/steamball_drawing.js";
 import { ACHIEVEMENT_RANK } from "../achievements/achievements.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER, DRAWN_MENU_PANEL_WIDTH, DRAWN_MENU_FACE_INSET, DRAWN_MENU_LIST_INSET } from "../drawn_menu/drawn_menu_images.js";
 
@@ -41,6 +42,9 @@ const LOOK = Object.freeze({
     rowsGap: 18, rowH: 64, rowGap: 8, rowPad: 8, tile: 48, rowAvatar: 48, cellGap: 14, rowInitialsW: 80, rowScoreW: 200,
     rowRankSize: 18, rowNameSize: 18, rowInitialsSize: 15, rowScoreSize: 20,
 });
+
+// How wide an Avatar Frame is drawn at most, for its image's size.
+export const AVATAR_FRAME_WIDTH = avatarFrameSide(Math.max(...LOOK.avatar, LOOK.rowAvatar));
 
 const stepH = index => LOOK.crownH[index] + LOOK.avatar[index] + LOOK.avatarGap + LOOK.blockH[index];
 const PODIUM_H = Math.max(...Array.from({ length: PODIUM_PLACES }, (_, index) => stepH(index)));
@@ -109,16 +113,20 @@ export function drawMessage(host, dc, message, w, h) {
     oneLine(host, dc, message, { x: 0, y: 0, width: w, height: h, size: LOOK.messageSize, weight: 400, color: COLORS.description, align: "center" });
 }
 
-// place: { rank, name, isDefaultScore, avatarPath (null: none), initials
-// (a mark when empty), score (formatted), isTableRecord } on the podium's
-// step index (0 for the 1st); recordLabel: the Table Record's mark. From the top: the crown's room, the Avatar, then
+// place: { rank, name, isDefaultScore, avatarPath (null: none), framePath
+// (the worn Avatar Frame's image, null: none), initials (a mark when
+// empty), score (formatted), isTableRecord } on the podium's step index (0
+// for the 1st); recordLabel: the Table Record's mark. From the top: the
+// crown's room, the Avatar in its frame (reaching into the crown's room), then
 // the block with its metal edge: rank, the mark on the Table Record, name,
 // score, initials.
 export function drawStep(host, dc, place, index, recordLabel, w) {
     const metal = METALS[index];
     const avatar = LOOK.avatar[index];
     const avatarY = LOOK.crownH[index];
-    drawAvatar(dc, place.avatarPath, Math.round((w - avatar) / 2), avatarY, avatar);
+    const avatarX = Math.round((w - avatar) / 2);
+    drawAvatar(dc, place.avatarPath, avatarX, avatarY, avatar);
+    drawAvatarFrame(dc, place.framePath, avatarX, avatarY, avatar);
     const blockY = avatarY + avatar + LOOK.avatarGap;
     const blockH = LOOK.blockH[index];
     dc.fillRect(0, blockY, w, blockH, COLORS.panelTop);
@@ -139,7 +147,8 @@ export function drawStep(host, dc, place, index, recordLabel, w) {
 }
 
 // A compact row, left to right: the rank's tile, the Avatar, the name,
-// the initials, the score at the right end.
+// the initials, the score at the right end. A framed Avatar is smaller,
+// centred on the same spot, so its frame stays within the row's height.
 export function drawRow(host, dc, place, w) {
     const { rowH: h, rowPad: pad, tile, rowAvatar: avatar, cellGap: gap } = LOOK;
     dc.fillRect(0, 0, w, h, place.isDefaultScore ? COLORS.rowMissing : COLORS.rowUnlocked);
@@ -148,7 +157,11 @@ export function drawRow(host, dc, place, w) {
     dc.frameRect(pad, tileY, tile, tile, 1, COLORS.border);
     oneLine(host, dc, String(place.rank), { x: pad, y: tileY, width: tile, height: tile, size: LOOK.rowRankSize, weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
     const avatarX = pad + tile + gap;
-    drawAvatar(dc, place.avatarPath, avatarX, Math.round((h - avatar) / 2), avatar);
+    const size = place.framePath ? Math.min(avatar, Math.floor(h * h / avatarFrameSide(h))) : avatar;
+    const shownX = avatarX + Math.round((avatar - size) / 2);
+    const shownY = Math.round((h - size) / 2);
+    drawAvatar(dc, place.avatarPath, shownX, shownY, size);
+    drawAvatarFrame(dc, place.framePath, shownX, shownY, size);
     const scoreX = w - pad - LOOK.rowScoreW;
     const initialsX = scoreX - gap - LOOK.rowInitialsW;
     const nameX = avatarX + avatar + gap;
