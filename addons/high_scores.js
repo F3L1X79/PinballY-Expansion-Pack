@@ -25,6 +25,7 @@ import { getHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score
 import { createHighScoreBoard } from "../common/high_scores/high_score_board.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
+import { getDrawingAhead } from "../common/core/drawing_ahead.js";
 import { getWheelDialogs } from "../common/core/wheel_dialog.js";
 import lang from "../common/core/i18n.js";
 
@@ -46,7 +47,9 @@ export default function init() {
     // The Play the Profile store announced for the launched table, if any.
     let announcedPlay = null;
 
-    const board = createHighScoreBoard(host, { highScores, profileRewards: getProfileRewards(), refresh: refreshBoard });
+    const board = createHighScoreBoard(host, {
+        highScores, profileRewards: getProfileRewards(), drawingAhead: getDrawingAhead(), refresh: refreshBoard,
+    });
     const mainMenu = getMainMenu();
     mainMenu.add({
         name: BOARD_ENTRY,

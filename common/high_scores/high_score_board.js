@@ -3,19 +3,23 @@
 // menu or the HighScores button to see the selected table's board, as the
 // High Score store knows it: the table's title, the podium for the three
 // first places and compact rows for the others, laid out by the High Score
-// Board painter on the Drawn Menu's panel. Each place shows its owner's
-// name and Avatar, in the Avatar Frame its Profile wears, or "Default
-// score". Opens at once on the last known board under a "Reading..." note
-// (or a "Reading..." message for a table never read) while the High Scores
+// Board painter on the Drawn Menu's panel, a Gold, Silver and Bronze crown
+// over the podium's three steps. Each place shows its owner's name and
+// Avatar, in the Avatar Frame its Profile wears, or "Default score".
+// Opens at once on the last known board under a "Reading..." note (or a
+// "Reading..." message for a table never read) while the High Scores
 // Add-on reads it fresh, then redraws in place: the fresh board, "No score
 // yet" when empty, a "could not be refreshed" note when the read failed,
 // or "not supported" when PINemHi says so or no board is known. The screen
-// is drawn at once on all its layers, then faded in. While open it
-// swallows every button through "commandbuttondown"; when the rows below
-// the podium do not all fit the window, the flippers (Next / Prev) scroll
-// them, the podium staying in place; Exit closes it and calls the return
-// given to open(); attract mode only closes it. Opens directly, not
-// through the wheel dialog module: the player asked for it. isOpen() and
+// is drawn at once on all its layers, then faded in; the crowns, drawn
+// ahead once on their own layers through the shared drawing ahead
+// (PinballY reads an image file again on every draw), are only placed,
+// and wait hidden, shrunk to a point, while the board is closed. While
+// open it swallows every button through "commandbuttondown"; when the
+// rows below the podium do not all fit the window, the flippers (Next /
+// Prev) scroll them, the podium staying in place; Exit closes it and calls
+// the return given to open(); attract mode only closes it. Opens directly,
+// not through the wheel dialog module: the player asked for it. isOpen() and
 // onClosed() let the wheel dialogs wait for it.
 // ============================================================
 
@@ -26,17 +30,45 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
 import { SCRIPT_NAME } from "./high_score_store.js";
 import {
-    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard, placedRect,
-    drawBackdrop, drawPanel, drawGlass, drawTitle, drawNote, drawMessage, drawStep, drawRow,
+    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX, CROWN_IMAGES, CROWN_CANVAS, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard, placedRect,
+    drawBackdrop, drawPanel, drawGlass, drawCrown, drawTitle, drawNote, drawMessage, drawStep, drawRow,
 } from "./high_score_board_painter.js";
 
+const TRANSPARENT = 0x00000000;
+// A hidden layer shrunk to a point: PinballY would otherwise fill every
+// pixel of the window with it at each frame, even invisible.
+const POINT_SCALE = Object.freeze({ xSpan: 0.001, ySpan: 0.001 });
+
 // highScores: the High Score store; profileRewards: the worn Avatar
-// Frames; refresh(configId): reads the table's board into the store,
+// Frames; drawingAhead: the shared drawing ahead
+// (common/core/drawing_ahead.js); refresh(configId): reads the table's board into the store,
 // resolving to "read", "unsupported" or "failed".
-export function createHighScoreBoard(host, { highScores, profileRewards, refresh }) {
+export function createHighScoreBoard(host, { highScores, profileRewards, drawingAhead, refresh }) {
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     const projectFolder = host.getProjectFolder();
+
+    function hideCrown(crown) {
+        crown.layer.alpha = 0;
+        crown.layer.setScale(POINT_SCALE);
+    }
+    // The 1st, 2nd and 3rd places' crowns, each on its own layer, drawn once.
+    const crowns = CROWN_IMAGES.map((_, index) => ({ index, layer: host.createDrawingLayer(HIGH_SCORE_BOARD_CROWN_Z_INDEX), isDrawn: false }));
+    crowns.forEach(hideCrown);
+
+    function drawCrownLayer(crown) {
+        crown.layer.clear(TRANSPARENT);
+        crown.layer.draw(dc => drawCrown(dc, projectFolder, crown.index), CROWN_CANVAS, CROWN_CANVAS);
+        crown.isDrawn = true;
+    }
+
+    // One crown per step of the drawing ahead.
+    drawingAhead.add(() => {
+        const crown = crowns.find(candidate => !candidate.isDrawn);
+        if (!crown) return false;
+        drawCrownLayer(crown);
+        return true;
+    });
     // The screen on show: its drawn screen, return, opacity, the layers
     // of its content (all but the backdrop), its layout, its rows' layers
     // and the first row in view; null when closed.
@@ -87,7 +119,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
     // out of view hidden, and puts each row in its scrolled place.
     function showContent(opened) {
         const { drawn, geometry, rowLayers, firstRow } = opened;
-        for (const layer of opened.content) layer.alpha = opened.opacity;
+        for (const layer of [...opened.content, ...opened.crownLayers]) layer.alpha = opened.opacity;
         rowLayers.forEach((layer, index) => {
             drawn.place(layer, placedRect(geometry, geometry.rows[index], firstRow * geometry.rowPitch));
             const inView = index >= firstRow && index < firstRow + geometry.rowsInView;
@@ -115,6 +147,13 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
             const rect = geometry.steps[index];
             piece(Z_INDEX.podium, rect, dc => drawStep(host, dc, place, index, TEXT.record, rect.w));
         });
+        crowns.forEach(hideCrown);
+        // Drawn now when the board opens before the drawing ahead reached them.
+        const crownLayers = crowns.slice(0, Math.min(PODIUM_PLACES, screen.places.length)).map((crown, index) => {
+            if (!crown.isDrawn) drawCrownLayer(crown);
+            drawn.place(crown.layer, placedRect(geometry, geometry.crowns[index]));
+            return crown.layer;
+        });
         const rowLayers = screen.places.slice(PODIUM_PLACES).map((place, index) => {
             const rect = geometry.rows[index];
             return piece(Z_INDEX.rows, rect, dc => drawRow(host, dc, place, rect.w));
@@ -123,6 +162,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
         opened.content = content;
         opened.geometry = geometry;
         opened.rowLayers = rowLayers;
+        opened.crownLayers = crownLayers;
         opened.firstRow = Math.min(opened.firstRow, lastFirstRow(opened));
         showContent(opened);
     }
@@ -151,7 +191,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
             backdropZIndex: Z_INDEX.backdrop,
             drawBackdrop,
         });
-        const opened = { drawn, onBack, opacity: 0, content: [], geometry: null, rowLayers: [], firstRow: 0 };
+        const opened = { drawn, onBack, opacity: 0, content: [], geometry: null, rowLayers: [], crownLayers: [], firstRow: 0 };
         shown = opened;
         drawContent(opened, screenFor(game, game ? "reading" : "read"));
         drawn.fadeIn(opacity => {
@@ -172,6 +212,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, refresh
     function close() {
         if (!shown) return;
         shown.drawn.close(shown.content);
+        crowns.forEach(hideCrown);
         shown = null;
         closedListeners.tell();
     }

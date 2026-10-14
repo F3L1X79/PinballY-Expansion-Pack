@@ -4,21 +4,24 @@
 // is REFERENCE_HEIGHT reference pixels), on the Drawn Menu's panel and
 // glass images: the table's title and a discreet note under it, then the
 // podium (the 2nd place on the left, the 1st in the middle and highest,
-// the 3rd on the right, room kept above each for its crown), then the
-// places from the 4th on in compact rows, as many in view as the window's
-// height leaves room for; or a message in place of the board. Each Avatar
+// the 3rd on the right, each under its crown, above where an Avatar
+// Frame reaches), then the places from the 4th on in compact rows, as
+// many in view as the window's height leaves room for; or a message in place of the board. Each Avatar
 // wears its Profile's Avatar Frame, if any, as on the Profile Stats. Only
 // drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
-import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide } from "../drawing/steamball_drawing.js";
+import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN } from "../drawing/steamball_drawing.js";
 import { ACHIEVEMENT_RANK } from "../achievements/achievements.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER, DRAWN_MENU_PANEL_WIDTH, DRAWN_MENU_FACE_INSET, DRAWN_MENU_LIST_INSET } from "../drawn_menu/drawn_menu_images.js";
 
 // Between the Household Stats and the Drawn Menus, which never show at the
 // same time, so each reader sees only its own layers.
-export const HIGH_SCORE_BOARD_Z_INDEX = Object.freeze({ backdrop: 6180, panel: 6181, title: 6182, note: 6183, message: 6184, podium: 6185, rows: 6186, glass: 6187 });
+export const HIGH_SCORE_BOARD_Z_INDEX = Object.freeze({ backdrop: 6180, panel: 6181, title: 6182, note: 6183, message: 6184, podium: 6185, rows: 6186, glass: 6188 });
+// The crowns' layers, drawn ahead and kept while the board is closed: over
+// the podium, under the glass.
+export const HIGH_SCORE_BOARD_CROWN_Z_INDEX = 6187;
 
 export const REFERENCE_HEIGHT = 1920;
 // The places on the podium, the others in rows below it.
@@ -26,6 +29,10 @@ export const PODIUM_PLACES = 3;
 
 // The 1st, 2nd and 3rd places' metal, as the crowns over them.
 const METALS = [RANK_COLORS[ACHIEVEMENT_RANK.GOLD], RANK_COLORS[ACHIEVEMENT_RANK.SILVER], RANK_COLORS[ACHIEVEMENT_RANK.BRONZE]];
+// The 1st, 2nd and 3rd places' crown images, in the pack's assets\ folder.
+export const CROWN_IMAGES = Object.freeze(["gold", "silver", "bronze"].map(metal => `assets\\images\\crown_${metal}.png`));
+// The side of a crown's square canvas, as its image's.
+export const CROWN_CANVAS = 512;
 const LIGHT_GOLD = 0xFFFFE6A6;
 const DIMMING = 0xB0080A0E;
 
@@ -35,8 +42,9 @@ const LOOK = Object.freeze({
     titleH: 84, titleSize: 34, minTitleSize: 22, noteH: 30, noteSize: 15, titleGap: 6,
     messageH: 200, messageSize: 26,
     // The podium's steps, the 1st's first: the crown's room, the Avatar,
-    // the block under it; the steps stand on the same floor.
-    stepGap: 14, crownH: [110, 84, 84], avatar: [120, 92, 92], avatarGap: 10, blockH: [210, 184, 164],
+    // the block under it; the steps stand on the same floor. The crown
+    // stands crownGap above where an Avatar Frame reaches into its room.
+    stepGap: 14, crownH: [110, 84, 84], crownGap: 4, avatar: [120, 92, 92], avatarGap: 10, blockH: [210, 184, 164],
     edge: 4, blockPad: 10, rankH: 44, rankSize: 28, recordH: 24, recordSize: 14,
     nameH: 36, nameSize: 20, minNameSize: 14, scoreH: 40, scoreSize: 22, recordScoreSize: 26, initialsH: 28, initialsSize: 15,
     // The rows from the 4th place on.
@@ -65,7 +73,8 @@ const MIN_PANEL_H = Math.max(
 // also the size its piece is drawn at; placedRect() puts one in the
 // window. Gives the panel, the title, the note's line under it, then
 // either the message's box or the podium's steps (the 1st's first, those
-// with no place included) and one rect per row as if none were scrolled.
+// with no place included), the crowns over them, and one rect per row as
+// if none were scrolled.
 // zoom: board to reference pixels; rowsInView: how many rows show at
 // once (all of them when they fit), the others scrolling rowPitch apart.
 export function layoutHighScoreBoard(referenceWidth, placeCount) {
@@ -95,16 +104,25 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const middleX = (w - stepW) / 2;
     const stepXs = [middleX, middleX - LOOK.stepGap - stepW, middleX + stepW + LOOK.stepGap];
     const steps = stepXs.map((stepX, index) => ({ x: stepX, y: bodyY + PODIUM_H - stepH(index), w: stepW, h: stepH(index) }));
+    const crowns = steps.map((step, index) => {
+        const side = LOOK.crownH[index] - LOOK.avatar[index] * AVATAR_FRAME_MARGIN - LOOK.crownGap;
+        return { x: step.x + (step.w - side) / 2, y: step.y, w: side, h: side };
+    });
     const rowPitch = LOOK.rowH + LOOK.rowGap;
     const rowsY = bodyY + PODIUM_H + LOOK.rowsGap;
     const rows = Array.from({ length: rowCount }, (_, index) => ({ x, y: rowsY + index * rowPitch, w: contentW, h: LOOK.rowH }));
-    return { zoom, origin, panel, title, note, message, steps, rows, rowsInView, rowPitch };
+    return { zoom, origin, panel, title, note, message, steps, crowns, rows, rowsInView, rowPitch };
 }
 
 // A rect of the layout in reference pixels from the window's top left,
 // moved up by shiftY board pixels (a scrolled row).
 export function placedRect({ zoom, origin }, rect, shiftY = 0) {
     return { x: origin.x + rect.x * zoom, y: origin.y + (rect.y - shiftY) * zoom, w: rect.w * zoom, h: rect.h * zoom };
+}
+
+// projectFolder: where the pack's assets\ folder is.
+export function drawCrown(dc, projectFolder, index) {
+    dc.drawImage(`${projectFolder}\\${CROWN_IMAGES[index]}`, 0, 0, CROWN_CANVAS, CROWN_CANVAS);
 }
 
 export function drawBackdrop(dc, { width, height }) {
@@ -144,7 +162,8 @@ export function drawMessage(host, dc, message, w, h) {
 // (the worn Avatar Frame's image, null: none), initials (a mark when
 // empty), score (formatted), isTableRecord } on the podium's step index (0
 // for the 1st); recordLabel: the Table Record's mark. From the top: the
-// crown's room, the Avatar in its frame (reaching into the crown's room), then
+// crown's room (the crown on its own layer), the Avatar in its frame
+// (reaching into the crown's room, below the crown), then
 // the block with its metal edge: rank, the mark on the Table Record, name,
 // score, initials.
 export function drawStep(host, dc, place, index, recordLabel, w) {

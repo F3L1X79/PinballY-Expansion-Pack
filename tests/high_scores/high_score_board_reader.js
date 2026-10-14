@@ -4,12 +4,13 @@
 // of the board, the podium's three steps (left, middle, right) and the rows
 // below it, each place with its rank, owner's name or "Default score",
 // Avatar image, initials, score text and whether it is marked as the Table
-// Record, and the Avatar Frame drawn around its Avatar; and whether every
-// layer is gone after close. Opens it from the main menu entry. Never
+// Record, the Avatar Frame drawn around its Avatar and the crown over it;
+// and whether every layer is gone after close, but the crowns' (drawn
+// ahead, kept hidden). Opens it from the main menu entry. Never
 // loaded by PinballY.
 // ============================================================
 
-import { HIGH_SCORE_BOARD_Z_INDEX } from "../../common/high_scores/high_score_board_painter.js";
+import { HIGH_SCORE_BOARD_Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX } from "../../common/high_scores/high_score_board_painter.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
 
 // Past the fade in.
@@ -21,7 +22,8 @@ const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer
 
 export const isBoardOpen = fake => shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.backdrop).length > 0;
 
-// Its layers, shown or not: none once it closed.
+// Its layers, shown or not: none once it closed. The crowns' layers are
+// kept, drawn ahead.
 export const boardLayerCount = fake => fake.drawingLayers()
     .filter(layer => Object.values(HIGH_SCORE_BOARD_Z_INDEX).includes(layer.zIndex)).length;
 
@@ -112,3 +114,55 @@ export const frames = fake => ({ podium: mapSteps(stepLayers(fake), frameOf), ro
 
 // The discreet note over a known board ("Reading…", "could not be refreshed"), or null.
 export const note = fake => firstText(fake, HIGH_SCORE_BOARD_Z_INDEX.note);
+
+const fileOf = path => path.split("\\").pop();
+const crownLayers = fake => fake.drawingLayers().filter(layer => layer.zIndex === HIGH_SCORE_BOARD_CROWN_Z_INDEX);
+
+// The crown over each podium step: { left, middle, right }, each null or
+// { image (its file name), clearsFrame (between
+// the step's top and where an Avatar Frame would reach above its Avatar,
+// a quarter of the Avatar's box) }. Positions grow upwards, in window
+// heights. A crown is found over a step only when centred on it; any other
+// shown crown is counted as stray.
+export function crowns(fake) {
+    const steps = stepLayers(fake);
+    const shown = shownLayers(fake, HIGH_SCORE_BOARD_CROWN_Z_INDEX);
+    const near = (a, b) => Math.abs(a - b) < 1e-6;
+    const crownOver = (step) => {
+        if (!step) return null;
+        const crown = shown.find(layer => near(layer.position().x, step.position().x));
+        if (!crown) return null;
+        const [image] = crown.images();
+        const stepSpan = step.scale().ySpan;
+        const stepTop = step.position().y + stepSpan / 2;
+        const avatarImage = step.strokes().find(stroke => "image" in stroke && !isFrameImage(stroke.image));
+        // The Avatar's image is drawn 3 px inside its box.
+        const boxTop = avatarImage.rect.y - 3;
+        const boxSize = avatarImage.rect.width + 6;
+        const frameTop = stepTop - (boxTop - boxSize / 4) * stepSpan / step.canvasSize().height;
+        const crownSpan = crown.scale().ySpan;
+        const crownBottom = crown.position().y - crownSpan / 2;
+        const crownTop = crown.position().y + crownSpan / 2;
+        return { image: fileOf(image), clearsFrame: crownBottom >= frameTop - 1e-6 && crownTop <= stepTop + 1e-6 };
+    };
+    const found = mapSteps(steps, crownOver);
+    const placed = Object.values(found).filter(Boolean).length;
+    return shown.length === placed ? found : { ...found, stray: shown.length - placed };
+}
+
+// A crown as crowns() reads one in its place.
+export const crowned = image => ({ image, clearsFrame: true });
+
+// Whether every crown's layer waits hidden, shrunk to a point.
+export const crownsWaitHidden = fake => crownLayers(fake).length > 0 && crownLayers(fake)
+    .every(layer => layer.alpha === 0 && layer.scale().xSpan <= 0.001 && layer.scale().ySpan <= 0.001);
+
+// How many times each crown image was drawn, by file name.
+export function crownDrawCounts(fake) {
+    const counts = {};
+    for (const drawing of fake.drawings()) {
+        if (drawing.zIndex !== HIGH_SCORE_BOARD_CROWN_Z_INDEX) continue;
+        for (const image of drawing.images) counts[fileOf(image)] = (counts[fileOf(image)] || 0) + 1;
+    }
+    return counts;
+}
