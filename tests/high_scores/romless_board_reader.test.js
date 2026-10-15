@@ -46,3 +46,45 @@ test("a section whose scores are all empty is not a board", () => {
 test("equal scores keep their slot order", () => {
     assert.deepEqual(readSectionBoard(sections["Metal Slug"]).map(place => place.initials), ["AAA", "BBB", "CCC", "DDD"]);
 });
+
+test("Game of Thrones' section gives its sixteen places by score", () => {
+    const places = readSectionBoard(sections.gameofthrones);
+    assert.equal(places.length, 16);
+    assert.deepEqual(places.slice(0, 6).map(place => [place.rank, place.initials, place.score]), [
+        [1, "AAA", 750000000], [2, "BBB", 500000000], [3, "CCC", 400000000],
+        [4, "DDD", 300000000], [5, "EEE", 200000000], [6, "FEF", 72105500],
+    ]);
+    assert.deepEqual(places.at(-1), { rank: 16, initials: "PPP", score: 1000000 });
+});
+
+test("a lone HighScore or HiScore makes a one-place board with empty initials", () => {
+    assert.deepEqual(readSectionBoard(sections.smurfette), [{ rank: 1, initials: "", score: 10000 }]);
+    assert.deepEqual(readSectionBoard(sections.nellie), [{ rank: 1, initials: "", score: 1000 }]);
+});
+
+test("a second board of feats is left out", () => {
+    assert.deepEqual(readSectionBoard(sections.STLE), [
+        { rank: 1, initials: "SBW", score: 1300000 },
+        { rank: 2, initials: "JPS", score: 1200000 },
+        { rank: 3, initials: "011", score: 1100000 },
+        { rank: 4, initials: "011", score: 1000000 },
+    ]);
+    assert.equal(readSectionBoard({ SpecialHighScore1: "500000", SpecialHighScore1Name: "AAA" }), null);
+});
+
+test("initials that are not letters, digits or spaces read as empty", () => {
+    assert.deepEqual(readSectionBoard({
+        HighScore1: "300", HighScore1Name: " A B ",
+        HighScore2: "200", HighScore2Name: "A*Z",
+        HighScore3: "100", HighScore3Name: "\u0001\u0002",
+    }).map(place => place.initials), ["A B", "", ""]);
+});
+
+test("a lone score that is empty is not a board", () => {
+    assert.equal(readSectionBoard({ HighScore: "", Credits: "0" }), null);
+    assert.equal(readSectionBoard({ HiScore: "0" }), null);
+});
+
+test("a lone score is read when the HighScoreN family is all empty", () => {
+    assert.deepEqual(readSectionBoard({ HighScore1: "", HighScore1Name: "", HighScore: "5000" }), [{ rank: 1, initials: "", score: 5000 }]);
+});
