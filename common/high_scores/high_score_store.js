@@ -264,18 +264,23 @@ export function createHighScoreStore(host, profileStore) {
         // The named Profile's Lost Records on the given visible tables (by
         // config ID), most recent first, one per table: { configId, taker },
         // the taker the Profile store's Profile that took the Table Record
-        // from it most recently there since its seen marker; a table whose
-        // taker was removed since is left out. None without a marker, nor
-        // for Guest.
+        // from it most recently there since its seen marker. Left out: a
+        // table whose last known board has the Profile first again, and one
+        // whose taker was removed since. None without a marker, nor for
+        // Guest.
         lostRecordsOf(profileName, visibleConfigIds) {
             const profileKey = profileKeyOf(profileName);
             const profile = profileNamed(profileName);
             const seen = isRecord(data.lostRecordsSeen) ? data.lostRecordsSeen[profileKey] : undefined;
             if (!profile || profile.isGuest || typeof seen !== "string") return [];
             const visible = new Set(visibleConfigIds);
+            const holdsTableRecord = configId => {
+                const known = knownBoardOf(configId);
+                return known !== null && known.length > 0 && typeof known[0].owner === "string" && profileKeyOf(known[0].owner) === profileKey;
+            };
             const takings = data.highScores
                 .filter(highScore => typeof highScore.takenFrom === "string" && profileKeyOf(highScore.takenFrom) === profileKey
-                    && highScore.date > seen && visible.has(highScore.configId))
+                    && highScore.date > seen && visible.has(highScore.configId) && !holdsTableRecord(highScore.configId))
                 .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
             const latestByTable = new Map();
             for (const highScore of takings) {

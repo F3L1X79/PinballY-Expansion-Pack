@@ -1,7 +1,7 @@
 // ============================================================
 // Reads the drawn Welcome Screen the way the player sees it, on the fake
 // PinballY host: whether it is open, its greeting, its Daily Streak line,
-// its Lost Records line and the Avatar on it,
+// its Lost Records line and the Avatar on it, where its layers sit,
 // its Collection Mastery card, its Period Table cards (period, name,
 // Mastery head, grey line, logo), its bottom row's labels, the highlighted choice (the label under
 // the gold halo, the period of the card whose button it surrounds, or the
@@ -73,6 +73,13 @@ export function lostRecordsLine(fake) {
 
 // The images drawn on the Lost Records line: the taker's Avatar, if any.
 export const lostRecordsImages = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.lostRecords).flatMap(layer => layer.images());
+
+// Where each shown layer sits and how large it is, by z-index then top to
+// bottom, to tell whether two screens are laid out alike.
+export const welcomeScreenLayout = fake => Object.values(WELCOME_SCREEN_Z_INDEX)
+    .flatMap(zIndex => shownLayers(fake, zIndex))
+    .map(layer => ({ zIndex: layer.zIndex, position: layer.position(), scale: layer.scale(), canvasSize: layer.canvasSize() }))
+    .sort((a, b) => a.zIndex - b.zIndex || b.position.y - a.position.y);
 
 // The bottom row's labels, from left to right, without the mystery box
 // icon's "?".
