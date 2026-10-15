@@ -1233,6 +1233,14 @@ export function createFakePinballYHost({
             if (uiMode === "wheel") fire("wheelmode");
         },
 
+        // The Exit button in a native menu: PinballY runs MenuReturn, which
+        // closes it (Commands.html; an Exit menu set to treat Exit as Select
+        // aside). Whether a "command" event fires for it is not documented:
+        // modelled without one, a MenuReturn entry covering the other case.
+        pressExitInMenu() {
+            host.closeMenu();
+        },
+
         // Picks the item with this title in the current menu: fires its
         // command, then carries it out as PinballY does unless a listener
         // prevented it, then closes the menu, unless the item stays open. A
@@ -1249,9 +1257,16 @@ export function createFakePinballYHost({
 
         // The cabinet enters attract mode after a while on its own: PinballY
         // then moves the wheel itself ("gameselect" outside wheel mode).
+        // A native menu open closes with it, after "attractmodestart" (the
+        // order is not documented: to be checked on the cabinet).
         enterAttractMode() {
             uiMode = "attract";
             fire("attractmodestart");
+            if (shownMenu) {
+                const { id } = shownMenu;
+                shownMenu = null;
+                fire("menuclose", { id });
+            }
         },
         // A button press ends attract mode, back to the wheel.
         exitAttractMode() {

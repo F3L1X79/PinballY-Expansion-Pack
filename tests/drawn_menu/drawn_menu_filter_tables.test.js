@@ -14,9 +14,8 @@ import { assertNoErrorLogged } from "../support/error_log.js";
 import { OPEN_OVER_MS, drawnMenuLines, readDrawnMenu, highlightedEntry, press, openMainMenu, chooseEntry } from "./drawn_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "menuCleanup", "drawnMenus"];
-// Command ids of PinballY's own entries in the Era menu.
+// Command id of a PinballY filter in the Era menu.
 const ERA_1980S_CMD = 940;
-const ERA_BACK_CMD = 941;
 
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 15, 20, 0, 0) });
 let LABELS;
@@ -31,14 +30,14 @@ test("setup", async () => {
     await import("../../main.js");
     await settle();
     const COMMAND = globalThis.command;
-    // What PinballY does itself on these commands.
+    // What PinballY does itself on these commands; its group menus end
+    // with a MenuReturn entry.
     fake.setNativeCommand(COMMAND.ShowMainMenu, () => fake.openMainMenu());
     fake.setNativeCommand(COMMAND.FilterByEra, () => fake.openMenu("filter by era", [
         { title: "1980s", cmd: ERA_1980S_CMD },
         { title: "", cmd: -1 },
-        { title: "Back", cmd: ERA_BACK_CMD },
+        { title: "Back", cmd: COMMAND.MenuReturn },
     ]));
-    fake.setNativeCommand(ERA_BACK_CMD, () => fake.openMainMenu());
 });
 
 test("the main menu's Filter Tables entry carries the submenu arrow", () => {
@@ -96,7 +95,7 @@ test("the group menu's Back entry does the same", () => {
     press(fake, "Next");
     chooseEntry(fake, "Filter by Manufacturer");
     // Only the Era menu is described: any group stands for the others.
-    fake.openMenu("filter by manuf", [{ title: "Williams", cmd: 942 }, { title: "", cmd: -1 }, { title: "Back", cmd: ERA_BACK_CMD }]);
+    fake.openMenu("filter by manuf", [{ title: "Williams", cmd: 942 }, { title: "", cmd: -1 }, { title: "Back", cmd: globalThis.command.MenuReturn }]);
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Back");
     fake.advanceTime(OPEN_OVER_MS);

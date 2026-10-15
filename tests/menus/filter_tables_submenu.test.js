@@ -4,7 +4,8 @@
 // groups leave the main menu for one "Filter Tables" entry with the
 // submenu arrow, above Return; it lists every group in PinballY's order;
 // a group opens PinballY's own group menu, a filter value applies there;
-// Back goes up one level at a time, the cursor on the entry left; with
+// Back and Exit go up one level at a time, the cursor on the entry left
+// (PinballY's own Back in a group menu, MenuReturn, only closes it); with
 // no group the entry is gone, with one the submenu stays.
 // ============================================================
 
@@ -17,9 +18,8 @@ import { assertNoErrorLogged } from "../support/error_log.js";
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands"];
 const SEPARATOR = "---";
 const FILTER_BY_ERA = "filter by era";
-// Command ids of PinballY's own entries in the Era menu, in the filter range.
+// Command id of a PinballY filter in the Era menu, in the filter range.
 const ERA_1980S_CMD = 940;
-const ERA_BACK_CMD = 941;
 
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 15, 20, 0, 0) });
 let lang;
@@ -29,6 +29,8 @@ let appliedFilter = null;
 const titlesOf = items => items.map(item => (item.cmd === -1 && !item.title ? SEPARATOR : item.title));
 const currentTitles = () => titlesOf(fake.currentMenu().items);
 const selectedTitle = () => fake.currentMenu().items.filter(item => item.selected).map(item => item.title);
+// Exit goes up one level at a time: pressed until no menu is left.
+const closeMenus = () => { while (fake.currentMenu()) fake.pressExitInMenu(); };
 
 test("setup", async () => {
     // Never uninstalled: node --test runs each test file in its own process.
@@ -39,19 +41,18 @@ test("setup", async () => {
     await import("../../main.js");
     await settle();
     COMMAND = globalThis.command;
-    // What PinballY does itself on these commands; its Era menu's Back
-    // entry opens the main menu again.
+    // What PinballY does itself on these commands; its Era menu ends with
+    // a MenuReturn entry, which only closes it.
     fake.setNativeCommand(COMMAND.ShowMainMenu, () => fake.openMainMenu());
     fake.setNativeCommand(COMMAND.FilterByEra, () => fake.openMenu(FILTER_BY_ERA, [
         { title: "1980s", cmd: ERA_1980S_CMD },
         { title: "", cmd: -1 },
-        { title: "Back", cmd: ERA_BACK_CMD },
+        { title: "Back", cmd: COMMAND.MenuReturn },
     ]));
     fake.setNativeCommand(ERA_1980S_CMD, () => {
         appliedFilter = "1980s";
         fake.fire("filterselect", {});
     });
-    fake.setNativeCommand(ERA_BACK_CMD, () => fake.openMainMenu());
 });
 
 test("the filter groups leave the main menu for one Filter Tables entry with the arrow, above Return", () => {
@@ -74,7 +75,7 @@ test("Filter Tables lists every group PinballY shows, in its order, then Back", 
         lang.customMenuLabels.filterTablesBack,
     ]);
     assert.ok(fake.currentMenu().items.filter(item => String(item.title).startsWith("Filter by")).every(item => item.hasSubmenu));
-    fake.closeMenu();
+    closeMenus();
 });
 
 test("a group opens PinballY's own group menu, where choosing a filter applies it and closes the menus", () => {
@@ -109,21 +110,44 @@ test("Back in a group menu goes back to Filter Tables, the cursor on that group"
 
     assert.equal(currentTitles()[0], "Filter by Era", "Filter Tables again");
     assert.deepEqual(selectedTitle(), ["Filter by Era"]);
-    fake.closeMenu();
+    closeMenus();
     fake.openMainMenu();
     assert.equal(fake.currentMenu().id, "main", "the next opening is the main menu again");
     fake.closeMenu();
 });
 
-test("closing a group menu leaves the next opening to the main menu", () => {
+test("Exit in Filter Tables goes back to the main menu, the cursor on Filter Tables", () => {
+    fake.openMainMenu();
+    fake.selectMenuItem(lang.customMenuLabels.filterTables);
+    fake.pressExitInMenu();
+
+    assert.equal(fake.currentMenu().id, "main");
+    assert.deepEqual(selectedTitle(), [lang.customMenuLabels.filterTables]);
+    fake.pressExitInMenu();
+    assert.equal(fake.currentMenu(), null, "Exit in the main menu closes it");
+});
+
+test("Exit in a group menu goes back to Filter Tables, the cursor on that group, then to the main menu", () => {
     fake.openMainMenu();
     fake.selectMenuItem(lang.customMenuLabels.filterTables);
     fake.selectMenuItem("Filter by Era");
-    fake.closeMenu();
+    fake.pressExitInMenu();
 
-    fake.openMainMenu();
+    assert.equal(currentTitles()[0], "Filter by Era", "Filter Tables again");
+    assert.deepEqual(selectedTitle(), ["Filter by Era"]);
+    fake.pressExitInMenu();
     assert.equal(fake.currentMenu().id, "main");
-    fake.closeMenu();
+    assert.deepEqual(selectedTitle(), [lang.customMenuLabels.filterTables]);
+    fake.pressExitInMenu();
+});
+
+test("attract mode closing Filter Tables leaves the cabinet idle", () => {
+    fake.openMainMenu();
+    fake.selectMenuItem(lang.customMenuLabels.filterTables);
+    fake.enterAttractMode();
+
+    assert.equal(fake.currentMenu(), null);
+    fake.exitAttractMode();
 });
 
 test("with a single group the submenu stays; with none the entry is gone", () => {
@@ -137,7 +161,7 @@ test("with a single group the submenu stays; with none the entry is gone", () =>
     fake.openMenu("main", mainMenu([{ title: "Filter by Rating", cmd: COMMAND.FilterByRating, hasSubmenu: true }]));
     fake.selectMenuItem(lang.customMenuLabels.filterTables);
     assert.deepEqual(currentTitles(), ["Filter by Rating", SEPARATOR, lang.customMenuLabels.filterTablesBack]);
-    fake.closeMenu();
+    closeMenus();
 
     fake.openMenu("main", mainMenu([]));
     assert.ok(!currentTitles().includes(lang.customMenuLabels.filterTables));

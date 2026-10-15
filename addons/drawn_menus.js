@@ -14,7 +14,8 @@
 
 import { safeHandler } from "../common/core/safe_handler.js";
 import { getDrawnMenus } from "../common/drawn_menu/drawn_menu.js";
-import { FILTER_TABLES_MENU_ID, getMainMenu } from "../common/menus/main_menu.js";
+import { getMainMenu } from "../common/menus/main_menu.js";
+import { FILTER_GROUPS, FILTER_TABLES_MENU_ID } from "../common/menus/filter_tables.js";
 
 const SCRIPT_NAME = "DrawnMenus";
 
@@ -22,7 +23,7 @@ const SCRIPT_NAME = "DrawnMenus";
 // menus, the table's setup and categories menus, opened from the main
 // menu, and the operator menu, from the Exit menu. The capture, media
 // drop and elevation menus and the pause menu stay native.
-const FILTER_MENU_IDS = ["category", "era", "manuf", "rating", "system", "when added", "when played"].map(name => `filter by ${name}`);
+const FILTER_MENU_IDS = FILTER_GROUPS.map(group => group.menuId);
 const DRAWN_MENU_IDS = ["main", FILTER_TABLES_MENU_ID, "exit", "power off", "game setup", "game categories", "operator", ...FILTER_MENU_IDS];
 
 export default function init() {
@@ -59,7 +60,7 @@ export default function init() {
             // Back from a group menu lands here: the main menu module puts
             // the cursor on that group itself.
             mainMenuSelectedCmd = null;
-            drawOptions.onBack = () => { getMainMenu().backFromFilterTables(); };
+            drawOptions.onBack = () => { getMainMenu().filterTables.back(); };
         } else if (ev.id === "main") {
             drawOptions.selectedCmd = mainMenuSelectedCmd;
             mainMenuSelectedCmd = null;

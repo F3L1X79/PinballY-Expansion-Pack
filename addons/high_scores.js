@@ -40,6 +40,7 @@ import { getHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score
 import { createHighScoreBoard } from "../common/high_scores/high_score_board.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
+import { isSeparator } from "../common/menus/menu_separator.js";
 import { getDrawingAhead } from "../common/core/drawing_ahead.js";
 import { getWheelDialogs } from "../common/core/wheel_dialog.js";
 import { displayNameOf } from "../common/profiles/profile_name.js";
@@ -82,7 +83,6 @@ export default function init() {
     // The board replaces PinballY's own "High Scores": its window and its
     // main menu entry, the DMD's high score text left as it is.
     const highScoresCommand = host.getBuiltInCommand("HighScores");
-    const isSeparator = item => item.cmd < 0 && !item.title;
 
     // Fires when any menu opens, with a fresh item list each time; removes
     // PinballY's entry whether Menu Cleanup is on or not. The native

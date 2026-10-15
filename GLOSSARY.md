@@ -16,6 +16,10 @@ _Avoid_: plugin, script (a script is just a `.js` file)
 A menu the player sees drawn in the pack's own style instead of PinballY's native one, with the same entries and the same effect when one is chosen: the menus a player meets (main, Exit, filter choices, power off) and those the Add-ons open. The setup menus that look after the cabinet and the pause menu of a running game stay native, and so does every menu when the Add-on is turned off or a menu cannot be drawn. Shown simply as "menu".
 _Avoid_: Steamball menu (Steamball is the palette), custom menu, popup (a popup shows information, a menu offers choices)
 
+**Filter Tables**:
+The submenu, opened by the player from the main menu, that gathers PinballY's filter groups (by era, manufacturer, category, rating, and the others the player kept), each opening PinballY's own list of filters for that group. Back or Exit goes up one level at a time: from a group to "Filter Tables" on that group, from "Filter Tables" to the main menu on its entry. The entry and the group are marked when the current filter belongs to that group. Shown as "Filtrer les tables" in French.
+_Avoid_: filter menu (each group's own list is a filter menu too), filter groups (the groups are what it lists)
+
 ### Wheel
 
 **Wheel Arc**:

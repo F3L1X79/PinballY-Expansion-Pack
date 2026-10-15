@@ -11,6 +11,7 @@
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";
+import { isSeparator } from "../common/menus/menu_separator.js";
 
 const SCRIPT_NAME = "MenuCleanup";
 
@@ -20,10 +21,6 @@ const REMOVED_COMMANDS = {
     operator: ["Help", "AboutBox"],
     main: ["GameInfo", "Flyer", "HighScores", "Instructions", "FilterBySystem", "FilterByRecency", "FilterByAdded"],
 };
-
-// Looser than PinballY's tidyMenu(), which needs title === "": the main
-// menu module's separators have no title at all.
-const isSeparator = item => item.cmd < 0 && !item.title;
 
 export default function init() {
     // Fires when any menu opens, with a fresh item list each time.
