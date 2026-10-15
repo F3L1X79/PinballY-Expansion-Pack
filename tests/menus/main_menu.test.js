@@ -1,10 +1,10 @@
 ﻿// ============================================================
 // Main menu module tests: entries added through its interface appear in
-// PinballY's main menu right after "Play", grouped in sections (launch,
-// then personal) split by separators, in their fixed position order
-// whatever order the Add-ons added them in, and selecting one runs its
-// action; reopening on an entry puts the cursor on it. Other menus are
-// left alone.
+// PinballY's main menu in their sections (Play and the launches, the
+// player, the selected table) split by separators, in their fixed position
+// order whatever order the Add-ons added them in, PinballY's other items
+// in their own sections below; selecting one runs its action; reopening
+// on an entry puts the cursor on it. Other menus are left alone.
 // ============================================================
 
 import { test } from "node:test";
@@ -16,7 +16,8 @@ function setUp() {
     const fake = createFakePinballYHost();
     const mainMenu = createMainMenu(fake);
     const PLAY = { title: "Play", cmd: fake.getBuiltInCommand("PlayGame") };
-    const openMainMenu = () => fake.openMenu("main", [PLAY, { title: "Exit", cmd: 99 }]);
+    const RETURN = { title: "Return", cmd: fake.getBuiltInCommand("MenuReturn") };
+    const openMainMenu = () => fake.openMenu("main", [PLAY, RETURN]);
     return { fake, mainMenu, openMainMenu };
 }
 
@@ -24,7 +25,7 @@ const titles = menu => menu.items.map(item => item.title);
 // A separator has no title.
 const SEPARATOR = undefined;
 
-test("entries sit right after Play, in their sections and position order, whatever order they were added in", () => {
+test("entries sit in their sections and position order, whatever order they were added in", () => {
     const { fake, mainMenu, openMainMenu } = setUp();
     mainMenu.add({ name: "stats", label: "Stats", position: MAIN_MENU_POSITION.PROFILE_STATS, action: () => {} });
     mainMenu.add({ name: "week", label: "Week", position: MAIN_MENU_POSITION.TABLE_OF_THE_WEEK, action: () => {} });
@@ -37,7 +38,7 @@ test("entries sit right after Play, in their sections and position order, whatev
     openMainMenu();
 
     assert.deepEqual(titles(fake.currentMenu()),
-        ["Play", "Day", "Week", "Random", SEPARATOR, "Setup", SEPARATOR, "Player", "List", "Stats", SEPARATOR, "Exit"]);
+        ["Play", "Day", "Week", "Random", SEPARATOR, "Player", "List", "Stats", SEPARATOR, "Setup", SEPARATOR, "Return"]);
     assert.ok(fake.currentMenu().items.filter(item => item.title === SEPARATOR).every(item => item.cmd === -1));
 });
 
@@ -48,26 +49,52 @@ test("a section with no shown entry adds no separator", () => {
     mainMenu.add({ name: "list", label: "List", position: MAIN_MENU_POSITION.ACHIEVEMENT_LIST, action: () => {} });
 
     openMainMenu();
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Setup", SEPARATOR, "List", SEPARATOR, "Exit"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "List", SEPARATOR, "Setup", SEPARATOR, "Return"]);
     fake.closeMenu();
 
     setupShown = false;
     openMainMenu();
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "List", SEPARATOR, "Exit"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "List", SEPARATOR, "Return"]);
 });
 
-test("no separator is doubled when a native separator already follows Play, nor added when nothing follows", () => {
+test("PinballY's separators give way to the sections': none doubled, leading or trailing", () => {
     const { fake, mainMenu } = setUp();
     mainMenu.add({ name: "day", label: "Day", position: MAIN_MENU_POSITION.TABLE_OF_THE_DAY, action: () => {} });
-    mainMenu.add({ name: "list", label: "List", position: MAIN_MENU_POSITION.ACHIEVEMENT_LIST, action: () => {} });
+    mainMenu.add({ name: "board", label: "Board", position: MAIN_MENU_POSITION.HIGH_SCORE_BOARD, action: () => {} });
     const play = { title: "Play", cmd: fake.getBuiltInCommand("PlayGame") };
+    const rate = { title: "Rate", cmd: fake.getBuiltInCommand("RateGame") };
 
-    fake.openMenu("main", [play, { cmd: -1 }, { title: "Rate", cmd: 97 }]);
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Day", SEPARATOR, "List", SEPARATOR, "Rate"]);
+    fake.openMenu("main", [{ title: "", cmd: -1 }, play, { title: "", cmd: -1 }, { cmd: -1 }, rate, { title: "", cmd: -1 }]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Day", SEPARATOR, "Board", "Rate"]);
     fake.closeMenu();
 
     fake.openMenu("main", [play]);
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Day", SEPARATOR, "List"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Day", SEPARATOR, "Board"]);
+});
+
+test("PinballY's items go to their sections: the selected table's around the pack's, the table lists, the filter groups, the unknown ones, then Return", () => {
+    const { fake, mainMenu } = setUp();
+    mainMenu.add({ name: "board", label: "Board", position: MAIN_MENU_POSITION.HIGH_SCORE_BOARD, action: () => {} });
+    mainMenu.add({ name: "setup", label: "Setup", position: MAIN_MENU_POSITION.TABLE_SETUP, action: () => {} });
+    const native = name => fake.getBuiltInCommand(name);
+
+    fake.openMenu("main", [
+        { title: "Return", cmd: native("MenuReturn") },
+        { title: "Other", cmd: 3000 },
+        { title: "Era", cmd: native("FilterByEra") },
+        { title: "All Tables", cmd: native("FilterFirst") },
+        { title: "Favorite", cmd: native("AddFavorite") },
+        { title: "Info", cmd: native("GameInfo") },
+        { title: "Play", cmd: native("PlayGame") },
+        { title: "Rating", cmd: native("FilterByRating") },
+        { title: "Favorites", cmd: native("FilterLast") },
+        { title: "Another", cmd: 3001 },
+    ]);
+
+    assert.deepEqual(titles(fake.currentMenu()), [
+        "Play", SEPARATOR, "Board", "Info", "Favorite", "Setup", SEPARATOR, "All Tables", "Favorites", SEPARATOR,
+        "Era", "Rating", SEPARATOR, "Other", "Another", SEPARATOR, "Return",
+    ]);
 });
 
 test("the entries are added again each time the main menu opens, and only to the main menu", () => {
@@ -81,7 +108,7 @@ test("the entries are added again each time the main menu opens, and only to the
     openMainMenu();
     fake.closeMenu();
     openMainMenu();
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "List", SEPARATOR, "Exit"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "List", SEPARATOR, "Return"]);
 });
 
 test("selecting an entry runs its action, and only its own", async () => {
@@ -104,21 +131,21 @@ test("an entry with a shown-when predicate appears only when it holds, checked o
     mainMenu.add({ name: "week", label: "Week", position: MAIN_MENU_POSITION.TABLE_OF_THE_WEEK, action: () => {}, shownWhen: () => shown });
 
     openMainMenu();
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "List", SEPARATOR, "Exit"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "List", SEPARATOR, "Return"]);
     fake.closeMenu();
 
     shown = true;
     openMainMenu();
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Week", SEPARATOR, "List", SEPARATOR, "Exit"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Week", SEPARATOR, "List", SEPARATOR, "Return"]);
 });
 
-test("with every entry hidden by its predicate, the main menu is left as it is", () => {
+test("with every entry hidden by its predicate, PinballY's items are still sorted", () => {
     const { fake, mainMenu, openMainMenu } = setUp();
     mainMenu.add({ name: "week", label: "Week", position: MAIN_MENU_POSITION.TABLE_OF_THE_WEEK, action: () => {}, shownWhen: () => false });
 
     openMainMenu();
 
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "Exit"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "Return"]);
 });
 
 test("a failing shown-when predicate hides only its own entry", () => {
@@ -129,7 +156,7 @@ test("a failing shown-when predicate hides only its own entry", () => {
 
     openMainMenu();
 
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", "List", SEPARATOR, "Exit"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "List", SEPARATOR, "Return"]);
 });
 
 test("reopening on an entry shows the main menu with the cursor on it, once", () => {

@@ -1,6 +1,6 @@
 // ============================================================
 // The main menu in French, through main.js on the fake PinballY globals:
-// the Achievement List and Profile Stats entries read "Voir vos succès" and
+// the Achievement List and Profile Stats entries read "Vos succès" and
 // "Vos statistiques", PinballY's Favorites filter reads "Tables favorites",
 // the screens keep their own titles, and the Tables to Discover filter
 // reads "Tables à découvrir".
@@ -33,7 +33,7 @@ test("the main menu names the Achievements, the Stats and the Favorite Tables in
     ]);
     const titles = fake.currentMenu().items.map(item => item.title);
 
-    for (const label of ["Voir vos succès", "Vos statistiques", "Tables favorites"]) {
+    for (const label of ["Vos succès", "Vos statistiques", "Tables favorites"]) {
         assert.ok(titles.includes(label), `${label} in ${titles.join(" | ")}`);
     }
     assert.equal(lang.achievementList.title, "Succès personnels");

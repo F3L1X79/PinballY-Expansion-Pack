@@ -1,6 +1,6 @@
 // ============================================================
 // Profile picker, through main.js on the fake PinballY globals: the
-// "Change Player" entry, right after "Play" in the main menu and right
+// "Change Player" entry, first of the main menu's player section and right
 // after "Quit" in the exit menu, closes that menu and opens the drawn
 // carousel on the active Profile; the flipper buttons move through the
 // Profiles and wrap (the name shows once the Avatars have glided into

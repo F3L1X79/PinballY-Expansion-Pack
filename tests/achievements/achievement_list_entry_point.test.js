@@ -74,10 +74,10 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
         MENU_LABELS.tableOfTheWeek,
         MENU_LABELS.randomGame,
         SEPARATOR,
-        MENU_LABELS.tableSetup,
-        SEPARATOR,
         TEXT.menuEntry,
         lang.profileStats.menuEntry,
+        SEPARATOR,
+        MENU_LABELS.tableSetup,
         SEPARATOR,
         "Exit",
     ]);

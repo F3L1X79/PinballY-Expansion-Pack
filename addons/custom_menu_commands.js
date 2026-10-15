@@ -1,7 +1,7 @@
 ﻿// ============================================================
-// Adds the launch section entries (table setup, table of the day, table of
-// the week, random table) to PinballY's main menu through the main menu
-// module, which places them right after "Play" and runs the matching action
+// Adds the launch entries (table of the day, table of the week, random
+// table) and "Table Setup" to PinballY's main menu through the main menu
+// module, which places them in their sections and runs the matching action
 // when one is selected. A Child Profile does not get a Period Table's
 // entry while it is an Adult Table. Once the household has an Admin
 // Profile, only the Admin Profiles see "Table Setup" there and PinballY's

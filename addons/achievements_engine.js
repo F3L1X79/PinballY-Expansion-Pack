@@ -15,7 +15,7 @@
 // Profile that is not a child would have, built only to be counted.
 // Keeps the shown Player Level (the level pip's): the baseline, then each
 // Level Toast's level as it starts.
-// Also adds the Achievement List entry to the main menu, right after "Play",
+// Also adds the Achievement List entry to the main menu's player section,
 // and the Profile Stats entry right after it, and lets the Profile Rewards
 // module submit its Reward Prompt, which opens the Profile Stats' frame
 // list; the Profile Stats open the Household Stats. No wheel dialog shows

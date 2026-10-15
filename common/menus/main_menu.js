@@ -1,10 +1,12 @@
 ﻿// ============================================================
-// Main menu module: Add-ons add their entries (label, action, position,
-// and optionally a "shown when" predicate checked on each opening) and it
-// inserts them into PinballY's main menu right after "Play", grouped in
-// sections (launch, the table, then personal) split by separators, in a
-// fixed position order, so the Add-on order in main.js never decides where
-// an entry lands.
+// Main menu module: owns the whole main menu order. Add-ons add their
+// entries (label, action, position, and optionally a "shown when"
+// predicate checked on each opening); on each opening it sorts them and
+// PinballY's own items into fixed sections split by separators: Play and
+// the launches, the player, the selected table, the table lists, the
+// filter groups, any item it does not know, then Return. A section with no
+// item shown goes with its separator, and the Add-on order in main.js
+// never decides where an entry lands.
 // It owns the entry commands and runs the matching action when one is
 // selected, and can reopen the main menu with the cursor on an entry (a
 // screen going back one level). Listens to "menuopen" and "command".
@@ -15,22 +17,45 @@ import { createPinballYHost } from "../core/pinbally_host.js";
 
 const SCRIPT_NAME = "MainMenu";
 
-// Sections from "Play" down, each listing its entries in menu order. A
-// section with no shown entry is left out with its separator.
+// Slots for PinballY's items, matched by command: builtIn lists built-in
+// command names, filters takes every filter's command (the [Top] filters,
+// the only ones in the main menu). Items sharing a slot keep PinballY's order.
+const UNKNOWN = { unknown: true };
+const FILTER_GROUPS = {
+    builtIn: ["FilterByEra", "FilterByManufacturer", "FilterBySystem", "FilterByCategory", "FilterByRating", "FilterByRecency", "FilterByAdded"],
+};
+
+// Sections from the top down, each listing its slots in menu order: a
+// string names a pack entry's position, an object places PinballY's items.
 const SECTIONS = [
-    ["TABLE_OF_THE_DAY", "TABLE_OF_THE_WEEK", "RANDOM_GAME"],
-    ["HIGH_SCORE_BOARD", "TABLE_SETUP"],
+    [{ builtIn: ["PlayGame"] }, "TABLE_OF_THE_DAY", "TABLE_OF_THE_WEEK", "RANDOM_GAME"],
     ["PROFILE_PICKER", "ACHIEVEMENT_LIST", "PROFILE_STATS"],
+    [
+        "HIGH_SCORE_BOARD",
+        { builtIn: ["GameInfo"] }, { builtIn: ["Flyer"] }, { builtIn: ["HighScores"] }, { builtIn: ["Instructions"] },
+        { builtIn: ["RateGame"] }, { builtIn: ["AddFavorite", "RemoveFavorite"] },
+        "TABLE_SETUP",
+    ],
+    [{ filters: true }],
+    [FILTER_GROUPS],
+    [UNKNOWN],
+    [{ builtIn: ["MenuReturn"] }],
 ];
 
-export const MAIN_MENU_POSITION = Object.freeze(Object.fromEntries(SECTIONS.flatMap((names, section) =>
-    names.map((name, order) => [name, Object.freeze({ section, order })]))));
+const SLOTS = SECTIONS.flatMap((slots, section) => slots.map((slot, order) => ({ slot, position: Object.freeze({ section, order }) })));
+
+export const MAIN_MENU_POSITION = Object.freeze(Object.fromEntries(SLOTS
+    .filter(({ slot }) => typeof slot === "string")
+    .map(({ slot, position }) => [slot, position])));
+
+const NATIVE_SLOTS = SLOTS.filter(({ slot }) => typeof slot !== "string");
+const UNKNOWN_POSITION = NATIVE_SLOTS.find(({ slot }) => slot === UNKNOWN).position;
 
 const SEPARATOR_CMD = -1;
+// PinballY titles its separators "", the pack leaves them untitled.
+const isSeparator = item => item.cmd < 0 && !item.title;
 
-function comesAfter(position, other) {
-    return position.section > other.section || (position.section === other.section && position.order > other.order);
-}
+const comparePositions = (a, b) => a.section - b.section || a.order - b.order;
 
 export function createMainMenu(host) {
     // Sorted by position.
@@ -42,34 +67,43 @@ export function createMainMenu(host) {
     // false. Guarded on its own, so a failing one hides only its own entry.
     function add({ name, label, position, action, shownWhen = () => true }) {
         const entry = { name, label, position, action, shownWhen: safeHandler(SCRIPT_NAME, shownWhen), cmd: host.allocateCommand(name) };
-        const insertAt = entries.findIndex(other => comesAfter(other.position, position));
+        const insertAt = entries.findIndex(other => comparePositions(other.position, position) > 0);
         if (insertAt === -1) entries.push(entry);
         else entries.splice(insertAt, 0, entry);
     }
 
-    // Fires when any menu opens, with a fresh item list each time: adds the
-    // entries shown this time to the main menu.
+    // The position of one of PinballY's items, by its command.
+    function nativePositionOf(cmd) {
+        const isFilter = cmd >= host.getBuiltInCommand("FilterFirst") && cmd <= host.getBuiltInCommand("FilterLast");
+        const found = NATIVE_SLOTS.find(({ slot }) => (slot.filters
+            ? isFilter
+            : Boolean(slot.builtIn) && slot.builtIn.some(name => host.getBuiltInCommand(name) === cmd)));
+        return found ? found.position : UNKNOWN_POSITION;
+    }
+
+    // Fires when any menu opens, with a fresh item list each time: sorts the
+    // entries shown this time and PinballY's items into their sections.
+    // Items removed by a listener registered earlier stay removed; one
+    // registered later (Menu Cleanup, the High Scores) tidies the
+    // separators its removals leave.
     host.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
         if (ev.id !== "main") return;
         const shown = entries.filter(entry => entry.shownWhen());
         const selected = shown.find(entry => entry.name === entryToSelect);
         entryToSelect = null;
-        if (shown.length === 0) return;
+        // Array sort is stable: items sharing a slot keep their order.
+        const placed = [
+            ...shown.map(({ label, cmd, position }) => ({ item: { title: label, cmd }, position })),
+            ...ev.items.filter(item => !isSeparator(item)).map(item => ({ item, position: nativePositionOf(item.cmd) })),
+        ].sort((a, b) => comparePositions(a.position, b.position));
         const items = [];
-        shown.forEach(({ label, cmd, position }, index) => {
-            if (index > 0 && shown[index - 1].position.section !== position.section) items.push({ cmd: SEPARATOR_CMD });
-            items.push({ title: label, cmd });
+        placed.forEach(({ item, position }, index) => {
+            if (index > 0 && placed[index - 1].position.section !== position.section) items.push({ cmd: SEPARATOR_CMD });
+            items.push(item);
         });
-        const play = host.getBuiltInCommand("PlayGame");
-        const playIndex = ev.items.findIndex(item => item.cmd === play);
-        const afterPlay = playIndex === -1 ? undefined : ev.items[playIndex + 1];
-        // Native entries follow in their own section, unless PinballY already
-        // starts it with a separator.
-        if (afterPlay && afterPlay.cmd !== SEPARATOR_CMD) items.push({ cmd: SEPARATOR_CMD });
-        ev.addMenuItem({ after: play }, items);
-        if (!selected) return;
+        if (selected) for (const item of items) item.selected = item.cmd === selected.cmd;
+        ev.items = items;
         // PinballY ignores edits to ev.items unless menuUpdated is set.
-        for (const item of ev.items) item.selected = item.cmd === selected.cmd;
         ev.menuUpdated = true;
     }));
 

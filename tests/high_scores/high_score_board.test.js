@@ -1,6 +1,7 @@
 // ============================================================
 // The High Score Board, through main.js on the fake PinballY globals: the
-// "High Scores" main menu entry right before Table Setup opens the
+// "High Scores" main menu entry, first of the selected table's section
+// (PinballY's own information entries after it), opens the
 // selected table's last known board, the 1st in the middle of the podium,
 // the 2nd on its left, the 3rd on its right, each with its owner's name
 // and Avatar or "Default score", the places after them in rows below.
@@ -11,7 +12,7 @@ import assert from "node:assert/strict";
 import { startHighScores, board, FACTORY, MEDIEVAL, avatarOf, avatarFiles } from "./high_scores_scenario.js";
 import { mainMenuTitles, openBoard, isBoardOpen, title, podium, rows, message } from "./high_score_board_reader.js";
 
-test("the entry sits right before Table Setup and opens the podium with each place's owner", async () => {
+test("the entry heads the selected table's section and opens the podium with each place's owner", async () => {
     const { fake, setBoard, play, switchTo } = await startHighScores({
         addOns: ["highScores", "customMenuCommands"], profiles: { Alice: {}, Bob: {} }, active: "Alice", files: avatarFiles("Alice", "Bob"),
     });
@@ -23,7 +24,8 @@ test("the entry sits right before Table Setup and opens the podium with each pla
 
     const { titles, boardEntry } = mainMenuTitles(fake);
     assert.equal(titles[boardEntry], "High Scores");
-    assert.equal(titles[boardEntry + 1], lang.customMenuLabels.tableSetup);
+    assert.equal(titles[boardEntry - 1], undefined, "a separator before it");
+    assert.deepEqual(titles.slice(boardEntry + 1, boardEntry + 3), ["Information", "Flyer"]);
 
     openBoard(fake, lang);
     assert.ok(isBoardOpen(fake));

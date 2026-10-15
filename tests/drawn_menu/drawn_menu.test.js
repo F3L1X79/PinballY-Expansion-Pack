@@ -49,10 +49,12 @@ test("the main menu is drawn instead of the native one, with the same entries in
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.ok(isDrawnMenuShown(fake));
     assert.deepEqual(drawnMenuLines(fake), [
-        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, "---", LABELS.tableSetup, "---",
-        "Information", "Flyer", "High Scores", "Instruction Card", "---",
-        "Rate Table", "Add to Favorites", "---",
-        "All Tables", "Favorite Tables",
+        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, "---",
+        "Information", "Flyer", "High Scores", "Instruction Card", "Rate Table", "Add to Favorites", LABELS.tableSetup, "---",
+        "All Tables", "Favorite Tables", "---",
+        "Filter by Era", "Filter by Manufacturer", "Filter by System", "Filter by Category",
+        "Filter by Rating", "Filter by Last Played", "Filter by Date Added", "---",
+        "Return",
     ]);
     assert.equal(readDrawnMenu(fake).message, null);
     assert.equal(highlightedEntry(fake), "Play", "the cursor opens on the first entry");
@@ -61,12 +63,12 @@ test("the main menu is drawn instead of the native one, with the same entries in
 test("Next and Prev move the cursor over the entries only, wrapping, with the navigation sound", () => {
     const soundsBefore = fake.soundsPlayed().length;
     press(fake, "Prev");
-    assert.equal(highlightedEntry(fake), "Favorite Tables", "Prev from the first entry wraps to the last");
+    assert.equal(highlightedEntry(fake), "Return", "Prev from the first entry wraps to the last");
     press(fake, "Next");
     assert.equal(highlightedEntry(fake), "Play", "Next from the last entry wraps to the first");
-    for (let count = 0; count < 5; count++) press(fake, "Next");
+    for (let count = 0; count < 4; count++) press(fake, "Next");
     assert.equal(highlightedEntry(fake), "Information", "the separator is skipped");
-    assert.deepEqual(fake.soundsPlayed().slice(soundsBefore), Array(7).fill(NEXT_SOUND));
+    assert.deepEqual(fake.soundsPlayed().slice(soundsBefore), Array(6).fill(NEXT_SOUND));
 });
 
 test("the gold title lands at once on the new entry, while only the outline glides", () => {

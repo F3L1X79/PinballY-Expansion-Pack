@@ -30,7 +30,7 @@ test("with the Drawn Menus, one High Scores entry; the HighScores button opens t
         { title: "", cmd: -1 },
         { title: "Rate Table", cmd: command.RateGame },
     ]);
-    assert.deepEqual(drawnMenuLines(fake), ["Play", "High Scores", "---", "Rate Table"]);
+    assert.deepEqual(drawnMenuLines(fake), ["Play", "---", "High Scores", "Rate Table"]);
     pressInMenu(fake, "Exit");
 
     setBoard(MEDIEVAL, FACTORY, { durationMs: 100 });

@@ -402,7 +402,7 @@ export default {
     },
 
     achievementList: {
-        menuEntry: "Voir vos succès",
+        menuEntry: "Vos succès",
         // The header's title, the section titles, the key caps and the
         // footer's hints are shown in capitals.
         title: "Succès personnels",

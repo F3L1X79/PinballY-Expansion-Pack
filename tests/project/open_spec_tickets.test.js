@@ -13,13 +13,17 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 const SCRIPT = resolve("maintainer/specs/open_spec_tickets.mjs");
+// Run from a pre-commit hook, git exports GIT_INDEX_FILE (absolute in a
+// worktree) and the like: inherited, they would point the throwaway
+// repository's git at the real one.
+const OUTSIDE_GIT_ENV = Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")));
 const ticket = (number, title) => ({ number, title, labels: [], body: `## Parent\n\n#216\n\n## What to build\n\n${title}` });
 
 // A repository whose origin/main stops before a commit closing #217,
 // gh listing #217 and #218 as open tickets of spec #216.
 function repositoryAhead() {
     const folder = mkdtempSync(join(tmpdir(), "open-spec-tickets-"));
-    const git = (...args) => execFileSync("git", ["-c", "user.name=Test", "-c", "user.email=test@example.com", ...args], { cwd: folder, encoding: "utf8" });
+    const git = (...args) => execFileSync("git", ["-c", "user.name=Test", "-c", "user.email=test@example.com", ...args], { cwd: folder, encoding: "utf8", env: OUTSIDE_GIT_ENV });
     git("init", "-q", "-b", "main");
     git("commit", "-q", "--allow-empty", "-m", "Start");
     git("update-ref", "refs/remotes/origin/main", "HEAD");
@@ -29,7 +33,7 @@ function repositoryAhead() {
     writeFileSync(join(folder, ".bin", "issues.json"), JSON.stringify([ticket(217, "First ticket"), ticket(218, "Second ticket")]));
     writeFileSync(join(bin, "gh"), `#!/bin/sh\ncat "${join(bin, "issues.json")}"\n`);
     chmodSync(join(bin, "gh"), 0o755);
-    const run = () => execFileSync("node", [SCRIPT, "216"], { cwd: folder, encoding: "utf8", env: { ...process.env, PATH: `${bin}:${process.env.PATH}` } });
+    const run = () => execFileSync("node", [SCRIPT, "216"], { cwd: folder, encoding: "utf8", env: { ...OUTSIDE_GIT_ENV, PATH: `${bin}:${process.env.PATH}` } });
     return { git, run };
 }
 

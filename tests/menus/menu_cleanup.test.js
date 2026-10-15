@@ -20,7 +20,8 @@ const markAdmin = (fake, name) =>
 
 // Separators, titled "" (PinballY's) or untitled (the main menu module's), read "---".
 const SEPARATOR = "---";
-const CLEANED_NATIVE_MAIN_MENU = [SEPARATOR, "Rate Table", "Add to Favorites", SEPARATOR, "All Tables", "Favorites"];
+const CLEANED_TABLE_LISTS_AND_FILTERS = [SEPARATOR, "All Tables", "Favorites", SEPARATOR,
+    "Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating", SEPARATOR, "Return"];
 const CLEANED_ADMIN_EXIT_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Operator Menu", "Reset profile", SEPARATOR, "Cancel"];
 const CLEANED_EXIT_MENU_WITHOUT_OPERATOR_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Cancel"];
 
@@ -59,13 +60,15 @@ test("turned on, Menu Cleanup lightens the menus for every Profile, Admin includ
 
     store.switchTo("Alice");
     assert.deepEqual(mainMenuTitles(), [
-        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, ...CLEANED_NATIVE_MAIN_MENU,
+        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR,
+        "Rate Table", "Add to Favorites", ...CLEANED_TABLE_LISTS_AND_FILTERS,
     ]);
     assert.deepEqual(exitMenuTitles(), CLEANED_EXIT_MENU_WITHOUT_OPERATOR_MENU);
 
     store.switchTo("Bob");
     assert.deepEqual(mainMenuTitles(), [
-        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR, LABELS.tableSetup, ...CLEANED_NATIVE_MAIN_MENU,
+        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR,
+        "Rate Table", "Add to Favorites", LABELS.tableSetup, ...CLEANED_TABLE_LISTS_AND_FILTERS,
     ]);
     assert.deepEqual(exitMenuTitles(), CLEANED_ADMIN_EXIT_MENU);
 

@@ -47,9 +47,10 @@ const BUILT_IN_COMMANDS = {
     ShowMainMenu: 8, ShowOperatorMenu: 9, PowerOff: 10, GameInfo: 11, Flyer: 12, HighScores: 13,
     Instructions: 14, AddFavorite: 15, Help: 16, AboutBox: 17,
     FilterByEra: 18, FilterByManufacturer: 19, FilterBySystem: 20, FilterByCategory: 21, FilterByRating: 22,
-    FilterByRecency: 23, FilterByAdded: 24,
+    FilterByRecency: 23, FilterByAdded: 24, RemoveFavorite: 25,
+    // Every filter's command is in this range, PinballY's and the scripts' alike.
+    FilterFirst: 900, FilterLast: 949,
 };
-// The [Top] filters' commands in the native main menu (any ids below the custom ones).
 const ALL_TABLES_FILTER_CMD = 900;
 const FAVORITES_FILTER_CMD = 901;
 const FIRST_CUSTOM_COMMAND = 1000;
@@ -275,6 +276,8 @@ export function createFakePinballYHost({
     let wheelConfigIds = null;
     // Script filters by full id ("User.<id>"), and the id of the one shown.
     const filters = new Map();
+    // Their commands, by full id.
+    const filterCommands = new Map();
     let currentFilterId = "All";
     // Metafilters by id, and the tables they ruled out the last time a
     // filter ran: like PinballY, select() is not called again until then.
@@ -289,6 +292,7 @@ export function createFakePinballYHost({
     const handlers = new Map();
     const commandIds = new Map();
     let nextCommandId = FIRST_CUSTOM_COMMAND;
+    let nextFilterCommandId = FAVORITES_FILTER_CMD + 1;
     const shownMenuList = [];
     let shownMenu = null;
     let uiMode = "wheel";
@@ -877,7 +881,11 @@ export function createFakePinballYHost({
     // Like gameList.createFilter(): kept under its full id, never shown until selected.
     function createFilter(filter) {
         filters.set(`User.${filter.id}`, filter);
-        return allocateCommand(`filter ${filter.id}`);
+        const cmd = nextFilterCommandId++;
+        if (cmd > BUILT_IN_COMMANDS.FilterLast) throw new Error("The fake host has no filter command left.");
+        commandIds.set(`filter ${filter.id}`, cmd);
+        filterCommands.set(`User.${filter.id}`, cmd);
+        return cmd;
     }
 
     // A script filter runs again from its first table; any other filter
@@ -1135,12 +1143,21 @@ export function createFakePinballYHost({
         },
 
         // The main menu as PinballY opens it, with its native items: "Play",
-        // the information section, Rate Table / Add to Favorites, then the
-        // [Top] filters. Its separators are not documented: to be checked on
-        // the cabinet.
+        // the information section, Rate Table / Add to Favorites, the [Top]
+        // filters (PinballY's All Tables and Favorites, the scripts' ones
+        // between them by sort key), the filter groups, then Return. Its
+        // separators are not documented: to be checked on the cabinet.
         openMainMenu() {
+            const topFilters = [...filters.entries()]
+                .filter(([, filter]) => filter.group === "[Top]")
+                .map(([id, filter]) => ({ sortKey: filter.sortKey || "", title: filter.menuTitle || filter.title, cmd: filterCommands.get(id) }));
+            topFilters.push({ sortKey: "3000", title: "All Tables", cmd: ALL_TABLES_FILTER_CMD });
+            topFilters.push({ sortKey: "7000", title: "Favorites", cmd: FAVORITES_FILTER_CMD });
+            topFilters.sort((a, b) => (a.sortKey < b.sortKey ? -1 : a.sortKey > b.sortKey ? 1 : 0));
+            const filterGroup = (title, name) => ({ title, cmd: BUILT_IN_COMMANDS[name], hasSubmenu: true });
             host.openMenu("main", [
                 { title: "Play", cmd: BUILT_IN_COMMANDS.PlayGame },
+                { title: "", cmd: -1 },
                 { title: "Information", cmd: BUILT_IN_COMMANDS.GameInfo },
                 { title: "Flyer", cmd: BUILT_IN_COMMANDS.Flyer },
                 { title: "High Scores", cmd: BUILT_IN_COMMANDS.HighScores },
@@ -1149,8 +1166,17 @@ export function createFakePinballYHost({
                 { title: "Rate Table", cmd: BUILT_IN_COMMANDS.RateGame },
                 { title: "Add to Favorites", cmd: BUILT_IN_COMMANDS.AddFavorite },
                 { title: "", cmd: -1 },
-                { title: "All Tables", cmd: ALL_TABLES_FILTER_CMD },
-                { title: "Favorites", cmd: FAVORITES_FILTER_CMD },
+                ...topFilters.map(({ title, cmd }) => ({ title, cmd })),
+                { title: "", cmd: -1 },
+                filterGroup("Filter by Era", "FilterByEra"),
+                filterGroup("Filter by Manufacturer", "FilterByManufacturer"),
+                filterGroup("Filter by System", "FilterBySystem"),
+                filterGroup("Filter by Category", "FilterByCategory"),
+                filterGroup("Filter by Rating", "FilterByRating"),
+                filterGroup("Filter by Last Played", "FilterByRecency"),
+                filterGroup("Filter by Date Added", "FilterByAdded"),
+                { title: "", cmd: -1 },
+                { title: "Return", cmd: BUILT_IN_COMMANDS.MenuReturn },
             ]);
         },
 

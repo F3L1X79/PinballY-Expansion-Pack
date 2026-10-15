@@ -54,7 +54,7 @@ test("the Achievements button opens the Achievement List and the selection butto
     fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }, { title: "Exit", cmd: 99 }]);
     const mainMenu = fake.currentMenu().items.map(item => item.title);
     assert.deepEqual(mainMenu.slice(mainMenu.indexOf(lang.achievementList.menuEntry)), [
-        lang.achievementList.menuEntry, TEXT.menuEntry, SEPARATOR, "Exit",
+        lang.achievementList.menuEntry, TEXT.menuEntry, SEPARATOR, lang.customMenuLabels.tableSetup, SEPARATOR, "Exit",
     ]);
 
     // The Achievement List's own total, read from its header.

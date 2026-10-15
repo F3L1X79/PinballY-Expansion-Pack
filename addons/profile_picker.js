@@ -1,6 +1,6 @@
 // ============================================================
-// Profile picker: a "Change Player" entry, right after "Play" in the main
-// menu and right after "Quit" in the exit menu (and on the Welcome Screen,
+// Profile picker: a "Change Player" entry, first of the main menu's player section
+// and right after "Quit" in the exit menu (and on the Welcome Screen,
 // through common/profiles/change_player.js), opens a drawn carousel of
 // the Profiles' Avatars above the menus, starting on the active Profile.
 // The flipper buttons move through it and wrap, with PinballY's navigation
