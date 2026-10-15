@@ -227,8 +227,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). Reste à les essayer sur la borne.</p>
-      <span class="next">Ensuite : <a href="#profile-rivalries">rivalités (n° <span data-ref="profile-rivalries"></span>)</a>, en tête de file</span>
+      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne.</p>
+      <span class="next">Ensuite : <a href="#event-frames">cadres de fête (n° <span data-ref="event-frames"></span>)</a>, en tête de file</span>
     </div>
   </section>
 
@@ -252,33 +252,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rivalries" data-track="profiles" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Rivalités : « Bob t'a pris ton record »</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Quand un Profile bat le record d'un autre, celui-ci l'apprend à son prochain passage, dans sa Profile Greeting : « Bob t'a pris le record de Medieval Madness ». De quoi donner envie d'y retourner.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec : <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/222">#222</a>, tickets #223 à #226. Flow Matt : <code>/implement</code> par ticket ou <code>/implement-spec 222</code>. S'appuie sur les records par Profile (faits)</div>
-          <details>
-            <summary>Ce qui a été décidé (grill du 15/10/2026)</summary>
-            <ul>
-              <li>Seul le Table Record compte : un Lost Record (« record perdu »), pas les autres places du tableau.</li>
-              <li>Annoncé uniquement dans le Welcome Screen (pas de toast de plus) : une ligne sous la salutation, avant les cartes, en couleur d'alerte, avec l'Avatar du preneur le plus récent, sans nouveau choix.</li>
-              <li>Un seul message : les 3 records perdus les plus récents, chacun avec son preneur, puis « et N autres ».</li>
-              <li>Child Profiles dans les deux sens ; Guest peut prendre un record (« un invité ») mais n'est jamais prévenu.</li>
-              <li>Vu dès que le Welcome Screen l'a affiché, jamais répété ; rien si le Welcome Screen est éteint ; rien d'antérieur à la mise en service.</li>
-              <li>Retiré si le Profile a repris le record, si le preneur a été supprimé, ou si la table n'est pas visible pour lui. On nomme celui qui le lui a pris, même si un troisième l'a repris depuis. Un Profile Reset garde les annonces en attente.</li>
-              <li>Le High Score Toast du preneur ajoute « pris à Alice », Guest compris.</li>
-            </ul>
-            <p class="ctx">Proposé le 01/10/2026, avec les records par Profile.</p>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-profiles" id="event-frames" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -806,7 +779,6 @@
             <a class="chip tr-play" href="#hidden-tables-filter"><b></b>Tables masquées</a>
           </div>
           <div class="cell">
-            <a class="chip tr-profiles" href="#profile-rivalries"><b></b>Rivalités</a>
             <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
             <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
             <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
