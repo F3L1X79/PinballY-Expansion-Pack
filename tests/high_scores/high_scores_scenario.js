@@ -29,6 +29,8 @@ export const GAME_MS = 5 * 60 * 1000;
 // Covers the wait after "postlaunch" and the reads, a second at a time.
 const READS_STEPS = 15;
 
+// ROM tables of no system: no User folder is read for them, so a ROM-less
+// fallback needs { ...table, system: VPX_SYSTEM }.
 export const MEDIEVAL = "Medieval Madness (Williams 1997)";
 export const AFM = "Attack from Mars (Bally 1995)";
 export const TABLES = [

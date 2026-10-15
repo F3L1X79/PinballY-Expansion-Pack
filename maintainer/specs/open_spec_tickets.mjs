@@ -1,8 +1,9 @@
 // ============================================================
 // Lists the tickets of a spec still to do: open on GitHub, whose
-// "## Parent" section names the spec, minus those a commit of the current
-// branch closes ("Closes #N" since main), which GitHub closes only on the
-// push. Tells whether the next commit closes the spec too. A maintainer's
+// "## Parent" section names the spec, minus those a commit not on
+// origin/main yet closes ("Closes #N"), which GitHub closes only once the
+// commit reaches it: unpushed on main, or on a branch not merged yet.
+// Without that remote, the commits since main. Tells whether the next commit closes the spec too. A maintainer's
 // tool (node maintainer/specs/open_spec_tickets.mjs <spec>), run through
 // the gh CLI, never loaded by PinballY.
 // ============================================================
@@ -27,7 +28,16 @@ const openIssues = JSON.parse(run("gh", [
 const parentPattern = new RegExp(`##\\s*Parent\\s+#${spec}\\b`);
 const tickets = openIssues.filter(issue => issue.number !== spec && parentPattern.test(issue.body));
 
-const closedOnBranch = new Set([...run("git", ["log", "main..HEAD", "--format=%B"]).matchAll(CLOSING_PATTERN)]
+const hasRef = (ref) => {
+    try {
+        run("git", ["rev-parse", "--verify", "--quiet", ref]);
+        return true;
+    } catch {
+        return false;
+    }
+};
+const base = hasRef("refs/remotes/origin/main") ? "origin/main" : "main";
+const closedOnBranch = new Set([...run("git", ["log", `${base}..HEAD`, "--format=%B"]).matchAll(CLOSING_PATTERN)]
     .map(match => Number(match[1])));
 
 const remaining = tickets.filter(ticket => !closedOnBranch.has(ticket.number)).sort((a, b) => a.number - b.number);

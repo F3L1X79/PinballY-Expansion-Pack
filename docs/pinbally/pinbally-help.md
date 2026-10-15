@@ -144,6 +144,8 @@ Categories and media:
 - `resolveMedia(type, mustExist) → string[]`.
 - `resolveROM() → {dofRom, vpmRom, vpmRomFile, nvramPath}`.
 - `getHighScores() → Promise<string[]>` (the array also has `.source`) and `setHighScores(lines|null)`.
+  - `setHighScores(lines)` only fills PinballY's in-memory copy, which the DMD and the info box show; nothing is written to the NVRAM or any file. Lines are free text, one display line each.
+  - `setHighScores(null)` forgets that copy, so PinballY reads the board again the next time the table is selected on the wheel. PinballY forgets it by itself at every launch: a board handed by a script has to be handed again after each Play.
 
 **Lifetime.** A settings reload reloads the game list. Held GameInfo objects then throw when used, and ids become invalid. Don't cache GameInfo objects or ids; re-read them, for example with `gameList.getWheelGame(0)`. The help tells you to clear caches on "settingschange", but that event doesn't exist; the real one is `settingsreload` (SettingsEvent.html).
 
