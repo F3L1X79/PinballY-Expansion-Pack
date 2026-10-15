@@ -38,6 +38,8 @@ Every minute you play a table builds your Table Mastery of it, through ten Maste
 
 When you enter a table's high score board, the place is yours: the pack reads the board before and after each game of a minute or more and credits every new score to the Profile that was playing, whatever initials were typed, the other players of a multiplayer game included. A toast announces your best place, or the Table Record. The scores already on the board at the first read, factory ones included, belong to no one, and a ROM reset that brings them back is never credited. A High Score stays won even once later scores push it off the board, and earns its own Achievements; **Your Stats** shows the High Scores and Table Records you still hold, and **Household Stats** who holds the most Table Records. Tables with a ROM only, whose board PinballY already reads.
 
+**High Scores** in the main menu (or PinballY's `HighScores` button, if mapped) opens the selected table's board, drawn in the Steamball look in place of PinballY's own window: the three first places on a podium under a Gold, Silver and Bronze crown, the others in rows below, each with its rank, score, initials and the Profile that won it (name, Avatar and Avatar Frame), or "Default score". The board is read again from the table each time you open it, so it always shows what the table holds now; the flippers scroll a board too long for the screen.
+
 ### Achievements
 
 <img src="docs/images/achievements.png" alt="The Achievement List" width="380">
