@@ -228,7 +228,7 @@
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
       <p><strong>High Scores</strong> : faits sur la branche <code>high-scores</code>, les records par Profile (tables à ROM) et le tableau des meilleurs scores dessiné, qui remplace celui de PinballY. Reste le dernier des trois chantiers, les tables sans ROM ; la branche ne fusionne dans <code>main</code> qu'une fois les trois finis</p>
-      <span class="next">Ensuite : <code>/grill-with-docs</code> des <a href="#romless-high-scores">tables sans ROM (n° <span data-ref="romless-high-scores"></span>)</a></span>
+      <span class="next">Ensuite : <code>/to-spec</code> des <a href="#romless-high-scores">tables sans ROM (n° <span data-ref="romless-high-scores"></span>)</a></span>
     </div>
   </section>
 
@@ -261,17 +261,22 @@
             <h3>Meilleurs scores des tables sans ROM</h3>
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span></div>
           </div>
-          <p>Lire nous-mêmes les tableaux des tables électromécaniques et originales, que PINemHi ignore : <code>VPReg.stg</code> (lecteur du format en JS, octets lus par kernel32), <code>VPReg.ini</code> quand VPX 10.8.1 sortira, et les fichiers texte des tables électromécaniques. Ces tables entrent alors dans les records par Profile et le tableau dessiné, et leur tableau peut passer à PinballY par <code>setHighScores()</code>.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : gardé après le prototype des records par Profile (faits) → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
+          <p>Lire nous-mêmes les tableaux des tables originales, que PINemHi ignore : <code>VPReg.stg</code> (lecteur du format en JS, octets lus par kernel32) et les fichiers texte « 5 scores + 5 initiales » du dossier <code>User\</code>. Ces tables entrent alors dans les records par Profile et le tableau dessiné, et leur tableau passe à PinballY par <code>setHighScores()</code>.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : grillé le 15/10/2026 → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Ce qui a été décidé (grill du 15/10/2026)</summary>
             <ul>
-              <li>Copier <code>scoringdb.json</code> de vpin-studio (44 formats de fichiers texte, MIT) ou écrire nos propres formats ?</li>
-              <li>Relier une table à sa section de <code>VPReg.stg</code> ou à son fichier : par ce qui a changé pendant la Play, ou par le script de la table ?</li>
-              <li>Quand lire <code>VPReg.stg</code> sans gêner VPX, qui l'ouvre en exclusif ?</li>
+              <li><strong>Sources</strong> : <code>VPReg.stg</code> et les fichiers texte « 5 scores + 5 initiales » du dossier <code>User\</code> (les deux Schtroumpfs). Rien pour les électromécaniques (aucune sur la borne), <code>VPReg.ini</code> quand VPX 10.8.1 sortira, pas de <code>scoringdb.json</code>.</li>
+              <li><strong>Lecture</strong> : octets lus par kernel32 (<code>CreateFileW</code>, <code>ReadFile</code>), format décodé en JS testable ; ni <code>IStorage</code> d'ole32, ni 7-Zip, ni PINemHi 3.6.8 (il lui faut 7-Zip et le nom de la section, et il ne sait pas lister le fichier). Tout le fichier lu d'un coup au <code>prelaunch</code> puis après la partie, jamais pendant que VPX tourne.</li>
+              <li><strong>Table ↔ section ou fichier</strong> : appris par ce qui a changé pendant la Play, retenu une fois pour toutes dans <code>high_scores.json</code> (nouvelle clé figée). Une Play qui change plusieurs sections : celle qui a un tableau ; deux tableaux changés (hors section + fichier de la même table, où le plus long gagne) : rien d'appris, une ligne dans <code>logfile.log</code>. La photo d'avant donne les Default Scores, donc la première Play est déjà attribuée.</li>
+              <li><strong>Tableau</strong> : toutes les <code>HighScoreN</code> / <code>HighScoreNName</code>, classées par valeur ; à défaut un score seul (<code>HighScore</code>, <code>HiScore</code>) fait une place ; seconds tableaux ignorés (<code>WaffleScore</code>, <code>SpecialHighScore</code>) ; initiales illisibles affichées vides. Règles portées de vpin-studio (mention MIT), limitées à ce qui existe sur la borne.</li>
+              <li><strong>Source par Play</strong> : le tableau de PinballY (ROM) s'il y en a un, sinon la section ou le fichier appris ; rien n'est figé, une table qui gagne une ROM passe côté ROM.</li>
+              <li><strong>PinballY</strong> : le tableau lu lui est passé par <code>setHighScores()</code> (DMD, fiche de la table), petit ticket en fin de spec.</li>
+              <li><strong>High Score Board</strong> d'une table sans ROM pas encore apprise : un message dédié (« Jouez une partie pour faire apparaître ce tableau »), en <code>en</code> et <code>fr</code>.</li>
             </ul>
             <p class="ctx">Décidé le 11/10/2026 : un score fait sur une de ces tables avant ce chantier ne sera jamais attribué (accepté).</p>
+            <p class="ctx">Copie du dossier <code>User\</code> de la borne (15/10/2026) dans <code>docs/research/high-scores-tools/user_folder/</code> : 37 sections dans <code>VPReg.stg</code>, 27 sur la famille <code>HighScoreN</code> ; absentes : Kill Bill, Mass Effect, Spiderman, Wrath of Olympus, Pokémon Gameboy. Ces fichiers servent de fixtures.</p>
             <p class="ctx">Prototype du 11/10/2026 : 28 originales sans ROM sur la borne, aucune électromécanique. VPX écrit bien <code>User\VPReg.stg</code> pendant une Play d'originale (Zelda) : c'est la source à lire en premier.</p>
           </details>
         </div>
