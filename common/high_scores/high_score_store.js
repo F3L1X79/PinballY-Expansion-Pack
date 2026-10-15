@@ -68,6 +68,9 @@ export function createHighScoreStore(host, profileStore) {
         data.tables[configId] = { ...(isRecord(data.tables[configId]) ? data.tables[configId] : {}), board };
     };
     const learnedSources = () => (isRecord(data.learnedSources) ? data.learnedSources : {});
+    // The Profile store's Profile under that name, or null.
+    const profileNamed = (name, profiles = profileStore.listProfiles()) => (typeof name === "string"
+        && profiles.find(profile => profileKeyOf(profile.name) === profileKeyOf(name))) || null;
     const profileExists = name => profileStore.listProfileNames().some(candidate => profileKeyOf(candidate) === profileKeyOf(name));
     // Called with the Profile's name after a Play credited it High Scores.
     const creditedListeners = [];
@@ -170,7 +173,9 @@ export function createHighScoreStore(host, profileStore) {
         // play: the Play the Profile store announced ({ profileName, start, ... }),
         // or null for a game under a minute. The new places are Default
         // Scores after a game under a minute or a ROM reset. Returns the
-        // best place credited ({ rank, initials, score }), or null.
+        // best place credited ({ rank, initials, score, takenFromProfile }),
+        // or null; takenFromProfile is the Profile store's Profile a Table
+        // Record was taken from, else null.
         settlePlay(configId, places, play) {
             const known = knownBoardOf(configId);
             if (!known) {
@@ -193,6 +198,7 @@ export function createHighScoreStore(host, profileStore) {
                 return null;
             }
             const formerOwner = known.length > 0 ? known[0].owner : null;
+            let takenFromProfile = null;
             for (const place of added) {
                 const tableRecord = place.rank === 1;
                 const takenFrom = tableRecord && formerOwner !== null && formerOwner.toLowerCase() !== play.profileName.toLowerCase()
@@ -201,13 +207,15 @@ export function createHighScoreStore(host, profileStore) {
                     profile: play.profileName, configId, score: place.score, initials: place.initials, place: place.rank,
                     date: toLocalIsoString(play.start), tableRecord, takenFrom,
                 });
+                if (takenFrom !== null) takenFromProfile = profileNamed(takenFrom);
                 const tableRecordNote = takenFrom !== null ? `, Table Record taken from ${takenFrom}` : (tableRecord ? ", Table Record" : "");
                 log(`"${configId}": High Score for ${play.profileName}: place ${place.rank}, ${place.score} (${place.initials || "no initials"})${tableRecordNote}.`);
             }
             save();
             if (added.length === 0) log(`"${configId}": Play by ${play.profileName}, no new place${changed ? " (board changed)" : ""}.`);
             else creditedListeners.forEach(listener => listener(play.profileName));
-            return added.reduce((best, place) => (best === null || place.rank < best.rank ? place : best), null);
+            const bestPlace = added.reduce((best, place) => (best === null || place.rank < best.rank ? place : best), null);
+            return bestPlace === null ? null : { ...bestPlace, takenFromProfile };
         },
         // What the named Profile's High Score Achievements count, from the
         // High Scores it won since its last Profile Reset: the tables with
@@ -249,9 +257,7 @@ export function createHighScoreStore(host, profileStore) {
             const known = knownBoardOf(configId);
             if (!known) return null;
             const profiles = profileStore.listProfiles();
-            const ownerOf = name => (typeof name === "string"
-                && profiles.find(profile => profileKeyOf(profile.name) === profileKeyOf(name))) || null;
-            return known.map(({ rank, initials, score, owner }) => ({ rank, initials, score, owner: ownerOf(owner) }));
+            return known.map(({ rank, initials, score, owner }) => ({ rank, initials, score, owner: profileNamed(owner, profiles) }));
         },
         onCredited(listener) { creditedListeners.push(listener); },
     };

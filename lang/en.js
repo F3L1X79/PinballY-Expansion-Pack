@@ -534,6 +534,8 @@ export default {
         tableRecordTitle: (table) => `Table Record on ${table}!`,
         // The score, thousands separated.
         toastScore: (score) => `${score} points`,
+        // A Table Record taken from another Profile.
+        takenFrom: (profile) => `taken from ${profile}`,
         // The High Score Board.
         board: {
             menuEntry: "High Scores",

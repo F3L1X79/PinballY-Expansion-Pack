@@ -651,6 +651,7 @@ export default {
         },
         tableRecordTitle: (table) => `Table Record on ${table}!`,
         toastScore: (score) => `${score} points`,
+        takenFrom: (profile) => `taken from ${profile}`, // TODO: translation pass
         // TODO: translation pass
         // The High Score Board.
         board: {

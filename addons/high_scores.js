@@ -16,7 +16,8 @@
 // as plain lines (DMD, info box) at startup and after each read of that
 // source, after a Play or from the High Score Board; at startup a ROM
 // table's is not, PINemHi may read it now. A Play that won places submits
-// one High Score Toast, for the best place. Writes high_scores.json next
+// one High Score Toast, for the best place, naming the Profile a Table
+// Record was taken from. Writes high_scores.json next
 // to cabinet.json and logfile.log. Adds the "High Scores" main menu
 // entry, which opens the High Score Board on the selected table, Exit
 // there going back to the menu on that entry; each opening reads the board again without PinballY's cache, or, when
@@ -41,6 +42,7 @@ import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achieve
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { getDrawingAhead } from "../common/core/drawing_ahead.js";
 import { getWheelDialogs } from "../common/core/wheel_dialog.js";
+import { displayNameOf } from "../common/profiles/profile_name.js";
 import lang from "../common/core/i18n.js";
 
 // PinballY's own read after the game returns the board cached at launch
@@ -394,6 +396,7 @@ export default function init() {
             tileNumber: place.rank,
             title: place.rank === 1 ? TEXT.tableRecordTitle(table) : TEXT.toastTitle(table, place.rank),
             description: TEXT.toastScore(lang.profileStats.number(place.score)),
+            extraLine: place.takenFromProfile ? TEXT.takenFrom(displayNameOf(place.takenFromProfile)) : undefined,
             onShown: () => {},
         });
     }
