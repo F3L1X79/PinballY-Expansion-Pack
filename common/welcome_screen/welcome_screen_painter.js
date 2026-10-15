@@ -4,7 +4,8 @@
 // from the prototype validated on the cabinet: the dimmed backdrop with
 // the centred Steamball panel, the header (Avatar in its worn Avatar
 // Frame, with its Player Level pip, close cross, greeting with the
-// Profile's name in gold, Daily Streak line, Collection Mastery on the Mastery Bar's card), one card
+// Profile's name in gold, Daily Streak line, Lost Records line in the
+// alert colour with the taker's Avatar, Collection Mastery on the Mastery Bar's card), one card
 // per Period Table (logo, period, name on one line, Table Mastery card
 // around the Mastery Bar's square, grey line, "Go" button),
 // the bottom row ("random" and "stay") and one highlight per choice (a
@@ -21,7 +22,7 @@ import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.
 
 // Above the Achievement List (6000 to 6006), under the toasts and the
 // Profile picker. Exported for the tests' reader.
-export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, highlights: 6110 });
+export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, lostRecords: 6107, highlights: 6110 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -35,6 +36,9 @@ const LOOK = Object.freeze({
     // The Daily Streak line, when there is one, between the greeting and
     // Collection Mastery.
     dailyStreakGap: 4,
+    // The Lost Records line, when there is one, under the greeting and the
+    // Daily Streak line.
+    lostRecordsGap: 4, lostRecordsSize: 20, minLostRecordsSize: 15,
     rowH: 120, rowSize: 26, rowIcon: 76,
     // A Period Table card, from its top: period, name, Mastery card (the
     // Mastery Bar's, scaled by cardK), then the grey line, if any.
@@ -77,6 +81,16 @@ function drawCheck(dc, x, y, size, color) {
     const t = Math.max(3, Math.round(size / 7));
     for (let i = 0; i <= size * 0.35; i++) dc.fillRect(Math.round(x + i), Math.round(y + size * 0.5 + i), t, t, color);
     for (let i = 0; i <= size * 0.65; i++) dc.fillRect(Math.round(x + size * 0.35 + i), Math.round(y + size * 0.85 - i * 1.15), t, t, color);
+}
+
+// The Lost Records line: the taker's Avatar in a small square, when its
+// image can be read, then the text in the alert colour.
+function drawLostRecordsLine(host, dc, { avatarPath, text: lineText }, w) {
+    const tile = LOOK.lineTile;
+    const top = 2;
+    const textX = avatarPath ? tile + 12 : 0;
+    if (avatarPath) drawAvatar(dc, avatarPath, 0, top, tile);
+    oneLine(host, dc, lineText, { x: textX, y: top, width: w - textX, height: tile, size: LOOK.lostRecordsSize, minSize: LOOK.minLostRecordsSize, color: COLORS.alert });
 }
 
 // A grey line: a small square like the go-back arrow's, with the check
@@ -201,7 +215,9 @@ function geometry(referenceWidth, screen) {
     const greetingEndY = greetingY + Math.round(LOOK.greetingSize * 1.4);
     const dailyStreakY = greetingEndY + LOOK.dailyStreakGap;
     const dailyStreakH = screen.dailyStreak ? LOOK.dailyStreakGap + LOOK.lineH : 0;
-    const collectionY = greetingEndY + dailyStreakH + LOOK.greetingBottom;
+    const lostRecordsY = greetingEndY + dailyStreakH + LOOK.lostRecordsGap;
+    const lostRecordsH = screen.lostRecords ? LOOK.lostRecordsGap + LOOK.lineH : 0;
+    const collectionY = greetingEndY + dailyStreakH + lostRecordsH + LOOK.greetingBottom;
     const masteryCardH = Math.round(LOOK.masteryCardH * LOOK.cardK);
     const headerH = collectionY + masteryCardH + LOOK.headerBottom;
     // Each card ends under its Mastery card, or under its grey line.
@@ -214,7 +230,7 @@ function geometry(referenceWidth, screen) {
     const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
     const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + LOOK.pad;
     const panel = { x: inner.x - LOOK.pad, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
-    return { panel, inner, headerH, greetingY, dailyStreakY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
+    return { panel, inner, headerH, greetingY, dailyStreakY, lostRecordsY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
 }
 
 // The backdrop: the dimmed wheel and the panel, drawn on a window-sized
@@ -266,7 +282,8 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
 // screen: { picker, avatarPath, framePath (the worn Avatar Frame's image,
 // null for none), level (the shown Player Level, null for
 // no pip), greeting (runs of [text, gold?]), dailyStreak (null, or
-// { count, text }),
+// { count, text }), lostRecords (null, or { avatarPath (null for none),
+// text }),
 // collection ({ tier, reached, needed, goal, current }), cards
 // (each { choice, period, title, logoPath, mastery, masteryHead ({ text,
 // color }, as the Mastery Bar's), line
@@ -275,9 +292,9 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
 // its rect's own coordinates, and the highlight of each choice.
 export function layoutWelcomeScreen(host, screen, referenceWidth) {
     const layout = geometry(referenceWidth, screen);
-    const { inner, headerH, greetingY, dailyStreakY, collectionY, masteryCardH, detailsX, panel, cardsH } = layout;
+    const { inner, headerH, greetingY, dailyStreakY, lostRecordsY, collectionY, masteryCardH, detailsX, panel, cardsH } = layout;
     const top = panel.y + LOOK.pad;
-    // The greeting and the Daily Streak line stop short of the cross.
+    // The greeting and the lines under it stop short of the cross.
     const greetingW = inner.w - LOOK.cross - 40;
     const pieces = [{
         zIndex: WELCOME_SCREEN_Z_INDEX.header,
@@ -303,6 +320,14 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
             zIndex: WELCOME_SCREEN_Z_INDEX.dailyStreak,
             rect: { x: inner.x, y: top + dailyStreakY, w: greetingW, h: LOOK.lineH },
             draw: dc => drawGreyLine(host, dc, screen.dailyStreak.count, screen.dailyStreak.text, 0, 0, greetingW),
+        });
+    }
+    // Under the greeting and the Daily Streak line, on a layer of its own.
+    if (screen.lostRecords) {
+        pieces.push({
+            zIndex: WELCOME_SCREEN_Z_INDEX.lostRecords,
+            rect: { x: inner.x, y: top + lostRecordsY, w: greetingW, h: LOOK.lineH },
+            draw: dc => drawLostRecordsLine(host, dc, screen.lostRecords, greetingW),
         });
     }
     // From the card details' left edge to the right edge, on a layer of its

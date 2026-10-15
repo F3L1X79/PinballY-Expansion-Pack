@@ -4,7 +4,10 @@
 // dimmed wheel greets the active Profile by the hour (its Avatar, in its
 // worn Avatar Frame, with the shown Player Level as a pip, and its name
 // in gold when the Profile picker is on), shows its Daily Streak under the greeting from 2 days
-// on, its Collection Mastery (the tier kept in profile.json when the
+// on, then its most recent Lost Record (with the High Scores Add-on on: the Table
+// Record another Profile took from it since its last Welcome Screen, seen
+// once the screen is drawn, the seen marker written to high_scores.json),
+// its Collection Mastery (the tier kept in profile.json when the
 // tables no longer reach it) and offers to close, to play the Table of the Day or of the Week
 // (one card each, with its Table Mastery and the active Profile's Streak;
 // reading them picks and locks this Period's tables, and Select launches
@@ -35,6 +38,7 @@ import { cleanTitle } from "../common/tables/table_title.js";
 import { getChangePlayer } from "../common/profiles/change_player.js";
 import { getRandomGame } from "../common/tables/random_game.js";
 import { getDailyStreak } from "../common/achievements/daily_streak.js";
+import { getHighScoreStore } from "../common/high_scores/high_score_store.js";
 import { getTableOfTheDay, getTableOfTheWeek } from "../common/tables/period_table.js";
 import { masteryOf, collectionMasteryOfProfile } from "../common/mastery/table_mastery.js";
 import { tablesVisibleTo } from "../common/tables/visible_tables.js";
@@ -68,6 +72,8 @@ export default function init() {
     const shownPlayerLevel = getShownPlayerLevel();
     const randomGame = getRandomGame();
     const dailyStreak = getDailyStreak();
+    // The Lost Records come from the High Scores Add-on's store: none when it is off.
+    const highScores = config.addOns.highScores === false ? null : getHighScoreStore();
     const periodTables = { [CHOICE.DAY]: getTableOfTheDay(), [CHOICE.WEEK]: getTableOfTheWeek() };
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     // The screen greets the Profile in place of the Profile Greeting, so it
@@ -104,6 +110,29 @@ export default function init() {
         return { count: current, text: isTodayCounted ? TEXT.cabinetStreak.playedToday : TEXT.cabinetStreak.notYetToday };
     }
 
+    // Each missing Avatar logged once: the screen opens on every change of player.
+    const loggedMissingAvatars = new Set();
+    // The taker's Avatar on the Lost Records line; null, logged, when its
+    // image cannot be read, so the line shows its text alone.
+    function lineAvatarOf(taker) {
+        if (host.files.isImageReadable(taker.avatarPath)) return taker.avatarPath;
+        if (!loggedMissingAvatars.has(taker.avatarPath)) {
+            loggedMissingAvatars.add(taker.avatarPath);
+            log(`${taker.avatarPath} is missing or unreadable; the Lost Records line shows without ${taker.name}'s Avatar.`);
+        }
+        return null;
+    }
+
+    // The most recent Lost Record, on the tables the active Profile can see.
+    function readLostRecordsLine(profile) {
+        if (!highScores) return null;
+        const visibleTables = tablesVisibleTo(host.getVisibleTables(), store);
+        const [lost] = highScores.lostRecordsOf(profile.name, visibleTables.map(game => game.configId));
+        if (!lost) return null;
+        const game = visibleTables.find(candidate => candidate.configId === lost.configId);
+        return { avatarPath: lineAvatarOf(lost.taker), text: TEXT.lostRecord(displayNameOf(lost.taker), cleanTitle(game.title)) };
+    }
+
     // A card per Period Table offered to the active Profile; reading it
     // picks and locks this Period's table when nobody did yet.
     function readCards() {
@@ -132,8 +161,7 @@ export default function init() {
     const readCollection = () => collectionTextsOf(
         collectionMasteryOfProfile(tablesVisibleTo(host.getVisibleTables(), store), store.getProfileData()));
 
-    function readScreen() {
-        const profile = store.getActiveProfile();
+    function readScreen(profile) {
         const picker = getChangePlayer() !== null;
         const greeting = TEXT.greetings[partOfDay(host.now().getHours())];
         // What the wheel shows behind the screen: staying keeps it.
@@ -150,6 +178,7 @@ export default function init() {
                 ? TEXT.greetingWithName(greeting, displayNameOf(profile)).map((part, index) => [part, index === 1])
                 : [[TEXT.greetingAlone(greeting), false]],
             dailyStreak: readDailyStreakLine(),
+            lostRecords: readLostRecordsLine(profile),
             collection: readCollection(),
             cards,
             // The flippers' loop; the first one is selected on opening,
@@ -181,7 +210,8 @@ export default function init() {
     // startup (docs/adr/0011).
     function draw() {
         const openedAt = host.now().getTime();
-        const screen = readScreen();
+        const profile = store.getActiveProfile();
+        const screen = readScreen(profile);
         const layers = [];
         // The backdrop first: it measures the window and dims the wheel.
         const backdrop = hiddenLayer(WELCOME_SCREEN_Z_INDEX.backdrop);
@@ -202,6 +232,8 @@ export default function init() {
         const { pieces, highlights } = layoutWelcomeScreen(host, screen, referenceWidth);
         pieces.forEach(drawPiece);
         const highlightLayers = screen.choices.map(choice => drawPiece(highlights[choice]));
+        // Seen once drawn, even if the screen closes at once.
+        if (highScores) highScores.markLostRecordsSeen(profile.name);
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         const selected = Math.max(0, screen.choices.indexOf(firstChoice));

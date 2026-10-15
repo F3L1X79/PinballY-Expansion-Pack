@@ -26,6 +26,8 @@ export const STEAMBALL_COLORS = Object.freeze({
     challengeAccentLit: 0xFFB8FFF0,
     // The High Score Toast's accent, apart from the Ranks' metals and the Challenges' teal.
     highScoreAccent: 0xFFB07CF0,
+    // News the player would rather not hear, such as a Lost Record.
+    alert: 0xFFE8644A,
     // Provisional, the border's colour until the Achievement List's key caps
     // and pills are checked on the cabinet.
     // StyledText ignores a semi-transparent backgroundColor.

@@ -202,6 +202,7 @@ export default {
             notYetToday: "jours d'affilée sur la borne : continue !",
             playedToday: "jours d'affilée sur la borne",
         },
+        lostRecord: (taker, tableTitle) => `${taker} t'a pris ton record sur ${tableTitle}`,
         // One card per Period Table; its grey line says it was played this
         // Period, or else the Streak of the daily or weekly rendezvous, its
         // count shown in a square before the text.

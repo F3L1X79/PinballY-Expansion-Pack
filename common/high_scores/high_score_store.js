@@ -18,7 +18,9 @@
 // what each Profile won since then, and hear when a Play credited High
 // Scores; the Profile Stats read the tables where each Profile still holds
 // a place or the Table Record; the High Score Board reads a table's last
-// known board with each place's owner. Per table without a board PinballY
+// known board with each place's owner. Per Profile, the date the Welcome
+// Screen last told it its Lost Records (the Table Records another Profile
+// took from it since), set only when it shows. Per table without a board PinballY
 // can read, the source it was learned from ({ kind: "vpreg", section }),
 // kept for good.
 // ============================================================
@@ -258,6 +260,40 @@ export function createHighScoreStore(host, profileStore) {
             if (!known) return null;
             const profiles = profileStore.listProfiles();
             return known.map(({ rank, initials, score, owner }) => ({ rank, initials, score, owner: profileNamed(owner, profiles) }));
+        },
+        // The named Profile's Lost Records on the given visible tables (by
+        // config ID), most recent first, one per table: { configId, taker },
+        // the taker the Profile store's Profile that took the Table Record
+        // from it most recently there since its seen marker; a table whose
+        // taker was removed since is left out. None without a marker, nor
+        // for Guest.
+        lostRecordsOf(profileName, visibleConfigIds) {
+            const profileKey = profileKeyOf(profileName);
+            const profile = profileNamed(profileName);
+            const seen = isRecord(data.lostRecordsSeen) ? data.lostRecordsSeen[profileKey] : undefined;
+            if (!profile || profile.isGuest || typeof seen !== "string") return [];
+            const visible = new Set(visibleConfigIds);
+            const takings = data.highScores
+                .filter(highScore => typeof highScore.takenFrom === "string" && profileKeyOf(highScore.takenFrom) === profileKey
+                    && highScore.date > seen && visible.has(highScore.configId))
+                .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+            const latestByTable = new Map();
+            for (const highScore of takings) {
+                if (!latestByTable.has(highScore.configId)) latestByTable.set(highScore.configId, highScore);
+            }
+            return [...latestByTable.values()]
+                .map(highScore => ({ configId: highScore.configId, taker: profileNamed(highScore.profile) }))
+                .filter(record => record.taker !== null);
+        },
+        // The named Profile's Lost Records so far are seen; never for
+        // Guest, which has none. The key is written only then, so a file
+        // without a shown Welcome Screen keeps its first shape.
+        markLostRecordsSeen(profileName) {
+            const profile = profileNamed(profileName);
+            if (!profile || profile.isGuest) return;
+            if (!isRecord(data.lostRecordsSeen)) data.lostRecordsSeen = {};
+            data.lostRecordsSeen[profileKeyOf(profileName)] = toLocalIsoString(host.now());
+            save();
         },
         onCredited(listener) { creditedListeners.push(listener); },
     };

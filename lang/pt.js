@@ -203,6 +203,7 @@ export default {
             notYetToday: "days in a row on the cabinet: keep it going!",
             playedToday: "days in a row on the cabinet",
         },
+        lostRecord: (taker, tableTitle) => `${taker} took your record on ${tableTitle}`, // TODO: translation pass
         // One card per Period Table; its grey line says it was played this
         // Period, or else the Streak of the daily or weekly rendezvous, its
         // count shown in a square before the text.
