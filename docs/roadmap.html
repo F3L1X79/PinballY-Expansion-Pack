@@ -219,7 +219,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 11.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 15.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -227,8 +227,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>High Scores</strong> : faits et fusionnés dans <code>main</code> le 15/10, les records par Profile (tables à ROM) et le tableau des meilleurs scores dessiné, qui remplace celui de PinballY. Reste le dernier des trois chantiers, les tables sans ROM, mené lui aussi sur <code>main</code> (plus de branche de chantier)</p>
-      <span class="next">Ensuite : <code>/implement-spec 216</code> (tickets #217 à #221), tables <a href="#romless-high-scores">sans ROM (n° <span data-ref="romless-high-scores"></span>)</a></span>
+      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). Reste à les essayer sur la borne.</p>
+      <span class="next">Ensuite : <a href="#profile-rivalries">rivalités (n° <span data-ref="profile-rivalries"></span>)</a>, en tête de file</span>
     </div>
   </section>
 
@@ -252,35 +252,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="romless-high-scores" data-track="play" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Meilleurs scores des tables sans ROM</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Lire nous-mêmes les tableaux des tables originales, que PINemHi ignore : <code>VPReg.stg</code> (lecteur du format en JS, octets lus par kernel32) et les fichiers texte « 5 scores + 5 initiales » du dossier <code>User\</code>. Ces tables entrent alors dans les records par Profile et le tableau dessiné, et leur tableau passe à PinballY par <code>setHighScores()</code>.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : grillé le 15/10/2026, spec #216, tickets #217 à #221 → <code>/implement</code>, sur <code>main</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
-          <details>
-            <summary>Ce qui a été décidé (grill du 15/10/2026)</summary>
-            <ul>
-              <li><strong>Sources</strong> : <code>VPReg.stg</code> et les fichiers texte « 5 scores + 5 initiales » du dossier <code>User\</code> (les deux Schtroumpfs). Rien pour les électromécaniques (aucune sur la borne), <code>VPReg.ini</code> quand VPX 10.8.1 sortira, pas de <code>scoringdb.json</code>.</li>
-              <li><strong>Lecture</strong> : octets lus par kernel32 (<code>CreateFileW</code>, <code>ReadFile</code>), format décodé en JS testable ; ni <code>IStorage</code> d'ole32, ni 7-Zip, ni PINemHi 3.6.8 (il lui faut 7-Zip et le nom de la section, et il ne sait pas lister le fichier). Tout le fichier lu d'un coup au <code>prelaunch</code> puis après la partie, jamais pendant que VPX tourne.</li>
-              <li><strong>Table ↔ section ou fichier</strong> : appris par ce qui a changé pendant la Play, retenu une fois pour toutes dans <code>high_scores.json</code> (nouvelle clé figée). Une Play qui change plusieurs sections : celle qui a un tableau ; deux tableaux changés (hors section + fichier de la même table, où le plus long gagne) : rien d'appris, une ligne dans <code>logfile.log</code>. La photo d'avant donne les Default Scores, donc la première Play est déjà attribuée.</li>
-              <li><strong>Tableau</strong> : toutes les <code>HighScoreN</code> / <code>HighScoreNName</code>, classées par valeur ; à défaut un score seul (<code>HighScore</code>, <code>HiScore</code>) fait une place ; seconds tableaux ignorés (<code>WaffleScore</code>, <code>SpecialHighScore</code>) ; initiales illisibles affichées vides. Règles portées de vpin-studio (mention MIT), limitées à ce qui existe sur la borne.</li>
-              <li><strong>Source par Play</strong> : le tableau de PinballY (ROM) s'il y en a un, sinon la section ou le fichier appris ; rien n'est figé, une table qui gagne une ROM passe côté ROM.</li>
-              <li><strong>PinballY</strong> : le tableau lu lui est passé par <code>setHighScores()</code> (DMD, fiche de la table), petit ticket en fin de spec.</li>
-              <li><strong>High Score Board</strong> d'une table sans ROM pas encore apprise : un message dédié (« Jouez une partie pour faire apparaître ce tableau »), en <code>en</code> et <code>fr</code>.</li>
-            </ul>
-            <p class="ctx">Décidé le 11/10/2026 : un score fait sur une de ces tables avant ce chantier ne sera jamais attribué (accepté).</p>
-            <p class="ctx">Copie du dossier <code>User\</code> de la borne (15/10/2026) dans <code>docs/research/high-scores-tools/user_folder/</code> : 37 sections dans <code>VPReg.stg</code>, 27 sur la famille <code>HighScoreN</code> ; absentes : Kill Bill, Mass Effect, Spiderman, Wrath of Olympus, Pokémon Gameboy. Ces fichiers servent de fixtures.</p>
-            <p class="ctx">Prototype du 11/10/2026 : 28 originales sans ROM sur la borne, aucune électromécanique. VPX écrit bien <code>User\VPReg.stg</code> pendant une Play d'originale (Zelda) : c'est la source à lire en premier.</p>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-rivalries" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -838,7 +809,6 @@
             <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
           </div>
           <div class="cell">
-            <a class="chip tr-play" href="#romless-high-scores"><b></b>Tables sans ROM</a>
             <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
             <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
             <a class="chip tr-share" href="#themes"><b></b>Thèmes</a>
