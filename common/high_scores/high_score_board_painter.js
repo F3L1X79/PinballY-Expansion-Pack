@@ -130,19 +130,23 @@ export function drawBackdrop(dc, { width, height }) {
 }
 
 // A top, a middle stretched to the panel's height and a bottom, the panel
-// w wide and h high.
-function drawSlices(dc, folder, slices, w, h) {
+// w wide and h high. GDI+ fades a stretched image's last source row into
+// transparency, a band where the wheel shows through: an opaque middle
+// (the panel's) is drawn one stretched row longer, under the bottom.
+function drawSlices(dc, folder, slices, w, h, isOpaque) {
     const path = slice => `${folder}\\${DRAWN_MENU_IMAGES_FOLDER}\\${slice.file}`;
     dc.drawImage(path(slices.top), 0, 0, w, slices.top.height);
     const middleH = h - slices.top.height - slices.bottom.height;
-    if (middleH > 0) dc.drawImage(path(slices.middle), 0, slices.top.height, w, middleH);
+    const rows = slices.middle.height;
+    const drawnH = isOpaque ? middleH * rows / (rows - 1) : middleH;
+    if (middleH > 0) dc.drawImage(path(slices.middle), 0, slices.top.height, w, drawnH);
     dc.drawImage(path(slices.bottom), 0, h - slices.bottom.height, w, slices.bottom.height);
 }
 
 // projectFolder: where the pack's assets\ folder is.
-export const drawPanel = (dc, projectFolder, w, h) => drawSlices(dc, projectFolder, DRAWN_MENU_IMAGES.panel, w, h);
+export const drawPanel = (dc, projectFolder, w, h) => drawSlices(dc, projectFolder, DRAWN_MENU_IMAGES.panel, w, h, true);
 // Over the texts, as on the Drawn Menu.
-export const drawGlass = (dc, projectFolder, w, h) => drawSlices(dc, projectFolder, DRAWN_MENU_IMAGES.glass, w, h);
+export const drawGlass = (dc, projectFolder, w, h) => drawSlices(dc, projectFolder, DRAWN_MENU_IMAGES.glass, w, h, false);
 
 export function drawTitle(host, dc, title, w, h) {
     oneLine(host, dc, title, { x: 0, y: 0, width: w, height: h, size: LOOK.titleSize, minSize: LOOK.minTitleSize, weight: 700, color: COLORS.gold, font: FONTS.display, align: "center" });

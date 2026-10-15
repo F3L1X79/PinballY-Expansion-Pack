@@ -166,3 +166,16 @@ export function crownDrawCounts(fake) {
     }
     return counts;
 }
+
+// The panel's slices as drawn: { top, middle, bottom }, each the rect its
+// image is drawn on, by its file name's end.
+export function panelSlices(fake) {
+    const [panel] = shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.panel);
+    const slices = {};
+    for (const stroke of panel.strokes()) {
+        if (!("image" in stroke)) continue;
+        const part = ["top", "middle", "bottom"].find(name => stroke.image.endsWith(`panel_${name}.png`));
+        if (part) slices[part] = stroke.rect;
+    }
+    return slices;
+}
