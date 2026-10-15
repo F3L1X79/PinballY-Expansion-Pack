@@ -39,12 +39,12 @@ const DIMMING = 0xB0080A0E;
 const LOOK = Object.freeze({
     // From the panel's edges to the content, as the Drawn Menu's entries.
     sideInset: DRAWN_MENU_FACE_INSET + DRAWN_MENU_LIST_INSET, topInset: DRAWN_MENU_FACE_INSET + 40, bottomInset: DRAWN_MENU_FACE_INSET + 40,
-    titleH: 84, titleSize: 34, minTitleSize: 22, noteH: 30, noteSize: 15, titleGap: 6,
+    titleH: 50, titleSize: 34, minTitleSize: 22, noteH: 30, noteSize: 15, titleGap: 6,
     messageH: 200, messageSize: 26,
     // The podium's steps, the 1st's first: the crown's room, the Avatar,
     // the block under it; the steps stand on the same floor. The crown
     // stands crownGap above where an Avatar Frame reaches into its room.
-    stepGap: 14, crownH: [110, 84, 84], crownGap: 4, avatar: [120, 92, 92], avatarGap: 10, blockH: [210, 184, 164],
+    stepGap: 14, crownH: [144, 116, 116], crownGap: 4, avatar: [120, 92, 92], avatarGap: 10, blockH: [210, 184, 164],
     edge: 4, blockPad: 10, rankH: 44, rankSize: 28, recordH: 24, recordSize: 14,
     nameH: 36, nameSize: 20, minNameSize: 14, scoreH: 40, scoreSize: 22, recordScoreSize: 26, initialsH: 28, initialsSize: 15,
     // The rows from the 4th place on.
