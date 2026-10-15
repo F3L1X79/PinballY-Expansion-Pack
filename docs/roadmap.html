@@ -228,7 +228,7 @@
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
       <p><strong>High Scores</strong> : faits sur la branche <code>high-scores</code>, les records par Profile (tables à ROM) et le tableau des meilleurs scores dessiné, qui remplace celui de PinballY. Reste le dernier des trois chantiers, les tables sans ROM ; la branche ne fusionne dans <code>main</code> qu'une fois les trois finis</p>
-      <span class="next">Ensuite : <code>/to-tickets</code> de la spec #216, tables <a href="#romless-high-scores">sans ROM (n° <span data-ref="romless-high-scores"></span>)</a></span>
+      <span class="next">Ensuite : <code>/implement-spec 216</code> (tickets #217 à #221), tables <a href="#romless-high-scores">sans ROM (n° <span data-ref="romless-high-scores"></span>)</a></span>
     </div>
   </section>
 
@@ -262,8 +262,8 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span></div>
           </div>
           <p>Lire nous-mêmes les tableaux des tables originales, que PINemHi ignore : <code>VPReg.stg</code> (lecteur du format en JS, octets lus par kernel32) et les fichiers texte « 5 scores + 5 initiales » du dossier <code>User\</code>. Ces tables entrent alors dans les records par Profile et le tableau dessiné, et leur tableau passe à PinballY par <code>setHighScores()</code>.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : grillé le 15/10/2026, spec #216 → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Flow Matt : grillé le 15/10/2026, spec #216, tickets #217 à #221 → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
           <details>
             <summary>Ce qui a été décidé (grill du 15/10/2026)</summary>
             <ul>
