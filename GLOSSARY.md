@@ -227,7 +227,7 @@ An Achievement whose condition holds right now. It can be lost again, for exampl
 _Avoid_: earned, obtained
 
 **Achievement List**:
-The screen, opened by the player, that shows every Achievement in one scrolling list of two sections: the Unlocked ones, the most recently Notified at the top, then the missing ones, the highest Unlock Rate first. Each Achievement shows its Achievement Rank. Shown as "Succès personnels" in French, opened from "Voir vos succès" ("Your Achievements").
+The screen, opened by the player, that shows every Achievement in one scrolling list of two sections: the Unlocked ones, the most recently Notified at the top, then the missing ones, the highest Unlock Rate first. Each Achievement shows its Achievement Rank. Shown as "Succès personnels" in French, opened from "Vos succès" ("Your Achievements").
 _Avoid_: My Achievements, trophy room
 
 **Achievement Family**:
