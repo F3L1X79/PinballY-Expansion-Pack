@@ -10,6 +10,8 @@
 // PinballY's filter groups leave the main menu for the "Filter Tables"
 // submenu, shown in place of a main menu opening (see FILTER_TABLES_MENU_ID);
 // Back in it, or in a group menu opened from it, goes up one level.
+// When the current filter belongs to one of its groups, "Filter Tables"
+// and that group are marked radio.
 // It owns the entry commands and runs the matching action when one is
 // selected, and can reopen the main menu with the cursor on an entry (a
 // screen going back one level). Listens to "menuopen", "menuclose",
@@ -113,10 +115,13 @@ export function createMainMenu(host) {
 
     // Turns this main menu opening into "Filter Tables": PinballY's groups
     // in its order, then Back.
+    // Its group holding the current filter is marked, set on each group so
+    // a mark PinballY may put on them itself is never doubled.
     function showFilterTables(ev, groups, selectedCmd) {
+        const activeGroupCmd = host.getCurrentFilterGroupCmd();
         ev.id = FILTER_TABLES_MENU_ID;
         ev.items = [
-            ...groups.map(item => Object.assign({}, item, { selected: item.cmd === selectedCmd })),
+            ...groups.map(item => Object.assign({}, item, { selected: item.cmd === selectedCmd, radio: item.cmd === activeGroupCmd })),
             { cmd: SEPARATOR_CMD },
             { title: lang.customMenuLabels.filterTablesBack, cmd: filterTablesBackCmd },
         ];
@@ -146,12 +151,19 @@ export function createMainMenu(host) {
             return;
         }
         groupsShown = groups;
+        const activeGroupCmd = host.getCurrentFilterGroupCmd();
+        const marksFilterTables = groups.some(item => item.cmd === activeGroupCmd);
         const shown = entries.filter(entry => entry.shownWhen());
         const selected = shown.find(entry => entry.name === entryToSelect);
         entryToSelect = null;
         // Array sort is stable: items sharing a slot keep their order.
         const placed = [
-            ...shown.map(({ label, cmd, position, hasSubmenu }) => ({ item: hasSubmenu ? { title: label, cmd, hasSubmenu } : { title: label, cmd }, position })),
+            ...shown.map(({ name, label, cmd, position, hasSubmenu }) => {
+                const item = { title: label, cmd };
+                if (hasSubmenu) item.hasSubmenu = true;
+                if (name === FILTER_TABLES_ENTRY && marksFilterTables) item.radio = true;
+                return { item, position };
+            }),
             ...ev.items
                 .filter(item => !isSeparator(item) && !groupCmds.includes(item.cmd))
                 .map(item => ({ item, position: nativePositionOf(item.cmd) })),

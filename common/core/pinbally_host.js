@@ -317,6 +317,9 @@ export function createPinballYHost() {
         // listed in no filter menu. Returns its command ID.
         createFilter: (desc) => gameList.createFilter(desc),
         getCurrentFilterId: () => gameList.getCurFilter().id,
+        // The command of the main menu item opening the current filter's
+        // group (FilterByEra...); undefined for a top-level filter.
+        getCurrentFilterGroupCmd: () => gameList.getCurFilter().groupCmd,
         // Runs the current filter again, before() included.
         refreshFilter: () => { gameList.refreshFilter(); },
         // Always on top of the current filter, in effect at once; returns its id.

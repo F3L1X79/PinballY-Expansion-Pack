@@ -53,6 +53,24 @@ const BUILT_IN_COMMANDS = {
 };
 const ALL_TABLES_FILTER_CMD = 900;
 const FAVORITES_FILTER_CMD = 901;
+// PinballY's own filters in a group, by id prefix (FilterInfo.html), and
+// the group menu listing them.
+const NATIVE_FILTER_GROUPS = [
+    ["YearRange.", "FilterByEra"], ["Manuf.", "FilterByManufacturer"], ["System.", "FilterBySystem"],
+    ["Category.", "FilterByCategory"], ["Uncategorized", "FilterByCategory"], ["Rating.", "FilterByRating"],
+    ["PlayedWithin.", "FilterByRecency"], ["NotPlayedWithin.", "FilterByRecency"], ["NeverPlayed", "FilterByRecency"],
+    ["AddedWithin.", "FilterByAdded"], ["AddedBefore.", "FilterByAdded"],
+];
+// The system groups a script filter can join, and their group menu.
+const SYSTEM_GROUP_COMMANDS = {
+    "[Era]": "FilterByEra", "[Manuf]": "FilterByManufacturer", "[Sys]": "FilterBySystem", "[Cat]": "FilterByCategory",
+    "[Rating]": "FilterByRating", "[Played]": "FilterByRecency", "[!Played]": "FilterByRecency", "[!!Played]": "FilterByRecency",
+    "[Added]": "FilterByAdded", "[!Added]": "FilterByAdded",
+};
+const nativeGroupOf = filterId => {
+    const found = NATIVE_FILTER_GROUPS.find(([prefix]) => filterId.startsWith(prefix));
+    return found ? found[1] : null;
+};
 const FIRST_CUSTOM_COMMAND = 1000;
 
 const TRUE_STRINGS = ["1", "true", "yes", "on"];
@@ -871,6 +889,10 @@ export function createFakePinballYHost({
                 .filter(canBeOnWheel)
                 .map(game => game.configId);
             runMetaFilters();
+        } else if (nativeGroupOf(filterId)) {
+            // PinballY's own group filters keep the wheel as it is here.
+            currentFilterId = filterId;
+            runMetaFilters();
         } else {
             applyFilter(filterId);
         }
@@ -917,6 +939,21 @@ export function createFakePinballYHost({
         wheelConfigIds = [...configIds.slice(start), ...configIds.slice(0, start)];
     }
 
+    // Like FilterInfo.groupCmd: the command of the main menu item opening
+    // the current filter's group; undefined for a top-level filter.
+    function currentFilterGroupCmd() {
+        const filter = filters.get(currentFilterId);
+        const groupName = filter ? SYSTEM_GROUP_COMMANDS[filter.group] : nativeGroupOf(currentFilterId);
+        return groupName ? BUILT_IN_COMMANDS[groupName] : undefined;
+    }
+
+    // The command of the current filter, for its radio mark in the main menu.
+    function currentFilterCmd() {
+        if (currentFilterId === "All") return ALL_TABLES_FILTER_CMD;
+        if (currentFilterId === "Favorites") return FAVORITES_FILTER_CMD;
+        return filterCommands.get(currentFilterId);
+    }
+
     function allocateCommand(name) {
         const id = nextCommandId++;
         commandIds.set(name, id);
@@ -941,6 +978,7 @@ export function createFakePinballYHost({
         setCurrentFilter,
         createFilter,
         getCurrentFilterId: () => currentFilterId,
+        getCurrentFilterGroupCmd: currentFilterGroupCmd,
         refreshFilter,
         createMetaFilter,
         setWheelGame,
@@ -1146,8 +1184,10 @@ export function createFakePinballYHost({
         // The main menu as PinballY opens it, with its native items: "Play",
         // the information section, Rate Table / Add to Favorites, the [Top]
         // filters (PinballY's All Tables and Favorites, the scripts' ones
-        // between them by sort key), the filter groups, then Return. Its
-        // separators are not documented: to be checked on the cabinet.
+        // between them by sort key; the current one marked radio), the
+        // filter groups, then Return. Its separators, and whether a group
+        // holding the current filter is marked, are not documented: to be
+        // checked on the cabinet.
         openMainMenu() {
             const topFilters = [...filters.entries()]
                 .filter(([, filter]) => filter.group === "[Top]")
@@ -1167,7 +1207,7 @@ export function createFakePinballYHost({
                 { title: "Rate Table", cmd: BUILT_IN_COMMANDS.RateGame },
                 { title: "Add to Favorites", cmd: BUILT_IN_COMMANDS.AddFavorite },
                 { title: "", cmd: -1 },
-                ...topFilters.map(({ title, cmd }) => ({ title, cmd })),
+                ...topFilters.map(({ title, cmd }) => (cmd === currentFilterCmd() ? { title, cmd, radio: true } : { title, cmd })),
                 { title: "", cmd: -1 },
                 filterGroup("Filter by Era", "FilterByEra"),
                 filterGroup("Filter by Manufacturer", "FilterByManufacturer"),
@@ -1287,7 +1327,7 @@ export function createFakePinballYHost({
                     getWheelGame: (offset) => host.getWheelTables()[offset] || null,
                     getWheelCount: () => host.getWheelTables().length,
                     createFilter,
-                    getCurFilter: () => ({ id: currentFilterId }),
+                    getCurFilter: () => ({ id: currentFilterId, groupCmd: currentFilterGroupCmd() }),
                     setCurFilter: setCurrentFilter,
                     setWheelGame: (offset) => { setWheelGame(offset); },
                     refreshFilter,
