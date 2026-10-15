@@ -203,6 +203,12 @@ export default {
             playedToday: "jours d'affilée sur la borne",
         },
         lostRecord: (taker, tableTitle) => `${taker} t'a pris ton record sur ${tableTitle}`,
+        lostRecords: (records, moreCount) => {
+            const named = records.map(record => `${record.tableTitle} (${record.taker})`);
+            return moreCount > 0
+                ? `Records perdus : ${named.join(", ")} et ${moreCount} ${moreCount === 1 ? "autre" : "autres"}`
+                : `Records perdus : ${named.slice(0, -1).join(", ")} et ${named[named.length - 1]}`;
+        },
         // One card per Period Table; its grey line says it was played this
         // Period, or else the Streak of the daily or weekly rendezvous, its
         // count shown in a square before the text.

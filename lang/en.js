@@ -85,8 +85,16 @@ export default {
             playedToday: "days in a row on the cabinet",
         },
         // The active Profile's Lost Record under the greeting, after the
-        // Daily Streak line.
+        // Daily Streak line, when it lost a single one.
         lostRecord: (taker, tableTitle) => `${taker} took your record on ${tableTitle}`,
+        // Several Lost Records in one line: the tables named (each
+        // { taker, tableTitle }), the most recent first, then how many more.
+        lostRecords: (records, moreCount) => {
+            const named = records.map(record => `${record.tableTitle} (${record.taker})`);
+            return moreCount > 0
+                ? `Records lost: ${named.join(", ")} and ${moreCount} more`
+                : `Records lost: ${named.slice(0, -1).join(", ")} and ${named[named.length - 1]}`;
+        },
         // One card per Period Table; its grey line says it was played this
         // Period, or else the Streak of the daily or weekly rendezvous, its
         // count shown in a square before the text.

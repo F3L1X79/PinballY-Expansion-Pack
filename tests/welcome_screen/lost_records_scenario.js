@@ -1,14 +1,19 @@
 // ============================================================
 // Lost Records tests' scenario: the High Scores scenario with the Welcome
 // Screen and the Profile picker on, so a Profile arriving (at startup, or
-// switched to as Change Player does) gets its Welcome Screen. Reads the
+// switched to as Change Player does) gets its Welcome Screen, or plays
+// before it shows. Builds a board whose Table Record is a Profile's. Reads the
 // Lost Records line the way the player sees it, and the seen markers in
 // high_scores.json. Never loaded by PinballY.
 // ============================================================
 
 import { settle } from "../support/fake_pinbally_host.js";
-import { startHighScores } from "../high_scores/high_scores_scenario.js";
+import { startHighScores, board } from "../high_scores/high_scores_scenario.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, lostRecordsLine, lostRecordsImages } from "./welcome_screen_reader.js";
+
+// The factory board under a new Table Record of score millions.
+export const recordBoard = (initials, millions) => board(
+    [initials, `${millions}000000`], ["SLL", "52000000"], ["BRE", "40000000"], ["LFS", "30000000"], ["ZAP", "20000000"]);
 
 // addOns: the Add-ons on besides the Welcome Screen and the Profile picker;
 // the other options as startHighScores takes them. The startup Welcome
@@ -27,6 +32,13 @@ export async function startLostRecords({ addOns = ["highScores"], ...options } =
             scenario.switchTo(name);
             await settle();
             fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+        },
+        // Switches to the named Profile and plays the table at once, so its
+        // Welcome Screen is dropped before it shows; VPinMAME saves after.
+        playAs: async (name, configId, after) => {
+            scenario.switchTo(name);
+            await settle();
+            await scenario.play(configId, { after });
         },
         isOpen: () => isWelcomeScreenOpen(fake),
         close: async () => {

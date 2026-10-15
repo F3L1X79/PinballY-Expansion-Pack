@@ -4,8 +4,9 @@
 // dimmed wheel greets the active Profile by the hour (its Avatar, in its
 // worn Avatar Frame, with the shown Player Level as a pip, and its name
 // in gold when the Profile picker is on), shows its Daily Streak under the greeting from 2 days
-// on, then its most recent Lost Record (with the High Scores Add-on on: the Table
-// Record another Profile took from it since its last Welcome Screen, seen
+// on, then its Lost Records (with the High Scores Add-on on: the Table
+// Records other Profiles took from it since its last Welcome Screen, the
+// three most recent named in one line and the others counted, seen
 // once the screen is drawn, the seen marker written to high_scores.json),
 // its Collection Mastery (the tier kept in profile.json when the
 // tables no longer reach it) and offers to close, to play the Table of the Day or of the Week
@@ -56,6 +57,8 @@ const SCRIPT_NAME = "WelcomeScreen";
 const STARTUP_PAUSE_MS = 500;
 const FADE_MS = 220;
 const FRAME_MS = 16;
+// The Lost Records line names this many tables at most, then counts the others.
+const MAX_NAMED_LOST_RECORDS = 3;
 
 // The greeting by the hour: from 5 h, 12 h, 19 h and 22 h.
 function partOfDay(hour) {
@@ -123,14 +126,22 @@ export default function init() {
         return null;
     }
 
-    // The most recent Lost Record, on the tables the active Profile can see.
+    // The Lost Records on the tables the active Profile can see: the one
+    // alone, or the most recent few named and the others counted, behind
+    // the most recent taker's Avatar.
     function readLostRecordsLine(profile) {
         if (!highScores) return null;
         const visibleTables = tablesVisibleTo(host.getVisibleTables(), store);
-        const [lost] = highScores.lostRecordsOf(profile.name, visibleTables.map(game => game.configId));
-        if (!lost) return null;
-        const game = visibleTables.find(candidate => candidate.configId === lost.configId);
-        return { avatarPath: lineAvatarOf(lost.taker), text: TEXT.lostRecord(displayNameOf(lost.taker), cleanTitle(game.title)) };
+        const lostRecords = highScores.lostRecordsOf(profile.name, visibleTables.map(game => game.configId));
+        if (lostRecords.length === 0) return null;
+        const named = lostRecords.slice(0, MAX_NAMED_LOST_RECORDS).map(lost => ({
+            taker: displayNameOf(lost.taker),
+            tableTitle: cleanTitle(visibleTables.find(candidate => candidate.configId === lost.configId).title),
+        }));
+        const text = named.length === 1
+            ? TEXT.lostRecord(named[0].taker, named[0].tableTitle)
+            : TEXT.lostRecords(named, lostRecords.length - named.length);
+        return { avatarPath: lineAvatarOf(lostRecords[0].taker), text };
     }
 
     // A card per Period Table offered to the active Profile; reading it
