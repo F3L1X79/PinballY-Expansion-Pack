@@ -55,7 +55,7 @@ test("failed, killed, unanswered and unsupported reads each show their message",
     const noBoard = `[HighScores] "${MEDIEVAL}": no board for the High Score Board; the last known board kept.`;
     const noneKnown = `[HighScores] "${MEDIEVAL}": no board for the High Score Board; none known yet.`;
     const failed = `[HighScores] "${MEDIEVAL}": the high scores read failed (PINemHi could not read the high scores.).`;
-    assert.deepEqual(log().filter(line => !line.includes("opened")), [
+    assert.deepEqual(log().filter(line => !line.includes("opened") && !line.includes("Default Score image")), [
         failed, noneKnown,
         failed, noneKnown,
         `[HighScores] "${MEDIEVAL}": first board read, 5 places, all Default Scores.`,

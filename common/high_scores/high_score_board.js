@@ -5,7 +5,8 @@
 // first places and compact rows for the others, laid out by the High Score
 // Board painter on the Drawn Menu's panel, a Gold, Silver and Bronze crown
 // over the podium's three steps. Each place shows its owner's name and
-// Avatar, in the Avatar Frame its Profile wears, or "Default score".
+// Avatar, in the Avatar Frame its Profile wears, or "Default score" with
+// the Default Score image of its initials, read again on every opening.
 // Opens at once on the last known board under a "Reading..." note (or a
 // "Reading..." message for a table never read) while the High Scores
 // Add-on reads it fresh, then redraws in place: the fresh board, "No score
@@ -29,6 +30,7 @@ import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
 import { SCRIPT_NAME } from "./high_score_store.js";
+import { readDefaultScoreImages, pickDefaultScoreImages } from "./default_score_images.js";
 import {
     HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX, CROWN_IMAGES, CROWN_CANVAS, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard, placedRect,
     drawBackdrop, drawPanel, drawGlass, drawCrown, drawTitle, drawNote, drawMessage, drawStep, drawRow,
@@ -74,6 +76,14 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
     // and the first row in view; null when closed.
     let shown = null;
 
+    // Each line once: the Default Score images are read again on every opening.
+    const loggedImageLines = new Set();
+    function logImageLine(line) {
+        if (loggedImageLines.has(line)) return;
+        loggedImageLines.add(line);
+        log(line);
+    }
+
     // The owner's Avatar; null, logged, when its image is missing.
     function avatarOf(owner) {
         if (host.files.isImageReadable(owner.avatarPath)) return owner.avatarPath;
@@ -81,13 +91,14 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
         return null;
     }
 
-    function placeShown({ rank, initials, score, owner }) {
+    // defaultImageOf(initials): a Default Score's image.
+    function placeShown({ rank, initials, score, owner }, defaultImageOf) {
         const TEXT = lang.highScores.board;
         return {
             rank,
             name: owner ? displayNameOf(owner) : TEXT.defaultScore,
             isDefaultScore: owner === null,
-            avatarPath: owner ? avatarOf(owner) : null,
+            avatarPath: owner ? avatarOf(owner) : defaultImageOf(initials),
             framePath: owner ? profileRewards.wornImageOf(owner.name, AVATAR_FRAME_WIDTH) : null,
             initials: initials || TEXT.noInitials,
             score: lang.profileStats.number(score),
@@ -97,8 +108,9 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
 
     // What the screen shows of the table: its title, its last known
     // places, and the message or note for where the read stands (status:
-    // "reading", "read", "unsupported", "failed").
-    function screenFor(game, status) {
+    // "reading", "read", "unsupported", "failed"); defaultImages: the
+    // Default Score images' paths.
+    function screenFor(game, status, defaultImages) {
         const TEXT = lang.highScores.board;
         const known = game ? highScores.boardOf(game.configId) : [];
         const screen = { title: game ? game.title : "", places: [], message: null, note: null };
@@ -108,7 +120,8 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
             screen.message = status === "reading" ? TEXT.reading : TEXT.noScore;
             if (status === "failed") screen.note = TEXT.notRefreshed;
         } else {
-            screen.places = known.map(placeShown);
+            const defaultImageOf = pickDefaultScoreImages(known.filter(place => place.owner === null).map(place => place.initials), defaultImages);
+            screen.places = known.map(place => placeShown(place, defaultImageOf));
             if (status === "reading") screen.note = TEXT.reading;
             if (status === "failed") screen.note = TEXT.notRefreshed;
         }
@@ -193,7 +206,8 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
         });
         const opened = { drawn, onBack, opacity: 0, content: [], geometry: null, rowLayers: [], crownLayers: [], firstRow: 0 };
         shown = opened;
-        drawContent(opened, screenFor(game, game ? "reading" : "read"));
+        const defaultImages = readDefaultScoreImages(host, logImageLine);
+        drawContent(opened, screenFor(game, game ? "reading" : "read", defaultImages));
         drawn.fadeIn(opacity => {
             opened.opacity = opacity;
             for (const layer of drawn.layers) layer.alpha = opacity;
@@ -205,7 +219,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
             if (shown !== opened) return;
             for (const layer of opened.content) host.removeDrawingLayer(layer);
             // A read whose recording threw resolves to nothing, logged: shown as failed.
-            drawContent(opened, screenFor(game, status || "failed"));
+            drawContent(opened, screenFor(game, status || "failed", defaultImages));
         }));
     }
 

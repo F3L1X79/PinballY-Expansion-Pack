@@ -32,7 +32,7 @@ test("a read ending after Exit only updates the store; a second opening reuses t
     assert.equal(boardLayerCount(fake), 0);
     assert.equal(pinemhiRuns, 1);
     assert.equal(saved().tables[MEDIEVAL].board.length, 5);
-    assert.deepEqual(log().filter(line => !line.includes("opened")), [`[HighScores] "${MEDIEVAL}": first board read, 5 places, all Default Scores.`]);
+    assert.deepEqual(log().filter(line => !line.includes("opened") && !line.includes("Default Score image")), [`[HighScores] "${MEDIEVAL}": first board read, 5 places, all Default Scores.`]);
 
     fake.closeMenu();
     setBoard(MEDIEVAL, FACTORY, { durationMs: 5000 });

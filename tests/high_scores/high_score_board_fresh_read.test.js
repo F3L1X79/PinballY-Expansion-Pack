@@ -35,5 +35,5 @@ test("a never-read table shows Reading… then its board, saved as the baseline,
     assert.deepEqual(rows(fake, lang).map(row => row.initials), ["ZAP", "RCF"]);
     assert.deepEqual(saved().tables[MEDIEVAL].board.map(place => place.owner), [null, null, null, null, null]);
     assert.deepEqual(saved().highScores, []);
-    assert.deepEqual(log().filter(line => !line.includes("opened")), [`[HighScores] "${MEDIEVAL}": first board read, 5 places, all Default Scores.`]);
+    assert.deepEqual(log().filter(line => !line.includes("opened") && !line.includes("Default Score image")), [`[HighScores] "${MEDIEVAL}": first board read, 5 places, all Default Scores.`]);
 });

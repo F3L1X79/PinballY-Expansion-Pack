@@ -18,6 +18,11 @@ export const HIGH_SCORES_FILE = `${PROFILES_FOLDER}\\high_scores.json`;
 // A Profile's own Avatar file, and files to seed for those Profiles' Avatars.
 export const avatarOf = name => `${PROFILES_FOLDER}\\${name}\\avatar.png`;
 export const avatarFiles = (...names) => Object.fromEntries(names.map(name => [avatarOf(name), "png"]));
+// The pack's Default Score images, by number (1 for default_score_01.png),
+// and files to seed for those numbers.
+export const DEFAULT_SCORE_IMAGES_PATH = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\default_scores";
+export const defaultScoreImageOf = number => `${DEFAULT_SCORE_IMAGES_PATH}\\default_score_${String(number).padStart(2, "0")}.png`;
+export const defaultScoreImageFiles = (...numbers) => Object.fromEntries(numbers.map(number => [defaultScoreImageOf(number), "png"]));
 export const GAME_MS = 5 * 60 * 1000;
 // Covers the wait after "postlaunch" and the reads, a second at a time.
 const READS_STEPS = 15;
