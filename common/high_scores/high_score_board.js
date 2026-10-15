@@ -11,7 +11,9 @@
 // "Reading..." message for a table never read) while the High Scores
 // Add-on reads it fresh, then redraws in place: the fresh board, "No score
 // yet" when empty, a "could not be refreshed" note when the read failed,
-// or "not supported" when PINemHi says so or no board is known. The screen
+// "not supported" when PINemHi says so or no board is known, or "Play a
+// game to bring up this table's high scores" for a table without a ROM
+// whose VPReg.stg section or text file is not learned yet. The screen
 // is drawn at once on all its layers, then faded in; the crowns, drawn
 // ahead once on their own layers through the shared drawing ahead
 // (PinballY reads an image file again on every draw), are only placed,
@@ -44,7 +46,8 @@ const POINT_SCALE = Object.freeze({ xSpan: 0.001, ySpan: 0.001 });
 // highScores: the High Score store; profileRewards: the worn Avatar
 // Frames; drawingAhead: the shared drawing ahead
 // (common/core/drawing_ahead.js); refresh(configId): reads the table's board into the store,
-// resolving to "read", "unsupported" or "failed".
+// resolving to "read", "unsupported", "failed" or "notLearned" (a table
+// without a ROM whose board source is not learned yet).
 export function createHighScoreBoard(host, { highScores, profileRewards, drawingAhead, refresh }) {
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     const closedListeners = createClosedListeners(SCRIPT_NAME);
@@ -108,13 +111,14 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
 
     // What the screen shows of the table: its title, its last known
     // places, and the message or note for where the read stands (status:
-    // "reading", "read", "unsupported", "failed"); defaultImages: the
+    // "reading", "read", "unsupported", "failed", "notLearned"); defaultImages: the
     // Default Score images' paths.
     function screenFor(game, status, defaultImages) {
         const TEXT = lang.highScores.board;
         const known = game ? highScores.boardOf(game.configId) : [];
         const screen = { title: game ? game.title : "", places: [], message: null, note: null };
-        if (status === "unsupported" || (known === null && status === "failed")) screen.message = TEXT.notSupported;
+        if (status === "notLearned") screen.message = TEXT.notLearned;
+        else if (status === "unsupported" || (known === null && status === "failed")) screen.message = TEXT.notSupported;
         else if (known === null) screen.message = TEXT.reading;
         else if (known.length === 0) {
             screen.message = status === "reading" ? TEXT.reading : TEXT.noScore;

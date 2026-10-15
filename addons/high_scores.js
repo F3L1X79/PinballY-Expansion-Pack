@@ -15,8 +15,10 @@
 // Score Toast, for the best place. Writes high_scores.json next to
 // cabinet.json and logfile.log. Adds the "High Scores" main menu entry,
 // which opens the High Score Board on the selected table, Exit there going back to the menu on that entry; each
-// opening reads the board again without PinballY's cache, recorded as a
-// board read outside a Play. Replaces PinballY's own "High Scores": removes
+// opening reads the board again without PinballY's cache, or, when
+// PINemHi gives none, the learned section or file, recorded as a board
+// read outside a Play; a VPX table without a ROM and nothing learned yet
+// asks for a game instead. Replaces PinballY's own "High Scores": removes
 // its main menu entry and cancels the HighScores command, which opens the
 // board instead, Exit going back to the wheel. The rules live in
 // common/high_scores/.
@@ -151,14 +153,18 @@ export default function init() {
 
     // A fresh read for the High Score Board, recorded as a board read
     // outside a Play: resolves to its status ("read", "unsupported",
-    // "failed") once the store holds it (after a Play being settled on the
-    // table, if any), whether the screen is still open or not.
+    // "failed", or "notLearned" for a table without a ROM whose source is
+    // not learned yet) once the store holds it (after a Play being settled
+    // on the table, if any), whether the screen is still open or not. When
+    // PINemHi gives no board, the learned section or file is read now: the
+    // board sits over the wheel, so VPX does not run.
     function refreshBoard(configId) {
         if (boardReads.has(configId)) return boardReads.get(configId);
-        const read = readTable(configId, { forget: true }).then(safeHandler(SCRIPT_NAME, async (result) => {
+        const read = readTable(configId, { forget: true }).then(safeHandler(SCRIPT_NAME, async (pinemhiRead) => {
             try {
+                const result = pinemhiRead.status === "read" ? pinemhiRead : romlessRead(configId, pinemhiRead);
                 if (result.status === "read") await highScores.recordBoard(configId, result.places);
-                else log(`"${configId}": no board for the High Score Board; ${highScores.boardOf(configId) === null ? "none known yet" : "the last known board kept"}.`);
+                else if (!result.logged) log(`"${configId}": no board for the High Score Board; ${highScores.boardOf(configId) === null ? "none known yet" : "the last known board kept"}.`);
                 return result.status;
             } finally {
                 boardReads.delete(configId);
@@ -325,6 +331,32 @@ export default function init() {
             return null;
         }
         return { before: boardIn(before, source), after: afterBoard };
+    }
+
+    // The High Score Board's read when PINemHi gives no board: the learned
+    // section or file read now ({ status: "read", places } or "failed"),
+    // "notLearned" for a VPX table with nothing learned yet, else
+    // PINemHi's result as it is; logged: true when the outcome was logged.
+    function romlessRead(configId, pinemhiRead) {
+        const source = highScores.sourceOf(configId);
+        if (!source) {
+            const game = host.getGameInfo(configId);
+            if (!game || game.rom || userFolderOf(configId) === null) return pinemhiRead;
+            log(`"${configId}": no board for the High Score Board; no VPReg.stg section or text file learned yet.`);
+            return { status: "notLearned", logged: true };
+        }
+        const snapshot = takeSnapshot(configId);
+        const places = boardIn(snapshot, source);
+        if (places !== null) {
+            log(`"${configId}": board read from ${describe(source)} for the High Score Board (User folder read in ${snapshot.ms} ms).`);
+            return { status: "read", places };
+        }
+        // A VPReg.stg that could not be read was logged by the snapshot.
+        if (!(source.kind === "vpreg" && snapshot.logged)) {
+            const why = source.kind === "vpreg" && snapshot.error ? ` (VPReg.stg: ${snapshot.error})` : "";
+            log(`"${configId}": no board in ${describe(source)} for the High Score Board${why}; ${highScores.boardOf(configId) === null ? "none known yet" : "the last known board kept"}.`);
+        }
+        return { status: "failed", logged: true };
     }
 
     // One toast per Play, for the best place won; the toast module holds

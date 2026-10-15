@@ -650,6 +650,8 @@ export default {
             // Over the last known board when the fresh read failed.
             notRefreshed: "Ces scores n'ont pas pu être actualisés",
             notSupported: "Les meilleurs scores de cette table ne sont pas pris en charge",
+            // A table without a ROM whose VPReg.stg section or text file is not learned yet.
+            notLearned: "Lancez une partie pour faire apparaître les meilleurs scores de cette table",
         },
     },
 };

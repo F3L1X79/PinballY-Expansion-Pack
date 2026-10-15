@@ -667,6 +667,8 @@ export default {
             // Over the last known board when the fresh read failed.
             notRefreshed: "These scores could not be refreshed", // TODO: translation pass
             notSupported: "This table's high scores are not supported", // TODO: translation pass
+            // A table without a ROM whose VPReg.stg section or text file is not learned yet.
+            notLearned: "Play a game to bring up this table's high scores", // TODO: translation pass
         },
     },
 };
