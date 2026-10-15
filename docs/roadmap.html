@@ -584,6 +584,24 @@
           </details>
         </div>
       </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="menu-test-helper" data-track="share" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Tests du menu principal sans l'ordre complet recopié</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+          </div>
+          <p>Un assistant partagé dans <code>tests/support/</code> (par exemple <code>mainMenuSection(fake, "player")</code>) pour que chaque test vérifie sa propre entrée du menu principal, au lieu de recopier tout l'ordre : 13 fichiers de tests figent aujourd'hui des titres du menu, et le réordonner en a touché 9.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/improve-codebase-architecture</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Proposé à la rétro de la spec #227 (15/10/2026), dont la partie la plus longue a été la mise à jour des tests qui figeaient l'ancien ordre.</p>
+          </details>
+        </div>
+      </li>
     </ol>
   </section>
 
