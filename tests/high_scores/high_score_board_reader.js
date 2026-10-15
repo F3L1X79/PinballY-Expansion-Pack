@@ -121,7 +121,7 @@ const crownLayers = fake => fake.drawingLayers().filter(layer => layer.zIndex ==
 // The crown over each podium step: { left, middle, right }, each null or
 // { image (its file name), clearsFrame (between the step's top and the
 // Avatar's top, or where its worn Avatar Frame reaches above it, a
-// quarter of the Avatar's box, resting at most 8 board pixels above) }.
+// quarter of the Avatar's box, resting at most 12 board pixels above) }.
 // Positions grow upwards, in window heights. A crown is found over a step only when centred on it; any other
 // shown crown is counted as stray.
 export function crowns(fake) {
@@ -145,7 +145,7 @@ export function crowns(fake) {
         const crownSpan = crown.scale().ySpan;
         const crownBottom = crown.position().y - crownSpan / 2;
         const crownTop = crown.position().y + crownSpan / 2;
-        const rests = crownBottom >= frameTop - 1e-6 && crownBottom <= frameTop + 8 * perBoardPixel;
+        const rests = crownBottom >= frameTop - 1e-6 && crownBottom <= frameTop + 12 * perBoardPixel;
         return { image: fileOf(image), clearsFrame: rests && crownTop <= stepTop + 1e-6 };
     };
     const found = mapSteps(steps, crownOver);

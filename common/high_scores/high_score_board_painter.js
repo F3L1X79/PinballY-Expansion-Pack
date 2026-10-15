@@ -45,7 +45,7 @@ const LOOK = Object.freeze({
     // the block under it; the steps stand on the same floor. The crown
     // stands crownGap above the Avatar, or above where its Avatar Frame
     // reaches into the crown's room when one is worn.
-    stepGap: 14, crownH: [144, 116, 116], crownGap: 4, avatar: [120, 106, 92], avatarGap: 10, blockH: [210, 184, 164],
+    stepGap: 14, crownH: [150, 132, 118], crownGap: 10, avatar: [120, 106, 92], avatarGap: 10, blockH: [204, 184, 164],
     edge: 4, blockPad: 10, rankH: 44, rankSize: 28, recordH: 24, recordSize: 14,
     nameH: 36, nameSize: 20, minNameSize: 14, scoreH: 40, scoreSize: 22, recordScoreSize: 26, minScoreSize: 14, initialsH: 28, initialsSize: 15,
     // The rows from the 4th place on.
