@@ -201,6 +201,8 @@ export function createFakePinballYHost({
     const nvramBoards = new Map();
     // The board PinballY keeps after a read, by config ID, until a launch or setHighScores(null).
     const highScoreCache = new Map();
+    // Every setHighScores() call, in order: { configId, lines } (null to forget).
+    const highScoreSetList = [];
     const boardKeyOf = game => (game.rom ? `rom:${game.rom}` : `table:${game.configId}`);
     const withSource = (lines, source) => Object.assign([...lines], { source });
     // Like PinballY's getHighScores(): the cached board, or a PINemHi run
@@ -253,6 +255,7 @@ export function createFakePinballYHost({
             // A board of lines replaces the cached one; null forgets it, so the next read runs PINemHi.
             setHighScores: {
                 value: (lines) => {
+                    highScoreSetList.push({ configId: game.configId, lines: lines === null ? null : [...lines] });
                     if (lines === null) highScoreCache.delete(game.configId);
                     else highScoreCache.set(game.configId, [...lines]);
                 },
@@ -1042,6 +1045,7 @@ export function createFakePinballYHost({
         // Kernel32 file handles not closed yet.
         openFileHandleCount: () => openFileHandles.size,
         setTables(newTables) { allTables = newTables.map(withMedia); },
+        highScoreSets: () => highScoreSetList.map(set => ({ configId: set.configId, lines: set.lines && [...set.lines] })),
         gameUpdates: () => gameUpdateList.map(update => ({ configId: update.configId, changes: { ...update.changes } })),
         // The current wheel selection, in wheel order (index 0 is the current
         // table), optionally under a filter id such as "Favorites".

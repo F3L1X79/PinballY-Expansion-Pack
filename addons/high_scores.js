@@ -11,11 +11,15 @@
 // VPX runs: the table's section or file is learned from the one board the
 // Play changed (of a section and a file, the one with more places), kept
 // for good, and the board it held before the Play recorded first, so its
-// places are Default Scores. A Play that won places submits one High
-// Score Toast, for the best place. Writes high_scores.json next to
-// cabinet.json and logfile.log. Adds the "High Scores" main menu entry,
-// which opens the High Score Board on the selected table, Exit there going back to the menu on that entry; each
-// opening reads the board again without PinballY's cache, or, when
+// places are Default Scores. PinballY shows no board of its own for a
+// table with a learned section or file: its known board is handed to it
+// as plain lines (DMD, info box) at startup and after each read of that
+// source, after a Play or from the High Score Board; at startup a ROM
+// table's is not, PINemHi may read it now. A Play that won places submits
+// one High Score Toast, for the best place. Writes high_scores.json next
+// to cabinet.json and logfile.log. Adds the "High Scores" main menu
+// entry, which opens the High Score Board on the selected table, Exit
+// there going back to the menu on that entry; each opening reads the board again without PinballY's cache, or, when
 // PINemHi gives none, the learned section or file, recorded as a board
 // read outside a Play; a VPX table without a ROM and nothing learned yet
 // asks for a game instead. Replaces PinballY's own "High Scores": removes
@@ -103,6 +107,23 @@ export default function init() {
 
     const wait = ms => new Promise(resolve => host.setTimeout(resolve, ms));
 
+    // PinballY reads no board for a table with a learned source: its DMD
+    // and info box show the one handed to it, kept until the next launch
+    // or forgetting read. A ROM table PINemHi reads never learns one.
+    function handToPinballY(configId) {
+        const known = highScores.boardOf(configId);
+        const game = host.getGameInfo(configId);
+        if (!highScores.sourceOf(configId) || known === null || !game) return;
+        const number = lang.profileStats.number;
+        game.setHighScores(known.map(place => [`${place.rank})`, place.initials, number(place.score)].filter(Boolean).join(" ")));
+    }
+    // A learned source is kept for good: a ROM table's ROM, read by
+    // PINemHi since, must not be hidden behind a stale board.
+    for (const configId of highScores.learnedTables()) {
+        const game = host.getGameInfo(configId);
+        if (game && !game.rom) safeHandler(SCRIPT_NAME, handToPinballY)(configId);
+    }
+
     // The table's board, read by PINemHi without PinballY's cache when
     // forget is set: { status: "read", places }, or { status } "unsupported"
     // or "failed" (failed, timed out), logged.
@@ -168,6 +189,9 @@ export default function init() {
                 return result.status;
             } finally {
                 boardReads.delete(configId);
+                // The read made PinballY forget the board: handed again,
+                // the last known one when nothing was read.
+                if (pinemhiRead.status !== "read") handToPinballY(configId);
             }
         })).then(status => status, () => "failed");
         boardReads.set(configId, read);
@@ -393,16 +417,27 @@ export default function init() {
     async function settleAfterGame(bracket, play) {
         await bracket.launchRead;
         await wait(AFTER_READ_DELAY_MS);
-        let places = await readPlaces(bracket.configId, { forget: true });
-        if (places === null) {
+        const places = await readPlaces(bracket.configId, { forget: true });
+        if (places !== null) {
+            settleAndAnnounce(bracket.configId, places, play);
+            return;
+        }
+        try {
             const after = takeSnapshot(bracket.configId, bracket.snapshot);
             const boards = romlessBoards(bracket.configId, bracket.snapshot, after);
             if (boards === null) return;
             if (boards.before !== null) highScores.recordBoardBeforePlay(bracket.configId, boards.before);
-            places = boards.after;
+            settleAndAnnounce(bracket.configId, boards.after, play);
+        } finally {
+            // The launch made PinballY forget the board: handed again, the
+            // last known one when nothing was read.
+            handToPinballY(bracket.configId);
         }
-        const best = highScores.settlePlay(bracket.configId, places, play);
-        if (best) announce(bracket.configId, best);
+    }
+
+    function settleAndAnnounce(configId, places, play) {
+        const best = highScores.settlePlay(configId, places, play);
+        if (best) announce(configId, best);
     }
 
     // Fires after the game, back on the wheel, once the Table ROMs Add-on

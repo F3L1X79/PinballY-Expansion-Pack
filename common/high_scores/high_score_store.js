@@ -67,6 +67,7 @@ export function createHighScoreStore(host, profileStore) {
     const setBoard = (configId, board) => {
         data.tables[configId] = { ...(isRecord(data.tables[configId]) ? data.tables[configId] : {}), board };
     };
+    const learnedSources = () => (isRecord(data.learnedSources) ? data.learnedSources : {});
     const profileExists = name => profileStore.listProfileNames().some(candidate => profileKeyOf(candidate) === profileKeyOf(name));
     // Called with the Profile's name after a Play credited it High Scores.
     const creditedListeners = [];
@@ -133,8 +134,13 @@ export function createHighScoreStore(host, profileStore) {
         },
         // The source learned for the table, or null.
         sourceOf(configId) {
-            const sources = isRecord(data.learnedSources) ? data.learnedSources : {};
+            const sources = learnedSources();
             return isRecord(sources[configId]) ? sources[configId] : null;
+        },
+        // The config IDs of every table with a learned source.
+        learnedTables() {
+            const sources = learnedSources();
+            return Object.keys(sources).filter(configId => isRecord(sources[configId]));
         },
         // Remembers for good where the table keeps its board. The key is
         // written only then, so a file without one keeps its first shape.

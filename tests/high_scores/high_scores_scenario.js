@@ -202,6 +202,8 @@ export async function startHighScores({
         pendingTimerCount: () => fake.pendingTimerCount(),
         // Every toast drawn so far, its texts joined with " | ".
         toasts: () => toastDrawings(fake).map(drawing => drawing.texts.join(" | ")),
+        // The boards handed to PinballY, in order: { configId, lines }.
+        handedBoards: () => fake.highScoreSets().filter(set => set.lines !== null),
         log: () => fake.logLines().filter(line => line.startsWith("[HighScores]")),
         saved: () => {
             const text = fake.readFile(HIGH_SCORES_FILE);
