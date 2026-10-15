@@ -119,10 +119,10 @@ const fileOf = path => path.split("\\").pop();
 const crownLayers = fake => fake.drawingLayers().filter(layer => layer.zIndex === HIGH_SCORE_BOARD_CROWN_Z_INDEX);
 
 // The crown over each podium step: { left, middle, right }, each null or
-// { image (its file name), clearsFrame (between
-// the step's top and where an Avatar Frame would reach above its Avatar,
-// a quarter of the Avatar's box) }. Positions grow upwards, in window
-// heights. A crown is found over a step only when centred on it; any other
+// { image (its file name), clearsFrame (between the step's top and the
+// Avatar's top, or where its worn Avatar Frame reaches above it, a
+// quarter of the Avatar's box, resting at most 8 board pixels above) }.
+// Positions grow upwards, in window heights. A crown is found over a step only when centred on it; any other
 // shown crown is counted as stray.
 export function crowns(fake) {
     const steps = stepLayers(fake);
@@ -139,11 +139,14 @@ export function crowns(fake) {
         // The Avatar's image is drawn 3 px inside its box.
         const boxTop = avatarImage.rect.y - 3;
         const boxSize = avatarImage.rect.width + 6;
-        const frameTop = stepTop - (boxTop - boxSize / 4) * stepSpan / step.canvasSize().height;
+        const isFramed = step.strokes().some(stroke => "image" in stroke && isFrameImage(stroke.image));
+        const perBoardPixel = stepSpan / step.canvasSize().height;
+        const frameTop = stepTop - (boxTop - (isFramed ? boxSize / 4 : 0)) * perBoardPixel;
         const crownSpan = crown.scale().ySpan;
         const crownBottom = crown.position().y - crownSpan / 2;
         const crownTop = crown.position().y + crownSpan / 2;
-        return { image: fileOf(image), clearsFrame: crownBottom >= frameTop - 1e-6 && crownTop <= stepTop + 1e-6 };
+        const rests = crownBottom >= frameTop - 1e-6 && crownBottom <= frameTop + 8 * perBoardPixel;
+        return { image: fileOf(image), clearsFrame: rests && crownTop <= stepTop + 1e-6 };
     };
     const found = mapSteps(steps, crownOver);
     const placed = Object.values(found).filter(Boolean).length;

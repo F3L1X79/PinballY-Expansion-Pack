@@ -43,10 +43,11 @@ const LOOK = Object.freeze({
     messageH: 200, messageSize: 26,
     // The podium's steps, the 1st's first: the crown's room, the Avatar,
     // the block under it; the steps stand on the same floor. The crown
-    // stands crownGap above where an Avatar Frame reaches into its room.
-    stepGap: 14, crownH: [144, 116, 116], crownGap: 4, avatar: [120, 92, 92], avatarGap: 10, blockH: [210, 184, 164],
+    // stands crownGap above the Avatar, or above where its Avatar Frame
+    // reaches into the crown's room when one is worn.
+    stepGap: 14, crownH: [144, 116, 116], crownGap: 4, avatar: [120, 106, 92], avatarGap: 10, blockH: [210, 184, 164],
     edge: 4, blockPad: 10, rankH: 44, rankSize: 28, recordH: 24, recordSize: 14,
-    nameH: 36, nameSize: 20, minNameSize: 14, scoreH: 40, scoreSize: 22, recordScoreSize: 26, initialsH: 28, initialsSize: 15,
+    nameH: 36, nameSize: 20, minNameSize: 14, scoreH: 40, scoreSize: 22, recordScoreSize: 26, minScoreSize: 14, initialsH: 28, initialsSize: 15,
     // The rows from the 4th place on.
     rowsGap: 18, rowH: 64, rowGap: 8, rowPad: 8, tile: 48, rowAvatar: 48, cellGap: 14, rowInitialsW: 80, rowScoreW: 200,
     rowRankSize: 18, rowNameSize: 18, rowInitialsSize: 15, rowScoreSize: 20,
@@ -73,8 +74,9 @@ const MIN_PANEL_H = Math.max(
 // also the size its piece is drawn at; placedRect() puts one in the
 // window. Gives the panel, the title, the note's line under it, then
 // either the message's box or the podium's steps (the 1st's first, those
-// with no place included), the crowns over them, and one rect per row as
-// if none were scrolled.
+// with no place included), the crowns over them (framed: over an Avatar
+// wearing an Avatar Frame, bare: over one without), and one rect per row
+// as if none were scrolled.
 // zoom: board to reference pixels; rowsInView: how many rows show at
 // once (all of them when they fit), the others scrolling rowPitch apart.
 export function layoutHighScoreBoard(referenceWidth, placeCount) {
@@ -105,8 +107,10 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const stepXs = [middleX, middleX - LOOK.stepGap - stepW, middleX + stepW + LOOK.stepGap];
     const steps = stepXs.map((stepX, index) => ({ x: stepX, y: bodyY + PODIUM_H - stepH(index), w: stepW, h: stepH(index) }));
     const crowns = steps.map((step, index) => {
-        const side = LOOK.crownH[index] - LOOK.avatar[index] * AVATAR_FRAME_MARGIN - LOOK.crownGap;
-        return { x: step.x + (step.w - side) / 2, y: step.y, w: side, h: side };
+        const reach = LOOK.avatar[index] * AVATAR_FRAME_MARGIN;
+        const side = LOOK.crownH[index] - reach - LOOK.crownGap;
+        const framed = { x: step.x + (step.w - side) / 2, y: step.y, w: side, h: side };
+        return { framed, bare: { ...framed, y: framed.y + reach } };
     });
     const rowPitch = LOOK.rowH + LOOK.rowGap;
     const rowsY = bodyY + PODIUM_H + LOOK.rowsGap;
@@ -191,7 +195,7 @@ export function drawStep(host, dc, place, index, recordLabel, w) {
     if (place.isTableRecord) centred(recordLabel, LOOK.recordH, { size: LOOK.recordSize, weight: 700, color: COLORS.gold, font: FONTS.display });
     centred(place.name, LOOK.nameH, { size: LOOK.nameSize, minSize: LOOK.minNameSize, weight: 600, color: place.isDefaultScore ? COLORS.dim : COLORS.title });
     centred(place.score, LOOK.scoreH, {
-        size: place.isTableRecord ? LOOK.recordScoreSize : LOOK.scoreSize, weight: 700, color: place.isTableRecord ? LIGHT_GOLD : COLORS.title, font: FONTS.display,
+        size: place.isTableRecord ? LOOK.recordScoreSize : LOOK.scoreSize, minSize: LOOK.minScoreSize, weight: 700, color: place.isTableRecord ? LIGHT_GOLD : COLORS.title, font: FONTS.display,
     });
     centred(place.initials, LOOK.initialsH, { size: LOOK.initialsSize, weight: 600, color: COLORS.description, font: FONTS.display });
 }
@@ -220,5 +224,5 @@ export function drawRow(host, dc, place, w) {
         color: place.isDefaultScore ? COLORS.dim : COLORS.title,
     });
     oneLine(host, dc, place.initials, { x: initialsX, y: 0, width: LOOK.rowInitialsW, height: h, size: LOOK.rowInitialsSize, weight: 600, color: COLORS.description, font: FONTS.display, align: "center" });
-    oneLine(host, dc, place.score, { x: scoreX, y: 0, width: LOOK.rowScoreW, height: h, size: LOOK.rowScoreSize, weight: 700, color: COLORS.title, font: FONTS.display, align: "right" });
+    oneLine(host, dc, place.score, { x: scoreX, y: 0, width: LOOK.rowScoreW, height: h, size: LOOK.rowScoreSize, minSize: LOOK.minScoreSize, weight: 700, color: COLORS.title, font: FONTS.display, align: "right" });
 }

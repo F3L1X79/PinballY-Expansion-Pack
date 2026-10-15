@@ -164,7 +164,8 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
         // Drawn now when the board opens before the drawing ahead reached them.
         const crownLayers = crowns.slice(0, Math.min(PODIUM_PLACES, screen.places.length)).map((crown, index) => {
             if (!crown.isDrawn) drawCrownLayer(crown);
-            drawn.place(crown.layer, placedRect(geometry, geometry.crowns[index]));
+            const { framed, bare } = geometry.crowns[index];
+            drawn.place(crown.layer, placedRect(geometry, screen.places[index].framePath ? framed : bare));
             return crown.layer;
         });
         const rowLayers = screen.places.slice(PODIUM_PLACES).map((place, index) => {
