@@ -1,9 +1,9 @@
 // ============================================================
 // The main menu's sections in French with Menu Cleanup on, through main.js
 // on the fake PinballY globals, for a non-Admin Profile once the household
-// has an Admin: PinballY's information entries and the filter groups by
-// system, last played and date added are gone, Table Setup too, and no
-// separator is doubled; the Achievement List entry reads "Vos succès".
+// has an Admin: PinballY's information entries are gone, Table Setup too,
+// the filter groups are behind "Filtrer les tables", and no separator is
+// doubled; the Achievement List entry reads "Vos succès".
 // ============================================================
 
 import { test } from "node:test";
@@ -42,7 +42,7 @@ test("a non-Admin Profile's cleaned main menu runs in its sections, in French", 
         lang.profiles.menuEntry, "Vos succès", "Vos statistiques", SEPARATOR,
         lang.highScores.board.menuEntry, "Noter la table", "Ajouter aux favoris", SEPARATOR,
         "Toutes les tables", LABELS.challengeTables, LABELS.tablesToDiscoverFilter, LABELS.hallOfFameFilter, "Tables favorites", SEPARATOR,
-        "Filtrer par époque", "Filtrer par fabricant", "Filtrer par catégorie", "Filtrer par note", SEPARATOR,
+        "Filtrer les tables", SEPARATOR,
         "Retour",
     ]);
     assertNoErrorLogged(fake);

@@ -259,6 +259,8 @@ export default {
         tableOfTheDay: "Iniciar a mesa do dia",
         tableOfTheWeek: "Iniciar a mesa da semana",
         tableSetup: "Configuração da mesa",
+        filterTables: "Filter Tables", // TODO: translation pass
+        filterTablesBack: "Back", // TODO: translation pass
     },
 
     achievements: {

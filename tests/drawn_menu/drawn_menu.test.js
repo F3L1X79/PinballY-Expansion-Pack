@@ -52,8 +52,7 @@ test("the main menu is drawn instead of the native one, with the same entries in
         "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, "---",
         "Information", "Flyer", "High Scores", "Instruction Card", "Rate Table", "Add to Favorites", LABELS.tableSetup, "---",
         "All Tables", "Favorite Tables", "---",
-        "Filter by Era", "Filter by Manufacturer", "Filter by System", "Filter by Category",
-        "Filter by Rating", "Filter by Last Played", "Filter by Date Added", "---",
+        LABELS.filterTables, "---",
         "Return",
     ]);
     assert.equal(readDrawnMenu(fake).message, null);

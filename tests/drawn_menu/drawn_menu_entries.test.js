@@ -44,7 +44,7 @@ test("a non-admin Profile's main menu shows the final entries, translated and cl
         "Vos succès", "Vos statistiques", "---",
         "Noter la table", "Ajouter aux favoris", "---",
         "Toutes les tables", "Tables favorites", "---",
-        "Filtrer par époque", "Filtrer par fabricant", "Filtrer par catégorie", "Filtrer par note", "---",
+        "Filtrer les tables", "---",
         "Retour",
     ]);
 });

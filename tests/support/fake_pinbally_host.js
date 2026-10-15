@@ -1122,7 +1122,8 @@ export function createFakePinballYHost({
             // Like PinballY's FireMenuEvent: a menu marked updated is shown
             // even when "menuopen" was cancelled; preventDefault() only
             // stops the unchanged native menu.
-            if (ev.menuUpdated || !ev.defaultPrevented) showMenu(id, menuItems);
+            // A listener may show another menu in its place by changing ev.id.
+            if (ev.menuUpdated || !ev.defaultPrevented) showMenu(ev.id, menuItems);
         },
 
         // The Exit menu as PinballY opens it on the Exit button, with its
@@ -1193,13 +1194,15 @@ export function createFakePinballYHost({
         },
 
         // Picks the item with this title in the current menu: fires its
-        // command, then closes the menu, unless the item stays open. A menu
-        // shown by the command replaces it: only its "menuclose" fires.
+        // command, then carries it out as PinballY does unless a listener
+        // prevented it, then closes the menu, unless the item stays open. A
+        // menu shown by the command replaces it: only its "menuclose" fires.
         selectMenuItem(title) {
             const menu = shownMenu;
             const item = menu && menu.items.find(menuItem => menuItem.title === title);
             if (!item) throw new Error(`No menu item titled "${title}" is showing.`);
-            fire("command", { id: item.cmd });
+            const ev = fire("command", { id: item.cmd });
+            if (!ev.defaultPrevented && nativeCommands.has(item.cmd)) nativeCommands.get(item.cmd)();
             if (shownMenu !== menu) fire("menuclose", { id: menu.id });
             else if (!item.stayOpen) host.closeMenu();
         },

@@ -50,6 +50,10 @@ import * as drawnMenus from "./addons/drawn_menus.js";
 // - highScores comes after sessionStatsTracker and tableRoms, and before
 //   achievements: a ROM Table ROMs confirms after a game must be in
 //   PinballY before the High Scores read the board again.
+// - menuCleanup must come before customMenuCommands, the first script
+//   using the main menu module: that module's "menuopen" listener must
+//   see the main menu as Menu Cleanup left it, so that the filter groups
+//   it removes stay out of "Filter Tables".
 // - profilePicker must come before the Welcome Screen, which offers
 //   "Change Player" only when the picker registered itself at init.
 // - drawnMenus must come last, so its "menuopen" listener draws the final
@@ -59,15 +63,15 @@ import * as drawnMenus from "./addons/drawn_menus.js";
 // which shows them in a fixed priority order, and Achievements are announced
 // by non-blocking toasts, which wait for the Welcome Screen.
 const SCRIPTS = [
-    // Interface: translations, status line, menus, filters, menu cleanup,
+    // Interface: translations, status line, menu cleanup, menus, filters,
     // Profile picker, clock, Wheel Arc, launch overlay.
     { key: "uiTranslation", module: uiTranslation },
     { key: "statusLineInfo", module: statusLineInfo },
+    { key: "menuCleanup", module: menuCleanup },
     { key: "customMenuCommands", module: customMenuCommands },
     { key: "customFilter", module: customFilter },
     { key: "hallOfFame", module: hallOfFame },
     { key: "tablesToDiscover", module: tablesToDiscover },
-    { key: "menuCleanup", module: menuCleanup },
     { key: "profilePicker", module: profilePicker },
     { key: "clock", module: clock },
     { key: "wheelArc", module: wheelArc },

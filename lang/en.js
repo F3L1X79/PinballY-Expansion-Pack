@@ -143,6 +143,9 @@ export default {
         tableOfTheDay: "Launch Table of the Day",
         tableOfTheWeek: "Launch Table of the Week",
         tableSetup: "Set Up Table",
+        // The main menu entry gathering PinballY's filter groups, and its submenu's way back.
+        filterTables: "Filter Tables",
+        filterTablesBack: "Back",
     },
 
     // Thresholded titles are keyed by their threshold, which is part of the

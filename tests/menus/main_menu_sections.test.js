@@ -3,7 +3,7 @@
 // Menu Cleanup off: Play and the launches, the player, the selected table
 // (High Score Board, PinballY's table entries, Rate Table, Add to
 // Favorites, Table Setup last for an Admin Profile only), the table lists,
-// the filter groups, any entry the pack does not know, then Return; a
+// "Filter Tables", any entry the pack does not know, then Return; a
 // section with no entry shown goes with its separator.
 // ============================================================
 
@@ -34,11 +34,6 @@ function mainMenuTitles(open = () => fake.openMainMenu()) {
     return titles;
 }
 
-const FILTER_GROUPS = [
-    "Filter by Era", "Filter by Manufacturer", "Filter by System", "Filter by Category",
-    "Filter by Rating", "Filter by Last Played", "Filter by Date Added",
-];
-
 test("setup", async () => {
     fake.addFolder(`${PROFILES}\\Alice`);
     fake.addFolder(`${PROFILES}\\Bob`);
@@ -61,14 +56,14 @@ const tableLists = () => {
     return ["All Tables", challengeTables, tablesToDiscoverFilter, hallOfFameFilter, "Favorite Tables"];
 };
 
-test("the main menu runs launches, player, selected table, table lists, filter groups, then Return", () => {
+test("the main menu runs launches, player, selected table, table lists, Filter Tables, then Return", () => {
     assert.deepEqual(mainMenuTitles(), [
         ...launches(), SEPARATOR,
         ...player(), SEPARATOR,
         lang.highScores.board.menuEntry, "Information", "Flyer", "Instruction Card", "Rate Table", "Add to Favorites",
         lang.customMenuLabels.tableSetup, SEPARATOR,
         ...tableLists(), SEPARATOR,
-        ...FILTER_GROUPS, SEPARATOR,
+        lang.customMenuLabels.filterTables, SEPARATOR,
         "Return",
     ]);
 });
@@ -112,8 +107,8 @@ test("entries the pack does not know keep their order in their own section, just
         { title: "Another script's entry", cmd: OTHER_SCRIPT_CMD },
         { title: "Return", cmd: MenuReturn },
     ]));
-    assert.deepEqual(titles.slice(titles.indexOf("Filter by Era")),
-        ["Filter by Era", SEPARATOR, "Quit PinballY", "Another script's entry", SEPARATOR, "Return"]);
+    assert.deepEqual(titles.slice(titles.indexOf(lang.customMenuLabels.filterTables)),
+        [lang.customMenuLabels.filterTables, SEPARATOR, "Quit PinballY", "Another script's entry", SEPARATOR, "Return"]);
 });
 
 test("no section leaves a doubled, leading or trailing separator when PinballY lists nothing but Play", () => {

@@ -53,7 +53,7 @@ test("with no selected-table entry shown, the main menu has no selected-table se
         "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR,
         lang.profiles.menuEntry, SEPARATOR,
         "All Tables", SEPARATOR,
-        "Filter by Era", SEPARATOR,
+        LABELS.filterTables, SEPARATOR,
         "Return",
     ]);
     assertNoErrorLogged(fake);

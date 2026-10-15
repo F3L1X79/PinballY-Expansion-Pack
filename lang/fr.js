@@ -257,6 +257,8 @@ export default {
         tableOfTheDay: "Lancer la table du jour",
         tableOfTheWeek: "Lancer la table de la semaine",
         tableSetup: "Configurer la table",
+        filterTables: "Filtrer les tables",
+        filterTablesBack: "Retour",
     },
 
     achievements: {

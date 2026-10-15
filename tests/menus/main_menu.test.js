@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import { createMainMenu, MAIN_MENU_POSITION } from "../../common/menus/main_menu.js";
+import lang from "../../common/core/i18n.js";
 
 function setUp() {
     const fake = createFakePinballYHost();
@@ -72,7 +73,7 @@ test("PinballY's separators give way to the sections': none doubled, leading or 
     assert.deepEqual(titles(fake.currentMenu()), ["Play", "Day", SEPARATOR, "Board"]);
 });
 
-test("PinballY's items go to their sections: the selected table's around the pack's, the table lists, the filter groups, the unknown ones, then Return", () => {
+test("PinballY's items go to their sections: the selected table's around the pack's, the table lists, Filter Tables for the groups, the unknown ones, then Return", () => {
     const { fake, mainMenu } = setUp();
     mainMenu.add({ name: "board", label: "Board", position: MAIN_MENU_POSITION.HIGH_SCORE_BOARD, action: () => {} });
     mainMenu.add({ name: "setup", label: "Setup", position: MAIN_MENU_POSITION.TABLE_SETUP, action: () => {} });
@@ -93,7 +94,7 @@ test("PinballY's items go to their sections: the selected table's around the pac
 
     assert.deepEqual(titles(fake.currentMenu()), [
         "Play", SEPARATOR, "Board", "Info", "Favorite", "Setup", SEPARATOR, "All Tables", "Favorites", SEPARATOR,
-        "Era", "Rating", SEPARATOR, "Other", "Another", SEPARATOR, "Return",
+        lang.customMenuLabels.filterTables, SEPARATOR, "Other", "Another", SEPARATOR, "Return",
     ]);
 });
 

@@ -3,8 +3,8 @@
 // by default, PinballY's native menus keep Help, About and the information
 // entries; turned on, they are gone for every Profile, Admin Profiles
 // included, from the Operator menu too, as are the filter submenus by
-// system, last played and date added, the others set apart by a
-// separator; Rate Table and Add to Favorites stay, the Operator Menu rules
+// system, last played and date added, which stay out of "Filter Tables";
+// Rate Table and Add to Favorites stay, the Operator Menu rules
 // are unchanged, and no doubled, leading or trailing separator is left.
 // ============================================================
 
@@ -20,8 +20,8 @@ const markAdmin = (fake, name) =>
 
 // Separators, titled "" (PinballY's) or untitled (the main menu module's), read "---".
 const SEPARATOR = "---";
-const CLEANED_TABLE_LISTS_AND_FILTERS = [SEPARATOR, "All Tables", "Favorites", SEPARATOR,
-    "Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating", SEPARATOR, "Return"];
+const FILTER_TABLES = "Filter Tables";
+const CLEANED_TABLE_LISTS_AND_FILTERS = [SEPARATOR, "All Tables", "Favorites", SEPARATOR, FILTER_TABLES, SEPARATOR, "Return"];
 const CLEANED_ADMIN_EXIT_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Operator Menu", "Reset profile", SEPARATOR, "Cancel"];
 const CLEANED_EXIT_MENU_WITHOUT_OPERATOR_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Cancel"];
 
@@ -93,38 +93,16 @@ test("no doubled, leading or trailing separator is left, titled or not", async (
     fake.closeMenu();
 });
 
-test("the filter submenus by system, last played and date added are gone, the others stay", () => {
-    const { PlayGame, FilterByEra, FilterByManufacturer, FilterBySystem, FilterByCategory, FilterByRating, FilterByRecency, FilterByAdded } = globalThis.command;
-    fake.openMenu("main", [
-        { title: "Play", cmd: PlayGame },
-        { title: "", cmd: -1 },
-        { title: "All Tables", cmd: 900 },
-        { title: "Filter by Era", cmd: FilterByEra, hasSubmenu: true },
-        { title: "Filter by Manufacturer", cmd: FilterByManufacturer, hasSubmenu: true },
-        { title: "Filter by System", cmd: FilterBySystem, hasSubmenu: true },
-        { title: "Filter by Category", cmd: FilterByCategory, hasSubmenu: true },
-        { title: "Filter by Rating", cmd: FilterByRating, hasSubmenu: true },
-        { title: "Filter by Last Played", cmd: FilterByRecency, hasSubmenu: true },
-        { title: "Filter by Date Added", cmd: FilterByAdded, hasSubmenu: true },
-    ]);
-    const titles = fake.currentMenu().items.map(item => item.title);
-    assert.deepEqual(titles.slice(-6), ["All Tables", undefined, "Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating"]);
-    fake.closeMenu();
-});
+test("the filter submenus by system, last played and date added stay out of Filter Tables, the others are there", () => {
+    fake.setNativeCommand(globalThis.command.ShowMainMenu, () => fake.openMainMenu());
+    fake.openMainMenu();
+    fake.selectMenuItem(FILTER_TABLES);
 
-test("a separator sets the filter submenus apart from the filters, never doubled", () => {
-    const { PlayGame, FilterBySystem, FilterByCategory } = globalThis.command;
-    fake.openMenu("main", [
-        { title: "Play", cmd: PlayGame },
-        { title: "", cmd: -1 },
-        { title: "All Tables", cmd: 900 },
-        { title: "Filter by System", cmd: FilterBySystem, hasSubmenu: true },
-        { title: "", cmd: -1 },
-        { title: "Filter by Category", cmd: FilterByCategory, hasSubmenu: true },
+    assert.deepEqual(fake.currentMenu().items.map(item => (item.cmd === -1 ? SEPARATOR : item.title)), [
+        "Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating", SEPARATOR, "Back",
     ]);
-    assert.deepEqual(fake.currentMenu().items.map(item => (item.cmd === -1 ? SEPARATOR : item.title)).slice(-4),
-        [SEPARATOR, "All Tables", SEPARATOR, "Filter by Category"]);
     fake.closeMenu();
+    assertNoErrorLogged(fake);
 });
 
 test("Help and About leave the Operator menu too", () => {

@@ -159,7 +159,7 @@ Pour tenir les tables pour adultes à l'écart d'un enfant, donnez-leur dans Pin
 
 ### Nettoyage des menus
 
-Menu Cleanup allège les menus de PinballY pour tous les Profils, Profils admin compris : il retire Aide et À propos des menus de sortie et opérateur, et Informations, Flyer, Meilleurs scores, Carte d'instructions et les sous-menus Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout du menu principal (Noter la table et Ajouter aux favoris restent), où un séparateur isole les sous-menus de filtre restants des filtres. C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
+Menu Cleanup allège les menus de PinballY pour tous les Profils, Profils admin compris : il retire Aide et À propos des menus de sortie et opérateur, et Informations, Flyer, Meilleurs scores, Carte d'instructions et les sous-menus Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout du menu principal (Noter la table et Ajouter aux favoris restent) ; ces trois sous-menus restent aussi hors de « Filtrer les tables ». C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
 
 ## Contribuer
 

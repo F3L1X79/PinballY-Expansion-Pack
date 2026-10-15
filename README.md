@@ -136,7 +136,7 @@ To keep the Adult Tables away from a child, tag them in PinballY with the catego
 
 ### Menu Cleanup
 
-Menu Cleanup lightens PinballY's menus for every Profile, Admin Profiles included: it removes Help and About from the Exit and Operator menus, and Information, Flyer, High Scores, Instruction Card and the Filter by System, Filter by Last Played and Filter by Date Added submenus from the main menu (Rate Table and Add to Favorites stay), where a separator now sets the remaining filter submenus apart from the filters. It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
+Menu Cleanup lightens PinballY's menus for every Profile, Admin Profiles included: it removes Help and About from the Exit and Operator menus, and Information, Flyer, High Scores, Instruction Card and the Filter by System, Filter by Last Played and Filter by Date Added submenus from the main menu (Rate Table and Add to Favorites stay); those three submenus stay out of "Filter Tables" too. It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
 
 ## Contributing
 
