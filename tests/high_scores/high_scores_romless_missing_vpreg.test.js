@@ -13,10 +13,10 @@ test("a missing VPReg.stg costs only that table's credit, with one log line", as
 
     await play(ZELDA);
 
-    assert.deepEqual(log().filter(line => !line.includes("the high scores read failed")), [
+    assert.deepEqual(log(), [
         `[HighScores] "${ZELDA}": no board after the game; nothing credited, the last known board kept (VPReg.stg: C:\\vPinball\\VisualPinball\\User\\VPReg.stg not found).`,
     ]);
     assert.equal(saved(), undefined);
     assert.deepEqual(toasts(), []);
-    assert.deepEqual(fake.logLines().filter(line => /error/i.test(line) && !line.includes("the high scores read failed")), []);
+    assert.deepEqual(fake.logLines().filter(line => /error/i.test(line)), []);
 });

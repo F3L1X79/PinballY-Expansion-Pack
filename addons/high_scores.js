@@ -133,7 +133,8 @@ export default function init() {
                     logHandlerError(SCRIPT_NAME, error);
                 }
             }, safeHandler(SCRIPT_NAME, (error) => {
-                log(`"${configId}": the high scores read failed (${error instanceof Error ? error.message : String(error)}).`);
+                // PinballY reads no board for a table without a ROM: no news there.
+                if (game.rom) log(`"${configId}": the high scores read failed (${error instanceof Error ? error.message : String(error)}).`);
                 finish({ status: "failed" });
             }));
         });
@@ -177,16 +178,21 @@ export default function init() {
         return `${exe.slice(0, folderEnd)}\\User\\VPReg.stg`;
     }
 
-    // VPReg.stg read whole: { sections }, or { error } (logged only when
-    // the board is needed: a ROM table's PINemHi board never consults it).
+    // VPReg.stg read whole: { sections, ms }, or { error } (null for a
+    // table of another system). A missing file is logged only when the
+    // board is needed, since a ROM table's PINemHi board never consults
+    // it; a file that cannot be read is logged at once ({ logged: true }).
     function takeSnapshot(configId) {
         const path = vpregPathOf(configId);
         if (path === null) return { error: null };
+        if (!host.files.fileExists(path)) return { error: `${path} not found` };
+        const start = host.now().getTime();
         try {
-            if (!host.files.fileExists(path)) return { error: `${path} not found` };
-            return { sections: readCompoundFile(host.files.readBytes(path)) };
+            return { sections: readCompoundFile(host.files.readBytes(path)), ms: host.now().getTime() - start };
         } catch (error) {
-            return { error: error instanceof Error ? error.message : String(error) };
+            const message = error instanceof Error ? error.message : String(error);
+            log(`"${configId}": ${path} could not be read (${message}); nothing credited from it.`);
+            return { error: message, logged: true };
         }
     }
 
@@ -197,11 +203,12 @@ export default function init() {
         return keys.length === Object.keys(b).length && keys.every(key => a[key] === b[key]);
     };
 
-    // The table's learned section, or the one board section the Play
-    // changed, learned now; null when there is none (logged).
+    // The table's learned section ({ section, isNew: false }), or the one
+    // board section the Play changed, learned now ({ section, isNew: true });
+    // null when there is none (logged).
     function sectionOf(configId, before, after) {
         const learned = highScores.sourceOf(configId);
-        if (learned && learned.kind === "vpreg") return learned.section;
+        if (learned && learned.kind === "vpreg") return { section: learned.section, isNew: false };
         const changed = Object.keys(after).filter(name => !sameValues(before[name], after[name]) && readSectionBoard(after[name]) !== null);
         if (changed.length !== 1) {
             log(changed.length === 0
@@ -210,8 +217,7 @@ export default function init() {
             return null;
         }
         highScores.learnSource(configId, { kind: "vpreg", section: changed[0] });
-        log(`"${configId}": VPReg.stg section "${changed[0]}" learned.`);
-        return changed[0];
+        return { section: changed[0], isNew: true };
     }
 
     // The table's VPReg.stg boards around the Play: { before, after },
@@ -219,13 +225,17 @@ export default function init() {
     // no board after the game (logged).
     function romlessBoards(configId, before, after) {
         const failed = [before, after].find(snapshot => !snapshot.sections);
+        if (failed && failed.logged) return null;
         if (failed) {
             const why = failed.error === null ? "" : ` (VPReg.stg: ${failed.error})`;
             log(`"${configId}": no board after the game; nothing credited, the last known board kept${why}.`);
             return null;
         }
-        const section = sectionOf(configId, before.sections, after.sections);
-        if (section === null) return null;
+        const found = sectionOf(configId, before.sections, after.sections);
+        if (found === null) return null;
+        const { section } = found;
+        const timing = `VPReg.stg read in ${before.ms} ms before the game, ${after.ms} ms after`;
+        log(found.isNew ? `"${configId}": VPReg.stg section "${section}" learned (${timing}).` : `"${configId}": board read from VPReg.stg section "${section}" (${timing}).`);
         const afterBoard = after.sections[section] ? readSectionBoard(after.sections[section]) : null;
         if (afterBoard === null) {
             log(`"${configId}": no board in VPReg.stg section "${section}" after the game; nothing credited, the last known board kept.`);
@@ -270,7 +280,9 @@ export default function init() {
         await wait(AFTER_READ_DELAY_MS);
         let places = await readPlaces(bracket.configId, { forget: true });
         if (places === null) {
-            const boards = romlessBoards(bracket.configId, bracket.snapshot, takeSnapshot(bracket.configId));
+            // A snapshot that failed at launch makes the second one useless.
+            const after = bracket.snapshot.sections ? takeSnapshot(bracket.configId) : bracket.snapshot;
+            const boards = romlessBoards(bracket.configId, bracket.snapshot, after);
             if (boards === null) return;
             if (boards.before !== null) highScores.recordBoardBeforePlay(bracket.configId, boards.before);
             places = boards.after;
