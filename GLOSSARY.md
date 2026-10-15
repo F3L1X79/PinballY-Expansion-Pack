@@ -109,7 +109,7 @@ The Period Table whose Period is a day; prefers tables never played, otherwise t
 The Period Table whose Period is a week; picked purely at random.
 
 **Welcome Screen**:
-The screen shown over the dimmed wheel when PinballY starts, and again after Change Player picked another Profile, that greets the active Profile by its Avatar and name, shows the Table of the Day and the Table of the Week with what they mean for that Profile, and offers to stay on the table selected on the wheel, to change player or to launch a Period Table or a Random Game. While it is open, toasts and Confetti Showers wait for it to close. Shown as "Écran d'accueil" in French.
+The screen shown over the dimmed wheel when PinballY starts, and again after Change Player picked another Profile, that greets the active Profile by its Avatar and name, tells it its Lost Records, shows the Table of the Day and the Table of the Week with what they mean for that Profile, and offers to stay on the table selected on the wheel, to change player or to launch a Period Table or a Random Game. While it is open, toasts and Confetti Showers wait for it to close. Shown as "Écran d'accueil" in French.
 _Avoid_: startup prompt, splash screen, dialog (it does more than ask a question)
 
 **Last Played Table**:
@@ -200,8 +200,12 @@ _Avoid_: original score (confused with original tables), anonymous score, factor
 The best score on a table's high score board, whoever holds it, an anonymous one included. Shown as "record" in French.
 _Avoid_: Grand Champion (the name only some tables give it), world record
 
+**Lost Record**:
+A Table Record a Profile held that another Profile, Guest included, beat with a Play since the Welcome Screen last showed it that Profile's Lost Records; Child Profiles lose and take them like any other, Guest never has any. The Welcome Screen tells the Profile once, in a single line naming who took each one (the three most recent, then how many more), and then never again; it is dropped as soon as the Profile holds that Table Record again, when the Profile that took it is removed, and while the table is not one the Profile can see. Shown as "record perdu" in French.
+_Avoid_: rivalry (the feature, not the record), stolen record, notification
+
 **High Score Toast**:
-A toast like the Mastery Toast, with its own colour and no trophy, the place won in its tile, that announces the best place a Play won on a table's high score board, or the Table Record when that place is the first; one only per Play, after the other toasts of that Play. No board opens by itself. Shown as "Meilleur score" in French.
+A toast like the Mastery Toast, with its own colour and no trophy, the place won in its tile, that announces the best place a Play won on a table's high score board, or the Table Record when that place is the first, naming the Profile it was taken from, Guest included, when another one held it; one only per Play, after the other toasts of that Play. No board opens by itself. Shown as "Meilleur score" in French.
 _Avoid_: high score popup, record toast
 
 **High Score Board**:
