@@ -18,7 +18,9 @@
 // what each Profile won since then, and hear when a Play credited High
 // Scores; the Profile Stats read the tables where each Profile still holds
 // a place or the Table Record; the High Score Board reads a table's last
-// known board with each place's owner.
+// known board with each place's owner. Per table without a board PinballY
+// can read, the source it was learned from ({ kind: "vpreg", section }),
+// kept for good.
 // ============================================================
 
 import { hasUnbeatenGonePlace, newPlaces, placeKey } from "./board_reader.js";
@@ -122,6 +124,24 @@ export function createHighScoreStore(host, profileStore) {
                     resolve();
                 }
             }));
+        },
+        // The board a ROM-less table held before the Play (read from the
+        // snapshot taken at launch), recorded as a board read outside a
+        // Play while that Play is being settled: it never waits for it.
+        recordBoardBeforePlay(configId, places) {
+            recordOutsidePlay(configId, places);
+        },
+        // The source learned for the table, or null.
+        sourceOf(configId) {
+            const sources = isRecord(data.learnedSources) ? data.learnedSources : {};
+            return isRecord(sources[configId]) ? sources[configId] : null;
+        },
+        // Remembers for good where the table keeps its board. The key is
+        // written only then, so a file without one keeps its first shape.
+        learnSource(configId, source) {
+            if (!isRecord(data.learnedSources)) data.learnedSources = {};
+            data.learnedSources[configId] = source;
+            save();
         },
         // From the game's end until its Play is settled (or given up): the
         // board reads outside a Play on the table wait. Returns the

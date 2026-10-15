@@ -21,7 +21,7 @@ const CHAMPION_TITLES = [
 // found, so a lone Grand Champion above the numbered places does not end it.
 const MIN_PLACES_BEFORE_STOP = 3;
 // vpin-studio's MAX_RESET_SCORE_VALUE: below it, a reset slot, not a score.
-const MIN_SCORE = 10;
+export const MIN_SCORE = 10;
 const RANK_PATTERN = /^(\d+\)|#\d+|\d+#|\d+,|\d+\.:)\s*(.*)$/;
 // Optional initials, then digits in groups of three (any separator) or
 // plain digits, then an optional word that makes it a statistic ("20 COMBOS").

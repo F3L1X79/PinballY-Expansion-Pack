@@ -598,6 +598,15 @@ test("the High Score store keeps the key of each Profile's Achievements reset da
     assert.deepEqual(JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\high_scores.json`)).achievementsFrom, { bob: "2026-09-23T10:00:00" });
 });
 
+test("the High Score store keeps the key of the sources learned for tables without a ROM", () => {
+    const fake = createFakePinballYHost({ now: NOW, tables: [] });
+    createHighScoreStore(fake, createProfileStore(fake)).learnSource("Zelda (Original 2023)", { kind: "vpreg", section: "ZELDA" });
+
+    assert.deepEqual(JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\high_scores.json`)).learnedSources, {
+        "Zelda (Original 2023)": { kind: "vpreg", section: "ZELDA" },
+    });
+});
+
 test("the High Scores Achievement IDs stay byte-identical", () => {
     assert.deepEqual(buildHighScoreAchievements({}).map(achievement => achievement.id), [
         "highScoreTables:1",

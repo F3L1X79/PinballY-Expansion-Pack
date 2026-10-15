@@ -7,7 +7,7 @@
 // StyledText, commands and running them, table launch, program and pack folders,
 // monitor count, backglass window, sound playback (one-off or on players
 // in turn), logfile.log, the few file operations the Profile store
-// needs, a file's modified date and size, a folder's files with theirs,
+// needs, a whole file's bytes, a file's modified date and size, a folder's files with theirs,
 // a program run hidden without waiting, whose output is read later, and a
 // registry value).
 // Every call passes straight through to PinballY's globals; tests use the
@@ -28,6 +28,12 @@ const TEMPORARY_FOLDER = 2;
 const SW_HIDE = 0;
 // ShellExecuteW returns a number above this on success, an error code otherwise.
 const SHELL_EXECUTE_MAX_ERROR = 32;
+// CreateFileW's arguments for a read that leaves the file open to other
+// readers and writers, so VPX never finds it busy.
+const GENERIC_READ = 0x80000000;
+const FILE_SHARE_READ_WRITE = 0x1 | 0x2;
+const OPEN_EXISTING = 3;
+const FILE_ATTRIBUTE_NORMAL = 0x80;
 // Under the user's temporary folder: the wrapper script and each run's files.
 const RUN_FOLDER_NAME = "PinballYExpansionPack";
 // Given "<output file>" "<exit code file>" "<program>" "<args>"..., runs the
@@ -56,6 +62,45 @@ function openUtf8Stream() {
     stream.Charset = "utf-8";
     stream.Open();
     return stream;
+}
+
+// INVALID_HANDLE_VALUE, (HANDLE)-1, as a hexadecimal string on 32 or 64 bits.
+const isInvalidHandle = handle => /^(0x)?f+$/i.test(handle.toString());
+
+// A whole file's bytes, read through kernel32: ADODB.Stream and
+// Scripting.FileSystemObject only read text. The handle is closed before
+// returning, so the file is held for the read alone.
+function createByteReader() {
+    // Bound on the first read, then kept.
+    let kernel32 = null;
+    return (path) => {
+        if (!kernel32) {
+            kernel32 = dllImport.bind("Kernel32.dll", `
+                HANDLE WINAPI CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPVOID lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+                BOOL WINAPI GetFileSizeEx(HANDLE hFile, LONGLONG *lpFileSize);
+                BOOL WINAPI ReadFile(HANDLE hFile, UINT8 *lpBuffer, DWORD nNumberOfBytesToRead, DWORD *lpNumberOfBytesRead, LPVOID lpOverlapped);
+                BOOL WINAPI CloseHandle(HANDLE hObject);
+            `);
+        }
+        const handle = kernel32.CreateFileW(path, GENERIC_READ, FILE_SHARE_READ_WRITE, null, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, null);
+        if (isInvalidHandle(handle)) throw new Error(`Cannot open ${path}.`);
+        try {
+            const size = dllImport.create("LONGLONG");
+            if (!kernel32.GetFileSizeEx(handle, size)) throw new Error(`Cannot read the size of ${path}.`);
+            // The value is an Int64 object; its decimal text converts exactly for any file this small.
+            const bytes = new Uint8Array(Number(String(size.value)));
+            if (bytes.length === 0) return bytes;
+            // One read for the whole file: the help does not say whether a
+            // subarray passes its own offset, and these files are a few KB.
+            const readCount = dllImport.create("DWORD");
+            if (!kernel32.ReadFile(handle, bytes, bytes.length, readCount, null) || readCount.value !== bytes.length) {
+                throw new Error(`Cannot read ${path} whole.`);
+            }
+            return bytes;
+        } finally {
+            kernel32.CloseHandle(handle);
+        }
+    };
 }
 
 function createFileSystem() {
@@ -91,6 +136,8 @@ function createFileSystem() {
             return infos;
         },
         fileExists: (path) => fso().FileExists(path),
+        // The whole file as a Uint8Array; throws when it is missing or unreadable.
+        readBytes: createByteReader(),
         readText: (path) => {
             const stream = openUtf8Stream();
             try {

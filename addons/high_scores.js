@@ -1,10 +1,15 @@
 // ============================================================
-// High Scores: credits each score that entered a ROM table's board during
-// a Play to the Profile active when the Play started, whatever initials
+// High Scores: credits each score that entered a table's board during a
+// Play to the Profile active when the Play started, whatever initials
 // were typed. At "prelaunch" the board is read fresh and becomes the last
 // known board; a little after "postlaunch" it is read again and the Play
 // settled against it. A failed launch read leaves the last known board to
-// compare with; a failed read after the game credits nothing. A Play that
+// compare with; a failed read after the game credits nothing. When
+// PinballY reads no board (a table without a ROM), the board comes from
+// VPX's VPReg.stg, read whole at "prelaunch" and again after the game,
+// never while VPX runs: the table's section is learned from the one board
+// section the Play changed, kept for good, and the board it held before
+// the Play recorded first, so its places are Default Scores. A Play that
 // won places submits one High Score Toast, for the best place. Writes
 // high_scores.json next to cabinet.json and logfile.log. Adds the "High
 // Scores" main menu entry, which opens the High Score Board on the
@@ -21,6 +26,8 @@ import { safeHandler, logHandlerError } from "../common/core/safe_handler.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
 import { readBoard } from "../common/high_scores/board_reader.js";
+import { readCompoundFile } from "../common/high_scores/compound_file_reader.js";
+import { readSectionBoard } from "../common/high_scores/romless_board_reader.js";
 import { getHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score_store.js";
 import { createHighScoreBoard } from "../common/high_scores/high_score_board.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
@@ -42,7 +49,8 @@ export default function init() {
     const highScores = getHighScoreStore();
     const toasts = getAchievementToasts();
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
-    // From "prelaunch" to "postlaunch": { configId, launchRead (a promise) }.
+    // From "prelaunch" to "postlaunch": { configId, launchRead (a promise),
+    // snapshot (VPReg.stg at launch) }.
     let launched = null;
     // The Play the Profile store announced for the launched table, if any.
     let announcedPlay = null;
@@ -158,6 +166,74 @@ export default function init() {
         return read;
     }
 
+    // VPX keeps VPReg.stg in the User folder beside its executable
+    // (VPinballX.exe, VPinballX64.exe, VPinballX_GL64.exe...); null for a
+    // table of another system, such as Future Pinball.
+    function vpregPathOf(configId) {
+        const game = host.getGameInfo(configId);
+        const exe = game && game.system ? String(game.system.exe || "") : "";
+        const folderEnd = exe.lastIndexOf("\\");
+        if (folderEnd === -1 || !/^vpinballx/i.test(exe.slice(folderEnd + 1))) return null;
+        return `${exe.slice(0, folderEnd)}\\User\\VPReg.stg`;
+    }
+
+    // VPReg.stg read whole: { sections }, or { error } (logged only when
+    // the board is needed: a ROM table's PINemHi board never consults it).
+    function takeSnapshot(configId) {
+        const path = vpregPathOf(configId);
+        if (path === null) return { error: null };
+        try {
+            if (!host.files.fileExists(path)) return { error: `${path} not found` };
+            return { sections: readCompoundFile(host.files.readBytes(path)) };
+        } catch (error) {
+            return { error: error instanceof Error ? error.message : String(error) };
+        }
+    }
+
+    // Two snapshots' values of a section are the same, in any order.
+    const sameValues = (a, b) => {
+        if (!a || !b) return a === b;
+        const keys = Object.keys(a);
+        return keys.length === Object.keys(b).length && keys.every(key => a[key] === b[key]);
+    };
+
+    // The table's learned section, or the one board section the Play
+    // changed, learned now; null when there is none (logged).
+    function sectionOf(configId, before, after) {
+        const learned = highScores.sourceOf(configId);
+        if (learned && learned.kind === "vpreg") return learned.section;
+        const changed = Object.keys(after).filter(name => !sameValues(before[name], after[name]) && readSectionBoard(after[name]) !== null);
+        if (changed.length !== 1) {
+            log(changed.length === 0
+                ? `"${configId}": no board after the game, and no VPReg.stg board changed; nothing learned, nothing credited.`
+                : `"${configId}": no board after the game, and ${changed.length} VPReg.stg boards changed (${changed.join(", ")}); nothing learned, nothing credited.`);
+            return null;
+        }
+        highScores.learnSource(configId, { kind: "vpreg", section: changed[0] });
+        log(`"${configId}": VPReg.stg section "${changed[0]}" learned.`);
+        return changed[0];
+    }
+
+    // The table's VPReg.stg boards around the Play: { before, after },
+    // before null when its section did not exist yet; null when there is
+    // no board after the game (logged).
+    function romlessBoards(configId, before, after) {
+        const failed = [before, after].find(snapshot => !snapshot.sections);
+        if (failed) {
+            const why = failed.error === null ? "" : ` (VPReg.stg: ${failed.error})`;
+            log(`"${configId}": no board after the game; nothing credited, the last known board kept${why}.`);
+            return null;
+        }
+        const section = sectionOf(configId, before.sections, after.sections);
+        if (section === null) return null;
+        const afterBoard = after.sections[section] ? readSectionBoard(after.sections[section]) : null;
+        if (afterBoard === null) {
+            log(`"${configId}": no board in VPReg.stg section "${section}" after the game; nothing credited, the last known board kept.`);
+            return null;
+        }
+        return { before: before.sections[section] ? readSectionBoard(before.sections[section]) : null, after: afterBoard };
+    }
+
     // One toast per Play, for the best place won; the toast module holds
     // it until the wheel is back and the toasts before it have shown.
     function announce(configId, place) {
@@ -180,7 +256,8 @@ export default function init() {
         const launchRead = readPlaces(configId).then(safeHandler(SCRIPT_NAME, (places) => {
             if (places !== null) highScores.recordBoard(configId, places);
         }));
-        launched = { configId, launchRead };
+        // Read at once, before VPX starts and holds the file.
+        launched = { configId, launchRead, snapshot: takeSnapshot(configId) };
     }));
 
     profileStore.onPlay(safeHandler(SCRIPT_NAME, (play) => {
@@ -191,10 +268,12 @@ export default function init() {
     async function settleAfterGame(bracket, play) {
         await bracket.launchRead;
         await wait(AFTER_READ_DELAY_MS);
-        const places = await readPlaces(bracket.configId, { forget: true });
+        let places = await readPlaces(bracket.configId, { forget: true });
         if (places === null) {
-            log(`"${bracket.configId}": no board after the game; nothing credited, the last known board kept.`);
-            return;
+            const boards = romlessBoards(bracket.configId, bracket.snapshot, takeSnapshot(bracket.configId));
+            if (boards === null) return;
+            if (boards.before !== null) highScores.recordBoardBeforePlay(bracket.configId, boards.before);
+            places = boards.after;
         }
         const best = highScores.settlePlay(bracket.configId, places, play);
         if (best) announce(bracket.configId, best);

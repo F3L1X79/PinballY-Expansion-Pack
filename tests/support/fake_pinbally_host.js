@@ -15,7 +15,8 @@
 // PinballY's show() puts it); script filters are shown with selectFilter().
 // Its in-memory file system is seeded with files (with their modified
 // date) and folders (and unreadable images) and inspected (file contents,
-// reads, writes, renames and deletes), and registry values seeded.
+// reads, writes, renames and deletes, Kernel32 handles left open), and
+// registry values seeded.
 // Programs run hidden are described by the tests (output, exit code, run
 // time) and their runs inspected. The board PINemHi reads in each table's
 // NVRAM is set by the tests; a game's getHighScores() reads it like
@@ -591,6 +592,13 @@ export function createFakePinballYHost({
             fileReadList.push(path);
             return files.get(path);
         },
+        // A file seeded with bytes (a Uint8Array), as a copy; a text file as its UTF-8 bytes.
+        readBytes(path) {
+            requireFile(path);
+            fileReadList.push(path);
+            const content = files.get(path);
+            return content instanceof Uint8Array ? new Uint8Array(content) : new Uint8Array(Buffer.from(content, "utf8"));
+        },
         writeText(path, text) {
             requireParentFolder(path);
             requireUnlocked(path);
@@ -631,6 +639,49 @@ export function createFakePinballYHost({
         getFileInfo: (path) => (files.has(path)
             ? { modified: modifiedDates.get(path), size: Buffer.byteLength(files.get(path), "utf8") }
             : null),
+    };
+
+    // Kernel32's file reads: CreateFileW opens an existing file for reading
+    // only, shared with readers and writers (the only open the pack makes);
+    // a missing file gives INVALID_HANDLE_VALUE. Each handle stays open
+    // until CloseHandle, and openFileHandleCount() tells how many are.
+    const openFileHandles = new Map();
+    let nextFileHandle = 1;
+    const INVALID_HANDLE = { toString: () => "FFFFFFFFFFFFFFFF" };
+    const GENERIC_READ = 0x80000000;
+    const FILE_SHARE_READ_WRITE = 3;
+    const OPEN_EXISTING = 3;
+    const openFileOf = (handle) => {
+        if (!openFileHandles.has(handle)) throw new Error("Not an open file handle.");
+        return openFileHandles.get(handle);
+    };
+    const kernel32 = {
+        CreateFileW(path, access, share, security, disposition) {
+            if (access !== GENERIC_READ || share !== FILE_SHARE_READ_WRITE || disposition !== OPEN_EXISTING) {
+                throw new Error(`The fake host opens files for a shared read only: ${path}`);
+            }
+            if (!files.has(path)) return INVALID_HANDLE;
+            const id = nextFileHandle++;
+            const handle = { toString: () => id.toString(16) };
+            // Recorded as a read of the file.
+            openFileHandles.set(handle, fileSystem.readBytes(path));
+            return handle;
+        },
+        GetFileSizeEx(handle, size) {
+            size.value = openFileOf(handle).length;
+            return 1;
+        },
+        ReadFile(handle, buffer, count, readCount) {
+            const bytes = openFileOf(handle).subarray(0, count);
+            buffer.set(bytes);
+            readCount.value = bytes.length;
+            return 1;
+        },
+        CloseHandle(handle) {
+            openFileOf(handle);
+            openFileHandles.delete(handle);
+            return 1;
+        },
     };
 
     // Starts the program as the test described it; onEnd({ exitCode, output })
@@ -938,7 +989,7 @@ export function createFakePinballYHost({
         // The id of the player each sound played on, in the same order.
         soundPlayers: () => sounds.map(sound => sound.playerId),
         // Seeds a file (and its folders) without recording a write, modified
-        // now unless a date is given.
+        // now unless a date is given; content is text, or bytes as a Uint8Array.
         addFile(filePath, content = "", { modified = new RealDate(nowMs) } = {}) {
             addFolder(parentFolder(filePath));
             files.set(filePath, content);
@@ -980,6 +1031,8 @@ export function createFakePinballYHost({
         readFile: (filePath) => files.get(filePath),
         fileOperations: () => fileOperationList.map(operation => ({ ...operation })),
         fileReads: () => [...fileReadList],
+        // Kernel32 file handles not closed yet.
+        openFileHandleCount: () => openFileHandles.size,
         setTables(newTables) { allTables = newTables.map(withMedia); },
         gameUpdates: () => gameUpdateList.map(update => ({ configId: update.configId, changes: { ...update.changes } })),
         // The current wheel selection, in wheel order (index 0 is the current
@@ -1235,13 +1288,17 @@ export function createFakePinballYHost({
                 backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
                 // Only User32's GetSystemMetrics, for the monitor count
                 // (SM_CMONITORS), and Shell32's ShellExecuteW, for cmd.exe
-                // run hidden; any other DLL throws.
+                // run hidden, and Kernel32's file reads over the in-memory
+                // file system; any other DLL throws. create() gives a native
+                // variable for an out parameter.
                 dllImport: {
                     bind: (dllName) => {
                         if (dllName.toLowerCase() === "user32.dll") return { GetSystemMetrics: (index) => (index === 80 ? monitorCount : 0) };
                         if (dllName.toLowerCase() === "shell32.dll") return { ShellExecuteW: shellExecute };
+                        if (dllName.toLowerCase() === "kernel32.dll") return kernel32;
                         throw new Error(`The fake host has no DLL "${dllName}".`);
                     },
+                    create: () => ({ value: 0 }),
                 },
                 // Only Windows Media Player, WScript.Shell's RegRead, and the file objects over the
                 // in-memory file system (no .env.local unless a test adds

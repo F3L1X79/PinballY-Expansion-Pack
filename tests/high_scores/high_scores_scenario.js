@@ -1,7 +1,8 @@
 // ============================================================
 // High Scores tests' scenario: main.js on the fake PinballY globals, with
 // the chosen Add-ons and Profiles. Sets what PINemHi reads in each
-// table's NVRAM before and after a Play, plays a table as PinballY
+// table's NVRAM, and the VPReg.stg of VPX's User folder, before and
+// after a Play, plays a table as PinballY
 // launches it (the reads after "postlaunch" included), switches the
 // active Profile, resets a Profile, and reads back the High Scores file,
 // the toasts drawn, the Achievements Notified and shown in the Achievement
@@ -11,6 +12,7 @@
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { getProfileStore } from "../../common/profiles/profile_store.js";
+import { writeCompoundFile } from "../support/compound_file_writer.js";
 
 export const NOW = new Date(2026, 9, 12, 20, 0, 0);
 export const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -33,6 +35,21 @@ export const TABLES = [
     { id: 1, configId: MEDIEVAL, title: "Medieval Madness", manufacturer: "Williams", year: 1997, isHidden: false, rom: "mm_109c" },
     { id: 2, configId: AFM, title: "Attack from Mars", manufacturer: "Bally", year: 1995, isHidden: false, rom: "afm_113b" },
 ];
+
+// The VPX system of the cabinet's tables, and its User folder's VPReg.stg.
+export const VPX_SYSTEM = { exe: "C:\\vPinball\\VisualPinball\\VPinballX64.exe" };
+export const VPREG_PATH = "C:\\vPinball\\VisualPinball\\User\\VPReg.stg";
+// An original table, with no ROM.
+export const ZELDA = "Zelda (Original 2023)";
+export const ZELDA_TABLE = { id: 3, configId: ZELDA, title: "Zelda", manufacturer: "Original", year: 2023, isHidden: false, system: VPX_SYSTEM };
+
+// A VPReg.stg section of the HighScoreN family; each entry is [initials, score].
+export const vpregBoard = (...entries) => Object.fromEntries(entries.flatMap(([initials, score], index) => [
+    [`HighScore${index + 1}`, String(score)], [`HighScore${index + 1}Name`, initials],
+]));
+// Zelda's section as on the cabinet, and settings sections around it.
+export const ZELDA_FACTORY = vpregBoard(["AAA", 2800000], ["BBB", 2700000], ["CCC", 2600000], ["DDD", 2500000]);
+export const OTHER_SECTIONS = { ww_lh6: { LUT: "1" }, burner: vpregBoard(["AAA", 1500000], ["BBB", 1400000]) };
 
 // count tables, "Table 1 (Williams 1990)" on, each on its own ROM.
 export const romTables = count => Array.from({ length: count }, (_, index) => ({
@@ -140,12 +157,15 @@ export async function startHighScores({
         },
         // What PINemHi reads in the table's NVRAM from now on.
         setBoard: (configId, lines, options) => fake.setNvramBoard(configId, lines, options),
+        // The sections VPX's VPReg.stg holds from now on ({ section: { value: text } }).
+        setVpreg: (sections) => fake.addFile(VPREG_PATH, writeCompoundFile(sections)),
         switchTo: (name) => getProfileStore().switchTo(name),
         // Plays the table as PinballY launches it; VPinMAME saves the board
         // after (raw lines) as the game ends, read as afterRead says
-        // (setBoard's options); backOnWheel() runs right after "postlaunch",
+        // (setBoard's options), and VPX saves the VPReg.stg sections
+        // afterVpreg; backOnWheel() runs right after "postlaunch",
         // before the reads after the game.
-        play: async (configId, { after, afterRead, durationMs = GAME_MS, backOnWheel = () => {} } = {}) => {
+        play: async (configId, { after, afterRead, afterVpreg, durationMs = GAME_MS, backOnWheel = () => {} } = {}) => {
             const game = fake.getGameInfo(configId);
             fake.playGame(game);
             fake.fire("prelaunch", { game });
@@ -155,6 +175,7 @@ export async function startHighScores({
             fake.advanceTime(Math.max(durationMs - READS_STEPS * 1000, 0));
             await settle();
             if (after) fake.setNvramBoard(configId, after, afterRead);
+            if (afterVpreg) fake.addFile(VPREG_PATH, writeCompoundFile(afterVpreg));
             fake.gameOver(game);
             fake.fire("postlaunch", { game });
             backOnWheel();
