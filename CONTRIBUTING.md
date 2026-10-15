@@ -32,9 +32,10 @@ The repository is the pack's folder, installed as `PinballY\Scripts\ExpansionPac
 - `period_table`: the Table of the Day and the Table of the Week, and their Streaks.
 - `random_game`: the Random Game.
 - `wheel_dialog`: spontaneous dialogs from Add-ons, shown one at a time when the wheel is free, by priority.
-- `achievement_toast`: Achievement Toasts, Challenge Toasts, Mastery Toasts and Level Toasts, drawn in the bottom-right corner of the playfield screen, never as a dialog.
+- `achievement_toast`: Achievement Toasts, Challenge Toasts, Mastery Toasts, Level Toasts and High Score Toasts, drawn in the bottom-right corner of the playfield screen, never as a dialog.
 - `player_level`: the Player Level worked out from a Profile's Notified Achievements, never persisted.
 - `steamball_palette`: the colours and fonts shared by the Achievement List, the Achievement Toast and the Challenge Card, so that they look like one product.
+- `high_score_store`: the boards the High Scores know, every High Score won and each Profile's High Scores Achievements reset date, in `profiles\high_scores.json`, shared by the High Scores Add-on and the Achievements (`getHighScoreStore()`); the rule that turns PINemHi's lines into a board is `board_reader`'s alone.
 - `main_menu`: every main menu entry after "Play", placed by a fixed position. Only a PinballY filter may reach the main menu on its own, through `createFilter({ group: "[Top]" })`.
 - `i18n`: every text shown to the player, in the active language.
 - `safe_handler`: wraps event handlers and callbacks so that an error is logged with the script's name instead of being lost.
@@ -59,6 +60,8 @@ node --test
 
 Run from the project root with Node.js 22 or later; nothing to install. PinballY never loads the tests.
 
+To refuse any commit while the tests fail, turn on the pre-commit hook once per clone: `git config core.hooksPath .githooks`.
+
 `tests/project/persisted_data_pinning.test.js` locks the saved data format and every Achievement ID: they are the Profiles' progress. Never change it to make a change pass.
 
 ## Adding a language
@@ -72,7 +75,7 @@ Translations live in `lang/<code>.js`. English is the fallback, and missing keys
 
 ## Progress and reset
 
-Each Profile's progress lives in `Scripts\ExpansionPack\profiles\<Profile>\profile.json`: its plays, Streaks, Random Games, session stats, Challenge progress and the list of Notified Achievements. Next to it, `play-log-<year>.json` holds its Play Log: every Play (a game of at least one minute) started that year, with its start, table and seconds. `Scripts\ExpansionPack\profiles\cabinet.json` holds what the household shares: the active Profile, the Table of the Day, the Table of the Week and the week's Challenge. Every save keeps the previous version as `*.bak.json`, and a missing or broken file comes back from it.
+Each Profile's progress lives in `Scripts\ExpansionPack\profiles\<Profile>\profile.json`: its plays, Streaks, Random Games, session stats, Challenge progress and the list of Notified Achievements. Next to it, `play-log-<year>.json` holds its Play Log: every Play (a game of at least one minute) started that year, with its start, table and seconds. `Scripts\ExpansionPack\profiles\cabinet.json` holds what the household shares: the active Profile, the Table of the Day, the Table of the Week and the week's Challenge. Other cabinet-level files sit next to it and no Profile Reset erases them: `table_roms.json` (the ROMs the Table ROMs Add-on found) and `high_scores.json` (each table's last known board, every High Score won, and the date each Profile's High Scores Achievements count from, set by its Profile Reset). Every save keeps the previous version as `*.bak.json`, and a missing or broken file comes back from it.
 
 Every Achievement counts the plays recorded for the active Profile since installation; PinballY's own statistics are not used.
 

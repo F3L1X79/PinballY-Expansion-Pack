@@ -52,6 +52,7 @@ test("no Challenge, Challenge Card or Challenges Achievements when the Challenge
     assert.ok(isProfileStatsOpen(fake), "the Profile Stats open without the Challenge module");
     const STATS = lang.profileStats;
     assert.deepEqual(Object.keys(section(fake, STATS.sections.progression, STATS.stats)),
-        [STATS.stats.collection, STATS.stats.cabinetStreak, STATS.stats.dayStreak, STATS.stats.weekStreak], "no completed Challenges");
+        [STATS.stats.collection, STATS.stats.cabinetStreak, STATS.stats.dayStreak, STATS.stats.weekStreak, STATS.stats.highScoresHeld, STATS.stats.tableRecordsHeld],
+        "no completed Challenges");
     assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
 });

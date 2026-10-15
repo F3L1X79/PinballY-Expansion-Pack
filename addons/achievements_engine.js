@@ -1,9 +1,9 @@
 ﻿// ============================================================
 // Checks all registered achievements for the active Profile at startup,
 // after every "gamestarted" and "gameover" event, on every Profile
-// switch and when the World Tour tracker, started here, completes a tour,
-// and hands each newly unlocked one to the Achievement Toast
-// module, which announces it with a card in the bottom-right corner once no
+// switch, when the World Tour tracker, started here, completes a tour and
+// when a Play credited High Scores, and hands each newly unlocked one to
+// the Achievement Toast module, which announces it with a card in the bottom-right corner once no
 // game is running, with a Confetti Shower for a Platinum; an Achievement
 // becomes Notified, for the Profile that unlocked it, when its toast starts. A Profile Reset forgets what was
 // announced to that Profile and drops its toasts still waiting. When the
@@ -22,7 +22,9 @@
 // while one of these drawn screens is open.
 // The Challenges family and the
 // Profile Stats line on completed Challenges exist only while the
-// Challenges Add-on is enabled. Also starts the Surprises tracker, which
+// Challenges Add-on is enabled, the High Scores family and the Profile
+// Stats and Household Stats lines on the boards only while the High
+// Scores Add-on is. Also starts the Surprises tracker, which
 // records each Play for the Surprises family.
 // ============================================================
 
@@ -37,6 +39,8 @@ import { buildCategoryCompletionAchievements } from "../achievements/category_co
 import { buildSessionMilestoneAchievements } from "../achievements/session_milestones.js";
 import { buildRandomGameFanAchievements } from "../achievements/random_game_fans.js";
 import { buildChallengeAchievements } from "../achievements/challenges.js";
+import { buildHighScoreAchievements } from "../achievements/high_scores.js";
+import { getHighScoreStore } from "../common/high_scores/high_score_store.js";
 import { buildWorldTourAchievements } from "../achievements/world_tour.js";
 import { createWorldTour } from "../common/achievements/world_tour.js";
 import { buildSurprisesAchievements } from "../achievements/surprises.js";
@@ -70,6 +74,10 @@ const ACHIEVEMENT_LIST_ENTRY = "achievementList";
 // family nor the Profile Stats line exists.
 const getEnabledChallenges = () => (config.addOns.challenges === false ? null : getChallenges());
 
+// Null when the High Scores Add-on is disabled: then neither the High Scores
+// family nor the stats lines exist.
+const getEnabledHighScores = () => (config.addOns.highScores === false ? null : getHighScoreStore());
+
 // Empty when the session stats tracker Add-on is disabled: the Sessions
 // family follows the Add-on that records what most of it reads.
 const getEnabledSessionMilestones = () => (config.addOns.sessionStatsTracker === false ? [] : buildSessionMilestoneAchievements());
@@ -81,6 +89,7 @@ const getEnabledSessionMilestones = () => (config.addOns.sessionStatsTracker ===
 // Notified).
 export function getAllAchievements({ asNonChild = false, profileName } = {}) {
     const challenges = getEnabledChallenges();
+    const highScores = getEnabledHighScores();
     const seenBy = { asNonChild, profileName };
     return [
         ...buildDayManufacturersAchievements(),
@@ -94,6 +103,7 @@ export function getAllAchievements({ asNonChild = false, profileName } = {}) {
         ...getEnabledSessionMilestones(),
         ...buildRandomGameFanAchievements(),
         ...(challenges ? buildChallengeAchievements(challenges) : []),
+        ...(highScores ? buildHighScoreAchievements(highScores, seenBy) : []),
         ...buildSurprisesAchievements(seenBy),
     ];
 }
@@ -170,6 +180,7 @@ export default function init() {
         tableOfTheDay: getTableOfTheDay(),
         tableOfTheWeek: getTableOfTheWeek(),
         challenges: getEnabledChallenges(),
+        highScores: getEnabledHighScores(),
         // Without its Add-on, a selection has no filter, so no button.
         hallOfFameFilter: config.addOns.hallOfFame === false ? null : HALL_OF_FAME_FULL_FILTER_ID,
         tablesToDiscoverFilter: config.addOns.tablesToDiscover === false ? null : TABLES_TO_DISCOVER_FULL_FILTER_ID,
@@ -287,6 +298,11 @@ export default function init() {
     // Its Play listener runs inside the "gameover" handlers, so the deferred
     // check above reads what it recorded.
     createSurprises(createPinballYHost(), profileStore);
+    // Fires a little after the game, once the board read again credited
+    // High Scores. A tick later, so the High Score Toast, submitted after
+    // the store's answer, shows before the Achievements it brought.
+    const highScores = getEnabledHighScores();
+    if (highScores) highScores.onCredited(safeHandler(SCRIPT_NAME, () => setTimeout(safeCheckForNewAchievements, 0)));
 
     // Startup check, one tick after the inits, so a Welcome Screen submitted
     // at startup is already waiting whatever the order in main.js, and its

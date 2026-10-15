@@ -6,13 +6,13 @@
 // value is gold), the highlighted column (the one the gold halo
 // surrounds, or the cross's tooltip), the columns in view and those faded at the edges while
 // gliding, opens them from the Profile Stats' "Household Stats" button and picks
-// a column as a player would. Never loaded by PinballY.
+// a column as a player would, and goes back to the wheel. Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";
 import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/stats/household_stats_painter.js";
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
-import { openProfileStats, choose, press, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
+import { openProfileStats, choose, press, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
 
 export { press };
@@ -133,4 +133,15 @@ export function chooseColumn(fake, name) {
     }
     assert.equal(highlightedColumn(fake), name, `the Household Stats show "${name}"`);
     return press(fake, "Select");
+}
+
+// Presses Exit until no stats screen is left: Exit on another Profile's
+// read-only Profile Stats shows the Household Stats again, and Exit there
+// the active Profile's Profile Stats, which Exit only then closes.
+export function backToWheel(fake) {
+    for (let guard = 0; guard < 5 && (isHouseholdStatsOpen(fake) || isProfileStatsOpen(fake)); guard++) {
+        press(fake, "Exit");
+        fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    }
+    assert.ok(!isHouseholdStatsOpen(fake) && !isProfileStatsOpen(fake), "back on the wheel");
 }

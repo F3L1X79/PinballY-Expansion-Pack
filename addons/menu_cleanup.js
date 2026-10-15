@@ -6,7 +6,8 @@
 // last played and date added from the main menu, where a separator splits
 // the remaining filter submenus from the filters. It leaves no doubled,
 // leading or trailing separator. PinballY's dedicated buttons still open
-// those screens.
+// those screens (the HighScores one opens the High Score Board while the
+// High Scores Add-on is on).
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";

@@ -253,6 +253,20 @@ export default {
             100: "Legend of the Week",
         },
         challengesCompletedDescription: (count) => (count === 1 ? "Complete a Challenge." : `Complete ${count} Challenges.`),
+        highScoreTablesTitles: {
+            1: "Initials in Stone",
+            3: "Three Banners Raised",
+            5: "Lord of the Five Boards",
+            10: "The Kwisatz Hiscorach",
+        },
+        highScoreTablesDescription: (count) => (count === 1 ? "Win a High Score on a table." : `Win High Scores on ${count} different tables.`),
+        tableRecordTablesTitles: {
+            1: "One Score to Rule Them All",
+            3: "Warlord of Three Worlds",
+        },
+        tableRecordTablesDescription: (count) => (count === 1 ? "Set a Table Record." : `Set Table Records on ${count} different tables.`),
+        tableRecordTakenTitle: "The Usurper",
+        tableRecordTakenDescription: "Take a Table Record from another Profile.",
         dayManufacturersTitles: {
             3: "Express World Tour",
             5: "Pinball Butterfly",
@@ -370,6 +384,8 @@ export default {
             averageDuration: "Average game",
             collection: "Collection",
             challengesCompleted: "Challenges completed",
+            highScoresHeld: "High Scores held",
+            tableRecordsHeld: "Table Records held",
             cabinetStreak: "Days in a row",
             dayStreak: "Table of the Day streak",
             weekStreak: "Table of the Week streak",
@@ -505,5 +521,33 @@ export default {
         toastHeader: "Level up",
         toastTitle: (level) => `Level ${level}`,
         toastDescription: "Your Achievements took you to a new level.",
+    },
+    // The High Score toast, after a Play that won places on a table's
+    // board: for the best place won, or the Table Record when it is first.
+    highScores: {
+        toastHeader: "High Score",
+        toastTitle: (table, place) => {
+            const teen = place % 100 >= 11 && place % 100 <= 13;
+            const suffix = teen ? "th" : (["th", "st", "nd", "rd"][place % 10] || "th");
+            return `High score on ${table}: ${place}${suffix} place`;
+        },
+        tableRecordTitle: (table) => `Table Record on ${table}!`,
+        // The score, thousands separated.
+        toastScore: (score) => `${score} points`,
+        // The High Score Board.
+        board: {
+            menuEntry: "High Scores",
+            record: "Record",
+            // In place of a place's owner when it belongs to no Profile.
+            defaultScore: "Default score",
+            // In place of the initials when none were typed.
+            noInitials: "\u2014",
+            noScore: "No score yet",
+            // While PINemHi reads the board, as a message or a note over the last known one.
+            reading: "Reading\u2026",
+            // Over the last known board when the fresh read failed.
+            notRefreshed: "These scores could not be refreshed",
+            notSupported: "This table's high scores are not supported",
+        },
     },
 };

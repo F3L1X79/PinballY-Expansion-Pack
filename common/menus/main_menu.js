@@ -2,7 +2,7 @@
 // Main menu module: Add-ons add their entries (label, action, position,
 // and optionally a "shown when" predicate checked on each opening) and it
 // inserts them into PinballY's main menu right after "Play", grouped in
-// sections (launch, table setup, then personal) split by separators, in a
+// sections (launch, the table, then personal) split by separators, in a
 // fixed position order, so the Add-on order in main.js never decides where
 // an entry lands.
 // It owns the entry commands and runs the matching action when one is
@@ -19,7 +19,7 @@ const SCRIPT_NAME = "MainMenu";
 // section with no shown entry is left out with its separator.
 const SECTIONS = [
     ["TABLE_OF_THE_DAY", "TABLE_OF_THE_WEEK", "RANDOM_GAME"],
-    ["TABLE_SETUP"],
+    ["HIGH_SCORE_BOARD", "TABLE_SETUP"],
     ["PROFILE_PICKER", "ACHIEVEMENT_LIST", "PROFILE_STATS"],
 ];
 

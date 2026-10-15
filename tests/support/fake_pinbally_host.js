@@ -17,7 +17,9 @@
 // date) and folders (and unreadable images) and inspected (file contents,
 // reads, writes, renames and deletes), and registry values seeded.
 // Programs run hidden are described by the tests (output, exit code, run
-// time) and their runs inspected.
+// time) and their runs inspected. The board PINemHi reads in each table's
+// NVRAM is set by the tests; a game's getHighScores() reads it like
+// PinballY (cache, highscoresrequest / highscoresready, failed or killed runs).
 // installGlobals() also exposes it as PinballY's globals (and the global
 // Date and timers, and the COM file objects over the same file system), so
 // code not yet on the host runs too. settle() waits on a real timer for
@@ -28,7 +30,11 @@
 import { projectFolderOf } from "../../common/core/pinbally_host.js";
 
 const RealDate = Date;
+// The fake whose globals are installed and not yet uninstalled, if any.
+let installedHost = null;
 const realSetTimeout = setTimeout;
+// PinballY kills a PINemHi run that lasts longer.
+const PINEMHI_KILL_MS = 7500;
 const realClearTimeout = clearTimeout;
 
 // Lets the zero-delay timers (deferred checks, dialogs) run for real.
@@ -187,6 +193,43 @@ export function createFakePinballYHost({
     const wheelImageOf = game => (game.wheelImage && files.has(game.wheelImage) ? game.wheelImage : null);
     // Every GameInfo update(), in order: { configId, changes }.
     const gameUpdateList = [];
+    // What PINemHi reads in each NVRAM, by board key (the table's ROM, or
+    // its config ID without one): { lines, durationMs, fails, hangs }.
+    const nvramBoards = new Map();
+    // The board PinballY keeps after a read, by config ID, until a launch or setHighScores(null).
+    const highScoreCache = new Map();
+    const boardKeyOf = game => (game.rom ? `rom:${game.rom}` : `table:${game.configId}`);
+    const withSource = (lines, source) => Object.assign([...lines], { source });
+    // Like PinballY's getHighScores(): the cached board, or a PINemHi run
+    // (after highscoresrequest, unless a listener cancels it) that fires
+    // highscoresready and fails on a failed run or one killed after
+    // PINEMHI_KILL_MS, or never answers (a run stuck behind another one).
+    // The board is read as it is when the run starts.
+    function getHighScoresOf(game) {
+        if (highScoreCache.has(game.configId)) return Promise.resolve(withSource(highScoreCache.get(game.configId), "cache"));
+        return new Promise((resolve, reject) => {
+            const request = fire("highscoresrequest", { game });
+            if (request.defaultPrevented) {
+                if (highScoreCache.has(game.configId)) resolve(withSource(highScoreCache.get(game.configId), "javascript"));
+                else reject(new Error("High scores request cancelled."));
+                return;
+            }
+            const nvram = nvramBoards.get(boardKeyOf(game));
+            const killed = Boolean(nvram) && nvram.durationMs > PINEMHI_KILL_MS;
+            const lines = nvram ? [...nvram.lines] : [];
+            if (nvram && nvram.hangs) return;
+            addTimer(() => {
+                if (!nvram || nvram.fails || killed) {
+                    fire("highscoresready", { game, success: false, scores: [], source: "none" });
+                    reject(new Error("PINemHi could not read the high scores."));
+                    return;
+                }
+                highScoreCache.set(game.configId, lines);
+                fire("highscoresready", { game, success: true, scores: [...lines], source: "pinemhi" });
+                resolve(withSource(lines, "pinemhi"));
+            }, nvram ? Math.min(nvram.durationMs, PINEMHI_KILL_MS) : 0);
+        });
+    }
     const withMedia = (table) => {
         const game = { ...table };
         return Object.defineProperties(game, {
@@ -201,6 +244,14 @@ export function createFakePinballYHost({
                     const path = table.gameFile || "";
                     const separator = path.lastIndexOf("\\");
                     return { exists: files.has(path), filename: path.slice(separator + 1), folder: path.slice(0, Math.max(separator, 0)), path };
+                },
+            },
+            getHighScores: { value: () => getHighScoresOf(game) },
+            // A board of lines replaces the cached one; null forgets it, so the next read runs PINemHi.
+            setHighScores: {
+                value: (lines) => {
+                    if (lines === null) highScoreCache.delete(game.configId);
+                    else highScoreCache.set(game.configId, [...lines]);
                 },
             },
             // Like PinballY: saves the changed fields, seen at once by every reader.
@@ -260,6 +311,12 @@ export function createFakePinballYHost({
             storedSettings.set(key, toStoredString(value));
             writtenKeys.add(key);
         },
+    };
+
+    let heardThroughGlobals = false;
+    const onThroughGlobals = (eventName, handler) => {
+        heardThroughGlobals = true;
+        on(eventName, handler);
     };
 
     // PinballY accepts "event.Namespace" names; only the event part matters here.
@@ -851,6 +908,7 @@ export function createFakePinballYHost({
         // PinballY leaves the wheel as soon as a launch starts.
         playGame: (game) => {
             launchList.push(game);
+            highScoreCache.delete(game.configId);
             uiMode = "running";
             runMode = "starting";
         },
@@ -870,6 +928,8 @@ export function createFakePinballYHost({
         advanceTime,
         // Intervals still running (a frame timer left on keeps redrawing).
         runningIntervalCount: () => timers.filter(timer => timer.intervalMs !== undefined).length,
+        // Timers and intervals not run or cleared yet.
+        pendingTimerCount: () => timers.length,
         setLayoutSize(size) { currentLayoutSize = { ...size }; },
         drawingLayers: () => [...layers],
         underlay: () => underlayFile,
@@ -889,6 +949,13 @@ export function createFakePinballYHost({
         addProgram(filePath, describe) {
             host.addFile(filePath, "program");
             programs.set(filePath, describe);
+        },
+        // The board PINemHi reads now in the table's NVRAM (shared by the
+        // tables of the same ROM), as raw lines; a run takes durationMs,
+        // fails when fails is set or PinballY kills it, never answers when
+        // hangs is set.
+        setNvramBoard(configId, lines, { durationMs = 1000, fails = false, hangs = false } = {}) {
+            nvramBoards.set(boardKeyOf(getGameInfo(configId)), { lines: [...lines], durationMs, fails, hangs });
         },
         // Seeds a registry value, by its full path ("HKCU\\Software\\...\\name").
         setRegistryValue(path, value) { registryValues.set(path, value); },
@@ -1081,7 +1148,17 @@ export function createFakePinballYHost({
 
         // Exposes this fake as PinballY's globals; returns the function that
         // restores the previous globals.
+        // Whether code reaching PinballY through the globals (main.js and the
+        // shared modules) listens to this fake.
+        isHeardThroughGlobals: () => heardThroughGlobals,
         installGlobals() {
+            // main.js and the shared modules load once per process and listen
+            // to the first fake: a second one would never hear them.
+            if (installedHost !== null && installedHost !== host && installedHost.isHeardThroughGlobals()) {
+                throw new Error("A second fake host installs its globals while the first one's still hold PinballY listeners: "
+                    + "main.js and the shared modules load once per process, so put each scenario test in a file of its own.");
+            }
+            installedHost = host;
             const globalNames = [
                 "optionSettings", "gameList", "mainWindow", "command", "logfile", "Date",
                 "StyledText", "CommandEvent", "systemInfo", "createAutomationObject",
@@ -1112,7 +1189,7 @@ export function createFakePinballYHost({
                     getAllGames: () => [...allTables],
                     getAllWheelGames: () => host.getWheelTables(),
                     // "gameselect" and "filterselect", fired with fire() like the main window's events.
-                    on,
+                    on: onThroughGlobals,
                     getWheelGame: (offset) => host.getWheelTables()[offset] || null,
                     getWheelCount: () => host.getWheelTables().length,
                     createFilter,
@@ -1125,7 +1202,7 @@ export function createFakePinballYHost({
                     resolveMedia: (subfolder, baseName) => resolveGlobalImage(subfolder, baseName),
                 },
                 mainWindow: {
-                    on,
+                    on: onThroughGlobals,
                     showMenu,
                     getUIMode: getFullUIMode,
                     playGame: host.playGame,
@@ -1180,6 +1257,7 @@ export function createFakePinballYHost({
             });
 
             return function uninstallGlobals() {
+                if (installedHost === host) installedHost = null;
                 for (const [name, descriptor] of previous) {
                     if (descriptor) Object.defineProperty(globalThis, name, descriptor);
                     else delete globalThis[name];

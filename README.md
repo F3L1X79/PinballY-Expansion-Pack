@@ -34,6 +34,12 @@ A new Challenge comes every Monday, the same for the whole household: five diffe
 
 Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti. Each Collection Tier also unlocks an Avatar Frame, from the Enchanted Forest to the Celestial Legend, to wear around your Avatar: pick it in **Your Stats**, under **Frame**.
 
+### High Scores
+
+When you enter a table's high score board, the place is yours: the pack reads the board before and after each game of a minute or more and credits every new score to the Profile that was playing, whatever initials were typed, the other players of a multiplayer game included. A toast announces your best place, or the Table Record. The scores already on the board at the first read, factory ones included, belong to no one, and a ROM reset that brings them back is never credited. A High Score stays won even once later scores push it off the board, and earns its own Achievements; **Your Stats** shows the High Scores and Table Records you still hold, and **Household Stats** who holds the most Table Records. Tables with a ROM only, whose board PinballY already reads.
+
+**High Scores** in the main menu (or PinballY's `HighScores` button, if mapped) opens the selected table's board, drawn in the Steamball look in place of PinballY's own window: the three first places on a podium under a Gold, Silver and Bronze crown, the others in rows below, each with its rank, score, initials and the Profile that won it (name, Avatar and Avatar Frame), or "Default score" with a portrait picked by its initials, the same on every table. The board is read again from the table each time you open it, so it always shows what the table holds now; the flippers scroll a board too long for the screen.
+
 ### Achievements
 
 <img src="docs/images/achievements.png" alt="The Achievement List" width="380">
@@ -81,7 +87,8 @@ Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows 
    Your own scripts keep running: nothing else in `Scripts` is touched.
 3. **Copy `ExpansionPack\.env.example` to `ExpansionPack\.env.local`** and set what you need, one `KEY=value` per line (UTF-8). Missing settings keep their default; `.env.local` is ignored by git.
 4. **Optional: install vpxtool**, so each table's ROM is filled in by itself (Table ROMs). Download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools` (create the folder). Without it, a table's ROM is still found, after its first Play.
-5. **Restart PinballY** and check `PinballY.log`: it lists your overrides, one "initialized" line per add-on, and `ERROR` lines naming the add-on at fault.
+5. **Optional: update PINemHi to 3.6.8**, so the High Scores read the boards of about 300 more ROMs. Replace the files of `PinballY\PINemHi` with those of PINemHi 3.6.8, then **append the whole `[romfind]` section of its `romfind.ini` to the end of its `pinemhi.ini`** (PinballY reads that section from `pinemhi.ini` only: without it, a table with an empty ROM field gets no board at all), and set `USER=` in `pinemhi.ini` to Visual Pinball X's `User` folder.
+6. **Restart PinballY** and check `PinballY.log`: it lists your overrides, one "initialized" line per add-on, and `ERROR` lines naming the add-on at fault.
 
 Everything the pack keeps stays in `Scripts\ExpansionPack`: your settings (`.env.local`) and each Profile's progress (`profiles`). **To back up**, copy that folder. **To uninstall**, delete it and remove the import line from `Scripts\main.js`.
 

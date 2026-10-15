@@ -193,12 +193,20 @@ A place on a table's own high score board that a Profile won with a Play: a scor
 _Avoid_: record (the Table Record is only the best one), hi-score, score (the score of a game that did not reach the board is never known)
 
 **Default Score**:
-A score that was already on a table's high score board when the pack first read it, whoever really set it, or a High Score whose Profile was removed since: it belongs to no Profile, for good, and only its initials are shown. Shown as "score par défaut" in French.
+A score that was already on a table's high score board when the pack first read it, whoever really set it, or a High Score whose Profile was removed since: it belongs to no Profile, for good (a Profile later created under the removed one's name gets its High Scores back, accepted), and only its initials are shown, with the placeholder image they pick on the High Score Board (the same for the same initials on every table). Shown as "score par défaut" in French.
 _Avoid_: original score (confused with original tables), anonymous score, factory score (not all of them come from the factory)
 
 **Table Record**:
 The best score on a table's high score board, whoever holds it, an anonymous one included. Shown as "record" in French.
 _Avoid_: Grand Champion (the name only some tables give it), world record
+
+**High Score Toast**:
+A toast like the Mastery Toast, with its own colour and no trophy, the place won in its tile, that announces the best place a Play won on a table's high score board, or the Table Record when that place is the first; one only per Play, after the other toasts of that Play. No board opens by itself. Shown as "Meilleur score" in French.
+_Avoid_: high score popup, record toast
+
+**High Score Board**:
+The drawn screen, opened by the player from the main menu, that shows the selected table's high score board with each place's owner: the three first places on a podium (the Table Record in the middle and highest), the others in rows below, each with its rank, score, initials, and the Profile that won it (name and Avatar) or "Default score". Not a table's own board, which it shows. Shown as "Meilleurs scores" in French.
+_Avoid_: high scores popup, leaderboard
 
 ### Achievements
 

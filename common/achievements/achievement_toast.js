@@ -16,7 +16,8 @@
 // Toast its own header (Collection Mastery's for a Collection Tier, with an
 // extra line naming the Avatar Frame it unlocks), the reached level's metal
 // as its accent and the level's number drawn in its tile; a Level Toast the
-// Player Level's colour and the reached level's number in its tile. A celebrated toast starts the
+// Player Level's colour and the reached level's number in its tile; a High
+// Score Toast its own accent and the place won in its tile. A celebrated toast starts the
 // Confetti Shower when it starts, a Level Toast the Fireworks; while a shower
 // falls, a Level Toast waits until a second before its end.
 // ============================================================
@@ -87,7 +88,9 @@ const COLORS = Object.freeze({
     transparent: STEAMBALL_COLORS.transparent,
 });
 
-export const TOAST_KIND = Object.freeze({ ACHIEVEMENT: "achievement", CHALLENGE: "challenge", MASTERY: "mastery", LEVEL: "level" });
+export const TOAST_KIND = Object.freeze({
+    ACHIEVEMENT: "achievement", CHALLENGE: "challenge", MASTERY: "mastery", LEVEL: "level", HIGH_SCORE: "highScore",
+});
 
 // Icons in the pack's assets folder, drawn by absolute path: drawImage
 // resolves relative paths from the PinballY folder, not the pack's.
@@ -112,6 +115,11 @@ const KIND_LOOKS = Object.freeze({
     [TOAST_KIND.LEVEL]: {
         accent: toast => playerLevelColorOf(toast.tileNumber),
         header: () => lang.playerLevel.toastHeader,
+    },
+    // No trophy: the place won fills the tile.
+    [TOAST_KIND.HIGH_SCORE]: {
+        accent: STEAMBALL_COLORS.highScoreAccent,
+        header: () => lang.highScores.toastHeader,
     },
 });
 
@@ -392,9 +400,10 @@ export function createAchievementToasts(host, {
     // Toast, onShown running when the toast starts, isStale (optional)
     // dropping it unshown when it returns true at its turn, celebrate
     // (optional) starting the Confetti Shower with it; a Mastery Toast
-    // gives its accent and the number its tile shows, a Level Toast that
-    // number only, header (optional) replaces the kind's, and extraLine
-    // (optional) shows under the description, in the accent, growing the card.
+    // gives its accent and the number its tile shows, a Level Toast and a
+    // High Score Toast that number only, header (optional) replaces the
+    // kind's, and extraLine (optional) shows under the description, in the
+    // accent, growing the card.
     function submit(toast) {
         waiting.push(toast);
         safeShowNext();

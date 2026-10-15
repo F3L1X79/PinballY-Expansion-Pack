@@ -52,11 +52,12 @@ export function openDrawnScreen(host, scriptName, { referenceHeight, backdropZIn
         layers,
         place,
         // A hidden layer placed on rect and drawn in its own coordinates,
-        // kept in into (the screen's layers by default).
-        drawPiece(zIndex, rect, draw, into = layers) {
+        // canvas.w by canvas.h (rect's size by default, another one
+        // stretched to rect), kept in into (the screen's layers by default).
+        drawPiece(zIndex, rect, draw, into = layers, canvas = rect) {
             const layer = hiddenLayer(zIndex);
             place(layer, rect);
-            layer.draw(draw, rect.w, rect.h);
+            layer.draw(draw, canvas.w, canvas.h);
             into.push(layer);
             return layer;
         },

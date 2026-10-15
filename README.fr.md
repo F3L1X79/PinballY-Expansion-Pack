@@ -56,6 +56,12 @@ Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq table
 
 Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis. Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Vos statistiques**, sous **Cadre**.
 
+### Meilleurs scores
+
+Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie d'au moins une minute et attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris. Un encart annonce votre meilleure place, ou le record. Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée. Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès ; **Vos statistiques** montrent les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records. Tables à ROM seulement, dont PinballY lit déjà le tableau.
+
+**Meilleurs scores** dans le menu principal (ou le bouton `HighScores` de PinballY, s'il est affecté) ouvre le tableau de la table sélectionnée, dessiné dans le style Steamball à la place de la fenêtre de PinballY : les trois premières places sur un podium sous une couronne d'or, d'argent et de bronze, les autres en lignes en dessous, chacune avec son rang, son score, ses initiales et le Profil qui l'a gagnée (nom, Avatar et cadre d'Avatar), ou « Score par défaut » avec un portrait choisi d'après ses initiales, le même sur toutes les tables. Le tableau est relu sur la table à chaque ouverture, il montre donc toujours ce qu'elle contient ; les flippers font défiler un tableau trop long pour l'écran.
+
 ### Succès
 
 <img src="docs/images/achievements.png" alt="La liste « Succès personnels »" width="380">
@@ -104,7 +110,8 @@ Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fo
    Vos propres scripts continuent de fonctionner : rien d'autre n'est touché dans `Scripts`.
 3. **Copiez `ExpansionPack\.env.example` en `ExpansionPack\.env.local`** et réglez ce qu'il vous faut, un `CLÉ=valeur` par ligne (UTF-8). Les réglages absents gardent leur valeur par défaut ; `.env.local` est ignoré par git.
 4. **Facultatif : installez vpxtool**, pour que la ROM de chaque table soit remplie toute seule (Table ROMs). Téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools` (créez le dossier). Sans lui, la ROM d'une table est quand même trouvée, après sa première Play.
-5. **Redémarrez PinballY** et consultez `PinballY.log` : il liste vos réglages, une ligne « initialized » par add-on, et des lignes `ERROR` qui désignent l'add-on en cause.
+5. **Facultatif : passez PINemHi en 3.6.8**, pour que les High Scores lisent les tableaux d'environ 300 ROM de plus. Remplacez les fichiers de `PinballY\PINemHi` par ceux de PINemHi 3.6.8, puis **ajoutez toute la section `[romfind]` de son `romfind.ini` à la fin de son `pinemhi.ini`** (PinballY ne lit cette section que dans `pinemhi.ini` : sans elle, une table au champ ROM vide n'a plus aucun tableau), et réglez `USER=` dans `pinemhi.ini` sur le dossier `User` de Visual Pinball X.
+6. **Redémarrez PinballY** et consultez `PinballY.log` : il liste vos réglages, une ligne « initialized » par add-on, et des lignes `ERROR` qui désignent l'add-on en cause.
 
 Tout ce que le pack conserve reste dans `Scripts\ExpansionPack` : vos réglages (`.env.local`) et la progression de chaque Profil (`profiles`). **Pour sauvegarder**, copiez ce dossier. **Pour désinstaller**, supprimez-le et retirez la ligne d'import de `Scripts\main.js`.
 

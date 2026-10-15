@@ -88,6 +88,8 @@ const DEFAULTS = {
         tableMastery: true,
         // Fills each table's empty ROM field from its script (vpxtool in the pack's tools folder).
         tableRoms: true,
+        // Credits each score that enters a ROM table's board to the Profile that played.
+        highScores: true,
         // The main menu drawn in the pack's look instead of PinballY's native one.
         drawnMenus: true,
         menuCleanup: false,

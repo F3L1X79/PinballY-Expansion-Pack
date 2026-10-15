@@ -369,6 +369,20 @@ export default {
             100: "Légende de la semaine",
         },
         challengesCompletedDescription: (count) => (count === 1 ? "Réussir un défi." : `Réussir ${count} défis.`),
+        highScoreTablesTitles: {
+            1: "Initiales gravées dans la pierre",
+            3: "Trois bannières hissées",
+            5: "Seigneur des cinq tableaux",
+            10: "Le Kwisatz Hiscorach",
+        },
+        highScoreTablesDescription: (count) => (count === 1 ? "Faire un meilleur score sur une table." : `Faire un meilleur score sur ${count} tables différentes.`),
+        tableRecordTablesTitles: {
+            1: "Un score pour les gouverner tous",
+            3: "Seigneur de guerre des trois mondes",
+        },
+        tableRecordTablesDescription: (count) => (count === 1 ? "Battre le record d'une table." : `Battre le record de ${count} tables différentes.`),
+        tableRecordTakenTitle: "L'Usurpateur",
+        tableRecordTakenDescription: "Prendre le record d'une table à un autre profil.",
         dayManufacturersTitles: {
             3: "Tour du monde express",
             5: "Papillon du flipper",
@@ -485,6 +499,8 @@ export default {
             averageDuration: "Durée moyenne",
             collection: "Collection",
             challengesCompleted: "Défis réussis",
+            highScoresHeld: "Meilleurs scores détenus",
+            tableRecordsHeld: "Records détenus",
             cabinetStreak: "Jours d'affilée",
             dayStreak: "Série du jour",
             weekStreak: "Série de la semaine",
@@ -614,5 +630,26 @@ export default {
         toastHeader: "Level up",
         toastTitle: (level) => `Niveau ${level}`,
         toastDescription: "Vos succès vous font passer au niveau supérieur.",
+    },
+    highScores: {
+        toastHeader: "Meilleur score",
+        toastTitle: (table, place) => `Meilleur score sur ${table} : ${place === 1 ? "1ère" : `${place}e`} place`,
+        tableRecordTitle: (table) => `Record sur ${table} !`,
+        toastScore: (score) => `${score} points`,
+        // The High Score Board.
+        board: {
+            menuEntry: "Meilleurs scores",
+            record: "Record",
+            // In place of a place's owner when it belongs to no Profile.
+            defaultScore: "Score par défaut",
+            // In place of the initials when none were typed.
+            noInitials: "\u2014",
+            noScore: "Pas encore de score",
+            // While PINemHi reads the board, as a message or a note over the last known one.
+            reading: "Lecture\u2026",
+            // Over the last known board when the fresh read failed.
+            notRefreshed: "Ces scores n'ont pas pu être actualisés",
+            notSupported: "Les meilleurs scores de cette table ne sont pas pris en charge",
+        },
     },
 };

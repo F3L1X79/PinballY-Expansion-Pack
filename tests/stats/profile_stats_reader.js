@@ -6,7 +6,8 @@
 // right column by its title (each stat's label with the texts drawn after
 // it, and its images), the highlighted choice (the button under the gold
 // halo, or the cross's tooltip), and picks a choice with Next and Select
-// as a player would. Opens them from the main menu entry. Reads the
+// as a player would. Opens them from the main menu entry, or reads one
+// section of the active Profile's screen and closes it again. Reads the
 // Avatar Frame list opened from the Frame button too: whether it is open,
 // its rows (name, status and frame image) and the highlighted one, and
 // picks a row as a player would.
@@ -94,6 +95,15 @@ export function section(fake, title, labels) {
         if (known.has(text)) stats[current = text] = [];
         else if (current !== null) stats[current].push(text);
     }
+    return stats;
+}
+
+// Opens the active Profile's Profile Stats from the main menu, reads the
+// section of that title (as section() does) and closes them with Exit.
+export function readOwnSection(fake, lang, title) {
+    openProfileStats(fake, lang);
+    const stats = section(fake, title, lang.profileStats.stats);
+    press(fake, "Exit");
     return stats;
 }
 
