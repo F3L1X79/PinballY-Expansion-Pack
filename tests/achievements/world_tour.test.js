@@ -14,6 +14,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import { toastDrawings } from "./achievement_toast_reader.js";
 import { readRows, pressAndGlide } from "./achievement_list_reader.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 
@@ -90,5 +91,5 @@ test("selecting every table of All Tables unlocks the World Tour at once, for go
     getProfileStore().resetProfile("guest");
     assert.equal(worldTourRow().unlocked, false, "a Profile Reset erases it");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

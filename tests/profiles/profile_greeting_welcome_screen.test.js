@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen } from "../welcome_screen/welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const PICKER_Z = 6500;
@@ -42,5 +43,5 @@ test("with the Welcome Screen on, no greeting shows at startup", async () => {
     fake.advanceTime(2000);
     assert.equal(isWelcomeScreenOpen(fake), false, "it does not come back");
     assert.deepEqual(pickerTexts(fake), [], "nor does the greeting after it");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

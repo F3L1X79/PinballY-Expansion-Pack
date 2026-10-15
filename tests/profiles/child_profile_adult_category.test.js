@@ -8,6 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
@@ -30,5 +31,5 @@ test("the adult category set in .env.local replaces NSFW", async () => {
     await settle();
 
     assert.deepEqual(fake.getWheelTables().map(game => game.title), ["Medieval Madness"]);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

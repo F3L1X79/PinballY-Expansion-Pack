@@ -8,6 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 
@@ -33,5 +34,5 @@ test("with the option empty, the lower status line shows only the table info", a
         TEXT.year(2), TEXT.manufacturer(2), TEXT.playCount(2, 0), TEXT.playTime(2, 0, 0),
     ]);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

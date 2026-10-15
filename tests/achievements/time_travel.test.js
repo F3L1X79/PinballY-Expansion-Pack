@@ -12,6 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, showsMissing, showsUnlocked, table, SHORT_GAME_MS } from "./surprises_scenario.js";
 import { TIME_TRAVEL_PLAYS } from "../../common/achievements/surprises.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const T2005 = table(1, "Table 2005", { year: 2005 });
 const T1985 = table(2, "Table 1985", { year: 1985 });
@@ -62,5 +63,5 @@ test("3 Plays in a row going back in decades unlock Time Travel", async () => {
     assert.ok(!(await playsUnlock(T1975)), "the 1970s after the reset");
     assert.ok(await playsUnlock(T2005, T1985, T1975), "2000s, 1980s, 1970s after the reset");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const MEDIEVAL = {
@@ -43,5 +44,5 @@ test("turning the Profile picker off makes Guest the active Profile", async () =
 
     assert.equal(readJson(fake, `${PROFILES_FOLDER}\\guest\\profile.json`).plays?.[MEDIEVAL.configId]?.count, 1);
     assert.equal(readJson(fake, `${PROFILES_FOLDER}\\Alice\\profile.json`).plays?.[MEDIEVAL.configId], undefined);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

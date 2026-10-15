@@ -12,6 +12,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { tableNumbered } from "../welcome_screen/welcome_screen_collection_scenario.js";
 import { openProfileStats, collectionMastery, press } from "./profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The Play seconds that reach each Mastery Level, from level 1.
@@ -57,5 +58,5 @@ test("the card shows the Collection Mastery's goal, count and tier", async () =>
     assert.deepEqual(collectionOf("Alice"), { goal: "Objectif : 10 tables Novice", current: "Actuel : 3/10", tier: 0 });
     assert.deepEqual(collectionOf("Bob"), { goal: "Objectif : 10 tables Disciple", current: "Actuel : 4/10", tier: 3 });
     assert.deepEqual(collectionOf("Carol"), { goal: "Toutes tes tables : Mage du flipper", current: null, tier: 10 });
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SESSION_MS = 5 * 60 * 1000;
@@ -56,5 +57,5 @@ test("a Streak never announced announces the first play once", async () => {
     await settle();
 
     assert.equal(announcements().filter(Boolean).length, 1, "announced only once");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

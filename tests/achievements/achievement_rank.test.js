@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const ADD_ONS_UNDER_TEST = ["customMenuCommands", "sessionStatsTracker", "achievements", "challenges", "profilePicker"];
@@ -84,5 +85,5 @@ test("every Achievement has an Achievement Rank deduced from its ladder or group
     assert.deepEqual(ranksOf(GROUP_SIZES.map(group => `decadeCompletion:${Math.floor(group.year / 10) * 10}s`)), EXPECTED_GROUP_RANKS);
     assert.deepEqual(ranksOf(GROUP_SIZES.map(group => `categoryCompletion:${group.category}`)), EXPECTED_GROUP_RANKS);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

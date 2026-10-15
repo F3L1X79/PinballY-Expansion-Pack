@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import { startScenario, playLastTable, showerStartLogs, ALL_TOASTS_MS, challengeTitle } from "./confetti_shower_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const CONFETTI_SOUND_FILE = "C:\\Sounds\\cheers.wav";
 const ACHIEVEMENT_SOUND_FILE = "C:\\Sounds\\trophy.wav";
@@ -36,5 +37,5 @@ test("a Challenge and Platinums on one return to the wheel: one shower, its soun
     assert.equal(sounds.filter(file => file === CONFETTI_SOUND_FILE).length, 1, "the shower's sound once");
     assert.equal(sounds.filter(file => file === ACHIEVEMENT_SOUND_FILE).length, newToasts.length,
         "the Achievement sound with each toast");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

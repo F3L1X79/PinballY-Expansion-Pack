@@ -10,6 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, table, PROFILES_FOLDER } from "./achievement_progress_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLE_OF_THE_DAY = table(1, "Medieval Madness", "Williams", 1997);
 const TABLE_OF_THE_WEEK = table(2, "Attack from Mars", "Bally", 1995);
@@ -72,5 +73,5 @@ test("Streak Achievements stay Unlocked after a break, missing ones show the cur
         missingRow(weekStreaks[1], "weeksInARow", 2, 12),
     ]);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

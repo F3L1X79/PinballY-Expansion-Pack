@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startLostRecords, recordBoard } from "./lost_records_scenario.js";
 import { MEDIEVAL, FACTORY } from "../high_scores/high_scores_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("each Profile is told who took the Table Record from it", async () => {
     const { fake, setBoard, play, playAs, arrive, close, line } = await startLostRecords({
@@ -27,5 +28,5 @@ test("each Profile is told who took the Table Record from it", async () => {
     await close();
     await arrive("Bob");
     assert.equal(line(), "Claire took your record on Medieval Madness");
-    assert.deepEqual(fake.logLines().filter(text => text.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

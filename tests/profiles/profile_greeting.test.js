@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { errorLines } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const ALICE_AVATAR = `${PROFILES_FOLDER}\\Alice\\avatar.png`;
@@ -91,7 +92,7 @@ test("picking a Profile greets it with its Avatar and a sound, then fades out", 
     pick(1);
     fake.advanceTime(PAUSE_OVER_MS);
     assert.ok(visibleTexts(fake).includes(greeting), "a missing sound never stops the greeting");
-    const errors = fake.logLines().filter(line => line.includes("ERROR"));
+    const errors = errorLines(fake);
     assert.equal(errors.length, 1);
     assert.match(errors[0], /\[ProfilePicker\].*missing\.wav/);
     fake.advanceTime(GREETING_OVER_MS);

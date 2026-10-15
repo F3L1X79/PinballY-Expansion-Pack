@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged, errorLines } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 1, 20, 15, 30);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -63,7 +64,7 @@ test("after Yes, a message with OK tells whether the Profile Reset worked", asyn
     assert.equal(JSON.parse(fake.readFile(profileFile("Bob"))).randomGames, 0);
     fake.selectMenuItem(TEXT.ok);
     assert.equal(fake.currentMenu(), null, "OK closes the message");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 
     fake.lockFile(profileFile("Carol"));
     askToReset("Carol");
@@ -71,7 +72,7 @@ test("after Yes, a message with OK tells whether the Profile Reset worked", asyn
     assert.deepEqual(shownMessage(), { titles: [TEXT.failed("Carol"), "", TEXT.ok], selected: [TEXT.ok], dialogStyle: true },
         "the failure message names the Profile and points to the log");
     assert.ok(!TEXT.failed("Carol").includes("Permission denied"), "the cause stays out of the message");
-    const errors = fake.logLines().filter(line => line.includes("ERROR"));
+    const errors = errorLines(fake);
     assert.equal(errors.length, 1);
     assert.match(errors[0], /^\[ProfileReset\] .*Permission denied: .*\\Carol\\/s, "the cause is logged");
     fake.selectMenuItem(TEXT.ok);

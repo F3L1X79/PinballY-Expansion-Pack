@@ -11,6 +11,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, isProfileStatsOpen, section } from "../stats/profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
@@ -54,5 +55,5 @@ test("no Challenge, Challenge Card or Challenges Achievements when the Challenge
     assert.deepEqual(Object.keys(section(fake, STATS.sections.progression, STATS.stats)),
         [STATS.stats.collection, STATS.stats.cabinetStreak, STATS.stats.dayStreak, STATS.stats.weekStreak, STATS.stats.highScoresHeld, STATS.stats.tableRecordsHeld],
         "no completed Challenges");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -12,6 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const markAdmin = (fake, name) =>
@@ -68,7 +69,7 @@ test("turned on, Menu Cleanup lightens the menus for every Profile, Admin includ
     ]);
     assert.deepEqual(exitMenuTitles(), CLEANED_ADMIN_EXIT_MENU);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });
 
 test("no doubled, leading or trailing separator is left, titled or not", async () => {

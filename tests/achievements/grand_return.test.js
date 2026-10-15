@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SESSION_MS = 5 * 60 * 1000;
@@ -79,5 +80,5 @@ test("the grand return needs a 31-day break and says so", async () => {
     assert.ok(toast.includes(TEXT.grandReturnTitle()), toast.join(" | "));
     assert.ok(toast.includes(TEXT.grandReturnDescription(31)), toast.join(" | "));
     assert.match(TEXT.grandReturnDescription(31), /31/);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

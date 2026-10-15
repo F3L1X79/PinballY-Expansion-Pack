@@ -7,6 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { start, MEDIEVAL, MARS, KEPT_FROM_CHILD_POINTS } from "../levels/child_player_level_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("without Adult Tables, the scaling only makes up for Night Owl and Full Moon Night", async () => {
     const { fake, levelOf, worthOf, pointsOf } = await start([MEDIEVAL, MARS]);
@@ -16,5 +17,5 @@ test("without Adult Tables, the scaling only makes up for Night Owl and Full Moo
     assert.equal(pointsOf(levelOf("Kid")), Math.floor(50 * adultWorth / (adultWorth - KEPT_FROM_CHILD_POINTS)));
     assert.deepEqual(levelOf("Alice"), { level: "2", current: "Actuel : 50 / 125" });
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

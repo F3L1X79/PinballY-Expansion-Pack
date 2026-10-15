@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen, greeting, choose } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
@@ -43,5 +44,5 @@ test("late at night, the Welcome Screen's random choice launches a Random Game",
     await settle();
     assert.equal(isWelcomeScreenOpen(fake), false);
     assert.deepEqual(fake.launches().map(game => game.configId), [TABLES[1].configId]);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

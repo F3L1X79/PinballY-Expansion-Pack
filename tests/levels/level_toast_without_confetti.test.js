@@ -7,6 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, playLastTable, showerStartLogs, levelToastCount, advanceUntil } from "../celebrations/confetti_shower_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Drawing the Fireworks ahead, and the startup toasts.
 const STARTUP_MS = 30000;
@@ -22,5 +23,5 @@ test("with CONFETTI=false the Level Toast never waits for a shower", async () =>
     // Behind the three Platinums' toasts, staggered.
     assert.ok(shownAtMs < UNHELD_MS, `the Level Toast waited ${shownAtMs} ms`);
     assert.equal(showerStartLogs(fake).length, 0);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

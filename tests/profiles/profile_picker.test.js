@@ -15,6 +15,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CABINET_FILE = `${PROFILES_FOLDER}\\cabinet.json`;
@@ -134,5 +135,5 @@ test("the Profile picker moves, wraps, switches, cancels and sees new folders", 
     assert.equal(highlightedName(fake, names), "Bob", "the exit menu opens the carousel too");
     press(fake, "Exit");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

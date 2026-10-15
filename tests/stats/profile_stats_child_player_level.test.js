@@ -9,6 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { start, MEDIEVAL, MARS, PLAYBOY, PARTY_NIGHT, KEPT_FROM_CHILD_POINTS } from "../levels/child_player_level_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("with Adult Tables, a child gets more points than an adult for the same Notified Achievements", async () => {
     const { fake, levelOf, worthOf, pointsOf, profileStore } = await start([MEDIEVAL, MARS, PLAYBOY, PARTY_NIGHT]);
@@ -25,5 +26,5 @@ test("with Adult Tables, a child gets more points than an adult for the same Not
     profileStore.resetProfile("Kid");
     assert.deepEqual(levelOf("Kid"), { level: "1", current: "Actuel : 0 / 50" }, "a Profile Reset starts over");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

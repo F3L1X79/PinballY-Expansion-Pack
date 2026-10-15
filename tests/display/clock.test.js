@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const CLOCK_Z = 4500;
 const GAME = { id: 1, configId: "mm", title: "Medieval Madness" };
@@ -54,5 +55,5 @@ test("the clock shows the time, follows the minutes and hides during a game", as
     assert.equal(clock(fake).alpha, 1, "back on the wheel");
     assert.ok(clock(fake).texts().includes(lang.clock.time(21, 59)), "on time after the game");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

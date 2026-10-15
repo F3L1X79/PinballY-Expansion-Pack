@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 30, 20, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -77,5 +78,5 @@ test("only the Admin Profiles keep the setup entries, once the household has one
     assert.deepEqual(exitMenuTitles(), EXIT_MENU_WITHOUT_OPERATOR_MENU);
     assert.ok(fake.logLines().some(line => line.includes("guest\\profile.json") && line.includes("isAdmin")));
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

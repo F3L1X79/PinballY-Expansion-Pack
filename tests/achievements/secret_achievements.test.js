@@ -15,6 +15,7 @@ import { toastDrawings } from "./achievement_toast_reader.js";
 import { chromeTexts, headerRankCounts, press, readRows } from "./achievement_list_reader.js";
 import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -139,5 +140,5 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     assert.deepEqual(rowsAfter.filter(row => row.title === LIST_TEXT.secretTitle).map(row => row.description), [TEXT.worldTourHint(), TEXT.grandReturnHint(), ...SURPRISES_HINTS]);
     assert.ok(headerCountsEvery(rowsAfter));
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

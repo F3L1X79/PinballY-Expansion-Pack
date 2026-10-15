@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CARD_Z_INDEX = 4500;
@@ -46,5 +47,5 @@ test("the Challenges Add-on draws the week's Challenge, shows the card and count
     const profile = JSON.parse(fake.readFile(`${PROFILES_FOLDER}\\Alice\\profile.json`));
     assert.deepEqual(profile.challenge.games.map(game => game.configId), ["Medieval Madness"]);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

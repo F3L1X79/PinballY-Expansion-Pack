@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -53,5 +54,5 @@ test("the upper status line welcomes the active Profile after the player's messa
         PLAYER_MESSAGES[0], "Ajouté aux favoris", PLAYER_MESSAGES[1], ...projectMessages("Bienvenue, Invité !"),
     ], "a temporary message moves the project's messages along, never over the player's messages");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

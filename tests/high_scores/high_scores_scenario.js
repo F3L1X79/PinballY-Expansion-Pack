@@ -7,6 +7,11 @@
 // active Profile, resets a Profile, and reads back the High Scores file,
 // the toasts drawn, the Achievements Notified and shown in the Achievement
 // List, and the Add-on's log lines. Never loaded by PinballY.
+// Changing the cabinet mid-test goes through the fake host: remove a
+// Profile with fake.removeFolder(`${PROFILES_FOLDER}\\Name`); hide or
+// remove a table with fake.setTables(...) ({ ...table, isHidden: true },
+// or leave it out); make an Adult Table with categories: ["NSFW"]
+// (config.adultCategory).
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";

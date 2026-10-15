@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Thursday 1 October 2026, 20:15:30.
 const NOW = new Date(2026, 9, 1, 20, 15, 30);
@@ -173,5 +174,5 @@ test("an Admin Profile resets another Profile from the Exit menu, after one conf
     assert.deepEqual(store.getPlayLogOf("Bob", 2026).map(play => play.seconds), [300], "his next Play starts a fresh year file");
     assert.equal(fake.readFile(playLogFile("Bob", "play-log-2026.reset-2026-10-01_20-15-30.json")), bobLog2026);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

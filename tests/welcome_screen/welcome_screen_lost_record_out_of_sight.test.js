@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startLostRecords, recordBoard } from "./lost_records_scenario.js";
 import { MEDIEVAL, AFM, FACTORY, TABLES } from "../high_scores/high_scores_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TWILIGHT_ZONE = "Twilight Zone (Bally 1993)";
 const THEATRE = "Theatre of Magic (Bally 1995)";
@@ -34,5 +35,5 @@ test("Lost Records on hidden, removed or Adult Tables are left out for a Child P
 
     await arrive("Alice");
     assert.equal(line(), "Bob took your record on Theatre of Magic");
-    assert.deepEqual(fake.logLines().filter(text => text.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

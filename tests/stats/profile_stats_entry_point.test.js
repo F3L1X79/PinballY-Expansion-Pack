@@ -13,6 +13,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { chromeTexts, pressAndGlide, isListOpen } from "../achievements/achievement_list_reader.js";
 import { isProfileStatsOpen, openProfileStats, buttons, highlighted, choose, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
@@ -83,5 +84,5 @@ test("the Achievements button opens the Achievement List and the selection butto
     assert.deepEqual(fake.getWheelTables().map(game => game.title), ["Attack from Mars", "Godzilla"]);
     assert.deepEqual(fake.launches(), [], "the player launches a table with Play");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -13,6 +13,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import { toastDrawings } from "./achievement_toast_reader.js";
 import { readRows, press } from "./achievement_list_reader.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 23 September 2026, one minute before midnight.
 const NOW = new Date(2026, 8, 23, 23, 59, 0);
@@ -139,5 +140,5 @@ test("only a Play started from 00:00 to 03:59 unlocks Night Owl, never for a Chi
     waitUntil(2, 0);
     assert.equal(await play(), true, "the reset Profile unlocks it again");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -13,6 +13,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 import {
     WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, greeting, periodCards, headerImages, bottomRowLabels, highlighted, readChoices, choose,
     welcomeScreenLayerCount,
@@ -81,5 +82,5 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     assert.equal(welcomeScreenLayerCount(fake), 0, "its layers are removed");
     assert.equal(press(fake, "Next").defaultPrevented, false, "the buttons drive the wheel again");
     assert.deepEqual(fake.launches(), []);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

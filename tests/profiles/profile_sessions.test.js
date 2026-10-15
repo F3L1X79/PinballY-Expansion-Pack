@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 // Longer than a toast's whole life (rise, hold, fade).
@@ -111,5 +112,5 @@ test("session stats and their Achievements belong to the active Profile", async 
     assert.equal(bobSessions.longestSeconds, 5 * 60);
 
     assert.deepEqual([...fake.writtenSettingsKeys()].filter(key => key.startsWith("custom.sessionStats.")), []);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -9,6 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, showsMissing, showsUnlocked, SHORT_GAME_MS } from "./surprises_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("only a weekday Play started from 12:00 to 13:59 unlocks Lunch Break", async () => {
     // Monday 5 October 2026.
@@ -38,5 +39,5 @@ test("only a weekday Play started from 12:00 to 13:59 unlocks Lunch Break", asyn
     waitUntil(2026, 9, 16, 12, 0);
     assert.ok((await play()).includes(secret.title), "Alice, on a Friday at 12:00");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

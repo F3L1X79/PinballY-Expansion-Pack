@@ -16,6 +16,7 @@ import config from "../../common/core/config.js";
 import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
 import { WELCOME_SCREEN_OPEN_MS, press, periodCards, readChoices } from "../welcome_screen/welcome_screen_reader.js";
 import { openProfileStats, section } from "../stats/profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CABINET = `${PROFILES}\\cabinet.json`;
@@ -162,5 +163,5 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     fake.setTables([{ ...PLAYBOY, categories: [] }, MEDIEVAL]);
     assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek]);
     assert.deepEqual(JSON.parse(fake.readFile(CABINET)).tableOfTheDay.adultPeriods, ["2026-09-30", "2026-10-02"]);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

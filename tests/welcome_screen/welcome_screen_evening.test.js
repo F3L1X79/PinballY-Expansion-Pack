@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, greeting, bottomRowLabels, highlighted } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 
@@ -42,5 +43,5 @@ test("the Welcome Screen waits for a menu to close, greets in the evening and cl
 
     press(fake, "Exit");
     assert.equal(isWelcomeScreenOpen(fake), false);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

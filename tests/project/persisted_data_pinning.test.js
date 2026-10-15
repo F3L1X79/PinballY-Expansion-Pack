@@ -38,6 +38,7 @@ import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js
 import { createHighScoreStore } from "../../common/high_scores/high_score_store.js";
 import { buildHighScoreAchievements } from "../../achievements/high_scores.js";
 import { WELCOME_SCREEN_PAUSE_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -290,7 +291,7 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
         tableOfTheWeek: { configId: weekTable.configId, period: "2026-09-21" },
     });
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });
 
 test("the Challenges' saved data stays byte-identical", () => {

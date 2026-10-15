@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 30 September 2026: its week is keyed "2026-09-28".
 const NOW = new Date(2026, 8, 30, 21, 0, 0);
@@ -96,5 +97,5 @@ test("an Admin Profile resetting itself starts over at once, without replaying a
     assert.ok(aliceData().notified.includes("collectionMilestone:firstTable"), "her first game earns First Steps again");
     assert.ok(toastDrawings(fake).length > toastCount);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

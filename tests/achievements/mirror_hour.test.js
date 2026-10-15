@@ -9,6 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, showsMissing, showsUnlocked, SHORT_GAME_MS } from "./surprises_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("only a Play started when hours equal minutes unlocks Mirror Hour, a Child Profile included", async () => {
     // Monday 5 October 2026.
@@ -37,5 +38,5 @@ test("only a Play started when hours equal minutes unlocks Mirror Hour, a Child 
     waitUntil(2026, 9, 9, 1, 1);
     assert.ok((await play()).includes(secret.title), "a Child Profile, at 01:01");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

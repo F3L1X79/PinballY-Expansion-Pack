@@ -13,6 +13,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import { toastDrawings } from "./achievement_toast_reader.js";
 import config from "../../common/core/config.js";
 import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SECONDS_PER_HOUR = 3600;
@@ -114,5 +115,5 @@ test("Achievement Toasts wait for the end of the game, arrive staggered and neve
         assert.deepEqual(drawing.images, [emblemOf(rankByTitle.get(drawing.texts[1]))], `${drawing.texts[1]} shows its Rank's emblem`);
     }
     assert.deepEqual(fake.soundsPlayed(), [], "no sound by default");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

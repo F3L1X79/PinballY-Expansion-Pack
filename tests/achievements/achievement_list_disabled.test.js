@@ -8,6 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("no Achievement List or Profile Stats entry when the achievements Add-on is disabled", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0) });
@@ -31,5 +32,5 @@ test("no Achievement List or Profile Stats entry when the achievements Add-on is
         undefined,
         MENU_LABELS.tableSetup,
     ]);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

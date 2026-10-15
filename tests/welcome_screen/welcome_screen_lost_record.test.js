@@ -13,6 +13,7 @@ import { startLostRecords } from "./lost_records_scenario.js";
 import { settle } from "../support/fake_pinbally_host.js";
 import { readChoices, press, WELCOME_SCREEN_PAUSE_MS } from "./welcome_screen_reader.js";
 import { board, avatarFiles, avatarOf, MEDIEVAL, AFM, FACTORY } from "../high_scores/high_scores_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const ALICE_RECORD = board(["ALI", "60000000"], ["SLL", "52000000"], ["BRE", "40000000"], ["LFS", "30000000"], ["ZAP", "20000000"]);
 const BOB_RECORD = board(["BOB", "70000000"], ["ALI", "60000000"], ["SLL", "52000000"], ["BRE", "40000000"], ["LFS", "30000000"]);
@@ -59,5 +60,5 @@ test("Alice's Welcome Screen tells her once that Bob took her Table Record", asy
     await close();
     await arrive("Alice");
     assert.equal(line(), null, "seen even when closed at once");
-    assert.deepEqual(fake.logLines().filter(text => text.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

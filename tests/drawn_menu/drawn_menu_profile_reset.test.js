@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, squeezed, press, openExitMenu, chooseEntry } from "./drawn_menu_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const ADD_ONS_UNDER_TEST = ["customMenuCommands", "drawnMenus"];
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -83,5 +84,5 @@ test("Yes resets the Profile and the outcome shows with OK", () => {
 
     assert.ok(!isDrawnMenuShown(fake));
     assert.equal(fake.currentMenu(), null);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

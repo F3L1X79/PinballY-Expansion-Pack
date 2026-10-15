@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -67,5 +68,5 @@ test("the status line shows the active Profile's play count and play time of the
         TEXT.year(2), TEXT.manufacturer(2), TEXT.playCount(2, 8), TEXT.playTime(2, 3, 5),
     ], "a temporary message moves the table info along, never over the player's messages");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROJECT_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack";
 const PROFILES_FOLDER = `${PROJECT_FOLDER}\\profiles`;
@@ -71,5 +72,5 @@ test("the badge shows the active Profile, follows switches and hides during a ga
     store.switchTo("Bob");
     assert.ok(shows(badge(fake), { name: "Bob", avatar: DEFAULT_AVATAR }), "a Profile without an Avatar shows the default one");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

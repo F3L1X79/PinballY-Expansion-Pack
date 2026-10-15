@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { settle } from "../support/fake_pinbally_host.js";
 import { startScenario, table, PROFILES_FOLDER } from "./achievement_progress_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const MEDIEVAL = table(1, "Medieval Madness", "Williams", 1997, ["Fantasy"]);
 const TWILIGHT = table(2, "Twilight Zone", "Williams", 1993, ["Fantasy"]);
@@ -49,5 +50,5 @@ test("a completion Achievement shows its tables played until it unlocks, and fol
     await play(ADDAMS);
     assert.deepEqual(readShown([williams]), [unlockedRow(williams)], "Unlocked: no Achievement Progress");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

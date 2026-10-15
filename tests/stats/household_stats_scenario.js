@@ -77,4 +77,4 @@ export async function startHousehold({
     return { fake, lang, profileStore: getProfileStore(), readProfileStats };
 }
 
-export const errorLines = fake => fake.logLines().filter(line => line.includes("ERROR"));
+export { errorLines } from "../support/error_log.js";

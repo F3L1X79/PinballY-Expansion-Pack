@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startLostRecords, recordBoard } from "./lost_records_scenario.js";
 import { MEDIEVAL, AFM, FACTORY, PROFILES_FOLDER } from "../high_scores/high_scores_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("a Lost Record whose taker was removed is left out", async () => {
     const { fake, setBoard, play, playAs, arrive, close, line } = await startLostRecords({
@@ -26,5 +27,5 @@ test("a Lost Record whose taker was removed is left out", async () => {
     await arrive("Alice");
     assert.equal(line(), "Claire took your record on Attack from Mars");
     await close();
-    assert.deepEqual(fake.logLines().filter(text => text.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

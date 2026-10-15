@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startLostRecords, recordBoard } from "./lost_records_scenario.js";
 import { avatarFiles, romTables, FACTORY } from "../high_scores/high_scores_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLES = romTables(5);
 const CONFIG_IDS = TABLES.map(table => table.configId);
@@ -30,5 +31,5 @@ test("past three Lost Records, the line counts the others", async () => {
     for (const configId of CONFIG_IDS.slice(0, 4)) await playAs("Bob", configId, recordBoard("BOB", 90));
     await arrive("Alice");
     assert.equal(line(), "Records lost: Table 4 (Bob), Table 3 (Bob), Table 2 (Bob) and 1 more");
-    assert.deepEqual(fake.logLines().filter(text => text.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

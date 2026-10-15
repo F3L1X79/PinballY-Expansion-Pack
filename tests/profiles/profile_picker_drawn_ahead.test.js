@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The carousel's background, its Avatars, then the gold frame and names.
@@ -73,5 +74,5 @@ test("once drawn ahead, the carousel opens and moves without drawing", async () 
     press(fake, "Exit");
     assert.deepEqual(visibleTexts(fake), [], "Exit hides the carousel");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
@@ -53,5 +54,5 @@ test("the Welcome Screen and the main menu launch the same Table of the Day", as
     assert.equal(firstLaunch.configId, "Medieval Madness (Williams 1997)");
     assert.equal(secondLaunch.configId, firstLaunch.configId);
     assert.equal(getTableOfTheDay().getStreak(), 1);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

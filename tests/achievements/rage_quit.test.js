@@ -11,6 +11,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import { toastDrawings } from "./achievement_toast_reader.js";
 import config from "../../common/core/config.js";
 import { readRows } from "./achievement_list_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
@@ -78,5 +79,5 @@ test("only a session of 30 seconds to under a minute unlocks the rage quit for g
     const rageQuitRow = readRows(fake, lang.achievementList).find(row => row.title === TEXT.rageQuitTitle());
     assert.equal(rageQuitRow.unlocked, true);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

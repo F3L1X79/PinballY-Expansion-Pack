@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, greeting } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The carousel's background, its Avatars, then the gold frame and names.
@@ -97,5 +98,5 @@ test("Change Player from the Welcome Screen or the main menu brings the screen b
     await playOut();
     assert.equal(isWelcomeScreenOpen(fake), false, "nor does leaving the carousel with Exit");
     assert.deepEqual(greetings(), []);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

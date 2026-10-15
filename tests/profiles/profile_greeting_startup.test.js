@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { isWelcomeScreenOpen } from "../welcome_screen/welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const PICKER_Z = 6500;
@@ -46,5 +47,5 @@ test("without the Welcome Screen, the active Profile is greeted once at startup"
     await settle();
     fake.advanceTime(GREETING_OVER_MS);
     assert.deepEqual(pickerTexts(fake), [], "only once");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

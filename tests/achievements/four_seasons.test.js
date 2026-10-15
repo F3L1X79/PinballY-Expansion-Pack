@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { SEASON_COUNT } from "../../common/achievements/surprises.js";
 import { startSurprisesScenario, showsMissing, showsUnlocked, profileFile, PROFILES, SHORT_GAME_MS } from "./surprises_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const SCENARIO_URL = new URL("./surprises_scenario.js", import.meta.url).href;
 const KEPT_FILES = [`${PROFILES}\\cabinet.json`, profileFile("guest")];
@@ -61,5 +62,5 @@ test("a Play in each of the four seasons unlocks Four Seasons, even across a res
     waitUntil(2029, 2, 1, 10, 0);
     assert.ok((await play()).includes(secret.title), "the fourth season after the reset");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

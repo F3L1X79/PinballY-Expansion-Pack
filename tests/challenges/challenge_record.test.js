@@ -14,6 +14,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, section, press } from "../stats/profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 23 September 2026: its week is keyed "2026-09-21".
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -136,5 +137,5 @@ test("completed Challenges unlock the Challenges Achievements", async () => {
     ]);
     assert.deepEqual(challengesShown(), ["0/0"]);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

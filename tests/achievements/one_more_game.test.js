@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { ONE_MORE_GAME_PLAYS } from "../../common/achievements/surprises.js";
 import { startSurprisesScenario, showsMissing, showsUnlocked, profileFile, PROFILES, SHORT_GAME_MS, PERIOD_TABLE } from "./surprises_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const SCENARIO_URL = new URL("./surprises_scenario.js", import.meta.url).href;
 const KEPT_FILES = [`${PROFILES}\\cabinet.json`, profileFile("guest"), profileFile("Alice"), profileFile("Bob")];
@@ -81,5 +82,5 @@ test("5 Plays in a row on the same table unlock One More Game!, even across a re
     assert.ok(!(await playsUnlock(4)), "4 Plays after the reset");
     assert.ok(await playsUnlock(1), "the 5th Play after the reset");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

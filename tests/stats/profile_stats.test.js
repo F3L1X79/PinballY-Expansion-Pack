@@ -13,6 +13,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 import {
     press, isProfileStatsOpen, profileStatsLayerCount, openProfileStats, cardTexts, cardImages, buttons, section,
     highlighted, readChoices, choose,
@@ -113,5 +114,5 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
     fake.fire("attractmodestart");
     assert.equal(isProfileStatsOpen(fake), false, "attract mode closes them");
     assert.equal(press(fake, "Next").defaultPrevented, false);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

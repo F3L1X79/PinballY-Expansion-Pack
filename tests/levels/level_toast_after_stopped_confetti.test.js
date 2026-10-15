@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { settle } from "../support/fake_pinbally_host.js";
 import { startScenario, playLastTable, advanceUntil, showerStartLogs, levelToastCount } from "../celebrations/confetti_shower_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Drawing the confetti and the Fireworks ahead, and the startup toasts.
 const STARTUP_MS = 30000;
@@ -28,5 +29,5 @@ test("a shower vanishing on attract mode releases the Level Toast at once", asyn
     fake.enterAttractMode();
     await settle();
     assert.equal(levelToastCount(fake), 1, "the Level Toast shows as the shower vanishes");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

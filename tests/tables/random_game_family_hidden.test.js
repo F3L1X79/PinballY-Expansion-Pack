@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { readRows } from "../achievements/achievement_list_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLE = {
     id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", manufacturer: "Williams",
@@ -37,5 +38,5 @@ test("no Random Game Achievement when neither the main menu commands nor the sta
     assert.ok(titles.length > 0, "the Achievements are shown");
     const randomGameTitles = Object.values(lang.achievements.randomGamesTitles);
     assert.deepEqual(titles.filter(title => randomGameTitles.includes(title)), []);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

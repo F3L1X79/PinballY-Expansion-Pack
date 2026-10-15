@@ -8,6 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const CARD_Z_INDEX = 4500;
 const TABLES = [
@@ -30,5 +31,5 @@ test("with the Profile picker off, the Challenge Card sits in the top right corn
     assert.ok(cards[0].alpha > 0, "the Challenge Card is shown to Guest");
     assert.deepEqual(cards[0].position(), { x: 0, y: 0, align: "top right" });
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

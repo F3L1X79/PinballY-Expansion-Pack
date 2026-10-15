@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { openProfileStats, section, press } from "./profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Thursday 8 October 2026, in the morning.
 const NOW = new Date(2026, 9, 8, 10, 0, 0);
@@ -73,5 +74,5 @@ test("the Profile Stats show the Daily Streak first in the streak row, its longe
     getProfileStore().switchTo("Carol");
     await settle();
     assert.deepEqual(streakRow()[TEXT.stats.cabinetStreak], ["0", TEXT.record(3)], "broken, its longest across New Year's Eve");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

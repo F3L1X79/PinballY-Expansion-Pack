@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { startLostRecords, recordBoard } from "./lost_records_scenario.js";
 import { welcomeScreenLayout } from "./welcome_screen_reader.js";
 import { board, MEDIEVAL, FACTORY } from "../high_scores/high_scores_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const BOB_RECORD = board(["BOB", "70000000"], ["ALI", "60000000"], ["SLL", "52000000"], ["BRE", "40000000"], ["LFS", "30000000"]);
 const ALICE_BACK = board(["ALI", "80000000"], ["BOB", "70000000"], ["ALI", "60000000"], ["SLL", "52000000"], ["BRE", "40000000"]);
@@ -35,5 +36,5 @@ test("a Table Record taken back before the Welcome Screen leaves no line", async
     await arrive("Alice");
     assert.equal(line(), null, "Alice holds the Table Record again");
     assert.deepEqual(welcomeScreenLayout(fake), layoutWithoutLostRecord, "laid out as before Bob took it");
-    assert.deepEqual(fake.logLines().filter(text => text.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

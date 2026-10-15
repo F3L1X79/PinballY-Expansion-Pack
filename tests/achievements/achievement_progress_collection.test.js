@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { settle } from "../support/fake_pinbally_host.js";
 import { startScenario, table, PROFILES_FOLDER } from "./achievement_progress_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLES = Array.from({ length: 10 }, (_, index) => table(index + 1, `Table ${index + 1}`, "Williams", 1990));
 const [FIRST, SECOND] = TABLES;
@@ -69,5 +70,5 @@ test("collection milestones show the tables played, play time the hours rounded 
     assert.deepEqual(readShown([...collection.slice(0, 2), playTime[0]]),
         [missingRow(collection[0]), missingRow(collection[1]), missingRow(playTime[0])]);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

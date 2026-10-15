@@ -9,6 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, table, PROFILES_FOLDER } from "./achievement_progress_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const MEDIEVAL = table(1, "Medieval Madness", "Williams", 1997);
 
@@ -49,5 +50,5 @@ test("marathons show whole minutes, Random Games and Day's Manufacturers their c
     await play(MEDIEVAL, 30 * 60);
     assert.deepEqual(readShown([halfHour, fullHour]), [unlockedRow(halfHour), missingRow(fullHour, "minutes", 30, 60)]);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -14,6 +14,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import config from "../../common/core/config.js";
 import { readRows } from "../achievements/achievement_list_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SECONDS_PER_HOUR = 3600;
@@ -132,5 +133,5 @@ test("each Profile unlocks and is announced its own Achievements", async () => {
 
     // No Notified flag is left in PinballY's settings.
     assert.deepEqual([...fake.writtenSettingsKeys()].filter(key => key.startsWith("custom.achievements.")), []);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

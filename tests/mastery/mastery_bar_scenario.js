@@ -142,7 +142,7 @@ export const ONE_TOAST_MS = 6000;
 // Long enough for every toast of a Play, shown five at a time.
 export const ALL_TOASTS_MS = 3 * ONE_TOAST_MS;
 
-export const errorLines = fake => fake.logLines().filter(line => line.includes("ERROR"));
+export { errorLines } from "../support/error_log.js";
 
 // How long the bar stays lit after a Play that moved it.
 export const LIT_MS = 1200;

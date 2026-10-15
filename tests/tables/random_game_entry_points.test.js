@@ -14,6 +14,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
 import { getRandomGame } from "../../common/tables/random_game.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const MENU_LAUNCH_COUNT = 50;
@@ -75,5 +76,5 @@ test("the Welcome Screen and the main menu never launch the Last Played Table, a
     const lastPlayedBefore = [LAST_PLAYED_CONFIG_ID, ...launchedConfigIds];
     launchedConfigIds.forEach((configId, i) => assert.notEqual(configId, lastPlayedBefore[i], `launch ${i}`));
     assert.equal(getRandomGame().getRandomGamesPlayed(), 1 + MENU_LAUNCH_COUNT);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

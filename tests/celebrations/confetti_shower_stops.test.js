@@ -7,6 +7,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { assertNoErrorLogged } from "../support/error_log.js";
 import {
     startScenario, playLastTable, advanceUntil, visibleConfettiCount, showerStartLogs, TABLES,
 } from "./confetti_shower_scenario.js";
@@ -47,5 +48,5 @@ test("the Confetti Shower vanishes at once on attract mode, a table launch and a
     fake.advanceTime(SHOWER_MS);
     assert.equal(visibleConfettiCount(fake), 0, "nothing falls again while the game runs");
     assert.equal(showerStartLogs(fake).length, 3);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

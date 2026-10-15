@@ -10,6 +10,7 @@
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen, collectionCard } from "./welcome_screen_reader.js";
+import { errorLines } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The Play seconds that reach each Mastery Level, from level 1.
@@ -49,6 +50,6 @@ export async function openCollectionCard({ tables, levels, profile = {}, languag
         card: collectionCard(fake),
         TEXT: lang.tableMastery.collection,
         LEVEL_NAMES: lang.tableMastery.levelNames,
-        errors: fake.logLines().filter(line => line.includes("ERROR")),
+        errors: errorLines(fake),
     };
 }

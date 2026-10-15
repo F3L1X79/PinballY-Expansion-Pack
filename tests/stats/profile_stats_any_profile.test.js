@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { openProfileStats, playerLevel, press } from "./profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const HOUR = 3600;
@@ -82,5 +83,5 @@ test("a Child Profile's values read while an adult is active are its own, and no
     assert.equal(fake.readFile(`${PROFILES}\\Kid\\profile.json`), kidFile, "its profile.json untouched");
     assert.equal(profileStore.getActiveProfile().name, "Alice", "the active Profile untouched");
     assert.deepEqual(readProfileStats().plays, { count: 0, seconds: 0 }, "the active Profile by default");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

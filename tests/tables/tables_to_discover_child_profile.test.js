@@ -7,6 +7,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 6, 20, 0, 0);
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -33,5 +34,5 @@ test("a Child Profile's Tables to Discover leave out the Adult Tables", async ()
 
     fake.selectFilter(TABLES_TO_DISCOVER_FULL_FILTER_ID);
     assert.deepEqual(fake.getWheelTables().map(game => game.title), ["Attack from Mars", "Medieval Madness"]);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

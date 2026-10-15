@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, greeting, dailyStreakLine } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 7 October 2026, in the morning.
 const NOW = new Date(2026, 9, 7, 10, 0, 0);
@@ -82,5 +83,5 @@ test("the Welcome Screen shows the active Profile's Daily Streak from 2 days on"
     await switchTo("Alice");
     assert.equal(TEXT.playedToday, "days in a row on the cabinet");
     assert.equal(dailyStreakLine(fake), `3 ${TEXT.playedToday}`, "today counts once played");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

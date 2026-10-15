@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, playLastTable, showerStartLogs, levelToastCount, msFromShowerToLevelToast } from "../celebrations/confetti_shower_scenario.js";
 import { fireworksStartLogs } from "../celebrations/fireworks_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Drawing the confetti and the Fireworks ahead, and the startup toasts.
 const STARTUP_MS = 30000;
@@ -30,5 +31,5 @@ test("a Play bringing Platinums and a new level shows the Level Toast and the Fi
         `the Level Toast starts a second before the shower's end, not ${fromShowerMs} ms after its start`);
     assert.equal(fireworksStartLogs(fake).length, 1, "the Fireworks start with the Level Toast");
     assert.equal(showerStartLogs(fake).length, 1);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

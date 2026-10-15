@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen, periodCards, collectionCard, readChoices } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("with no table at all, the Welcome Screen opens with no Period Table card", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables: [] });
@@ -29,5 +30,5 @@ test("with no table at all, the Welcome Screen opens with no Period Table card",
     const COLLECTION = lang.tableMastery.collection;
     assert.deepEqual(collectionCard(fake), { goal: COLLECTION.goal(10, lang.tableMastery.levelNames[0]), current: COLLECTION.current(0, 10), tier: 0 });
     assert.deepEqual(readChoices(fake), [lang.profiles.menuEntry, TEXT.closeTooltip, TEXT.randomTable, TEXT.stayOnWheel]);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

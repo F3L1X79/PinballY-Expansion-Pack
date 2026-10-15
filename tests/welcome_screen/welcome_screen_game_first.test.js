@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, isWelcomeScreenOpen } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLES = [{ id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness" }];
 
@@ -32,5 +33,5 @@ test("a game started during the startup pause drops the Welcome Screen", async (
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), false);
     assert.equal(getWheelDialogs().isIdle(), true, "the queue is free");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, dailyStreakLine } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 7 October 2026, in the evening.
 const NOW = new Date(2026, 9, 7, 20, 0, 0);
@@ -58,5 +59,5 @@ test("a Profile Reset brings the Daily Streak back to 0", async () => {
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.equal(dailyStreakLine(fake), null, "her Play Log was set aside");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -10,6 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, showsMissing, showsUnlocked, SHORT_GAME_MS } from "./surprises_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("only a Play started from 22:00 to 05:59 under a full moon unlocks Full Moon Night, never for a Child Profile", async () => {
     // Sunday 25 October 2026; the moon is full on the night of 25 to 26 October.
@@ -59,5 +60,5 @@ test("only a Play started from 22:00 to 05:59 under a full moon unlocks Full Moo
     assert.ok(!(await play()).includes(secret.title), "never for a Child Profile");
     assert.ok(!listRows().some(row => row.description === secret.hint || row.title === secret.title));
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

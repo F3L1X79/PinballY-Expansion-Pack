@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { errorLines } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 1, 20, 15, 30);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -83,7 +84,7 @@ test("Every Profile resets them all, and a failing one does not stop the others"
     assert.deepEqual(shownMessage(), {
         titles: [TEXT.everyFailed(3, ["Bob"]), "", TEXT.ok], selected: [TEXT.ok], dialogStyle: true,
     }, "the message gives the count reset and names the failed Profile");
-    const errors = fake.logLines().filter(line => line.includes("ERROR"));
+    const errors = errorLines(fake);
     assert.equal(errors.length, 1);
     assert.match(errors[0], /^\[ProfileReset\] .*Permission denied: .*\\Bob\\/s, "the failure is logged");
     for (const name of ["guest", "Alice", "Carol"]) {
@@ -106,5 +107,5 @@ test("Every Profile resets them all, and a failing one does not stop the others"
     }, "when all succeed, the message gives the count reset");
     assert.equal(JSON.parse(fake.readFile(profileFile("Bob"))).randomGames, 0);
     assert.equal(JSON.parse(fake.readFile(profileFile("Bob"))).isChild, true, "Bob keeps his Child mark");
-    assert.equal(fake.logLines().filter(line => line.includes("ERROR")).length, 1, "no new failure");
+    assert.equal(errorLines(fake).length, 1, "no new failure");
 });

@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startScenario, table, PROFILES_FOLDER } from "./achievement_progress_scenario.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const MEDIEVAL = table(1, "Medieval Madness", "Williams", 1997);
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -52,5 +53,5 @@ test("Daily Streak Achievements show the current Daily Streak and stay Unlocked 
         missingRow(titles[3], "daysInARow", 0, 30),
     ]);
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

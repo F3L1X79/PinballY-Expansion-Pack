@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLE = { id: 1, configId: "Medieval Madness", title: "Medieval Madness", manufacturer: "Williams", year: 1997 };
 
@@ -27,5 +28,5 @@ test("on a single screen the backglass window is hidden at startup and after a g
 
     assert.ok(fake.backglassShowCalls().length > 1, "hidden again after the game");
     assert.ok(fake.backglassShowCalls().every(visible => visible === false), "never shown");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

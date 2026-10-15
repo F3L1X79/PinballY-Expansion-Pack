@@ -11,6 +11,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, highlightedCard } from "./welcome_screen_reader.js";
 import { isProfileStatsOpen, openProfileStats, highlighted } from "../stats/profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
@@ -47,5 +48,5 @@ test("the plunger runs the highlighted choice of the Welcome Screen and of the P
     for (let guard = 0; guard < 10 && highlighted(fake) !== achievements; guard++) press(fake, "Next");
     press(fake, "Launch");
     assert.equal(isProfileStatsOpen(fake), false, "the Profile Stats give way to the Achievement List");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

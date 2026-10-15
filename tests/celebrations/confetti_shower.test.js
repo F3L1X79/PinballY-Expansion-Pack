@@ -11,6 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import { ACHIEVEMENT_TOAST_Z_INDEX } from "../../common/achievements/achievement_toast.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 import {
     startScenario, playLastTable, advanceUntil, confettiLayers, visibleConfettiCount, showerStartLogs,
 } from "./confetti_shower_scenario.js";
@@ -54,6 +55,6 @@ test("a Platinum Achievement's toast brings a single Confetti Shower, gone after
     assert.ok(toastDrawings(fake).length - startupToastCount >= 3, "the three Platinum toasts showed");
     assert.equal(showerStartLogs(fake).length, 1, "one shower for several Platinum toasts");
     assert.deepEqual(fake.soundsPlayed(), [], "no sound with an empty CONFETTI_SOUND_FILE");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), [],
+    assertNoErrorLogged(fake,
         "no error, so no draw on the backglass, which the fake host does not offer");
 });

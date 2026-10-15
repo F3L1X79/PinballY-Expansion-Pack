@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
@@ -40,5 +41,5 @@ test("the Challenge Tables filter puts the Challenge's tables on the wheel", asy
     await settle();
 
     assert.deepEqual(fake.getWheelTables().map(game => game.title), ["Medieval Madness", "Attack from Mars"]);
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

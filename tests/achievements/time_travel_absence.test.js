@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, table } from "./surprises_scenario.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("Time Travel is absent when the visible tables cover fewer than three decades", async () => {
     const { fake, TEXT, listRows, switchTo } = await startSurprisesScenario({
@@ -30,5 +31,5 @@ test("Time Travel is absent when the visible tables cover fewer than three decad
     await switchTo("Alice");
     assert.ok(showsTimeTravel(), "Alice sees the Adult Table");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { ACHIEVEMENT_FAMILY } from "../../common/achievements/achievements.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("no Sessions Achievement without the session stats tracker Add-on", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 9, 8, 10, 0, 0) });
@@ -25,5 +26,5 @@ test("no Sessions Achievement without the session stats tracker Add-on", async (
     assert.deepEqual(achievements.filter(({ family }) => family === ACHIEVEMENT_FAMILY.SESSIONS).map(({ id }) => id), []);
     // The other families are still there.
     assert.ok(achievements.some(({ id }) => id === "tableOfTheDayStreak:3"));
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, periodCards, choose } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const CABINET = `${PROFILES}\\cabinet.json`;
@@ -65,5 +66,5 @@ test("in French, the Welcome Screen says a Period Table was played, cuts a long 
     await settle();
     assert.deepEqual(fake.launches().map(game => game.configId), [MARS.configId]);
     assert.deepEqual(JSON.parse(fake.readFile(CABINET)).tableOfTheWeek, { configId: MARS.configId, period: "2026-09-21" });
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

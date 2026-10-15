@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, highlighted } from "./welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const GLIDE_OVER_MS = 500;
@@ -42,5 +43,5 @@ test("the Welcome Screen highlights Change Player at startup and Close after a c
     await settle();
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.equal(highlighted(fake).tooltip, lang.welcomeScreen.closeTooltip, "Close after a change of player");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { isDrawnMenuShown, press, chooseEntry, openMainMenu } from "../drawn_menu/drawn_menu_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const PICKER_Z = 6500;
@@ -55,5 +56,5 @@ test("the startup greeting waits for the Achievement List opened from the main D
     await settle();
     fake.advanceTime(PAUSE_OVER_MS);
     assert.ok(pickerTexts(fake).includes(greeting), "greets back on the wheel");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

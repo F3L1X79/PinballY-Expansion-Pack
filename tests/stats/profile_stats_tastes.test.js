@@ -17,6 +17,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { openProfileStats, section, sectionImages, press } from "./profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const MISSING_IMAGE = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\missing_image.png";
@@ -114,5 +115,5 @@ test("the TASTES section shows the favourites and the first, favourite and last 
     });
     assert.deepEqual(sectionImages(fake, "GOÛTS"), [MEDIEVAL_LOGO, MISSING_IMAGE, MEDIEVAL_LOGO],
         "the first and last tables' wheel logo, the missing image for the favourite table without a logo");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

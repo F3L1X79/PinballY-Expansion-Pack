@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
@@ -62,5 +63,5 @@ test("a launched Period Table becomes the table selected on the wheel", async ()
     assert.equal(fake.launches()[2].title, "Theatre of Magic");
     assert.equal(fake.currentFilterId(), "All", "a filter that leaves it out gives way to all tables");
     assert.equal(current(), "Theatre of Magic");
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

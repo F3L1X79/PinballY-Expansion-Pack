@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { openProfileStats, playerLevel, press } from "./profile_stats_reader.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 
@@ -67,5 +68,5 @@ test("the card shows the Player Level and the points toward the next one", async
     getProfileStore().resetProfile("Carol");
     assert.deepEqual(levelOf("Carol"), { level: "1", current: "Actuel : 0 / 50" }, "a Profile Reset starts over");
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });

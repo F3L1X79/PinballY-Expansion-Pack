@@ -8,6 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
+import { errorLines } from "../support/error_log.js";
 import {
     startScenario, playTable, advanceUntil, visibleConfettiCount, showerStartLogs,
     PLAYED_TABLE, ALL_TOASTS_MS, challengeTitle,
@@ -36,7 +37,7 @@ test("Guest's completed Challenge brings the confetti with its Challenge Toast, 
     assert.ok(confettiMs >= toastMs && confettiMs - toastMs <= SAME_MOMENT_MS, `the confetti start with the Challenge Toast (${toastMs} ms, ${confettiMs} ms)`);
     assert.equal(showerStartLogs(fake).length, 1);
 
-    const errors = fake.logLines().filter(line => line.includes("ERROR"));
+    const errors = errorLines(fake);
     assert.equal(errors.length, 1, "the missing sound is logged once");
     assert.match(errors[0], /\[ConfettiShower\].*missing\.wav/);
 });

@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startSurprisesScenario, showsMissing, showsUnlocked, SHORT_GAME_MS } from "./surprises_scenario.js";
 import { showerStartLogs } from "../celebrations/confetti_shower_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 test("only a Play started on a Friday the 13th unlocks Friday the 13th, with a Confetti Shower", async () => {
     // Monday 1 June 2026.
@@ -33,5 +34,5 @@ test("only a Play started on a Friday the 13th unlocks Friday the 13th, with a C
     assert.equal(showerStartLogs(fake).length, 1, "a Platinum's Confetti Shower");
     assert.ok(showsUnlocked(listRows(), secret));
 
-    assert.deepEqual(fake.logLines().filter(line => line.includes("ERROR")), []);
+    assertNoErrorLogged(fake);
 });
