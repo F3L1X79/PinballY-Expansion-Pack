@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { readCompoundFile } from "../../common/high_scores/compound_file_reader.js";
-import { readSectionBoard } from "../../common/high_scores/romless_board_reader.js";
+import { readSectionBoard, readTextBoard } from "../../common/high_scores/romless_board_reader.js";
 
 const CABINET_VPREG = new URL("../../docs/research/high-scores-tools/user_folder/VPReg.stg", import.meta.url);
 const sections = readCompoundFile(new Uint8Array(readFileSync(CABINET_VPREG)));
@@ -87,4 +87,38 @@ test("a lone score that is empty is not a board", () => {
 
 test("a lone score is read when the HighScoreN family is all empty", () => {
     assert.deepEqual(readSectionBoard({ HighScore1: "", HighScore1Name: "", HighScore: "5000" }), [{ rank: 1, initials: "", score: 5000 }]);
+});
+
+const cabinetText = name => readFileSync(new URL(`../../docs/research/high-scores-tools/user_folder/${name}`, import.meta.url), "utf8");
+
+test("Le Grand Schtroumpf's text file gives its five places, after its settings lines", () => {
+    assert.deepEqual(readTextBoard(cabinetText("papasmurf.txt")), [
+        { rank: 1, initials: "AAA", score: 45510 },
+        { rank: 2, initials: "ZZZ", score: 44000 },
+        { rank: 3, initials: "XXX", score: 43000 },
+        { rank: 4, initials: "ABC", score: 42000 },
+        { rank: 5, initials: "BBB", score: 41000 },
+    ]);
+});
+
+test("La Schtroumpfette's text file gives its five places", () => {
+    assert.deepEqual(readTextBoard(cabinetText("smurfette.txt")).map(place => [place.initials, place.score]), [
+        ["AAA", 145510], ["ZZZ", 144000], ["XXX", 143000], ["ABC", 142000], ["BBB", 141000],
+    ]);
+});
+
+test("CRLF lines read the same, and places are ordered by score", () => {
+    assert.deepEqual(readTextBoard("0\r\n300\r\n500\r\n400\r\n200\r\n100\r\nAAA\r\nBBB\r\nCCC\r\nDDD\r\nEEE\r\n").map(place => [place.rank, place.initials, place.score]), [
+        [1, "BBB", 500], [2, "CCC", 400], [3, "AAA", 300], [4, "DDD", 200], [5, "EEE", 100],
+    ]);
+});
+
+test("the LUT files and TAF_L7.txt are not boards", () => {
+    for (const name of ["BATMANDELUT.txt", "BigBuckLUT.txt", "CongoLUT.txt", "TimeLordLUT.txt", "XFilesLUT.txt", "SLUT_bttf_a27.txt", "TAF_L7.txt", "user.txt"]) {
+        assert.equal(readTextBoard(cabinetText(name)), null, name);
+    }
+});
+
+test("an empty initials line reads as empty initials", () => {
+    assert.deepEqual(readTextBoard("0\n500\n400\n300\n200\n100\nAAA\n\nCCC\nDDD\nEEE\n").map(place => place.initials), ["AAA", "", "CCC", "DDD", "EEE"]);
 });

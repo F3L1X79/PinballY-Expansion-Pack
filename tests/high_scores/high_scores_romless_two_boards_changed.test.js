@@ -18,7 +18,7 @@ test("two board sections changed teach nothing; a later Play changing one learns
     await play(ZELDA, { afterVpreg: { ...burnerChanged, ZELDA: zeldaAfter } });
 
     assert.deepEqual(log(), [
-        `[HighScores] "${ZELDA}": no board after the game, and 2 VPReg.stg boards changed (burner, ZELDA); nothing learned, nothing credited.`,
+        `[HighScores] "${ZELDA}": no board after the game, and 2 boards changed (burner, ZELDA); nothing learned, nothing credited.`,
     ]);
     assert.equal(saved(), undefined, "nothing learned, no board recorded");
     assert.deepEqual(toasts().filter(text => text.includes("HIGH SCORE")), []);

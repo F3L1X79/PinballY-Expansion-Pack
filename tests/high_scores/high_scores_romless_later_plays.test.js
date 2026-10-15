@@ -31,9 +31,9 @@ test("a learned table keeps its section through a killed VPX and credits a later
     await play(ZELDA, { afterVpreg: { ...otherChanged, ZELDA: vpregBoard(["BOB", 3000000], ["AAA", 2800000], ["FEF", 2750000], ["BBB", 2700000]) } });
 
     assert.deepEqual(log().slice(logged), [
-        `[HighScores] "${ZELDA}": board read from VPReg.stg section "ZELDA" (VPReg.stg read in 0 ms before the game, 0 ms after).`,
+        `[HighScores] "${ZELDA}": board read from VPReg.stg section "ZELDA" (User folder read in 0 ms before the game, 0 ms after).`,
         `[HighScores] "${ZELDA}": Play by Alice, no new place.`,
-        `[HighScores] "${ZELDA}": board read from VPReg.stg section "ZELDA" (VPReg.stg read in 0 ms before the game, 0 ms after).`,
+        `[HighScores] "${ZELDA}": board read from VPReg.stg section "ZELDA" (User folder read in 0 ms before the game, 0 ms after).`,
         `[HighScores] "${ZELDA}": High Score for Bob: place 1, 3000000 (BOB), Table Record.`,
     ]);
     assert.deepEqual(saved().learnedSources, { [ZELDA]: { kind: "vpreg", section: "ZELDA" } });

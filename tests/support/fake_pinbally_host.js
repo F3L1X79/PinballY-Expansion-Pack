@@ -172,6 +172,8 @@ export function createFakePinballYHost({
     const lockedFiles = new Set();
     // Image files that exist but cannot be decoded (broken or half-written).
     const unreadableImages = new Set();
+    // Files deleted by another program between a folder listing and their read.
+    const vanishingFiles = new Set();
     // Every write, rename and delete, in order: { operation, path, to? }.
     const fileOperationList = [];
     // Every file read, in order, by path.
@@ -594,6 +596,10 @@ export function createFakePinballYHost({
         },
         // A file seeded with bytes (a Uint8Array), as a copy; a text file as its UTF-8 bytes.
         readBytes(path) {
+            if (vanishingFiles.delete(path)) {
+                files.delete(path);
+                modifiedDates.delete(path);
+            }
             requireFile(path);
             fileReadList.push(path);
             const content = files.get(path);
@@ -1019,6 +1025,8 @@ export function createFakePinballYHost({
         // Locks a file as another program holding it open would.
         lockFile(filePath) { lockedFiles.add(filePath); },
         unlockFile(filePath) { lockedFiles.delete(filePath); },
+        // The file is listed in its folder, but gone by the time readBytes reads it.
+        vanishBeforeRead(filePath) { vanishingFiles.add(filePath); },
         addFolder,
         // Removes the folder with everything in it, as a player would by hand.
         removeFolder(folderPath) {

@@ -33,7 +33,7 @@ test("the PINemHi board wins on a ROM table; without one, its learned section is
     assert.deepEqual(log().filter(line => !line.includes("the high scores read failed")), [
         `[HighScores] "${MEDIEVAL}": first board read, 5 places, all Default Scores.`,
         `[HighScores] "${MEDIEVAL}": High Score for Alice: place 2, 45000000 (ALI).`,
-        `[HighScores] "${AFM}": board read from VPReg.stg section "afm" (VPReg.stg read in 0 ms before the game, 0 ms after).`,
+        `[HighScores] "${AFM}": board read from VPReg.stg section "afm" (User folder read in 0 ms before the game, 0 ms after).`,
         `[HighScores] "${AFM}": first board read, 2 places, all Default Scores.`,
         `[HighScores] "${AFM}": High Score for Alice: place 2, 8500000 (ALI).`,
     ]);

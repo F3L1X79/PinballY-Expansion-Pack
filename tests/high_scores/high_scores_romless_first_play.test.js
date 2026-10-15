@@ -46,7 +46,7 @@ test("the first Play on an original table learns its section and credits the new
         learnedSources: { [ZELDA]: { kind: "vpreg", section: "ZELDA" } },
     });
     assert.deepEqual(log(), [
-        `[HighScores] "${ZELDA}": VPReg.stg section "ZELDA" learned (VPReg.stg read in 0 ms before the game, 0 ms after).`,
+        `[HighScores] "${ZELDA}": VPReg.stg section "ZELDA" learned (User folder read in 0 ms before the game, 0 ms after).`,
         `[HighScores] "${ZELDA}": first board read, 4 places, all Default Scores.`,
         `[HighScores] "${ZELDA}": High Score for Alice: place 2, 2750000 (FEF).`,
     ]);

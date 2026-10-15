@@ -1,13 +1,17 @@
 // ============================================================
 // ROM-less board reader: turns the values of a table's VPReg.stg section
-// (from the compound file reader) into the same board of places the
+// (from the compound file reader), or the text of a "5 scores + 5
+// initials" file of VPX's User folder, into the same board of places the
 // board reader gives for PINemHi: { rank, initials, score }, ordered by
 // score whatever slot the table stored them in, and renumbered. Reads the
 // HighScoreN / HighScoreNName family, of any length; when it gives no
 // place, a lone HighScore or HiScore makes a one-place board with empty
 // initials. Other families (WaffleScore..., SpecialHighScore...) are
 // feats or second boards, left out; a section without any score is not a
-// board. Pure: reads no PinballY global, writes nothing.
+// board. A text file's board is a block of five whole numbers followed by
+// five initials lines, after any leading settings lines; a file without
+// one (a LUT file) is not a board. Pure: reads no PinballY global, writes
+// nothing.
 // The rules follow vpin-studio's VPReg parsing (MIT, (c) Matthias Faust /
 // syd711, github.com/syd711/vpin-studio), limited to the families found
 // on the cabinet.
@@ -46,4 +50,27 @@ export function readSectionBoard(values) {
     // Such a table keeps no initials (Whoa Nellie's Initial1...3 are digits).
     const lone = LONE_SCORE_NAMES.find(name => scoreOf(values[name]) !== null);
     return lone === undefined ? null : [{ rank: 1, initials: "", score: scoreOf(values[lone]) }];
+}
+
+const TEXT_PLACES = 5;
+const WHOLE_NUMBER = /^\d+$/;
+
+// The text file's board of places, or null when it holds no block of
+// five scores followed by five initials (CRLF or LF lines).
+export function readTextBoard(text) {
+    const lines = String(text).split(/\r?\n/).map(line => line.trim());
+    const isScore = line => WHOLE_NUMBER.test(line);
+    // An initials line is never a whole number, so a settings line just
+    // before the scores is not taken for one of them; an empty one reads
+    // as empty initials.
+    const isInitials = line => !isScore(line);
+    for (let start = 0; start + 2 * TEXT_PLACES <= lines.length; start++) {
+        const scores = lines.slice(start, start + TEXT_PLACES);
+        const initials = lines.slice(start + TEXT_PLACES, start + 2 * TEXT_PLACES);
+        if (scores.every(isScore) && initials.every(isInitials)) {
+            const places = toPlaces(scores.map((score, index) => ({ slot: index + 1, initials: initialsOf(initials[index]), score: scoreOf(score) })));
+            return places.length > 0 ? places : null;
+        }
+    }
+    return null;
 }

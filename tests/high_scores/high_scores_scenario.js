@@ -1,8 +1,8 @@
 // ============================================================
 // High Scores tests' scenario: main.js on the fake PinballY globals, with
 // the chosen Add-ons and Profiles. Sets what PINemHi reads in each
-// table's NVRAM, and the VPReg.stg of VPX's User folder, before and
-// after a Play, plays a table as PinballY
+// table's NVRAM, and the VPReg.stg and text files of VPX's User folder,
+// before and after a Play, plays a table as PinballY
 // launches it (the reads after "postlaunch" included), switches the
 // active Profile, resets a Profile, and reads back the High Scores file,
 // the toasts drawn, the Achievements Notified and shown in the Achievement
@@ -42,6 +42,18 @@ export const VPREG_PATH = "C:\\vPinball\\VisualPinball\\User\\VPReg.stg";
 // An original table, with no ROM.
 export const ZELDA = "Zelda (Original 2023)";
 export const ZELDA_TABLE = { id: 3, configId: ZELDA, title: "Zelda", manufacturer: "Original", year: 2023, isHidden: false, system: VPX_SYSTEM };
+
+// The User folder's "5 scores + 5 initials" text files, by name.
+export const USER_FOLDER = "C:\\vPinball\\VisualPinball\\User";
+export const userFileOf = name => `${USER_FOLDER}\\${name}`;
+// Smurf tables, with no ROM, keeping their board in a text file.
+export const PAPASMURF = "Le Grand Schtroumpf (Original 2022)";
+export const PAPASMURF_TABLE = { id: 4, configId: PAPASMURF, title: "Le Grand Schtroumpf", manufacturer: "Original", year: 2022, isHidden: false, system: VPX_SYSTEM };
+export const SMURFETTE = "La Schtroumpfette (Original 2022)";
+export const SMURFETTE_TABLE = { id: 5, configId: SMURFETTE, title: "La Schtroumpfette", manufacturer: "Original", year: 2022, isHidden: false, system: VPX_SYSTEM };
+// A text file's lines as the Smurf tables write them: leading settings
+// lines, five scores, five initials; each entry is [initials, score].
+export const textBoard = (settings, ...entries) => [...settings, ...entries.map(entry => String(entry[1])), ...entries.map(entry => entry[0]), ""].join("\n");
 
 // A VPReg.stg section of the HighScoreN family; each entry is [initials, score].
 export const vpregBoard = (...entries) => Object.fromEntries(entries.flatMap(([initials, score], index) => [
@@ -160,12 +172,17 @@ export async function startHighScores({
         // The sections VPX's VPReg.stg holds from now on ({ section: { value: text } }).
         setVpreg: (sections) => fake.addFile(VPREG_PATH, writeCompoundFile(sections)),
         switchTo: (name) => getProfileStore().switchTo(name),
+        // The User folder's text files from now on ({ name: text }).
+        setUserFiles: (texts) => {
+            for (const [name, text] of Object.entries(texts)) fake.addFile(userFileOf(name), text);
+        },
         // Plays the table as PinballY launches it; VPinMAME saves the board
         // after (raw lines) as the game ends, read as afterRead says
         // (setBoard's options), and VPX saves the VPReg.stg sections
-        // afterVpreg; backOnWheel() runs right after "postlaunch",
+        // afterVpreg and the User folder's text files afterUserFiles
+        // ({ name: text }); backOnWheel() runs right after "postlaunch",
         // before the reads after the game.
-        play: async (configId, { after, afterRead, afterVpreg, durationMs = GAME_MS, backOnWheel = () => {} } = {}) => {
+        play: async (configId, { after, afterRead, afterVpreg, afterUserFiles = {}, durationMs = GAME_MS, backOnWheel = () => {} } = {}) => {
             const game = fake.getGameInfo(configId);
             fake.playGame(game);
             fake.fire("prelaunch", { game });
@@ -176,6 +193,7 @@ export async function startHighScores({
             await settle();
             if (after) fake.setNvramBoard(configId, after, afterRead);
             if (afterVpreg) fake.addFile(VPREG_PATH, writeCompoundFile(afterVpreg));
+            for (const [name, text] of Object.entries(afterUserFiles)) fake.addFile(userFileOf(name), text);
             fake.gameOver(game);
             fake.fire("postlaunch", { game });
             backOnWheel();
