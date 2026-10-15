@@ -12,7 +12,7 @@
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
-import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN } from "../drawing/steamball_drawing.js";
+import { text, oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN } from "../drawing/steamball_drawing.js";
 import { ACHIEVEMENT_RANK } from "../achievements/achievements.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER, DRAWN_MENU_PANEL_WIDTH, DRAWN_MENU_FACE_INSET, DRAWN_MENU_LIST_INSET } from "../drawn_menu/drawn_menu_images.js";
 
@@ -162,8 +162,9 @@ export function drawNote(host, dc, note, w, h) {
     oneLine(host, dc, note, { x: 0, y: 0, width: w, height: h, size: LOOK.noteSize, weight: 400, color: COLORS.dim, align: "center" });
 }
 
+// Wrapped on as many lines as it needs: a translated message can be long.
 export function drawMessage(host, dc, message, w, h) {
-    oneLine(host, dc, message, { x: 0, y: 0, width: w, height: h, size: LOOK.messageSize, weight: 400, color: COLORS.description, align: "center" });
+    text(host, dc, message, { x: 0, y: 0, width: w, height: h, size: LOOK.messageSize, weight: 400, color: COLORS.description, align: "center" });
 }
 
 // place: { rank, name, isDefaultScore, avatarPath (null: none), framePath
