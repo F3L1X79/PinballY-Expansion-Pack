@@ -227,8 +227,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>Records par Profile</strong> : grill fini le 11/10 (trois chantiers or sur la branche <code>high-scores</code>, recherches sur PINemHi, vpxtool et vpin-studio). Livrés juste avant : les Household Stats, les Drawn Menus, <code>common/</code> rangé par fonctionnalité, les retouches du Welcome Screen et la bande TASTES des Profile Stats</p>
-      <span class="next">Ensuite : <code>/prototype</code> sur la borne (journal des tableaux de chaque table), puis <code>/to-spec</code></span>
+      <p><strong>High Scores</strong> : faits sur la branche <code>high-scores</code>, les records par Profile (tables à ROM) et le tableau des meilleurs scores dessiné, qui remplace celui de PinballY. Reste le dernier des trois chantiers, les tables sans ROM ; la branche ne fusionne dans <code>main</code> qu'une fois les trois finis</p>
+      <span class="next">Ensuite : <code>/grill-with-docs</code> des <a href="#romless-high-scores">tables sans ROM (n° <span data-ref="romless-high-scores"></span>)</a></span>
     </div>
   </section>
 
@@ -253,74 +253,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="profile-records" data-track="play" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Records par Profile : qui a fait les high scores</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Tables à ROM seulement. Après une Play, relire le tableau des meilleurs scores que PinballY tire de PINemHi (<code>getHighScores()</code> / <code>highscoresready</code>) et attribuer au Profile actif tout score qui vient d'y entrer. De là, des Achievements, un toast et les High Scores et Table Records de chacun dans les Profile Stats. Première des trois parties du chantier High Scores, avec le <a href="#high-score-board">tableau dessiné (n° <span data-ref="high-score-board"></span>)</a> et les <a href="#romless-high-scores">tables sans ROM (n° <span data-ref="romless-high-scores"></span>)</a>.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : grill fini le 11/10 (recherches : <code>docs/research/high-scores.md</code>, <code>docs/research/high-scores-tools.md</code>) → <code>/prototype</code> (journal des tableaux de chaque table sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>. Avant les <a href="#profile-rivalries">rivalités (n° <span data-ref="profile-rivalries"></span>)</a></div>
-          <details>
-            <summary>Décisions (grills des 10 et 11/10/2026)</summary>
-            <ul>
-              <li>Termes du glossaire : High Score (« meilleur score », une place au tableau gagnée par une Play), Table Record (« record », le meilleur score du tableau) et Default Score (« score par défaut », déjà au tableau au premier relevé, ou d'un Profile supprimé depuis).</li>
-              <li>Le tableau des meilleurs scores suffit : une partie ordinaire ne laisse aucune trace, entrer au tableau est rare et c'est ce qui en fait la valeur.</li>
-              <li>Trois chantiers or à la suite plutôt qu'un platine : celui-ci (tables à ROM), le tableau dessiné, puis les tables sans ROM. Tous sur la branche <code>high-scores</code>, fusionnée dans <code>main</code> seulement quand les trois sont finis (exception à ce chantier : les autres restent sur <code>main</code>). La roadmap, les recherches, le glossaire et les ADR restent sur <code>main</code> ; la branche fusionne <code>main</code> à chaque reprise.</li>
-              <li>Tables à ROM : le tableau que PinballY lit déjà avec PINemHi 1.3.1. Aucun outil externe lancé par l'Add-on ; un outil externe n'entre que si aucune solution JS ne tient, avec l'accord de Félix (son besoin local prime). La règle de lecture reprend celle de vpin-studio (MIT, cité en commentaire), réécrite.</li>
-              <li>Un High Score = une place du premier groupe du tableau (Grand Champion et places numérotées), lu jusqu'à la première ligne vide après au moins 3 scores, absente du tableau avant la Play. Une ligne de champion ne compte que si son titre est dans une courte liste (<code>GRAND CHAMPION</code>…) ; les champions spéciaux (combos, châteaux) et les statistiques sont ignorés. Plus de seuil en chiffres. Le prototype valide la règle ; trop de cas douteux et on recreuse avant la spec.</li>
-              <li>Tableau « avant » : le dernier tableau connu de la table, rafraîchi au lancement et remplacé par le relevé d'après chaque Play. Relevé du lancement en échec : on compare au dernier tableau connu. Table jamais relevée : le relevé d'après la Play devient sa base, rien n'est attribué cette fois.</li>
-              <li>On ne vide jamais un tableau : la ROM remet ses scores d'usine, qui restent la barre à battre ; l'affichage les distingue.</li>
-              <li>Attribution : au Profile actif au début de la Play (au moins une minute), quelles que soient les initiales, tous les nouveaux scores d'une partie à plusieurs compris. Guest et Child Profiles comme les autres.</li>
-              <li>Les Default Scores n'appartiennent à personne, pour toujours ; pas de menu pour les attribuer à la main, jamais.</li>
-              <li>Un High Score gagné le reste, même chassé du tableau. La Profile Reset ne l'enlève pas ; seule la suppression du Profile le perd (il devient un Default Score).</li>
-              <li>Achievements, comptés par table et seulement sur les High Scores gagnés depuis la dernière Profile Reset, jamais perdus : premier High Score ; High Scores sur 3, 5 puis 10 tables ; premier Table Record ; Table Record sur 3 tables ; reprendre le Table Record d'un autre Profile (Guest compris, pas un Default Score). Noms à la spec.</li>
-              <li>Annonce : un toast comme le Mastery Toast, sa propre couleur, sans trophée, un seul par Play pour la meilleure place (« Meilleur score sur … : 2ᵉ place »), un texte à part pour un Table Record. Pas de tableau ouvert d'office.</li>
-              <li>Affichage : deux lignes dans les Profile Stats (« Meilleurs scores détenus », « Records détenus », comptées en tables encore au tableau), la ligne « Records détenus » dans les Household Stats.</li>
-              <li>Un Add-on à part, High Scores (<code>addons/high_scores.js</code>), activé par défaut ; désactivé, ses lignes et Achievements disparaissent.</li>
-              <li>Prototype : un script jetable lancé une fois sur la borne journalise, pour chaque table, sa sorte (à ROM, électromécanique, originale), la source, <code>success</code>, les lignes brutes et les places retenues par la règle, plus la version de VPX et son dossier <code>User</code>. Lu ensemble avant <code>/to-spec</code> ; il décide aussi du sort des tables sans ROM.</li>
-            </ul>
-          </details>
-          <details>
-            <summary>Faits déjà trouvés (recherches des 10 et 11/10/2026)</summary>
-            <ul>
-              <li>Une ligne de PinEMHi = un élément du tableau, une ligne vide sépare les groupes. Titres (<code>GRAND CHAMPION</code>, <code>HIGHEST SCORES</code>), places (<code>1)</code>, <code>#1</code>), champions spéciaux (<code>CASTLE CHAMPION</code> / <code>JCY - 6</code>) et statistiques sont mêlés ; initiales parfois absentes ; séparateurs <code>52.000.000</code> ou <code>6,000,000</code>.</li>
-              <li><code>getHighScores()</code> renvoie <code>.source = "pinemhi"</code> même pour un fichier <code>.pinballyHighScores</code> ; seul <code>highscoresready</code> donne la vraie source.</li>
-              <li>Le cache est vidé au lancement ; après la sortie du jeu, PinballY redemande les scores (<code>highscoresready</code>). Les lectures passent une à une, coupées après 7,5 s.</li>
-              <li>« Terminate By = Kill Process » peut empêcher l'écriture de la NVRAM ; une NVRAM corrompue fait planter PINemHi.</li>
-              <li>Aucun outil existant n'attribue un score à la personne qui jouait (tous se fient aux initiales). vpxtool ne lit pas <code>VPReg.stg</code> ; vpin-studio (Java, MIT) a les meilleures règles à reprendre. L'issue PinballY #277 est ouverte et ne couvrirait pas les tables sans ROM.</li>
-            </ul>
-            <p class="ctx">Proposé le 01/10/2026. À lancer tôt : l'auteur d'un record ne se retrouve pas après coup, chaque record battu avant reste un Default Score.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="high-score-board" data-track="play" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Tableau des meilleurs scores dessiné</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
-          </div>
-          <p>Le tableau de la table sélectionnée, dessiné en Steamball, ouvert depuis l'entrée « Meilleurs scores » du menu principal. Il remplace la fenêtre « High Scores » de PinballY, jugée laide et peu accessible.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : grillé avec les <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a> le 11/10 → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, juste après</div>
-          <details>
-            <summary>Décisions (grill du 11/10/2026)</summary>
-            <ul>
-              <li>Chaque place : rang, score, initiales tapées, et le Profile qui l'a gagnée (nom et Avatar), ou « par défaut » pour un Default Score. Le Table Record est mis en avant. Ni champions spéciaux, ni statistiques, ni High Scores chassés du tableau.</li>
-              <li>Entrée « Meilleurs scores » toujours présente dans le menu principal. Un clic relit tout de suite le tableau (une table jamais relevée prend ce relevé comme base). Lecture en échec : le tableau s'ouvre avec « Les meilleurs scores de cette table ne sont pas pris en charge », en Steamball.</li>
-              <li>Add-on actif : l'entrée « High Scores » de PinballY disparaît du menu principal, Menu Cleanup activé ou non, et la commande <code>HighScores</code> (bouton dédié) ouvre notre tableau. Le texte des scores qui défile sur le DMD de la roue reste tel quel.</li>
-            </ul>
-            <p class="ctx">Ajouté le 11/10/2026 pendant le grill des Records par Profile.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-play" id="romless-high-scores" data-track="play" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -331,7 +263,7 @@
           </div>
           <p>Lire nous-mêmes les tableaux des tables électromécaniques et originales, que PINemHi ignore : <code>VPReg.stg</code> (lecteur du format en JS, octets lus par kernel32), <code>VPReg.ini</code> quand VPX 10.8.1 sortira, et les fichiers texte des tables électromécaniques. Ces tables entrent alors dans les records par Profile et le tableau dessiné, et leur tableau peut passer à PinballY par <code>setHighScores()</code>.</p>
           <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : gardé après le prototype des <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
+          <div class="links">Flow Matt : gardé après le prototype des records par Profile (faits) → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>, sur la branche <code>high-scores</code>, en dernier. Détails : <code>docs/research/high-scores-tools.md</code></div>
           <details>
             <summary>Questions ouvertes (3)</summary>
             <ul>
@@ -355,7 +287,7 @@
           </div>
           <p>Quand un Profile bat le record d'un autre, celui-ci l'apprend à son prochain passage, dans sa Profile Greeting : « Bob t'a pris le record de Medieval Madness ». De quoi donner envie d'y retourner.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur les <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. S'appuie sur les records par Profile (faits)</div>
           <details>
             <summary>Questions ouvertes (3)</summary>
             <ul>
@@ -666,7 +598,7 @@
           </div>
           <p>Une sélection de la roue, depuis le menu principal comme le Hall of Fame, avec les tables où le Profile actif détient un High Score ou un Table Record.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les <a href="#profile-records">records par Profile (n° <span data-ref="profile-records"></span>)</a></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les records par Profile (faits)</div>
           <details>
             <summary>Questions ouvertes (2)</summary>
             <ul>
@@ -884,7 +816,6 @@
           <div class="cell">
           </div>
           <div class="cell">
-            <a class="chip tr-play" href="#profile-records"><b></b>Records par Profile</a>
             <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
           </div>
 
@@ -902,7 +833,6 @@
             <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
           </div>
           <div class="cell">
-            <a class="chip tr-play" href="#high-score-board"><b></b>Tableau des scores</a>
             <a class="chip tr-play" href="#romless-high-scores"><b></b>Tables sans ROM</a>
             <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
             <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
