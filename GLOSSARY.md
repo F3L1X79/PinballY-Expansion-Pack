@@ -20,6 +20,10 @@ _Avoid_: Steamball menu (Steamball is the palette), custom menu, popup (a popup 
 The submenu, opened by the player from the main menu, that gathers PinballY's filter groups (by era, manufacturer, category, rating, and the others the player kept), each opening PinballY's own list of filters for that group. Back or Exit goes up one level at a time: from a group to "Filter Tables" on that group, from "Filter Tables" to the main menu on its entry. The entry and the group are marked when the current filter belongs to that group. Shown as "Filtrer les tables" in French.
 _Avoid_: filter menu (each group's own list is a filter menu too), filter groups (the groups are what it lists)
 
+**Selection Marker**:
+The four gold strokes that circle slowly, without end, around the current choice of a drawn screen (Welcome Screen, Profile Stats, Household Stats, the Avatar Frame list), so the player sees at once where they are; nothing is drawn between the strokes, and it jumps straight to a new choice. Drawn Menus mark their selected entry their own way.
+_Avoid_: halo, cursor, highlight
+
 ### Wheel
 
 **Wheel Arc**:

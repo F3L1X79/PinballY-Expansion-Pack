@@ -262,14 +262,17 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>Les joueurs ne voient pas où est le curseur à l'ouverture (sur « Changer de joueur ») : le halo doré actuel (<code>selectionHalo</code>) ne suffit pas. Idée de Félix : quatre traits dorés qui tournent en carré autour de l'icône sélectionnée, comme dans certains jeux vidéo. Le même contour pourrait ensuite servir aux autres écrans Steamball.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/prototype</code> (les variantes, à juger sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Décidé au grill du 16/10/2026 (6)</summary>
             <ul>
-              <li>La règle du 09/10 écarte les animations en boucle (fatigantes pour les yeux). Proposition de Claude : les traits font un tour complet à l'ouverture et à chaque déplacement, puis se posent en équerres aux quatre coins. Ou bien une exception pour ce seul curseur ?</li>
-              <li>Coût sur la borne : un calque déplacé à chaque image, ou quelques images dessinées d'avance via <code>getDrawingAhead()</code>, comme la Mastery Bar ?</li>
-              <li>Seulement le Welcome Screen, ou toutes les sélections Steamball (Drawn Menus, Achievement List, Profile Stats) pour rester cohérent ?</li>
+              <li><strong>Selection Marker</strong> (glossaire) : quatre traits dorés qui tournent tranquillement, sans fin, autour du choix courant, rien entre les traits. Exception assumée à la règle du 09/10 sur les animations en boucle.</li>
+              <li>Remplace <code>selectionHalo</code> partout : Welcome Screen, Profile Stats, Household Stats, liste des Avatar Frames. Les Drawn Menus gardent leur bande.</li>
+              <li>Au déplacement, il saute sur le nouveau choix et reprend son tour là où il en était.</li>
+              <li>Technique : un seul petit calque redessiné à chaque tick (rectangles seulement) ; repli sur des images dessinées d'avance si la roue rame.</li>
+              <li>Lancement d'une table ou mode attract : le halo actuel reprend la place. Pendant les dessins d'avance après un appui, il continue de tourner, sauf si le prototype montre une gêne (le halo le remplace alors un court instant).</li>
+              <li>Pas de réglage pour le couper. Prototype sur le seul Welcome Screen : un tour en 3, 5 ou 8 s (réglé dans <code>config.js</code>), temps moyen d'un dessin dans <code>logfile.log</code>.</li>
             </ul>
             <p class="ctx">Retour de Félix du 16/10/2026, après des essais avec d'autres joueurs.</p>
           </details>
