@@ -21,7 +21,7 @@ The submenu, opened by the player from the main menu, that gathers PinballY's fi
 _Avoid_: filter menu (each group's own list is a filter menu too), filter groups (the groups are what it lists)
 
 **Selection Marker**:
-The four gold strokes that circle slowly, without end, around the current choice of a drawn screen (Welcome Screen, Profile Stats, Household Stats, the Avatar Frame list), so the player sees at once where they are; nothing is drawn between the strokes, and it jumps straight to a new choice. Drawn Menus mark their selected entry their own way.
+The soft gold glow around the current choice of a drawn screen (Welcome Screen, Profile Stats, Household Stats, the Avatar Frame list), whose golds, from bronze to a white gleam, flow round it without end, always the same way, so the player sees at once where they are; it jumps straight to a new choice. Drawn Menus mark their selected entry their own way.
 _Avoid_: halo, cursor, highlight
 
 ### Wheel

@@ -261,8 +261,8 @@
             <h3>Welcome Screen : une sélection qui se voit</h3>
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
-          <p>Les joueurs ne voient pas où est le curseur à l'ouverture (sur « Changer de joueur ») : le halo doré actuel (<code>selectionHalo</code>) ne suffit pas. Idée de Félix : quatre traits dorés qui tournent en carré autour de l'icône sélectionnée, comme dans certains jeux vidéo. Le même contour pourrait ensuite servir aux autres écrans Steamball.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <p>Les joueurs ne voient pas où est le curseur à l'ouverture (sur « Changer de joueur ») : le halo doré actuel (<code>selectionHalo</code>) ne suffit pas. Idée de Félix : quatre traits dorés qui tournent en carré autour de l'icône sélectionnée, comme dans certains jeux vidéo ; le prototype a retenu un halo doré qui défile. Le même contour servira ensuite aux autres écrans Steamball.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">prototype</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/prototype</code> (les variantes, à juger sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
             <summary>Décidé au grill du 16/10/2026 (6)</summary>
@@ -275,6 +275,17 @@
               <li>Pas de réglage pour le couper. Prototype sur le seul Welcome Screen : un tour en 3, 5 ou 8 s (réglé dans <code>config.js</code>), temps moyen d'un dessin dans <code>logfile.log</code>.</li>
             </ul>
             <p class="ctx">Retour de Félix du 16/10/2026, après des essais avec d'autres joueurs.</p>
+          </details>
+          <details>
+            <summary>Verdict du prototype du 16/10/2026 (5)</summary>
+            <ul>
+              <li><strong>Apparence</strong> : plus quatre traits (jugés moches sur la borne), ni comètes, ni arc-en-ciel (superbe mais détonne). Un halo flou juste à l'extérieur du choix (six anneaux de 2 px qui s'estompent), dans un dégradé diagonal d'ors, du bronze chaud (<code>0xA8661C</code>) à un éclat blanc, deux fois par tour ; la moitié du dégradé visible sur un choix. « Premium ».</li>
+              <li><strong>Mouvement</strong> : les couleurs défilent toujours dans le même sens (vers le bas à droite), un tour en 6 s (4, 8 et 10 s essayés).</li>
+              <li><strong>Coût</strong> : un seul calque redessiné toutes les 33 ms, 250 à 540 rectangles, aucune image : environ 2 ms par dessin, 5 ms au pire ; la roue reste fluide. Pas besoin des images dessinées d'avance.</li>
+              <li><strong>Après un appui</strong> : aucune gêne mesurée ni vue ; le halo ne le remplace pas.</li>
+              <li><strong>Piège</strong> : arrondir les deux bords de chaque morceau, jamais sa taille, sinon deux morceaux translucides se chevauchent d'1 px et tracent un trait sombre.</li>
+            </ul>
+            <p class="ctx">Prototype sur la branche <code>prototype/selection-marker</code> (jamais fusionnée), jugé par Félix sur la borne.</p>
           </details>
         </div>
       </li>
