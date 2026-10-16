@@ -1,17 +1,17 @@
 // ============================================================
 // Default Score images: the placeholder images the High Score Board shows
 // in place of an Avatar for its Default Scores, picked by their initials
-// among the pack's default_score_01.png to default_score_10.png in
-// assets\images\default_scores\, those present and readable only. The same
-// initials always get the same image, whatever the table; on one board,
-// different initials share one only once none is free. Reads the folder
-// and logs an unreadable image, or none at all; draws nothing.
+// among the numbered default_score_NN.png of assets\images\default_scores\
+// and of its local\ folder (the owner's own, kept out of git), those
+// readable only. The same initials always get the same image, whatever the
+// table, as long as the images stay the same; on one board, different
+// initials share one only once none is free. Reads both folders and logs
+// an unreadable image, or none at all; draws nothing.
 // ============================================================
 
 export const DEFAULT_SCORE_IMAGES_FOLDER = "assets\\images\\default_scores";
-const IMAGE_COUNT = 10;
-
-const fileOf = number => `default_score_${String(number).padStart(2, "0")}.png`;
+// Any other file there, such as the sheet the images were cut from, is left out.
+const IMAGE_FILE = /^default_score_(\d+)\.png$/i;
 // Initials are the same in any case, as the High Score store's places.
 const keyOf = initials => initials.toUpperCase();
 
@@ -22,15 +22,17 @@ function hashOf(text) {
     return hash >>> 0;
 }
 
-// The paths of the present and readable images, in their numbers' order.
+// The paths of the readable images, the pack's then the local ones, each
+// in their numbers' order.
 // log: one line per image left out as unreadable, one when none is left.
 export function readDefaultScoreImages(host, log) {
     const folder = `${host.getProjectFolder()}\\${DEFAULT_SCORE_IMAGES_FOLDER}`;
-    const present = new Set(host.files.listFiles(folder));
+    const numbered = folderPath => host.files.listFiles(folderPath)
+        .filter(name => IMAGE_FILE.test(name))
+        .sort((a, b) => Number(IMAGE_FILE.exec(a)[1]) - Number(IMAGE_FILE.exec(b)[1]))
+        .map(name => `${folderPath}\\${name}`);
     const images = [];
-    for (let number = 1; number <= IMAGE_COUNT; number++) {
-        if (!present.has(fileOf(number))) continue;
-        const path = `${folder}\\${fileOf(number)}`;
+    for (const path of [...numbered(folder), ...numbered(`${folder}\\local`)]) {
         if (host.files.isImageReadable(path)) images.push(path);
         else log(`${path} is unreadable; Default Scores show without it.`);
     }

@@ -30,6 +30,8 @@ export const avatarFiles = (...names) => Object.fromEntries(names.map(name => [a
 export const DEFAULT_SCORE_IMAGES_PATH = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\default_scores";
 export const defaultScoreImageOf = number => `${DEFAULT_SCORE_IMAGES_PATH}\\default_score_${String(number).padStart(2, "0")}.png`;
 export const defaultScoreImageFiles = (...numbers) => Object.fromEntries(numbers.map(number => [defaultScoreImageOf(number), "png"]));
+// The owner's own Default Score images, in the local\ folder kept out of git.
+export const localDefaultScoreImageOf = number => `${DEFAULT_SCORE_IMAGES_PATH}\\local\\default_score_${String(number).padStart(2, "0")}.png`;
 export const GAME_MS = 5 * 60 * 1000;
 // Covers the wait after "postlaunch" and the reads, a second at a time.
 const READS_STEPS = 15;

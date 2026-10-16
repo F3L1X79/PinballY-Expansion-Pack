@@ -219,7 +219,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 15.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 16.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -227,8 +227,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne.</p>
-      <span class="next">Ensuite : <a href="#event-frames">cadres de fête (n° <span data-ref="event-frames"></span>)</a>, en tête de file</span>
+      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne. Le 16/10, les Default Scores ont reçu 28 portraits libres de droits ; les anciens, non libres, ne restent que sur la borne de Félix (<code>assets/images/default_scores/local/</code>, hors git).</p>
+      <span class="next">Ensuite : <a href="#welcome-selection">sélection du Welcome Screen (n° <span data-ref="welcome-selection"></span>)</a>, en tête de file</span>
     </div>
   </section>
 
@@ -253,6 +253,98 @@
 
     <ol class="queue">
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="welcome-selection" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Welcome Screen : une sélection qui se voit</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Les joueurs ne voient pas où est le curseur à l'ouverture (sur « Changer de joueur ») : le halo doré actuel (<code>selectionHalo</code>) ne suffit pas. Idée de Félix : quatre traits dorés qui tournent en carré autour de l'icône sélectionnée, comme dans certains jeux vidéo. Le même contour pourrait ensuite servir aux autres écrans Steamball.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/prototype</code> (les variantes, à juger sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>La règle du 09/10 écarte les animations en boucle (fatigantes pour les yeux). Proposition de Claude : les traits font un tour complet à l'ouverture et à chaque déplacement, puis se posent en équerres aux quatre coins. Ou bien une exception pour ce seul curseur ?</li>
+              <li>Coût sur la borne : un calque déplacé à chaque image, ou quelques images dessinées d'avance via <code>getDrawingAhead()</code>, comme la Mastery Bar ?</li>
+              <li>Seulement le Welcome Screen, ou toutes les sélections Steamball (Drawn Menus, Achievement List, Profile Stats) pour rester cohérent ?</li>
+            </ul>
+            <p class="ctx">Retour de Félix du 16/10/2026, après des essais avec d'autres joueurs.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="loader" data-track="play" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Un écran de chargement Steamball</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Un loader partagé dans <code>common/</code>, affiché dans cet ordre :</p>
+          <ul>
+            <li>avant l'apparition du Welcome Screen, au démarrage, où l'écran reste vide un moment ;</li>
+            <li>avant les autres écrans Steamball longs à dessiner (High Score Board, Achievement List, Profile Stats…) ;</li>
+            <li>pendant le lancement d'une table, dans le Seamless Launch Overlay, qui n'affiche aujourd'hui qu'un fond uni.</li>
+          </ul>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (mesurer les temps sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avec la <a href="#welcome-selection">sélection du Welcome Screen (n° <span data-ref="welcome-selection"></span>)</a>, sur le même écran</div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Quels écrans sont vraiment « longs » ? À mesurer sur la borne avant de choisir où l'afficher (un seuil, par exemple 300 ms).</li>
+              <li>Le dessin de PinballY est synchrone : le loader doit être affiché avant le travail (<code>setTimeout(..., 0)</code> pour laisser passer une image), et ne bouge qu'entre les tranches de <code>getDrawingAhead()</code>. Une jauge qui se remplit une fois, comme celles des Profile Stats, plutôt qu'un rouage qui tourne (règle du 09/10 contre les animations en boucle) ?</li>
+              <li>Au lancement d'une table, rien ne dit où en est le chargement : une jauge sur la durée du dernier lancement de la table, ou un simple logo animé une fois ?</li>
+              <li>Le Seamless Launch Overlay est un Add-on désactivable : le loader de lancement en dépend-il, ou devient-il un réglage à part ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 16/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="back-buttons" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Un bouton Retour sur chaque écran Steamball</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Un bouton « Retour » visible sur les nouveaux écrans dessinés (Meilleurs scores, Succès personnels, Statistiques, Statistiques de la maison…), qui ramène à l'écran ou au menu d'où on vient.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Quels écrans exactement, et le Welcome Screen en fait-il partie ?</li>
+              <li>Une ligne « Retour » à atteindre aux boutons, comme dans les Drawn Menus, ou un rappel du bouton à presser ?</li>
+            </ul>
+            <p class="ctx">Proposé par Félix le 15/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="readme-screenshots" data-track="share" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>README à jour, avec de belles captures</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+          </div>
+          <p>Remettre à jour <code>README.md</code> et <code>README.fr.md</code> avec les fonctions livrées depuis, et refaire les captures de <code>docs/images/</code> sur la borne (menu principal en sections, Meilleurs scores, Statistiques de la maison…).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : tâche directe, sans spec (captures prises par Félix sur la borne, textes revus ensuite). Après la <a href="#welcome-selection">sélection (n° <span data-ref="welcome-selection"></span>)</a>, le <a href="#loader">loader (n° <span data-ref="loader"></span>)</a> et les <a href="#back-buttons">boutons Retour (n° <span data-ref="back-buttons"></span>)</a>, pour qu'ils figurent sur les captures</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Proposé par Félix le 15/10/2026. Les Profiles de la borne sont des données de test, sans souci sur des captures publiques.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="event-frames" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -263,7 +355,7 @@
           </div>
           <p>Des Avatar Frames en plus de ceux des Collection Tiers : un cadre de fête (Noël, Halloween, Nouvel An…) gagné en venant jouer pendant la fête, et un cadre d'année (« 2026 ») gagné en jouant dans l'année, comme les cadres datés des jeux mobiles. Ils rejoignent la liste de choix des Profile Stats.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les récompenses de profil (livrées), dont il reprend les Avatar Frames et la liste de choix ; le cadre d'année touche au <a href="#year-in-pinball">Year in Pinball</a></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les récompenses de profil (livrées), dont il reprend les Avatar Frames et la liste de choix ; le cadre d'année touche au <a href="#year-in-pinball">Year in Pinball</a>. À finir avant décembre pour que le cadre de Noël serve dès cette année</div>
           <details>
             <summary>Questions ouvertes (5)</summary>
             <ul>
@@ -274,6 +366,173 @@
               <li>Dessins : même technique que les cadres des Collection Tiers (choisie au prototype des récompenses de profil), un dessin par fête, l'année écrite dans le cadre d'année.</li>
             </ul>
             <p class="ctx">Idée de Félix du 08/10/2026, pendant le prototype des récompenses de profil, inspirée des cadres de fête et des cadres datés de Mobile Legends (planches de newjer53 sur DeviantArt). Ces visuels appartiennent à Moonton : on s'en inspire sans les reprendre.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="menu-test-helper" data-track="share" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Tests du menu principal sans l'ordre complet recopié</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+          </div>
+          <p>Un assistant partagé dans <code>tests/support/</code> (par exemple <code>mainMenuSection(fake, "player")</code>) pour que chaque test vérifie sa propre entrée du menu principal, au lieu de recopier tout l'ordre : 13 fichiers de tests figent aujourd'hui des titres du menu, et le réordonner en a touché 9.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/improve-codebase-architecture</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant les filtres <a href="#hidden-tables-filter">« Tables masquées »</a> et <a href="#my-records-filter">« Mes records »</a>, qui ajoutent chacun une entrée au menu</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Proposé à la rétro de la spec #227 (15/10/2026), dont la partie la plus longue a été la mise à jour des tests qui figeaient l'ancien ordre.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="hidden-tables-filter" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Filtre « Tables masquées »</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Une entrée « Tables masquées » sous les Tables favorites, pour retrouver les tables cachées sans passer par Quitter › Menu opérateur › Afficher les tables masquées (le filtre <code>Hidden</code> de PinballY).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Qui la voit : tout le monde, ou seulement les Admin Profiles comme le Menu opérateur ? Un filtre PinballY est le même pour tous les Profiles.</li>
+              <li>Une Child Profile y voit-elle les Adult Tables masquées ? (Le filtre de la roue des Child Profiles les retire déjà.)</li>
+            </ul>
+            <p class="ctx">Proposé par Félix le 11/10/2026 : Pac-Man et Seawitch, masquées, n'étaient plus accessibles depuis les nouveaux menus.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="my-records-filter" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Filtre « Mes records »</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Une sélection de la roue, depuis le menu principal comme le Hall of Fame, avec les tables où le Profile actif détient un High Score ou un Table Record.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les records par Profile (faits)</div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Ordre des tables : par place au tableau, Table Records d'abord, ou par titre ?</li>
+              <li>Les High Scores chassés du tableau y restent-ils ?</li>
+            </ul>
+            <p class="ctx">Reporté le 10/10/2026 pendant le grill des Records par Profile.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Table Mastery : le temps restant avant le prochain niveau</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Dire combien de minutes de jeu il manque sur une table pour atteindre le Mastery Level suivant (« Niveau 8 dans 12 min »). C'est la seule info vraiment nouvelle de l'idée d'un moteur de recommandation, dont le reste existe déjà (Table of the Day, Tables to Discover, Challenge Tables, Random Game).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur la Mastery Bar et le Welcome Screen (livrés)</div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Où l'afficher : dans la Mastery Bar sous la jauge, sur les Period Tables du Welcome Screen, ou les deux ?</li>
+              <li>À partir de quand : toujours, ou seulement quand le niveau suivant est proche (moins d'une partie ou deux) ?</li>
+            </ul>
+            <p class="ctx">Idée externe du 08/10/2026. Écartés en même temps : un moteur de suggestion de plus, les objectifs de session quotidiens, les quêtes (doublons des Achievements Manufacturers et Decades) et des annonces de progression supplémentaires.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Robustesse : configuration lisible, résumé de démarrage, fichiers d'une version future protégés</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Quatre points, un ticket chacun :</p>
+          <ul>
+            <li><code>.env.example</code> découpé en sections commentées (Profils, Progression, Présentation, Menus…), avec une ligne par lien entre Add-ons (« sans <code>ADD_ON_PROFILE_PICKER</code>, les Challenges… »).</li>
+            <li>Dans le code, un seul point d'accès du genre <code>isAddOnOn("challenges")</code> remplace les <code>config.addOns.X !== false</code> éparpillés, pour retrouver chaque lien d'un <code>grep</code>.</li>
+            <li>Un résumé de démarrage dans <code>logfile.log</code> : version de PinballY (<code>systemInfo.version</code>) comparée au minimum Beta 10, langue, Add-ons désactivés, nombre de Profiles et de tables visibles. Log seulement, rien à l'écran.</li>
+            <li>Le Profile Store relit la <code>version</code> qu'il écrit déjà : un fichier d'une version plus récente que le code (retour à un ancien commit) est mis de côté sous un nom daté et journalisé, jamais lu ni réécrit dans l'ancien format.</li>
+          </ul>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par point) puis <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code> et facilite les retours en arrière</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Passe de traduction : allemand, espagnol, italien, portugais</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="language-menu" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Choix de la langue dans un menu</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Choisir la langue de l'interface depuis un menu du cabinet, sans éditer <code>.env.local</code> ni <code>common/core/config.js</code>. Aujourd'hui, <code>common/i18n.js</code> fige la langue au chargement, à partir de <code>config.language</code>.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Où placer l'entrée : menu principal via <code>getMainMenu().add(...)</code>, ou le menu Exit, réservé à l'Admin Profile comme « Réinitialiser un profil » (livré le 01/10) ?</li>
+              <li>Où l'enregistrer : dans <code>optionSettings</code> (sans <code>save()</code>), ou dans <code>profile.json</code>, ce qui donne une langue par Profile ?</li>
+              <li>Changement immédiat, qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage, ou appliqué au prochain lancement de PinballY ?</li>
+              <li>Le menu liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
+            </ul>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Distribution : installation et mises à jour</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Réécrit la section Install des README</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/images/rank_*.png</code>) des emblèmes de League of Legends.</p>
           </details>
         </div>
       </li>
@@ -315,30 +574,7 @@
               <li>Un bilan de la maison, tous Profiles confondus, en plus de celui de chaque Profile ?</li>
               <li>Une carte « ton style de joueur » : taux d'exploration (tables différentes par Play), régularité, et un archétype (Explorer, Completionist…) ? Avec quels seuils, pour que ça ne ressemble pas à un horoscope ?</li>
             </ul>
-            <p class="ctx">Idée externe du 30/09/2026, sans doute la plus partageable. En fin de file car elle a besoin d'une année de journal et de la Distribution pour être vue.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="language-menu" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Choix de la langue dans un menu</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Choisir la langue de l'interface depuis un menu du cabinet, sans éditer <code>.env.local</code> ni <code>common/core/config.js</code>. Aujourd'hui, <code>common/i18n.js</code> fige la langue au chargement, à partir de <code>config.language</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Questions ouvertes (4)</summary>
-            <ul>
-              <li>Où placer l'entrée : menu principal via <code>getMainMenu().add(...)</code>, ou le menu Exit, réservé à l'Admin Profile comme « Réinitialiser un profil » (livré le 01/10) ?</li>
-              <li>Où l'enregistrer : dans <code>optionSettings</code> (sans <code>save()</code>), ou dans <code>profile.json</code>, ce qui donne une langue par Profile ?</li>
-              <li>Changement immédiat, qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage, ou appliqué au prochain lancement de PinballY ?</li>
-              <li>Le menu liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
-            </ul>
+            <p class="ctx">Idée externe du 30/09/2026, sans doute la plus partageable. En fin de file car elle a besoin d'une année de journal et de la Distribution pour être vue : le Play Log ne date que du 01/10/2026, le premier bilan complet sera celui de 2027.</p>
           </details>
         </div>
       </li>
@@ -362,110 +598,6 @@
               <li>Activité de toute la maison, ou des seuls Profiles qui fixent la barre ?</li>
             </ul>
             <p class="ctx">Reporté pendant le grilling du rééquilibrage (01/10/2026) : idée intéressante, mais pas assez de recul. Il faut d'abord analyser un gros Play Log, des mois de parties réelles, pour y voir plus clair.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Passe de traduction : allemand, espagnol, italien, portugais</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Robustesse : configuration lisible, résumé de démarrage, fichiers d'une version future protégés</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Quatre points, un ticket chacun :</p>
-          <ul>
-            <li><code>.env.example</code> découpé en sections commentées (Profils, Progression, Présentation, Menus…), avec une ligne par lien entre Add-ons (« sans <code>ADD_ON_PROFILE_PICKER</code>, les Challenges… »).</li>
-            <li>Dans le code, un seul point d'accès du genre <code>isAddOnOn("challenges")</code> remplace les <code>config.addOns.X !== false</code> éparpillés, pour retrouver chaque lien d'un <code>grep</code>.</li>
-            <li>Un résumé de démarrage dans <code>logfile.log</code> : version de PinballY (<code>systemInfo.version</code>) comparée au minimum Beta 10, langue, Add-ons désactivés, nombre de Profiles et de tables visibles. Log seulement, rien à l'écran.</li>
-            <li>Le Profile Store relit la <code>version</code> qu'il écrit déjà : un fichier d'une version plus récente que le code (retour à un ancien commit) est mis de côté sous un nom daté et journalisé, jamais lu ni réécrit dans l'ancien format.</li>
-          </ul>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par point) puis <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code> et facilite les retours en arrière</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Distribution : installation et mises à jour</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Réécrit la section Install des README</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/images/rank_*.png</code>) des emblèmes de League of Legends.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Table Mastery : le temps restant avant le prochain niveau</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
-          </div>
-          <p>Dire combien de minutes de jeu il manque sur une table pour atteindre le Mastery Level suivant (« Niveau 8 dans 12 min »). C'est la seule info vraiment nouvelle de l'idée d'un moteur de recommandation, dont le reste existe déjà (Table of the Day, Tables to Discover, Challenge Tables, Random Game).</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur la Mastery Bar et le Welcome Screen (livrés)</div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>Où l'afficher : dans la Mastery Bar sous la jauge, sur les Period Tables du Welcome Screen, ou les deux ?</li>
-              <li>À partir de quand : toujours, ou seulement quand le niveau suivant est proche (moins d'une partie ou deux) ?</li>
-            </ul>
-            <p class="ctx">Idée externe du 08/10/2026. Écartés en même temps : un moteur de suggestion de plus, les objectifs de session quotidiens, les quêtes (doublons des Achievements Manufacturers et Decades) et des annonces de progression supplémentaires.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-titles" data-track="profiles" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Titres de profil (mis de côté, pas prévu)</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">pas prévu</span></div>
-          </div>
-          <p>Un titre drôle sous le nom du Profile, un tous les 3 Player Levels jusqu'au 30, choisi depuis les Profile Stats. Retiré des récompenses de profil (livrées le 10/10) le 09/10/2026 : ça faisait trop. Gardé ici pour mémoire, sans intention de l'implémenter.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt, si on le reprend : <code>/grill-with-docs</code> (à revoir après les cadres) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Ce qui avait été décidé (grill du 08/10/2026)</summary>
-            <ul>
-              <li>Un titre tous les 3 Player Levels (3 à 30), débloqué en atteignant le niveau et reverrouillé s'il baisse (le Profile porte alors le plus haut qui lui reste). Annoncé par une ligne dans le Level Toast, avec une Reward Prompt pour le premier. Affiché sous le nom dans le Profile picker, la Profile Greeting, le Welcome Screen et les Profile Stats.</li>
-              <li>Noms (en / fr, épicènes) : 3 Bumper Tourist / Touriste des bumpers, 6 Pinball Explorer / Pilote d'exploration, 9 Clockwork Tinkerer / Mécano à vapeur, 12 Tilt Tamer / Dompte-tilt, 15 Spice Nomad / Nomade de l'épice, 18 Ramp Sentinel / Sentinelle des rampes, 21 Scourge of Bumpers / Fléau des bumpers, 24 Steam Tycoon / Magnat de la vapeur, 27 Playfield Dragon / Dragon du plateau, 30 Prophet of the Silver Ball / Prophète de la bille d'argent.</li>
-              <li>Sur la borne (100 tables, Player Level vers 17), seuls les titres 3 à 15 étaient atteignables.</li>
-            </ul>
           </details>
         </div>
       </li>
@@ -541,104 +673,24 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="my-records-filter" data-track="play" data-rank="bronze">
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-titles" data-track="profiles" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Filtre « Mes records »</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+            <h3>Titres de profil (mis de côté, pas prévu)</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">pas prévu</span></div>
           </div>
-          <p>Une sélection de la roue, depuis le menu principal comme le Hall of Fame, avec les tables où le Profile actif détient un High Score ou un Table Record.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les records par Profile (faits)</div>
+          <p>Un titre drôle sous le nom du Profile, un tous les 3 Player Levels jusqu'au 30, choisi depuis les Profile Stats. Retiré des récompenses de profil (livrées le 10/10) le 09/10/2026 : ça faisait trop. Gardé ici pour mémoire, sans intention de l'implémenter.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt, si on le reprend : <code>/grill-with-docs</code> (à revoir après les cadres) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Questions ouvertes (2)</summary>
+            <summary>Ce qui avait été décidé (grill du 08/10/2026)</summary>
             <ul>
-              <li>Ordre des tables : par place au tableau, Table Records d'abord, ou par titre ?</li>
-              <li>Les High Scores chassés du tableau y restent-ils ?</li>
+              <li>Un titre tous les 3 Player Levels (3 à 30), débloqué en atteignant le niveau et reverrouillé s'il baisse (le Profile porte alors le plus haut qui lui reste). Annoncé par une ligne dans le Level Toast, avec une Reward Prompt pour le premier. Affiché sous le nom dans le Profile picker, la Profile Greeting, le Welcome Screen et les Profile Stats.</li>
+              <li>Noms (en / fr, épicènes) : 3 Bumper Tourist / Touriste des bumpers, 6 Pinball Explorer / Pilote d'exploration, 9 Clockwork Tinkerer / Mécano à vapeur, 12 Tilt Tamer / Dompte-tilt, 15 Spice Nomad / Nomade de l'épice, 18 Ramp Sentinel / Sentinelle des rampes, 21 Scourge of Bumpers / Fléau des bumpers, 24 Steam Tycoon / Magnat de la vapeur, 27 Playfield Dragon / Dragon du plateau, 30 Prophet of the Silver Ball / Prophète de la bille d'argent.</li>
+              <li>Sur la borne (100 tables, Player Level vers 17), seuls les titres 3 à 15 étaient atteignables.</li>
             </ul>
-            <p class="ctx">Reporté le 10/10/2026 pendant le grill des Records par Profile.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="hidden-tables-filter" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Filtre « Tables masquées »</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
-          </div>
-          <p>Une entrée « Tables masquées » sous les Tables favorites, pour retrouver les tables cachées sans passer par Quitter › Menu opérateur › Afficher les tables masquées (le filtre <code>Hidden</code> de PinballY).</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>Qui la voit : tout le monde, ou seulement les Admin Profiles comme le Menu opérateur ? Un filtre PinballY est le même pour tous les Profiles.</li>
-              <li>Une Child Profile y voit-elle les Adult Tables masquées ? (Le filtre de la roue des Child Profiles les retire déjà.)</li>
-            </ul>
-            <p class="ctx">Proposé par Félix le 11/10/2026 : Pac-Man et Seawitch, masquées, n'étaient plus accessibles depuis les nouveaux menus.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="menu-test-helper" data-track="share" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Tests du menu principal sans l'ordre complet recopié</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
-          </div>
-          <p>Un assistant partagé dans <code>tests/support/</code> (par exemple <code>mainMenuSection(fake, "player")</code>) pour que chaque test vérifie sa propre entrée du menu principal, au lieu de recopier tout l'ordre : 13 fichiers de tests figent aujourd'hui des titres du menu, et le réordonner en a touché 9.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/improve-codebase-architecture</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Proposé à la rétro de la spec #227 (15/10/2026), dont la partie la plus longue a été la mise à jour des tests qui figeaient l'ancien ordre.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="back-buttons" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Un bouton Retour sur chaque écran Steamball</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
-          </div>
-          <p>Un bouton « Retour » visible sur les nouveaux écrans dessinés (Meilleurs scores, Succès personnels, Statistiques, Statistiques de la maison…), qui ramène à l'écran ou au menu d'où on vient.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>Quels écrans exactement, et le Welcome Screen en fait-il partie ?</li>
-              <li>Une ligne « Retour » à atteindre aux boutons, comme dans les Drawn Menus, ou un rappel du bouton à presser ?</li>
-            </ul>
-            <p class="ctx">Proposé par Félix le 15/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="readme-screenshots" data-track="share" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>README à jour, avec de belles captures</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
-          </div>
-          <p>Remettre à jour <code>README.md</code> et <code>README.fr.md</code> avec les fonctions livrées depuis, et refaire les captures de <code>docs/images/</code> sur la borne (menu principal en sections, Meilleurs scores, Statistiques de la maison…).</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : tâche directe, sans spec (captures prises par Félix sur la borne, textes revus ensuite). Plutôt après les <a href="#back-buttons">boutons Retour (n° <span data-ref="back-buttons"></span>)</a>, pour qu'ils figurent sur les captures</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Proposé par Félix le 15/10/2026. Les Profiles de la borne sont des données de test, sans souci sur des captures publiques.</p>
           </details>
         </div>
       </li>
@@ -651,6 +703,15 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>16/10 <span class="count">(2)</span></summary>
+          <ol>
+            <li><strong>Nouvel ordre : d'abord ce qui gêne les joueurs sur la borne</strong>
+              <span>Ordre pensé par Claude, à la demande de Félix : la sélection visible et le loader du Welcome Screen (premier écran vu), les boutons Retour, puis le README pour montrer tout cela. Viennent ensuite les cadres de fête (avant Noël), l'aide aux tests du menu avant les deux filtres qui ajoutent des entrées, la robustesse et les traductions avant la Distribution. Les idées qui ont besoin de mois de Play Log (Year in Pinball, Challenges adaptés) et l'outillage pour les autres (thèmes, API) ferment la file.</span></li>
+            <li><strong>Default Scores : des portraits libres de droits, les anciens en local</strong>
+              <span>28 portraits générés par IA remplacent les 8 anciens, non libres, retirés du dépôt. Leur version HD reste sur la borne de Félix dans <code>assets/images/default_scores/local/</code>, ignoré par git, comme <code>assets/sounds/local/</code>. Le pack lit toutes les images numérotées des deux dossiers.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>11/10 <span class="count">(4)</span></summary>
           <ol>
             <li><strong>Records par Profile : les tables à ROM d'abord</strong>
@@ -823,8 +884,13 @@
 
           <div class="ax row">Fort</div>
           <div class="cell sweet">
+            <a class="chip tr-play" href="#welcome-selection"><b></b>Sélection visible</a>
+            <a class="chip tr-play" href="#back-buttons"><b></b>Boutons Retour</a>
+            <a class="chip tr-play" href="#hidden-tables-filter"><b></b>Tables masquées</a>
           </div>
           <div class="cell">
+            <a class="chip tr-play" href="#loader"><b></b>Loader</a>
+            <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
           </div>
           <div class="cell">
             <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
@@ -832,15 +898,14 @@
 
           <div class="ax row">Moyen</div>
           <div class="cell sweet">
-            <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
+            <a class="chip tr-share" href="#readme-screenshots"><b></b>README et captures</a>
             <a class="chip tr-play" href="#my-records-filter"><b></b>Filtre « Mes records »</a>
-            <a class="chip tr-play" href="#hidden-tables-filter"><b></b>Tables masquées</a>
+            <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
           </div>
           <div class="cell">
-            <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
-            <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
-            <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
             <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
+            <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
+            <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
           </div>
           <div class="cell">
             <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
@@ -850,9 +915,11 @@
 
           <div class="ax row">Faible</div>
           <div class="cell">
+            <a class="chip tr-share" href="#menu-test-helper"><b></b>Aide aux tests du menu</a>
           </div>
           <div class="cell">
             <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
+            <a class="chip tr-profiles" href="#profile-titles"><b></b>Titres (pas prévu)</a>
           </div>
           <div class="cell">
             <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
