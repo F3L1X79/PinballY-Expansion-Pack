@@ -60,8 +60,6 @@ node --test
 
 Run from the project root with Node.js 22 or later; nothing to install. PinballY never loads the tests.
 
-To refuse any commit while the tests fail, turn on the pre-commit hook once per clone: `git config core.hooksPath .githooks`.
-
 `tests/project/persisted_data_pinning.test.js` locks the saved data format and every Achievement ID: they are the Profiles' progress. Never change it to make a change pass.
 
 ## Adding a language
