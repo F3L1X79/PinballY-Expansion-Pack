@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 import { startHousehold } from "./household_stats_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import {
-    PROFILE_STATS_OPEN_MS, press, openProfileStats, isProfileStatsOpen, profileStatsLayerCount, buttons, highlighted, markerLayer, markerLayerCount, choose,
+    PROFILE_STATS_OPEN_MS, press, openProfileStats, isProfileStatsOpen, profileStatsLayerCount, buttons, highlighted, markerLayer, markerLayerCount, isMarkerOnCross, choose,
 } from "./profile_stats_reader.js";
 
 test("the Selection Marker surrounds the cross, jumps on Next, follows the screen back from its lists and is gone once it closes", async () => {
@@ -22,7 +22,8 @@ test("the Selection Marker surrounds the cross, jumps on Next, follows the scree
 
     openProfileStats(fake, lang);
     assert.ok(markerLayer(fake), "the marker is drawn on opening");
-    assert.equal(highlighted(fake), TEXT.closeTooltip, "round the cross, with its tooltip");
+    assert.ok(isMarkerOnCross(fake), "round the cross");
+    assert.equal(highlighted(fake), TEXT.closeTooltip, "with its tooltip");
     press(fake, "Next");
     assert.equal(highlighted(fake), buttons(fake)[0].label, "on the first button after Next");
 

@@ -5,7 +5,8 @@
 // the buttons at the card's foot (label and grey count; none read-only), a section of the
 // right column by its title (each stat's label with the texts drawn after
 // it, and its images), the highlighted choice (the button the Selection
-// Marker surrounds, or the cross's tooltip on its own layer), and picks a choice with Next and Select
+// Marker surrounds, or the cross's tooltip on its own layer), whether the
+// marker surrounds the cross, and picks a choice with Next and Select
 // as a player would. Opens them from the main menu entry, or reads one
 // section of the active Profile's screen and closes it again. Reads the
 // Avatar Frame list opened from the Frame button too: whether it is open,
@@ -115,6 +116,13 @@ export function sectionImages(fake, title) {
 
 // The Selection Marker's layers, shown or not.
 export const markerLayerCount = fake => fake.drawingLayers().filter(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.marker).length;
+
+// Whether the marker surrounds the cross (both centred on the same point).
+export function isMarkerOnCross(fake) {
+    const [cross] = shownLayers(fake, PROFILE_STATS_Z_INDEX.cross);
+    const marker = markerLayer(fake).position();
+    return Math.abs(cross.position().x - marker.x) < 0.001 && Math.abs(cross.position().y - marker.y) < 0.001;
+}
 
 export function markerLayer(fake) {
     const marked = shownLayers(fake, PROFILE_STATS_Z_INDEX.marker);
