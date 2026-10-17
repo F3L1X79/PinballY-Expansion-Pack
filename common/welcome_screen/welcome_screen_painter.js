@@ -21,7 +21,7 @@ import {
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
-// Above the Achievement List (6000 to 6006), under the toasts and the
+// Above the Achievement List (6000 to 6010), under the toasts and the
 // Profile picker. Exported for the tests' reader.
 export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, lostRecords: 6107, marker: 6109, tooltips: 6110 });
 

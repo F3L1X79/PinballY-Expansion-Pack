@@ -1,7 +1,7 @@
 // ============================================================
 // Starts the pack through main.js on the fake PinballY globals for the
 // Achievement List's opening tests: the main menu commands and the
-// Achievements on, English texts, a few tables, Guest with some plays, and
+// Achievements on, English texts unless told otherwise, a few tables, Guest with some plays, and
 // each layer draw taking drawMs on the clock. The clock stays at startup,
 // so nothing of the list is drawn ahead yet. Never loaded by PinballY.
 // ============================================================
@@ -29,14 +29,16 @@ const TABLES = [
 // The veil the list's opening dims the wheel with, as readVeil() reads it.
 export const LIST_VEIL = { shown: true, zIndex: ACHIEVEMENT_LIST_Z_INDEX.backdrop - 2, color: DIMMED_WHEEL };
 
-export async function startPack({ drawMs = 0 } = {}) {
+// language: set in config before the scenario is imported, since its
+// imports already read the texts.
+export async function startPack({ drawMs = 0, language = "en" } = {}) {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables: TABLES, drawMs });
     fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({ version: 1, notified: [] }));
     fake.addFile(NAVIGATION_SOUND);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["customMenuCommands", "achievements"].includes(key);
-    config.language = "en";
+    config.language = language;
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();

@@ -5,8 +5,9 @@
 // the glide run) and checks what the player sees: the header, the two
 // sections in their order (a waiting toast first, then the most recently
 // Notified, then the missing ones), the highlighted line moving, skipping
-// the section headers and wrapping, the buttons swallowed only while it is
-// open, Exit and attract mode closing it, the rank emblems and the
+// the section headers and looping through the Exit Button (its Selection
+// Marker, tooltip and place clear of the header, Select on it leaving), the
+// buttons swallowed only while it is open, Exit and attract mode closing it, the rank emblems and the
 // Achievement Progress bars on the rows, the header's counts per rank, the
 // Unlock Rate (the other Profiles' Avatars) and the missing section's
 // order by Unlock Rate, then Achievement Progress, the owner's emblem
@@ -24,10 +25,11 @@ import { createDrawingAhead } from "../../common/core/drawing_ahead.js";
 import { createProfileStore } from "../../common/profiles/profile_store.js";
 import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, PROGRESS_UNIT } from "../../common/achievements/achievements.js";
 import { RANK_COLORS, STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
+import { LIST_LOOK } from "../../common/achievements/achievement_list_painter.js";
 import lang from "../../common/core/i18n.js";
 import {
     press, pressAndGlide, chromeTexts, headerRankCounts, headerEmblemImages, isListOpen, shownItems, highlightedTexts, readSections,
-    readRows, readWholeList, untilListShown, footerHints,
+    readRows, readWholeList, untilListShown, footerHints, isMarkerOnExitButton, isExitButtonShown, exitButtonTooltip, isARowHighlighted,
 } from "./achievement_list_reader.js";
 
 const TEXT = lang.achievementList;
@@ -97,9 +99,11 @@ function setUp({
     return { fake, list, achievements, profileStore, exits, open };
 }
 
-const LIST_Z_INDEXES = Object.values(ACHIEVEMENT_LIST_Z_INDEX).filter(zIndex => zIndex !== ACHIEVEMENT_LIST_Z_INDEX.backdrop);
+// The Selection Marker redraws itself on its own tick while it shows.
+const LIST_Z_INDEXES = Object.values(ACHIEVEMENT_LIST_Z_INDEX)
+    .filter(zIndex => zIndex !== ACHIEVEMENT_LIST_Z_INDEX.backdrop && zIndex !== ACHIEVEMENT_LIST_Z_INDEX.marker);
 // Every draw of the list's rows, section headers, emblems, Unlock Rates,
-// header and footer so far, as the texts and images drawn.
+// header, footer and Exit Button so far, as the texts and images drawn.
 const listDrawings = fake => fake.drawings().filter(drawing => LIST_Z_INDEXES.includes(drawing.zIndex));
 const IDLE_ENOUGH_MS = 60 * 1000;
 
@@ -113,7 +117,9 @@ test("the list opens over the menu with the Profile's header, both sections and 
     for (const text of [upper(TEXT.title), "Alice", TEXT.totalLine(4, 6, 67)]) {
         assert.ok(chrome.includes(text), `"${text}" is shown in ${JSON.stringify(chrome)}`);
     }
-    assert.deepEqual(footerHints(fake), [{ keys: ["PREV", "NEXT"], label: "BROWSE" }, { keys: ["EXIT"], label: "BACK" }]);
+    assert.deepEqual(footerHints(fake), [
+        { keys: ["PREV", "NEXT"], label: "BROWSE" }, { keys: ["SELECT"], label: "CHOOSE" }, { keys: ["EXIT"], label: "BACK" },
+    ]);
     assert.deepEqual(readSections(fake, TEXT), [
         {
             header: [upper(TEXT.unlockedSection), TEXT.sectionCount(4)],
@@ -158,21 +164,106 @@ test("the list always opens at the top, on the first Achievement", () => {
     assert.deepEqual(shownItems(fake)[0].texts, [upper(TEXT.unlockedSection), TEXT.sectionCount(4)]);
 });
 
-test("Next and Prev move the highlight one Achievement at a time, skip the section headers and wrap", () => {
+test("Next and Prev move the highlight one Achievement at a time, skip the section headers and loop through the Exit Button", () => {
     const { fake } = setUp();
     const highlightedTitle = () => highlightedTexts(fake)[0];
 
     assert.equal(highlightedTitle(), "beta title");
-    for (const title of ["delta title", "alpha title", "gamma title", "epsilon title", "zeta title", "beta title"]) {
+    for (const title of ["delta title", "alpha title", "gamma title", "epsilon title", "zeta title"]) {
         pressAndGlide(fake, "Next");
         assert.equal(highlightedTitle(), title);
     }
+    pressAndGlide(fake, "Next");
+    assert.ok(isMarkerOnExitButton(fake), "Next from the last Achievement selects the Exit Button");
+    pressAndGlide(fake, "Next");
+    assert.equal(highlightedTitle(), "beta title", "Next from the Exit Button goes to the first Achievement");
     pressAndGlide(fake, "Prev");
-    assert.equal(highlightedTitle(), "zeta title", "Prev wraps to the last Achievement");
+    assert.ok(isMarkerOnExitButton(fake), "Prev from the first Achievement selects the Exit Button");
+    pressAndGlide(fake, "Prev");
+    assert.equal(highlightedTitle(), "zeta title", "Prev from the Exit Button goes to the last Achievement");
     pressAndGlide(fake, "Prev");
     assert.equal(highlightedTitle(), "epsilon title");
     pressAndGlide(fake, "Prev");
     assert.equal(highlightedTitle(), "gamma title", "the missing section's header is skipped");
+});
+
+test("on the Exit Button, the Selection Marker surrounds it, its tooltip says Back and no line is highlighted", () => {
+    const { fake } = setUp();
+    assert.ok(isExitButtonShown(fake), "the Exit Button shows");
+    assert.ok(!isMarkerOnExitButton(fake), "the list opens on its first row, not on the Exit Button");
+    assert.equal(exitButtonTooltip(fake), null);
+    const scrollBefore = shownItems(fake).map(item => item.texts);
+
+    pressAndGlide(fake, "Prev");
+
+    assert.ok(isMarkerOnExitButton(fake));
+    assert.equal(exitButtonTooltip(fake), lang.buttonHints.back);
+    assert.ok(!isARowHighlighted(fake), "no line is highlighted");
+    assert.deepEqual(shownItems(fake).map(item => item.texts), scrollBefore, "selecting it never scrolls");
+    pressAndGlide(fake, "Next");
+    assert.ok(!isMarkerOnExitButton(fake), "the marker leaves with the selection");
+    assert.equal(exitButtonTooltip(fake), null);
+    assert.deepEqual(highlightedTexts(fake), rowTexts("beta"));
+});
+
+test("on a long list, Next from the last row selects the Exit Button without scrolling, and Prev from it scrolls back to the last row", () => {
+    const achievements = Array.from({ length: 30 }, (_, index) => fakeAchievement(`a${index}`, false));
+    const { fake } = setUp({ achievements, notified: [] });
+    const shownTitles = () => shownItems(fake).map(item => item.texts[0]);
+
+    pressAndGlide(fake, "Prev");
+    assert.ok(isMarkerOnExitButton(fake));
+    assert.ok(shownTitles().includes("a0 title"), "still at the top");
+    pressAndGlide(fake, "Prev");
+    assert.equal(highlightedTexts(fake)[0], "a29 title", "scrolled to the last row");
+    const atBottom = shownTitles();
+    assert.ok(!atBottom.includes("a0 title"));
+    pressAndGlide(fake, "Next");
+    assert.ok(isMarkerOnExitButton(fake));
+    assert.deepEqual(shownTitles(), atBottom, "selecting the Exit Button never scrolls");
+    pressAndGlide(fake, "Next");
+    assert.equal(highlightedTexts(fake)[0], "a0 title");
+    assert.ok(shownTitles().includes("a0 title"), "back at the top");
+});
+
+test("the Exit Button sits at the header's top right, clear of the header's texts, in landscape and portrait", () => {
+    for (const size of [{ width: 1920, height: 1080 }, { width: 1080, height: 1920 }]) {
+        const { fake, open } = setUp({ opened: false, emblemImages: EMBLEM_IMAGES });
+        fake.setLayoutSize(size);
+        open();
+        const where = `${size.width}x${size.height}`;
+        const [button] = fake.drawingLayers().filter(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.exitButton && layer.alpha > 0);
+        const side = button.scale().ySpan * size.height;
+        const left = (button.position().x + 0.5) * size.width - side / 2;
+        const top = (0.5 - button.position().y) * size.height - side / 2;
+        const [mask] = fake.drawingLayers().filter(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.mask);
+        const panelRight = (size.width + Math.round(size.width * 0.75)) / 2;
+        assert.ok(left + side <= panelRight && top >= (size.height - Math.round(size.height * 0.75)) / 2, `${where}: inside the panel`);
+        const headerBottom = (size.height - Math.round(size.height * 0.75)) / 2 + LIST_LOOK.headerHeight;
+        const headerTexts = mask.strokes().filter(stroke => "text" in stroke && stroke.rect.y < headerBottom);
+        assert.ok(headerTexts.length > 0);
+        for (const { text, rect } of headerTexts) {
+            assert.ok(rect.x + rect.width <= left, `${where}: "${text}" ends at ${rect.x + rect.width}, left of the Exit Button at ${left}`);
+        }
+        for (const emblem of fake.drawingLayers().filter(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.headerEmblems && layer.alpha > 0)) {
+            const right = (emblem.position().x + 0.5) * size.width + emblem.scale().ySpan * size.height / 2;
+            assert.ok(right <= left, `${where}: a header emblem ends at ${right}, left of the Exit Button at ${left}`);
+        }
+    }
+});
+
+test("Select or Launch on the Exit Button closes the list and goes back as Exit does", () => {
+    for (const buttonCommand of ["Select", "Launch"]) {
+        const { fake, exits } = setUp();
+        pressAndGlide(fake, "Prev");
+
+        assert.equal(press(fake, buttonCommand).defaultPrevented, true, `${buttonCommand} never reaches the wheel`);
+
+        assert.equal(isListOpen(fake), false, `${buttonCommand} closed it`);
+        assert.deepEqual(exits, ["exit"]);
+        assert.equal(isExitButtonShown(fake), false, "the Exit Button closes with it");
+        assert.equal(isMarkerOnExitButton(fake), false, "and so does the Selection Marker");
+    }
 });
 
 test("each Next / Prev plays PinballY's navigation sound once, quick presses on three players in turn", () => {

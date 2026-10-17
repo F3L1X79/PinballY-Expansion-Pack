@@ -93,7 +93,9 @@ test("the thumb follows the scroll: in the middle halfway down the list, at the 
     near(scrollbarThumb(fake).top + scrollbarThumb(fake).height, track.bottom, "at the bottom on the last row");
 
     pressAndGlide(fake, "Next");
-    near(scrollbarThumb(fake).top, track.top, "back at the top after wrapping");
+    near(scrollbarThumb(fake).top + scrollbarThumb(fake).height, track.bottom, "still at the bottom on the Exit Button");
+    pressAndGlide(fake, "Next");
+    near(scrollbarThumb(fake).top, track.top, "back at the top on the first row");
 });
 
 test("the thumb glides with the rows, frame by frame", () => {

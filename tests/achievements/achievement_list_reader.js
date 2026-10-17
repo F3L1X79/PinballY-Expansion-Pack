@@ -3,7 +3,8 @@
 // PinballY host: the texts of its header and footer, the footer's Button
 // Hints, the items shown in
 // the rows area from top to bottom, the highlighted one (the only one not
-// dimmed), the whole list, walked with Next as a player would, with the
+// dimmed, none while the Exit Button is selected), whether the Selection
+// Marker surrounds the Exit Button and its tooltip, the whole list, walked with Next as a player would, with the
 // colours each row is drawn in, its rank emblem image and its Unlock Rate
 // (the Avatars and the "+N" pill beside it, from left to right), and the
 // header's count per Achievement Rank and its emblem images.
@@ -14,7 +15,8 @@ import assert from "node:assert/strict";
 import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
 import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
 import { readVeil } from "../support/opening_reader.js";
-import { readButtonHints } from "../support/button_hints_reader.js";
+import { readButtonHints, exitButtonTooltipOn } from "../support/button_hints_reader.js";
+import * as selectionMarker from "../support/selection_marker_reader.js";
 import { computeGeometry, LIST_LOOK } from "../../common/achievements/achievement_list_painter.js";
 
 // Past the glide from one line to the next.
@@ -99,6 +101,21 @@ function highlightedLayer(fake) {
 // The texts of the highlighted line.
 export const highlightedTexts = fake => highlightedLayer(fake).texts();
 
+// Whether a line of the rows area is lit.
+export const isARowHighlighted = fake => shownItemLayers(fake).some(layer => layer.alpha === 1);
+
+const shownExitButtons = fake => fake.drawingLayers()
+    .filter(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.exitButton && layer.alpha > 0);
+
+export const isExitButtonShown = fake => shownExitButtons(fake).length === 1;
+
+// Whether the Selection Marker shows, round the Exit Button.
+export const isMarkerOnExitButton = fake => fake.drawingLayers().some(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.marker && layer.alpha > 0)
+    && selectionMarker.layerUnderMarker(fake, ACHIEVEMENT_LIST_Z_INDEX.marker, shownExitButtons(fake)) !== undefined;
+
+// The Exit Button's tooltip ("Back"), null while hidden.
+export const exitButtonTooltip = fake => exitButtonTooltipOn(fake, ACHIEVEMENT_LIST_Z_INDEX.tooltip);
+
 // The shown layers at this z-index sitting at the item's height, from left
 // to right.
 const layersBeside = (fake, itemLayer, zIndex) => fake.drawingLayers()
@@ -120,7 +137,7 @@ function piecesBeside(fake, itemLayer) {
 
 // Every item's layer of the open list from top to bottom, section headers
 // included, with what is seen beside each: read while pressing Next until
-// the highlight comes back to where it was.
+// the highlight comes back to where it was, past the Exit Button.
 function readWholeListLayers(fake, piecesOf = new Map()) {
     const order = [];
     // The shown items always follow each other in the list, so each new one
@@ -138,6 +155,7 @@ function readWholeListLayers(fake, piecesOf = new Map()) {
     const start = highlightedLayer(fake);
     for (let guard = 0; guard < 1000; guard++) {
         pressAndGlide(fake, "Next");
+        if (!isARowHighlighted(fake)) continue;
         merge();
         if (highlightedLayer(fake) === start) return order;
     }

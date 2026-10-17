@@ -15,15 +15,20 @@
 // Achievement Progress, and its Unlock Rate: the Avatars of the other Profiles Notified of it,
 // once the household has two Profiles besides Guest.
 // Next / Prev glide the highlighted line from one Achievement to the next,
-// wrapping, with PinballY's navigation sound; the other lines are dimmed.
-// Exit closes the list and calls the return given to open(); attract mode
-// closes it too. While it is open, every button is swallowed through
-// "commandbuttondown".
+// with PinballY's navigation sound; the other lines are dimmed. The Exit
+// Button (the back arrow, its tooltip saying Back) at the header's top
+// right closes the loop: past the last row or before the first, the
+// Selection Marker surrounds it and no line is lit. The footer's Button
+// Hints name the flippers, Select and Exit.
+// Exit, or Select or Launch on the Exit Button, closes the list and calls
+// the return given to open(); attract mode closes it too. While it is
+// open, every button is swallowed through "commandbuttondown".
 // Each item (a row or a section header) has its own layer, only moved and
 // faded while the list is open; the header and footer sit on a mask layer
 // above the rows, the header's small emblem images on layers above it. Each
 // emblem image, Avatar and "+N" pill of the rows sits on a small layer of
-// its own, one set per on-screen slot, moved with the rows. When the list
+// its own, one set per on-screen slot, moved with the rows; the Exit Button
+// and its tooltip on layers of their own too. When the list
 // overflows the rows area, a gold scrollbar sits in the panel's right
 // margin: its rail on the mask, its thumb on a layer of its own, moved with
 // the glide.
@@ -47,11 +52,12 @@ import { createNavigationSound } from "../core/navigation_sound.js";
 import { displayNameOf } from "../profiles/profile_name.js";
 import { createScreenOpening } from "../drawing/screen_opening.js";
 import { EXIT_BUTTON_LOOK } from "../drawing/steamball_drawing.js";
-import { buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
+import { buttonHintGroupsOf, exitButtonWordOf, FLIPPER_HINT } from "../drawing/button_hints.js";
+import { createSelectionMarker } from "../drawing/selection_marker.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
 import {
     LIST_LOOK, AVATAR_FRAME_WIDTH, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
-    drawPiece, layoutScrollbar, thumbTopAt, drawScrollbarThumb,
+    drawPiece, layoutScrollbar, thumbTopAt, drawScrollbarThumb, drawExitButton, drawExitTooltip, SHARED_SCALE, EXIT_BUTTON_CANVAS, EXIT_TOOLTIP_CANVAS,
 } from "./achievement_list_painter.js";
 
 const SCRIPT_NAME = "AchievementList";
@@ -60,6 +66,7 @@ const SCRIPT_NAME = "AchievementList";
 // Achievement Toast and the Profile picker. Exported for the tests' reader.
 export const ACHIEVEMENT_LIST_Z_INDEX = Object.freeze({
     backdrop: 6000, items: 6001, emblems: 6002, owners: 6003, mask: 6004, headerEmblems: 6005, scrollbarThumb: 6006,
+    exitButton: 6007, marker: 6009, tooltip: 6010,
 });
 
 const ITEM_KIND = Object.freeze({ SECTION: "section", ROW: "row" });
@@ -76,6 +83,10 @@ const ROW_PITCH = LIST_LOOK.rowHeight + LIST_LOOK.itemGap;
 const MAX_OWNER_AVATARS = 4;
 // The file name's ending of each rank's emblem image, by where it shows.
 const EMBLEM_VARIANT = Object.freeze({ UNLOCKED: "_plain", MISSING: "_missing", HEADER: "_plain" });
+// The list always brings back the main menu or the Profile Stats.
+const EXIT_LOOK = EXIT_BUTTON_LOOK.BACK;
+// The highlighted item's index while the Exit Button is selected.
+const EXIT_BUTTON = -1;
 
 // drawingAhead: the shared drawing ahead (common/core/drawing_ahead.js).
 export function createAchievementList(host, { getAchievements, profileStore, drawingAhead, profileRewards = null }) {
@@ -98,6 +109,8 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     const pieceLayers = new Map();
     // The scrollbar's thumb: one layer, kept in a map like the others.
     const thumbLayers = new Map();
+    // The Exit Button and its tooltip, by EXIT_PIECES key.
+    const exitLayers = new Map();
     const imagesFolder = `${host.getProjectFolder()}\\assets\\images`;
     // Each emblem image's path, or null when its file is missing: checked
     // once per session.
@@ -114,9 +127,10 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // every Profile's name to notice one added or removed; null once a
     // Profile's data changed.
     let household = null;
-    // The open list, null when closed: the highlighted item's index, the
-    // scroll it glides to, what Exit returns to and whether it is still
-    // getting ready.
+    // The open list, null when closed: the highlighted item's index
+    // (EXIT_BUTTON for the Exit Button), the scroll it glides to, what Exit
+    // returns to, whether it is still getting ready and the Selection
+    // Marker, there only while the Exit Button is selected.
     let shown = null;
     // Below 1 only while a list that had to get ready fades in.
     let opacity = 1;
@@ -312,7 +326,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
 
     function readContent() {
         const entries = readEntries();
-        const footer = buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, exitLook: EXIT_BUTTON_LOOK.BACK });
+        const footer = buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_LOOK });
         return { ...buildItems(entries), header: describeHeader(entries), footer };
     }
 
@@ -334,8 +348,9 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     const signatureOf = (look, width, height) => JSON.stringify([look, width, height, geometry.height]);
 
     // The layer drawn with draw(dc) at this size, created on first use and
-    // drawn again only when its signature changed.
-    function signedLayer(layers, key, zIndex, look, width, height, draw) {
+    // drawn again only when its signature changed; shown shownHeight tall
+    // in layout pixels.
+    function signedLayer(layers, key, zIndex, look, width, height, draw, shownHeight = height) {
         let record = layers.get(key);
         if (!record) {
             record = { layer: hiddenLayer(zIndex), signature: null };
@@ -345,7 +360,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         if (record.signature !== signature) {
             record.layer.clear(TRANSPARENT);
             record.layer.draw(draw, width, height);
-            record.layer.setScale({ ySpan: height / geometry.height });
+            record.layer.setScale({ ySpan: shownHeight / geometry.height });
             record.signature = signature;
         }
         return record.layer;
@@ -393,6 +408,22 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
             dc => drawScrollbarThumb(dc, bar.thumbWidth, bar.thumbHeight));
     }
 
+    // The Exit Button and its tooltip, each drawn in the reference pixels of
+    // the other drawn screens and shown at its rect in the geometry.
+    const EXIT_PIECES = Object.freeze({
+        button: { zIndex: ACHIEVEMENT_LIST_Z_INDEX.exitButton, canvas: EXIT_BUTTON_CANVAS, rectOf: g => g.exitButton, draw: dc => drawExitButton(dc, EXIT_LOOK) },
+        tooltip: {
+            zIndex: ACHIEVEMENT_LIST_Z_INDEX.tooltip, canvas: EXIT_TOOLTIP_CANVAS, rectOf: g => g.exitTooltip,
+            draw: dc => drawExitTooltip(host, dc, exitButtonWordOf(EXIT_LOOK)),
+        },
+    });
+    const isExitPieceDrawn = key => isDrawn(exitLayers, key, EXIT_LOOK, EXIT_PIECES[key].canvas.width, EXIT_PIECES[key].canvas.height);
+
+    function exitLayer(key) {
+        const { zIndex, canvas, rectOf, draw } = EXIT_PIECES[key];
+        return signedLayer(exitLayers, key, zIndex, EXIT_LOOK, canvas.width, canvas.height, draw, rectOf(geometry).h);
+    }
+
     // The rail's place only depends on the geometry; whether it shows, on
     // whether the list overflows.
     function maskSignature() {
@@ -405,10 +436,12 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         mask.signature = maskSignature();
     }
 
-    // The next of the header and footer, the header's emblems and the
-    // scrollbar's thumb to draw, as a function drawing it, or null.
+    // The next of the header and footer, the Exit Button and its tooltip,
+    // the header's emblems and the scrollbar's thumb to draw, as a function drawing it, or null.
     function nextChromeDrawing() {
         if (mask.signature !== maskSignature()) return drawMaskLayer;
+        const exitPiece = Object.keys(EXIT_PIECES).find(key => !isExitPieceDrawn(key));
+        if (exitPiece) return () => exitLayer(exitPiece);
         const headerEmblem = headerEmblems().find(emblem => !isHeaderEmblemDrawn(emblem));
         if (headerEmblem) return () => headerEmblemLayer(headerEmblem);
         const bar = scrollbar();
@@ -433,7 +466,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // one outwards, wrapping (a wrap reaches the other end).
     function nextDrawing() {
         const { items } = content;
-        const around = shown ? shown.highlighted : Math.max(0, items.findIndex(item => item.kind === ITEM_KIND.ROW));
+        const around = shown && shown.highlighted !== EXIT_BUTTON ? shown.highlighted : Math.max(0, firstRowIndex());
         const distance = index => Math.min(Math.abs(index - around), items.length - Math.abs(index - around));
         const order = items.map((item, index) => index).sort((a, b) => distance(a) - distance(b) || a - b);
         return nextChromeDrawing() || nextItemDrawing(order);
@@ -538,7 +571,8 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     function jumpToTarget() {
         stopGlide();
         glide.scroll = shown.scroll;
-        glide.highlightTop = shown.highlighted === -1 ? -ROW_PITCH : content.items[shown.highlighted].top;
+        // A row's pitch above the list: every line dimmed.
+        glide.highlightTop = shown.highlighted === EXIT_BUTTON ? -ROW_PITCH : content.items[shown.highlighted].top;
         placeItems();
     }
 
@@ -575,27 +609,69 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         shown.scroll = Math.max(0, Math.min(Math.max(0, listHeight - geometry.areaHeight), scroll));
     }
 
-    // direction: 1 for Next, -1 for Prev. Section headers are skipped; a
-    // wrap jumps instead of gliding across the whole list.
+    const firstRowIndex = () => content.items.findIndex(item => item.kind === ITEM_KIND.ROW);
+    const lastRowIndex = () => content.items.map(item => item.kind).lastIndexOf(ITEM_KIND.ROW);
+
+    // direction: 1 for Next, -1 for Prev. Section headers are skipped; past
+    // either end, the Exit Button is selected, the rows staying where they
+    // are. Coming from it jumps instead of gliding across the whole list.
     function move(direction) {
         const { items } = content;
-        if (shown.highlighted === -1) return;
+        if (firstRowIndex() === -1) return;
         navigationSound.play();
-        let index = shown.highlighted;
-        do {
-            index = (index + direction + items.length) % items.length;
-        } while (items[index].kind !== ITEM_KIND.ROW);
-        const wrapped = direction > 0 ? index < shown.highlighted : index > shown.highlighted;
-        shown.highlighted = index;
-        scrollToHighlighted();
-        if (wrapped) {
+        if (shown.highlighted === EXIT_BUTTON) {
+            shown.highlighted = direction > 0 ? firstRowIndex() : lastRowIndex();
+            scrollToHighlighted();
             jumpToTarget();
+            placeExitButton();
             return;
         }
+        let index = shown.highlighted;
+        do {
+            index += direction;
+        } while (index >= 0 && index < items.length && items[index].kind !== ITEM_KIND.ROW);
+        if (index < 0 || index >= items.length) {
+            shown.highlighted = EXIT_BUTTON;
+            jumpToTarget();
+            placeExitButton();
+            return;
+        }
+        shown.highlighted = index;
+        scrollToHighlighted();
         if (glide.timer === null) {
             glide.lastMs = host.now().getTime();
             glide.timer = host.setInterval(safeHandler(SCRIPT_NAME, glideStep), FRAME_MS);
         }
+    }
+
+    const placeAt = (layer, rect) => layer.setPos((rect.x + rect.w / 2) / geometry.width - 0.5, 0.5 - (rect.y + rect.h / 2) / geometry.height);
+
+    // The Exit Button at its place, and while it is selected its tooltip and
+    // the Selection Marker round it; drawn on the spot if not drawn ahead.
+    function placeExitButton() {
+        const isSelected = shown.highlighted === EXIT_BUTTON;
+        const button = exitLayer("button");
+        placeAt(button, geometry.exitButton);
+        button.alpha = opacity;
+        const tooltipLayer = exitLayer("tooltip");
+        placeAt(tooltipLayer, geometry.exitTooltip);
+        tooltipLayer.alpha = isSelected ? opacity : 0;
+        if (isSelected && !shown.marker) {
+            // In the shared reference pixels, so it looks as on the other screens.
+            shown.marker = createSelectionMarker(host, {
+                zIndex: ACHIEVEMENT_LIST_Z_INDEX.marker, referenceWidth: geometry.width * SHARED_SCALE, referenceHeight: geometry.height * SHARED_SCALE,
+            });
+            const { x, y, w, h } = geometry.exitButton;
+            shown.marker.moveTo({ x: x * SHARED_SCALE, y: y * SHARED_SCALE, w: w * SHARED_SCALE, h: h * SHARED_SCALE });
+        } else if (!isSelected && shown.marker) {
+            removeMarker();
+        }
+        if (shown.marker) shown.marker.setOpacity(opacity);
+    }
+
+    function removeMarker() {
+        shown.marker.remove();
+        shown.marker = null;
     }
 
     // Over the mask at their place; drawn on the spot if not drawn ahead.
@@ -616,6 +692,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         mask.layer.alpha = opacity;
         showHeaderEmblems();
         jumpToTarget();
+        placeExitButton();
     }
 
     // Each frame of the fade in; leaves a glide the player started going.
@@ -625,6 +702,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         mask.layer.alpha = opacity;
         showHeaderEmblems();
         placeItems();
+        placeExitButton();
     }
 
     // onExit: what Exit returns to, called once the list is closed.
@@ -639,7 +717,8 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         isContentStale = false;
         // Drawn: only what was not drawn ahead yet.
         opening.draw(measure);
-        shown = { onExit, scroll: 0, highlighted: content.items.findIndex(item => item.kind === ITEM_KIND.ROW), isPreparing: false };
+        // On the first row; on the Exit Button when there is none.
+        shown = { onExit, scroll: 0, highlighted: firstRowIndex(), isPreparing: false, marker: null };
         if (!nextFirstScreenDrawing()) {
             show();
             opening.logOpened();
@@ -671,9 +750,10 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         opening.remove();
         opacity = 1;
         stopGlide();
+        if (shown.marker) removeMarker();
         shown = null;
         for (const layer of [backdropLayer, mask.layer]) layer.alpha = 0;
-        for (const layers of [itemLayers, pieceLayers, headerEmblemLayers, thumbLayers]) hideAllExcept(layers, new Set());
+        for (const layers of [itemLayers, pieceLayers, headerEmblemLayers, thumbLayers, exitLayers]) hideAllExcept(layers, new Set());
         // What changed while it was open is read again once it is closed.
         wakeDrawingAhead();
         closedListeners.tell();
@@ -684,9 +764,10 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         if (!shown) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
+        const isOnExitButton = !shown.isPreparing && shown.highlighted === EXIT_BUTTON;
         if ((ev.command === "Next" || ev.command === "Prev") && !shown.isPreparing) {
             move(ev.command === "Next" ? 1 : -1);
-        } else if (ev.command === "Exit") {
+        } else if (ev.command === "Exit" || (isOnExitButton && (ev.command === "Select" || ev.command === "Launch"))) {
             const { onExit } = shown;
             close();
             onExit();
