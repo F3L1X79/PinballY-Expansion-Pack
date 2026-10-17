@@ -21,9 +21,17 @@ The submenu, opened by the player from the main menu, that gathers PinballY's fi
 _Avoid_: filter menu (each group's own list is a filter menu too), filter groups (the groups are what it lists)
 
 **Selection Marker**:
-The soft gold glow around the current choice of a drawn screen (Welcome Screen, Profile Stats, Household Stats, the Avatar Frame list), whose golds, from bronze to a white gleam, flow round it without end, always the same way, so the player sees at once where they are; it jumps straight to a new choice. Drawn Menus mark their selected entry their own way.
+The soft gold glow around the current choice of a drawn screen (Welcome Screen, Profile Stats, Household Stats, the Avatar Frame list, and the Exit Button of the Achievement List and High Score Board), whose golds, from bronze to a white gleam, flow round it without end, always the same way, so the player sees at once where they are; it jumps straight to a new choice. Drawn Menus mark their selected entry their own way.
 The choice it surrounds is the current (or highlighted) choice; only the glow itself is never called a highlight.
 _Avoid_: halo (for the selection; a Rank emblem's or a Mastery square's halo stays a halo), cursor, highlight
+
+**Exit Button**:
+The button at the top right of every drawn screen (Welcome Screen, Profile Stats, Household Stats, Achievement List, Avatar Frame list, High Score Board) that does just what Exit does there, chosen like the screen's other choices. It shows a back arrow, its tooltip saying "Back", whenever Exit brings something back, a parent screen or a menu; and a cross, its tooltip saying "Close", only when Exit leaves the bare wheel. On a screen with no other choice it is always the current one. The screen's footer names the same word after the Exit key. Shown as "Retour" or "Fermer" in French.
+_Avoid_: close cross, back button (it is one button whose look follows where Exit goes)
+
+**Button Hints**:
+The footer of a drawn screen that shows, as key caps followed by what they do, the player's buttons that act there: the flippers (browse, or scroll on a High Score Board longer than the window), Select (choose), and Exit, named with the Exit Button's word. A button that does nothing on that screen is left out. Shown under no title.
+_Avoid_: help bar, legend
 
 **Loader**:
 A small gold comet that circles without end on the top third of the playfield screen, always in the same place, with no text nor backdrop, over whatever is already there, while something the player waits for gets ready: PinballY starting up until the Welcome Screen shows (over the wheel already dimmed for it), a table launching, or closing to go back to the wheel (never while it is played), the High Score Board while it reads a table's board afresh, and the Profile Stats, the Household Stats and the Achievement List (the Avatar Frame list too if it proves slow) while they get ready, over the wheel already dimmed for them, and only if they are not ready within a moment; the screen then fades in whole, and Exit meanwhile gives up opening it. It only shows where it can keep turning, never on a screen drawn all at once, nor when the Welcome Screen comes back after Change Player. It never takes the player's buttons. Shown as "Indicateur de chargement" in French.
