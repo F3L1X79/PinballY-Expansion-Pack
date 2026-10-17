@@ -1,6 +1,7 @@
 ﻿// ============================================================
 // Reads the drawn Achievement List the way the player sees it, on the fake
-// PinballY host: the texts of its header and footer, the items shown in
+// PinballY host: the texts of its header and footer, the footer's Button
+// Hints, the items shown in
 // the rows area from top to bottom, the highlighted one (the only one not
 // dimmed), the whole list, walked with Next as a player would, with the
 // colours each row is drawn in, its rank emblem image and its Unlock Rate
@@ -13,6 +14,8 @@ import assert from "node:assert/strict";
 import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
 import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
 import { readVeil } from "../support/opening_reader.js";
+import { readButtonHints } from "../support/button_hints_reader.js";
+import { computeGeometry, LIST_LOOK } from "../../common/achievements/achievement_list_painter.js";
 
 // Past the glide from one line to the next.
 export const GLIDE_OVER_MS = 400;
@@ -33,6 +36,14 @@ const chromeLayers = fake => fake.drawingLayers()
 
 // The texts of the header and the footer; none when the list is closed.
 export const chromeTexts = fake => chromeLayers(fake).flatMap(layer => layer.texts());
+
+// The footer's Button Hints: the mask's texts in the footer's band.
+export function footerHints(fake) {
+    const [layer] = chromeLayers(fake);
+    const g = computeGeometry(layer.canvasSize());
+    const footerTop = g.y + g.panelHeight - LIST_LOOK.footerHeight;
+    return readButtonHints(layer.strokes().filter(stroke => "text" in stroke && stroke.rect.y >= footerTop));
+}
 
 // The header's count of Unlocked Achievements per Achievement Rank: the
 // text drawn right after that rank's emblem, which is in its colour.

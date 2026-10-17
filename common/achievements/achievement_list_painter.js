@@ -11,7 +11,7 @@
 
 import { ACHIEVEMENT_RANK, RANKS_IN_ORDER } from "./achievements.js";
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
-import { drawAvatarFrame, avatarFrameSide, avatarFrameInset } from "../drawing/steamball_drawing.js";
+import { drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawButtonHints } from "../drawing/steamball_drawing.js";
 
 // The wheel shows dimmed through it.
 const OVERLAY_COLOR = 0xD0080A0E;
@@ -312,41 +312,14 @@ function drawHeader(host, dc, g, header) {
     dc.fillRect(x, y + look.headerHeight - 1, width, 1, COLORS.border);
 }
 
-// Centred like a console's hints: key caps, then what they do.
+// The Button Hints (footer: their groups) on the footer's band.
 function drawFooter(host, dc, g, footer) {
     const look = LIST_LOOK;
     const { x, panelWidth: width } = g;
     const y = g.y + g.panelHeight - look.footerHeight;
     fillGradient(dc, x, y, width, look.footerHeight, FOOTER_TOP_COLOR, COLORS.panel);
     dc.fillRect(x, y, width, 1, COLORS.border);
-
-    const keyCap = () => host.createStyledText({
-        backgroundColor: COLORS.keyCap, cornerRadius: 6, padding: 8,
-        textStyle: { font: FONTS.display, size: 15, weight: 700, color: COLORS.title },
-    });
-    const label = () => host.createStyledText({ textStyle: { font: FONTS.display, size: 18, weight: 600, color: COLORS.description } });
-    const pieces = [
-        { key: footer.prevKey }, { gap: 8 }, { key: footer.nextKey }, { gap: 12 }, { label: footer.browse },
-        { gap: 48 },
-        { key: footer.exitKey }, { gap: 12 }, { label: footer.back },
-    ].map(piece => {
-        if (piece.gap) return piece;
-        const text = piece.key === undefined ? label() : keyCap();
-        text.add(piece.key === undefined ? piece.label : piece.key);
-        const size = text.measure(width);
-        return { text, width: size.width, height: size.height };
-    });
-    const total = pieces.reduce((sum, piece) => sum + (piece.gap || piece.width), 0);
-    let pieceX = x + (width - total) / 2;
-    for (const piece of pieces) {
-        if (piece.gap) {
-            pieceX += piece.gap;
-            continue;
-        }
-        // A little wider than measured, so the last letter never wraps.
-        piece.text.draw(dc, { x: pieceX, y: y + (look.footerHeight - piece.height) / 2, width: piece.width + 2, height: piece.height });
-        pieceX += piece.width;
-    }
+    drawButtonHints(host, dc, footer, { x, y, width, height: look.footerHeight });
 }
 
 // The whole window, transparent between the header and the footer, so a

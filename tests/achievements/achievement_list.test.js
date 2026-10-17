@@ -27,7 +27,7 @@ import { RANK_COLORS, STEAMBALL_COLORS } from "../../common/drawing/steamball_pa
 import lang from "../../common/core/i18n.js";
 import {
     press, pressAndGlide, chromeTexts, headerRankCounts, headerEmblemImages, isListOpen, shownItems, highlightedTexts, readSections,
-    readRows, readWholeList, untilListShown,
+    readRows, readWholeList, untilListShown, footerHints,
 } from "./achievement_list_reader.js";
 
 const TEXT = lang.achievementList;
@@ -110,10 +110,10 @@ test("the list opens over the menu with the Profile's header, both sections and 
 
     assert.ok(fake.executedCommands().includes(fake.getBuiltInCommand("MenuReturn")), "the main menu is closed first");
     const chrome = chromeTexts(fake);
-    for (const text of [upper(TEXT.title), "Alice", TEXT.totalLine(4, 6, 67),
-        upper(TEXT.keyCaps.next), upper(TEXT.keyCaps.prev), upper(TEXT.keyCaps.exit), upper(TEXT.browse), upper(TEXT.back)]) {
+    for (const text of [upper(TEXT.title), "Alice", TEXT.totalLine(4, 6, 67)]) {
         assert.ok(chrome.includes(text), `"${text}" is shown in ${JSON.stringify(chrome)}`);
     }
+    assert.deepEqual(footerHints(fake), [{ keys: ["PREV", "NEXT"], label: "BROWSE" }, { keys: ["EXIT"], label: "BACK" }]);
     assert.deepEqual(readSections(fake, TEXT), [
         {
             header: [upper(TEXT.unlockedSection), TEXT.sectionCount(4)],

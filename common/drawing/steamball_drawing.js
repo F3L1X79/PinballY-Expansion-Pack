@@ -2,8 +2,9 @@
 // Steamball drawing helpers shared by the drawn screens (Welcome Screen,
 // Profile Stats) and the Profile badge: text on one or several lines,
 // rounded and gradient fills, glows, the dimmed backdrop with its panel,
-// the Avatar, a wheel logo, the close cross, a tooltip, the Avatar Frame
-// around an Avatar and the Player Level pip. Each
+// the Avatar, a wheel logo, the Exit Button (its cross or back arrow), a
+// tooltip, the Button Hints, the Avatar Frame around an Avatar and the
+// Player Level pip. Each
 // draws on the drawing context it is given, in its coordinates. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
@@ -147,16 +148,99 @@ export function drawAvatar(dc, path, x, y, size) {
     dc.frameRect(x, y, size, size, 3, COLORS.border);
 }
 
-// The close cross on a small tile.
-export function drawCross(dc, x, y, size) {
+// The Exit Button's two looks: the back arrow where Exit brings back a
+// screen or a menu, the cross where it leaves the bare wheel.
+export const EXIT_BUTTON_LOOK = Object.freeze({ BACK: "back", CLOSE: "close" });
+
+// The Exit Button on a small tile, size pixels wide: the cross or the back arrow.
+export function drawExitButton(dc, look, x, y, size) {
     fillGradient(dc, x, y, size, size, COLORS.rowUnlocked, COLORS.tile);
     dc.frameRect(x, y, size, size, 2, COLORS.border);
+    if (look === EXIT_BUTTON_LOOK.BACK) drawBackArrow(dc, x, y, size);
+    else drawCross(dc, x, y, size);
+}
+
+// A gold U-turn pointing left (↩): its head at the bottom left, its shaft
+// running right, then a short hook round a half circle up and back left.
+function drawBackArrow(dc, x, y, size) {
+    const t = Math.max(3, Math.round(size / 14));
+    const half = Math.floor(t / 2);
+    const inset = Math.round(size * 0.22);
+    const r = Math.round(size * 0.16);
+    const bottom = y + Math.round(size * 0.62);
+    const top = bottom - 2 * r;
+    const cx = x + size - inset - r;
+    const tipX = x + inset;
+    const head = Math.round(size * 0.2);
+    for (let i = 0; i <= head; i++) {
+        const spread = Math.round(i * 0.8);
+        dc.fillRect(tipX + i, bottom - spread, 1, 2 * spread + 1, COLORS.gold);
+    }
+    dc.fillRect(tipX + head, bottom - half, cx - tipX - head, t, COLORS.gold);
+    const tail = Math.round(r * 0.8);
+    dc.fillRect(cx - tail, top - half, tail, t, COLORS.gold);
+    // In small squares round the half circle, close enough to touch.
+    const steps = Math.ceil(Math.PI * r / Math.max(1, half));
+    for (let step = 0; step <= steps; step++) {
+        const angle = -Math.PI / 2 + Math.PI * step / steps;
+        dc.fillRect(Math.round(cx + r * Math.cos(angle)) - half, Math.round(top + r + r * Math.sin(angle)) - half, t, t, COLORS.gold);
+    }
+}
+
+function drawCross(dc, x, y, size) {
     const inset = Math.round(size * 0.3);
     const t = Math.max(3, Math.round(size / 14));
     for (let i = 0; i <= size - 2 * inset; i++) {
         dc.fillRect(x + inset + i - 1, y + inset + i - 1, t, t, COLORS.description);
         dc.fillRect(x + size - inset - i - t + 1, y + inset + i - 1, t, t, COLORS.description);
     }
+}
+
+// The Button Hints' look at scale 1, in the Achievement List's layout pixels.
+const BUTTON_HINTS = Object.freeze({ keySize: 15, keyPadding: 8, keyRadius: 6, labelSize: 18, keyGap: 8, labelGap: 12, groupGap: 48 });
+
+const piecesWidth = pieces => pieces.reduce((sum, piece) => sum + (piece.gap || piece.width), 0);
+
+// The Button Hints centred in the box, both ways: groups ([{ keys: [key
+// cap texts], label }]) of key caps then what they do, side by side.
+// scale: the look's size against the Achievement List's; shrunk further
+// when the hints would not fit in the box's width.
+export function drawButtonHints(host, dc, groups, { x, y, width, height, scale = 1 }) {
+    let pieces = buttonHintPieces(host, groups, width, scale);
+    const total = piecesWidth(pieces);
+    if (total > width) pieces = buttonHintPieces(host, groups, width, scale * width / total);
+    let pieceX = x + (width - piecesWidth(pieces)) / 2;
+    for (const piece of pieces) {
+        if (piece.gap) {
+            pieceX += piece.gap;
+            continue;
+        }
+        // A little wider than measured, so the last letter never wraps.
+        piece.text.draw(dc, { x: pieceX, y: y + (height - piece.height) / 2, width: piece.width + 2, height: piece.height });
+        pieceX += piece.width;
+    }
+}
+
+// Each key cap and label measured, with the gaps between them.
+function buttonHintPieces(host, groups, width, scale) {
+    const look = BUTTON_HINTS;
+    const px = value => Math.max(1, Math.round(value * scale));
+    const keyCap = () => host.createStyledText({
+        backgroundColor: COLORS.keyCap, cornerRadius: px(look.keyRadius), padding: px(look.keyPadding),
+        textStyle: { font: FONTS.display, size: px(look.keySize), weight: 700, color: COLORS.title },
+    });
+    const label = () => host.createStyledText({ textStyle: { font: FONTS.display, size: px(look.labelSize), weight: 600, color: COLORS.description } });
+    const measured = (styled, str) => {
+        styled.add(str);
+        const size = styled.measure(width);
+        return { text: styled, width: size.width, height: size.height };
+    };
+    return groups.flatMap((group, index) => [
+        ...(index > 0 ? [{ gap: px(look.groupGap) }] : []),
+        ...group.keys.flatMap((key, keyIndex) => [...(keyIndex > 0 ? [{ gap: px(look.keyGap) }] : []), measured(keyCap(), key)]),
+        { gap: px(look.labelGap) },
+        measured(label(), group.label),
+    ]);
 }
 
 // A web-style tooltip: a dark rounded label with a small arrow whose tip

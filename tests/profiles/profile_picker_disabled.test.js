@@ -30,7 +30,7 @@ test("turning the Profile picker off removes its main-menu entry and Welcome Scr
 
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     const choices = readChoices(fake);
-    assert.ok(choices.includes(lang.welcomeScreen.closeTooltip), "the Welcome Screen is open");
+    assert.ok(choices.includes(lang.buttonHints.close), "the Welcome Screen is open");
     assert.ok(!choices.includes(lang.profiles.menuEntry));
     press(fake, "Exit");
 

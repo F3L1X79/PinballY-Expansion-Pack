@@ -46,6 +46,8 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { displayNameOf } from "../profiles/profile_name.js";
 import { createScreenOpening } from "../drawing/screen_opening.js";
+import { EXIT_BUTTON_LOOK } from "../drawing/steamball_drawing.js";
+import { buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
 import {
     LIST_LOOK, AVATAR_FRAME_WIDTH, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
@@ -308,20 +310,10 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         };
     }
 
-    function describeFooter() {
-        const upper = text => text.toLocaleUpperCase();
-        return {
-            nextKey: upper(TEXT.keyCaps.next),
-            prevKey: upper(TEXT.keyCaps.prev),
-            exitKey: upper(TEXT.keyCaps.exit),
-            browse: upper(TEXT.browse),
-            back: upper(TEXT.back),
-        };
-    }
-
     function readContent() {
         const entries = readEntries();
-        return { ...buildItems(entries), header: describeHeader(entries), footer: describeFooter() };
+        const footer = buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, exitLook: EXIT_BUTTON_LOOK.BACK });
+        return { ...buildItems(entries), header: describeHeader(entries), footer };
     }
 
     // Draws the backdrop, which also measures the window.

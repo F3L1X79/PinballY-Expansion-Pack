@@ -67,7 +67,7 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     const CARDS = TEXT.periodCards;
     assert.deepEqual(periodCards(fake).map(card => card.line), [null, null], "no grey line without a Streak, nor a Play this Period");
     assert.deepEqual(readChoices(fake), [
-        lang.profiles.menuEntry, TEXT.closeTooltip, CARDS.day.period, CARDS.week.period, TEXT.randomTable, TEXT.stayOn("Attack from Mars Special"),
+        lang.profiles.menuEntry, lang.buttonHints.close, CARDS.day.period, CARDS.week.period, TEXT.randomTable, TEXT.stayOn("Attack from Mars Special"),
     ]);
     assert.deepEqual(fake.soundsPlayed(), Array(6).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
     press(fake, "Prev");

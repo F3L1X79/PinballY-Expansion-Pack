@@ -24,10 +24,10 @@ const VEIL = { shown: true, zIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop - 2, color:
 const DRAW_MS = 60;
 const TICK_MS = 4;
 
-// The screen's layers that fade in, the cross's tooltip and marker left out.
+// The screen's layers that fade in, the Exit Button's tooltip and marker left out.
 const fadingLayers = fake => fake.drawingLayers().filter(layer =>
     [HOUSEHOLD_STATS_Z_INDEX.backdrop, HOUSEHOLD_STATS_Z_INDEX.title, HOUSEHOLD_STATS_Z_INDEX.labels,
-        HOUSEHOLD_STATS_Z_INDEX.columns, HOUSEHOLD_STATS_Z_INDEX.cross].includes(layer.zIndex));
+        HOUSEHOLD_STATS_Z_INDEX.columns, HOUSEHOLD_STATS_Z_INDEX.exitButton].includes(layer.zIndex));
 
 // Runs the clock a tick at a time until the screen starts fading in;
 // returns how long it took.

@@ -17,7 +17,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, drawCross, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, drawExitButton, EXIT_BUTTON_LOOK, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
@@ -310,7 +310,7 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
                     drawLevelPip(host, dc, screen.level, pip.cx, pip.cy, pip.size);
                 }
             }
-            drawCross(dc, inner.w - LOOK.cross, 0, LOOK.cross);
+            drawExitButton(dc, EXIT_BUTTON_LOOK.CLOSE, inner.w - LOOK.cross, 0, LOOK.cross);
             const parts = screen.greeting.map(([str, gold]) => [str, gold ? COLORS.gold : COLORS.title]);
             runs(host, dc, parts, { x: 0, y: greetingY, width: greetingW, size: LOOK.greetingSize });
         },

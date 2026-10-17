@@ -187,12 +187,27 @@ export default {
         notNow: "Später",
     },
 
+    // The Button Hints at the foot of every drawn screen and the Exit
+    // Button's tooltip (see GLOSSARY.md). The key caps and the footer's
+    // words are shown in capitals.
+    buttonHints: {
+        // PinballY's button names, as on the cabinet's key caps.
+        keyCaps: { next: "Next", prev: "Prev", select: "Select", exit: "Exit" },
+        browse: "Blättern",
+        // The flippers on a High Score Board longer than the window.
+        scroll: "Scroll", // TODO: translation pass
+        choose: "Choose", // TODO: translation pass
+        // Exit's word and the Exit Button's tooltip: Back where Exit brings
+        // back a screen or a menu, Close where it leaves the bare wheel.
+        back: "Zurück",
+        close: "Close", // TODO: translation pass
+    },
+
     // TODO: translation pass
     welcomeScreen: {
         greetings: { morning: "Good morning", afternoon: "Good afternoon", evening: "Good evening", night: "Still up" },
         greetingWithName: (greeting, name) => [`${greeting}, `, name, "!"],
         greetingAlone: (greeting) => `${greeting}!`,
-        closeTooltip: "Close",
         stayOn: (tableTitle) => `Stay on ${tableTitle}`,
         stayOnWheel: "Stay on the wheel",
         randomTable: "Launch a random table",
@@ -411,18 +426,13 @@ export default {
 
     achievementList: {
         menuEntry: "Erfolgsliste",
-        // The header's title, the section titles, the key caps and the
-        // footer's hints are shown in capitals.
+        // The header's title and the section titles are shown in capitals.
         title: "Erfolgsliste",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} Erfolge freigeschaltet (${percent} %)`,
         unlockedSection: "Freigeschaltete Erfolge",
         missingSection: "Offene Erfolge",
         // After a section's title.
         sectionCount: (count) => `(${count})`,
-        // PinballY's button names, as on the cabinet's key caps.
-        keyCaps: { next: "Next", prev: "Prev", exit: "Exit" },
-        browse: "Blättern",
-        back: "Zurück",
         // After at most four Avatars on a row: how many other Profiles have it too.
         moreOwners: (count) => `+${count}`,
         // A missing Secret Achievement's title.
@@ -465,8 +475,6 @@ export default {
     profileStats: {
         menuEntry: "Statistiken",
         // TODO: translation pass
-        closeTooltip: "Close",
-        backTooltip: "Back", // TODO: translation pass
         // The buttons at the card's foot.
         buttons: {
             achievements: "Achievements",

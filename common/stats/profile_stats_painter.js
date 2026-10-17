@@ -21,7 +21,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, mix, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
-    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawCross, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawExitButton, EXIT_BUTTON_LOOK, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
     UNBOUNDED,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
@@ -408,7 +408,7 @@ export function layoutProfileStats(host, screen, referenceWidth) {
     pieces.push({
         zIndex: PROFILE_STATS_Z_INDEX.cross,
         rect: { x: crossX, y: top, w: LOOK.cross, h: LOOK.cross },
-        draw: dc => drawCross(dc, 0, 0, LOOK.cross),
+        draw: dc => drawExitButton(dc, EXIT_BUTTON_LOOK.CLOSE, 0, 0, LOOK.cross),
     });
     // The tooltip sits on the cross's left; the rect leaves room for it.
     const crossRoom = LOOK.crossTooltipRoom;

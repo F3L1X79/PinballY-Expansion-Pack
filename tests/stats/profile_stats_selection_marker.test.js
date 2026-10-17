@@ -23,7 +23,7 @@ test("the Selection Marker surrounds the cross, jumps on Next, follows the scree
     openProfileStats(fake, lang);
     assert.ok(markerLayer(fake), "the marker is drawn on opening");
     assert.ok(isMarkerOnCross(fake), "round the cross");
-    assert.equal(highlighted(fake), TEXT.closeTooltip, "with its tooltip");
+    assert.equal(highlighted(fake), lang.buttonHints.close, "with its tooltip");
     press(fake, "Next");
     assert.equal(highlighted(fake), buttons(fake)[0].label, "on the first button after Next");
 

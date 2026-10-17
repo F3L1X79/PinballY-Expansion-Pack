@@ -6,21 +6,24 @@
 // on the left, then one column per Profile (its Avatar in its worn Avatar
 // Frame, with no Player Level pip, and its name as a header, then one cell
 // per line, the best values in gold, the Collection Mastery with its
-// Collection Tier square, the pair centred), and the cross at the top
-// right with the Back tooltip shown while it is selected (the Selection
-// Marker surrounds the selected column or the cross).
+// Collection Tier square, the pair centred), the Exit Button at the top
+// right with its tooltip shown while it is selected (the Selection
+// Marker surrounds the selected column or the Exit Button), and the
+// Button Hints in a footer under the columns.
 // Past five columns, or fewer in a narrow window, the layout also gives
 // the view the columns show through and their pitch, for the module to
 // glide them sideways. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
-import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, drawCross as drawCrossTile, tooltip, UNBOUNDED } from "../drawing/steamball_drawing.js";
+import {
+    oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, drawExitButton as drawExitButtonTile, drawButtonHints as drawButtonHintsCentred, tooltip, UNBOUNDED,
+} from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
 // Above the Avatar Frame list's band, which never shows at the same time,
 // so each reader sees only its own layers.
-export const HOUSEHOLD_STATS_Z_INDEX = Object.freeze({ backdrop: 6160, title: 6161, labels: 6162, columns: 6163, cross: 6164, marker: 6169, tooltip: 6170 });
+export const HOUSEHOLD_STATS_Z_INDEX = Object.freeze({ backdrop: 6160, title: 6161, labels: 6162, columns: 6163, exitButton: 6164, buttonHints: 6165, marker: 6169, tooltip: 6170 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -40,9 +43,12 @@ const LOOK = Object.freeze({
     avatar: 104, nameGap: 4, nameH: 40, nameSize: 24, minNameSize: 16, headerH: 212,
     // Each line: its height, its value at valueSize, a thin rule under it.
     lineH: 76, valueSize: 28, minValueSize: 18, squareK: 0.6, squareGap: 10,
-    // The cross at the title's right end, as on the Profile Stats, with
-    // room on its left for its tooltip, and round it on the tooltip's layer.
-    cross: 56, crossTooltipRoom: 240, tooltipMargin: 16,
+    // The Exit Button at the title's right end, as on the Profile Stats,
+    // with room on its left for its tooltip, and round it on the tooltip's layer.
+    exitButton: 56, exitTooltipRoom: 240, tooltipMargin: 16,
+    // The Button Hints' footer under the columns, a rule on its top; their
+    // look at hintsScale times the Achievement List's.
+    footerGap: 16, footerH: 96, hintsScale: 1.5,
 });
 
 // How wide a column's Avatar Frame is drawn, for its image's size.
@@ -52,9 +58,10 @@ export const AVATAR_FRAME_WIDTH = avatarFrameSide(LOOK.avatar);
 const AVATAR_Y = LOOK.avatar * AVATAR_FRAME_MARGIN;
 const NAME_Y = AVATAR_FRAME_WIDTH + LOOK.nameGap;
 
-// The panel, its title, the cross, the labels' column, each column as if
+// The panel, its title, the Exit Button, the labels' column, each column as if
 // none were scrolled (the first ones in view, the others lined up after
-// them), the view the columns show through and their pitch, in a window
+// them), the view the columns show through and their pitch, the Button
+// Hints' footer, in a window
 // referenceWidth wide, for columnCount columns and lineCount lines.
 export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     const widest = Math.round(referenceWidth * LOOK.widthShare);
@@ -64,34 +71,42 @@ export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     const columnW = Math.max(LOOK.columnMinW, Math.min(LOOK.columnMaxW, Math.floor(room / shown)));
     const w = 2 * LOOK.pad + LOOK.labelsW + shown * (LOOK.columnGap + columnW);
     const tableH = LOOK.headerH + lineCount * LOOK.lineH;
-    const h = 2 * LOOK.pad + LOOK.titleH + LOOK.titleGap + tableH;
+    const h = 2 * LOOK.pad + LOOK.titleH + LOOK.titleGap + tableH + LOOK.footerGap + LOOK.footerH;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     const x = panel.x + LOOK.pad;
     const title = { x, y: panel.y + LOOK.pad, w: w - 2 * LOOK.pad, h: LOOK.titleH };
-    const cross = { x: panel.x + w - LOOK.pad - LOOK.cross, y: title.y + Math.round((title.h - LOOK.cross) / 2), w: LOOK.cross, h: LOOK.cross };
+    const exitButton = { x: panel.x + w - LOOK.pad - LOOK.exitButton, y: title.y + Math.round((title.h - LOOK.exitButton) / 2), w: LOOK.exitButton, h: LOOK.exitButton };
     const tableY = title.y + title.h + LOOK.titleGap;
     const labels = { x, y: tableY, w: LOOK.labelsW, h: tableH };
     const pitch = columnW + LOOK.columnGap;
     const firstX = x + LOOK.labelsW + LOOK.columnGap;
     const columns = Array.from({ length: columnCount }, (_, index) => ({ x: firstX + index * pitch, y: tableY, w: columnW, h: tableH }));
     const view = { x: firstX, w: shown * pitch - LOOK.columnGap, count: shown };
-    return { panel, title, cross, labels, columns, view, pitch };
+    const buttonHints = { x, y: tableY + tableH + LOOK.footerGap, w: w - 2 * LOOK.pad, h: LOOK.footerH };
+    return { panel, title, exitButton, labels, columns, view, pitch, buttonHints };
 }
 
-// The cross's tooltip layer, with the tooltip on the cross's left: its
-// rect leaves room for it.
-export function crossTooltipRectOf(cross) {
+// The Exit Button's tooltip layer, with the tooltip on the button's left:
+// its rect leaves room for it.
+export function exitTooltipRectOf(exitButton) {
     const M = LOOK.tooltipMargin;
-    return { x: cross.x - LOOK.crossTooltipRoom, y: cross.y - M, w: LOOK.crossTooltipRoom + cross.w + M, h: cross.h + 2 * M };
+    return { x: exitButton.x - LOOK.exitTooltipRoom, y: exitButton.y - M, w: LOOK.exitTooltipRoom + exitButton.w + M, h: exitButton.h + 2 * M };
 }
 
-export function drawCross(dc) {
-    drawCrossTile(dc, 0, 0, LOOK.cross);
+// look: an EXIT_BUTTON_LOOK.
+export function drawExitButton(dc, look) {
+    drawExitButtonTile(dc, look, 0, 0, LOOK.exitButton);
 }
 
-export function drawCrossTooltip(host, dc, label) {
+export function drawExitTooltip(host, dc, label) {
     const M = LOOK.tooltipMargin;
-    tooltip(host, dc, label, LOOK.crossTooltipRoom - 18, M + LOOK.cross / 2, "left");
+    tooltip(host, dc, label, LOOK.exitTooltipRoom - 18, M + LOOK.exitButton / 2, "left");
+}
+
+// The footer w by h: a rule on its top, the Button Hints (groups) centred.
+export function drawButtonHints(host, dc, groups, w, h) {
+    dc.fillRect(0, 0, w, 1, COLORS.border);
+    drawButtonHintsCentred(host, dc, groups, { x: 0, y: 0, width: w, height: h, scale: LOOK.hintsScale });
 }
 
 export function drawTitle(host, dc, title, w, h) {

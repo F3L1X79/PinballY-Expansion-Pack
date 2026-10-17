@@ -187,12 +187,27 @@ export default {
         notNow: "Plus tard...",
     },
 
+    // The Button Hints at the foot of every drawn screen and the Exit
+    // Button's tooltip (see GLOSSARY.md). The key caps and the footer's
+    // words are shown in capitals.
+    buttonHints: {
+        // The key caps: Next and Prev are the right and left flipper buttons.
+        keyCaps: { next: "Droite", prev: "Gauche", select: "Select", exit: "Exit" },
+        browse: "Parcourir",
+        // The flippers on a High Score Board longer than the window.
+        scroll: "Défiler",
+        choose: "Choisir",
+        // Exit's word and the Exit Button's tooltip: Back where Exit brings
+        // back a screen or a menu, Close where it leaves the bare wheel.
+        back: "Retour",
+        close: "Fermer",
+    },
+
     // The Welcome Screen, at startup (see addons/welcome_screen.js).
     welcomeScreen: {
         greetings: { morning: "Bien le bonjour", afternoon: "Hey salut", evening: "Bien le bonsoir", night: "Salut nocturne" },
         greetingWithName: (greeting, name) => [`${greeting}, `, name, " !"],
         greetingAlone: (greeting) => `${greeting} !`,
-        closeTooltip: "Fermer",
         stayOn: (tableTitle) => `Rester sur ${tableTitle}`,
         stayOnWheel: "Rester sur la roue",
         randomTable: "Lancer une table au hasard",
@@ -405,18 +420,13 @@ export default {
 
     achievementList: {
         menuEntry: "Vos succès",
-        // The header's title, the section titles, the key caps and the
-        // footer's hints are shown in capitals.
+        // The header's title and the section titles are shown in capitals.
         title: "Succès personnels",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} succès débloqués (${percent} %)`,
         unlockedSection: "Succès débloqués",
         missingSection: "Succès à obtenir",
         // After a section's title.
         sectionCount: (count) => `(${count})`,
-        // The key caps: Next and Prev are the right and left flipper buttons.
-        keyCaps: { next: "Droite", prev: "Gauche", exit: "Exit" },
-        browse: "Parcourir",
-        back: "Retour",
         // After at most four Avatars on a row: how many other Profiles have it too.
         moreOwners: (count) => `+${count}`,
         // A missing Secret Achievement's title.
@@ -458,10 +468,6 @@ export default {
 
     profileStats: {
         menuEntry: "Vos statistiques",
-        closeTooltip: "Fermer",
-        // The cross's tooltip where it goes back: the Household Stats, and
-        // another Profile's Profile Stats opened from them.
-        backTooltip: "Retour",
         // The buttons at the card's foot.
         buttons: {
             achievements: "Succès",

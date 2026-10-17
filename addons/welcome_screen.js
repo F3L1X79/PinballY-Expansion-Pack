@@ -233,7 +233,7 @@ export default function init() {
             choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, ...cards.map(card => card.choice), CHOICE.RANDOM, CHOICE.STAY],
             labels: {
                 [CHOICE.AVATAR]: lang.profiles.menuEntry,
-                [CHOICE.CLOSE]: TEXT.closeTooltip,
+                [CHOICE.CLOSE]: lang.buttonHints.close,
                 [CHOICE.STAY]: stay ? TEXT.stayOn(stay) : TEXT.stayOnWheel,
                 [CHOICE.RANDOM]: TEXT.randomTable,
             },

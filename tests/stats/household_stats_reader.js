@@ -4,8 +4,8 @@
 // columns from left to right (the Profile's name, its Avatar image, the
 // Avatar Frame around it, and each line's cell: its texts and whether its
 // value is gold), the highlighted column (the one the Selection Marker
-// surrounds, or the cross's tooltip on its own layer), whether the marker
-// surrounds the cross, the columns in view and those faded at the edges
+// surrounds, or the Exit Button's tooltip on its own layer), whether the marker
+// surrounds the Exit Button, the Button Hints, the columns in view and those faded at the edges
 // while gliding, opens them from the Profile Stats' "Household Stats" button and picks
 // a column as a player would (letting them get ready and fade in, or not), and goes back to the wheel. Never loaded by PinballY.
 // ============================================================
@@ -17,6 +17,7 @@ import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { openProfileStats, choose, press, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
 import { untilFadedIn } from "../support/opening_reader.js";
+import { buttonHintsOn } from "../support/button_hints_reader.js";
 
 export { press };
 
@@ -56,6 +57,37 @@ function labelLayer(fake) {
 }
 
 export const labels = fake => labelLayer(fake).texts();
+
+// The footer's groups of key caps and words, null when it does not show.
+export const buttonHints = fake => buttonHintsOn(fake, HOUSEHOLD_STATS_Z_INDEX.buttonHints);
+
+// Where a layer shows in a window of that size: PinballY centres it on its
+// position and scales it to ySpan of the window's height, its canvas's
+// aspect kept.
+function windowRect(layer, { width, height }) {
+    const canvas = layer.canvasSize();
+    const h = layer.scale().ySpan * height;
+    const w = h * canvas.width / canvas.height;
+    const cx = (layer.position().x + 0.5) * width;
+    const cy = (0.5 - layer.position().y) * height;
+    return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 };
+}
+
+// In a window of that size: the footer's rect, the columns' and the
+// labels' (each { left, top, right, bottom }), and whether every footer
+// text sits inside the footer.
+export function footerLayout(fake, size) {
+    const [footer] = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.buttonHints);
+    const canvas = footer.canvasSize();
+    const textsInside = textStrokes(footer).every(({ rect }) =>
+        rect.x >= 0 && rect.y >= 0 && rect.x + rect.width <= canvas.width + 2 && rect.y + rect.height <= canvas.height);
+    return {
+        footer: windowRect(footer, size),
+        columns: columnLayers(fake).map(layer => windowRect(layer, size)),
+        labels: windowRect(labelLayer(fake), size),
+        textsInside,
+    };
+}
 
 const columnLayers = fake => [...shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.columns)].sort((a, b) => a.position().x - b.position().x);
 
@@ -129,20 +161,20 @@ export const markerLayerCount = fake => selectionMarker.markerLayerCount(fake, H
 
 export const markerLayer = fake => selectionMarker.markerLayer(fake, HOUSEHOLD_STATS_Z_INDEX.marker);
 
-export const isMarkerOnCross = fake =>
-    selectionMarker.layerUnderMarker(fake, HOUSEHOLD_STATS_Z_INDEX.marker, shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.cross)) !== undefined;
+export const isMarkerOnExitButton = fake =>
+    selectionMarker.layerUnderMarker(fake, HOUSEHOLD_STATS_Z_INDEX.marker, shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.exitButton)) !== undefined;
 
-// The cross's tooltip, null when hidden.
+// The Exit Button's tooltip, null when hidden.
 function shownTooltip(fake) {
     const lit = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.tooltip);
     assert.ok(lit.length <= 1, "one tooltip at most");
     return lit.length > 0 ? lit[0].texts()[0] || null : null;
 }
 
-// The name of the column the marker surrounds, or the cross's tooltip when
-// the marker is on the cross.
+// The name of the column the marker surrounds, or the Exit Button's tooltip when
+// the marker is on the Exit Button.
 export function highlightedColumn(fake) {
-    // Exactly one marker, even on the cross.
+    // Exactly one marker, even on the Exit Button.
     markerLayer(fake);
     const tooltip = shownTooltip(fake);
     if (tooltip) return tooltip;

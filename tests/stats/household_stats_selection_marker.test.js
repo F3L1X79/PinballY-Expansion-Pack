@@ -3,7 +3,7 @@
 // globals with a Household of seven: the marker surrounds the first
 // column on opening; while the columns glide after a move it is held in
 // the view, still on every frame where the selected column ends, and is on
-// that column once the glide is over; on the cross it surrounds the cross,
+// that column once the glide is over; on the Exit Button it surrounds the Exit Button,
 // whose tooltip shows; it is gone, with its timer, once the screen closes.
 // ============================================================
 
@@ -12,13 +12,13 @@ import assert from "node:assert/strict";
 import { startHousehold } from "./household_stats_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import {
-    openHouseholdStats, highlightedColumn, markerLayer, markerLayerCount, isMarkerOnCross, householdStatsLayerCount, isHouseholdStatsOpen, press, GLIDE_OVER_MS,
+    openHouseholdStats, highlightedColumn, markerLayer, markerLayerCount, isMarkerOnExitButton, householdStatsLayerCount, isHouseholdStatsOpen, press, GLIDE_OVER_MS,
 } from "./household_stats_reader.js";
 
 const NAMES = ["Ann", "Ben", "Cat", "Dan", "Eve", "Fay", "Gus"];
 const FRAME_MS = 16;
 
-test("the Selection Marker surrounds the column, follows the glide, surrounds the cross and is gone once the screen closes", async () => {
+test("the Selection Marker surrounds the column, follows the glide, surrounds the Exit Button and is gone once the screen closes", async () => {
     const { fake, lang } = await startHousehold({ profiles: Object.fromEntries(NAMES.map(name => [name, {}])) });
     const intervalsBefore = fake.runningIntervalCount();
 
@@ -39,9 +39,9 @@ test("the Selection Marker surrounds the column, follows the glide, surrounds th
     press(fake, "Next");
     fake.advanceTime(GLIDE_OVER_MS);
     press(fake, "Next");
-    assert.equal(markerLayerCount(fake), 1, "still a single marker on the cross");
-    assert.ok(isMarkerOnCross(fake), "round the cross");
-    assert.equal(highlightedColumn(fake), lang.profileStats.backTooltip, "with its tooltip");
+    assert.equal(markerLayerCount(fake), 1, "still a single marker on the Exit Button");
+    assert.ok(isMarkerOnExitButton(fake), "round the Exit Button");
+    assert.equal(highlightedColumn(fake), lang.buttonHints.back, "with its tooltip");
 
     press(fake, "Exit");
     fake.advanceTime(GLIDE_OVER_MS);

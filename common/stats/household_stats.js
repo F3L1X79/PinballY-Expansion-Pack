@@ -10,14 +10,15 @@
 // one Profile per step of the shared screen opening (docs/adr/0014). While open
 // it swallows every button through "commandbuttondown": Next / Prev move
 // the Selection Marker (a gold glow flowing round the choice) through the
-// cross at the top right (its tooltip says Back), then from column to
+// Exit Button at the top right (the back arrow, its tooltip saying Back),
+// then from column to
 // column, looping, with PinballY's navigation sound. Past five columns
 // (fewer in a narrow window), the columns glide sideways to keep the
 // marker in view, the marker following its column on every frame, the ones cut by the view's edges
-// faded, and coming from the cross jumps instead of gliding across them
-// all. Select or Launch on another Profile's column opens its Profile
+// faded, and coming from the Exit Button jumps instead of gliding across
+// them all. The Button Hints' footer names the flippers, Select and Exit. Select or Launch on another Profile's column opens its Profile
 // Stats read-only, whose Exit shows this screen again on that column; on
-// one's own column or the cross it goes back as Exit does. Exit closes it
+// one's own column or the Exit Button it goes back as Exit does. Exit closes it
 // and calls the return given to open(); attract mode only closes it. Opens directly, not through the
 // wheel dialog module: the player asked for it. isOpen() and onClosed()
 // let the wheel dialogs wait for it.
@@ -30,11 +31,12 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { prepareDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
-import { drawBackdrop } from "../drawing/steamball_drawing.js";
+import { drawBackdrop, EXIT_BUTTON_LOOK } from "../drawing/steamball_drawing.js";
+import { exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import {
-    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, crossTooltipRectOf,
-    drawTitle, drawLabels, drawColumn, drawCross, drawCrossTooltip,
+    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, exitTooltipRectOf,
+    drawTitle, drawLabels, drawColumn, drawExitButton, drawExitTooltip, drawButtonHints,
 } from "./household_stats_painter.js";
 
 const SCRIPT_NAME = "HouseholdStats";
@@ -44,9 +46,11 @@ const MINUTES_PER_HOUR = 60;
 // the Achievement List's does.
 const GLIDE_TIME_CONSTANT_MS = 40;
 const GLIDE_SNAP_PX = 0.5;
-// The selection on the cross rather than on a column; first in the
+// The selection on the Exit Button rather than on a column; first in the
 // Next / Prev loop, as on the Profile Stats.
-const CROSS = -1;
+const EXIT_BUTTON = -1;
+// Exit always brings one's own Profile Stats back.
+const EXIT_LOOK = EXIT_BUTTON_LOOK.BACK;
 
 // readStats(profileName): the Profile Stats' values for that Profile
 // (common/stats/profile_stats.js); openProfileStats(profileName, onBack): opens
@@ -149,7 +153,8 @@ export function createHouseholdStats(host, {
         });
         return {
             title: TEXT.household.title,
-            backLabel: TEXT.backTooltip,
+            exitWord: exitButtonWordOf(EXIT_LOOK),
+            buttonHints: buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_LOOK }),
             labels: lines.map(line => line.label),
             columns: entries.map(({ profile, isActive }, column) => ({
                 profileName: profile.name,
@@ -181,7 +186,7 @@ export function createHouseholdStats(host, {
         shown = opening;
         let screen = null;
         let geometry = null;
-        let crossTooltip = null;
+        let exitTooltip = null;
         // A step drawing one piece; rect() is read then, once the backdrop
         // has measured the window.
         const drawPiece = (zIndex, rect, draw, into) => drawn.draw(() => drawn.drawPiece(zIndex, rect(), draw, into));
@@ -196,12 +201,14 @@ export function createHouseholdStats(host, {
                 drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);
             }));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, () => geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
-            drawPiece(HOUSEHOLD_STATS_Z_INDEX.cross, () => geometry.cross, drawCross);
+            drawPiece(HOUSEHOLD_STATS_Z_INDEX.exitButton, () => geometry.exitButton, dc => drawExitButton(dc, EXIT_LOOK));
+            drawPiece(HOUSEHOLD_STATS_Z_INDEX.buttonHints, () => geometry.buttonHints,
+                dc => drawButtonHints(host, dc, screen.buttonHints, geometry.buttonHints.w, geometry.buttonHints.h));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, () => geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
             entries.forEach((entry, index) => drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, () => geometry.columns[index],
                 dc => drawColumn(host, dc, screen.columns[index], geometry.columns[index].w), columnLayers));
             drawn.draw(() => {
-                crossTooltip = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.tooltip, crossTooltipRectOf(geometry.cross), dc => drawCrossTooltip(host, dc, screen.backLabel));
+                exitTooltip = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.tooltip, exitTooltipRectOf(geometry.exitButton), dc => drawExitTooltip(host, dc, screen.exitWord));
             });
         }
 
@@ -215,7 +222,7 @@ export function createHouseholdStats(host, {
             // first: the first column in view once the glide is over; scroll:
             // how far the columns have glided, in reference pixels.
             Object.assign(opening, {
-                isPreparing: false, columns: screen.columns, crossTooltip, marker, marked: null, geometry, selected: column, first, scroll: first * geometry.pitch,
+                isPreparing: false, columns: screen.columns, exitTooltip, marker, marked: null, geometry, selected: column, first, scroll: first * geometry.pitch,
             });
             placeColumns(opening);
         }
@@ -237,7 +244,7 @@ export function createHouseholdStats(host, {
 
     // Each column at the glide's scroll, faded at the view's edges; the
     // marker on the selected column, held inside the view while that column
-    // glides into it, or on the cross with its tooltip.
+    // glides into it, or on the Exit Button with its tooltip.
     function placeColumns(screen) {
         const { geometry, drawn } = screen;
         const { view } = geometry;
@@ -247,10 +254,10 @@ export function createHouseholdStats(host, {
             drawn.place(layer, { ...rect, x });
             layer.alpha = screen.opacity * edgeAlpha(geometry, x, rect.w);
         });
-        const isOnCross = screen.selected === CROSS;
-        screen.crossTooltip.alpha = isOnCross ? screen.opacity : 0;
-        let marked = geometry.cross;
-        if (!isOnCross) {
+        const isOnExitButton = screen.selected === EXIT_BUTTON;
+        screen.exitTooltip.alpha = isOnExitButton ? screen.opacity : 0;
+        let marked = geometry.exitButton;
+        if (!isOnExitButton) {
             const selected = geometry.columns[screen.selected];
             const x = Math.max(view.x, Math.min(view.x + view.w - selected.w, selected.x - screen.scroll));
             marked = { ...selected, x };
@@ -298,20 +305,20 @@ export function createHouseholdStats(host, {
         closedListeners.tell();
     }
 
-    // direction: 1 for Next, -1 for Prev, through the cross then each
+    // direction: 1 for Next, -1 for Prev, through the Exit Button then each
     // column. Brings the selected column into view, gliding unless it comes
-    // from the cross: the columns then stay where they were.
+    // from the Exit Button: the columns then stay where they were.
     function move(direction) {
         navigationSound.play();
         const screen = shown;
         const { columns, view } = screen.geometry;
         const previous = screen.selected;
-        // The loop's places: the cross at 0, then the columns.
+        // The loop's places: the Exit Button at 0, then the columns.
         const places = columns.length + 1;
         screen.selected = ((previous + 1 + direction + places) % places) - 1;
-        if (screen.selected === CROSS) return placeColumns(screen);
+        if (screen.selected === EXIT_BUTTON) return placeColumns(screen);
         screen.first = Math.min(screen.selected, Math.max(screen.first, screen.selected - view.count + 1));
-        if (previous === CROSS) {
+        if (previous === EXIT_BUTTON) {
             stopGlide(screen);
             screen.scroll = targetScroll(screen);
         } else if (screen.glideTimer === null && screen.scroll !== targetScroll(screen)) {
@@ -328,10 +335,10 @@ export function createHouseholdStats(host, {
     }
 
     // Another Profile's column opens its Profile Stats, whose Exit comes
-    // back here on that column; one's own and the cross go back as Exit does.
+    // back here on that column; one's own and the Exit Button go back as Exit does.
     function choose() {
         const { onBack, columns, selected } = shown;
-        if (selected === CROSS) return back();
+        if (selected === EXIT_BUTTON) return back();
         const column = columns[selected];
         if (column.isActive) return back();
         close();

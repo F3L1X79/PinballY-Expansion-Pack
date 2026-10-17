@@ -336,7 +336,7 @@ export function createProfileStats(host, {
                 collection: collectionTextsOf(collectionMastery),
                 buttons,
                 // Another Profile's screen goes back to the Household Stats.
-                closeLabel: isReadOnly ? TEXT.backTooltip : TEXT.closeTooltip,
+                closeLabel: isReadOnly ? lang.buttonHints.back : lang.buttonHints.close,
                 // The flippers' loop, the cross first.
                 choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],
             },

@@ -43,7 +43,7 @@ test("the Selection Marker surrounds the Avatar, jumps on Next, flows round in 6
 
     press(fake, "Next");
     assert.equal(markedImage(fake), null, "the marker left the Avatar");
-    assert.deepEqual(highlighted(fake), { label: null, tooltip: lang.welcomeScreen.closeTooltip }, "for the cross");
+    assert.deepEqual(highlighted(fake), { label: null, tooltip: lang.buttonHints.close }, "for the cross");
 
     // A move draws the marker at once, at the current point of the lap.
     press(fake, "Prev");

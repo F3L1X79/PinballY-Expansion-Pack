@@ -3,7 +3,7 @@
 // Household for the Household Stats tests: Guest and the named Profiles,
 // each with its own profile.json and Play Log, the Achievements,
 // Challenges and Table Mastery Add-ons on unless told otherwise, English
-// texts, PinballY's navigation sound, every startup toast over. Never loaded by PinballY.
+// texts unless told otherwise, PinballY's navigation sound, every startup toast over. Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
@@ -41,10 +41,11 @@ const playLogJson = starts => JSON.stringify({
 // hasDefaultAvatar: false leaves the default Avatar image out of the install;
 // hasAdultTable: the cabinet also has PLAYBOY; frameImages: whether the
 // Avatar Frame images exist; files: { path: content } seeded before startup;
-// drawMs: how long each layer draw takes on the clock.
+// drawMs: how long each layer draw takes on the clock; language: the texts'
+// language, also to set before importing this file, whose imports read the texts.
 export async function startHousehold({
     profiles = {}, active = null, addOns = ["achievements", "challenges", "tableMastery"], hasDefaultAvatar = true, hasAdultTable = false,
-    frameImages = false, files = {}, drawMs = 0,
+    frameImages = false, files = {}, drawMs = 0, language = "en",
 } = {}) {
     const tables = [MEDIEVAL, MARS, THEATRE, TWILIGHT, ...(hasAdultTable ? [PLAYBOY] : [])];
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables, drawMs });
@@ -66,7 +67,7 @@ export async function startHousehold({
     for (const [path, content] of Object.entries(files)) fake.addFile(path, content);
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
-    config.language = "en";
+    config.language = language;
 
     const { default: lang } = await import("../../common/core/i18n.js");
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");

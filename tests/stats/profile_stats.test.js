@@ -80,8 +80,8 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
         [TEXT.stats.averageDuration]: ["5 min"],
     });
 
-    assert.equal(highlighted(fake), TEXT.closeTooltip, "the cross is selected on opening");
-    assert.deepEqual(readChoices(fake), [TEXT.closeTooltip, TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables, TEXT.buttons.tablesToDiscover]);
+    assert.equal(highlighted(fake), lang.buttonHints.close, "the cross is selected on opening");
+    assert.deepEqual(readChoices(fake), [lang.buttonHints.close, TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables, TEXT.buttons.tablesToDiscover]);
     assert.deepEqual(fake.soundsPlayed(), Array(4).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
     press(fake, "Prev");
     assert.equal(highlighted(fake), TEXT.buttons.tablesToDiscover, "Prev loops back to the last choice");
@@ -106,7 +106,7 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
     assert.deepEqual(buttons(fake).map(button => button.label), [TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables],
         "no Tables to Discover once every table was played");
     assert.equal(buttons(fake)[1].count, "3");
-    choose(fake, TEXT.closeTooltip);
+    choose(fake, lang.buttonHints.close);
     assert.equal(isProfileStatsOpen(fake), false, "Select on the cross closes them");
     assert.equal(fake.getUIMode(), "wheel");
 

@@ -42,6 +42,6 @@ test("the Welcome Screen highlights Change Player at startup and Close after a c
     fake.advanceTime(SETTLED_MS);
     await settle();
     assert.equal(isWelcomeScreenOpen(fake), true);
-    assert.equal(highlighted(fake).tooltip, lang.welcomeScreen.closeTooltip, "Close after a change of player");
+    assert.equal(highlighted(fake).tooltip, lang.buttonHints.close, "Close after a change of player");
     assertNoErrorLogged(fake);
 });

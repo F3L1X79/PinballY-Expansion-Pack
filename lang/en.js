@@ -67,6 +67,22 @@ export default {
         notNow: "Not Now",
     },
 
+    // The Button Hints at the foot of every drawn screen and the Exit
+    // Button's tooltip (see GLOSSARY.md). The key caps and the footer's
+    // words are shown in capitals.
+    buttonHints: {
+        // PinballY's button names, as on the cabinet's key caps.
+        keyCaps: { next: "Next", prev: "Prev", select: "Select", exit: "Exit" },
+        browse: "Browse",
+        // The flippers on a High Score Board longer than the window.
+        scroll: "Scroll",
+        choose: "Choose",
+        // Exit's word and the Exit Button's tooltip: Back where Exit brings
+        // back a screen or a menu, Close where it leaves the bare wheel.
+        back: "Back",
+        close: "Close",
+    },
+
     // The Welcome Screen, at startup (see addons/welcome_screen.js).
     welcomeScreen: {
         // By the hour: 5-12 h, 12-18 h, 18-22 h, 22-5 h.
@@ -74,7 +90,6 @@ export default {
         // The greeting's runs, the Profile's name (shown in gold) apart.
         greetingWithName: (greeting, name) => [`${greeting}, `, name, "!"],
         greetingAlone: (greeting) => `${greeting}!`,
-        closeTooltip: "Close",
         stayOn: (tableTitle) => `Stay on ${tableTitle}`,
         stayOnWheel: "Stay on the wheel",
         randomTable: "Launch a random table",
@@ -295,18 +310,13 @@ export default {
     // The Achievement List screen (see common/achievements/achievement_list.js).
     achievementList: {
         menuEntry: "Your Achievements",
-        // The header's title, the section titles, the key caps and the
-        // footer's hints are shown in capitals.
+        // The header's title and the section titles are shown in capitals.
         title: "Achievement List",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} achievements unlocked (${percent}%)`,
         unlockedSection: "Unlocked achievements",
         missingSection: "Achievements to earn",
         // After a section's title.
         sectionCount: (count) => `(${count})`,
-        // PinballY's button names, as on the cabinet's key caps.
-        keyCaps: { next: "Next", prev: "Prev", exit: "Exit" },
-        browse: "Browse",
-        back: "Back",
         // After at most four Avatars on a row: how many other Profiles have it too.
         moreOwners: (count) => `+${count}`,
         // A missing Secret Achievement's title.
@@ -348,10 +358,6 @@ export default {
 
     profileStats: {
         menuEntry: "Your Stats",
-        closeTooltip: "Close",
-        // The cross's tooltip where it goes back: the Household Stats, and
-        // another Profile's Profile Stats opened from them.
-        backTooltip: "Back",
         // The buttons at the card's foot.
         buttons: {
             achievements: "Achievements",

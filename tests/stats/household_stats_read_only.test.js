@@ -32,9 +32,9 @@ test("Select on another Profile's column opens its Profile Stats, read-only", as
     assert.equal(cardTexts(fake)[0], "Bob");
     assert.deepEqual(section(fake, TEXT.sections.game, TEXT.stats)[TEXT.stats.gamesPlayed], ["5"]);
     assert.ok(isReadOnly(fake), "no button at the card's foot");
-    assert.equal(highlighted(fake), TEXT.backTooltip, "only the cross, which goes back");
+    assert.equal(highlighted(fake), lang.buttonHints.back, "only the cross, which goes back");
     press(fake, "Next");
-    assert.equal(highlighted(fake), TEXT.backTooltip);
+    assert.equal(highlighted(fake), lang.buttonHints.back);
 
     const exit = press(fake, "Exit");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);

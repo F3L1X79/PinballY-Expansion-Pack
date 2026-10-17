@@ -1,5 +1,5 @@
 // ============================================================
-// The Household Stats' cross, through main.js on the fake PinballY
+// The Household Stats' Exit Button (the back arrow), through main.js on the fake PinballY
 // globals: at the top right, its tooltip saying Back, Select on it goes
 // back to one's own Profile Stats on the "Household Stats" button, as
 // Exit does.
@@ -11,12 +11,12 @@ import { startHousehold, errorLines } from "./household_stats_scenario.js";
 import { highlighted, isProfileStatsOpen, cardTexts, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { openHouseholdStats, highlightedColumn, isHouseholdStatsOpen, press } from "./household_stats_reader.js";
 
-test("Select on the cross goes back to one's own Profile Stats", async () => {
+test("Select on the Exit Button goes back to one's own Profile Stats", async () => {
     const { fake, lang } = await startHousehold({ profiles: { Alice: {}, Bob: {} }, active: "Alice" });
     openHouseholdStats(fake, lang);
 
     press(fake, "Prev");
-    assert.equal(highlightedColumn(fake), lang.profileStats.backTooltip);
+    assert.equal(highlightedColumn(fake), lang.buttonHints.back);
     const select = press(fake, "Select");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     assert.ok(select.defaultPrevented, "Select never reaches the wheel");
