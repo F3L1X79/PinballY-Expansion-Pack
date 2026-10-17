@@ -1,8 +1,8 @@
 // ============================================================
 // A big Household, through main.js on the fake PinballY globals: past
-// five Profiles the Household Stats' columns glide sideways with the gold
-// halo, which always stays in view, looping both ways through the cross,
-// from which the columns jump; the cut edges fade while gliding.
+// five Profiles the Household Stats' columns glide sideways with the
+// Selection Marker, which always stays in view, looping both ways through
+// the cross, from which the columns jump; the cut edges fade while gliding.
 // ============================================================
 
 import { test } from "node:test";
@@ -14,12 +14,12 @@ const NAMES = ["Ann", "Ben", "Cat", "Dan", "Eve", "Fay", "Gus"];
 const FRAME_MS = 16;
 const household = () => Object.fromEntries(NAMES.map(name => [name, {}]));
 
-function assertHaloInView(fake, context) {
+function assertMarkerInView(fake, context) {
     const inView = columnsInView(fake);
     assert.ok(inView.includes(highlightedColumn(fake)), `${context}: ${highlightedColumn(fake)} is in view among ${inView.join(", ")}`);
 }
 
-test("past five Profiles, the columns glide sideways with the halo", async () => {
+test("past five Profiles, the columns glide sideways with the marker", async () => {
     const { fake, lang } = await startHousehold({ profiles: household() });
     openHouseholdStats(fake, lang);
 
@@ -28,11 +28,11 @@ test("past five Profiles, the columns glide sideways with the halo", async () =>
 
     for (let move = 0; move < 4; move++) press(fake, "Next");
     fake.advanceTime(GLIDE_OVER_MS);
-    assert.deepEqual(columnsInView(fake), NAMES.slice(0, 5), "no glide while the halo stays in view");
+    assert.deepEqual(columnsInView(fake), NAMES.slice(0, 5), "no glide while the marker stays in view");
 
     press(fake, "Next");
     fake.advanceTime(FRAME_MS);
-    assert.equal(highlightedColumn(fake), null, "mid-glide, the halo waits in the view for its column");
+    assert.equal(highlightedColumn(fake), null, "mid-glide, the marker waits in the view for its column");
     assert.ok(fadedColumns(fake).includes("Ann"), "the column leaving fades at the cut edge");
     fake.advanceTime(GLIDE_OVER_MS);
     assert.deepEqual(columnsInView(fake), NAMES.slice(1, 6));
@@ -63,7 +63,7 @@ test("past five Profiles, the columns glide sideways with the halo", async () =>
     for (let move = 0; move < 6; move++) {
         press(fake, "Prev");
         fake.advanceTime(GLIDE_OVER_MS);
-        assertHaloInView(fake, `Prev ${move + 1}`);
+        assertMarkerInView(fake, `Prev ${move + 1}`);
         assert.equal(columnsInView(fake).length, 5);
     }
     assert.equal(highlightedColumn(fake), "Ann");

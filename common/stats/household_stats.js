@@ -8,11 +8,12 @@
 // per stat where more is better, the best of each line in gold. Every
 // value is read again on each opening, through the Profile Stats' reader;
 // the screen is drawn at once on all its layers, then faded in. While open
-// it swallows every button through "commandbuttondown": Next / Prev move a
-// gold halo through the cross at the top right (its tooltip says Back),
-// then from column to column, looping, with PinballY's navigation sound.
-// Past five columns (fewer in a narrow window), the columns glide
-// sideways to keep the halo in view, the ones cut by the view's edges
+// it swallows every button through "commandbuttondown": Next / Prev move
+// the Selection Marker (a gold glow flowing round the choice) through the
+// cross at the top right (its tooltip says Back), then from column to
+// column, looping, with PinballY's navigation sound. Past five columns
+// (fewer in a narrow window), the columns glide sideways to keep the
+// marker in view, the marker following its column on every frame, the ones cut by the view's edges
 // faded, and coming from the cross jumps instead of gliding across them
 // all. Select or Launch on another Profile's column opens its Profile
 // Stats read-only, whose Exit shows this screen again on that column; on
@@ -30,9 +31,10 @@ import { createNavigationSound } from "../core/navigation_sound.js";
 import { openDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import { drawBackdrop } from "../drawing/steamball_drawing.js";
+import { createSelectionMarker } from "../drawing/selection_marker.js";
 import {
-    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, haloRectOf, crossHaloRectOf,
-    drawTitle, drawLabels, drawColumn, drawHalo, drawCross, drawCrossHalo,
+    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, crossTooltipRectOf,
+    drawTitle, drawLabels, drawColumn, drawCross, drawCrossTooltip,
 } from "./household_stats_painter.js";
 
 const SCRIPT_NAME = "HouseholdStats";
@@ -152,7 +154,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
     }
 
     // onBack: what Exit returns to, called once the screen is closed;
-    // selectedName: the Profile whose column is under the halo, brought
+    // selectedName: the Profile whose column the marker surrounds, brought
     // into view (the first column when null or no longer there). Draws every
     // layer at once, hidden, then fades them in together, like the Profile
     // Stats: it never shows up half drawn.
@@ -178,10 +180,8 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
             const rect = geometry.columns[index];
             drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, rect, dc => drawColumn(host, dc, column, rect.w), columnLayers);
         });
-        // Drawn once for the columns' size and only moved.
-        const haloRect = haloRectOf(geometry.columns[0]);
-        const halo = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.highlight, haloRect, dc => drawHalo(dc, haloRect.w, haloRect.h));
-        const crossHalo = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.highlight, crossHaloRectOf(geometry.cross), dc => drawCrossHalo(host, dc, screen.backLabel));
+        const crossTooltip = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.tooltip, crossTooltipRectOf(geometry.cross), dc => drawCrossTooltip(host, dc, screen.backLabel));
+        const marker = createSelectionMarker(host, { zIndex: HOUSEHOLD_STATS_Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         const column = Math.max(0, screen.columns.findIndex(entry => entry.profileName === selectedName));
@@ -189,7 +189,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         // first: the first column in view once the glide is over; scroll:
         // how far the columns have glided, in reference pixels.
         const opened = {
-            onBack, columns: screen.columns, drawn, columnLayers, halo, crossHalo, geometry, selected: column, first, scroll: first * geometry.pitch,
+            onBack, columns: screen.columns, drawn, columnLayers, crossTooltip, marker, marked: null, geometry, selected: column, first, scroll: first * geometry.pitch,
             opacity: 0, glideTimer: null, glideMs: 0,
         };
         shown = opened;
@@ -210,8 +210,8 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
     }
 
     // Each column at the glide's scroll, faded at the view's edges; the
-    // halo on the selected column, held inside the view while that column
-    // glides into it, or the cross's halo alone.
+    // marker on the selected column, held inside the view while that column
+    // glides into it, or on the cross with its tooltip.
     function placeColumns(screen) {
         const { geometry, drawn } = screen;
         const { view } = geometry;
@@ -222,17 +222,24 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
             layer.alpha = screen.opacity * edgeAlpha(geometry, x, rect.w);
         });
         const isOnCross = screen.selected === CROSS;
-        screen.halo.alpha = isOnCross ? 0 : screen.opacity;
-        screen.crossHalo.alpha = isOnCross ? screen.opacity : 0;
-        if (isOnCross) return;
-        const selected = geometry.columns[screen.selected];
-        const x = Math.max(view.x, Math.min(view.x + view.w - selected.w, selected.x - screen.scroll));
-        drawn.place(screen.halo, haloRectOf({ ...selected, x }));
+        screen.crossTooltip.alpha = isOnCross ? screen.opacity : 0;
+        let marked = geometry.cross;
+        if (!isOnCross) {
+            const selected = geometry.columns[screen.selected];
+            const x = Math.max(view.x, Math.min(view.x + view.w - selected.w, selected.x - screen.scroll));
+            marked = { ...selected, x };
+        }
+        // Only when it moved: a fade frame changes no more than the alpha,
+        // and the marker's own tick redraws it anyway.
+        const isMoved = !screen.marked || ["x", "y", "w", "h"].some(key => marked[key] !== screen.marked[key]);
+        if (isMoved) screen.marker.moveTo(marked);
+        screen.marked = marked;
     }
 
     function setOpacity(screen, opacity) {
         screen.opacity = opacity;
         for (const layer of screen.drawn.layers) layer.alpha = opacity;
+        screen.marker.setOpacity(opacity);
         placeColumns(screen);
     }
 
@@ -258,6 +265,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
     function close() {
         if (!shown) return;
         stopGlide(shown);
+        shown.marker.remove();
         shown.drawn.close(shown.columnLayers);
         shown = null;
         closedListeners.tell();

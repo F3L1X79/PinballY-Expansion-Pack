@@ -1,7 +1,7 @@
 // ============================================================
 // An Avatar image missing from the install, through main.js on the fake
 // PinballY globals: it is logged and the Household Stats' column shows
-// without it. Guest is active: it has no column, and the halo starts on
+// without it. Guest is active: it has no column, and the marker starts on
 // the first one.
 // ============================================================
 

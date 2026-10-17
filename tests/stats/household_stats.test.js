@@ -4,7 +4,7 @@
 // order without Guest; each value as that Profile's own Profile Stats show
 // it, a Profile with no Play showing zeros; the best value of each line in
 // gold, ties included, none on an all-zero line, the Collection Mastery's
-// tier square and value centred together; Next / Prev move the halo
+// tier square and value centred together; Next / Prev move the marker
 // through the cross (its tooltip saying Back), then from column to column,
 // looping, and no button reaches the wheel.
 // ============================================================

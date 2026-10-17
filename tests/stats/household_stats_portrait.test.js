@@ -1,7 +1,7 @@
 // ============================================================
 // A big Household in a portrait window, through main.js on the fake
 // PinballY globals: the Household Stats show fewer columns rather than
-// shrinking them, the gold halo always in view.
+// shrinking them, the Selection Marker always in view.
 // ============================================================
 
 import { test } from "node:test";
@@ -11,7 +11,7 @@ import { openHouseholdStats, columnsInView, highlightedColumn, press, GLIDE_OVER
 
 const NAMES = ["Ann", "Ben", "Cat", "Dan", "Eve", "Fay", "Gus"];
 
-test("a portrait window shows fewer columns, the halo always in view", async () => {
+test("a portrait window shows fewer columns, the marker always in view", async () => {
     const { fake, lang } = await startHousehold({ profiles: Object.fromEntries(NAMES.map(name => [name, {}])) });
     fake.setLayoutSize({ width: 1080, height: 1920 });
     openHouseholdStats(fake, lang);
@@ -22,7 +22,7 @@ test("a portrait window shows fewer columns, the halo always in view", async () 
         press(fake, "Next");
         fake.advanceTime(GLIDE_OVER_MS);
         const highlighted = highlightedColumn(fake);
-        assert.ok(highlighted === "Back" || columnsInView(fake).includes(highlighted), `Next ${move + 1}: the halo's column is in view`);
+        assert.ok(highlighted === "Back" || columnsInView(fake).includes(highlighted), `Next ${move + 1}: the marker's column is in view`);
         assert.equal(columnsInView(fake).length, shownAtOnce);
     }
     assert.deepEqual(errorLines(fake), []);

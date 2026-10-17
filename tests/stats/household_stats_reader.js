@@ -3,9 +3,10 @@
 // PinballY host: whether they are open, the title, the line labels, the
 // columns from left to right (the Profile's name, its Avatar image, the
 // Avatar Frame around it, and each line's cell: its texts and whether its
-// value is gold), the highlighted column (the one the gold halo
-// surrounds, or the cross's tooltip), the columns in view and those faded at the edges while
-// gliding, opens them from the Profile Stats' "Household Stats" button and picks
+// value is gold), the highlighted column (the one the Selection Marker
+// surrounds, or the cross's tooltip on its own layer), whether the marker
+// surrounds the cross, the columns in view and those faded at the edges
+// while gliding, opens them from the Profile Stats' "Household Stats" button and picks
 // a column as a player would, and goes back to the wheel. Never loaded by PinballY.
 // ============================================================
 
@@ -112,19 +113,42 @@ export const lineValues = (fake, label) => columns(fake).map(column => (column.c
 // The names of the columns whose value on that line is gold.
 export const goldOn = (fake, label) => columns(fake).filter(column => column.cells[label] && column.cells[label].isGold).map(column => column.name);
 
-// The name of the column the gold halo surrounds (both centred on the same
-// point), or the cross's tooltip when the halo is on the cross.
+// The Selection Marker's layers, shown or not.
+export const markerLayerCount = fake => fake.drawingLayers().filter(layer => layer.zIndex === HOUSEHOLD_STATS_Z_INDEX.marker).length;
+
+// Whether the marker surrounds the cross (both centred on the same point).
+export function isMarkerOnCross(fake) {
+    const [cross] = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.cross);
+    const marker = markerLayer(fake).position();
+    return Math.abs(cross.position().x - marker.x) < 0.001 && Math.abs(cross.position().y - marker.y) < 0.001;
+}
+
+export function markerLayer(fake) {
+    const marked = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.marker);
+    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one choice");
+    return marked[0];
+}
+
+// The cross's tooltip, null when hidden.
+function shownTooltip(fake) {
+    const lit = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.tooltip);
+    assert.ok(lit.length <= 1, "one tooltip at most");
+    return lit.length > 0 ? lit[0].texts()[0] || null : null;
+}
+
+// The name of the column the marker surrounds (both centred on the same
+// point, give or take the marker's canvas rounded up to whole pixels), or
+// the cross's tooltip when the marker is on the cross.
 export function highlightedColumn(fake) {
-    const lit = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.highlight);
-    assert.equal(lit.length, 1, "exactly one halo is shown");
-    const [tooltip] = lit[0].texts();
+    const marker = markerLayer(fake);
+    const tooltip = shownTooltip(fake);
     if (tooltip) return tooltip;
-    const same = (a, b) => Math.abs(a - b) < 1e-9;
-    const column = columnLayers(fake).find(layer => same(layer.position().x, lit[0].position().x) && same(layer.position().y, lit[0].position().y));
+    const same = (a, b) => Math.abs(a - b) < 0.001;
+    const column = columnLayers(fake).find(layer => same(layer.position().x, marker.position().x) && same(layer.position().y, marker.position().y));
     return column ? textStrokes(column)[0].text : null;
 }
 
-// Moves the halo with Next to the column of that name, letting each glide
+// Moves the marker with Next to the column of that name, letting each glide
 // end, then presses Select.
 export function chooseColumn(fake, name) {
     for (let guard = 0; guard < 20 && highlightedColumn(fake) !== name; guard++) {

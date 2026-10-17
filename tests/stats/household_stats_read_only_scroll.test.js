@@ -1,7 +1,7 @@
 // ============================================================
 // A big Household, through main.js on the fake PinballY globals: Exit on
 // the read-only Profile Stats of a column past the first five shows the
-// Household Stats again with that column in view, under the halo.
+// Household Stats again with that column in view, under the marker.
 // ============================================================
 
 import { test } from "node:test";
@@ -12,7 +12,7 @@ import { openHouseholdStats, chooseColumn, columnsInView, highlightedColumn, pre
 
 const NAMES = ["Ann", "Ben", "Cat", "Dan", "Eve", "Fay", "Gus"];
 
-test("back from a column past the first five, it is in view under the halo", async () => {
+test("back from a column past the first five, it is in view under the marker", async () => {
     const { fake, lang } = await startHousehold({ profiles: Object.fromEntries(NAMES.map(name => [name, {}])) });
     openHouseholdStats(fake, lang);
     chooseColumn(fake, "Gus");

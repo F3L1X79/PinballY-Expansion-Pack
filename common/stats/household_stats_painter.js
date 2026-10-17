@@ -6,21 +6,21 @@
 // on the left, then one column per Profile (its Avatar in its worn Avatar
 // Frame, with no Player Level pip, and its name as a header, then one cell
 // per line, the best values in gold, the Collection Mastery with its
-// Collection Tier square, the pair centred) and the gold halo of the
-// highlighted column, or of the cross at the top right with its Back
-// tooltip.
+// Collection Tier square, the pair centred), and the cross at the top
+// right with the Back tooltip shown while it is selected (the Selection
+// Marker surrounds the selected column or the cross).
 // Past five columns, or fewer in a narrow window, the layout also gives
 // the view the columns show through and their pitch, for the module to
 // glide them sideways. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
-import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, selectionHalo, drawCross as drawCrossTile, tooltip, UNBOUNDED } from "../drawing/steamball_drawing.js";
+import { oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, drawCross as drawCrossTile, tooltip, UNBOUNDED } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
 // Above the Avatar Frame list's band, which never shows at the same time,
 // so each reader sees only its own layers.
-export const HOUSEHOLD_STATS_Z_INDEX = Object.freeze({ backdrop: 6160, title: 6161, labels: 6162, columns: 6163, cross: 6164, highlight: 6170 });
+export const HOUSEHOLD_STATS_Z_INDEX = Object.freeze({ backdrop: 6160, title: 6161, labels: 6162, columns: 6163, cross: 6164, marker: 6169, tooltip: 6170 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -40,10 +40,9 @@ const LOOK = Object.freeze({
     avatar: 104, nameGap: 4, nameH: 40, nameSize: 24, minNameSize: 16, headerH: 212,
     // Each line: its height, its value at valueSize, a thin rule under it.
     lineH: 76, valueSize: 28, minValueSize: 18, squareK: 0.6, squareGap: 10,
-    haloMargin: 16,
     // The cross at the title's right end, as on the Profile Stats, with
-    // room on its left for its tooltip.
-    cross: 56, crossTooltipRoom: 240,
+    // room on its left for its tooltip, and round it on the tooltip's layer.
+    cross: 56, crossTooltipRoom: 240, tooltipMargin: 16,
 });
 
 // How wide a column's Avatar Frame is drawn, for its image's size.
@@ -79,15 +78,10 @@ export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     return { panel, title, cross, labels, columns, view, pitch };
 }
 
-// The halo's rect around a column's, centred on it as the reader expects.
-export function haloRectOf(rect) {
-    const M = LOOK.haloMargin;
-    return { x: rect.x - M, y: rect.y - M, w: rect.w + 2 * M, h: rect.h + 2 * M };
-}
-
-// The cross's halo with its tooltip on the left: its rect leaves room for it.
-export function crossHaloRectOf(cross) {
-    const M = LOOK.haloMargin;
+// The cross's tooltip layer, with the tooltip on the cross's left: its
+// rect leaves room for it.
+export function crossTooltipRectOf(cross) {
+    const M = LOOK.tooltipMargin;
     return { x: cross.x - LOOK.crossTooltipRoom, y: cross.y - M, w: LOOK.crossTooltipRoom + cross.w + M, h: cross.h + 2 * M };
 }
 
@@ -95,9 +89,8 @@ export function drawCross(dc) {
     drawCrossTile(dc, 0, 0, LOOK.cross);
 }
 
-export function drawCrossHalo(host, dc, label) {
-    const M = LOOK.haloMargin;
-    selectionHalo(dc, LOOK.crossTooltipRoom, M, LOOK.cross, LOOK.cross);
+export function drawCrossTooltip(host, dc, label) {
+    const M = LOOK.tooltipMargin;
     tooltip(host, dc, label, LOOK.crossTooltipRoom - 18, M + LOOK.cross / 2, "left");
 }
 
@@ -162,9 +155,4 @@ export function drawColumn(host, dc, column, w) {
     });
     column.cells.forEach((cell, index) => drawCell(host, dc, cell, lineY(index), w));
     drawRules(dc, w, column.cells.length);
-}
-
-export function drawHalo(dc, w, h) {
-    const M = LOOK.haloMargin;
-    selectionHalo(dc, M, M, w - 2 * M, h - 2 * M);
 }
