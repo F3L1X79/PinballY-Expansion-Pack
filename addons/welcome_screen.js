@@ -28,7 +28,8 @@
 // at startup and from Close after a change of player; Select or Launch
 // (the plunger) runs the selected choice, Exit
 // closes it; attract mode closes it too, and a game started during the
-// pause drops it. Its layers and the marker are removed once it closes.
+// pause drops it. A footer of Button Hints names the flippers, Select and
+// Exit. Its layers and the marker are removed once it closes.
 // ============================================================
 
 import lang from "../common/core/i18n.js";
@@ -53,7 +54,8 @@ import { createNavigationSound } from "../common/core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/drawing/steamball_palette.js";
 import { createSelectionMarker } from "../common/drawing/selection_marker.js";
 import { createLoader } from "../common/drawing/loader.js";
-import { DIMMED_WHEEL } from "../common/drawing/steamball_drawing.js";
+import { DIMMED_WHEEL, EXIT_BUTTON_LOOK } from "../common/drawing/steamball_drawing.js";
+import { buttonHintGroupsOf, FLIPPER_HINT } from "../common/drawing/button_hints.js";
 import {
     WELCOME_SCREEN_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutWelcomeScreen,
 } from "../common/welcome_screen/welcome_screen_painter.js";
@@ -237,6 +239,8 @@ export default function init() {
                 [CHOICE.STAY]: stay ? TEXT.stayOn(stay) : TEXT.stayOnWheel,
                 [CHOICE.RANDOM]: TEXT.randomTable,
             },
+            // Exit always leaves the bare wheel: the cross, and Close.
+            buttonHints: buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_BUTTON_LOOK.CLOSE }),
         };
     }
 

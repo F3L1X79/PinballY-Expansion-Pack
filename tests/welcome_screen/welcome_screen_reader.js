@@ -6,7 +6,8 @@
 // Mastery head, grey line, logo), its bottom row's labels, the highlighted choice (the label
 // the Selection Marker surrounds, the period of the card whose button it
 // surrounds, or the tooltip of the Avatar or the cross, on its tooltip
-// layer), and picks a choice with Next and Select as a player would.
+// layer), its Button Hints and where its footer sits, and picks a choice
+// with Next and Select as a player would.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -14,6 +15,7 @@ import assert from "node:assert/strict";
 import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
 import { shownPip } from "../levels/level_pip_reader.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { buttonHintsOn } from "../support/button_hints_reader.js";
 
 // The startup pause: the screen is drawn then, and starts fading in.
 export const WELCOME_SCREEN_PAUSE_MS = 500;
@@ -135,6 +137,37 @@ function textAt(fake, window, point) {
         }
     }
     return null;
+}
+
+// The footer's groups of key caps and words, null when it does not show.
+export const buttonHints = fake => buttonHintsOn(fake, WELCOME_SCREEN_Z_INDEX.buttonHints);
+
+// Where a layer shows in a window of that size: PinballY centres it on its
+// position and scales it to ySpan of the window's height, its canvas's
+// aspect kept.
+function windowRect(layer, { width, height }) {
+    const canvas = layer.canvasSize();
+    const h = layer.scale().ySpan * height;
+    const w = h * canvas.width / canvas.height;
+    const cx = (layer.position().x + 0.5) * width;
+    const cy = (0.5 - layer.position().y) * height;
+    return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 };
+}
+
+// In a window of that size: the footer's rect, every other shown layer's
+// but the backdrop's, the marker's and the tooltips' (each { zIndex,
+// left, top, right, bottom }), and whether every footer text sits inside
+// the footer.
+export function footerLayout(fake, size) {
+    const [footer] = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.buttonHints);
+    const canvas = footer.canvasSize();
+    const textsInside = footer.strokes().filter(stroke => "text" in stroke).every(({ rect }) =>
+        rect.x >= 0 && rect.y >= 0 && rect.x + rect.width <= canvas.width + 2 && rect.y + rect.height <= canvas.height);
+    const besides = ["backdrop", "buttonHints", "marker", "tooltips"];
+    const pieces = Object.entries(WELCOME_SCREEN_Z_INDEX).filter(([name]) => !besides.includes(name))
+        .flatMap(([, zIndex]) => shownLayers(fake, zIndex))
+        .map(layer => ({ zIndex: layer.zIndex, ...windowRect(layer, size) }));
+    return { footer: windowRect(footer, size), pieces, textsInside };
 }
 
 export const markerLayer = fake => selectionMarker.markerLayer(fake, WELCOME_SCREEN_Z_INDEX.marker);
