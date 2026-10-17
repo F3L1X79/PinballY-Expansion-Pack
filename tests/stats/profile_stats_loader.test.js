@@ -49,6 +49,7 @@ function expectOpening(fake) {
     const loader = readLoader(fake);
     assert.equal(loader.shown, true, "the Loader after 150 ms");
     assert.equal(loader.zIndex, PROFILE_STATS_Z_INDEX.backdrop - 1, "over the veil, under the screen");
+    assert.deepEqual(loader.position, { x: 0, y: 0 }, "in the middle of the playfield screen");
     assert.deepEqual(readVeil(fake), VEIL);
 
     untilFadeStarts(fake);

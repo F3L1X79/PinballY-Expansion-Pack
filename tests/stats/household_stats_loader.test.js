@@ -56,6 +56,7 @@ test("the wheel dims at once, the Loader turns after 150 ms, then the screen fad
     const loader = readLoader(fake);
     assert.equal(loader.shown, true, "the Loader after 150 ms");
     assert.equal(loader.zIndex, HOUSEHOLD_STATS_Z_INDEX.backdrop - 1, "over the veil, under the screen");
+    assert.deepEqual(loader.position, { x: 0, y: 0 }, "in the middle of the playfield screen");
     assert.deepEqual(readVeil(fake), VEIL);
 
     untilFadeStarts(fake);

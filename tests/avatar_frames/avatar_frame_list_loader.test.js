@@ -29,6 +29,7 @@ test("opened before its drawing ahead, the list dims the wheel at once, shows th
     const loader = readLoader(fake);
     assert.equal(loader.shown, true, "the Loader after 150 ms");
     assert.equal(loader.zIndex, AVATAR_FRAME_LIST_Z_INDEX.backdrop - 1, "over the veil, under the list");
+    assert.deepEqual(loader.position, { x: 0, y: 0 }, "in the middle of the playfield screen");
 
     while (!isFrameListOpen(fake)) fake.advanceTime(16);
     assert.deepEqual(readLoader(fake), { shown: false }, "the Loader gone before the fade in");

@@ -14,8 +14,8 @@
 // "not supported" when PINemHi says so or no board is known, or "Play a
 // game to bring up this table's high scores" for a table without a ROM
 // whose VPReg.stg section or text file is not learned yet. The Loader
-// turns above the board while the fresh read runs, from the end of the
-// board's fade in. The screen
+// turns above the board, on its top third, while the fresh read runs,
+// from the end of the board's fade in. The screen
 // is drawn at once on all its layers, then faded in; the crowns, drawn
 // ahead once on their own layers through the shared drawing ahead
 // (PinballY reads an image file again on every draw), are only placed,
@@ -34,7 +34,7 @@ import { displayNameOf } from "../profiles/profile_name.js";
 import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
-import { createLoader } from "../drawing/loader.js";
+import { createLoader, LOADER_PLACEMENT } from "../drawing/loader.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import { drawExitButton } from "../drawing/steamball_drawing.js";
 import { exitButtonLookOf, exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
@@ -59,7 +59,8 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     const projectFolder = host.getProjectFolder();
-    const loader = createLoader(host, { zIndex: HIGH_SCORE_BOARD_LOADER_Z_INDEX });
+    // On the top third, so that the comet never hides the scores.
+    const loader = createLoader(host, { zIndex: HIGH_SCORE_BOARD_LOADER_Z_INDEX, placement: LOADER_PLACEMENT.TOP_THIRD });
 
     function hideCrown(crown) {
         crown.layer.alpha = 0;

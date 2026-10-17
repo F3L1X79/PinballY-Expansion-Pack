@@ -1,9 +1,10 @@
 // ============================================================
 // The launch Loader, through main.js on the fake PinballY globals with the
-// Seamless Launch Overlay on: the comet turns on the top third, under the
-// menus, from the launch overlay's show until the game plays, comes back
-// while the table closes and is gone with the overlay; a launch that never
-// plays keeps it until the overlay goes. It never takes a button.
+// Seamless Launch Overlay on: the comet turns in the middle of the
+// playfield screen, under the menus, from the launch overlay's show until
+// the game plays, comes back while the table closes and is gone with the
+// overlay; a launch that never plays keeps it until the overlay goes. It
+// never takes a button.
 // ============================================================
 
 import { test } from "node:test";
@@ -17,7 +18,7 @@ const TABLE = { configId: "afm", title: "Attack from Mars" };
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 17, 20, 0, 0), tables: [TABLE] });
 const game = fake.getAllTables()[0];
 const message = id => fake.fire("launchoverlaymessage", { id, message: null, hideWheelImage: false });
-const SHOWN = { shown: true, zIndex: 5999, scale: { ySpan: 0.07 }, position: { x: 0, y: 1 / 6 } };
+const SHOWN = { shown: true, zIndex: 5999, scale: { ySpan: 0.07 }, position: { x: 0, y: 0 } };
 
 // A button pressed while the comet turns: none of the pack's listeners takes it.
 function assertButtonsPassThrough() {
@@ -34,7 +35,7 @@ test("the comet turns from the overlay's show until the game plays, and again wh
     assert.equal(loaderLayerCount(fake), 0, "no Loader layer before a launch");
 
     fake.fire("launchoverlayshow", { game });
-    assert.deepEqual(readLoader(fake), SHOWN, "on the top third, 7 % high, just under the menus");
+    assert.deepEqual(readLoader(fake), SHOWN, "centred, 7 % high, just under the menus");
     message("init");
     message("launching");
     assert.deepEqual(readLoader(fake), SHOWN, "still turning while the table loads");
