@@ -24,7 +24,9 @@ export const REFERENCE_HEIGHT = 1920;
 const LOOK = Object.freeze({
     // The panel's width: a share of the window's, at most maxWidth.
     widthShare: 0.9, maxWidth: 900, pad: 32,
-    titleH: 72, titleSize: 30,
+    // The title's line, the Exit Button at its right end, then titleGap
+    // down to the rows, room under the button.
+    titleH: 72, titleSize: 30, titleGap: 24,
     rowH: 128, rowGap: 10,
     // The Avatar, and its frame a quarter of its size beyond it on every
     // side, inset from the row's left edge.
@@ -40,7 +42,7 @@ const FRAME_SIZE = avatarFrameSide(LOOK.avatar);
 export function layoutFrameList(referenceWidth, rowCount) {
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
     const rowsH = rowCount * (LOOK.rowH + LOOK.rowGap) - LOOK.rowGap;
-    const h = LOOK.pad + LOOK.titleH + rowsH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
+    const h = LOOK.pad + LOOK.titleH + LOOK.titleGap + rowsH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     const x = panel.x + LOOK.pad;
     const rowW = w - 2 * LOOK.pad;
@@ -48,7 +50,7 @@ export function layoutFrameList(referenceWidth, rowCount) {
     const side = EXIT_AND_HINTS.exitButton;
     const exitButton = { x: x + rowW - side, y: title.y + Math.round((title.h - side) / 2), w: side, h: side };
     const rows = Array.from({ length: rowCount }, (_, index) =>
-        ({ x, y: title.y + title.h + index * (LOOK.rowH + LOOK.rowGap), w: rowW, h: LOOK.rowH }));
+        ({ x, y: title.y + title.h + LOOK.titleGap + index * (LOOK.rowH + LOOK.rowGap), w: rowW, h: LOOK.rowH }));
     const buttonHints = buttonHintsFooterRectOf(panel);
     return { panel, title, exitButton, rows, buttonHints };
 }

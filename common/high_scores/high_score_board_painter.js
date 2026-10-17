@@ -8,7 +8,7 @@
 // Frame reaches), then the places from the 4th on in compact rows, as
 // many in view as the window's height leaves room for; or a message in place of the board. Each Avatar
 // wears its Profile's Avatar Frame, if any, as on the Profile Stats. The
-// Exit Button at the title's right end, its tooltip on its left, and the
+// Exit Button in the panel's top right corner, its tooltip on its left, and the
 // Button Hints in a footer at the panel's bottom. Only drawing: no layer,
 // no event, no side effect.
 // ============================================================
@@ -56,9 +56,10 @@ export const CANVAS_ZOOM = 2;
 
 const LOOK = Object.freeze({
     // From the panel's edges to the content, as the Drawn Menu's entries;
-    // at the bottom, to the footer, which takes most of the room the
+    // at the top, little: the Exit Button sits in the corner, off the
+    // title's line; at the bottom, to the footer, which takes most of the room the
     // Drawn Menu leaves there, so a 5-place board still fits a landscape window.
-    sideInset: DRAWN_MENU_FACE_INSET + DRAWN_MENU_LIST_INSET, topInset: DRAWN_MENU_FACE_INSET + 40, bottomInset: DRAWN_MENU_FACE_INSET + 4,
+    sideInset: DRAWN_MENU_FACE_INSET + DRAWN_MENU_LIST_INSET, topInset: DRAWN_MENU_FACE_INSET + 16, bottomInset: DRAWN_MENU_FACE_INSET + 4,
     titleH: 50, titleSize: 34, minTitleSize: 22, noteH: 30, noteSize: 15, titleGap: 6,
     messageH: 200, messageSize: 26,
     // The podium's steps, the 1st's first: the crown's room, the Avatar,
@@ -71,13 +72,15 @@ const LOOK = Object.freeze({
     // The rows from the 4th place on.
     rowsGap: 18, rowH: 64, rowGap: 8, rowPad: 8, tile: 48, rowAvatar: 48, cellGap: 14, rowInitialsW: 80, rowScoreW: 200,
     rowRankSize: 18, rowNameSize: 18, rowInitialsSize: 15, rowScoreSize: 20,
-    // The Exit Button at the title's right end, the other drawn screens'
+    // The Exit Button in the panel's top right corner, the other drawn screens'
     // once on its canvas, with less room on its left for its tooltip;
     // the title keeps the same room on both sides, so it stays centred.
     exitButton: EXIT_AND_HINTS.exitButton / CANVAS_ZOOM, exitTooltipRoom: 100, tooltipMargin: EXIT_AND_HINTS.tooltipMargin / CANVAS_ZOOM,
+    // The Exit Button's room from the panel's face, in its top right corner.
+    exitCorner: 14,
     // The Button Hints' footer under the board, shorter than the other
     // drawn screens' so a 5-place board still fits a landscape window.
-    footerGap: 6, footerH: 40,
+    footerGap: 12, footerH: 58,
 });
 
 // How wide an Avatar Frame is drawn at most, for its image's size.
@@ -128,7 +131,9 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const contentW = w - 2 * LOOK.sideInset;
     const exitRoom = LOOK.exitTooltipRoom + LOOK.exitButton;
     const title = { x: x + exitRoom, y: LOOK.topInset, w: contentW - 2 * exitRoom, h: LOOK.titleH };
-    const exitButton = { x: x + contentW - LOOK.exitButton, y: title.y + (title.h - LOOK.exitButton) / 2, w: LOOK.exitButton, h: LOOK.exitButton };
+    const exitButton = {
+        x: w - DRAWN_MENU_FACE_INSET - LOOK.exitCorner - LOOK.exitButton, y: DRAWN_MENU_FACE_INSET + LOOK.exitCorner, w: LOOK.exitButton, h: LOOK.exitButton,
+    };
     const exitTooltip = exitTooltipRectOf(exitButton, { room: LOOK.exitTooltipRoom, margin: LOOK.tooltipMargin });
     const note = { x, y: title.y + title.h, w: contentW, h: LOOK.noteH };
     const bodyY = note.y + note.h + LOOK.titleGap;
