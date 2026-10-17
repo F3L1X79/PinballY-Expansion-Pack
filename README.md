@@ -71,7 +71,7 @@ Everything stays in one folder, with no change to PinballY itself.
 - "Tables to Discover", "Most Played Tables", "Favorite Tables" and "Original Tables" in the menus;
 - a clock, a gold arc under the wheel (the Wheel Arc) and a richer status line;
 - a reminder to rate a table;
-- launches without a black flash;
+- launches without a black flash, with a gold comet turning while you wait: during a launch, at startup and while a high score board is read;
 - the backglass hidden during a game;
 - sounds for launches, Achievements, greetings, confetti and fireworks, or your own.
 
