@@ -26,7 +26,7 @@ The choice it surrounds is the current (or highlighted) choice; only the glow it
 _Avoid_: halo (for the selection; a Rank emblem's or a Mastery square's halo stays a halo), cursor, highlight
 
 **Loader**:
-A small gold comet that circles without end on the top third of the playfield screen, always in the same place, with no text nor backdrop, over whatever is already there, while something the player waits for gets ready: PinballY starting up until the Welcome Screen shows (over the wheel already dimmed for it), a table launching, or closing to go back to the wheel (never while it is played), a drawn screen not yet ready when the player opens it. It only shows where it can keep turning, never on a screen drawn all at once, nor when the Welcome Screen comes back after Change Player. It never takes the player's buttons. Shown as "Indicateur de chargement" in French.
+A small gold comet that circles without end on the top third of the playfield screen, always in the same place, with no text nor backdrop, over whatever is already there, while something the player waits for gets ready: PinballY starting up until the Welcome Screen shows (over the wheel already dimmed for it), a table launching, or closing to go back to the wheel (never while it is played), the High Score Board while it reads a table's board afresh. It only shows where it can keep turning, never on a screen drawn all at once, nor when the Welcome Screen comes back after Change Player. It never takes the player's buttons. Shown as "Indicateur de chargement" in French.
 _Avoid_: spinner, loading screen, splash screen (it is not a screen, only a ring over the current one)
 
 ### Wheel
