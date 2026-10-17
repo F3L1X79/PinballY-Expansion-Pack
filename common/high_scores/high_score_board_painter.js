@@ -7,18 +7,27 @@
 // the 3rd on the right, each under its crown, above where an Avatar
 // Frame reaches), then the places from the 4th on in compact rows, as
 // many in view as the window's height leaves room for; or a message in place of the board. Each Avatar
-// wears its Profile's Avatar Frame, if any, as on the Profile Stats. Only
-// drawing: no layer, no event, no side effect.
+// wears its Profile's Avatar Frame, if any, as on the Profile Stats. The
+// Exit Button at the title's right end, its tooltip on its left, and the
+// Button Hints in a footer at the panel's bottom. Only drawing: no layer,
+// no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
-import { text, oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN } from "../drawing/steamball_drawing.js";
+import {
+    text, oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, drawExitButton as drawExitButtonTile, drawButtonHints as drawButtonHintsCentred, tooltip,
+} from "../drawing/steamball_drawing.js";
 import { ACHIEVEMENT_RANK } from "../achievements/achievements.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER, DRAWN_MENU_PANEL_WIDTH, DRAWN_MENU_FACE_INSET, DRAWN_MENU_LIST_INSET } from "../drawn_menu/drawn_menu_images.js";
 
 // Between the Household Stats and the Drawn Menus, which never show at the
-// same time, so each reader sees only its own layers.
-export const HIGH_SCORE_BOARD_Z_INDEX = Object.freeze({ backdrop: 6180, panel: 6181, title: 6182, note: 6183, message: 6184, podium: 6185, rows: 6186, glass: 6188 });
+// same time, so each reader sees only its own layers. The Button Hints,
+// the Exit Button, the Selection Marker and the Exit Button's tooltip
+// stand above the glass and the Loader, crisp.
+export const HIGH_SCORE_BOARD_Z_INDEX = Object.freeze({
+    backdrop: 6180, panel: 6181, title: 6182, note: 6183, message: 6184, podium: 6185, rows: 6186, glass: 6188,
+    buttonHints: 6190, exitButton: 6191, marker: 6192, tooltip: 6193,
+});
 // The crowns' layers, drawn ahead and kept while the board is closed: over
 // the podium, under the glass.
 export const HIGH_SCORE_BOARD_CROWN_Z_INDEX = 6187;
@@ -40,8 +49,10 @@ const LIGHT_GOLD = 0xFFFFE6A6;
 const DIMMING = 0xB0080A0E;
 
 const LOOK = Object.freeze({
-    // From the panel's edges to the content, as the Drawn Menu's entries.
-    sideInset: DRAWN_MENU_FACE_INSET + DRAWN_MENU_LIST_INSET, topInset: DRAWN_MENU_FACE_INSET + 40, bottomInset: DRAWN_MENU_FACE_INSET + 40,
+    // From the panel's edges to the content, as the Drawn Menu's entries;
+    // at the bottom, to the footer, which takes most of the room the
+    // Drawn Menu leaves there, so a 5-place board still fits a landscape window.
+    sideInset: DRAWN_MENU_FACE_INSET + DRAWN_MENU_LIST_INSET, topInset: DRAWN_MENU_FACE_INSET + 40, bottomInset: DRAWN_MENU_FACE_INSET + 4,
     titleH: 50, titleSize: 34, minTitleSize: 22, noteH: 30, noteSize: 15, titleGap: 6,
     messageH: 200, messageSize: 26,
     // The podium's steps, the 1st's first: the crown's room, the Avatar,
@@ -54,7 +65,19 @@ const LOOK = Object.freeze({
     // The rows from the 4th place on.
     rowsGap: 18, rowH: 64, rowGap: 8, rowPad: 8, tile: 48, rowAvatar: 48, cellGap: 14, rowInitialsW: 80, rowScoreW: 200,
     rowRankSize: 18, rowNameSize: 18, rowInitialsSize: 15, rowScoreSize: 20,
+    // The Exit Button at the title's right end, with room on its left for
+    // its tooltip, and round it on the tooltip's layer; the title keeps
+    // the same room on both sides, so it stays centred.
+    exitButton: 28, exitTooltipRoom: 100, tooltipMargin: 8,
+    // The Button Hints' footer under the board, a rule on its top; their
+    // look at hintsScale times the Achievement List's, on its canvas.
+    footerGap: 6, footerH: 40, hintsScale: 1.5,
 });
+
+// The Exit Button, its tooltip and the Button Hints are drawn on a canvas
+// this many times their board size: the board's zoom in a landscape
+// window, where they then match the other drawn screens' in reference pixels.
+export const CANVAS_ZOOM = 2;
 
 // How wide an Avatar Frame is drawn at most, for its image's size.
 export const AVATAR_FRAME_WIDTH = avatarFrameSide(Math.max(...LOOK.avatar, LOOK.rowAvatar));
@@ -78,14 +101,16 @@ const MIN_PANEL_H = Math.max(
 // window. Gives the panel, the title, the note's line under it, then
 // either the message's box or the podium's steps (the 1st's first, those
 // with no place included), the crowns over them (framed: over an Avatar
-// wearing an Avatar Frame, bare: over one without), and one rect per row
-// as if none were scrolled.
+// wearing an Avatar Frame, bare: over one without), one rect per row
+// as if none were scrolled, the Exit Button, its tooltip's layer and the
+// Button Hints' footer.
 // zoom: board to reference pixels; rowsInView: how many rows show at
 // once (all of them when they fit), the others scrolling rowPitch apart.
 export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const w = DRAWN_MENU_PANEL_WIDTH;
     const rowCount = Math.max(0, placeCount - PODIUM_PLACES);
-    const panelOf = bodyH => Math.max(MIN_PANEL_H, LOOK.topInset + LOOK.titleH + LOOK.noteH + LOOK.titleGap + bodyH + LOOK.bottomInset);
+    const panelOf = bodyH => Math.max(MIN_PANEL_H,
+        LOOK.topInset + LOOK.titleH + LOOK.noteH + LOOK.titleGap + bodyH + LOOK.footerGap + LOOK.footerH + LOOK.bottomInset);
     const panelH = rowsShown => panelOf(placeCount === 0 ? LOOK.messageH : PODIUM_H + rowsHeight(rowsShown));
     const maxH = FIT.heightShare * REFERENCE_HEIGHT;
     // Small enough for the podium and one row at least, whatever the
@@ -100,7 +125,11 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const origin = { x: (referenceWidth - w * zoom) / 2, y: (REFERENCE_HEIGHT - h * zoom) / 2 };
     const x = LOOK.sideInset;
     const contentW = w - 2 * LOOK.sideInset;
-    const title = { x, y: LOOK.topInset, w: contentW, h: LOOK.titleH };
+    const exitRoom = LOOK.exitTooltipRoom + LOOK.exitButton;
+    const title = { x: x + exitRoom, y: LOOK.topInset, w: contentW - 2 * exitRoom, h: LOOK.titleH };
+    const exitButton = { x: x + contentW - LOOK.exitButton, y: title.y + (title.h - LOOK.exitButton) / 2, w: LOOK.exitButton, h: LOOK.exitButton };
+    const M = LOOK.tooltipMargin;
+    const exitTooltip = { x: exitButton.x - LOOK.exitTooltipRoom, y: exitButton.y - M, w: LOOK.exitTooltipRoom + exitButton.w + M, h: exitButton.h + 2 * M };
     const note = { x, y: title.y + title.h, w: contentW, h: LOOK.noteH };
     const bodyY = note.y + note.h + LOOK.titleGap;
     const message = { x, y: bodyY, w: contentW, h: LOOK.messageH };
@@ -118,7 +147,27 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const rowPitch = LOOK.rowH + LOOK.rowGap;
     const rowsY = bodyY + PODIUM_H + LOOK.rowsGap;
     const rows = Array.from({ length: rowCount }, (_, index) => ({ x, y: rowsY + index * rowPitch, w: contentW, h: LOOK.rowH }));
-    return { zoom, origin, panel, title, note, message, steps, crowns, rows, rowsInView, rowPitch };
+    const buttonHints = { x, y: h - LOOK.bottomInset - LOOK.footerH, w: contentW, h: LOOK.footerH };
+    return { zoom, origin, panel, title, note, message, steps, crowns, rows, rowsInView, rowPitch, exitButton, exitTooltip, buttonHints };
+}
+
+// look: the Exit Button's (EXIT_BUTTON_LOOK), on its canvas.
+export function drawExitButton(dc, look) {
+    drawExitButtonTile(dc, look, 0, 0, LOOK.exitButton * CANVAS_ZOOM);
+}
+
+// On the Exit Button's left, on its tooltip's canvas.
+export function drawExitTooltip(host, dc, label) {
+    const M = LOOK.tooltipMargin * CANVAS_ZOOM;
+    tooltip(host, dc, label, (LOOK.exitTooltipRoom - 9) * CANVAS_ZOOM, M + LOOK.exitButton * CANVAS_ZOOM / 2, "left");
+}
+
+// The footer w by h board pixels, on its canvas: a rule on its top, the
+// Button Hints (groups) centred.
+export function drawButtonHints(host, dc, groups, w, h) {
+    const width = w * CANVAS_ZOOM;
+    dc.fillRect(0, 0, width, 1, COLORS.border);
+    drawButtonHintsCentred(host, dc, groups, { x: 0, y: 0, width, height: h * CANVAS_ZOOM, scale: LOOK.hintsScale });
 }
 
 // A rect of the layout in reference pixels from the window's top left,

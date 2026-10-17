@@ -19,11 +19,16 @@
 // is drawn at once on all its layers, then faded in; the crowns, drawn
 // ahead once on their own layers through the shared drawing ahead
 // (PinballY reads an image file again on every draw), are only placed,
-// and wait hidden, shrunk to a point, while the board is closed. While
+// and wait hidden, shrunk to a point, while the board is closed. The Exit
+// Button at the top right is the board's only choice, always under the
+// Selection Marker with its tooltip: the back arrow, "Back", when open()
+// was given a return, the cross, "Close", when Exit leaves the bare
+// wheel. The Button Hints' footer names the flippers (Scroll) only on a
+// board longer than the window, then Exit. While
 // open it swallows every button through "commandbuttondown"; when the
 // rows below the podium do not all fit the window, the flippers (Next /
-// Prev) scroll them, the podium staying in place; Exit closes it and calls
-// the return given to open(); attract mode only closes it. Opens directly,
+// Prev) scroll them, the podium staying in place; Exit, Select or Launch
+// close it and call the return given to open(); attract mode only closes it. Opens directly,
 // not through the wheel dialog module: the player asked for it. isOpen() and
 // onClosed() let the wheel dialogs wait for it.
 // ============================================================
@@ -34,11 +39,13 @@ import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
 import { createLoader } from "../drawing/loader.js";
+import { createSelectionMarker } from "../drawing/selection_marker.js";
+import { exitButtonLookOf, exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { SCRIPT_NAME } from "./high_score_store.js";
 import { readDefaultScoreImages, pickDefaultScoreImages } from "./default_score_images.js";
 import {
-    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX, HIGH_SCORE_BOARD_LOADER_Z_INDEX, CROWN_IMAGES, CROWN_CANVAS, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard, placedRect,
-    drawBackdrop, drawPanel, drawGlass, drawCrown, drawTitle, drawNote, drawMessage, drawStep, drawRow,
+    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX, HIGH_SCORE_BOARD_LOADER_Z_INDEX, CROWN_IMAGES, CROWN_CANVAS, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, CANVAS_ZOOM,
+    layoutHighScoreBoard, placedRect, drawBackdrop, drawPanel, drawGlass, drawCrown, drawTitle, drawNote, drawMessage, drawStep, drawRow, drawExitButton, drawExitTooltip, drawButtonHints,
 } from "./high_score_board_painter.js";
 
 const TRANSPARENT = 0x00000000;
@@ -141,6 +148,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
     function showContent(opened) {
         const { drawn, geometry, rowLayers, firstRow } = opened;
         for (const layer of [...opened.content, ...opened.crownLayers]) layer.alpha = opened.opacity;
+        opened.marker.setOpacity(opened.opacity);
         rowLayers.forEach((layer, index) => {
             drawn.place(layer, placedRect(geometry, geometry.rows[index], firstRow * geometry.rowPitch));
             const inView = index >= firstRow && index < firstRow + geometry.rowsInView;
@@ -157,6 +165,8 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
         const geometry = layoutHighScoreBoard(drawn.referenceWidth, screen.places.length);
         const content = [];
         const piece = (zIndex, rect, draw) => drawn.drawPiece(zIndex, placedRect(geometry, rect), draw, content, rect);
+        // Drawn finer, on a canvas CANVAS_ZOOM times the rect.
+        const finePiece = (zIndex, rect, draw) => drawn.drawPiece(zIndex, placedRect(geometry, rect), draw, content, { w: rect.w * CANVAS_ZOOM, h: rect.h * CANVAS_ZOOM });
         const { panel } = geometry;
         piece(Z_INDEX.panel, panel, dc => drawPanel(dc, projectFolder, panel.w, panel.h));
         piece(Z_INDEX.title, geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
@@ -181,6 +191,14 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
             return piece(Z_INDEX.rows, rect, dc => drawRow(host, dc, place, rect.w));
         });
         piece(Z_INDEX.glass, panel, dc => drawGlass(dc, projectFolder, panel.w, panel.h));
+        const { exitLook } = opened;
+        const flippers = geometry.rows.length > geometry.rowsInView ? FLIPPER_HINT.SCROLL : null;
+        const hints = buttonHintGroupsOf({ flippers, exitLook });
+        finePiece(Z_INDEX.buttonHints, geometry.buttonHints, dc => drawButtonHints(host, dc, hints, geometry.buttonHints.w, geometry.buttonHints.h));
+        finePiece(Z_INDEX.exitButton, geometry.exitButton, dc => drawExitButton(dc, exitLook));
+        finePiece(Z_INDEX.tooltip, geometry.exitTooltip, dc => drawExitTooltip(host, dc, exitButtonWordOf(exitLook)));
+        // The panel's height follows the board: the Exit Button may have moved.
+        opened.marker.moveTo(placedRect(geometry, geometry.exitButton));
         opened.content = content;
         opened.geometry = geometry;
         opened.rowLayers = rowLayers;
@@ -201,10 +219,11 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
         showContent(shown);
     }
 
-    // onBack: what Exit returns to, called once the screen is closed.
+    // onBack: what Exit returns to (a screen or a menu), called once the
+    // screen is closed; none when Exit leaves the bare wheel.
     // Opens at once on the last known board and redraws in place when the
     // fresh read ends; a read ending after close only updated the store.
-    function open(onBack = () => {}) {
+    function open(onBack = null) {
         if (shown) return;
         const openedAt = host.now().getTime();
         const game = host.getCurrentTable();
@@ -213,8 +232,10 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
             backdropZIndex: Z_INDEX.backdrop,
             drawBackdrop,
         });
+        const marker = createSelectionMarker(host, { zIndex: Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
         const opened = {
-            drawn, onBack, opacity: 0, content: [], geometry: null, rowLayers: [], crownLayers: [], firstRow: 0, isReading: Boolean(game),
+            drawn, onBack, exitLook: exitButtonLookOf(onBack !== null), marker,
+            opacity: 0, content: [], geometry: null, rowLayers: [], crownLayers: [], firstRow: 0, isReading: Boolean(game),
         };
         shown = opened;
         const defaultImages = readDefaultScoreImages(host, logImageLine);
@@ -242,6 +263,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
     function close() {
         if (!shown) return;
         shown.drawn.close(shown.content);
+        shown.marker.remove();
         loader.hide();
         crowns.forEach(hideCrown);
         shown = null;
@@ -249,16 +271,17 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
     }
 
     // Fires on every mapped button press; swallows them all while the
-    // screen is open, the flippers scrolling a board longer than the window.
+    // screen is open, the flippers scrolling a board longer than the window,
+    // Select and Launch choosing the Exit Button, always selected.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
         // Already handled within the same press by the screen that opened this one.
         if (!shown || ev.defaultPrevented) return;
         ev.preventDefault();
         if (ev.command === "Next" || ev.command === "Prev") scroll(ev.command === "Next" ? 1 : -1);
-        if (ev.command !== "Exit") return;
+        if (!["Exit", "Select", "Launch"].includes(ev.command)) return;
         const { onBack } = shown;
         close();
-        onBack();
+        if (onBack) onBack();
     }));
 
     // Fires when the cabinet sits idle: the screen must not stay over
