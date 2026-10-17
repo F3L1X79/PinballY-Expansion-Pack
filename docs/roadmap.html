@@ -219,7 +219,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 16.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 17.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -227,8 +227,8 @@
   <section>
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
-      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne. Le 16/10, les Default Scores ont reçu 28 portraits libres de droits ; les anciens, non libres, ne restent que sur la borne de Félix (<code>assets/images/default_scores/local/</code>, hors git).</p>
-      <span class="next">Ensuite : <a href="#welcome-selection">sélection du Welcome Screen (n° <span data-ref="welcome-selection"></span>)</a>, en tête de file</span>
+      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne. Le 16/10, les Default Scores ont reçu 28 portraits libres de droits ; les anciens, non libres, ne restent que sur la borne de Félix (<code>assets/images/default_scores/local/</code>, hors git). Le 17/10, le <strong>Selection Marker</strong> (un halo flou d'ors qui défile autour du choix courant) remplace <code>selectionHalo</code> sur le Welcome Screen, les Profile Stats, les Household Stats et la liste des Avatar Frames ; reste à le voir sur la borne.</p>
+      <span class="next">Ensuite : <a href="#loader">écran de chargement (n° <span data-ref="loader"></span>)</a>, en tête de file</span>
     </div>
   </section>
 
@@ -253,43 +253,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="welcome-selection" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Welcome Screen : une sélection qui se voit</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Les joueurs ne voient pas où est le curseur à l'ouverture (sur « Changer de joueur ») : le halo doré actuel (<code>selectionHalo</code>) ne suffit pas. Idée de Félix : quatre traits dorés qui tournent en carré autour de l'icône sélectionnée, comme dans certains jeux vidéo ; le prototype a retenu un halo doré qui défile. Le même contour servira ensuite aux autres écrans Steamball.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">prototype</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/prototype</code> (les variantes, à juger sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code> · Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/231">#231</a>, tickets #232 à #236</div>
-          <details>
-            <summary>Décidé au grill du 16/10/2026 (6)</summary>
-            <ul>
-              <li><strong>Selection Marker</strong> (glossaire) : quatre traits dorés qui tournent tranquillement, sans fin, autour du choix courant, rien entre les traits. Exception assumée à la règle du 09/10 sur les animations en boucle.</li>
-              <li>Remplace <code>selectionHalo</code> partout : Welcome Screen, Profile Stats, Household Stats, liste des Avatar Frames. Les Drawn Menus gardent leur bande.</li>
-              <li>Au déplacement, il saute sur le nouveau choix et reprend son tour là où il en était.</li>
-              <li>Technique : un seul petit calque redessiné à chaque tick (rectangles seulement) ; repli sur des images dessinées d'avance si la roue rame.</li>
-              <li>Lancement d'une table ou mode attract : le halo actuel reprend la place. Pendant les dessins d'avance après un appui, il continue de tourner, sauf si le prototype montre une gêne (le halo le remplace alors un court instant).</li>
-              <li>Pas de réglage pour le couper. Prototype sur le seul Welcome Screen : un tour en 3, 5 ou 8 s (réglé dans <code>config.js</code>), temps moyen d'un dessin dans <code>logfile.log</code>.</li>
-            </ul>
-            <p class="ctx">Retour de Félix du 16/10/2026, après des essais avec d'autres joueurs.</p>
-          </details>
-          <details>
-            <summary>Verdict du prototype du 16/10/2026 (5)</summary>
-            <ul>
-              <li><strong>Apparence</strong> : plus quatre traits (jugés moches sur la borne), ni comètes, ni arc-en-ciel (superbe mais détonne). Un halo flou juste à l'extérieur du choix (six anneaux de 2 px qui s'estompent), dans un dégradé diagonal d'ors, du bronze chaud (<code>0xA8661C</code>) à un éclat blanc, deux fois par tour ; la moitié du dégradé visible sur un choix. « Premium ».</li>
-              <li><strong>Mouvement</strong> : les couleurs défilent toujours dans le même sens (vers le bas à droite), un tour en 6 s (4, 8 et 10 s essayés).</li>
-              <li><strong>Coût</strong> : un seul calque redessiné toutes les 33 ms, 250 à 540 rectangles, aucune image : environ 2 ms par dessin, 5 ms au pire ; la roue reste fluide. Pas besoin des images dessinées d'avance.</li>
-              <li><strong>Après un appui</strong> : aucune gêne mesurée ni vue ; le halo ne le remplace pas.</li>
-              <li><strong>Piège</strong> : arrondir les deux bords de chaque morceau, jamais sa taille, sinon deux morceaux translucides se chevauchent d'1 px et tracent un trait sombre.</li>
-            </ul>
-            <p class="ctx">Prototype sur la branche <code>prototype/selection-marker</code> (jamais fusionnée), jugé par Félix sur la borne.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-play" id="loader" data-track="play" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -305,7 +268,7 @@
             <li>pendant le lancement d'une table, dans le Seamless Launch Overlay, qui n'affiche aujourd'hui qu'un fond uni.</li>
           </ul>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (mesurer les temps sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avec la <a href="#welcome-selection">sélection du Welcome Screen (n° <span data-ref="welcome-selection"></span>)</a>, sur le même écran</div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (mesurer les temps sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
             <summary>Questions ouvertes (4)</summary>
             <ul>
@@ -351,7 +314,7 @@
           </div>
           <p>Remettre à jour <code>README.md</code> et <code>README.fr.md</code> avec les fonctions livrées depuis, et refaire les captures de <code>docs/images/</code> sur la borne (menu principal en sections, Meilleurs scores, Statistiques de la maison…).</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : tâche directe, sans spec (captures prises par Félix sur la borne, textes revus ensuite). Après la <a href="#welcome-selection">sélection (n° <span data-ref="welcome-selection"></span>)</a>, le <a href="#loader">loader (n° <span data-ref="loader"></span>)</a> et les <a href="#back-buttons">boutons Retour (n° <span data-ref="back-buttons"></span>)</a>, pour qu'ils figurent sur les captures</div>
+          <div class="links">Flow Matt : tâche directe, sans spec (captures prises par Félix sur la borne, textes revus ensuite). Après le Selection Marker, le <a href="#loader">loader (n° <span data-ref="loader"></span>)</a> et les <a href="#back-buttons">boutons Retour (n° <span data-ref="back-buttons"></span>)</a>, pour qu'ils figurent sur les captures</div>
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Proposé par Félix le 15/10/2026. Les Profiles de la borne sont des données de test, sans souci sur des captures publiques.</p>
@@ -898,7 +861,6 @@
 
           <div class="ax row">Fort</div>
           <div class="cell sweet">
-            <a class="chip tr-play" href="#welcome-selection"><b></b>Sélection visible</a>
             <a class="chip tr-play" href="#back-buttons"><b></b>Boutons Retour</a>
             <a class="chip tr-play" href="#hidden-tables-filter"><b></b>Tables masquées</a>
           </div>
