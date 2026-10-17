@@ -1,9 +1,10 @@
 // ============================================================
-// Drawn screen: the layer plumbing the Profile Stats and the Household
-// Stats share. Each piece goes on its own hidden layer placed in reference
-// pixels, after the backdrop, which measures the window; the layers fade in
-// together on the clock and are all removed on close. openDrawnScreen()
-// draws them all at once; prepareDrawnScreen() is the shared opening of a
+// Drawn screen: the layer plumbing the Profile Stats, the Household Stats
+// and the High Score Board share. Each piece goes on its own hidden layer
+// placed in reference pixels, after the backdrop, which measures the
+// window; the layers fade in together on the clock and are all removed on
+// close. openDrawnScreen() draws them all at once (the High Score Board,
+// which has its own Loader); prepareDrawnScreen() is the shared opening of a
 // screen the player waits for (docs/adr/0014): the wheel dims at once under
 // a veil, the reading and drawing steps run in the drawing ahead's
 // foreground queue, the Loader turns over the veil if they last more than
@@ -104,11 +105,12 @@ export function openDrawnScreen(host, scriptName, { referenceHeight, backdropZIn
 
 // The shared opening of a screen the player waits for. referenceHeight:
 // the window's height in reference pixels; drawingAhead: the shared drawing
-// ahead (common/core/drawing_ahead.js). The screen queues its steps with
+// ahead (common/core/drawing_ahead.js); whose: what the timing line says
+// was opened ("Alice's"), null for nothing. The screen queues its steps with
 // read(step) and draw(step), each doing one thing (a step may queue more),
 // draws within them with drawBackdrop(draw) and drawPiece(), then calls
 // start(). The veil and Loader sit just under the backdrop.
-export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdropZIndex, drawingAhead }) {
+export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdropZIndex, drawingAhead, whose = null }) {
     const screen = createScreenLayers(host, scriptName, referenceHeight);
     const loader = createLoader(host, { zIndex: backdropZIndex - 1 });
     // Each step with whether it reads or draws, first come first run.
@@ -173,7 +175,7 @@ export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdrop
             const onDone = () => {
                 cancel = null;
                 const readyAt = host.now().getTime();
-                host.log(`[${scriptName}] Opened in ${readyAt - openedAt} ms: read in ${spentMs.read} ms, drawn in ${spentMs.draw} ms.`);
+                host.log(`[${scriptName}] Opened ${whose === null ? "" : `${whose} `}in ${readyAt - openedAt} ms: read in ${spentMs.read} ms, drawn in ${spentMs.draw} ms.`);
                 stopLoader();
                 onReady();
                 screen.fadeIn(setOpacity, removeVeil);

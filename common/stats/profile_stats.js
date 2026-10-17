@@ -8,7 +8,13 @@
 // and TASTES sections on its right (PROGRESSION ending with the High Scores
 // and Table Records held, TASTES with the first, favourite and
 // last table strips, read from the Play Log, the Hall of Fame and the plays). Every stat is read again on each
-// opening; the screen is drawn at once on all its layers, then faded in.
+// opening, through the drawn screen's shared opening (docs/adr/0014): the
+// wheel dims at once, one step per section read (the card, then each
+// section, the tastes last) then one per piece drawn run in the drawing
+// ahead's foreground queue, with the Loader if they take a while, then
+// every layer fades in together. While getting ready they count as open
+// and swallow every button: Exit gives up and goes where it would once
+// open, attract mode only gives up.
 // Created from the PinballY host, the Profile store, readers of a named
 // Profile's Player Level and Achievements Unlocked, the Achievement List
 // (opening it from the Achievements button, Exit there showing this screen
@@ -49,7 +55,7 @@ import { collectionTextsOf } from "../mastery/mastery_bar.js";
 import { getHallOfFame } from "./hall_of_fame.js";
 import { getTablesToDiscover } from "../tables/tables_to_discover.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
-import { openDrawnScreen } from "./drawn_screen.js";
+import { prepareDrawnScreen } from "./drawn_screen.js";
 import { playerLevelColorOf } from "../drawing/steamball_drawing.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
@@ -62,12 +68,13 @@ const NO_PLAY = Object.freeze({ count: 0, seconds: 0 });
 
 export function createProfileStats(host, {
     profileStore, readPlayerLevel, countAchievements, achievementList, profileRewards = null, frameList = null, dailyStreak, tableOfTheDay, tableOfTheWeek, challenges = null,
-    highScores = null, hallOfFameFilter = null, tablesToDiscoverFilter = null, householdStats = null,
+    highScores = null, hallOfFameFilter = null, tablesToDiscoverFilter = null, householdStats = null, drawingAhead,
 }) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
-    // The screen on show: its layers, choices and selection; null when closed.
+    // The screen on show, or getting ready (isPreparing): its layers,
+    // choices and selection; null when closed.
     let shown = null;
     const closedListeners = createClosedListeners(SCRIPT_NAME);
 
@@ -280,15 +287,16 @@ export function createProfileStats(host, {
         ? profileStore.getActiveProfile()
         : profileStore.listProfiles().find(profile => profile.name.toLowerCase() === profileName.toLowerCase()));
 
-    // isReadOnly: another Profile's screen, to look at only, with no button.
-    // Its tables as that Profile sees them, whoever looks: looking is not
-    // picking a table.
-    function readScreen(profile, isReadOnly) {
+    // The card: the Profile, its Player Level, Collection Mastery and
+    // buttons (none when isReadOnly: another Profile's screen, to look at
+    // only), with what the sections read after it (its tables as that
+    // Profile sees them, whoever looks: looking is not picking a table).
+    function readCard(profile, isReadOnly) {
         const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore, profile.name);
         const profilePlays = profileStore.getPlaysOf(profile.name);
         const getPlay = configId => profilePlays[configId] || NO_PLAY;
         const stats = readStats(profile.name);
-        const { plays, achievements, playerLevel } = stats;
+        const { achievements, playerLevel } = stats;
         const hallOfFame = getHallOfFame(profileTables, getPlay);
         const buttons = isReadOnly ? [] : [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
@@ -298,82 +306,118 @@ export function createProfileStats(host, {
             ...householdButton(),
         ];
         return {
-            name: displayNameOf(profile),
-            avatarPath: profile.avatarPath,
-            framePath: profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
-            playerLevel: {
-                title: TEXT.playerLevel.title,
-                number: String(playerLevel.level),
-                color: playerLevelColorOf(playerLevel.level),
-                share: (playerLevel.points - playerLevel.from) / (playerLevel.to - playerLevel.from),
-                current: TEXT.playerLevel.current(TEXT.number(playerLevel.points), TEXT.number(playerLevel.to)),
+            read: { profileTables, profilePlays, getPlay, stats, hallOfFame },
+            card: {
+                name: displayNameOf(profile),
+                avatarPath: profile.avatarPath,
+                framePath: profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
+                playerLevel: {
+                    title: TEXT.playerLevel.title,
+                    number: String(playerLevel.level),
+                    color: playerLevelColorOf(playerLevel.level),
+                    share: (playerLevel.points - playerLevel.from) / (playerLevel.to - playerLevel.from),
+                    current: TEXT.playerLevel.current(TEXT.number(playerLevel.points), TEXT.number(playerLevel.to)),
+                },
+                collectionTitle: TEXT.collectionTitle,
+                collection: collectionTextsOf(stats.collectionMastery),
+                buttons,
+                // Another Profile's screen goes back to the Household Stats.
+                closeLabel: isReadOnly ? TEXT.backTooltip : TEXT.closeTooltip,
+                // The flippers' loop, the cross first.
+                choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],
             },
-            collectionTitle: TEXT.collectionTitle,
-            collection: collectionTextsOf(stats.collectionMastery),
-            buttons,
-            sections: [{
-                title: TEXT.sections.game,
-                rows: [[
-                    { label: TEXT.stats.gamesPlayed, value: TEXT.number(plays.count) },
-                    { label: TEXT.stats.totalTime, value: hoursAndMinutes(Math.floor(plays.seconds / SECONDS_PER_MINUTE)) },
-                    { label: TEXT.stats.averageDuration, value: averageOf(plays) },
-                ]],
-            }, {
-                title: TEXT.sections.progression,
-                rows: [
-                    [collectionStat(stats.collection), ...challengesStats(stats.challenges)],
-                    [
-                        streakStat(TEXT.stats.cabinetStreak, stats.dailyStreak),
-                        streakStat(TEXT.stats.dayStreak, periodTableStreakOf(tableOfTheDay, profile.name)),
-                        streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek, profile.name)),
-                    ],
-                    ...highScoresStats(stats.boards),
+        };
+    }
+
+    function gameSection({ plays }) {
+        return {
+            title: TEXT.sections.game,
+            rows: [[
+                { label: TEXT.stats.gamesPlayed, value: TEXT.number(plays.count) },
+                { label: TEXT.stats.totalTime, value: hoursAndMinutes(Math.floor(plays.seconds / SECONDS_PER_MINUTE)) },
+                { label: TEXT.stats.averageDuration, value: averageOf(plays) },
+            ]],
+        };
+    }
+
+    function progressionSection(stats, profileName) {
+        return {
+            title: TEXT.sections.progression,
+            rows: [
+                [collectionStat(stats.collection), ...challengesStats(stats.challenges)],
+                [
+                    streakStat(TEXT.stats.cabinetStreak, stats.dailyStreak),
+                    streakStat(TEXT.stats.dayStreak, periodTableStreakOf(tableOfTheDay, profileName)),
+                    streakStat(TEXT.stats.weekStreak, periodTableStreakOf(tableOfTheWeek, profileName)),
                 ],
-            }, tastesSection(profile, profileTables, profilePlays, getPlay, hallOfFame)],
-            // Another Profile's screen goes back to the Household Stats.
-            closeLabel: isReadOnly ? TEXT.backTooltip : TEXT.closeTooltip,
-            // The flippers' loop, the cross first.
-            choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],
+                ...highScoresStats(stats.boards),
+            ],
         };
     }
 
     // viewed: another Profile's screen, read-only, as { profileName, onBack
-    // (what Exit returns to, called once the screen is closed) }; null:
-    // the active Profile's. Draws every layer at once, hidden, then fades
-    // them in together, like the Welcome Screen: it never shows up half drawn.
+    // (what Exit returns to, called once the screen is closed or given up) };
+    // null: the active Profile's. Reads and draws every layer hidden, step by
+    // step through the drawn screen's shared opening, then fades them in
+    // together: it never shows up half drawn.
     function open(selectedChoice = CHOICE.CLOSE, viewed = null) {
         if (shown) return;
-        const openedAt = host.now().getTime();
         const profile = viewed ? profileNamed(viewed.profileName) : profileStore.getActiveProfile();
         if (!profile) {
             log(`No Profile named ${viewed.profileName} any more; back where its screen was opened from.`);
             viewed.onBack();
             return;
         }
-        const screen = readScreen(profile, viewed !== null);
-        const readAt = host.now().getTime();
-        const drawn = openDrawnScreen(host, SCRIPT_NAME, {
+        const drawn = prepareDrawnScreen(host, SCRIPT_NAME, {
             referenceHeight: REFERENCE_HEIGHT,
             backdropZIndex: PROFILE_STATS_Z_INDEX.backdrop,
-            drawBackdrop: (dc, size, referenceWidth) => drawBackdrop(host, dc, size, referenceWidth, screen),
+            drawingAhead,
+            whose: viewed ? `${profile.name}'s, read only,` : `${profile.name}'s`,
         });
-        const drawPiece = piece => drawn.drawPiece(piece.zIndex, piece.rect, piece.draw);
-        const { pieces, highlights } = layoutProfileStats(host, screen, drawn.referenceWidth);
-        pieces.forEach(drawPiece);
-        // Only the cross has a tooltip: null for the buttons.
-        const tooltipLayers = screen.choices.map(choice => (highlights[choice].tooltip ? drawPiece(highlights[choice].tooltip) : null));
-        // Here rather than on the first move, which it would slow down.
-        navigationSound.load();
-        const selected = Math.max(0, screen.choices.indexOf(selectedChoice));
-        const targets = screen.choices.map(choice => highlights[choice].target);
-        const marker = createSelectionMarker(host, { zIndex: PROFILE_STATS_Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
-        marker.moveTo(targets[selected]);
-        const opened = { screen, viewed, drawn, tooltipLayers, marker, targets, choices: screen.choices, selected, opacity: 0 };
-        shown = opened;
-        drawn.fadeIn(opacity => setOpacity(opened, opacity));
-        const drawnAt = host.now().getTime();
-        const whose = viewed ? `${profile.name}'s, read only,` : `${profile.name}'s`;
-        log(`Opened ${whose} in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
+        // Completed by setUp() once every step ran.
+        const opening = { viewed, drawn, isPreparing: true, marker: null, tooltipLayers: [], opacity: 0 };
+        shown = opening;
+        let read = null;
+        let screen = null;
+        let highlights = null;
+        const tooltipLayers = [];
+
+        // Once the backdrop has measured the window: one step per piece,
+        // then one per choice's tooltip (only the cross has one: null for
+        // the buttons).
+        function queuePieces() {
+            const layout = layoutProfileStats(host, screen, drawn.referenceWidth);
+            highlights = layout.highlights;
+            for (const piece of layout.pieces) drawn.draw(() => drawn.drawPiece(piece.zIndex, piece.rect, piece.draw));
+            screen.choices.forEach((choice, index) => drawn.draw(() => {
+                const { tooltip } = highlights[choice];
+                tooltipLayers[index] = tooltip ? drawn.drawPiece(tooltip.zIndex, tooltip.rect, tooltip.draw) : null;
+            }));
+        }
+
+        // Once every step ran: the marker on the selected choice, still hidden.
+        function setUp() {
+            // Here rather than on the first move, which it would slow down.
+            navigationSound.load();
+            const selected = Math.max(0, screen.choices.indexOf(selectedChoice));
+            const targets = screen.choices.map(choice => highlights[choice].target);
+            const marker = createSelectionMarker(host, { zIndex: PROFILE_STATS_Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
+            marker.moveTo(targets[selected]);
+            Object.assign(opening, { isPreparing: false, screen, tooltipLayers, marker, targets, choices: screen.choices, selected });
+        }
+
+        // One step per section: the card, then the game, the progression and the tastes.
+        drawn.read(() => {
+            const card = readCard(profile, viewed !== null);
+            read = card.read;
+            screen = { ...card.card, sections: [] };
+        });
+        drawn.read(() => screen.sections.push(gameSection(read.stats)));
+        drawn.read(() => screen.sections.push(progressionSection(read.stats, profile.name)));
+        drawn.read(() => screen.sections.push(tastesSection(profile, read.profileTables, read.profilePlays, read.getPlay, read.hallOfFame)));
+        drawn.draw(() => drawn.drawBackdrop((dc, size, referenceWidth) => drawBackdrop(host, dc, size, referenceWidth, screen)));
+        drawn.draw(queuePieces);
+        drawn.start({ onReady: setUp, setOpacity: opacity => setOpacity(opening, opacity), onFailed: close });
     }
 
     // The marker and every layer to the same opacity, except the unselected
@@ -385,9 +429,10 @@ export function createProfileStats(host, {
         screen.marker.setOpacity(opacity);
     }
 
+    // Also gives up an opening still getting ready.
     function close() {
         if (!shown) return;
-        shown.marker.remove();
+        if (shown.marker) shown.marker.remove();
         shown.drawn.close();
         shown = null;
         closedListeners.tell();
@@ -429,6 +474,11 @@ export function createProfileStats(host, {
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing choice still never reaches the wheel.
         ev.preventDefault();
+        // Getting ready: Exit gives up, as it would close the open screen.
+        if (shown.isPreparing) {
+            if (ev.command === "Exit") back();
+            return;
+        }
         if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
         // Launch is the plunger, which selects in PinballY's own menus too.
         else if (ev.command === "Select" || ev.command === "Launch") choose();
