@@ -12,22 +12,23 @@
 // value when one does not fit, and a thin bar,
 // then wide strips with a table's wheel logo or the missing image, or else
 // its title),
-// the spare height shared evenly between the column's gaps, and one highlight
-// per choice (a gold halo, with a tooltip for the cross). Only drawing: no
-// layer, no event, no side effect.
+// the spare height shared evenly between the column's gaps, and, for each
+// choice, its own rect (which the Selection Marker surrounds) and, for the
+// cross, the tooltip shown while it is selected. Only drawing: no layer,
+// no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, mix, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
-    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawCross, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
     UNBOUNDED,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
 // In the Welcome Screen's band, which never shows at the same time, above
 // its own values so each screen's reader sees only its own layers.
-export const PROFILE_STATS_Z_INDEX = Object.freeze({ backdrop: 6120, card: 6121, buttons: 6122, sections: 6123, cross: 6124, highlights: 6130 });
+export const PROFILE_STATS_Z_INDEX = Object.freeze({ backdrop: 6120, card: 6121, buttons: 6122, sections: 6123, cross: 6124, marker: 6129, tooltips: 6130 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -83,9 +84,9 @@ const LOOK = Object.freeze({
         h: 132, gapAbove: 24, gap: 16, logoShare: 0.3, logoMaxW: 160, logoInsetX: 16, logoInsetY: 8, titleSize: 22, textGap: 16,
         labelY: 16, labelSize: 17, nameY: 40, nameSize: 21, minNameSize: 15, pillY: 87,
     }),
-    // Room around a highlighted element for its halo, and beside the cross
-    // for its tooltip.
-    haloMargin: 20, crossTooltipRoom: 240,
+    // Room around the cross on its tooltip's layer, and beside it for the
+    // tooltip.
+    tooltipMargin: 20, crossTooltipRoom: 240,
 });
 
 // ---------- Layout ----------
@@ -337,7 +338,8 @@ function drawSection(host, dc, blocks, top, columnW) {
 // (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]],
 // strips (optional: [{ label, hasTable, title, logoPath, pill (null or as a stat's) }]) }),
 // closeLabel }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn
-// in its rect's own coordinates, and the highlight of each choice.
+// in its rect's own coordinates, and the highlight of each choice:
+// { target (its own rect), tooltip (a piece shown while it is selected, or null) }.
 export function layoutProfileStats(host, screen, referenceWidth) {
     const { panel, innerH, cardW, contentW, avatar, columnX, columnW, blocks } = geometry(host, referenceWidth, screen);
     const top = panel.y + LOOK.pad;
@@ -375,13 +377,7 @@ export function layoutProfileStats(host, screen, referenceWidth) {
         },
     }];
 
-    const M = LOOK.haloMargin;
-    const highlightPiece = (rect, draw) => ({ zIndex: PROFILE_STATS_Z_INDEX.highlights, rect, draw });
-    // Centred on what it surrounds, as the reader expects.
-    const haloAround = rect => highlightPiece(
-        { x: rect.x - M, y: rect.y - M, w: rect.w + 2 * M, h: rect.h + 2 * M },
-        dc => selectionHalo(dc, M, M, rect.w, rect.h)
-    );
+    const choiceAt = (target, tooltipShown = null) => ({ target, tooltip: tooltipShown });
     const highlights = {};
 
     // At the card's foot, whatever the panel's height.
@@ -391,7 +387,7 @@ export function layoutProfileStats(host, screen, referenceWidth) {
     for (const entry of screen.buttons) {
         const rect = { x: cardX + LOOK.cardInset, y: buttonY, w: contentW, h: button.h };
         pieces.push({ zIndex: PROFILE_STATS_Z_INDEX.buttons, rect, draw: dc => drawButton(host, dc, entry, rect.w, rect.h, buttonSize) });
-        highlights[entry.choice] = haloAround(rect);
+        highlights[entry.choice] = choiceAt(rect);
         buttonY += button.h + button.gap;
     }
 
@@ -416,11 +412,13 @@ export function layoutProfileStats(host, screen, referenceWidth) {
     });
     // The tooltip sits on the cross's left; the rect leaves room for it.
     const crossRoom = LOOK.crossTooltipRoom;
-    highlights[CHOICE.CLOSE] = highlightPiece(
-        { x: crossX - crossRoom, y: top - M, w: crossRoom + LOOK.cross + M, h: LOOK.cross + 2 * M },
-        dc => {
-            selectionHalo(dc, crossRoom, M, LOOK.cross, LOOK.cross);
-            tooltip(host, dc, screen.closeLabel, crossRoom - 18, M + LOOK.cross / 2, "left");
+    const M = LOOK.tooltipMargin;
+    highlights[CHOICE.CLOSE] = choiceAt(
+        { x: crossX, y: top, w: LOOK.cross, h: LOOK.cross },
+        {
+            zIndex: PROFILE_STATS_Z_INDEX.tooltips,
+            rect: { x: crossX - crossRoom, y: top - M, w: crossRoom + LOOK.cross + M, h: LOOK.cross + 2 * M },
+            draw: dc => tooltip(host, dc, screen.closeLabel, crossRoom - 18, M + LOOK.cross / 2, "left"),
         }
     );
     return { pieces, highlights };

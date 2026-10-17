@@ -24,8 +24,8 @@
 // disabled: no button) and the Household Stats (opened from the Household
 // button, shown while the Household has two Profiles; Exit there shows
 // this screen again on that button). While open it swallows every button through
-// "commandbuttondown": Next / Prev move a gold halo through the cross and
-// the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
+// "commandbuttondown": Next / Prev move the Selection Marker (a gold glow
+// flowing round the choice) through the cross and the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
 // closes it too. Opens directly, not through the wheel dialog module:
 // the player asked for it. Can also open the frame list straight away, for
 // the Reward Prompt. openReadOnly() opens another Profile's screen from its
@@ -51,6 +51,7 @@ import { getTablesToDiscover } from "../tables/tables_to_discover.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { openDrawnScreen } from "./drawn_screen.js";
 import { playerLevelColorOf } from "../drawing/steamball_drawing.js";
+import { createSelectionMarker } from "../drawing/selection_marker.js";
 import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
 
 const SCRIPT_NAME = "ProfileStats";
@@ -358,25 +359,32 @@ export function createProfileStats(host, {
         const drawPiece = piece => drawn.drawPiece(piece.zIndex, piece.rect, piece.draw);
         const { pieces, highlights } = layoutProfileStats(host, screen, drawn.referenceWidth);
         pieces.forEach(drawPiece);
-        const highlightLayers = screen.choices.map(choice => drawPiece(highlights[choice]));
+        // Only the cross has a tooltip: null for the buttons.
+        const tooltipLayers = screen.choices.map(choice => (highlights[choice].tooltip ? drawPiece(highlights[choice].tooltip) : null));
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         const selected = Math.max(0, screen.choices.indexOf(selectedChoice));
-        const opened = { screen, viewed, drawn, highlightLayers, choices: screen.choices, selected, opacity: 0 };
+        const targets = screen.choices.map(choice => highlights[choice].target);
+        const marker = createSelectionMarker(host, { zIndex: PROFILE_STATS_Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
+        marker.moveTo(targets[selected]);
+        const opened = { screen, viewed, drawn, tooltipLayers, marker, targets, choices: screen.choices, selected, opacity: 0 };
         shown = opened;
         drawn.fadeIn(opacity => setOpacity(opened, opacity));
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
     }
 
-    // Every layer but the unselected highlights, to the same opacity.
+    // The marker and every layer to the same opacity, except the unselected
+    // choices' tooltips, kept hidden.
     function setOpacity(screen, opacity) {
         screen.opacity = opacity;
-        const unselected = screen.highlightLayers.filter((layer, index) => index !== screen.selected);
+        const unselected = screen.tooltipLayers.filter((layer, index) => layer && index !== screen.selected);
         for (const layer of screen.drawn.layers) layer.alpha = unselected.includes(layer) ? 0 : opacity;
+        screen.marker.setOpacity(opacity);
     }
 
     function close() {
         if (!shown) return;
+        shown.marker.remove();
         shown.drawn.close();
         shown = null;
         closedListeners.tell();
@@ -388,6 +396,7 @@ export function createProfileStats(host, {
         const count = shown.choices.length;
         shown.selected = (shown.selected + direction + count) % count;
         setOpacity(shown, shown.opacity);
+        shown.marker.moveTo(shown.targets[shown.selected]);
     }
 
     // Closes; another Profile's screen then goes back where it was opened from.

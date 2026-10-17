@@ -4,8 +4,8 @@
 // name first) and Avatar, its Player Level and Collection Mastery blocks,
 // the buttons at the card's foot (label and grey count; none read-only), a section of the
 // right column by its title (each stat's label with the texts drawn after
-// it, and its images), the highlighted choice (the button under the gold
-// halo, or the cross's tooltip), and picks a choice with Next and Select
+// it, and its images), the highlighted choice (the button the Selection
+// Marker surrounds, or the cross's tooltip on its own layer), and picks a choice with Next and Select
 // as a player would. Opens them from the main menu entry, or reads one
 // section of the active Profile's screen and closes it again. Reads the
 // Avatar Frame list opened from the Frame button too: whether it is open,
@@ -113,21 +113,32 @@ export function sectionImages(fake, title) {
     return layer ? layer.images() : [];
 }
 
-function haloLayer(fake) {
-    const lit = shownLayers(fake, PROFILE_STATS_Z_INDEX.highlights);
-    assert.equal(lit.length, 1, "exactly one choice is highlighted");
-    return lit[0];
+// The Selection Marker's layers, shown or not.
+export const markerLayerCount = fake => fake.drawingLayers().filter(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.marker).length;
+
+export function markerLayer(fake) {
+    const marked = shownLayers(fake, PROFILE_STATS_Z_INDEX.marker);
+    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one choice");
+    return marked[0];
+}
+
+// The tooltip shown beside the selected choice, null when it has none.
+function shownTooltip(fake) {
+    const lit = shownLayers(fake, PROFILE_STATS_Z_INDEX.tooltips);
+    assert.ok(lit.length <= 1, "one tooltip at most");
+    return lit.length > 0 ? lit[0].texts()[0] || null : null;
 }
 
 // The highlighted choice: the cross's tooltip, or the label of the button
-// the halo surrounds (both centred on the same point).
+// the marker surrounds (both centred on the same point, give or take the
+// marker's canvas rounded up to whole pixels; buttons are far further apart).
 export function highlighted(fake) {
-    const halo = haloLayer(fake);
-    const [tooltip] = halo.texts();
+    const marker = markerLayer(fake);
+    const tooltip = shownTooltip(fake);
     if (tooltip) return tooltip;
-    const same = (a, b) => Math.abs(a - b) < 1e-9;
+    const same = (a, b) => Math.abs(a - b) < 0.001;
     const button = buttonLayers(fake).find(layer =>
-        same(layer.position().x, halo.position().x) && same(layer.position().y, halo.position().y));
+        same(layer.position().x, marker.position().x) && same(layer.position().y, marker.position().y));
     return button ? button.texts()[0] : null;
 }
 

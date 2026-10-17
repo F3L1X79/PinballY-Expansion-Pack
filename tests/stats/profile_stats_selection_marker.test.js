@@ -1,0 +1,57 @@
+// ============================================================
+// Profile Stats' Selection Marker, through main.js on the fake PinballY
+// globals with a Household of two: the marker surrounds the cross on
+// opening and jumps to the first button on Next; back from the Achievement
+// List, the Avatar Frame list or the Household Stats, a single marker
+// surrounds the button the screen reopens on; it is gone, with its timer,
+// once Exit or attract mode closes the screen.
+// ============================================================
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { startHousehold } from "./household_stats_scenario.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
+import {
+    PROFILE_STATS_OPEN_MS, press, openProfileStats, isProfileStatsOpen, profileStatsLayerCount, buttons, highlighted, markerLayer, markerLayerCount, choose,
+} from "./profile_stats_reader.js";
+
+test("the Selection Marker surrounds the cross, jumps on Next, follows the screen back from its lists and is gone once it closes", async () => {
+    const { fake, lang } = await startHousehold({ profiles: { Alice: {}, Bob: {} } });
+    const TEXT = lang.profileStats;
+    const intervalsBefore = fake.runningIntervalCount();
+
+    openProfileStats(fake, lang);
+    assert.ok(markerLayer(fake), "the marker is drawn on opening");
+    assert.equal(highlighted(fake), TEXT.closeTooltip, "round the cross, with its tooltip");
+    press(fake, "Next");
+    assert.equal(highlighted(fake), buttons(fake)[0].label, "on the first button after Next");
+
+    choose(fake, TEXT.buttons.achievements);
+    press(fake, "Exit");
+    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    assert.equal(markerLayerCount(fake), 1, "a single marker back from the Achievement List");
+    assert.equal(highlighted(fake), TEXT.buttons.achievements);
+
+    choose(fake, TEXT.buttons.frame);
+    press(fake, "Exit");
+    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    assert.equal(markerLayerCount(fake), 1, "a single marker back from the Avatar Frame list");
+    assert.equal(highlighted(fake), TEXT.buttons.frame);
+
+    choose(fake, TEXT.buttons.household);
+    press(fake, "Exit");
+    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    assert.equal(markerLayerCount(fake), 1, "a single marker back from the Household Stats");
+    assert.equal(highlighted(fake), TEXT.buttons.household);
+
+    press(fake, "Exit");
+    assert.equal(isProfileStatsOpen(fake), false);
+    assert.equal(profileStatsLayerCount(fake), 0, "the marker's layer is removed with the others");
+    assert.equal(fake.runningIntervalCount(), intervalsBefore, "no timer of the marker keeps running");
+
+    openProfileStats(fake, lang);
+    fake.fire("attractmodestart", {});
+    assert.equal(profileStatsLayerCount(fake), 0, "removed on attract mode too");
+    assert.equal(fake.runningIntervalCount(), intervalsBefore);
+    assertNoErrorLogged(fake);
+});
