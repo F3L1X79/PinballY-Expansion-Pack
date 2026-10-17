@@ -18,6 +18,7 @@
 import assert from "node:assert/strict";
 import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
+import * as selectionMarker from "../support/selection_marker_reader.js";
 
 // Past the fade in.
 export const PROFILE_STATS_OPEN_MS = 300;
@@ -115,20 +116,12 @@ export function sectionImages(fake, title) {
 }
 
 // The Selection Marker's layers, shown or not.
-export const markerLayerCount = fake => fake.drawingLayers().filter(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.marker).length;
+export const markerLayerCount = fake => selectionMarker.markerLayerCount(fake, PROFILE_STATS_Z_INDEX.marker);
 
-// Whether the marker surrounds the cross (both centred on the same point).
-export function isMarkerOnCross(fake) {
-    const [cross] = shownLayers(fake, PROFILE_STATS_Z_INDEX.cross);
-    const marker = markerLayer(fake).position();
-    return Math.abs(cross.position().x - marker.x) < 0.001 && Math.abs(cross.position().y - marker.y) < 0.001;
-}
+export const markerLayer = fake => selectionMarker.markerLayer(fake, PROFILE_STATS_Z_INDEX.marker);
 
-export function markerLayer(fake) {
-    const marked = shownLayers(fake, PROFILE_STATS_Z_INDEX.marker);
-    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one choice");
-    return marked[0];
-}
+export const isMarkerOnCross = fake =>
+    selectionMarker.layerUnderMarker(fake, PROFILE_STATS_Z_INDEX.marker, shownLayers(fake, PROFILE_STATS_Z_INDEX.cross)) !== undefined;
 
 // The tooltip shown beside the selected choice, null when it has none.
 function shownTooltip(fake) {
@@ -138,15 +131,13 @@ function shownTooltip(fake) {
 }
 
 // The highlighted choice: the cross's tooltip, or the label of the button
-// the marker surrounds (both centred on the same point, give or take the
-// marker's canvas rounded up to whole pixels; buttons are far further apart).
+// the marker surrounds.
 export function highlighted(fake) {
-    const marker = markerLayer(fake);
+    // Exactly one marker, even on the cross.
+    markerLayer(fake);
     const tooltip = shownTooltip(fake);
     if (tooltip) return tooltip;
-    const same = (a, b) => Math.abs(a - b) < 0.001;
-    const button = buttonLayers(fake).find(layer =>
-        same(layer.position().x, marker.position().x) && same(layer.position().y, marker.position().y));
+    const button = selectionMarker.layerUnderMarker(fake, PROFILE_STATS_Z_INDEX.marker, buttonLayers(fake));
     return button ? button.texts()[0] : null;
 }
 
@@ -189,16 +180,11 @@ export const frameRows = fake => rowLayers(fake).map(layer => {
 });
 
 // The Avatar Frame list's Selection Marker layers, shown or not.
-export const frameListMarkerLayerCount = fake => fake.drawingLayers().filter(layer => layer.zIndex === AVATAR_FRAME_LIST_Z_INDEX.marker).length;
+export const frameListMarkerLayerCount = fake => selectionMarker.markerLayerCount(fake, AVATAR_FRAME_LIST_Z_INDEX.marker);
 
-// The name of the row the Selection Marker surrounds (both centred on the
-// same point, give or take the marker's canvas rounded up to whole pixels;
-// rows are far further apart).
+// The name of the row the Selection Marker surrounds.
 export function highlightedRow(fake) {
-    const marked = shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.marker);
-    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one row");
-    const same = (a, b) => Math.abs(a - b) < 0.001;
-    const row = rowLayers(fake).find(layer => same(layer.position().x, marked[0].position().x) && same(layer.position().y, marked[0].position().y));
+    const row = selectionMarker.layerUnderMarker(fake, AVATAR_FRAME_LIST_Z_INDEX.marker, rowLayers(fake));
     return row ? row.texts()[0] : null;
 }
 

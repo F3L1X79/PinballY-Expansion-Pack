@@ -13,6 +13,7 @@
 import assert from "node:assert/strict";
 import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
 import { shownPip } from "../levels/level_pip_reader.js";
+import * as selectionMarker from "../support/selection_marker_reader.js";
 
 // The startup pause: the screen is drawn then, and starts fading in.
 export const WELCOME_SCREEN_PAUSE_MS = 500;
@@ -132,11 +133,7 @@ function textAt(fake, window, point) {
     return null;
 }
 
-export function markerLayer(fake) {
-    const marked = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.marker);
-    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one choice");
-    return marked[0];
-}
+export const markerLayer = fake => selectionMarker.markerLayer(fake, WELCOME_SCREEN_Z_INDEX.marker);
 
 // The tooltip shown beside the selected choice, null when it has none.
 function shownTooltip(fake) {

@@ -12,6 +12,7 @@
 
 import assert from "node:assert/strict";
 import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/stats/household_stats_painter.js";
+import * as selectionMarker from "../support/selection_marker_reader.js";
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { openProfileStats, choose, press, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
@@ -114,20 +115,12 @@ export const lineValues = (fake, label) => columns(fake).map(column => (column.c
 export const goldOn = (fake, label) => columns(fake).filter(column => column.cells[label] && column.cells[label].isGold).map(column => column.name);
 
 // The Selection Marker's layers, shown or not.
-export const markerLayerCount = fake => fake.drawingLayers().filter(layer => layer.zIndex === HOUSEHOLD_STATS_Z_INDEX.marker).length;
+export const markerLayerCount = fake => selectionMarker.markerLayerCount(fake, HOUSEHOLD_STATS_Z_INDEX.marker);
 
-// Whether the marker surrounds the cross (both centred on the same point).
-export function isMarkerOnCross(fake) {
-    const [cross] = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.cross);
-    const marker = markerLayer(fake).position();
-    return Math.abs(cross.position().x - marker.x) < 0.001 && Math.abs(cross.position().y - marker.y) < 0.001;
-}
+export const markerLayer = fake => selectionMarker.markerLayer(fake, HOUSEHOLD_STATS_Z_INDEX.marker);
 
-export function markerLayer(fake) {
-    const marked = shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.marker);
-    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one choice");
-    return marked[0];
-}
+export const isMarkerOnCross = fake =>
+    selectionMarker.layerUnderMarker(fake, HOUSEHOLD_STATS_Z_INDEX.marker, shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.cross)) !== undefined;
 
 // The cross's tooltip, null when hidden.
 function shownTooltip(fake) {
@@ -136,15 +129,14 @@ function shownTooltip(fake) {
     return lit.length > 0 ? lit[0].texts()[0] || null : null;
 }
 
-// The name of the column the marker surrounds (both centred on the same
-// point, give or take the marker's canvas rounded up to whole pixels), or
-// the cross's tooltip when the marker is on the cross.
+// The name of the column the marker surrounds, or the cross's tooltip when
+// the marker is on the cross.
 export function highlightedColumn(fake) {
-    const marker = markerLayer(fake);
+    // Exactly one marker, even on the cross.
+    markerLayer(fake);
     const tooltip = shownTooltip(fake);
     if (tooltip) return tooltip;
-    const same = (a, b) => Math.abs(a - b) < 0.001;
-    const column = columnLayers(fake).find(layer => same(layer.position().x, marker.position().x) && same(layer.position().y, marker.position().y));
+    const column = selectionMarker.layerUnderMarker(fake, HOUSEHOLD_STATS_Z_INDEX.marker, columnLayers(fake));
     return column ? textStrokes(column)[0].text : null;
 }
 

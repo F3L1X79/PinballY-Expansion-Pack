@@ -2,8 +2,8 @@
 // Steamball drawing helpers shared by the drawn screens (Welcome Screen,
 // Profile Stats) and the Profile badge: text on one or several lines,
 // rounded and gradient fills, glows, the dimmed backdrop with its panel,
-// the Avatar, a wheel logo, the close cross, a tooltip, the gold selection
-// halo, the Avatar Frame around an Avatar and the Player Level pip. Each
+// the Avatar, a wheel logo, the close cross, a tooltip, the Avatar Frame
+// around an Avatar and the Player Level pip. Each
 // draws on the drawing context it is given, in its coordinates. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
@@ -187,12 +187,6 @@ export function drawBackdrop(dc, { width, height }, referenceHeight, panel) {
     glow(dc, x, y, w, h, COLORS.gold, 6, 0x30);
     fillGradient(dc, x, y, w, h, COLORS.panelTop, COLORS.panel);
     dc.frameRect(x, y, w, h, 1, COLORS.border);
-}
-
-// Gold halo and frame around the selected element.
-export function selectionHalo(dc, x, y, w, h) {
-    glow(dc, x, y, w, h, COLORS.gold, 12, 0x90);
-    dc.frameRect(x, y, w, h, 4, COLORS.gold);
 }
 
 // A table's wheel logo ({ title, logoPath }) fitted in the box, its aspect
