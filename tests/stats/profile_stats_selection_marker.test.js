@@ -1,6 +1,6 @@
 // ============================================================
 // Profile Stats' Selection Marker, through main.js on the fake PinballY
-// globals with a Household of two: the marker surrounds the cross on
+// globals with a Household of two: the marker surrounds the Exit Button on
 // opening and jumps to the first button on Next; back from the Achievement
 // List, the Avatar Frame list or the Household Stats, a single marker
 // surrounds the button the screen reopens on; it is gone, with its timer,
@@ -12,18 +12,18 @@ import assert from "node:assert/strict";
 import { startHousehold } from "./household_stats_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import {
-    PROFILE_STATS_OPEN_MS, press, openProfileStats, isProfileStatsOpen, profileStatsLayerCount, buttons, highlighted, markerLayer, markerLayerCount, isMarkerOnCross, choose,
+    PROFILE_STATS_OPEN_MS, press, openProfileStats, isProfileStatsOpen, profileStatsLayerCount, buttons, highlighted, markerLayer, markerLayerCount, isMarkerOnExitButton, choose,
 } from "./profile_stats_reader.js";
 
-test("the Selection Marker surrounds the cross, jumps on Next, follows the screen back from its lists and is gone once it closes", async () => {
+test("the Selection Marker surrounds the Exit Button, jumps on Next, follows the screen back from its lists and is gone once it closes", async () => {
     const { fake, lang } = await startHousehold({ profiles: { Alice: {}, Bob: {} } });
     const TEXT = lang.profileStats;
     const intervalsBefore = fake.runningIntervalCount();
 
     openProfileStats(fake, lang);
     assert.ok(markerLayer(fake), "the marker is drawn on opening");
-    assert.ok(isMarkerOnCross(fake), "round the cross");
-    assert.equal(highlighted(fake), lang.buttonHints.close, "with its tooltip");
+    assert.ok(isMarkerOnExitButton(fake), "round the Exit Button");
+    assert.equal(highlighted(fake), lang.buttonHints.back, "with its tooltip");
     press(fake, "Next");
     assert.equal(highlighted(fake), buttons(fake)[0].label, "on the first button after Next");
 

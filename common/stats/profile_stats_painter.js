@@ -6,7 +6,7 @@
 // Level colour with a soft glow (Avatar in its worn Avatar Frame, the
 // Profile's name in gold, the Player Level in big digits with its bar and points, a rule, the
 // Collection Mastery stacked like the Mastery Bar, the buttons at its
-// foot), the close cross and the right column's sections (a title, then
+// foot), the Exit Button at the top right and the right column's sections (a title, then
 // rows of stats, label over value (every label at one size, the largest
 // at which they all fit), with a pill beside the value, or every pill of the row under its
 // value when one does not fit, and a thin bar,
@@ -14,29 +14,30 @@
 // its title),
 // the spare height shared evenly between the column's gaps, and, for each
 // choice, its own rect (which the Selection Marker surrounds) and, for the
-// cross, the tooltip shown while it is selected. Only drawing: no layer,
-// no event, no side effect.
+// Exit Button, the tooltip shown while it is selected; the Button Hints in
+// a footer across the panel's foot, under the card and the column. Only
+// drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, mix, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
-    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawExitButton, EXIT_BUTTON_LOOK, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawExitButton, drawButtonHints, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
     UNBOUNDED,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
 // In the Welcome Screen's band, which never shows at the same time, above
 // its own values so each screen's reader sees only its own layers.
-export const PROFILE_STATS_Z_INDEX = Object.freeze({ backdrop: 6120, card: 6121, buttons: 6122, sections: 6123, cross: 6124, marker: 6129, tooltips: 6130 });
+export const PROFILE_STATS_Z_INDEX = Object.freeze({ backdrop: 6120, card: 6121, buttons: 6122, sections: 6123, exitButton: 6124, buttonHints: 6125, marker: 6129, tooltips: 6130 });
 
 export const REFERENCE_HEIGHT = 1920;
 
-export const CHOICE = Object.freeze({ CLOSE: "close", ACHIEVEMENTS: "achievements", FRAME: "frame", MOST_PLAYED: "mostPlayed", TO_DISCOVER: "toDiscover", HOUSEHOLD: "household" });
+export const CHOICE = Object.freeze({ EXIT_BUTTON: "exitButton", ACHIEVEMENTS: "achievements", FRAME: "frame", MOST_PLAYED: "mostPlayed", TO_DISCOVER: "toDiscover", HOUSEHOLD: "household" });
 
 
 const LOOK = Object.freeze({
-    pad: 32, cross: 56,
+    pad: 32, exitButton: 56,
     // The panel's width: a share of the window's, at most maxWidth.
     widthShare: 0.9, maxWidth: 1500,
     // The card: its share of the inner width (narrower in a portrait window,
@@ -84,9 +85,13 @@ const LOOK = Object.freeze({
         h: 132, gapAbove: 24, gap: 16, logoShare: 0.3, logoMaxW: 160, logoInsetX: 16, logoInsetY: 8, titleSize: 22, textGap: 16,
         labelY: 16, labelSize: 17, nameY: 40, nameSize: 21, minNameSize: 15, pillY: 87,
     }),
-    // Room around the cross on its tooltip's layer, and beside it for the
-    // tooltip.
-    tooltipMargin: 20, crossTooltipRoom: 240,
+    // Room around the Exit Button on its tooltip's layer, and beside it for
+    // the tooltip.
+    tooltipMargin: 20, exitTooltipRoom: 240,
+    // The Button Hints' footer under the card and the column, a rule on its
+    // top; their look at hintsScale times the Achievement List's, as on the
+    // Household Stats.
+    footerGap: 16, footerH: 96, hintsScale: 1.5,
 });
 
 // ---------- Layout ----------
@@ -170,7 +175,7 @@ function cardHeight(screen, avatar) {
 }
 
 // The panel, the card and the column in a window referenceWidth wide; the
-// panel is as tall as the taller of the card and the column.
+// panel is as tall as the taller of the card and the column, plus the footer.
 function geometry(host, referenceWidth, screen) {
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
     const innerW = w - 2 * LOOK.pad;
@@ -190,7 +195,7 @@ function geometry(host, referenceWidth, screen) {
         block.y = Math.round(y);
         y += block.h + (block.isSpread ? spare : 0);
     }
-    const h = innerH + 2 * LOOK.pad;
+    const h = innerH + LOOK.footerGap + LOOK.footerH + 2 * LOOK.pad;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     return { panel, innerW, innerH, cardW, contentW, avatar, columnX, columnW, blocks };
 }
@@ -319,8 +324,8 @@ function drawSection(host, dc, blocks, top, columnW) {
     for (const block of blocks) {
         const y = block.y - top;
         if (block.kind === "title") {
-            // The first title stops short of the cross.
-            const width = block.isFirst ? columnW - LOOK.cross - 24 : columnW;
+            // The first title stops short of the Exit Button.
+            const width = block.isFirst ? columnW - LOOK.exitButton - 24 : columnW;
             text(host, dc, block.section.title, { x: 0, y, width, size: LOOK.titleSize, weight: 700, color: COLORS.gold, font: FONTS.display });
             dc.fillRect(0, y + LOOK.ruleY, width, 1, COLORS.border);
         } else if (block.kind === "row") {
@@ -337,7 +342,8 @@ function drawSection(host, dc, blocks, top, columnW) {
 // or a string }; none on another Profile's read-only card), sections (each { title, rows: [[{ label, value, pill
 // (optional { text, isLit }), share (optional, 0 to 1: a thin gold bar) }]],
 // strips (optional: [{ label, hasTable, title, logoPath, pill (null or as a stat's) }]) }),
-// closeLabel }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn
+// exitLook (an EXIT_BUTTON_LOOK), exitWord (its tooltip), buttonHints (the
+// footer's groups) }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn
 // in its rect's own coordinates, and the highlight of each choice:
 // { target (its own rect), tooltip (a piece shown while it is selected, or null) }.
 export function layoutProfileStats(host, screen, referenceWidth) {
@@ -404,22 +410,33 @@ export function layoutProfileStats(host, screen, referenceWidth) {
         });
     });
 
-    const crossX = panel.x + panel.w - LOOK.pad - LOOK.cross;
+    const size = LOOK.exitButton;
+    const exitX = panel.x + panel.w - LOOK.pad - size;
     pieces.push({
-        zIndex: PROFILE_STATS_Z_INDEX.cross,
-        rect: { x: crossX, y: top, w: LOOK.cross, h: LOOK.cross },
-        draw: dc => drawExitButton(dc, EXIT_BUTTON_LOOK.CLOSE, 0, 0, LOOK.cross),
+        zIndex: PROFILE_STATS_Z_INDEX.exitButton,
+        rect: { x: exitX, y: top, w: size, h: size },
+        draw: dc => drawExitButton(dc, screen.exitLook, 0, 0, size),
     });
-    // The tooltip sits on the cross's left; the rect leaves room for it.
-    const crossRoom = LOOK.crossTooltipRoom;
+    // The tooltip sits on the Exit Button's left; the rect leaves room for it.
+    const room = LOOK.exitTooltipRoom;
     const M = LOOK.tooltipMargin;
-    highlights[CHOICE.CLOSE] = choiceAt(
-        { x: crossX, y: top, w: LOOK.cross, h: LOOK.cross },
+    highlights[CHOICE.EXIT_BUTTON] = choiceAt(
+        { x: exitX, y: top, w: size, h: size },
         {
             zIndex: PROFILE_STATS_Z_INDEX.tooltips,
-            rect: { x: crossX - crossRoom, y: top - M, w: crossRoom + LOOK.cross + M, h: LOOK.cross + 2 * M },
-            draw: dc => tooltip(host, dc, screen.closeLabel, crossRoom - 18, M + LOOK.cross / 2, "left"),
+            rect: { x: exitX - room, y: top - M, w: room + size + M, h: size + 2 * M },
+            draw: dc => tooltip(host, dc, screen.exitWord, room - 18, M + size / 2, "left"),
         }
     );
+
+    const footer = { x: cardX, y: top + innerH + LOOK.footerGap, w: panel.w - 2 * LOOK.pad, h: LOOK.footerH };
+    pieces.push({
+        zIndex: PROFILE_STATS_Z_INDEX.buttonHints,
+        rect: footer,
+        draw: dc => {
+            dc.fillRect(0, 0, footer.w, 1, COLORS.border);
+            drawButtonHints(host, dc, screen.buttonHints, { x: 0, y: 0, width: footer.w, height: footer.h, scale: LOOK.hintsScale });
+        },
+    });
     return { pieces, highlights };
 }

@@ -69,6 +69,7 @@ import { safeHandler } from "../common/core/safe_handler.js";
 
 const SCRIPT_NAME = "AchievementsEngine";
 const ACHIEVEMENT_LIST_ENTRY = "achievementList";
+const PROFILE_STATS_ENTRY = "profileStats";
 
 // Null when the Challenges Add-on is disabled: then neither the Challenges
 // family nor the Profile Stats line exists.
@@ -196,10 +197,11 @@ export default function init() {
     // Prompt exists only with them.
     profileRewards.enablePrompts(profileStats.openFrameList);
     mainMenu.add({
-        name: "profileStats",
+        name: PROFILE_STATS_ENTRY,
         label: lang.profileStats.menuEntry,
         position: MAIN_MENU_POSITION.PROFILE_STATS,
-        action: profileStats.open,
+        // Exit goes back one level: the main menu, on this entry.
+        action: () => profileStats.open(() => mainMenu.reopenOn(PROFILE_STATS_ENTRY)),
     });
     // Achievements handed to the Achievement Toast module, by Profile name
     // in lower case (Profile names ignore case). They are not Notified until

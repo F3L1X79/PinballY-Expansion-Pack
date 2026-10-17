@@ -2,7 +2,9 @@
 // Another Profile's Profile Stats, opened from its Household Stats column,
 // through main.js on the fake PinballY globals: the same card and sections
 // with that Profile's values, read-only (no button at the card's foot, the
-// cross's tooltip saying Back); Exit, or Select on the cross, goes back to the Household Stats on that
+// Exit Button's tooltip saying Back, the Button Hints naming Exit alone,
+// the flippers and Select having nothing else to do); Exit, or Select on
+// the Exit Button, goes back to the Household Stats on that
 // column, and Exit there to one's own Profile Stats on the "Household Stats"
 // button.
 // ============================================================
@@ -10,7 +12,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHousehold, errorLines, played, HOUR, MEDIEVAL, THEATRE } from "./household_stats_scenario.js";
-import { cardTexts, isReadOnly, section, highlighted, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
+import { cardTexts, isReadOnly, section, highlighted, buttonHints, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
+import { expectedButtonHints } from "../support/button_hints_reader.js";
 import { openHouseholdStats, chooseColumn, highlightedColumn, isHouseholdStatsOpen, press } from "./household_stats_reader.js";
 
 test("Select on another Profile's column opens its Profile Stats, read-only", async () => {
@@ -32,7 +35,8 @@ test("Select on another Profile's column opens its Profile Stats, read-only", as
     assert.equal(cardTexts(fake)[0], "Bob");
     assert.deepEqual(section(fake, TEXT.sections.game, TEXT.stats)[TEXT.stats.gamesPlayed], ["5"]);
     assert.ok(isReadOnly(fake), "no button at the card's foot");
-    assert.equal(highlighted(fake), lang.buttonHints.back, "only the cross, which goes back");
+    assert.equal(highlighted(fake), lang.buttonHints.back, "only the Exit Button, which goes back");
+    assert.deepEqual(buttonHints(fake), expectedButtonHints(lang, { flippers: null, select: false, exit: "back" }));
     press(fake, "Next");
     assert.equal(highlighted(fake), lang.buttonHints.back);
 
@@ -43,7 +47,7 @@ test("Select on another Profile's column opens its Profile Stats, read-only", as
     assert.ok(isHouseholdStatsOpen(fake), "back to the Household Stats");
     assert.equal(highlightedColumn(fake), "Bob", "on that column");
 
-    // Select on the cross goes back the same way.
+    // Select on the Exit Button goes back the same way.
     chooseColumn(fake, "Bob");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     press(fake, "Select");

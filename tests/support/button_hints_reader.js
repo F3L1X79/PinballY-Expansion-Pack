@@ -2,8 +2,9 @@
 // Reads the Button Hints of a drawn screen the way the player sees them,
 // on the fake PinballY host: from a footer's text strokes, the groups of
 // key caps (drawn in the title's colour) each followed by the word saying
-// what they do (in the descriptions' colour), left to right; and the
-// Exit Button's tooltip on a screen's tooltip layer. Never loaded by PinballY.
+// what they do (in the descriptions' colour), left to right; the
+// Exit Button's tooltip on a screen's tooltip layer; and where a layer
+// shows in the window, to check that a footer fits. Never loaded by PinballY.
 // ============================================================
 
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
@@ -50,4 +51,23 @@ export function expectedButtonHints(lang, { flippers = "browse", select = true, 
 export function exitButtonTooltipOn(fake, zIndex) {
     const [layer] = fake.drawingLayers().filter(candidate => candidate.zIndex === zIndex && candidate.alpha > 0);
     return layer ? layer.texts()[0] || null : null;
+}
+
+// Where a layer shows in a window of that size: PinballY centres it on its
+// position and scales it to ySpan of the window's height, its canvas's
+// aspect kept.
+export function windowRect(layer, { width, height }) {
+    const canvas = layer.canvasSize();
+    const h = layer.scale().ySpan * height;
+    const w = h * canvas.width / canvas.height;
+    const cx = (layer.position().x + 0.5) * width;
+    const cy = (0.5 - layer.position().y) * height;
+    return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 };
+}
+
+// Whether every text of that layer sits inside its canvas.
+export function textsInsideLayer(layer) {
+    const canvas = layer.canvasSize();
+    return textStrokes(layer.strokes()).every(({ rect }) =>
+        rect.x >= 0 && rect.y >= 0 && rect.x + rect.width <= canvas.width + 2 && rect.y + rect.height <= canvas.height);
 }

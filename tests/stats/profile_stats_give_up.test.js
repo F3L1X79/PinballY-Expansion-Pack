@@ -2,8 +2,8 @@
 // Giving up the active Profile's Profile Stats while they get ready,
 // through main.js on the fake PinballY globals: Next, Prev and Select are
 // swallowed; Exit gives up (no veil, no Loader, no layer of the screen
-// left) and ends where Exit on the open screen ends, on the wheel with no
-// menu; attract mode gives up the same way.
+// left) and ends where Exit on the open screen ends, the main menu
+// reopened on "Your Stats"; attract mode gives up the same way.
 // ============================================================
 
 import { test } from "node:test";
@@ -40,7 +40,10 @@ test("Exit or attract mode while the Profile Stats get ready gives them up; othe
     fake.advanceTime(2000);
     assertNothingLeft(fake);
     assert.equal(isProfileStatsOpen(fake), false);
-    assert.equal(fake.currentMenu(), null, "on the wheel, as Exit on the open screen");
+    assert.equal(fake.executedCommands().at(-1), globalThis.command.ShowMainMenu, "the main menu reopens, as Exit on the open screen");
+    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
+    assert.deepEqual(fake.currentMenu().items.filter(item => item.selected).map(item => item.title), [lang.profileStats.menuEntry], "on Your Stats");
+    fake.closeMenu();
 
     startOpeningProfileStats(fake, lang);
     fake.advanceTime(200);
