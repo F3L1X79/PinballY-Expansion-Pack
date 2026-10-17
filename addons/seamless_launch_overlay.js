@@ -24,13 +24,16 @@ const SCRIPT_NAME = "SeamlessLaunchOverlay";
 const LOADER_Z_INDEX = 5999;
 const TEXT_Z_INDEX = 5998;
 
-// The text's canvas, drawn one to one on a 1080-pixel-high window and
-// scaled by height only elsewhere, so the layer never covers the whole
-// window. Gabriola draws small for its size and has a tall line, hence a
-// size above body text that still looks a little under it.
-const TEXT_LOOK = Object.freeze({ width: 600, height: 60, size: 24, weight: 400, outline: 1 });
-const TEXT_HEIGHT = TEXT_LOOK.height / 1080;
-const TEXT_GAP = 0.01;
+// The text's canvas, drawn at twice a 1080-pixel-high window's pixels so
+// that its one-pixel outline shows half as thick, and scaled by height
+// only, so the layer never covers the whole window. Gabriola draws small
+// for its size and has a tall line, hence a size above body text that
+// still looks a little under it, and a canvas kept just above its line's
+// height, its empty top already a gap under the comet.
+const CANVAS_SCALE = 2;
+const TEXT_LOOK = Object.freeze({ width: 1200, height: 100, size: 48, weight: 400, outline: 1 });
+const TEXT_HEIGHT = TEXT_LOOK.height / (1080 * CANVAS_SCALE);
+const TEXT_GAP = 0;
 // The comet and the text centred together as one block (PinballY's y axis
 // points up, in window heights).
 const LOADER_Y = (TEXT_GAP + TEXT_HEIGHT) / 2;
