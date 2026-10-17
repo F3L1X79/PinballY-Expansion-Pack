@@ -9,7 +9,7 @@ Extension non officielle de [PinballY](http://mjrnet.org/pinscape/PinballY.php),
 > - un niveau de maîtrise sur chaque table ;
 > - des succès du Bronze au Platine, dont quelques secrets, qui font monter votre niveau.
 >
-> Et ce n'est que le début…
+> [Et la suite arrive…](#à-venir)
 
 <img src="docs/images/hero.png" alt="L'écran de la roue avec l'horloge, le badge du Profil actif et son niveau, la carte du Défi de la semaine, la barre de maîtrise et l'arc de la roue" width="360">
 
@@ -44,13 +44,13 @@ Dès que vous êtes deux à avoir un Profil, **Stats de la maison** montre tous 
 
 <img src="docs/images/welcome_screen.png" alt="L'écran d'accueil avec la table du jour et la table de la semaine" width="480">
 
-Chaque jour une table jamais jouée ou oubliée, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, et après chaque « Changer de joueur », avec ce qu'elles représentent pour vous : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série.
+Chaque jour une table que personne à la maison n'a encore jouée, ou celle délaissée depuis le plus longtemps, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, et après chaque « Changer de joueur », avec ce qu'elles représentent pour vous : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série.
 
 ### Défis de la semaine
 
 <img src="docs/images/challenges.png" alt="La carte du Défi de la semaine sous le badge du Profil" width="376">
 
-Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une heure sur une même table… Sa carte suit votre progression sur l'écran de la roue. **Tables du défi**, juste sous « Toutes les tables » dans le menu principal, ne garde que les tables qui le font avancer. Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
+Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une demi-heure sur une même table… Sa carte suit votre progression sur l'écran de la roue. **Tables du défi**, juste sous « Toutes les tables » dans le menu principal, ne garde que les tables qui le font avancer. Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
 
 ### Maîtrise des tables
 
@@ -58,7 +58,7 @@ Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur
 
 ### Meilleurs scores
 
-Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie d'au moins une minute et attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris. Un encart annonce votre meilleure place, ou le record et à qui vous l'avez pris. Quand quelqu'un d'autre vous prend un record, Invité compris, votre prochain écran d'accueil vous dit qui, une seule fois, pour que vous sachiez quel record reprendre. Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée. Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès ; **Vos statistiques** montrent les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records. Les tables sans ROM (créations originales) comptent aussi : le pack lit leur tableau dans le dossier `User` de Visual Pinball X (`VPReg.stg`, ou le fichier texte que certaines tables y gardent), apprend où chaque table le range pendant sa première partie, et le passe à PinballY, pour que le DMD et la fiche de la table l'affichent aussi. Leur tableau apparaît dès qu'une telle table a été jouée avec le pack.
+Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie et, pour une partie d'au moins une minute, attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris. Un encart annonce votre meilleure place, ou le record et à qui vous l'avez pris. Quand quelqu'un d'autre vous prend un record, Invité compris, votre prochain écran d'accueil vous dit qui, une seule fois, pour que vous sachiez quel record reprendre. Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée. Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès ; **Vos statistiques** montrent les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records. Les tables sans ROM (créations originales) comptent aussi : le pack lit leur tableau dans le dossier `User` de Visual Pinball X (`VPReg.stg`, ou le fichier texte que certaines tables y gardent), apprend où chaque table le range pendant sa première partie, et le passe à PinballY, pour que le DMD et la fiche de la table l'affichent aussi. Leur tableau apparaît dès qu'une telle table a été jouée avec le pack.
 
 **Meilleurs scores** dans le menu principal (ou le bouton `HighScores` de PinballY, s'il est affecté) ouvre le tableau de la table sélectionnée, dessiné dans le style Steamball à la place de la fenêtre de PinballY : les trois premières places sur un podium sous une couronne d'or, d'argent et de bronze, les autres en lignes en dessous, chacune avec son rang, son score, ses initiales et le Profil qui l'a gagnée (nom, Avatar et cadre d'Avatar), ou « Score par défaut » avec un portrait choisi d'après ses initiales, le même sur toutes les tables. Le tableau est relu sur la table à chaque ouverture, il montre donc toujours ce qu'elle contient ; les flippers font défiler un tableau trop long pour l'écran.
 
@@ -89,14 +89,26 @@ Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son ra
 Tout tient dans un seul dossier, sans modifier PinballY.
 
 **Et aussi** :
-- les menus de PinballY (menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur) dessinés dans le style Steamball du pack, mêmes entrées et mêmes boutons ;
+- les menus de PinballY (menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur) dessinés dans le style Steamball du pack, mêmes entrées, rangées en sections, et mêmes boutons ;
 - une table au hasard sur une roue de la fortune ;
 - « Tables à découvrir », « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
 - une horloge, l'arc doré de la roue et une ligne d'état enrichie ;
 - un rappel pour noter une table ;
-- un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente, l'étape en cours écrite en doré dessous au lancement (« Chargement en cours… », « Retour aux tables… ») : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar ;
+- un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente, l'étape en cours écrite en doré dessous quand une table se lance ou se ferme (« Chargement en cours… », « Retour aux tables… ») : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar ;
 - le backglass masqué pendant une partie ;
 - des sons au lancement, aux succès, à l'accueil, aux confettis et au feu d'artifice, ou les vôtres.
+
+## À venir
+
+Voici ce que nous envisageons pour la suite du pack. Rien n'est promis : les projets évoluent, et certaines de ces idées ne verront peut-être jamais le jour.
+
+- **Year in Pinball** : le bilan de l'année de chaque Profil, les tables jouées et découvertes, les heures de jeu, les préférées, les succès et la plus longue série.
+- **Thèmes** : d'autres styles que Steamball pour tous les écrans dessinés, avec un petit éditeur pour créer le vôtre.
+- **Notes et favoris propres à chaque Profil**, puis la note moyenne de la maison pour chaque table.
+- **Cadres d'Avatar de fête et d'année** : Noël, Halloween, « 2026 »… gagnés en venant jouer au bon moment.
+- **Installation en 30 secondes et mises à jour**, sans git.
+- **La langue choisie depuis un menu**, et les textes récents traduits en allemand, espagnol, italien et portugais.
+- **De nouveaux filtres** : Mes records, Tables masquées.
 
 ## Installation
 
@@ -109,8 +121,8 @@ Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fo
    ```
    Vos propres scripts continuent de fonctionner : rien d'autre n'est touché dans `Scripts`.
 3. **Copiez `ExpansionPack\.env.example` en `ExpansionPack\.env.local`** et réglez ce qu'il vous faut, un `CLÉ=valeur` par ligne (UTF-8). Les réglages absents gardent leur valeur par défaut ; `.env.local` est ignoré par git.
-4. **Facultatif : installez vpxtool**, pour que la ROM de chaque table soit remplie toute seule (Table ROMs). Téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools` (créez le dossier). Sans lui, la ROM d'une table est quand même trouvée, après sa première Play.
-5. **Facultatif : passez PINemHi en 3.6.8**, pour que les High Scores lisent les tableaux d'environ 300 ROM de plus. Remplacez les fichiers de `PinballY\PINemHi` par ceux de PINemHi 3.6.8, puis **ajoutez toute la section `[romfind]` de son `romfind.ini` à la fin de son `pinemhi.ini`** (PinballY ne lit cette section que dans `pinemhi.ini` : sans elle, une table au champ ROM vide n'a plus aucun tableau), et réglez `USER=` dans `pinemhi.ini` sur le dossier `User` de Visual Pinball X.
+4. **Facultatif : installez vpxtool**, pour que la ROM de chaque table soit remplie toute seule (Table ROMs). Téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools` (créez le dossier). Sans lui, la ROM d'une table est quand même trouvée, après sa première partie.
+5. **Facultatif : passez PINemHi en 3.6.8**, pour que les meilleurs scores soient lus sur les tableaux d'environ 300 ROM de plus. Remplacez les fichiers de `PinballY\PINemHi` par ceux de PINemHi 3.6.8, puis **ajoutez toute la section `[romfind]` de son `romfind.ini` à la fin de son `pinemhi.ini`** (PinballY ne lit cette section que dans `pinemhi.ini` : sans elle, une table au champ ROM vide n'a plus aucun tableau), et réglez `USER=` dans `pinemhi.ini` sur le dossier `User` de Visual Pinball X.
 6. **Redémarrez PinballY** et consultez `PinballY.log` : il liste vos réglages, une ligne « initialized » par add-on, et des lignes `ERROR` qui désignent l'add-on en cause.
 
 Tout ce que le pack conserve reste dans `Scripts\ExpansionPack` : vos réglages (`.env.local`) et la progression de chaque Profil (`profiles`). **Pour sauvegarder**, copiez ce dossier. **Pour désinstaller**, supprimez-le et retirez la ligne d'import de `Scripts\main.js`.
@@ -149,9 +161,9 @@ La progression de chaque Profil est enregistrée dans `Scripts\ExpansionPack\pro
 
 ### Profil admin
 
-Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": true` au premier niveau du `Scripts\ExpansionPack\profiles\<nom>\profile.json` de votre Profil, PinballY fermé. Dès qu'au moins un Profil est marqué, les autres Profils (Invité compris) ne voient plus « Configurer la table » dans le menu principal ni « Menu opérateur » dans le menu de sortie ; les Profils admin voient toujours les deux, et le bouton de service de la porte monnayeur ouvre toujours le Menu opérateur pour tout le monde. Plusieurs Profils peuvent être marqués. Invité n'est jamais un Profil admin, et une marque qui n'est ni `true` ni `false`, ou dont la clé est mal écrite (`"isAdmin "`, `"IsAdmin"`), est ignorée et signalée dans `PinballY.log`.
+Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": true` au premier niveau du `Scripts\ExpansionPack\profiles\<nom>\profile.json` de votre Profil, PinballY fermé. Dès qu'au moins un Profil est marqué, les autres Profils (Invité compris) ne voient plus « Configurer la table » dans le menu principal ni « Menu opérateur » dans le menu de sortie ; les Profils admin voient toujours les deux, et le bouton de service de la porte du monnayeur ouvre toujours le Menu opérateur pour tout le monde. Plusieurs Profils peuvent être marqués. Invité n'est jamais un Profil admin, et une marque qui n'est ni `true` ni `false`, ou dont la clé est mal écrite (`"isAdmin "`, `"IsAdmin"`), est ignorée et signalée dans `PinballY.log`.
 
-Un Profil admin trouve aussi **Réinitialiser un profil** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils » pour remettre toute la maison à zéro d'un coup. Après une confirmation (le curseur part sur « Non »), le Profil choisi repart de zéro comme s'il n'avait jamais joué : ses parties, ses séries, ses records de session, ses parties aléatoires, sa progression aux défis et ses succès annoncés sont effacés, tandis que son nom, son avatar et ses marques restent. Un message indique ensuite si l'opération a réussi. Son ancien fichier est gardé à côté sous le nom `profile.reset-<date>.json` : pour annuler une réinitialisation, fermez PinballY et renommez cette copie en `profile.json`. Cette entrée a besoin du menu de sortie de PinballY : si vous l'avez désactivé dans les options de PinballY, elle ne peut pas apparaître.
+Un Profil admin trouve aussi **Réinitialiser un profil** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils », dès qu'il y en a au moins deux, pour remettre toute la maison à zéro d'un coup. Après une confirmation (le curseur part sur « Non »), le Profil choisi repart de zéro : ses parties, ses séries, ses records de session, ses parties aléatoires, sa progression aux défis, ses succès annoncés, sa maîtrise des tables, son palier de collection et ses cadres d'Avatar sont effacés, tandis que son nom, son avatar, ses marques et les meilleurs scores qu'il a gagnés restent. Un message indique ensuite si l'opération a réussi. Ses anciens fichiers sont gardés à côté, sous les noms `profile.reset-<date>.json` et `play-log-<année>.reset-<date>.json` : pour annuler une réinitialisation, fermez PinballY et renommez chaque copie sans sa partie `.reset-<date>`. Cette entrée a besoin du menu de sortie de PinballY : si vous l'avez désactivé dans les options de PinballY, elle ne peut pas apparaître.
 
 ### Profil enfant
 
@@ -159,7 +171,7 @@ Pour tenir les tables pour adultes à l'écart d'un enfant, donnez-leur dans Pin
 
 ### Nettoyage des menus
 
-Menu Cleanup allège les menus de PinballY pour tous les Profils, Profils admin compris : il retire Aide et À propos des menus de sortie et opérateur, et Informations, Flyer, Meilleurs scores, Carte d'instructions et les sous-menus Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout du menu principal (Noter la table et Ajouter aux favoris restent) ; ces trois sous-menus restent aussi hors de « Filtrer les tables ». C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
+Le nettoyage des menus allège les menus de PinballY pour tous les Profils, Profils admin compris : il retire Aide et À propos des menus de sortie et opérateur, Informations, Affiche et Carte d'instructions du menu principal (Noter la table et Ajouter aux favoris restent), l'entrée Meilleurs scores de PinballY quand les meilleurs scores du pack sont désactivés, et les groupes Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout de « Filtrer les tables ». C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
 
 ## Contribuer
 

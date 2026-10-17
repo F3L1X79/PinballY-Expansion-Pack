@@ -2,7 +2,7 @@
 
 An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), written with the JavaScript scripting API that PinballY opens to every developer. · *[Version française](README.fr.md)*
 
-> **Give everyone in the house a real reason to come back to your pincab.** A Profile with an Avatar for each of you, a Welcome Screen with the Table of the Day, weekly Challenges, a Mastery Level on every table, Achievements from Bronze to Platinum (a few of them secret) that raise your Player Level, your own stats, and PinballY itself in French, German, Spanish, Italian or Portuguese: everything PinballY was missing, without touching PinballY. And this is only the beginning…
+> **Give everyone in the house a real reason to come back to your pincab.** A Profile with an Avatar for each of you, a Welcome Screen with the Table of the Day, weekly Challenges, a Mastery Level on every table, Achievements from Bronze to Platinum (a few of them secret) that raise your Player Level, your own stats, and PinballY itself in French, German, Spanish, Italian or Portuguese: everything PinballY was missing, without touching PinballY. [More is on the way…](#coming-next)
 
 <img src="docs/images/hero.png" alt="The wheel screen with the clock, the active Profile's badge and its Player Level, the week's Challenge Card, the Mastery Bar and the Wheel Arc" width="360">
 
@@ -22,13 +22,13 @@ With Change Player, each of you picks your own Profile and Avatar, and the Welco
 
 <img src="docs/images/welcome_screen.png" alt="The Welcome Screen with the Table of the Day and the Table of the Week" width="480">
 
-Every day there is a table you have never played or long forgotten, and every week a random one. The Welcome Screen greets you with both at startup, and again after Change Player, with what they mean for you: launch one of them, stay on the table on the wheel, change player or spin a Random Game. Play them several days or weeks in a row to build a Streak.
+Every day there is a table nobody in the house has played yet, or the one left alone the longest, and every week a random one. The Welcome Screen greets you with both at startup, and again after Change Player, with what they mean for you: launch one of them, stay on the table on the wheel, change player or spin a Random Game. Play them several days or weeks in a row to build a Streak.
 
 ### Weekly Challenges
 
 <img src="docs/images/challenges.png" alt="The week's Challenge Card under the Profile badge" width="376">
 
-A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward. Completing it brings a shower of confetti across the wheel screen.
+A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, half an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward. Completing it brings a shower of confetti across the wheel screen.
 
 ### Table Mastery
 
@@ -36,7 +36,7 @@ Every minute you play a table builds your Table Mastery of it, through ten Maste
 
 ### High Scores
 
-When you enter a table's high score board, the place is yours: the pack reads the board before and after each game of a minute or more and credits every new score to the Profile that was playing, whatever initials were typed, the other players of a multiplayer game included. A toast announces your best place, or the Table Record and whom you took it from. When someone else takes one of yours, Guest included, your next Welcome Screen tells you who, once, so you know which record to win back. The scores already on the board at the first read, factory ones included, belong to no one, and a ROM reset that brings them back is never credited. A High Score stays won even once later scores push it off the board, and earns its own Achievements; **Your Stats** shows the High Scores and Table Records you still hold, and **Household Stats** who holds the most Table Records. Tables without a ROM (community originals) count too: the pack reads their board in Visual Pinball X's `User` folder (`VPReg.stg`, or the text file some tables keep there), learns where each table keeps it during its first game, and hands it to PinballY, so the DMD and the table's info box show it as well. Their board appears once such a table has been played with the pack.
+When you enter a table's high score board, the place is yours: the pack reads the board before and after each game and, for a game of a minute or more, credits every new score to the Profile that was playing, whatever initials were typed, the other players of a multiplayer game included. A toast announces your best place, or the Table Record and whom you took it from. When someone else takes one of yours, Guest included, your next Welcome Screen tells you who, once, so you know which record to win back. The scores already on the board at the first read, factory ones included, belong to no one, and a ROM reset that brings them back is never credited. A High Score stays won even once later scores push it off the board, and earns its own Achievements; **Your Stats** shows the High Scores and Table Records you still hold, and **Household Stats** who holds the most Table Records. Tables without a ROM (community originals) count too: the pack reads their board in Visual Pinball X's `User` folder (`VPReg.stg`, or the text file some tables keep there), learns where each table keeps it during its first game, and hands it to PinballY, so the DMD and the table's info box show it as well. Their board appears once such a table has been played with the pack.
 
 **High Scores** in the main menu (or PinballY's `HighScores` button, if mapped) opens the selected table's board, drawn in the Steamball look in place of PinballY's own window: the three first places on a podium under a Gold, Silver and Bronze crown, the others in rows below, each with its rank, score, initials and the Profile that won it (name, Avatar and Avatar Frame), or "Default score" with a portrait picked by its initials, the same on every table. The board is read again from the table each time you open it, so it always shows what the table holds now; the flippers scroll a board too long for the screen.
 
@@ -66,14 +66,26 @@ PinballY's own menus and messages in French, German, Spanish, Italian or Portugu
 Everything stays in one folder, with no change to PinballY itself.
 
 **And also**:
-- PinballY's menus (main menu, Exit, filters, power off, table setup, Operator Menu) drawn in the pack's Steamball look, same entries and same buttons;
+- PinballY's menus (main menu, Exit, filters, power off, table setup, Operator Menu) drawn in the pack's Steamball look, same entries, sorted into sections, and same buttons;
 - a Random Game spun on a wheel of fortune;
 - "Tables to Discover", "Most Played Tables", "Favorite Tables" and "Original Tables" in the menus;
 - a clock, a gold arc under the wheel (the Wheel Arc) and a richer status line;
 - a reminder to rate a table;
-- launches without a black flash, with a gold comet turning while you wait, the step under way written in gold beneath it during a launch ("Loading…", "Returning to tables…"): during a launch, at startup, while a high score board is read and while the Profile Stats, the Household Stats, the Achievement List or the Avatar Frame list get ready;
+- launches without a black flash, with a gold comet turning while you wait, the step under way written in gold beneath it while a table launches or closes ("Loading…", "Returning to tables…"): during a launch, at startup, while a high score board is read and while the Profile Stats, the Household Stats, the Achievement List or the Avatar Frame list get ready;
 - the backglass hidden during a game;
 - sounds for launches, Achievements, greetings, confetti and fireworks, or your own.
+
+## Coming next
+
+Here is what we are thinking about for the pack's future. Nothing is promised: plans change, and some of these ideas may never ship.
+
+- **Year in Pinball**: each Profile's year in review, the tables played and discovered, the hours, the favourites, the Achievements and the longest Streak.
+- **Themes**: other looks than Steamball for every drawn screen, with a small editor to make your own.
+- **Ratings and favourites for each Profile**, then the household's average rating of each table.
+- **Holiday and year Avatar Frames**: Christmas, Halloween, "2026"… earned by coming to play at the right time.
+- **Install in 30 seconds and updates**, without git.
+- **The language picked from a menu**, and the latest texts translated into German, Spanish, Italian and Portuguese.
+- **New filters**: My Records, Hidden Tables.
 
 ## Install
 
@@ -128,15 +140,15 @@ Each Profile's progress is saved in `Scripts\ExpansionPack\profiles`. Keep that 
 
 To keep the setup entries for yourself, add `"isAdmin": true` at the top level of your Profile's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed. Once at least one Profile is marked, the other Profiles (Guest included) no longer see "Set Up Table" in the main menu nor "Operator Menu" in the Exit menu; the Admin Profiles still see both, and the coin door service button still opens the Operator Menu for anyone. Several Profiles can be marked. Guest is never an Admin Profile, and a mark that is not `true` or `false`, or whose key is misspelt (`"isAdmin "`, `"IsAdmin"`), is ignored and logged in `PinballY.log`.
 
-An Admin Profile also finds **Reset profile** in the Exit menu (Escape), right after "Operator Menu". It lists every Profile, Guest and yourself included, plus "Every profile" to reset the whole household at once. After one confirmation (the cursor starts on "No"), the chosen Profile starts over as if it had never played: its plays, Streaks, session records, Random Games, Challenge progress and announced Achievements are erased, while its name, Avatar and marks stay. A message then tells whether it worked. Its former file is kept next to it as `profile.reset-<date>.json`: to undo a reset, close PinballY and rename that copy back to `profile.json`. Reset profile needs PinballY's Exit menu: if you disabled it in PinballY's options, the entry cannot show.
+An Admin Profile also finds **Reset profile** in the Exit menu (Escape), right after "Operator Menu". It lists every Profile, Guest and yourself included, plus "Every profile", once there are two or more, to reset the whole household at once. After one confirmation (the cursor starts on "No"), the chosen Profile starts over: its plays, Streaks, session records, Random Games, Challenge progress, announced Achievements, Table Mastery, Collection Tier and Avatar Frames are erased, while its name, Avatar, marks and the High Scores it won stay. A message then tells whether it worked. Its former files are kept next to them, as `profile.reset-<date>.json` and `play-log-<year>.reset-<date>.json`: to undo a reset, close PinballY and rename each copy back, without its `.reset-<date>` part. Reset profile needs PinballY's Exit menu: if you disabled it in PinballY's options, the entry cannot show.
 
 ### Child Profile
 
-To keep the Adult Tables away from a child, tag them in PinballY with the category `NSFW` (or name your own category with `ADULT_CATEGORY` in `Scripts\ExpansionPack\.env.local`, spelt exactly as in PinballY), then add `"isChild": true` at the top level of the child's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed. While that Profile is active, those tables are on the wheel under no filter, the Random Game never draws one, and starting up never leaves the wheel on one; switching to another Profile brings them back at once. The Table of the Day and the Table of the Week stay the same for the whole household: while one is an Adult Table, the child gets neither its main menu entry nor its startup choice, and that day or week neither extends nor breaks the child's Streak. Guest is never a Child Profile, so adult visitors see the whole collection. This is no parental control: nothing asks for a password.
+To keep the Adult Tables away from a child, tag them in PinballY with the category `NSFW` (or name your own category with `ADULT_CATEGORY` in `Scripts\ExpansionPack\.env.local`, spelt exactly as in PinballY), then add `"isChild": true` at the top level of the child's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed. While that Profile is active, those tables are left off the wheel whatever the filter, the Random Game never draws one, and starting up never leaves the wheel on one; switching to another Profile brings them back at once. The Table of the Day and the Table of the Week stay the same for the whole household: while one is an Adult Table, the child gets neither its main menu entry nor its startup choice, and that day or week neither extends nor breaks the child's Streak. Guest is never a Child Profile, so adult visitors see the whole collection. This is no parental control: nothing asks for a password.
 
 ### Menu Cleanup
 
-Menu Cleanup lightens PinballY's menus for every Profile, Admin Profiles included: it removes Help and About from the Exit and Operator menus, and Information, Flyer, High Scores, Instruction Card and the Filter by System, Filter by Last Played and Filter by Date Added submenus from the main menu (Rate Table and Add to Favorites stay); those three submenus stay out of "Filter Tables" too. It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
+Menu Cleanup lightens PinballY's menus for every Profile, Admin Profiles included: it removes Help and About from the Exit and Operator menus, Information, Flyer and Instruction Card from the main menu (Rate Table and Add to Favorites stay), PinballY's own High Scores entry when the pack's High Scores are turned off, and the Filter by System, Filter by Last Played and Filter by Date Added groups from "Filter Tables". It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
 
 ## Contributing
 

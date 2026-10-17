@@ -45,3 +45,6 @@ assets/images/drawn_menu/sheet.png
 
 # Others
 .githooks/
+
+# Raw cabinet screenshots, cut down into docs/images (see the README screenshots ticket)
+docs/images/raw/
