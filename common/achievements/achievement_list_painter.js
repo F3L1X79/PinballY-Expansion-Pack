@@ -72,8 +72,10 @@ export const LIST_LOOK = Object.freeze({
     scrollbarInset: 10,
     scrollbarMinThumbHeight: 40,
     // The Exit Button at the header's top right, its texts kept exitButtonGap
-    // away from it.
+    // away from it; nearer the panel's top than the padding, so that its
+    // tooltip stays above the rank counts.
     exitButtonGap: 16,
+    exitButtonTop: 10,
 });
 
 // The Exit Button and its tooltip are drawn at the other drawn screens'
@@ -225,7 +227,7 @@ export function computeGeometry({ width, height }) {
     const x = Math.round((width - panelWidth) / 2);
     const y = Math.round((height - panelHeight) / 2);
     const side = EXIT_BUTTON_SIDE / SHARED_SCALE;
-    const exitButton = { x: x + panelWidth - look.padding - side, y: y + look.padding, w: side, h: side };
+    const exitButton = { x: x + panelWidth - look.padding - side, y: y + look.exitButtonTop, w: side, h: side };
     return {
         width, height, x, y, panelWidth, panelHeight, exitButton,
         exitTooltip: exitTooltipRectOf(exitButton, {

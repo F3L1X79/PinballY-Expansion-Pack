@@ -51,6 +51,6 @@ export const STEAMBALL_FONTS = Object.freeze({
     body: "Segoe UI",
     // The Achievement List's footer and key caps.
     display: "Bahnschrift SemiCondensed",
-    // The launch's step beneath the Loader; a cursive font Windows ships.
-    script: "Segoe Script",
+    // The launch's step beneath the Loader; a calligraphic font Windows ships.
+    script: "Gabriola",
 });
