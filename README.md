@@ -34,6 +34,8 @@ A new Challenge comes every Monday, the same for the whole household: five diffe
 
 ### Table Mastery
 
+<img src="docs/images/table_mastery.png" alt="The Mastery Bar of the selected table: Rookie, Mastery Level 1" width="297">
+
 Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti. Each Collection Tier also unlocks an Avatar Frame, from the Enchanted Forest to the Celestial Legend, to wear around your Avatar: pick it in **Your Stats**, under **Frame**.
 
 ### High Scores
