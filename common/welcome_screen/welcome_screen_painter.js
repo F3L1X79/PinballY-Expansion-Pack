@@ -8,7 +8,8 @@
 // alert colour with the taker's Avatar, Collection Mastery on the Mastery Bar's card), one card
 // per Period Table (logo, period, name on one line, Table Mastery card
 // around the Mastery Bar's square, grey line, "Go" button),
-// the bottom row ("random" and "stay") and, for each choice, its own rect
+// the bottom row ("random" and "stay"), the Button Hints in a footer
+// under it and, for each choice, its own rect
 // (which the Selection Marker surrounds) and, for the Avatar and the
 // cross, the tooltip shown while it is selected. Only drawing: no layer,
 // no event, no side effect.
@@ -18,12 +19,13 @@ import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
     text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, drawExitButton, EXIT_BUTTON_LOOK, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    drawButtonHints,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
 // Above the Achievement List (6000 to 6010), under the toasts and the
 // Profile picker. Exported for the tests' reader.
-export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, lostRecords: 6107, marker: 6109, tooltips: 6110 });
+export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, lostRecords: 6107, buttonHints: 6108, marker: 6109, tooltips: 6110 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -47,6 +49,10 @@ const LOOK = Object.freeze({
     periodSize: 21, nameSize: 22, minNameSize: 18, lineSize: 18, minLineSize: 15, lineTile: 28,
     cardK: 1.25, masteryCardH: 74,
     button: Object.freeze({ w: 140, h: 52, size: 22 }),
+    // The Button Hints' footer under the bottom row, a rule on its top;
+    // their look at hintsScale times the Achievement List's, as on the
+    // Household Stats.
+    footerGap: 16, footerH: 96, hintsScale: 1.5,
     // The logo column, narrower inside a window under narrowBelow (a
     // portrait playfield), then the details at most detailsMaxW wide.
     logoInset: 24, logoTop: 20, logoW: 360, narrowLogoShare: 0.26, narrowBelow: 1300, detailsGap: 32, detailsMaxW: 640,
@@ -229,7 +235,7 @@ function geometry(referenceWidth, screen) {
     const logoW = inner.w < LOOK.narrowBelow ? Math.round(inner.w * LOOK.narrowLogoShare) : LOOK.logoW;
     // Where a card's details start, which Collection Mastery lines up with.
     const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
-    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + LOOK.pad;
+    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + LOOK.footerGap + LOOK.footerH + LOOK.pad;
     const panel = { x: inner.x - LOOK.pad, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     return { panel, inner, headerH, greetingY, dailyStreakY, lostRecordsY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
 }
@@ -289,7 +295,7 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
 // (each { choice, period, title, logoPath, mastery, masteryHead ({ text,
 // color }, as the Mastery Bar's), line
 // (null, or { played, streak, text }), goLabel }), choices, labels (by
-// choice) }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn in
+// choice), buttonHints (the footer's groups) }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn in
 // its rect's own coordinates, and the highlight of each choice.
 export function layoutWelcomeScreen(host, screen, referenceWidth) {
     const layout = geometry(referenceWidth, screen);
@@ -377,6 +383,16 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
                 }
                 text(host, dc, screen.labels[choice], { x: x + LOOK.rowIcon + 36, y: 0, width: r.w - LOOK.rowIcon - 56, height: r.h, size: LOOK.rowSize, weight: 600 });
             }
+        },
+    });
+
+    const footerTop = rowsTop + LOOK.rowH + LOOK.footerGap;
+    pieces.push({
+        zIndex: WELCOME_SCREEN_Z_INDEX.buttonHints,
+        rect: { x: inner.x, y: footerTop, w: inner.w, h: LOOK.footerH },
+        draw: dc => {
+            dc.fillRect(0, 0, inner.w, 1, COLORS.border);
+            drawButtonHints(host, dc, screen.buttonHints, { x: 0, y: 0, width: inner.w, height: LOOK.footerH, scale: LOOK.hintsScale });
         },
     });
 

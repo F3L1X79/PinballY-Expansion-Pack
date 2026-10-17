@@ -5,13 +5,16 @@
 // below it, each place with its rank, owner's name or "Default score",
 // Avatar image, initials, score text and whether it is marked as the Table
 // Record, the Avatar Frame drawn around its Avatar and the crown over it;
-// and whether every layer is gone after close, but the crowns' (drawn
-// ahead, kept hidden). Opens it from the main menu entry. Never
-// loaded by PinballY.
+// the Exit Button's tooltip, whether the Selection Marker surrounds it,
+// the Button Hints and where the footer shows in the window; and whether
+// every layer is gone after close, but the crowns' (drawn ahead, kept
+// hidden). Opens it from the main menu entry. Never loaded by PinballY.
 // ============================================================
 
 import { HIGH_SCORE_BOARD_Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX } from "../../common/high_scores/high_score_board_painter.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
+import { buttonHintsOn, exitButtonTooltipOn } from "../support/button_hints_reader.js";
+import * as selectionMarker from "../support/selection_marker_reader.js";
 
 // Past the fade in.
 export const BOARD_OPEN_MS = 300;
@@ -181,4 +184,43 @@ export function panelSlices(fake) {
         if (part) slices[part] = stroke.rect;
     }
     return slices;
+}
+
+// The footer's groups of key caps and words, null when none shows.
+export const buttonHints = fake => buttonHintsOn(fake, HIGH_SCORE_BOARD_Z_INDEX.buttonHints);
+
+// The Exit Button's tooltip ("Back" or "Close"), null while hidden.
+export const exitButtonTooltip = fake => exitButtonTooltipOn(fake, HIGH_SCORE_BOARD_Z_INDEX.tooltip);
+
+export const isMarkerOnExitButton = fake =>
+    selectionMarker.layerUnderMarker(fake, HIGH_SCORE_BOARD_Z_INDEX.marker, shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.exitButton)) !== undefined;
+
+// The Selection Marker's layers, shown or not: none once the board closed.
+export const markerLayerCount = fake => selectionMarker.markerLayerCount(fake, HIGH_SCORE_BOARD_Z_INDEX.marker);
+
+// Where a layer shows in a window of that size: PinballY centres it on its
+// position and scales it to ySpan of the window's height, its canvas's
+// aspect kept.
+function windowRect(layer, { width, height }) {
+    const canvas = layer.canvasSize();
+    const h = layer.scale().ySpan * height;
+    const w = h * canvas.width / canvas.height;
+    const cx = (layer.position().x + 0.5) * width;
+    const cy = (0.5 - layer.position().y) * height;
+    return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 };
+}
+
+// Where the footer, the podium's steps and the rows in view show in a
+// window of that size, and whether the footer's words are inside it.
+export function footerLayout(fake, size) {
+    const [footer] = shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.buttonHints);
+    const canvas = footer.canvasSize();
+    const textsInside = footer.strokes().filter(stroke => "text" in stroke).every(({ rect }) =>
+        rect.x >= 0 && rect.y >= 0 && rect.x + rect.width <= canvas.width + 2 && rect.y + rect.height <= canvas.height);
+    return {
+        footer: windowRect(footer, size),
+        steps: shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.podium).map(layer => windowRect(layer, size)),
+        rows: shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.rows).map(layer => windowRect(layer, size)),
+        textsInside,
+    };
 }

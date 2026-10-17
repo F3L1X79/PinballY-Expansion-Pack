@@ -1,7 +1,7 @@
 // ============================================================
 // The Avatar Frame list's Selection Marker, through main.js on the fake
 // PinballY globals: the marker surrounds the worn row on opening, follows
-// Next and Prev (looping), and is gone, with its timer, once Select, Exit
+// Next and Prev (looping through the Exit Button), and is gone, with its timer, once Select, Exit
 // or attract mode closes the list.
 // ============================================================
 
@@ -37,14 +37,18 @@ test("the Selection Marker surrounds the worn row, follows the moves and is gone
     assert.equal(frameListMarkerLayerCount(fake), 1, "a single marker");
     assert.equal(highlightedRow(fake), "None", "round the worn row on opening");
     press(fake, "Next");
-    assert.equal(highlightedRow(fake), "Enchanted Forest", "Next loops to the first row");
+    assert.equal(highlightedRow(fake), null, "Next loops onto the Exit Button");
+    press(fake, "Next");
+    assert.equal(highlightedRow(fake), "Enchanted Forest", "then the first row");
     press(fake, "Next");
     assert.equal(highlightedRow(fake), "Steam and Gears");
+    press(fake, "Prev");
     press(fake, "Prev");
     press(fake, "Prev");
     assert.equal(highlightedRow(fake), "None", "Prev loops back");
     assert.equal(frameListMarkerLayerCount(fake), 1, "still a single marker");
 
+    press(fake, "Next");
     press(fake, "Next");
     press(fake, "Select");
     assert.equal(isFrameListOpen(fake), false);
