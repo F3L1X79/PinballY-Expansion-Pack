@@ -40,13 +40,14 @@ const playLogJson = starts => JSON.stringify({
 // Profile switched to once started (Guest otherwise); addOns: the Add-ons on;
 // hasDefaultAvatar: false leaves the default Avatar image out of the install;
 // hasAdultTable: the cabinet also has PLAYBOY; frameImages: whether the
-// Avatar Frame images exist; files: { path: content } seeded before startup.
+// Avatar Frame images exist; files: { path: content } seeded before startup;
+// drawMs: how long each layer draw takes on the clock.
 export async function startHousehold({
     profiles = {}, active = null, addOns = ["achievements", "challenges", "tableMastery"], hasDefaultAvatar = true, hasAdultTable = false,
-    frameImages = false, files = {},
+    frameImages = false, files = {}, drawMs = 0,
 } = {}) {
     const tables = [MEDIEVAL, MARS, THEATRE, TWILIGHT, ...(hasAdultTable ? [PLAYBOY] : [])];
-    const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables });
+    const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables, drawMs });
     const all = { guest: {}, ...profiles };
     for (const [name, profile] of Object.entries(all)) {
         fake.addFile(`${PROFILES}\\${name}\\profile.json`, JSON.stringify({

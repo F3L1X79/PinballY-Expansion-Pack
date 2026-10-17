@@ -7,7 +7,7 @@
 // surrounds, or the cross's tooltip on its own layer), whether the marker
 // surrounds the cross, the columns in view and those faded at the edges
 // while gliding, opens them from the Profile Stats' "Household Stats" button and picks
-// a column as a player would, and goes back to the wheel. Never loaded by PinballY.
+// a column as a player would (letting them get ready and fade in, or not), and goes back to the wheel. Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";
@@ -16,6 +16,7 @@ import * as selectionMarker from "../support/selection_marker_reader.js";
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { openProfileStats, choose, press, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
+import { untilFadedIn } from "../support/opening_reader.js";
 
 export { press };
 
@@ -27,12 +28,21 @@ export const isHouseholdStatsOpen = fake => shownLayers(fake, HOUSEHOLD_STATS_Z_
 export const householdStatsLayerCount = fake => fake.drawingLayers()
     .filter(layer => Object.values(HOUSEHOLD_STATS_Z_INDEX).includes(layer.zIndex)).length;
 
-// Opens the Profile Stats from the main menu, picks "Household Stats" and lets
-// the fade end.
-export function openHouseholdStats(fake, lang) {
+// Lets the clock run until the Household Stats have faded in, their veil gone.
+export const untilHouseholdStatsFadedIn = fake => untilFadedIn(fake, HOUSEHOLD_STATS_Z_INDEX.backdrop);
+
+// Opens the Profile Stats from the main menu and picks "Household Stats",
+// which start getting ready: the clock does not run. Returns the Select press.
+export function startOpeningHouseholdStats(fake, lang) {
     openProfileStats(fake, lang);
-    choose(fake, lang.profileStats.buttons.household);
-    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    return choose(fake, lang.profileStats.buttons.household);
+}
+
+// Opens the Profile Stats from the main menu, picks "Household Stats" and lets
+// them get ready and fade in.
+export function openHouseholdStats(fake, lang) {
+    startOpeningHouseholdStats(fake, lang);
+    untilHouseholdStatsFadedIn(fake);
 }
 
 export function title(fake) {

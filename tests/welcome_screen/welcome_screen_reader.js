@@ -26,16 +26,9 @@ const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer
 
 export const isWelcomeScreenOpen = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.backdrop).length > 0;
 
-// The startup veil dimming the wheel: a shown layer cleared to a
-// translucent colour, with nothing drawn on it. { shown: false } without
-// one, else { shown: true, zIndex, color }.
-export function startupVeil(fake) {
-    const veils = fake.drawingLayers().filter(layer => layer.alpha > 0 && layer.clearColor() !== null
-        && layer.clearColor() >>> 24 > 0 && layer.strokes().length === 0 && layer.loadedImage() === null);
-    assert.ok(veils.length <= 1, "a single veil at a time");
-    if (veils.length === 0) return { shown: false };
-    return { shown: true, zIndex: veils[0].zIndex, color: veils[0].clearColor() };
-}
+// The startup veil dimming the wheel: { shown: false } without one, else
+// { shown: true, zIndex, color }.
+export { readVeil as startupVeil } from "../support/opening_reader.js";
 
 // Its layers, shown or not: none once it closed.
 export const welcomeScreenLayerCount = fake => fake.drawingLayers()

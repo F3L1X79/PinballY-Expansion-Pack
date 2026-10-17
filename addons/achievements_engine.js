@@ -158,6 +158,7 @@ export default function init() {
         readStats: profileName => profileStats.readStats(profileName),
         openProfileStats: (profileName, onBack) => profileStats.openReadOnly(profileName, onBack),
         profileRewards,
+        drawingAhead: getDrawingAhead(),
         hasCollectionMastery: config.addOns.tableMastery !== false,
     });
     const profileStats = createProfileStats(createPinballYHost(), {

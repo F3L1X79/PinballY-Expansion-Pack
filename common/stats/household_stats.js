@@ -6,8 +6,13 @@
 // per Profile (its Avatar in the Avatar Frame it wears; the active one
 // first unless it is Guest, then the Profile picker's order) and one line
 // per stat where more is better, the best of each line in gold. Every
-// value is read again on each opening, through the Profile Stats' reader;
-// the screen is drawn at once on all its layers, then faded in. While open
+// value is read again on each opening, through the Profile Stats' reader.
+// It opens through the drawn screen's shared opening (docs/adr/0014): the
+// wheel dims at once, one step per Profile read then one per piece drawn
+// run in the drawing ahead's foreground queue, with the Loader if they
+// take a while, then every layer fades in together. While getting ready it
+// counts as open and swallows every button: Exit gives up and calls the
+// return given to open(), attract mode only gives up. While open
 // it swallows every button through "commandbuttondown": Next / Prev move
 // the Selection Marker (a gold glow flowing round the choice) through the
 // cross at the top right (its tooltip says Back), then from column to
@@ -28,7 +33,7 @@ import { displayNameOf } from "../profiles/profile_name.js";
 import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
-import { openDrawnScreen, FRAME_MS } from "./drawn_screen.js";
+import { prepareDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import { drawBackdrop } from "../drawing/steamball_drawing.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
@@ -53,13 +58,17 @@ const CROSS = -1;
 // that Profile's Profile Stats, read-only, onBack called on its Exit;
 // profileRewards: the worn Avatar Frames (null: none);
 // hasCollectionMastery: false without the Table Mastery Add-on, which
-// takes the Collection Mastery line away.
-export function createHouseholdStats(host, { profileStore, readStats, openProfileStats, profileRewards = null, hasCollectionMastery = true }) {
+// takes the Collection Mastery line away; drawingAhead: the shared drawing
+// ahead (common/core/drawing_ahead.js), which runs the opening.
+export function createHouseholdStats(host, {
+    profileStore, readStats, openProfileStats, drawingAhead, profileRewards = null, hasCollectionMastery = true,
+}) {
     const { profileStats: TEXT } = lang;
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     const closedListeners = createClosedListeners(SCRIPT_NAME);
-    // The screen on show: its layers, columns' rects and selection; null when closed.
+    // The screen on show, or getting ready (isPreparing): its layers,
+    // columns' rects and selection; null when closed.
     let shown = null;
 
     // Every Profile but Guest, in the Profile picker's order, from either
@@ -125,12 +134,17 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         return null;
     }
 
-    function readScreen() {
+    // The Household's Profiles, the active one first, then the Profile picker's order.
+    function readProfiles() {
         const active = profileStore.getActiveProfile();
         const household = householdOf(profileStore.listProfiles());
         const isActive = profile => profile.name.toLowerCase() === active.name.toLowerCase();
-        const profiles = [...household.filter(isActive), ...household.filter(profile => !isActive(profile))];
-        const allStats = profiles.map(profile => readStats(profile.name));
+        return [...household.filter(isActive), ...household.filter(profile => !isActive(profile))]
+            .map(profile => ({ profile, isActive: isActive(profile) }));
+    }
+
+    // entries: readProfiles()'s; allStats: each one's stats, in the same order.
+    function describeScreen(entries, allStats) {
         const lines = LINES.filter(line => allStats.every(stats => line.isShown(stats)));
         const goldByLine = lines.map(line => {
             const scores = allStats.map(line.scoreOf);
@@ -142,9 +156,9 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
             title: TEXT.household.title,
             backLabel: TEXT.backTooltip,
             labels: lines.map(line => line.label),
-            columns: profiles.map((profile, column) => ({
+            columns: entries.map(({ profile, isActive }, column) => ({
                 profileName: profile.name,
-                isActive: isActive(profile),
+                isActive,
                 name: displayNameOf(profile),
                 avatarPath: avatarOf(profile),
                 framePath: profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
@@ -153,51 +167,66 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         };
     }
 
-    // onBack: what Exit returns to, called once the screen is closed;
-    // selectedName: the Profile whose column the marker surrounds, brought
-    // into view (the first column when null or no longer there). Draws every
-    // layer at once, hidden, then fades them in together, like the Profile
-    // Stats: it never shows up half drawn.
+    // onBack: what Exit returns to, called once the screen is closed (or
+    // given up); selectedName: the Profile whose column the marker
+    // surrounds, brought into view (the first column when null or no longer
+    // there). Reads and draws every layer hidden, step by step, then fades
+    // them in together: it never shows up half drawn.
     function open(onBack = () => {}, selectedName = null) {
         if (shown) return;
-        const openedAt = host.now().getTime();
-        const screen = readScreen();
-        const readAt = host.now().getTime();
-        let geometry = null;
-        const drawn = openDrawnScreen(host, SCRIPT_NAME, {
-            referenceHeight: REFERENCE_HEIGHT,
-            backdropZIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop,
-            drawBackdrop(dc, size, referenceWidth) {
-                geometry = layoutHouseholdStats(referenceWidth, screen.columns.length, screen.labels.length);
-                drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);
-            },
+        const drawn = prepareDrawnScreen(host, SCRIPT_NAME, {
+            referenceHeight: REFERENCE_HEIGHT, backdropZIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop, drawingAhead,
         });
-        drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
-        drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.cross, geometry.cross, drawCross);
-        drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
         // Apart from the other layers: their alpha also fades them at the view's edges.
         const columnLayers = [];
-        screen.columns.forEach((column, index) => {
-            const rect = geometry.columns[index];
-            drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, rect, dc => drawColumn(host, dc, column, rect.w), columnLayers);
-        });
-        const crossTooltip = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.tooltip, crossTooltipRectOf(geometry.cross), dc => drawCrossTooltip(host, dc, screen.backLabel));
-        const marker = createSelectionMarker(host, { zIndex: HOUSEHOLD_STATS_Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
-        // Here rather than on the first move, which it would slow down.
-        navigationSound.load();
-        const column = Math.max(0, screen.columns.findIndex(entry => entry.profileName === selectedName));
-        const first = Math.max(0, column - geometry.view.count + 1);
-        // first: the first column in view once the glide is over; scroll:
-        // how far the columns have glided, in reference pixels.
-        const opened = {
-            onBack, columns: screen.columns, drawn, columnLayers, crossTooltip, marker, marked: null, geometry, selected: column, first, scroll: first * geometry.pitch,
-            opacity: 0, glideTimer: null, glideMs: 0,
+        // Completed by setUp() once every step ran.
+        const opening = {
+            onBack, drawn, columnLayers, isPreparing: true, marker: null, glideTimer: null, glideMs: 0, opacity: 0,
         };
-        shown = opened;
-        placeColumns(opened);
-        drawn.fadeIn(opacity => setOpacity(opened, opacity));
-        const drawnAt = host.now().getTime();
-        log(`Opened in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
+        shown = opening;
+        let screen = null;
+        let geometry = null;
+        let crossTooltip = null;
+        // A step drawing one piece; rect() is read then, once the backdrop
+        // has measured the window.
+        const drawPiece = (zIndex, rect, draw, into) => drawn.draw(() => drawn.drawPiece(zIndex, rect(), draw, into));
+
+        // Queued once the Profiles are known: one step per Profile read.
+        function queueSteps(entries) {
+            const allStats = [];
+            for (const { profile } of entries) drawn.read(() => allStats.push(readStats(profile.name)));
+            drawn.read(() => { screen = describeScreen(entries, allStats); });
+            drawn.draw(() => drawn.drawBackdrop((dc, size, referenceWidth) => {
+                geometry = layoutHouseholdStats(referenceWidth, screen.columns.length, screen.labels.length);
+                drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);
+            }));
+            drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, () => geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
+            drawPiece(HOUSEHOLD_STATS_Z_INDEX.cross, () => geometry.cross, drawCross);
+            drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, () => geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
+            entries.forEach((entry, index) => drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, () => geometry.columns[index],
+                dc => drawColumn(host, dc, screen.columns[index], geometry.columns[index].w), columnLayers));
+            drawn.draw(() => {
+                crossTooltip = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.tooltip, crossTooltipRectOf(geometry.cross), dc => drawCrossTooltip(host, dc, screen.backLabel));
+            });
+        }
+
+        // Once every step ran: the marker and the columns in place, still hidden.
+        function setUp() {
+            const marker = createSelectionMarker(host, { zIndex: HOUSEHOLD_STATS_Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
+            // Here rather than on the first move, which it would slow down.
+            navigationSound.load();
+            const column = Math.max(0, screen.columns.findIndex(entry => entry.profileName === selectedName));
+            const first = Math.max(0, column - geometry.view.count + 1);
+            // first: the first column in view once the glide is over; scroll:
+            // how far the columns have glided, in reference pixels.
+            Object.assign(opening, {
+                isPreparing: false, columns: screen.columns, crossTooltip, marker, marked: null, geometry, selected: column, first, scroll: first * geometry.pitch,
+            });
+            placeColumns(opening);
+        }
+
+        drawn.read(() => queueSteps(readProfiles()));
+        drawn.start({ onReady: setUp, setOpacity: opacity => setOpacity(opening, opacity), onFailed: close });
     }
 
     // Where the columns glide to: the first one in view at the view's left.
@@ -264,10 +293,11 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         placeColumns(screen);
     }
 
+    // Also gives up an opening still getting ready.
     function close() {
         if (!shown) return;
         stopGlide(shown);
-        shown.marker.remove();
+        if (shown.marker) shown.marker.remove();
         shown.drawn.close(shown.columnLayers);
         shown = null;
         closedListeners.tell();
@@ -320,6 +350,11 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
+        // Getting ready: Exit gives up, as it would close the open screen.
+        if (shown.isPreparing) {
+            if (ev.command === "Exit") back();
+            return;
+        }
         if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
         // Launch is the plunger, which selects in PinballY's own menus too.
         else if (ev.command === "Select" || ev.command === "Launch") choose();

@@ -4,7 +4,10 @@
 // and no game is running (see docs/adr/0005): a draw blocks PinballY while
 // it runs, so it must never make the wheel stutter or slow a game down.
 // Each piece of work is a step function that draws one thing and returns
-// false once nothing is left; it sleeps until woken again.
+// false once nothing is left; it sleeps until woken again. A screen the
+// player waits for runs its opening in the foreground queue instead
+// (docs/adr/0014): at once, in slices of about 30 ms with a pause of a
+// frame for the Loader to turn, the background work waiting until it is over.
 // Listens to "commandbuttondown" to note the last button press.
 // ============================================================
 
@@ -17,6 +20,13 @@ const SLICE_MS = 12;
 const BUTTON_IDLE_MS = 400;
 // Between two slices, so PinballY runs its own work in between.
 const PAUSE_MS = 10;
+// The foreground's: longer slices, since the player waits for them, and a
+// pause of about a frame, just long enough for PinballY to turn the Loader.
+const FOREGROUND_SLICE_MS = 30;
+const FOREGROUND_PAUSE_MS = 16;
+// The foreground's first slice: a tick later, so PinballY first shows
+// what the screen put up at once (its veil).
+const FOREGROUND_START_MS = 1;
 
 export function createDrawingAhead(host) {
     // Startup counts as a press: PinballY is busy loading.
@@ -25,10 +35,19 @@ export function createDrawingAhead(host) {
     // The step functions, in the order they were added, each with whether
     // it may still have work.
     const works = [];
+    // The foreground work, first come first served: { step, onDone, onFailed }.
+    const foreground = [];
 
     function schedule(delayMs) {
         if (timer !== null) host.clearTimeout(timer);
-        timer = host.setTimeout(safeHandler(SCRIPT_NAME, runSlice), Math.max(PAUSE_MS, delayMs));
+        timer = host.setTimeout(safeHandler(SCRIPT_NAME, runSlice), delayMs);
+    }
+
+    // After a slice: the foreground's pause while it has work, else the
+    // background's once it has some.
+    function scheduleNext() {
+        if (foreground.length > 0) schedule(FOREGROUND_PAUSE_MS);
+        else if (works.some(work => work.awake)) schedule(PAUSE_MS);
     }
 
     // A step that throws sleeps until woken again, so a broken one never
@@ -42,9 +61,41 @@ export function createDrawingAhead(host) {
         }
     }
 
+    // Removed before its callback, which may well queue new work.
+    function finish(job, callback) {
+        foreground.splice(foreground.indexOf(job), 1);
+        safeHandler(SCRIPT_NAME, callback)();
+    }
+
+    function runForegroundStep(job) {
+        let hasMore = false;
+        try {
+            hasMore = job.step();
+        } catch (error) {
+            host.log(`[${SCRIPT_NAME}] A foreground step failed, its work given up: ${error.stack || error.message}`);
+            finish(job, job.onFailed);
+            return;
+        }
+        if (!hasMore) finish(job, job.onDone);
+    }
+
+    // Ignores the wait after a press and a running game: the player has
+    // just asked for the screen.
+    function runForegroundSlice(startMs) {
+        while (foreground.length > 0) {
+            runForegroundStep(foreground[0]);
+            if (host.now().getTime() - startMs >= FOREGROUND_SLICE_MS) break;
+        }
+        scheduleNext();
+    }
+
     function runSlice() {
         timer = null;
         const startMs = host.now().getTime();
+        if (foreground.length > 0) {
+            runForegroundSlice(startMs);
+            return;
+        }
         // A game is running exactly while PinballY reports a runMode.
         if (host.getFullUIMode().runMode !== undefined) {
             schedule(BUTTON_IDLE_MS);
@@ -61,12 +112,12 @@ export function createDrawingAhead(host) {
             runStep(work);
             if (host.now().getTime() - startMs >= SLICE_MS) break;
         }
-        if (works.some(work => work.awake)) schedule(PAUSE_MS);
+        scheduleNext();
     }
 
     function wake(work) {
         work.awake = true;
-        if (timer === null) schedule(lastPressMs + BUTTON_IDLE_MS - host.now().getTime());
+        if (timer === null) schedule(Math.max(PAUSE_MS, lastPressMs + BUTTON_IDLE_MS - host.now().getTime()));
     }
 
     // Fires on every mapped button press, the list's and the wheel's alike.
@@ -83,6 +134,19 @@ export function createDrawingAhead(host) {
             works.push(work);
             wake(work);
             return () => wake(work);
+        },
+        // A screen's opening, run at once in the foreground: step as add()'s,
+        // onDone() called once it returned false, onFailed() once it threw
+        // (logged). Returns the function that cancels it, neither then called.
+        runInForeground(step, { onDone = () => {}, onFailed = () => {} } = {}) {
+            const job = { step, onDone, onFailed };
+            foreground.push(job);
+            // A slice already waiting for its turn starts the job too.
+            if (foreground.length === 1) schedule(FOREGROUND_START_MS);
+            return () => {
+                const index = foreground.indexOf(job);
+                if (index >= 0) foreground.splice(index, 1);
+            };
         },
     };
 }

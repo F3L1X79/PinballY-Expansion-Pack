@@ -1,7 +1,8 @@
 ﻿// ============================================================
 // In-memory fake PinballY host for the node tests. Offers the same
 // interface as common/core/pinbally_host.js, plus controls for the tests: set
-// the date (a manual clock that also runs the host's timers), the monitor
+// the date (a manual clock that also runs the host's timers, and that each
+// layer draw can move on), the monitor
 // count, the table list, the wheel selection (and its filter, and the
 // player's wheel moves) and the
 // layout size, seed settings, fire PinballY events (the settings' own
@@ -171,8 +172,12 @@ export function createFakePinballYHost({
     lowerStatusLineMessages = [],
     // The monitors Windows reports: a cabinet has one per screen.
     monitorCount = 2,
+    // How long each layer draw takes on the clock: a draw blocks PinballY
+    // while it runs (docs/adr/0005); 0 leaves the clock still.
+    drawMs = 0,
 } = {}) {
     let nowMs = now.getTime();
+    let currentDrawMs = drawMs;
     let currentLayoutSize = { ...layoutSize };
     const layers = [];
     // Every layer draw, in order: { zIndex, texts, images }.
@@ -434,7 +439,9 @@ export function createFakePinballYHost({
     }
 
     // Moves the clock forward, running every timer that falls due on the way
-    // at its own due time, earliest first (creation order on a tie).
+    // at its own due time, earliest first (creation order on a tie). A
+    // callback that takes time (a slow draw) moves the clock on itself, and
+    // the timers due meanwhile then run late, as in PinballY.
     function advanceTime(ms) {
         const targetMs = nowMs + ms;
         for (;;) {
@@ -442,12 +449,12 @@ export function createFakePinballYHost({
                 .filter(timer => timer.dueMs <= targetMs)
                 .sort((a, b) => a.dueMs - b.dueMs || a.id - b.id)[0];
             if (!due) break;
-            nowMs = due.dueMs;
+            nowMs = Math.max(nowMs, due.dueMs);
             if (due.intervalMs === undefined) removeTimer(due.id);
-            else due.dueMs += due.intervalMs;
+            else due.dueMs = Math.max(due.dueMs + due.intervalMs, nowMs);
             due.callback();
         }
-        nowMs = targetMs;
+        nowMs = Math.max(nowMs, targetMs);
     }
 
     // A drawing layer that keeps only what the tests look at: the texts,
@@ -507,6 +514,7 @@ export function createFakePinballYHost({
                 replaceContent();
                 canvasSize = width === undefined ? { ...currentLayoutSize } : { width, height };
                 drawFunction(dc);
+                nowMs += currentDrawMs;
                 drawingList.push({ zIndex, texts: [...texts], images: [...images] });
             },
             clear(color) {
@@ -1064,6 +1072,8 @@ export function createFakePinballYHost({
 
         // Moves the date without running the timers.
         setNow(date) { nowMs = date.getTime(); },
+        // How long each layer draw takes from now on (the drawMs option).
+        setDrawMs(ms) { currentDrawMs = ms; },
         advanceTime,
         // Intervals still running (a frame timer left on keeps redrawing).
         runningIntervalCount: () => timers.filter(timer => timer.intervalMs !== undefined).length,
