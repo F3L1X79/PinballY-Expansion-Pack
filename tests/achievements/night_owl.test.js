@@ -11,7 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import { readRows, press } from "./achievement_list_reader.js";
+import { readRows, press, untilListShown } from "./achievement_list_reader.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -83,6 +83,7 @@ test("only a Play started from 00:00 to 03:59 unlocks Night Owl, never for a Chi
     function listRows() {
         fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
         fake.selectMenuItem(LIST_TEXT.menuEntry);
+        untilListShown(fake);
         const rows = readRows(fake, LIST_TEXT);
         press(fake, "Exit");
         return rows;

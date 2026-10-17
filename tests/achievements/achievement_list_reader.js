@@ -12,6 +12,7 @@
 import assert from "node:assert/strict";
 import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
 import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
+import { readVeil } from "../support/opening_reader.js";
 
 // Past the glide from one line to the next.
 export const GLIDE_OVER_MS = 400;
@@ -53,6 +54,20 @@ export const headerEmblemImages = fake => fake.drawingLayers()
     .flatMap(layer => layer.images());
 
 export const isListOpen = fake => chromeTexts(fake).length > 0;
+
+const FRAME_MS = 16;
+// Far past any opening, even with slow draws.
+const MAX_OPENING_MS = 10000;
+
+// Runs the clock a frame at a time until the list shows and the veil of
+// its opening is gone (at once when it was drawn ahead); fails past any
+// opening.
+export function untilListShown(fake) {
+    for (let elapsed = 0; !isListOpen(fake) || readVeil(fake).shown; elapsed += FRAME_MS) {
+        assert.ok(elapsed < MAX_OPENING_MS, "the Achievement List shows");
+        fake.advanceTime(FRAME_MS);
+    }
+}
 
 function shownItemLayers(fake) {
     return fake.drawingLayers()

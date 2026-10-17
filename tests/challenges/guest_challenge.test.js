@@ -11,7 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
-import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
+import { pressAndGlide, readRows, untilListShown } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, section, press } from "../stats/profile_stats_reader.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
@@ -74,6 +74,7 @@ test("Guest follows the week's Challenge, completes it and earns its record, apa
     function achievementRows() {
         openMainMenu();
         fake.selectMenuItem(LIST.menuEntry);
+        untilListShown(fake);
         const rows = readRows(fake, LIST);
         pressAndGlide(fake, "Exit");
         return rows;

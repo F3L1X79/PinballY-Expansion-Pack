@@ -12,7 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
+import { pressAndGlide, readRows, untilListShown } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, section, press } from "../stats/profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -77,6 +77,7 @@ test("completed Challenges unlock the Challenges Achievements", async () => {
     function challengeRows() {
         openMainMenu();
         fake.selectMenuItem(LIST.menuEntry);
+        untilListShown(fake);
         const rows = readRows(fake, LIST);
         pressAndGlide(fake, "Exit");
         const titles = Object.values(ACHIEVEMENT.challengesCompletedTitles);

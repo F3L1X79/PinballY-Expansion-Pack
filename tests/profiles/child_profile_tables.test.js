@@ -13,7 +13,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
+import { pressAndGlide, readRows, untilListShown } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, buttons, choose, press, section } from "../stats/profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -104,6 +104,7 @@ test("a Child Profile's Challenge, Profile Stats and Achievements leave out the 
     function readAchievementRows() {
         openMainMenu();
         fake.selectMenuItem(lang.achievementList.menuEntry);
+        untilListShown(fake);
         const rows = readRows(fake, lang.achievementList);
         pressAndGlide(fake, "Exit");
         return rows;

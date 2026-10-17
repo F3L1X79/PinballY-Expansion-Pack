@@ -13,7 +13,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
+import { pressAndGlide, readRows, untilListShown } from "../achievements/achievement_list_reader.js";
 import { WELCOME_SCREEN_OPEN_MS, press, periodCards, readChoices } from "../welcome_screen/welcome_screen_reader.js";
 import { openProfileStats, section } from "../stats/profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
@@ -82,6 +82,7 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     function dayStreakProgress() {
         openMainMenu();
         fake.selectMenuItem(lang.achievementList.menuEntry);
+        untilListShown(fake);
         const rows = readRows(fake, lang.achievementList);
         pressAndGlide(fake, "Exit");
         const titles = [ACHIEVEMENTS.dailyStreakTitles[7], ACHIEVEMENTS.dailyPeriodsPlayedTitles[10]];

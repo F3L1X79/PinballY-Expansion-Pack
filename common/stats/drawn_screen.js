@@ -14,13 +14,10 @@
 
 import { safeHandler } from "../core/safe_handler.js";
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";
-import { DIMMED_WHEEL } from "../drawing/steamball_drawing.js";
-import { createLoader } from "../drawing/loader.js";
+import { createOpeningVeil } from "../drawing/opening_veil.js";
 
 const FADE_MS = 220;
 export const FRAME_MS = 16;
-// A screen ready sooner shows no Loader: no flash of comet on a fast cabinet.
-const LOADER_DELAY_MS = 150;
 
 // The layers, their placing and fade in, shared by both openings.
 function createScreenLayers(host, scriptName, referenceHeight) {
@@ -110,33 +107,18 @@ export function openDrawnScreen(host, scriptName, { referenceHeight, backdropZIn
 // start(). The veil and Loader sit just under the backdrop.
 export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdropZIndex, drawingAhead }) {
     const screen = createScreenLayers(host, scriptName, referenceHeight);
-    const loader = createLoader(host, { zIndex: backdropZIndex - 1 });
+    const veil = createOpeningVeil(host, scriptName, { zIndex: backdropZIndex - 2 });
     // Each step with whether it reads or draws, first come first run.
     const steps = [];
     const spentMs = { read: 0, draw: 0 };
-    let veil = null;
-    let loaderTimer = null;
     let cancel = null;
-
-    function stopLoader() {
-        host.clearTimeout(loaderTimer);
-        loaderTimer = null;
-        loader.hide();
-    }
-
-    function removeVeil() {
-        if (!veil) return;
-        host.removeDrawingLayer(veil);
-        veil = null;
-    }
 
     // Gives up the opening or closes the open screen: the veil, the Loader
     // and the layers go, those of other included; safe to call again.
     function close(other = []) {
         if (cancel) cancel();
         cancel = null;
-        stopLoader();
-        removeVeil();
+        veil.remove();
         screen.close(other);
     }
 
@@ -163,20 +145,14 @@ export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdrop
         // and the opening is given up, everything already removed.
         start({ onReady, setOpacity, onFailed }) {
             const openedAt = host.now().getTime();
-            // Cleared, not drawn: nothing to measure, so it shows at once.
-            veil = host.createDrawingLayer(backdropZIndex - 2);
-            veil.clear(DIMMED_WHEEL);
-            loaderTimer = host.setTimeout(safeHandler(scriptName, () => {
-                loaderTimer = null;
-                loader.show();
-            }), LOADER_DELAY_MS);
+            veil.show();
             const onDone = () => {
                 cancel = null;
                 const readyAt = host.now().getTime();
                 host.log(`[${scriptName}] Opened in ${readyAt - openedAt} ms: read in ${spentMs.read} ms, drawn in ${spentMs.draw} ms.`);
-                stopLoader();
+                veil.hideLoader();
                 onReady();
-                screen.fadeIn(setOpacity, removeVeil);
+                screen.fadeIn(setOpacity, veil.remove);
             };
             cancel = drawingAhead.runInForeground(runNextStep, { onDone, onFailed: () => {
                 cancel = null;

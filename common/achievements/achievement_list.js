@@ -30,6 +30,14 @@
 // Every layer is drawn ahead from startup through the shared drawing
 // ahead, nearest the highlighted line first, kept from one opening to the
 // next and redrawn only when what it shows or the window size changed.
+// The list opens at once when what it shows first (the mask, the header's
+// emblems, the scrollbar's thumb and the items of the first screen and the
+// one below) is drawn ahead and up to date; otherwise (right after
+// startup, a Profile switch or a game) the wheel dims under the opening
+// veil, with the Loader after 150 ms, while the drawing ahead's foreground
+// queue draws what is missing (docs/adr/0014), then the list shows. While
+// it gets ready it counts as open: buttons swallowed, Exit gives up and
+// calls the return, attract mode gives up.
 // What the list shows is read again on each opening, and ahead after a
 // Profile switch or a change of a Profile's data; the other Profiles'
 // files only when their Notified Achievements may have changed.
@@ -43,6 +51,7 @@ import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { displayNameOf } from "../profiles/profile_name.js";
+import { createOpeningVeil } from "../drawing/opening_veil.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
 import {
     LIST_LOOK, AVATAR_FRAME_WIDTH, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
@@ -110,8 +119,12 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // Profile's data changed.
     let household = null;
     // The open list, null when closed: the highlighted item's index, the
-    // scroll it glides to and what Exit returns to.
+    // scroll it glides to, what Exit returns to and whether it is still
+    // getting ready.
     let shown = null;
+    // Cancels the foreground drawing of a list getting ready; null otherwise.
+    let cancelPreparing = null;
+    const openingVeil = createOpeningVeil(host, SCRIPT_NAME, { zIndex: ACHIEVEMENT_LIST_Z_INDEX.backdrop - 2 });
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     // Where the list and the highlighted line are while gliding, in pixels.
     const glide = { scroll: 0, highlightTop: 0, timer: null, lastMs: 0 };
@@ -406,28 +419,50 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         mask.signature = maskSignature();
     }
 
-    // The next layer to draw ahead, as a function drawing it, or null once
-    // everything is drawn: the header and footer, the header's emblems, the
-    // scrollbar's thumb, then the items from the highlighted one outwards,
-    // wrapping (a wrap reaches the other end), each followed by its emblem
-    // and Unlock Rate.
-    function nextDrawing() {
+    // The next of the header and footer, the header's emblems and the
+    // scrollbar's thumb to draw, as a function drawing it, or null.
+    function nextChromeDrawing() {
         if (mask.signature !== maskSignature()) return drawMaskLayer;
         const headerEmblem = headerEmblems().find(emblem => !isHeaderEmblemDrawn(emblem));
         if (headerEmblem) return () => headerEmblemLayer(headerEmblem);
         const bar = scrollbar();
         if (bar && !isThumbDrawn(bar)) return () => thumbLayer(bar);
-        const { items } = content;
-        const around = shown ? shown.highlighted : Math.max(0, items.findIndex(item => item.kind === ITEM_KIND.ROW));
-        const distance = index => Math.min(Math.abs(index - around), items.length - Math.abs(index - around));
-        const order = items.map((item, index) => index).sort((a, b) => distance(a) - distance(b) || a - b);
-        for (const index of order) {
-            const item = items[index];
+        return null;
+    }
+
+    // The next of these items (by index, in order) to draw, then its emblem
+    // and Unlock Rate, as a function drawing it, or null.
+    function nextItemDrawing(indexes) {
+        for (const index of indexes) {
+            const item = content.items[index];
             if (!isItemDrawn(item)) return () => itemLayer(item);
             const piece = item.pieces.find(candidate => !isPieceDrawn(index, candidate));
             if (piece) return () => pieceLayer(index, piece);
         }
         return null;
+    }
+
+    // The next layer to draw ahead, as a function drawing it, or null once
+    // everything is drawn: the chrome, then the items from the highlighted
+    // one outwards, wrapping (a wrap reaches the other end).
+    function nextDrawing() {
+        const { items } = content;
+        const around = shown ? shown.highlighted : Math.max(0, items.findIndex(item => item.kind === ITEM_KIND.ROW));
+        const distance = index => Math.min(Math.abs(index - around), items.length - Math.abs(index - around));
+        const order = items.map((item, index) => index).sort((a, b) => distance(a) - distance(b) || a - b);
+        return nextChromeDrawing() || nextItemDrawing(order);
+    }
+
+    // The next layer of what the list shows on opening to draw, or null:
+    // the chrome, then the items of the first screen and of the one below,
+    // so that the first moves draw nothing on the spot.
+    function nextFirstScreenDrawing() {
+        const bottom = 2 * geometry.areaHeight;
+        const indexes = [];
+        content.items.forEach((item, index) => {
+            if (item.top < bottom) indexes.push(index);
+        });
+        return nextChromeDrawing() || nextItemDrawing(indexes);
     }
 
     // One step of the drawing ahead. What the list shows is read again only
@@ -589,6 +624,14 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         hideAllExcept(headerEmblemLayers, shownLayers);
     }
 
+    // Shows the list drawn for it.
+    function show() {
+        backdropLayer.alpha = 1;
+        mask.layer.alpha = 1;
+        showHeaderEmblems();
+        jumpToTarget();
+    }
+
     // onExit: what Exit returns to, called once the list is closed.
     function open(onExit = () => {}) {
         // A native menu left open would sit over or under the list.
@@ -601,19 +644,48 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         isContentStale = false;
         const readAt = host.now().getTime();
         measure();
-        backdropLayer.alpha = 1;
-        if (mask.signature !== maskSignature()) drawMaskLayer();
-        mask.layer.alpha = 1;
-        showHeaderEmblems();
-        shown = { onExit, scroll: 0, highlighted: content.items.findIndex(item => item.kind === ITEM_KIND.ROW) };
-        jumpToTarget();
+        shown = { onExit, scroll: 0, highlighted: content.items.findIndex(item => item.kind === ITEM_KIND.ROW), isPreparing: false };
         // Drawn: only what was not drawn ahead yet.
-        const drawnAt = host.now().getTime();
-        host.log(`[${SCRIPT_NAME}] Opened in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
+        let drawnMs = host.now().getTime() - readAt;
+        const logOpening = () => host.log(`[${SCRIPT_NAME}] Opened in ${host.now().getTime() - openedAt} ms: `
+            + `read in ${readAt - openedAt} ms, drawn in ${drawnMs} ms.`);
+        if (!nextFirstScreenDrawing()) {
+            show();
+            logOpening();
+            return;
+        }
+        shown.isPreparing = true;
+        openingVeil.show();
+        const step = () => {
+            const drawing = nextFirstScreenDrawing();
+            if (!drawing) return false;
+            const startMs = host.now().getTime();
+            drawing();
+            drawnMs += host.now().getTime() - startMs;
+            return nextFirstScreenDrawing() !== null;
+        };
+        cancelPreparing = drawingAhead.runInForeground(step, {
+            onDone: () => {
+                cancelPreparing = null;
+                shown.isPreparing = false;
+                openingVeil.remove();
+                show();
+                logOpening();
+            },
+            // Logged by the drawing ahead: given up rather than left veiled.
+            onFailed: () => {
+                cancelPreparing = null;
+                close();
+            },
+        });
     }
 
+    // Closes the open list or gives up the one getting ready.
     function close() {
         if (!shown) return;
+        if (cancelPreparing) cancelPreparing();
+        cancelPreparing = null;
+        openingVeil.remove();
         stopGlide();
         shown = null;
         for (const layer of [backdropLayer, mask.layer]) layer.alpha = 0;
@@ -628,7 +700,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         if (!shown) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
-        if (ev.command === "Next" || ev.command === "Prev") {
+        if ((ev.command === "Next" || ev.command === "Prev") && !shown.isPreparing) {
             move(ev.command === "Next" ? 1 : -1);
         } else if (ev.command === "Exit") {
             const { onExit } = shown;

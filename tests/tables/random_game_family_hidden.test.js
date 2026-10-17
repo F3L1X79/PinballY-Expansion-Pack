@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { readRows } from "../achievements/achievement_list_reader.js";
+import { readRows, untilListShown } from "../achievements/achievement_list_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLE = {
@@ -33,6 +33,7 @@ test("no Random Game Achievement when neither the main menu commands nor the sta
 
     fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     fake.selectMenuItem(TEXT.menuEntry);
+    untilListShown(fake);
     const titles = readRows(fake, TEXT).map(row => row.title);
 
     assert.ok(titles.length > 0, "the Achievements are shown");

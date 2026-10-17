@@ -15,7 +15,7 @@ import { createDrawingAhead } from "../../common/core/drawing_ahead.js";
 import { createProfileStore } from "../../common/profiles/profile_store.js";
 import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
 import { LIST_LOOK, computeGeometry } from "../../common/achievements/achievement_list_painter.js";
-import { GLIDE_OVER_MS, press, pressAndGlide, scrollbarThumb, highlightedTexts } from "./achievement_list_reader.js";
+import { GLIDE_OVER_MS, press, pressAndGlide, scrollbarThumb, highlightedTexts, untilListShown } from "./achievement_list_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const IDLE_ENOUGH_MS = 60 * 1000;
@@ -41,7 +41,10 @@ function setUp({ count, opened = true }) {
     const achievements = achievementsOf(count);
     const profileStore = createProfileStore(fake);
     const list = createAchievementList(fake, { getAchievements: () => achievements, profileStore, drawingAhead: createDrawingAhead(fake) });
-    if (opened) list.open();
+    if (opened) {
+        list.open();
+        untilListShown(fake);
+    }
     return { fake, list, achievements, profileStore };
 }
 
@@ -114,6 +117,7 @@ test("the thumb is drawn ahead, only moved while scrolling, and hidden when the 
     assert.equal(scrollbarThumb(fake), null, "not shown while the list is closed");
 
     list.open();
+    untilListShown(fake);
     for (let presses = 0; presses < 30; presses++) pressAndGlide(fake, "Next");
     assert.equal(thumbDraws(fake), 1, "never redrawn while scrolling");
 
@@ -125,6 +129,7 @@ test("the thumb is redrawn only when the list's length or the window size change
     const { fake, list, achievements, profileStore } = setUp({ count: 30, opened: false });
     fake.advanceTime(IDLE_ENOUGH_MS);
     list.open();
+    untilListShown(fake);
     pressAndGlide(fake, "Exit");
     profileStore.updateProfileData(data => { data.notified.push("a0"); });
     fake.advanceTime(IDLE_ENOUGH_MS);
@@ -137,6 +142,7 @@ test("the thumb is redrawn only when the list's length or the window size change
 
     fake.setLayoutSize({ width: 1280, height: 720 });
     list.open();
+    untilListShown(fake);
     assert.equal(thumbDraws(fake), 3, "a new window size redraws it");
     assert.ok(scrollbarThumb(fake, { width: 1280, height: 720 }));
 });

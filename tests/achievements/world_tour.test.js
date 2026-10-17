@@ -12,7 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import { readRows, pressAndGlide } from "./achievement_list_reader.js";
+import { readRows, pressAndGlide, untilListShown } from "./achievement_list_reader.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -48,6 +48,7 @@ test("selecting every table of All Tables unlocks the World Tour at once, for go
     const worldTourRow = () => {
         fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
         fake.selectMenuItem(lang.achievementList.menuEntry);
+        untilListShown(fake);
         // A Secret Achievement: its row shows "???" and its hint while missing.
         const row = readRows(fake, lang.achievementList).find(candidate =>
             candidate.title === TEXT.worldTourTitle() || candidate.description === TEXT.worldTourHint());

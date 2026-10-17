@@ -27,7 +27,7 @@ import { RANK_COLORS, STEAMBALL_COLORS } from "../../common/drawing/steamball_pa
 import lang from "../../common/core/i18n.js";
 import {
     press, pressAndGlide, chromeTexts, headerRankCounts, headerEmblemImages, isListOpen, shownItems, highlightedTexts, readSections,
-    readRows, readWholeList,
+    readRows, readWholeList, untilListShown,
 } from "./achievement_list_reader.js";
 
 const TEXT = lang.achievementList;
@@ -91,6 +91,7 @@ function setUp({
         // Opened from the main menu, as the player does.
         fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
         list.open(() => exits.push("exit"));
+        untilListShown(fake);
     };
     if (opened) open();
     return { fake, list, achievements, profileStore, exits, open };
@@ -151,6 +152,7 @@ test("the list always opens at the top, on the first Achievement", () => {
     pressAndGlide(fake, "Exit");
 
     list.open();
+    untilListShown(fake);
 
     assert.deepEqual(highlightedTexts(fake), rowTexts("beta"));
     assert.deepEqual(shownItems(fake)[0].texts, [upper(TEXT.unlockedSection), TEXT.sectionCount(4)]);
@@ -258,6 +260,7 @@ test("the list shows no native menu", () => {
     });
 
     list.open();
+    untilListShown(fake);
     pressAndGlide(fake, "Next");
     pressAndGlide(fake, "Select");
     pressAndGlide(fake, "Exit");
@@ -283,6 +286,7 @@ test("Unlocked, the order and the counts are read again on each opening", () => 
     profileStore.updateProfileData(data => { data.notified.push("beta"); });
 
     list.open();
+    untilListShown(fake);
 
     const [unlocked, missing] = readSections(fake, TEXT);
     assert.deepEqual(unlocked.rows.map(texts => texts[0]), ["zeta title", "beta title", "delta title", "alpha title", "gamma title"]);
@@ -297,6 +301,7 @@ test("the list follows the active Profile: its name and its own Notified order",
     profileStore.switchTo("guest");
 
     list.open();
+    untilListShown(fake);
 
     assert.ok(chromeTexts(fake).includes(lang.profiles.guestName));
     // Guest was Notified of nothing: every Unlocked one waits for its toast.
@@ -425,6 +430,7 @@ test("with one emblem image missing, only the emblems using it are drawn, and it
     const { fake, list } = setUp({ ...oneOfEachRank(), emblemImages: EMBLEM_IMAGES.filter(path => path !== emblemOf(GOLD, "_plain")) });
     pressAndGlide(fake, "Exit");
     list.open();
+    untilListShown(fake);
 
     for (const row of readRows(fake, TEXT)) {
         const isFallback = titleOf(row) === `${GOLD}+`;
@@ -506,6 +512,7 @@ test("Guest viewing the list sees the other Profiles' Avatars", () => {
     profileStore.switchTo("guest");
 
     list.open();
+    untilListShown(fake);
 
     const owners = ownersByTitle(fake);
     assert.deepEqual(owners.alpha, avatarsOnly("Alice", "Bob"));
@@ -604,6 +611,7 @@ test("after a new unlock and after a Profile switch, the next opening shows the 
     fake.advanceTime(IDLE_ENOUGH_MS);
     const drawnBeforeOpening = listDrawings(fake).length;
     list.open();
+    untilListShown(fake);
     assert.equal(listDrawings(fake).length, drawnBeforeOpening, "the switch was drawn ahead");
     assert.ok(chromeTexts(fake).includes("Bob"));
     assert.deepEqual(readSections(fake, TEXT)[0].rows.map(texts => texts[0]), ["beta title", "gamma title", "zeta title", "delta title", "alpha title"]);
@@ -618,11 +626,13 @@ test("the other Profiles' files are read again only once their Notified Achievem
     fake.advanceTime(IDLE_ENOUGH_MS);
     const readsBefore = bobReads();
     list.open();
+    untilListShown(fake);
     pressAndGlide(fake, "Exit");
     assert.equal(bobReads(), readsBefore, "neither drawing ahead nor opening again reads Bob's file");
 
     profileStore.updateProfileData(data => { data.notified.push("epsilon"); }, "Bob");
     list.open();
+    untilListShown(fake);
 
     assert.deepEqual(ownersByTitle(fake).epsilon, avatarsOnly("Bob"));
 });

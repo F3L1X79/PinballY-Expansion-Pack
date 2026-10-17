@@ -9,7 +9,7 @@
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import { readRows, press } from "./achievement_list_reader.js";
+import { readRows, press, untilListShown } from "./achievement_list_reader.js";
 import config from "../../common/core/config.js";
 
 export const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -84,6 +84,7 @@ export async function startSurprisesScenario({ now, files = {}, tables = [TABLE,
     function listRows() {
         fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
         fake.selectMenuItem(LIST_TEXT.menuEntry);
+        untilListShown(fake);
         const rows = readRows(fake, LIST_TEXT);
         press(fake, "Exit");
         return rows;

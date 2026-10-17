@@ -9,7 +9,7 @@
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
 import config from "../../common/core/config.js";
-import { pressAndGlide, readRows } from "./achievement_list_reader.js";
+import { pressAndGlide, readRows, untilListShown } from "./achievement_list_reader.js";
 
 export const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // Longer than a toast's whole life (rise, hold, fade).
@@ -68,6 +68,7 @@ export async function startScenario({ now, tables, files = {}, folders = [] }) {
     function readShown(titles) {
         fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
         fake.selectMenuItem(TEXT.menuEntry);
+        untilListShown(fake);
         const rows = readRows(fake, TEXT);
         pressAndGlide(fake, "Exit");
         const taken = new Set();

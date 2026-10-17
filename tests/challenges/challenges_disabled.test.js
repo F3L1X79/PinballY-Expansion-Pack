@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
+import { pressAndGlide, readRows, untilListShown } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, isProfileStatsOpen, section } from "../stats/profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -43,6 +43,7 @@ test("no Challenge, Challenge Card or Challenges Achievements when the Challenge
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     openMainMenu();
     fake.selectMenuItem(lang.achievementList.menuEntry);
+    untilListShown(fake);
     const titles = readRows(fake, lang.achievementList).map(row => row.title);
     assert.ok(titles.length > 2, "the Achievements are shown");
     const challengeTitles = Object.values(lang.achievements.challengesCompletedTitles);

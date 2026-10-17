@@ -11,7 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { chromeTexts, pressAndGlide, isListOpen } from "../achievements/achievement_list_reader.js";
+import { chromeTexts, pressAndGlide, isListOpen, untilListShown } from "../achievements/achievement_list_reader.js";
 import { isProfileStatsOpen, openProfileStats, buttons, highlighted, choose, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -63,6 +63,7 @@ test("the Achievements button opens the Achievement List and the selection butto
     const [achievementsButton] = buttons(fake);
     assert.equal(achievementsButton.label, TEXT.buttons.achievements);
     choose(fake, TEXT.buttons.achievements);
+    untilListShown(fake);
     assert.equal(isProfileStatsOpen(fake), false, "the Achievement List takes their place");
     assert.ok(isListOpen(fake));
     assert.equal(achievementsButton.count, readListTotal(), "the button's count agrees with the list");

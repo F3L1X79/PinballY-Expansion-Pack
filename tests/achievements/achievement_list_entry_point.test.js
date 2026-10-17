@@ -11,7 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { pressAndGlide, readRows, isListOpen } from "./achievement_list_reader.js";
+import { pressAndGlide, readRows, isListOpen, untilListShown } from "./achievement_list_reader.js";
 import { openProfileStats, buttons, choose, isProfileStatsOpen } from "../stats/profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -83,6 +83,7 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
     ]);
 
     fake.selectMenuItem(TEXT.menuEntry);
+    untilListShown(fake);
     const rows = readRows(fake, TEXT);
     // A threshold without its title in lang/en.js would show as undefined.
     assert.ok(rows.every(row => typeof row.title === "string" && row.title !== "" && row.description !== ""), "every Achievement has its texts");
@@ -129,6 +130,7 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
     openProfileStats(fake, lang);
     assert.equal(buttons(fake)[0].count, lang.profileStats.fraction(unlocked.length, rows.length));
     choose(fake, lang.profileStats.buttons.achievements);
+    untilListShown(fake);
     assert.ok(isListOpen(fake));
     pressAndGlide(fake, "Exit");
     assert.equal(isListOpen(fake), false);

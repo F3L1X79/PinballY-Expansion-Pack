@@ -12,7 +12,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import { pressAndGlide, readRows } from "../achievements/achievement_list_reader.js";
+import { pressAndGlide, readRows, untilListShown } from "../achievements/achievement_list_reader.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -83,6 +83,7 @@ test("an Admin Profile resets another Profile from the Exit menu, after one conf
     const firstTableRow = () => {
         fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
         fake.selectMenuItem(lang.achievementList.menuEntry);
+        untilListShown(fake);
         const row = readRows(fake, lang.achievementList)
             .find(item => item.title === lang.achievements.firstTableTitle());
         pressAndGlide(fake, "Exit");

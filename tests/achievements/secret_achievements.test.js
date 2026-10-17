@@ -12,7 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { toastDrawings } from "./achievement_toast_reader.js";
-import { chromeTexts, headerRankCounts, press, readRows } from "./achievement_list_reader.js";
+import { chromeTexts, headerRankCounts, press, readRows, untilListShown } from "./achievement_list_reader.js";
 import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
@@ -75,6 +75,7 @@ test("a Secret Achievement keeps its title and description out of sight until Un
     function openList() {
         fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
         fake.selectMenuItem(LIST_TEXT.menuEntry);
+        untilListShown(fake);
         return readRows(fake, LIST_TEXT);
     }
 

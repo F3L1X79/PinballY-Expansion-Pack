@@ -130,7 +130,7 @@ export async function startHighScores({
     // Imported once the language is set: the toast module and the
     // Achievement List read the texts.
     const { toastDrawings } = await import("../achievements/achievement_toast_reader.js");
-    const { pressAndGlide, readRows } = await import("../achievements/achievement_list_reader.js");
+    const { pressAndGlide, readRows, untilListShown } = await import("../achievements/achievement_list_reader.js");
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
     await settle();
@@ -169,6 +169,7 @@ export async function startHighScores({
         readShown: (titles) => {
             fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
             fake.selectMenuItem(lang.achievementList.menuEntry);
+            untilListShown(fake);
             const rows = readRows(fake, lang.achievementList);
             pressAndGlide(fake, "Exit");
             return titles.map(title => {
