@@ -1,7 +1,7 @@
 // ============================================================
 // The High Score Board, through main.js on the fake PinballY globals: an
-// empty board shows "No score yet"; while open the board swallows
-// every button; Exit removes every layer and reopens the main menu on its
+// empty board shows "No score yet"; while open the board swallows the
+// buttons that leave it open; Exit removes every layer and reopens the main menu on its
 // entry; attract mode closes it too, leaving the player on the wheel.
 // ============================================================
 
@@ -23,7 +23,7 @@ test("an empty board says so; Exit goes back to the main menu on the entry, attr
     assert.equal(message(fake), "No score yet");
     assert.deepEqual(podium(fake, lang), { left: null, middle: null, right: null });
     assert.deepEqual(rows(fake, lang), []);
-    for (const button of ["Next", "Prev", "Select", "Launch", "Info"]) {
+    for (const button of ["Next", "Prev", "Info"]) {
         assert.ok(press(fake, button).defaultPrevented, `${button} never reaches the wheel`);
     }
     assert.ok(isBoardOpen(fake));

@@ -5,11 +5,14 @@
 // Avatar, then "None", laid out by the Avatar Frame list painter. A locked
 // row shows the greyed frame and its unlock condition; the worn row is
 // marked and the list opens on it. Next / Prev move the Selection Marker
-// (a gold glow flowing round the row) through the rows, looping, with
-// PinballY's navigation sound (it may open on another row, such as the
-// Reward Prompt's new frame); Select or Launch
-// (the plunger) on an unlocked row or "None" saves the choice through the
-// Profile Rewards module, on a locked row does nothing; Exit changes
+// (a gold glow flowing round the choice) through the Exit Button at the
+// top right (the back arrow, its tooltip saying Back), then the rows,
+// looping, with PinballY's navigation sound (it may open on another row,
+// such as the Reward Prompt's new frame, never on the Exit Button). The
+// Button Hints' footer names the flippers, Select and Exit. Select or
+// Launch (the plunger) on an unlocked row or "None" saves the choice
+// through the Profile Rewards module, on a locked row does nothing; on
+// the Exit Button, and Exit, it changes
 // nothing. Both then close the list and call the return given to open();
 // attract mode only closes it, the marker's layer and timer going with
 // it. While open it swallows every button through "commandbuttondown".
@@ -31,15 +34,22 @@ import { createNavigationSound } from "../core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import {
-    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, drawTitle, drawRow,
+    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, exitTooltipRectOf, drawTitle, drawRow, drawExitButton, drawExitTooltip, drawButtonHints,
 } from "./avatar_frame_list_painter.js";
-import { drawBackdrop } from "../drawing/steamball_drawing.js";
+import { drawBackdrop, EXIT_BUTTON_LOOK } from "../drawing/steamball_drawing.js";
+import { exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { createScreenOpening } from "../drawing/screen_opening.js";
 
 const SCRIPT_NAME = "AvatarFrameList";
 const NONE_KEY = "none";
 const HIDDEN_SCALE = Object.freeze({ xSpan: 0.001, ySpan: 0.001 });
 const WINDOW_SCALE = Object.freeze({ xSpan: 1, ySpan: 1 });
+// The selection on the Exit Button rather than on a row; first in the
+// Next / Prev loop, as on the Profile Stats.
+const EXIT_BUTTON = -1;
+// Exit always brings the Profile Stats back.
+const EXIT_LOOK = EXIT_BUTTON_LOOK.BACK;
+const EXIT_TOOLTIP = "exitTooltip";
 
 // profileRewards: the Profile Rewards module (common/avatar_frames/profile_rewards.js);
 // drawingAhead: the shared drawing ahead (common/core/drawing_ahead.js).
@@ -66,7 +76,8 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     // list is closed.
     let content = null;
     let isContentStale = true;
-    // The open list, null when closed: the selected row's index, its
+    // The open list, null when closed: the selected row's index (or
+    // EXIT_BUTTON), its
     // Selection Marker (null while getting ready), what Select and Exit
     // return to and whether it is still getting ready.
     let shown = null;
@@ -110,13 +121,22 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         isContentStale = false;
     }
 
-    // Every piece: the title, then each row, each { key, rect, zIndex,
-    // look, draw(dc) } in its rect's own coordinates.
+    // Every piece: the title, the Exit Button, its tooltip, the Button
+    // Hints, then each row, each { key, rect, zIndex, look, draw(dc) } in
+    // its rect's own coordinates.
     function pieces() {
         const { rows, geometry } = content;
+        const exitWord = exitButtonWordOf(EXIT_LOOK);
+        const hints = buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_LOOK });
         return [
             { key: "title", zIndex: AVATAR_FRAME_LIST_Z_INDEX.title, rect: geometry.title, look: TEXT.title,
                 draw: dc => drawTitle(host, dc, TEXT.title, geometry.title.w, geometry.title.h) },
+            { key: "exitButton", zIndex: AVATAR_FRAME_LIST_Z_INDEX.exitButton, rect: geometry.exitButton, look: EXIT_LOOK,
+                draw: dc => drawExitButton(dc, EXIT_LOOK) },
+            { key: EXIT_TOOLTIP, zIndex: AVATAR_FRAME_LIST_Z_INDEX.tooltip, rect: exitTooltipRectOf(geometry.exitButton), look: exitWord,
+                draw: dc => drawExitTooltip(host, dc, exitWord) },
+            { key: "buttonHints", zIndex: AVATAR_FRAME_LIST_Z_INDEX.buttonHints, rect: geometry.buttonHints, look: hints,
+                draw: dc => drawButtonHints(host, dc, hints, geometry.buttonHints.w, geometry.buttonHints.h) },
             ...rows.map((row, index) => ({
                 key: row.key, zIndex: AVATAR_FRAME_LIST_Z_INDEX.rows, rect: geometry.rows[index], look: row,
                 draw: dc => drawRow(host, dc, row, geometry.rows[index].w, geometry.rows[index].h),
@@ -174,8 +194,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         wakeDrawingAhead();
     }
 
+    const selectedRect = () => (shown.selected === EXIT_BUTTON ? content.geometry.exitButton : content.geometry.rows[shown.selected]);
+
     // Shows the list drawn for it at this opacity, the Selection Marker on
-    // the selected row.
+    // the selected choice.
     function show(opacity) {
         backdropLayer.setScale(WINDOW_SCALE);
         for (const piece of pieces()) place(layerOf(piece), piece.rect);
@@ -184,15 +206,18 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         shown.marker = createSelectionMarker(host, {
             zIndex: AVATAR_FRAME_LIST_Z_INDEX.marker, referenceWidth: content.referenceWidth, referenceHeight: REFERENCE_HEIGHT,
         });
-        shown.marker.moveTo(content.geometry.rows[shown.selected]);
+        shown.marker.moveTo(selectedRect());
         setOpacity(opacity);
     }
 
-    // Each frame of the fade in. Every layer is drawn by now: no
-    // layerOf(), which could draw on the spot within a frame.
+    // Each frame of the fade in, and each move. Every layer is drawn by
+    // now: no layerOf(), which could draw on the spot within a frame. The
+    // Exit Button's tooltip shows only while it is selected.
     function setOpacity(opacity) {
+        shown.opacity = opacity;
         backdropLayer.alpha = opacity;
         for (const piece of pieces()) layers.get(piece.key).layer.alpha = opacity;
+        if (shown.selected !== EXIT_BUTTON) layers.get(EXIT_TOOLTIP).layer.alpha = 0;
         shown.marker.setOpacity(opacity);
     }
 
@@ -210,7 +235,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         // The backdrop measures the window the rows' layout depends on.
         opening.draw(() => readContent(rows));
         const isOpenedOn = row => (selectedTier === null ? row.isWorn : row.tier === selectedTier);
-        shown = { onBack, onClosed, marker: null, selected: Math.max(0, content.rows.findIndex(isOpenedOn)), isPreparing: false };
+        shown = { onBack, onClosed, marker: null, opacity: 0, selected: Math.max(0, content.rows.findIndex(isOpenedOn)), isPreparing: false };
         const nextMissing = () => pieces().find(piece => !isDrawn(piece));
         if (!nextMissing()) {
             show(1);
@@ -251,12 +276,15 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         closedListeners.tell();
     }
 
-    // direction: 1 for Next, -1 for Prev.
+    // direction: 1 for Next, -1 for Prev, through the Exit Button then
+    // each row.
     function move(direction) {
         navigationSound.play();
-        const count = content.rows.length;
-        shown.selected = (shown.selected + direction + count) % count;
-        shown.marker.moveTo(content.geometry.rows[shown.selected]);
+        // The loop's places: the Exit Button at 0, then the rows.
+        const places = content.rows.length + 1;
+        shown.selected = ((shown.selected + 1 + direction + places) % places) - 1;
+        shown.marker.moveTo(selectedRect());
+        setOpacity(shown.opacity);
     }
 
     function back() {
@@ -265,8 +293,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         onBack();
     }
 
-    // A locked row cannot be worn: the list stays as it is.
+    // A locked row cannot be worn: the list stays as it is. The Exit
+    // Button goes back as Exit does.
     function choose() {
+        if (shown.selected === EXIT_BUTTON) return back();
         const row = content.rows[shown.selected];
         if (row.isLocked) return;
         profileRewards.choose(row.tier);
