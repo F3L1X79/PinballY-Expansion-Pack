@@ -222,12 +222,64 @@
     </div>
   </header>
 
-  <!-- ===== In progress ===== -->
+  <!-- ===== Effort x impact matrix ===== -->
   <section>
-    <p class="eyebrow">En cours</p>
-    <div class="panel now" id="now">
-      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne. Le 16/10, les Default Scores ont reçu 28 portraits libres de droits ; les anciens, non libres, ne restent que sur la borne de Félix (<code>assets/images/default_scores/local/</code>, hors git). Le 17/10, le <strong>Selection Marker</strong> (un halo flou d'ors qui défile autour du choix courant) remplace <code>selectionHalo</code> sur le Welcome Screen, les Profile Stats, les Household Stats et la liste des Avatar Frames ; reste à le voir sur la borne. Le 17/10 encore, le <strong>Loader</strong> (une comète dorée qui tourne au tiers haut de l'écran de jeu) accompagne le lancement et la fermeture d'une table, le démarrage jusqu'au fondu du Welcome Screen, et la lecture fraîche du High Score Board ; reste à le voir sur la borne.</p>
-      <span class="next">Ensuite : <a href="#sliced-stats-screens">Loader sur les écrans dessinés d'un bloc (n° <span data-ref="sliced-stats-screens"></span>)</a>, en tête de file</span>
+    <p class="eyebrow">Effort × impact <span class="count">(estimation de Claude)</span></p>
+    <div class="panel matrix-wrap">
+      <div class="matrix">
+        <div></div><div class="ax">Petit</div><div class="ax">Moyen</div><div class="ax">Gros</div>
+
+        <div class="ax row">Fort</div>
+        <div class="cell sweet">
+          <a class="chip tr-play" href="#back-buttons"><b></b>Boutons Retour</a>
+          <a class="chip tr-play" href="#hidden-tables-filter"><b></b>Tables masquées</a>
+        </div>
+        <div class="cell">
+          <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
+        </div>
+        <div class="cell">
+          <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
+        </div>
+
+        <div class="ax row">Moyen</div>
+        <div class="cell sweet">
+          <a class="chip tr-share" href="#readme-screenshots"><b></b>README et captures</a>
+          <a class="chip tr-play" href="#my-records-filter"><b></b>Filtre « Mes records »</a>
+          <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
+          <a class="chip tr-play" href="#launch-loading-text"><b></b>« Chargement en cours » doré</a>
+        </div>
+        <div class="cell">
+          <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
+          <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
+          <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
+          <a class="chip tr-play" href="#child-extra-challenges"><b></b>Challenges en plus pour les enfants</a>
+        </div>
+        <div class="cell">
+          <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
+          <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
+          <a class="chip tr-share" href="#themes"><b></b>Thèmes</a>
+        </div>
+
+        <div class="ax row">Faible</div>
+        <div class="cell">
+          <a class="chip tr-share" href="#menu-test-helper"><b></b>Aide aux tests du menu</a>
+          <a class="chip tr-play" href="#hide-challenge-tables-when-done"><b></b>Tables du défi masquées</a>
+        </div>
+        <div class="cell">
+          <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
+          <a class="chip tr-profiles" href="#profile-titles"><b></b>Titres (pas prévu)</a>
+        </div>
+        <div class="cell">
+          <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
+          <a class="chip tr-share" href="#theme-editor"><b></b>Éditeur de palette</a>
+        </div>
+      </div>
+      <div class="legend">
+        <span class="tr-profiles">Profiles</span>
+        <span class="tr-play">Jeu et succès</span>
+        <span class="tr-share">Diffusion</span>
+        <span class="sweet-key">Gains rapides</span>
+      </div>
     </div>
   </section>
 
@@ -261,8 +313,8 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
           <p>Ces écrans (et l'Avatar Frame list) se dessinent d'un bloc (mesuré sur la borne le 17/10 : Household Stats 954 ms, Profile Stats 316 à 419 ms) : le Loader y resterait figé, il n'y est donc pas. Les dessiner par tranches via <code>getDrawingAhead()</code> permettrait de l'y afficher. Les Household Stats approchent la seconde. L'Achievement List, elle, dessine sur-le-champ à l'ouverture les lignes que le dessin d'avance n'a pas encore faites : il faudrait l'ouvrir d'abord, avec le Loader, et laisser le dessin d'avance finir malgré sa pause après un appui.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/241">#241</a> ; flow Matt : <code>/to-tickets</code> → <code>/implement</code> ou <code>/implement-spec</code></div>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/241">#241</a>, implémentée sur la branche <code>spec-241</code> ; reste la mesure sur la borne (<a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/246">#246</a>, tâche humaine), qui décide du sort de l'Avatar Frame list</div>
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Reporté pendant le grill du Loader, le 17/10/2026.</p>
@@ -288,6 +340,29 @@
               <li>Une ligne « Retour » à atteindre aux boutons, comme dans les Drawn Menus, ou un rappel du bouton à presser ?</li>
             </ul>
             <p class="ctx">Proposé par Félix le 15/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="launch-loading-text" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>« Chargement en cours… » en doré au lancement d'une table</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Pendant le lancement d'une table, afficher « Chargement en cours… » en doré (Steamball) avec le Loader de <code>addons/seamless_launch_overlay.js</code>, qui aujourd'hui ne montre que la comète.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> (court) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Le texte seulement au lancement, ou aussi pendant la fermeture de la table (« Retour au menu… ») ?</li>
+              <li>Où le placer : sous la comète, au tiers haut ? Le glossaire veut aujourd'hui un Loader « sans texte ni fond » : le texte appartient-il au Loader ou au seamless launch seul ?</li>
+              <li>Animé (apparition en fondu une seule fois) ou fixe, vu la règle « pas d'animation sans fin » ?</li>
+            </ul>
+            <p class="ctx">Idée du 17/10/2026 : l'utilisateur croyait que ce texte s'affichait déjà. La clé <code>launching</code> (« Chargement en cours... ») existe encore dans <code>lang/</code>, mais plus aucun code ne l'utilise.</p>
           </details>
         </div>
       </li>
@@ -397,6 +472,28 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="hide-challenge-tables-when-done" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Filtre « Tables du défi » masqué une fois le Challenge terminé</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Retirer l'entrée Challenge Tables du menu principal dès que le Profile actif a terminé le Challenge de la semaine, puisqu'elle n'a plus rien à lui proposer.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> (court) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Si les Challenge Tables sont sur la roue au moment où le Challenge se termine, toutes les tables reviennent-elles d'elles-mêmes ?</li>
+              <li>Masquer aussi l'entrée quand le Challenge n'a pas de Challenge Tables (un Challenge de temps de jeu, par exemple) ?</li>
+            </ul>
+            <p class="ctx">Idée du 17/10/2026. Le glossaire dit aujourd'hui que l'entrée est toujours dans le menu principal : il faudra le mettre à jour.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -415,6 +512,30 @@
               <li>À partir de quand : toujours, ou seulement quand le niveau suivant est proche (moins d'une partie ou deux) ?</li>
             </ul>
             <p class="ctx">Idée externe du 08/10/2026. Écartés en même temps : un moteur de suggestion de plus, les objectifs de session quotidiens, les quêtes (doublons des Achievements Manufacturers et Decades) et des annonces de progression supplémentaires.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="child-extra-challenges" data-track="play" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Trois Challenges de plus pour les enfants</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Donner aux Child Profiles trois Challenges de plus que le Challenge de la semaine commun à toute la maison.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Part des Challenges (livrés) et des Child Profiles (livrés)</div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Trois de plus chaque semaine, en même temps que celui de la maison, ou à la suite, l'un après l'autre ?</li>
+              <li>Mêmes modèles de Challenge que les adultes, ou des modèles plus courts ou plus simples pour les enfants ?</li>
+              <li>Comment la Challenge Card, le filtre « Tables du défi », la Challenge Toast et les Profile Stats montrent-ils plusieurs Challenges ?</li>
+              <li>Les Challenges en plus comptent-ils dans les « Challenges terminés » des Household Stats et dans les Achievements de la famille Challenges ?</li>
+            </ul>
+            <p class="ctx">Idée du 17/10/2026. Aujourd'hui, le glossaire veut un seul Challenge par semaine, le même pour chaque Profile.</p>
           </details>
         </div>
       </li>
@@ -737,12 +858,19 @@
     </ol>
   </section>
 
-  <!-- ===== Decisions + matrix ===== -->
-  <section class="two">
+  <!-- ===== Decisions ===== -->
+  <section>
     <div>
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>17/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>Trois idées rangées à leur place, la matrice en haut</strong>
+              <span>« Chargement en cours » doré juste après les boutons Retour (petit, vu à chaque lancement) ; le filtre des Tables du défi masqué près des autres filtres ; les Challenges en plus pour les enfants avant la robustesse, comme besoin de la borne. La matrice effort × impact passe en tête de page, le panneau « En cours » en bas.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>16/10 <span class="count">(2)</span></summary>
           <ol>
             <li><strong>Nouvel ordre : d'abord ce qui gêne les joueurs sur la borne</strong>
@@ -915,62 +1043,14 @@
         </details>
       </div>
     </div>
+  </section>
 
-    <div>
-      <p class="eyebrow">Effort × impact <span class="count">(estimation de Claude)</span></p>
-      <div class="panel matrix-wrap">
-        <div class="matrix">
-          <div></div><div class="ax">Petit</div><div class="ax">Moyen</div><div class="ax">Gros</div>
-
-          <div class="ax row">Fort</div>
-          <div class="cell sweet">
-            <a class="chip tr-play" href="#back-buttons"><b></b>Boutons Retour</a>
-            <a class="chip tr-play" href="#hidden-tables-filter"><b></b>Tables masquées</a>
-          </div>
-          <div class="cell">
-            <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
-          </div>
-          <div class="cell">
-            <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
-          </div>
-
-          <div class="ax row">Moyen</div>
-          <div class="cell sweet">
-            <a class="chip tr-share" href="#readme-screenshots"><b></b>README et captures</a>
-            <a class="chip tr-play" href="#my-records-filter"><b></b>Filtre « Mes records »</a>
-            <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
-          </div>
-          <div class="cell">
-            <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
-            <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
-            <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
-          </div>
-          <div class="cell">
-            <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
-            <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
-            <a class="chip tr-share" href="#themes"><b></b>Thèmes</a>
-          </div>
-
-          <div class="ax row">Faible</div>
-          <div class="cell">
-            <a class="chip tr-share" href="#menu-test-helper"><b></b>Aide aux tests du menu</a>
-          </div>
-          <div class="cell">
-            <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
-            <a class="chip tr-profiles" href="#profile-titles"><b></b>Titres (pas prévu)</a>
-          </div>
-          <div class="cell">
-            <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
-            <a class="chip tr-share" href="#theme-editor"><b></b>Éditeur de palette</a>
-          </div>
-        </div>
-        <div class="legend">
-          <span class="tr-profiles">Profiles</span>
-          <span class="tr-play">Jeu et succès</span>
-          <span class="tr-share">Diffusion</span>
-          <span class="sweet-key">Gains rapides</span>
-        </div>
-      </div>
+  <!-- ===== In progress ===== -->
+  <section>
+    <p class="eyebrow">En cours</p>
+    <div class="panel now" id="now">
+      <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne. Le 16/10, les Default Scores ont reçu 28 portraits libres de droits ; les anciens, non libres, ne restent que sur la borne de Félix (<code>assets/images/default_scores/local/</code>, hors git). Le 17/10, le <strong>Selection Marker</strong> (un halo flou d'ors qui défile autour du choix courant) remplace <code>selectionHalo</code> sur le Welcome Screen, les Profile Stats, les Household Stats et la liste des Avatar Frames ; reste à le voir sur la borne. Le 17/10 encore, le <strong>Loader</strong> (une comète dorée qui tourne au tiers haut de l'écran de jeu) accompagne le lancement et la fermeture d'une table, le démarrage jusqu'au fondu du Welcome Screen, et la lecture fraîche du High Score Board ; reste à le voir sur la borne.</p>
+      <span class="next">Le 17/10 aussi, le Loader accompagne les Profile Stats, les Household Stats et l'Achievement List pendant leur préparation (branche <code>spec-241</code>), reste la mesure sur la borne. Ensuite : <a href="#back-buttons">boutons Retour (n° <span data-ref="back-buttons"></span>)</a></span>
     </div>
   </section>
 
