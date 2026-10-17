@@ -17,9 +17,11 @@
 // ahead, kept from one opening to the next and redrawn only when what it
 // shows or the window size changed; what the list shows is read again on
 // each opening, and ahead after a Profile switch or a change of a
-// Profile's data. Opens directly, not through the wheel dialog module:
-// the player asked for it. isOpen() and onClosed() let the wheel dialogs
-// wait for it.
+// Profile's data. It opens at once when its rows are drawn ahead,
+// otherwise through the shared screen opening (docs/adr/0014), counting
+// as open while it gets ready. Opens directly, not through the wheel
+// dialog module: the player asked for it. isOpen() and onClosed() let the
+// wheel dialogs wait for it.
 // ============================================================
 
 import lang from "../core/i18n.js";
@@ -32,7 +34,7 @@ import {
     AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, drawTitle, drawRow,
 } from "./avatar_frame_list_painter.js";
 import { drawBackdrop } from "../drawing/steamball_drawing.js";
-import { openingTimeLine } from "../drawing/screen_opening.js";
+import { createScreenOpening } from "../drawing/screen_opening.js";
 
 const SCRIPT_NAME = "AvatarFrameList";
 const NONE_KEY = "none";
@@ -65,8 +67,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     let content = null;
     let isContentStale = true;
     // The open list, null when closed: the selected row's index, its
-    // Selection Marker and what Select and Exit return to.
+    // Selection Marker (null while getting ready), what Select and Exit
+    // return to and whether it is still getting ready.
     let shown = null;
+    const opening = createScreenOpening(host, SCRIPT_NAME, { zIndex: AVATAR_FRAME_LIST_Z_INDEX.backdrop - 2, drawingAhead });
     const closedListeners = createClosedListeners(SCRIPT_NAME);
 
     function readRows() {
@@ -170,45 +174,75 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         wakeDrawingAhead();
     }
 
+    // Shows the list drawn for it at this opacity, the Selection Marker on
+    // the selected row.
+    function show(opacity) {
+        backdropLayer.setScale(WINDOW_SCALE);
+        for (const piece of pieces()) place(layerOf(piece), piece.rect);
+        // Not drawn ahead: it lives only while the list is open, its timer
+        // with it.
+        shown.marker = createSelectionMarker(host, {
+            zIndex: AVATAR_FRAME_LIST_Z_INDEX.marker, referenceWidth: content.referenceWidth, referenceHeight: REFERENCE_HEIGHT,
+        });
+        shown.marker.moveTo(content.geometry.rows[shown.selected]);
+        setOpacity(opacity);
+    }
+
+    // Each frame of the fade in. Every layer is drawn by now: no
+    // layerOf(), which could draw on the spot within a frame.
+    function setOpacity(opacity) {
+        backdropLayer.alpha = opacity;
+        for (const piece of pieces()) layers.get(piece.key).layer.alpha = opacity;
+        shown.marker.setOpacity(opacity);
+    }
+
     // onBack: what Select and Exit return to, called once the list is
     // closed; selectedTier (optional): the frame row it opens on instead of
     // the worn one; onClosed (optional): called whenever it closes, attract
-    // mode included, before onBack. Anything not drawn ahead yet is drawn
-    // on the spot.
+    // mode included, before onBack. Opens at once when every row is drawn
+    // ahead; otherwise the missing ones are drawn under the veil first.
     function open(onBack = () => {}, { selectedTier = null, onClosed = () => {} } = {}) {
         if (shown) return;
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
-        const openedAt = host.now().getTime();
-        const rows = readRows();
-        const readAt = host.now().getTime();
-        readContent(rows);
-        backdropLayer.setScale(WINDOW_SCALE);
-        backdropLayer.alpha = 1;
-        for (const piece of pieces()) {
-            const layer = layerOf(piece);
-            place(layer, piece.rect);
-            layer.alpha = 1;
-        }
+        opening.begin();
+        const rows = opening.read(readRows);
+        // The backdrop measures the window the rows' layout depends on.
+        opening.draw(() => readContent(rows));
         const isOpenedOn = row => (selectedTier === null ? row.isWorn : row.tier === selectedTier);
-        // Not drawn ahead: it lives only while the list is open, its timer
-        // with it.
-        const marker = createSelectionMarker(host, {
-            zIndex: AVATAR_FRAME_LIST_Z_INDEX.marker, referenceWidth: content.referenceWidth, referenceHeight: REFERENCE_HEIGHT,
+        shown = { onBack, onClosed, marker: null, selected: Math.max(0, content.rows.findIndex(isOpenedOn)), isPreparing: false };
+        const nextMissing = () => pieces().find(piece => !isDrawn(piece));
+        if (!nextMissing()) {
+            show(1);
+            opening.logOpened();
+            return;
+        }
+        shown.isPreparing = true;
+        const step = () => {
+            const piece = nextMissing();
+            if (!piece) return false;
+            opening.draw(() => layerOf(piece));
+            return nextMissing() !== undefined;
+        };
+        opening.runVeiled(step, {
+            onDone: () => {
+                shown.isPreparing = false;
+                show(0);
+                opening.logOpened();
+                opening.fadeIn(setOpacity);
+            },
+            // Logged by the drawing ahead: given up rather than left veiled.
+            onFailed: close,
         });
-        shown = { onBack, onClosed, marker, selected: Math.max(0, content.rows.findIndex(isOpenedOn)) };
-        marker.moveTo(content.geometry.rows[shown.selected]);
-        marker.setOpacity(1);
-        // Drawn: the backdrop, and any row not drawn ahead yet.
-        const drawnAt = host.now().getTime();
-        host.log(openingTimeLine(SCRIPT_NAME, { totalMs: drawnAt - openedAt, readMs: readAt - openedAt, drawnMs: drawnAt - readAt }));
     }
 
+    // Closes the open list or gives up the one getting ready.
     function close() {
         if (!shown) return;
         const { onClosed, marker } = shown;
         shown = null;
-        marker.remove();
+        opening.remove();
+        if (marker) marker.remove();
         hide(backdropLayer);
         for (const { layer } of layers.values()) hide(layer);
         // What changed while it was open is read again once it is closed.
@@ -246,6 +280,11 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing choice still never reaches the wheel.
         ev.preventDefault();
+        // Getting ready: Exit gives up, as it would close the open list.
+        if (shown.isPreparing) {
+            if (ev.command === "Exit") back();
+            return;
+        }
         if (ev.command === "Next" || ev.command === "Prev") move(ev.command === "Next" ? 1 : -1);
         // Launch is the plunger, which selects in PinballY's own menus too.
         else if (ev.command === "Select" || ev.command === "Launch") choose();

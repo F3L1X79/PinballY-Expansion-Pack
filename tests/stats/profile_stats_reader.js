@@ -10,9 +10,10 @@
 // as a player would. Opens them from the main menu entry (letting them get
 // ready and fade in, or not), or reads one
 // section of the active Profile's screen and closes it again. Reads the
-// Avatar Frame list opened from the Frame button too: whether it is open,
-// its rows (name, status and frame image) and the one the Selection
-// Marker surrounds, and picks a row as a player would.
+// Avatar Frame list opened from the Frame button too: lets it get ready
+// and fade in, reads whether it is open, its rows (name, status and frame
+// image) and the one the Selection Marker surrounds, and picks a row as a
+// player would.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -177,6 +178,10 @@ export function choose(fake, name) {
 // ---------- The Avatar Frame list ----------
 
 export const isFrameListOpen = fake => shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.backdrop).length > 0;
+
+// Lets the clock run until the Avatar Frame list has faded in, the veil
+// of its opening gone (at once when it was drawn ahead).
+export const untilFrameListShown = fake => untilFadedIn(fake, AVATAR_FRAME_LIST_Z_INDEX.backdrop);
 
 const rowLayers = fake => topToBottom(shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.rows));
 const fileNameOf = path => path.slice(path.lastIndexOf("\\") + 1);

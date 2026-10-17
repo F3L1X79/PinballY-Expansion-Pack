@@ -11,6 +11,7 @@ import { startScenario, DRAWN_AHEAD_MS } from "../mastery/mastery_bar_scenario.j
 import { assertNoErrorLogged } from "../support/error_log.js";
 import {
     openProfileStats, choose, press, isProfileStatsOpen, isFrameListOpen, highlightedRow, frameListMarkerLayerCount, PROFILE_STATS_OPEN_MS,
+    untilFrameListShown,
 } from "../stats/profile_stats_reader.js";
 
 test("the Selection Marker surrounds the worn row, follows the moves and is gone once the list closes", async () => {
@@ -23,6 +24,7 @@ test("the Selection Marker surrounds the worn row, follows the moves and is gone
     const reopenList = () => {
         openProfileStats(fake, lang);
         choose(fake, "Frame");
+        untilFrameListShown(fake);
         assert.equal(isFrameListOpen(fake), true);
     };
     const closeProfileStats = () => {

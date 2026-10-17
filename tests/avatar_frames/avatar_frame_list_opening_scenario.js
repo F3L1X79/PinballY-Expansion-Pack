@@ -1,0 +1,37 @@
+// ============================================================
+// Starts the pack through main.js on the fake PinballY globals for the
+// Avatar Frame list's opening tests: Table Mastery, the Achievements and
+// the main menu commands on, the frame images there, Guest at Collection
+// Tier 3 wearing "Steam and Gears". The Profile Stats open with instant
+// draws, then each layer draw takes drawMs on the clock while the Frame
+// button opens the list: right after startup, nothing of it is drawn
+// ahead yet. Never loaded by PinballY.
+// ============================================================
+
+import { startScenario } from "../mastery/mastery_bar_scenario.js";
+import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
+import { DIMMED_WHEEL } from "../../common/drawing/steamball_drawing.js";
+import { openProfileStats, choose } from "../stats/profile_stats_reader.js";
+
+export const WORN_FRAME = "Steam and Gears";
+
+// The veil the list's opening dims the wheel with, as readVeil() reads it.
+export const FRAME_LIST_VEIL = { shown: true, zIndex: AVATAR_FRAME_LIST_Z_INDEX.backdrop - 2, color: DIMMED_WHEEL };
+
+export async function startPack() {
+    const fake = await startScenario({
+        addOns: ["tableMastery", "achievements", "customMenuCommands"], frameImages: true,
+        profiles: { guest: { collectionTier: 3, avatarFrame: 2 } },
+    });
+    const { default: lang } = await import("../../common/core/i18n.js");
+    return { fake, lang };
+}
+
+// Opens the Profile Stats and presses their Frame button, each layer draw
+// then taking drawMs: the clock does not run once the button is pressed.
+export function startOpeningFrameList(fake, lang, { drawMs }) {
+    fake.setDrawMs(0);
+    openProfileStats(fake, lang);
+    fake.setDrawMs(drawMs);
+    choose(fake, lang.profileStats.buttons.frame);
+}

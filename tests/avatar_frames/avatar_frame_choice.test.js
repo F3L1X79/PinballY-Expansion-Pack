@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { startScenario, errorLines, profileFile, DRAWN_AHEAD_MS } from "../mastery/mastery_bar_scenario.js";
 import {
     openProfileStats, choose, highlighted, press, isProfileStatsOpen, isFrameListOpen, frameRows, highlightedRow, pickRow, PROFILE_STATS_OPEN_MS,
+    untilFrameListShown,
 } from "../stats/profile_stats_reader.js";
 
 const ADD_ONS = ["tableMastery", "achievements", "customMenuCommands"];
@@ -23,6 +24,7 @@ test("Select saves an unlocked frame and goes back on the Frame button; a locked
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
     choose(fake, "Frame");
+    untilFrameListShown(fake);
 
     pickRow(fake, "Eternal Frost");
     assert.equal(isFrameListOpen(fake), true, "a locked frame is not chosen");
@@ -36,6 +38,7 @@ test("Select saves an unlocked frame and goes back on the Frame button; a locked
     assert.equal(savedData(fake, "guest").avatarFrame, 2);
 
     choose(fake, "Frame");
+    untilFrameListShown(fake);
     assert.equal(wornRow(fake), "Steam and Gears");
     assert.equal(highlightedRow(fake), "Steam and Gears", "the list opens on the worn row");
     assert.deepEqual(frameRows(fake).find(row => row.name === "None").status, null);
@@ -47,10 +50,12 @@ test("Select saves an unlocked frame and goes back on the Frame button; a locked
     assert.equal(savedData(fake, "guest").avatarFrame, 2, "Exit changes nothing");
 
     choose(fake, "Frame");
+    untilFrameListShown(fake);
     pickRow(fake, "None");
     assert.equal(savedData(fake, "guest").avatarFrame, null, "None is recorded as null");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     choose(fake, "Frame");
+    untilFrameListShown(fake);
     assert.equal(wornRow(fake), "None");
     assert.deepEqual(errorLines(fake), []);
 });
