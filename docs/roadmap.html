@@ -331,6 +331,24 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="keep-parent-screen" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Retour instantané vers l'écran parent</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Revenir des Profile Stats d'un autre Profile vers les Household Stats, ou de l'Achievement List et de l'Avatar Frame list vers les Profile Stats, relit et redessine tout l'écran parent, donc avec le Loader. Garder ses calques cachés (réduits à un point) pendant que l'écran enfant est ouvert permettrait de le réafficher d'un coup. Il faut alors savoir quand il est périmé : un cadre équipé depuis l'Avatar Frame list change la carte des Profile Stats.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après les boutons Retour, qui fixent où mène chaque retour</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Reporté pendant le grill du Loader sur les écrans dessinés d'un bloc, le 17/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-play" id="launch-loading-text" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -350,24 +368,6 @@
               <li>Animé (apparition en fondu une seule fois) ou fixe, vu la règle « pas d'animation sans fin » ?</li>
             </ul>
             <p class="ctx">Idée du 17/10/2026 : l'utilisateur croyait que ce texte s'affichait déjà. La clé <code>launching</code> (« Chargement en cours... ») existe encore dans <code>lang/</code>, mais plus aucun code ne l'utilise.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="keep-parent-screen" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Retour instantané vers l'écran parent</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
-          </div>
-          <p>Revenir des Profile Stats d'un autre Profile vers les Household Stats, ou de l'Achievement List et de l'Avatar Frame list vers les Profile Stats, relit et redessine tout l'écran parent, donc avec le Loader. Garder ses calques cachés (réduits à un point) pendant que l'écran enfant est ouvert permettrait de le réafficher d'un coup. Il faut alors savoir quand il est périmé : un cadre équipé depuis l'Avatar Frame list change la carte des Profile Stats.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Reporté pendant le grill du Loader sur les écrans dessinés d'un bloc, le 17/10/2026.</p>
           </details>
         </div>
       </li>
@@ -851,8 +851,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>17/10 <span class="count">(2)</span></summary>
+          <summary>17/10 <span class="count">(3)</span></summary>
           <ol>
+            <li><strong>Retour instantané juste après les boutons Retour, sans fusion</strong>
+              <span>Les deux idées portent sur le même trajet mais restent deux chantiers : les boutons Retour montrent comment revenir sur tous les écrans Steamball (petit), le retour instantané garde les calques de trois écrans parents et doit savoir quand ils sont périmés (moyen). Le retour instantané passe donc devant le « Chargement en cours » doré, car le grill des boutons Retour décide où mène chaque retour, et il en a besoin. Un seul grill pour les deux reste possible.</span></li>
             <li><strong>Retour instantané après le « Chargement en cours » doré ; trois succès pour les enfants</strong>
               <span>Le retour instantané vers l'écran parent, ajouté en fin de file pendant le grill du Loader, remonte juste après le « Chargement en cours » doré : il finit le travail du Loader, et les boutons Retour rendront ces retours plus fréquents. L'idée pour les enfants est trois Achievements de plus, pas trois Challenges. La matrice reçoit les quatre idées qui y manquaient.</span></li>
             <li><strong>Trois idées rangées à leur place, la matrice en haut</strong>
