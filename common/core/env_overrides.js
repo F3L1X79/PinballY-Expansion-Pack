@@ -64,7 +64,7 @@ export function applyEnvOverrides(defaults, text) {
     const overridden = [];
     const problems = [];
 
-    const lines = String(text || "").replace(/^﻿/, "").split(/\r?\n/);
+    const lines = String(text || "").replace(/^\uFEFF/, "").split(/\r?\n/);
     lines.forEach((rawLine, index) => {
         const line = rawLine.trim();
         const lineLabel = `line ${index + 1}`;

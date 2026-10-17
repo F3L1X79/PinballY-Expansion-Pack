@@ -45,3 +45,10 @@ test("every script loaded by PinballY with non-ASCII text starts with a UTF-8 by
     });
     assert.deepEqual(offenders, []);
 });
+
+// A byte order mark added in a shell to a file that already had one leaves
+// a stray U+FEFF in the source.
+test("no script loaded by PinballY carries a byte order mark past its first bytes", () => {
+    const offenders = loadedScripts().filter(path => readFileSync(ROOT + path).indexOf("﻿", 1, "utf8") !== -1);
+    assert.deepEqual(offenders, []);
+});
