@@ -3,7 +3,8 @@
 // modules reach PinballY (settings, clock, timers, visible tables, wheel
 // selection and its current table, wheel logos, global media and the
 // underlay, filter and metafilters, game list and settings events, main
-// window menus / UI mode / events / drawing layers,
+// window menus / UI mode / events / drawing layers, the wheel shown or
+// hidden and the launch overlay's background,
 // StyledText, commands and running them, table launch, program and pack folders,
 // monitor count, backglass window, sound playback (one-off or on players
 // in turn), logfile.log, the few file operations the Profile store
@@ -341,6 +342,11 @@ export function createPinballYHost() {
         removeDrawingLayer: (layer) => { mainWindow.removeDrawingLayer(layer); },
         // Fires no "underlaychange".
         setUnderlay: (filePath) => { mainWindow.setUnderlay(filePath); },
+        // The wheel's icons, hidden or shown again.
+        showWheel: (visible) => { mainWindow.showWheel(visible); },
+        // The launch overlay's background layer: exists only during a launch,
+        // cannot be removed, moved or resized.
+        getLaunchOverlayBackground: () => mainWindow.launchOverlay.bg,
         // The image PinballY would pick for a global media file, such as
         // ("Images", "underlay"): the media folder first, then PinballY's
         // Assets folder; undefined when neither has one.

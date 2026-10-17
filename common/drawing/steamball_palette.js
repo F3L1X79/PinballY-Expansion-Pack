@@ -19,6 +19,10 @@ export const STEAMBALL_COLORS = Object.freeze({
     tile: 0xFF15181E,
     track: 0xFF2E3848,
     gold: 0xFFE8B84A,
+    // The Loader's golds round the main one, from its head to its tail's end.
+    gleam: 0xFFFFF6D8,
+    lightGold: 0xFFFFD678,
+    bronze: 0xFFA8661C,
     title: 0xFFFFFFFF,
     description: 0xFFA9B4C2,
     dim: 0xFF6E7887,

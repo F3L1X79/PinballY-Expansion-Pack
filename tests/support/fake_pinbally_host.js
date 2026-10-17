@@ -9,7 +9,8 @@
 // to the wheel selection and a filter's games, enter and leave attract
 // mode, open the Exit menu
 // or main menu with their native items, pick menu items, play launched games, and inspect shown menus, launches, written settings keys,
-// drawing layers, what was drawn, the underlay set by a script, running intervals, sounds played (and on which player), the
+// drawing layers, what was drawn, the underlay set by a script, the wheel
+// shown or hidden, the launch overlay's layers, running intervals, sounds played (and on which player), the
 // backglass window shown or hidden, and the lower status line (which can
 // start with the player's own messages, and get a temporary one as
 // PinballY's show() puts it); script filters are shown with selectFilter().
@@ -178,6 +179,8 @@ export function createFakePinballYHost({
     const drawingList = [];
     // The underlay a script set, null until one does.
     let underlayFile = null;
+    // The wheel's icons, hidden by showWheel(false).
+    let wheelShown = true;
     // Every sound played, in order: { filePath, playerId }.
     const sounds = [];
     // Each Windows Media Player gets the next id when created.
@@ -450,10 +453,12 @@ export function createFakePinballYHost({
     // A drawing layer that keeps only what the tests look at: the texts,
     // image paths, frames (frameRect) and fill colours (fillRect) drawn
     // since the last draw or clear, the fills, texts and images in their
-    // drawing order, the canvas size of the last draw, its position, scale and
+    // drawing order, the canvas size of the last draw, the image file it
+    // shows (loadImage), the colour it was cleared to, its position, scale and
     // alpha. Like PinballY, a draw without a size gets a canvas the size of
-    // the window.
-    function createDrawingLayer(zIndex) {
+    // the window, and a draw, a clear or a loaded image replaces whatever
+    // the layer showed.
+    function createLayerObject(zIndex) {
         let texts = [];
         let images = [];
         let frames = [];
@@ -462,6 +467,8 @@ export function createFakePinballYHost({
         // image's { image, rect } in one flat array, as films drawn ahead make millions of fills.
         let strokes = [];
         let canvasSize = null;
+        let loadedImage = null;
+        let clearColor = null;
         let position = { x: 0, y: 0 };
         // PinballY's default: stretched to the whole window.
         let scale = { xSpan: 1, ySpan: 1 };
@@ -493,14 +500,27 @@ export function createFakePinballYHost({
                 frames = [];
                 strokes = [];
                 canvasSize = width === undefined ? { ...currentLayoutSize } : { width, height };
+                loadedImage = null;
+                clearColor = null;
                 drawFunction(dc);
                 drawingList.push({ zIndex, texts: [...texts], images: [...images] });
             },
-            clear() {
+            clear(color) {
                 texts = [];
                 images = [];
                 frames = [];
                 strokes = [];
+                loadedImage = null;
+                clearColor = color === undefined ? null : color;
+            },
+            // A fully qualified path, as the DrawingLayer help asks.
+            loadImage(path) {
+                texts = [];
+                images = [];
+                frames = [];
+                strokes = [];
+                clearColor = null;
+                loadedImage = path;
             },
             setPos(x, y, align) { position = align === undefined ? { x, y } : { x, y, align }; },
             setScale(options) { scale = { ...options }; },
@@ -512,12 +532,24 @@ export function createFakePinballYHost({
             // ({ image: path, rect }) in drawing order.
             strokes: () => readStrokes(strokes),
             canvasSize: () => ({ ...canvasSize }),
+            loadedImage: () => loadedImage,
+            clearColor: () => clearColor,
             position: () => ({ ...position }),
             scale: () => ({ ...scale }),
         };
+        return layer;
+    }
+
+    function createDrawingLayer(zIndex) {
+        const layer = createLayerObject(zIndex);
         layers.push(layer);
         return layer;
     }
+
+    // PinballY's launch overlay: its background and foreground layers,
+    // drawn above every drawing layer, never listed with them (no z-index).
+    const launchOverlay = { bg: createLayerObject(null), fg: createLayerObject(null) };
+    function showWheel(visible) { wheelShown = visible; }
 
     function readStrokes(data) {
         const strokes = [];
@@ -994,6 +1026,8 @@ export function createFakePinballYHost({
         createDrawingLayer,
         removeDrawingLayer,
         setUnderlay,
+        showWheel,
+        getLaunchOverlayBackground: () => launchOverlay.bg,
         resolveGlobalImage,
         createStyledText: (options) => new FakeStyledText(options, (text) => { logLines.push(text); }),
         allocateCommand,
@@ -1042,6 +1076,9 @@ export function createFakePinballYHost({
         setLayoutSize(size) { currentLayoutSize = { ...size }; },
         drawingLayers: () => [...layers],
         underlay: () => underlayFile,
+        wheelShown: () => wheelShown,
+        // The launch overlay's layers, { bg, fg }.
+        launchOverlay: () => launchOverlay,
         drawings: () => drawingList.map(drawing => ({ ...drawing, texts: [...drawing.texts], images: [...drawing.images] })),
         soundsPlayed: () => sounds.map(sound => sound.filePath),
         // The id of the player each sound played on, in the same order.
@@ -1363,6 +1400,8 @@ export function createFakePinballYHost({
                     createDrawingLayer,
                     removeDrawingLayer,
                     setUnderlay,
+                    showWheel,
+                    launchOverlay,
                     statusLines: {
                         upper: statusLineObject(upperStatusLine),
                         lower: statusLineObject(lowerStatusLine),
