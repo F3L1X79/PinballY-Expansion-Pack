@@ -205,7 +205,6 @@
 </head>
 <body>
 
-
 <main>
 
   <header class="panel hero">
@@ -261,27 +260,45 @@
             <h3>Le Loader : une comète dorée pendant les chargements</h3>
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Une comète dorée qui tourne en boucle, au centre de l'écran, en transparence (APNG généré par un script de mainteneur, animé par PinballY lui-même). Affichée seulement là où elle peut tourner :</p>
+          <p>Une comète dorée qui tourne en boucle (un tour en 0,9 s), au tiers haut de l'écran de jeu, en transparence (APNG généré par un script de mainteneur, animé par PinballY lui-même). Affichée seulement là où elle peut tourner :</p>
           <ul>
             <li>au démarrage, jusqu'au fondu du Welcome Screen ;</li>
-            <li>pendant le lancement d'une table, dans le Seamless Launch Overlay (rien sans cet Add-on) ;</li>
+            <li>pendant le lancement d'une table et pendant son retour à la roue, jamais pendant la partie, dans le Seamless Launch Overlay (rien sans cet Add-on) ;</li>
             <li>à l'ouverture des écrans dessinés d'avance par tranches (Achievement List, High Score Board).</li>
           </ul>
-          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> (en cours) → <code>/prototype</code> visuel (2 ou 3 comètes) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Prototype : branche <code>prototype/loader</code> (variante « comet », verdict dans son dernier commit)</div>
           <details>
             <summary>Décidé au grill du 17/10/2026</summary>
             <ul>
               <li>Une seule spec, un seul Loader partagé dans <code>common/</code>, sans mesures de temps préalables.</li>
               <li>Exception à la règle contre les animations en boucle : un anneau moderne façon Windows 11, doré, en comète. APNG plutôt que GIF (transparence alpha pour la traîne).</li>
               <li>Le dessin JS fige l'affichage : pas de Loader sur les écrans dessinés d'un bloc (Profile Stats, Household Stats, Avatar Frame list), voir <a href="#sliced-stats-screens">n° <span data-ref="sliced-stats-screens"></span></a>.</li>
-              <li>Centré, environ 6 à 8 % de la hauteur, sans texte ni fond ; au lancement, sous le texte de PinballY s'il y en a. <code>setScale({ ySpan })</code> seul : PinballY garde les proportions, aucune mesure de fenêtre, donc pas de déformation au démarrage.</li>
-              <li>Démarrage : l'Add-on Welcome Screen pose dès son init un voile sombre (<code>clear(...)</code>) et la comète ; le panneau arrive en fondu par-dessus et le Loader disparaît. Abandonné avec le Welcome Screen ; rien si cet Add-on est éteint ; rien après Change Player (dessin d'un bloc).</li>
-              <li>Lancement : de <code>launchoverlayshow</code> à <code>launchoverlayhide</code>, sans durée estimée.</li>
+              <li>Prototype du 17/10 : variante « comet » (tête blanc-or, traîne de 300° de l'or au bronze), 7 % de la hauteur, centrée sur le tiers haut (<code>setPos(0, 1/6)</code>), au-dessus du logo de la table, partout au même endroit. <code>setScale({ ySpan })</code> seul : PinballY garde les proportions, aucune mesure de fenêtre, donc pas de déformation au démarrage.</li>
+              <li>Démarrage (706 ms mesurées : figé au premier démarrage, PinballY étant occupé, il tourne aux suivants ; gardé) : l'Add-on Welcome Screen pose dès son init un voile sombre (<code>clear(...)</code>) et la comète ; le panneau arrive en fondu par-dessus et le Loader disparaît. Abandonné avec le Welcome Screen ; rien si cet Add-on est éteint ; rien après Change Player (dessin d'un bloc).</li>
+              <li>Lancement : de <code>launchoverlayshow</code> au message <code>"running"</code>, puis de <code>"terminating"</code> à <code>launchoverlayhide</code> (l'overlay dure toute la partie), sans durée estimée. Calque à nous sous l'overlay (z 5999, sous les menus, dont le menu de pause natif).</li>
               <li>Écrans dessinés d'avance : seulement s'ils ne sont pas prêts quand le joueur les ouvre, jusqu'au fondu de l'écran.</li>
               <li>Écran de jeu seulement (ni backglass, ni DMD, ni topper) ; ne prend jamais les boutons.</li>
             </ul>
             <p class="ctx">Idée de Félix du 16/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="sliced-stats-screens" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Le Loader aussi sur les Profile Stats et les Household Stats</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Ces écrans (et l'Avatar Frame list) se dessinent d'un bloc (mesuré sur la borne le 17/10 : Household Stats 954 ms, Profile Stats 316 à 419 ms) : le <a href="#loader">Loader (n° <span data-ref="loader"></span>)</a> y resterait figé, il n'y est donc pas. Les dessiner par tranches via <code>getDrawingAhead()</code> permettrait de l'y afficher. Les Household Stats approchent la seconde.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Reporté pendant le grill du Loader, le 17/10/2026.</p>
           </details>
         </div>
       </li>
@@ -672,20 +689,23 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="sliced-stats-screens" data-track="play" data-rank="bronze">
+      <li draggable="true" tabindex="0" class="item tr-play" id="drawn-pause-menu" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Le Loader aussi sur les Profile Stats et les Household Stats</h3>
+            <h3>Menu de pause en Drawn Menu</h3>
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Ces écrans (et l'Avatar Frame list) se dessinent d'un bloc : le <a href="#loader">Loader (n° <span data-ref="loader"></span>)</a> y resterait figé, il n'y est donc pas. Les dessiner par tranches via <code>getDrawingAhead()</code> permettrait de l'y afficher, seulement si leur ouverture paraît lente sur la borne.</p>
+          <p>Le menu de pause d'une partie (Reprendre, Arrêter, Informations, Meilleurs scores…) reste natif : il détonne à côté des Drawn Menus.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Reporté pendant le grill du Loader, le 17/10/2026.</p>
+            <summary>Questions ouvertes (1)</summary>
+            <ul>
+              <li>L'<a href="adr/0013-the-player-s-menus-are-drawn-menus-replacing-the-native-ones.md">ADR 0013</a> l'a gardé natif exprès : pourquoi, et cette raison tient-elle encore (dessin pendant une partie, retour au jeu) ?</li>
+            </ul>
+            <p class="ctx">Vu sur une capture de la borne pendant le prototype du Loader, le 17/10/2026.</p>
           </details>
         </div>
       </li>
