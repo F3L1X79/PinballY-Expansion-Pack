@@ -334,17 +334,18 @@
             <h3>« Chargement en cours… » en doré au lancement d'une table</h3>
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
-          <p>Pendant le lancement d'une table, afficher « Chargement en cours… » en doré (Steamball) avec le Loader de <code>addons/seamless_launch_overlay.js</code>, qui aujourd'hui ne montre que la comète.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> (court) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <p>Pendant le lancement et la fermeture d'une table, écrire l'étape en cours (« Chargement en cours… », « Retour aux tables… ») en doré sous le Loader, qui passe au centre de l'écran partout. Aujourd'hui, <code>addons/seamless_launch_overlay.js</code> ne montre que la comète et l'icône de la table dessinée par PinballY.</p>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> (fait le 17/10/2026) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Décisions du grill (17/10/2026)</summary>
             <ul>
-              <li>Le texte seulement au lancement, ou aussi pendant la fermeture de la table (« Retour au menu… ») ?</li>
-              <li>Où le placer : sous la comète, au tiers haut ? Le glossaire veut aujourd'hui un Loader « sans texte ni fond » : le texte appartient-il au Loader ou au seamless launch seul ?</li>
-              <li>Animé (apparition en fondu une seule fois) ou fixe, vu la règle « pas d'animation sans fin » ?</li>
+              <li>Le message natif de PinballY est annulé (<code>preventDefault</code> sur <code>launchoverlaymessage</code>) : ni son texte, ni l'icône de la table. Notre texte est dessiné sur notre calque : police d'affichage Steamball, doré clair, contour noir fin (le texte répété en noir dans 8 directions), une ligne, environ deux fois la taille d'un texte courant, fixe (ni fondu, ni points qui défilent).</li>
+              <li>Le texte suit la comète : « Chargement en cours… » au lancement, rien pendant la partie, « Retour aux tables… » de « terminating » jusqu'à la disparition (pas de « Game Over »), « Capture en cours… » pendant une capture de médias.</li>
+              <li>Le Loader passe au centre de l'écran partout, le bloc comète + texte centré au lancement ; seule exception, le High Score Board déjà affiché, où il reste au tiers haut pour ne pas cacher les scores.</li>
+              <li>Le texte appartient au lancement, pas au Loader (glossaire mis à jour, pas de nouveau terme). Nouvelles clés i18n à part ; <code>launchOverlayMessages</code> de <code>addons/ui_translation.js</code> reste pour le texte natif quand la Seamless Launch Overlay est désactivée, avec « Retour aux tables… » à la place de « Retour à la liste des jeux... ».</li>
             </ul>
-            <p class="ctx">Idée du 17/10/2026 : l'utilisateur croyait que ce texte s'affichait déjà. La clé <code>launching</code> (« Chargement en cours... ») existe encore dans <code>lang/</code>, mais plus aucun code ne l'utilise.</p>
+            <p class="ctx">Idée du 17/10/2026 : l'utilisateur croyait que ce texte s'affichait déjà. La clé <code>launching</code> sert bien encore (traduction du texte natif), mais ce texte ne se voit pas sur la borne ; seule l'icône de la table apparaît.</p>
           </details>
         </div>
       </li>
