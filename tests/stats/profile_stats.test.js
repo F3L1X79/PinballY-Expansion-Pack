@@ -4,9 +4,9 @@
 // the card names the active Profile under its Avatar, with the Achievements,
 // Most Played Tables and Tables to Discover buttons at its foot; the GAME
 // section sums every table played, hidden and removed ones included; the
-// cross is selected on opening, Next / Prev loop with the navigation
-// sound, every button is swallowed, Exit and Select on the cross close
-// them, attract mode too, and every number is read again on each opening.
+// Exit Button (Back) is selected on opening, Next / Prev loop with the
+// navigation sound, every button is swallowed, Exit and Select on the Exit
+// Button close them, attract mode too, and every number is read again on each opening.
 // ============================================================
 
 import { test } from "node:test";
@@ -80,8 +80,8 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
         [TEXT.stats.averageDuration]: ["5 min"],
     });
 
-    assert.equal(highlighted(fake), lang.buttonHints.close, "the cross is selected on opening");
-    assert.deepEqual(readChoices(fake), [lang.buttonHints.close, TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables, TEXT.buttons.tablesToDiscover]);
+    assert.equal(highlighted(fake), lang.buttonHints.back, "the Exit Button is selected on opening");
+    assert.deepEqual(readChoices(fake), [lang.buttonHints.back, TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables, TEXT.buttons.tablesToDiscover]);
     assert.deepEqual(fake.soundsPlayed(), Array(4).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
     press(fake, "Prev");
     assert.equal(highlighted(fake), TEXT.buttons.tablesToDiscover, "Prev loops back to the last choice");
@@ -106,8 +106,8 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
     assert.deepEqual(buttons(fake).map(button => button.label), [TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables],
         "no Tables to Discover once every table was played");
     assert.equal(buttons(fake)[1].count, "3");
-    choose(fake, lang.buttonHints.close);
-    assert.equal(isProfileStatsOpen(fake), false, "Select on the cross closes them");
+    choose(fake, lang.buttonHints.back);
+    assert.equal(isProfileStatsOpen(fake), false, "Select on the Exit Button closes them");
     assert.equal(fake.getUIMode(), "wheel");
 
     openProfileStats(fake, lang);

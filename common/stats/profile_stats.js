@@ -25,13 +25,17 @@
 // button, shown while the Household has two Profiles; Exit there shows
 // this screen again on that button). While open it swallows every button through
 // "commandbuttondown": Next / Prev move the Selection Marker (a gold glow
-// flowing round the choice) through the cross and the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes; attract mode
-// closes it too. Opens directly, not through the wheel dialog module:
+// flowing round the choice) through the Exit Button and the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes
+// and brings back what open() was given (the main menu on "Your Stats"),
+// kept across the round trips to those lists; attract mode only closes it.
+// The Exit Button shows the back arrow when Exit brings something back,
+// the cross when it leaves the bare wheel; the Button Hints' footer names
+// the flippers, Select and Exit. Opens directly, not through the wheel dialog module:
 // the player asked for it. Can also open the frame list straight away, for
 // the Reward Prompt. openReadOnly() opens another Profile's screen from its
 // Household Stats column: its own values and tables (Adult Tables
 // included, whoever looks), no button at the card's foot, Exit or Select
-// on the cross (whose tooltip says Back) going back there. isOpen() and onClosed() let the wheel
+// on the Exit Button (the back arrow) going back there. isOpen() and onClosed() let the wheel
 // dialogs wait for it. readStats() reads the values it shows for any
 // named Profile, writing nothing.
 // ============================================================
@@ -51,6 +55,7 @@ import { getTablesToDiscover } from "../tables/tables_to_discover.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { prepareDrawnScreen } from "./drawn_screen.js";
 import { playerLevelColorOf } from "../drawing/steamball_drawing.js";
+import { exitButtonLookOf, exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import { PROFILE_STATS_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutProfileStats } from "./profile_stats_painter.js";
 
@@ -305,13 +310,15 @@ export function createProfileStats(host, {
 
     // The card: the Profile, its Player Level, Collection Mastery and
     // buttons (none when isReadOnly: another Profile's screen, to look at
-    // only), with what the sections read after it.
-    function readCard(profile, isReadOnly) {
+    // only), the Exit Button's look (hasReturn: Exit brings something back)
+    // and the Button Hints, with what the sections read after it.
+    function readCard(profile, isReadOnly, hasReturn) {
         const { data, profileTables } = readProfileData(profile.name);
         const profilePlays = data.plays;
         const getPlay = configId => profilePlays[configId] || NO_PLAY;
         const { achievements, playerLevel, collectionMastery } = readCardStats(profile.name, { data, profileTables });
         const hallOfFame = getHallOfFame(profileTables, getPlay);
+        const exitLook = exitButtonLookOf(hasReturn);
         const buttons = isReadOnly ? [] : [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
             ...frameButton(),
@@ -335,10 +342,13 @@ export function createProfileStats(host, {
                 collectionTitle: TEXT.collectionTitle,
                 collection: collectionTextsOf(collectionMastery),
                 buttons,
-                // Another Profile's screen goes back to the Household Stats.
-                closeLabel: isReadOnly ? lang.buttonHints.back : lang.buttonHints.close,
-                // The flippers' loop, the cross first.
-                choices: [CHOICE.CLOSE, ...buttons.map(entry => entry.choice)],
+                exitLook,
+                exitWord: exitButtonWordOf(exitLook),
+                // Read-only, the Exit Button is the only choice: the flippers
+                // do nothing and Select does what Exit does, so Exit says it all.
+                buttonHints: buttonHintGroupsOf({ flippers: isReadOnly ? null : FLIPPER_HINT.BROWSE, select: !isReadOnly, exitLook }),
+                // The flippers' loop, the Exit Button first.
+                choices: [CHOICE.EXIT_BUTTON, ...buttons.map(entry => entry.choice)],
             },
         };
     }
@@ -369,17 +379,19 @@ export function createProfileStats(host, {
         };
     }
 
-    // viewed: another Profile's screen, read-only, as { profileName, onBack
-    // (what Exit returns to, called once the screen is closed or given up) };
-    // null: the active Profile's. Reads and draws every layer hidden, step by
-    // step through the drawn screen's shared opening, then fades them in
-    // together: it never shows up half drawn.
-    function open(selectedChoice = CHOICE.CLOSE, viewed = null) {
+    // viewedName: another Profile's screen, read-only, by its name; null:
+    // the active Profile's. onReturn: what Exit brings back (the main menu,
+    // the Household Stats), called once the screen is closed or given up;
+    // null: Exit leaves the bare wheel. Kept across the round trips to the
+    // Achievement List, the Avatar Frame list and the Household Stats. Reads
+    // and draws every layer hidden, step by step through the drawn screen's
+    // shared opening, then fades them in together: it never shows up half drawn.
+    function open(selectedChoice, { viewedName = null, onReturn = null } = {}) {
         if (shown) return;
-        const profile = viewed ? profileNamed(viewed.profileName) : profileStore.getActiveProfile();
+        const profile = viewedName ? profileNamed(viewedName) : profileStore.getActiveProfile();
         if (!profile) {
-            log(`No Profile named ${viewed.profileName} any more; back where its screen was opened from.`);
-            viewed.onBack();
+            log(`No Profile named ${viewedName} any more; back where its screen was opened from.`);
+            if (onReturn) onReturn();
             return;
         }
         const drawn = prepareDrawnScreen(host, SCRIPT_NAME, {
@@ -387,10 +399,10 @@ export function createProfileStats(host, {
             backdropZIndex: PROFILE_STATS_Z_INDEX.backdrop,
             drawingAhead,
             profileName: profile.name,
-            isReadOnly: viewed !== null,
+            isReadOnly: viewedName !== null,
         });
         // Completed by setUp() once every step ran.
-        const opening = { viewed, drawn, isPreparing: true, marker: null, tooltipLayers: [], opacity: 0 };
+        const opening = { onReturn, drawn, isPreparing: true, marker: null, tooltipLayers: [], opacity: 0 };
         shown = opening;
         let profileData = null;
         let screen = null;
@@ -398,7 +410,7 @@ export function createProfileStats(host, {
         const tooltipLayers = [];
 
         // Once the backdrop has measured the window: one step per piece,
-        // then one per choice's tooltip (only the cross has one: null for
+        // then one per choice's tooltip (only the Exit Button has one: null for
         // the buttons).
         function queuePieces() {
             const layout = layoutProfileStats(host, screen, drawn.referenceWidth);
@@ -424,7 +436,7 @@ export function createProfileStats(host, {
         // One step per section, each reading its own values: the card, then
         // the game, the progression and the tastes.
         drawn.read(() => {
-            const card = readCard(profile, viewed !== null);
+            const card = readCard(profile, viewedName !== null, onReturn !== null);
             profileData = card.profileData;
             screen = { ...card.card, sections: [] };
         });
@@ -464,22 +476,25 @@ export function createProfileStats(host, {
         shown.marker.moveTo(shown.targets[shown.selected]);
     }
 
-    // Closes; another Profile's screen then goes back where it was opened from.
+    // Closes, then brings back what the screen was opened from, if anything.
     function back() {
-        const { viewed } = shown;
+        const { onReturn } = shown;
         close();
-        if (viewed) viewed.onBack();
+        if (onReturn) onReturn();
     }
 
     function choose() {
         const choice = shown.choices[shown.selected];
         const entry = shown.screen.buttons.find(button => button.choice === choice);
-        if (choice === CHOICE.CLOSE) return back();
+        if (choice === CHOICE.EXIT_BUTTON) return back();
+        const { onReturn } = shown;
         close();
-        // Exit from the list comes back here, on its button.
-        if (choice === CHOICE.ACHIEVEMENTS) achievementList.open(() => open(CHOICE.ACHIEVEMENTS));
-        else if (choice === CHOICE.FRAME) frameList.open(() => open(CHOICE.FRAME));
-        else if (choice === CHOICE.HOUSEHOLD) householdStats.open(() => open(CHOICE.HOUSEHOLD));
+        // Exit from the list comes back here, on its button, Exit here still
+        // bringing back what the screen was first opened from.
+        const reopenOn = button => () => open(button, { onReturn });
+        if (choice === CHOICE.ACHIEVEMENTS) achievementList.open(reopenOn(CHOICE.ACHIEVEMENTS));
+        else if (choice === CHOICE.FRAME) frameList.open(reopenOn(CHOICE.FRAME));
+        else if (choice === CHOICE.HOUSEHOLD) householdStats.open(reopenOn(CHOICE.HOUSEHOLD));
         else if (entry) host.setCurrentFilter(entry.filterId);
     }
 
@@ -507,15 +522,17 @@ export function createProfileStats(host, {
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
 
     return {
-        open: () => open(),
+        // onReturn: what Exit brings back, such as the main menu on its entry.
+        open: onReturn => open(CHOICE.EXIT_BUTTON, { onReturn }),
         // Another Profile's screen, read-only; onBack: what Exit returns to.
-        openReadOnly: (profileName, onBack) => open(CHOICE.CLOSE, { profileName, onBack }),
+        openReadOnly: (profileName, onBack) => open(CHOICE.EXIT_BUTTON, { viewedName: profileName, onReturn: onBack }),
         readStats,
         isOpen: () => shown !== null,
         onClosed: closedListeners.onClosed,
         // Opens the frame list straight away on that tier's row, onClosed
         // called once it closes; Select or Exit there shows this screen on the
-        // Frame button, as if the list had been opened from it.
+        // Frame button, as if the list had been opened from it, with nothing
+        // to bring back: its Exit leaves the bare wheel.
         openFrameList(tier, onClosed) {
             frameList.open(() => open(CHOICE.FRAME), { selectedTier: tier, onClosed });
         },

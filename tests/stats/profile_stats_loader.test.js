@@ -28,7 +28,7 @@ const TICK_MS = 4;
 // The screen's layers that fade in, the tooltips and marker left out.
 const fadingLayers = fake => fake.drawingLayers().filter(layer =>
     [PROFILE_STATS_Z_INDEX.backdrop, PROFILE_STATS_Z_INDEX.card, PROFILE_STATS_Z_INDEX.sections,
-        PROFILE_STATS_Z_INDEX.buttons, PROFILE_STATS_Z_INDEX.cross].includes(layer.zIndex));
+        PROFILE_STATS_Z_INDEX.buttons, PROFILE_STATS_Z_INDEX.exitButton].includes(layer.zIndex));
 
 // Runs the clock a tick at a time until the screen starts fading in.
 function untilFadeStarts(fake) {

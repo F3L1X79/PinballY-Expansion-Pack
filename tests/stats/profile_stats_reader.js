@@ -5,8 +5,9 @@
 // the buttons at the card's foot (label and grey count; none read-only), a section of the
 // right column by its title (each stat's label with the texts drawn after
 // it, and its images), the highlighted choice (the button the Selection
-// Marker surrounds, or the cross's tooltip on its own layer), whether the
-// marker surrounds the cross, and picks a choice with Next and Select
+// Marker surrounds, or the Exit Button's tooltip on its own layer), whether the
+// marker surrounds the Exit Button, the Button Hints and where their
+// footer sits beside the other pieces, and picks a choice with Next and Select
 // as a player would. Opens them from the main menu entry (letting them get
 // ready and fade in, or not), or reads one
 // section of the active Profile's screen and closes it again. Reads the
@@ -22,6 +23,7 @@ import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
 import { untilFadedIn } from "../support/opening_reader.js";
+import { buttonHintsOn, windowRect, textsInsideLayer } from "../support/button_hints_reader.js";
 
 // Past the fade in.
 export const PROFILE_STATS_OPEN_MS = 300;
@@ -133,8 +135,26 @@ export const markerLayerCount = fake => selectionMarker.markerLayerCount(fake, P
 
 export const markerLayer = fake => selectionMarker.markerLayer(fake, PROFILE_STATS_Z_INDEX.marker);
 
-export const isMarkerOnCross = fake =>
-    selectionMarker.layerUnderMarker(fake, PROFILE_STATS_Z_INDEX.marker, shownLayers(fake, PROFILE_STATS_Z_INDEX.cross)) !== undefined;
+export const isMarkerOnExitButton = fake =>
+    selectionMarker.layerUnderMarker(fake, PROFILE_STATS_Z_INDEX.marker, shownLayers(fake, PROFILE_STATS_Z_INDEX.exitButton)) !== undefined;
+
+// The footer's groups of key caps and words, null when it does not show.
+export const buttonHints = fake => buttonHintsOn(fake, PROFILE_STATS_Z_INDEX.buttonHints);
+
+// In a window of that size: the footer's rect and those of every other
+// piece of the screen (the card, the buttons, the sections and the Exit
+// Button), each { left, top, right, bottom }, and whether every footer
+// text sits inside the footer.
+export function footerLayout(fake, size) {
+    const [footer] = shownLayers(fake, PROFILE_STATS_Z_INDEX.buttonHints);
+    const { card, buttons: buttonsZ, sections, exitButton } = PROFILE_STATS_Z_INDEX;
+    const pieces = [card, buttonsZ, sections, exitButton].flatMap(zIndex => shownLayers(fake, zIndex));
+    return {
+        footer: windowRect(footer, size),
+        pieces: pieces.map(layer => windowRect(layer, size)),
+        textsInside: textsInsideLayer(footer),
+    };
+}
 
 // The tooltip shown beside the selected choice, null when it has none.
 function shownTooltip(fake) {
@@ -143,10 +163,10 @@ function shownTooltip(fake) {
     return lit.length > 0 ? lit[0].texts()[0] || null : null;
 }
 
-// The highlighted choice: the cross's tooltip, or the label of the button
+// The highlighted choice: the Exit Button's tooltip, or the label of the button
 // the marker surrounds.
 export function highlighted(fake) {
-    // Exactly one marker, even on the cross.
+    // Exactly one marker, even on the Exit Button.
     markerLayer(fake);
     const tooltip = shownTooltip(fake);
     if (tooltip) return tooltip;

@@ -17,7 +17,7 @@ import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { openProfileStats, choose, press, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
 import { untilFadedIn } from "../support/opening_reader.js";
-import { buttonHintsOn } from "../support/button_hints_reader.js";
+import { buttonHintsOn, windowRect } from "../support/button_hints_reader.js";
 
 export { press };
 
@@ -60,18 +60,6 @@ export const labels = fake => labelLayer(fake).texts();
 
 // The footer's groups of key caps and words, null when it does not show.
 export const buttonHints = fake => buttonHintsOn(fake, HOUSEHOLD_STATS_Z_INDEX.buttonHints);
-
-// Where a layer shows in a window of that size: PinballY centres it on its
-// position and scales it to ySpan of the window's height, its canvas's
-// aspect kept.
-function windowRect(layer, { width, height }) {
-    const canvas = layer.canvasSize();
-    const h = layer.scale().ySpan * height;
-    const w = h * canvas.width / canvas.height;
-    const cx = (layer.position().x + 0.5) * width;
-    const cy = (0.5 - layer.position().y) * height;
-    return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 };
-}
 
 // In a window of that size: the footer's rect, the columns' and the
 // labels' (each { left, top, right, bottom }), and whether every footer
