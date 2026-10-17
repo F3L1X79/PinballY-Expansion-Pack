@@ -13,7 +13,8 @@
 // yet" when empty, a "could not be refreshed" note when the read failed,
 // "not supported" when PINemHi says so or no board is known, or "Play a
 // game to bring up this table's high scores" for a table without a ROM
-// whose VPReg.stg section or text file is not learned yet. The screen
+// whose VPReg.stg section or text file is not learned yet. The Loader
+// turns above the board while the fresh read runs. The screen
 // is drawn at once on all its layers, then faded in; the crowns, drawn
 // ahead once on their own layers through the shared drawing ahead
 // (PinballY reads an image file again on every draw), are only placed,
@@ -31,10 +32,11 @@ import { displayNameOf } from "../profiles/profile_name.js";
 import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
+import { createLoader } from "../drawing/loader.js";
 import { SCRIPT_NAME } from "./high_score_store.js";
 import { readDefaultScoreImages, pickDefaultScoreImages } from "./default_score_images.js";
 import {
-    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX, CROWN_IMAGES, CROWN_CANVAS, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard, placedRect,
+    HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX, HIGH_SCORE_BOARD_LOADER_Z_INDEX, CROWN_IMAGES, CROWN_CANVAS, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, layoutHighScoreBoard, placedRect,
     drawBackdrop, drawPanel, drawGlass, drawCrown, drawTitle, drawNote, drawMessage, drawStep, drawRow,
 } from "./high_score_board_painter.js";
 
@@ -52,6 +54,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     const projectFolder = host.getProjectFolder();
+    const loader = createLoader(host, { zIndex: HIGH_SCORE_BOARD_LOADER_Z_INDEX });
 
     function hideCrown(crown) {
         crown.layer.alpha = 0;
@@ -220,8 +223,10 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
         });
         log(`High Score Board opened, drawn in ${host.now().getTime() - openedAt} ms.`);
         if (!game) return;
+        loader.show();
         refresh(game.configId).then(safeHandler(SCRIPT_NAME, (status) => {
             if (shown !== opened) return;
+            loader.hide();
             for (const layer of opened.content) host.removeDrawingLayer(layer);
             // A read whose recording threw resolves to nothing, logged: shown as failed.
             drawContent(opened, screenFor(game, status || "failed", defaultImages));
@@ -231,6 +236,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
     function close() {
         if (!shown) return;
         shown.drawn.close(shown.content);
+        loader.hide();
         crowns.forEach(hideCrown);
         shown = null;
         closedListeners.tell();

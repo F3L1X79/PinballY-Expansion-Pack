@@ -22,6 +22,9 @@ export const HIGH_SCORE_BOARD_Z_INDEX = Object.freeze({ backdrop: 6180, panel: 6
 // The crowns' layers, drawn ahead and kept while the board is closed: over
 // the podium, under the glass.
 export const HIGH_SCORE_BOARD_CROWN_Z_INDEX = 6187;
+// The Loader, turning while the board is read fresh: above the glass,
+// under the Drawn Menus.
+export const HIGH_SCORE_BOARD_LOADER_Z_INDEX = 6189;
 
 export const REFERENCE_HEIGHT = 1920;
 // The places on the podium, the others in rows below it.
