@@ -28,7 +28,7 @@ Every day there is a table nobody in the house has played yet, or the one left a
 
 ### Weekly Challenges
 
-<img src="docs/images/challenges.png" alt="The week's Challenge Card under the Profile badge" width="380">
+<img src="docs/images/challenges.png" alt="The week's Challenge Card with its progress and the days left" width="368">
 
 A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, half an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward. Completing it brings a shower of confetti across the wheel screen.
 

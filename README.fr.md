@@ -50,7 +50,7 @@ Chaque jour une table que personne à la maison n'a encore jouée, ou celle dél
 
 ### Défis de la semaine
 
-<img src="docs/images/challenges.png" alt="La carte du Défi de la semaine sous le badge du Profil" width="380">
+<img src="docs/images/challenges.png" alt="La carte du Défi de la semaine avec sa progression et les jours restants" width="368">
 
 Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une demi-heure sur une même table… Sa carte suit votre progression sur l'écran de la roue. **Tables du défi**, juste sous « Toutes les tables » dans le menu principal, ne garde que les tables qui le font avancer. Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
 
