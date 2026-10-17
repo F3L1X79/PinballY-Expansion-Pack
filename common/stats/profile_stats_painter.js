@@ -39,6 +39,9 @@ export const CHOICE = Object.freeze({ EXIT_BUTTON: "exitButton", ACHIEVEMENTS: "
 
 const LOOK = Object.freeze({
     pad: 32,
+    // The column starts under the Exit Button, exitGap below it; the
+    // footer's rule footerGap below the card and the column.
+    exitGap: 32, footerGap: 40,
     // The panel's width: a share of the window's, at most maxWidth.
     widthShare: 0.9, maxWidth: 1500,
     // The card: its share of the inner width (narrower in a portrait window,
@@ -124,7 +127,7 @@ function columnBlocks(host, screen, columnW, statGap) {
     const blocks = [];
     screen.sections.forEach((section, index) => {
         if (index > 0) blocks.push({ kind: "gap", h: LOOK.sectionGap, isSpread: true });
-        blocks.push({ kind: "title", h: LOOK.titleH, section, isFirst: index === 0 });
+        blocks.push({ kind: "title", h: LOOK.titleH, section });
         section.rows.forEach((stats, rowIndex) => {
             if (rowIndex > 0) blocks.push({ kind: "gap", h: LOOK.rowGap, isSpread: true });
             blocks.push(rowBlock(host, section, stats, columnW, statGap));
@@ -181,15 +184,16 @@ function geometry(host, referenceWidth, screen) {
     const columnW = w - LOOK.pad - columnX;
     const blocks = columnBlocks(host, screen, columnW, isPortrait ? LOOK.portraitStatGap : LOOK.statGap);
     const naturalH = blocks.reduce((sum, block) => sum + block.h, 0);
-    const innerH = Math.max(cardHeight(screen, avatar), naturalH);
+    const columnTop = EXIT_AND_HINTS.exitButton + LOOK.exitGap;
+    const innerH = Math.max(cardHeight(screen, avatar), columnTop + naturalH);
     const spreads = blocks.filter(block => block.isSpread).length;
-    const spare = spreads === 0 ? 0 : (innerH - naturalH) / spreads;
-    let y = 0;
+    const spare = spreads === 0 ? 0 : (innerH - columnTop - naturalH) / spreads;
+    let y = columnTop;
     for (const block of blocks) {
         block.y = Math.round(y);
         y += block.h + (block.isSpread ? spare : 0);
     }
-    const h = LOOK.pad + innerH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
+    const h = LOOK.pad + innerH + LOOK.footerGap + EXIT_AND_HINTS.footerH;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     return { panel, innerW, innerH, cardW, contentW, avatar, columnX, columnW, blocks };
 }
@@ -318,10 +322,8 @@ function drawSection(host, dc, blocks, top, columnW) {
     for (const block of blocks) {
         const y = block.y - top;
         if (block.kind === "title") {
-            // The first title stops short of the Exit Button.
-            const width = block.isFirst ? columnW - EXIT_AND_HINTS.exitButton - 24 : columnW;
-            text(host, dc, block.section.title, { x: 0, y, width, size: LOOK.titleSize, weight: 700, color: COLORS.gold, font: FONTS.display });
-            dc.fillRect(0, y + LOOK.ruleY, width, 1, COLORS.border);
+            text(host, dc, block.section.title, { x: 0, y, width: columnW, size: LOOK.titleSize, weight: 700, color: COLORS.gold, font: FONTS.display });
+            dc.fillRect(0, y + LOOK.ruleY, columnW, 1, COLORS.border);
         } else if (block.kind === "row") {
             block.stats.forEach((stat, index) => drawStat(host, dc, stat, index * (block.colW + block.statGap), y, block));
         } else if (block.kind === "strip") {

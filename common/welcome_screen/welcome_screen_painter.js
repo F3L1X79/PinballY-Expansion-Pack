@@ -233,7 +233,7 @@ function geometry(referenceWidth, screen) {
     const logoW = inner.w < LOOK.narrowBelow ? Math.round(inner.w * LOOK.narrowLogoShare) : LOOK.logoW;
     // Where a card's details start, which Collection Mastery lines up with.
     const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
-    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
+    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + LOOK.gap + EXIT_AND_HINTS.footerH;
     const panel = { x: inner.x - LOOK.pad, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     return { panel, inner, headerH, greetingY, dailyStreakY, lostRecordsY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
 }
