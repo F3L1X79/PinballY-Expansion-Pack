@@ -18,6 +18,7 @@ import { readVeil } from "../support/opening_reader.js";
 import { readButtonHints, exitButtonTooltipOn } from "../support/button_hints_reader.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
 import { computeGeometry, LIST_LOOK } from "../../common/achievements/achievement_list_painter.js";
+import { EXIT_BUTTON } from "../../common/drawing/exit_button_loop.js";
 
 // Past the glide from one line to the next.
 export const GLIDE_OVER_MS = 400;
@@ -137,7 +138,7 @@ function piecesBeside(fake, itemLayer) {
 
 // Every item's layer of the open list from top to bottom, section headers
 // included, with what is seen beside each: read while pressing Next until
-// the highlight comes back to where it was, past the Exit Button.
+// the selection comes back to where it was, a line or the Exit Button.
 function readWholeListLayers(fake, piecesOf = new Map()) {
     const order = [];
     // The shown items always follow each other in the list, so each new one
@@ -151,15 +152,16 @@ function readWholeListLayers(fake, piecesOf = new Map()) {
             else insertAt = index + 1;
         }
     }
+    // The highlighted line, or EXIT_BUTTON while the Exit Button is selected.
+    const selection = () => (isARowHighlighted(fake) ? highlightedLayer(fake) : EXIT_BUTTON);
     merge();
-    const start = highlightedLayer(fake);
+    const start = selection();
     for (let guard = 0; guard < 1000; guard++) {
         pressAndGlide(fake, "Next");
-        if (!isARowHighlighted(fake)) continue;
-        merge();
-        if (highlightedLayer(fake) === start) return order;
+        if (isARowHighlighted(fake)) merge();
+        if (selection() === start) return order;
     }
-    throw new Error("The highlight never came back to where it was.");
+    throw new Error("The selection never came back to where it was.");
 }
 
 // Every item of the open list from top to bottom, as their texts.

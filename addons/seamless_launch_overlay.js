@@ -26,8 +26,9 @@ const TEXT_Z_INDEX = 5998;
 
 // The text's canvas, drawn one to one on a 1080-pixel-high window and
 // scaled by height only elsewhere, so the layer never covers the whole
-// window. The size is about twice body text.
-const TEXT_LOOK = Object.freeze({ width: 1200, height: 80, size: 42, weight: 600, outline: 2 });
+// window. The size is a little under body text, cursive letters looking
+// larger than upright ones.
+const TEXT_LOOK = Object.freeze({ width: 600, height: 40, size: 18, weight: 400, outline: 1 });
 const TEXT_HEIGHT = TEXT_LOOK.height / 1080;
 const TEXT_GAP = 0.01;
 // The comet and the text centred together as one block (PinballY's y axis
@@ -39,12 +40,12 @@ const OUTLINE_DIRECTIONS = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1]
 
 const STEP_TEXT = lang.launchSteps;
 
-// The step's words on one line, in light gold, repeated first in black
+// The step's words on one line, in light gold cursive, repeated first in black
 // round them: PinballY's styled text has no stroke.
 function drawStepText(host, dc, words) {
     const { width, height, size, weight, outline } = TEXT_LOOK;
     const line = (dx, dy, color) => oneLine(host, dc, words, {
-        x: outline + dx, y: dy, width: width - 2 * outline, height, size, weight, color, font: FONTS.display, align: "center",
+        x: outline + dx, y: dy, width: width - 2 * outline, height, size, weight, color, font: FONTS.script, align: "center",
     });
     for (const [dx, dy] of OUTLINE_DIRECTIONS) line(dx * outline, dy * outline, OUTLINE_COLOR);
     line(0, 0, COLORS.lightGold);

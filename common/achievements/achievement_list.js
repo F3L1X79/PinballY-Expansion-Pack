@@ -14,7 +14,8 @@
 // its file is missing, logged once per file), when missing its
 // Achievement Progress, and its Unlock Rate: the Avatars of the other Profiles Notified of it,
 // once the household has two Profiles besides Guest.
-// Next / Prev glide the highlighted line from one Achievement to the next,
+// It opens at its top on the Exit Button, as the Profile Stats do. Next /
+// Prev glide the highlighted line from one Achievement to the next,
 // wrapping through the Exit Button, with PinballY's navigation sound; the other
 // lines are dimmed.
 // Exit closes the list and calls the return given to open(); attract mode
@@ -717,8 +718,8 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         isContentStale = false;
         // Drawn: only what was not drawn ahead yet.
         opening.draw(measure);
-        // On the first row; on the Exit Button when there is none.
-        shown = { onExit, scroll: 0, highlighted: firstRowIndex(), isPreparing: false, marker: null };
+        // On the Exit Button, the list at its top: Next reaches the first row.
+        shown = { onExit, scroll: 0, highlighted: EXIT_BUTTON, isPreparing: false, marker: null };
         if (!nextFirstScreenDrawing()) {
             show();
             opening.logOpened();
@@ -761,7 +762,9 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
 
     // Fires on every mapped button press; drives the list while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        if (!shown) return;
+        // Already handled: the Drawn Menu's or Profile Stats' Select opens
+        // the list within the same press, which must not reach its Exit Button.
+        if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
         const isOnExitButton = !shown.isPreparing && shown.highlighted === EXIT_BUTTON;

@@ -151,7 +151,7 @@ test("the section headers' texts sit inside their layer, with no text layout err
     assert.deepEqual(fake.logLines().filter(line => line.includes("styled text layout")), []);
 });
 
-test("the list always opens at the top, on the first Achievement", () => {
+test("the list always opens at the top, on the Exit Button", () => {
     const { fake, list } = setUp();
     pressAndGlide(fake, "Next");
     pressAndGlide(fake, "Next");
@@ -160,14 +160,17 @@ test("the list always opens at the top, on the first Achievement", () => {
     list.open();
     untilListShown(fake);
 
-    assert.deepEqual(highlightedTexts(fake), rowTexts("beta"));
+    assert.ok(isMarkerOnExitButton(fake));
     assert.deepEqual(shownItems(fake)[0].texts, [upper(TEXT.unlockedSection), TEXT.sectionCount(4)]);
+    pressAndGlide(fake, "Next");
+    assert.deepEqual(highlightedTexts(fake), rowTexts("beta"), "Next from it goes to the first Achievement");
 });
 
 test("Next and Prev move the highlight one Achievement at a time, skip the section headers and loop through the Exit Button", () => {
     const { fake } = setUp();
     const highlightedTitle = () => highlightedTexts(fake)[0];
 
+    pressAndGlide(fake, "Next");
     assert.equal(highlightedTitle(), "beta title");
     for (const title of ["delta title", "alpha title", "gamma title", "epsilon title", "zeta title"]) {
         pressAndGlide(fake, "Next");
@@ -190,8 +193,14 @@ test("Next and Prev move the highlight one Achievement at a time, skip the secti
 test("on the Exit Button, the Selection Marker surrounds it, its tooltip says Back and no line is highlighted", () => {
     const { fake } = setUp();
     assert.ok(isExitButtonShown(fake), "the Exit Button shows");
-    assert.ok(!isMarkerOnExitButton(fake), "the list opens on its first row, not on the Exit Button");
+    assert.ok(isMarkerOnExitButton(fake), "the list opens on the Exit Button");
+    assert.equal(exitButtonTooltip(fake), lang.buttonHints.back);
+    assert.ok(!isARowHighlighted(fake), "no line is highlighted");
+
+    pressAndGlide(fake, "Next");
+    assert.ok(!isMarkerOnExitButton(fake), "the marker leaves with the selection");
     assert.equal(exitButtonTooltip(fake), null);
+    assert.deepEqual(highlightedTexts(fake), rowTexts("beta"));
     const scrollBefore = shownItems(fake).map(item => item.texts);
 
     pressAndGlide(fake, "Prev");
@@ -200,10 +209,6 @@ test("on the Exit Button, the Selection Marker surrounds it, its tooltip says Ba
     assert.equal(exitButtonTooltip(fake), lang.buttonHints.back);
     assert.ok(!isARowHighlighted(fake), "no line is highlighted");
     assert.deepEqual(shownItems(fake).map(item => item.texts), scrollBefore, "selecting it never scrolls");
-    pressAndGlide(fake, "Next");
-    assert.ok(!isMarkerOnExitButton(fake), "the marker leaves with the selection");
-    assert.equal(exitButtonTooltip(fake), null);
-    assert.deepEqual(highlightedTexts(fake), rowTexts("beta"));
 });
 
 test("on a long list, Next from the last row selects the Exit Button without scrolling, and Prev from it scrolls back to the last row", () => {
@@ -211,9 +216,8 @@ test("on a long list, Next from the last row selects the Exit Button without scr
     const { fake } = setUp({ achievements, notified: [] });
     const shownTitles = () => shownItems(fake).map(item => item.texts[0]);
 
-    pressAndGlide(fake, "Prev");
     assert.ok(isMarkerOnExitButton(fake));
-    assert.ok(shownTitles().includes("a0 title"), "still at the top");
+    assert.ok(shownTitles().includes("a0 title"), "at the top");
     pressAndGlide(fake, "Prev");
     assert.equal(highlightedTexts(fake)[0], "a29 title", "scrolled to the last row");
     const atBottom = shownTitles();
@@ -255,7 +259,6 @@ test("the Exit Button sits at the header's top right, clear of the header's text
 test("Select or Launch on the Exit Button closes the list and goes back as Exit does", () => {
     for (const buttonCommand of ["Select", "Launch"]) {
         const { fake, exits } = setUp();
-        pressAndGlide(fake, "Prev");
 
         assert.equal(press(fake, buttonCommand).defaultPrevented, true, `${buttonCommand} never reaches the wheel`);
 
@@ -284,7 +287,7 @@ test("a missing navigation sound is logged once and the highlight still moves", 
     pressAndGlide(fake, "Next");
     pressAndGlide(fake, "Next");
 
-    assert.equal(highlightedTexts(fake)[0], "alpha title");
+    assert.equal(highlightedTexts(fake)[0], "delta title");
     assert.deepEqual(fake.soundsPlayed(), []);
     const soundLines = fake.logLines().filter(line => line.startsWith("[AchievementList]") && line.includes("Next.wav"));
     assert.equal(soundLines.length, 1);
@@ -292,6 +295,7 @@ test("a missing navigation sound is logged once and the highlight still moves", 
 
 test("the other lines are dimmed, and the highlight glides to its next line", () => {
     const { fake } = setUp();
+    pressAndGlide(fake, "Next");
 
     for (const item of shownItems(fake)) {
         if (item.texts[0] !== "beta title") assert.ok(item.alpha < 1 && item.alpha >= 0.6, `${item.texts[0]} is dimmed`);
@@ -311,7 +315,7 @@ test("only the items inside the rows area are shown, and the list scrolls to kee
 
     assert.ok(shownTitles().length < 10, `only a few items fit: ${shownTitles().join(", ")}`);
     assert.ok(!shownTitles().includes("a29 title"));
-    for (let press = 0; press < 29; press++) pressAndGlide(fake, "Next");
+    for (let press = 0; press < 30; press++) pressAndGlide(fake, "Next");
     assert.equal(highlightedTexts(fake)[0], "a29 title");
     assert.ok(!shownTitles().includes("a0 title"), "the top of the list has scrolled out");
     assert.equal(readRows(fake, TEXT).length, 30);
@@ -320,7 +324,7 @@ test("only the items inside the rows area are shown, and the list scrolls to kee
 test("every button is swallowed while the list is open, Select does nothing, and none once it is closed", () => {
     const { fake, exits } = setUp();
 
-    for (const buttonCommand of ["Next", "Prev", "Select", "Launch", "Information", "Exit"]) {
+    for (const buttonCommand of ["Next", "Select", "Launch", "Information", "Prev", "Exit"]) {
         assert.equal(press(fake, buttonCommand).defaultPrevented, true, `${buttonCommand} is swallowed`);
         if (buttonCommand === "Select") assert.ok(isListOpen(fake), "Select leaves the list open");
     }
@@ -366,6 +370,7 @@ test("an empty section keeps its header with a count of 0", () => {
         { header: [upper(TEXT.unlockedSection), TEXT.sectionCount(0)], rows: [] },
         { header: [upper(TEXT.missingSection), TEXT.sectionCount(2)], rows: [rowTexts("alpha"), rowTexts("beta")] },
     ]);
+    pressAndGlide(fake, "Next");
     assert.deepEqual(highlightedTexts(fake), rowTexts("alpha"));
     assert.ok(chromeTexts(fake).includes(TEXT.totalLine(0, 2, 0)));
 });
@@ -656,7 +661,7 @@ test("after startup and enough idle time, opening the list draws nothing new: ev
     open();
 
     assert.equal(listDrawings(fake).length, drawnAhead);
-    assert.equal(highlightedTexts(fake)[0], "beta title");
+    assert.ok(isMarkerOnExitButton(fake));
     assert.deepEqual(ownersByTitle(fake).alpha, avatarsOnly("Bob", "Carol"));
     assert.equal(listDrawings(fake).length, drawnAhead, "browsing the whole list draws nothing either");
 });

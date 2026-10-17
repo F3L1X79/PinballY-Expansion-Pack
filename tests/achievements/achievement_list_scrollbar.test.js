@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // Achievement List scrollbar tests: over the fake PinballY host, opens
 // lists of several lengths and checks the gold thumb in the panel's right
 // margin: shown only when the list overflows the rows area, as tall as the
@@ -86,7 +86,7 @@ test("the thumb follows the scroll: in the middle halfway down the list, at the 
     const { fake } = setUp({ count: 30 });
     const travel = () => (scrollbarThumb(fake).top - track.top) / (track.bottom - track.top - scrollbarThumb(fake).height);
 
-    for (let presses = 0; presses < 15; presses++) pressAndGlide(fake, "Next");
+    for (let presses = 0; presses < 16; presses++) pressAndGlide(fake, "Next");
     assert.ok(travel() > 0.35 && travel() < 0.65, `about halfway: ${travel()}`);
     for (let presses = 0; presses < 14; presses++) pressAndGlide(fake, "Next");
     assert.equal(highlightedTexts(fake)[0], "a29 title");
