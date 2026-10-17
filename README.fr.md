@@ -94,7 +94,7 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 - « Tables à découvrir », « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
 - une horloge, l'arc doré de la roue et une ligne d'état enrichie ;
 - un rappel pour noter une table ;
-- un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar ;
+- un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente, l'étape en cours écrite en doré dessous au lancement (« Chargement en cours… », « Retour aux tables… ») : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar ;
 - le backglass masqué pendant une partie ;
 - des sons au lancement, aux succès, à l'accueil, aux confettis et au feu d'artifice, ou les vôtres.
 
