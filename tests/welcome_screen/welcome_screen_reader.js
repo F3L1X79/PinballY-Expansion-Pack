@@ -3,9 +3,10 @@
 // PinballY host: whether it is open, its greeting, its Daily Streak line,
 // its Lost Records line and the Avatar on it, where its layers sit,
 // its Collection Mastery card, its Period Table cards (period, name,
-// Mastery head, grey line, logo), its bottom row's labels, the highlighted choice (the label under
-// the gold halo, the period of the card whose button it surrounds, or the
-// tooltip of the Avatar or the cross), and picks a choice with Next and Select as a player would.
+// Mastery head, grey line, logo), its bottom row's labels, the highlighted choice (the label
+// the Selection Marker surrounds, the period of the card whose button it
+// surrounds, or the tooltip of the Avatar or the cross, on its tooltip
+// layer), and picks a choice with Next and Select as a player would.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -131,34 +132,60 @@ function textAt(fake, window, point) {
     return null;
 }
 
-function haloLayer(fake) {
-    const lit = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.highlights);
-    assert.equal(lit.length, 1, "exactly one choice is highlighted");
-    return lit[0];
+export function markerLayer(fake) {
+    const marked = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.marker);
+    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one choice");
+    return marked[0];
 }
 
-// The text under the halo's centre, with its layer.
-function underHalo(fake) {
-    const layer = haloLayer(fake);
+// The tooltip shown beside the selected choice, null when it has none.
+function shownTooltip(fake) {
+    const lit = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.tooltips);
+    assert.ok(lit.length <= 1, "one tooltip at most");
+    return lit.length > 0 ? lit[0].texts()[0] || null : null;
+}
+
+// The window point at the centre of the choice the marker surrounds.
+function markedPoint(fake) {
+    const layer = markerLayer(fake);
     const [backdrop] = shownLayers(fake, WELCOME_SCREEN_Z_INDEX.backdrop);
     const window = backdrop.canvasSize();
     const canvas = layer.canvasSize();
-    return textAt(fake, window, toWindow(layer, window, canvas.width / 2, canvas.height / 2));
+    return { window, point: toWindow(layer, window, canvas.width / 2, canvas.height / 2) };
 }
 
-// The highlighted choice: { label, tooltip }, label being the text under
-// the halo (null for the Avatar and the cross, which show a tooltip).
+// The text under the marker's centre, with its layer.
+function underMarker(fake) {
+    const { window, point } = markedPoint(fake);
+    return textAt(fake, window, point);
+}
+
+// The header's image under the marker's centre (the Avatar), null when there is none.
+export function markedImage(fake) {
+    const { window, point } = markedPoint(fake);
+    for (const layer of shownLayers(fake, WELCOME_SCREEN_Z_INDEX.header)) {
+        for (const { image, rect } of layer.strokes().filter(stroke => "image" in stroke)) {
+            const from = toWindow(layer, window, rect.x, rect.y);
+            const to = toWindow(layer, window, rect.x + rect.width, rect.y + rect.height);
+            if (point.x >= from.x && point.x <= to.x && point.y >= from.y && point.y <= to.y) return image;
+        }
+    }
+    return null;
+}
+
+// The highlighted choice: { label, tooltip }, label being the text the
+// marker surrounds (null for the Avatar and the cross, which show a tooltip).
 export function highlighted(fake) {
-    const tooltip = haloLayer(fake).texts()[0] || null;
+    const tooltip = shownTooltip(fake);
     if (tooltip) return { label: null, tooltip };
-    const found = underHalo(fake);
+    const found = underMarker(fake);
     return { label: found ? found.text : null, tooltip: null };
 }
 
 // The period of the card whose button is highlighted, null for any other choice.
 export function highlightedCard(fake) {
-    if (haloLayer(fake).texts().length > 0) return null;
-    const found = underHalo(fake);
+    if (shownTooltip(fake)) return null;
+    const found = underMarker(fake);
     return found && found.layer.zIndex === WELCOME_SCREEN_Z_INDEX.cards ? found.layer.texts()[0] : null;
 }
 

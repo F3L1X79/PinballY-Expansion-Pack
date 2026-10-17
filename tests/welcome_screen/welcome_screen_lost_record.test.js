@@ -2,7 +2,7 @@
 // A Lost Record on the Welcome Screen, through main.js on the fake
 // PinballY globals: once Bob, a Child Profile, took the Table Record Alice
 // held, Alice's next Welcome Screen tells her so in one line with Bob's
-// Avatar, even after a Profile Reset, without changing the halo's
+// Avatar, even after a Profile Reset, without changing the screen's
 // choices; the line is seen as soon as it shows, so closing the screen at
 // once, before its fade ends, still counts and it never comes back.
 // ============================================================

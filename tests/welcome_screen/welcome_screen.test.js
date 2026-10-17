@@ -6,7 +6,7 @@
 // loops through its choices with Next / Prev and the navigation sound,
 // names the table selected on the wheel (title cleaned), not the Last
 // Played Table, swallows every button while open so the wheel never moves, and closes
-// on Select on Stay.
+// on Select on Stay, leaving no layer nor timer behind.
 // ============================================================
 
 import { test } from "node:test";
@@ -54,6 +54,7 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
 
     fake.advanceTime(400);
     assert.equal(isWelcomeScreenOpen(fake), false, "not before the startup pause");
+    const intervalsBefore = fake.runningIntervalCount();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS - 400);
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.equal(fake.currentMenu(), null, "no native menu");
@@ -80,6 +81,7 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     choose(fake, TEXT.stayOn("Attack from Mars Special"));
     assert.equal(isWelcomeScreenOpen(fake), false);
     assert.equal(welcomeScreenLayerCount(fake), 0, "its layers are removed");
+    assert.equal(fake.runningIntervalCount(), intervalsBefore, "no timer of its Selection Marker keeps running");
     assert.equal(press(fake, "Next").defaultPrevented, false, "the buttons drive the wheel again");
     assert.deepEqual(fake.launches(), []);
     assertNoErrorLogged(fake);

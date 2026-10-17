@@ -18,12 +18,13 @@
 // toasts wait for it. It opens 500 ms after its turn comes, drawn at once
 // on all its layers, then faded in as a whole with the Profile Greeting's
 // sound, since it greets the Profile in its place. While it is open it
-// swallows every button through "commandbuttondown": Next / Prev move a
-// gold halo through the choices, looping, with PinballY's navigation
-// sound, from Change Player at startup and from Close after a change of
-// player; Select or Launch (the plunger) runs the highlighted choice, Exit
+// swallows every button through "commandbuttondown": Next / Prev move the
+// Selection Marker (a gold glow flowing round the choice) through the
+// choices, looping, with PinballY's navigation sound, from Change Player
+// at startup and from Close after a change of player; Select or Launch
+// (the plunger) runs the selected choice, Exit
 // closes it; attract mode closes it too, and a game started during the
-// pause drops it. Its layers are removed once it closes.
+// pause drops it. Its layers and the marker are removed once it closes.
 // ============================================================
 
 import lang from "../common/core/i18n.js";
@@ -46,6 +47,7 @@ import { tablesVisibleTo } from "../common/tables/visible_tables.js";
 import { masteryHeadOf, collectionTextsOf } from "../common/mastery/mastery_bar.js";
 import { createNavigationSound } from "../common/core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/drawing/steamball_palette.js";
+import { createSelectionMarker } from "../common/drawing/selection_marker.js";
 import {
     WELCOME_SCREEN_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutWelcomeScreen,
 } from "../common/welcome_screen/welcome_screen_painter.js";
@@ -242,23 +244,29 @@ export default function init() {
         };
         const { pieces, highlights } = layoutWelcomeScreen(host, screen, referenceWidth);
         pieces.forEach(drawPiece);
-        const highlightLayers = screen.choices.map(choice => drawPiece(highlights[choice]));
+        // Only the Avatar and the cross have a tooltip: null for the others.
+        const tooltipLayers = screen.choices.map(choice => (highlights[choice].tooltip ? drawPiece(highlights[choice].tooltip) : null));
         // Seen once drawn, even if the screen closes at once.
         if (highScores) highScores.markLostRecordsSeen(profile.name);
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         const selected = Math.max(0, screen.choices.indexOf(firstChoice));
-        shown = { layers, highlightLayers, choices: screen.choices, selected, opacity: 0, fadeTimer: null };
+        const targets = screen.choices.map(choice => highlights[choice].target);
+        const marker = createSelectionMarker(host, { zIndex: WELCOME_SCREEN_Z_INDEX.marker, referenceWidth, referenceHeight: REFERENCE_HEIGHT });
+        marker.moveTo(targets[selected]);
+        shown = { layers, tooltipLayers, marker, targets, choices: screen.choices, selected, opacity: 0, fadeTimer: null };
         fadeIn(shown);
         playGreetingSound();
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
     }
 
-    // Every layer but the unselected highlights, to the same opacity.
+    // The marker and every layer to the same opacity, except the unselected
+    // choices' tooltips, kept hidden.
     function setOpacity(screen, opacity) {
         screen.opacity = opacity;
-        const unselected = screen.highlightLayers.filter((layer, index) => index !== screen.selected);
+        const unselected = screen.tooltipLayers.filter((layer, index) => layer && index !== screen.selected);
         for (const layer of screen.layers) layer.alpha = unselected.includes(layer) ? 0 : opacity;
+        screen.marker.setOpacity(opacity);
     }
 
     function fadeIn(screen) {
@@ -300,6 +308,7 @@ export default function init() {
         isWaitingForWheel = false;
         if (shown) {
             stopFade(shown);
+            shown.marker.remove();
             for (const layer of shown.layers) host.removeDrawingLayer(layer);
             shown = null;
         }
@@ -314,6 +323,7 @@ export default function init() {
         const count = shown.choices.length;
         shown.selected = (shown.selected + direction + count) % count;
         setOpacity(shown, shown.opacity);
+        shown.marker.moveTo(shown.targets[shown.selected]);
     }
 
     function choose() {

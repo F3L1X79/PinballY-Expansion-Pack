@@ -8,21 +8,22 @@
 // alert colour with the taker's Avatar, Collection Mastery on the Mastery Bar's card), one card
 // per Period Table (logo, period, name on one line, Table Mastery card
 // around the Mastery Bar's square, grey line, "Go" button),
-// the bottom row ("random" and "stay") and one highlight per choice (a
-// gold halo, with a tooltip for the Avatar and the cross). Only drawing:
-// no layer, no event, no side effect.
+// the bottom row ("random" and "stay") and, for each choice, its own rect
+// (which the Selection Marker surrounds) and, for the Avatar and the
+// cross, the tooltip shown while it is selected. Only drawing: no layer,
+// no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, drawCross, tooltip, selectionHalo, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, drawCross, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
 // Above the Achievement List (6000 to 6006), under the toasts and the
 // Profile picker. Exported for the tests' reader.
-export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, lostRecords: 6107, highlights: 6110 });
+export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 6101, rows: 6102, cards: 6103, logos: 6104, collection: 6105, dailyStreak: 6106, lostRecords: 6107, marker: 6109, tooltips: 6110 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -51,9 +52,9 @@ const LOOK = Object.freeze({
     logoInset: 24, logoTop: 20, logoW: 360, narrowLogoShare: 0.26, narrowBelow: 1300, detailsGap: 32, detailsMaxW: 640,
     // The panel's width: a share of the window's, at most maxWidth.
     widthShare: 0.9, maxWidth: 1800,
-    // Room around a highlighted element for its halo, and beside the
-    // Avatar and the cross for their tooltip.
-    haloMargin: 20, avatarTooltipRoom: 380, crossTooltipRoom: 240,
+    // Room around the Avatar and the cross on their tooltip's layer, and
+    // beside them for the tooltip.
+    tooltipMargin: 20, avatarTooltipRoom: 380, crossTooltipRoom: 240,
     // Room around the Collection Mastery card for its square's halo.
     squareHaloMargin: 24,
 });
@@ -241,7 +242,7 @@ export function drawBackdrop(dc, size, referenceWidth, screen) {
 
 // The Period Table cards, top to bottom, each with the highlight of its
 // "Go" button.
-function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, masteryCardH }, cardsTop, haloAround) {
+function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, masteryCardH }, cardsTop, choiceAt) {
     const { button } = LOOK;
     // Centred on the Mastery card's height.
     const buttonRect = { ...button, x: inner.w - LOOK.logoInset - button.w, y: LOOK.masteryY + Math.round((masteryCardH - button.h) / 2) };
@@ -273,7 +274,7 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
             rect: { x: inner.x + LOOK.logoInset, y: cardY + LOOK.logoTop, w: logoW, h: logoH },
             draw: dc => drawWheelLogo(host, dc, card, { x: 0, y: 0, w: logoW, h: logoH }, 30),
         });
-        highlights[card.choice] = haloAround({ x: inner.x + buttonRect.x, y: cardY + buttonRect.y, w: button.w, h: button.h });
+        highlights[card.choice] = choiceAt({ x: inner.x + buttonRect.x, y: cardY + buttonRect.y, w: button.w, h: button.h });
         cardY += cardH + LOOK.gap;
     });
     return { pieces, highlights };
@@ -340,15 +341,13 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         draw: dc => drawCollectionCard(host, dc, screen.collection, squareRoom, squareRoom, collectionW),
     });
 
-    const M = LOOK.haloMargin;
-    const highlightPiece = (rect, draw) => ({ zIndex: WELCOME_SCREEN_Z_INDEX.highlights, rect, draw });
-    const haloAround = rect => highlightPiece(
-        { x: rect.x - M, y: rect.y - M, w: rect.w + 2 * M, h: rect.h + 2 * M },
-        dc => selectionHalo(dc, M, M, rect.w, rect.h)
-    );
+    const M = LOOK.tooltipMargin;
+    const tooltipPiece = (rect, draw) => ({ zIndex: WELCOME_SCREEN_Z_INDEX.tooltips, rect, draw });
+    // target: the choice's own rect; tooltip: a piece shown while it is selected.
+    const choiceAt = (target, tooltipShown = null) => ({ target, tooltip: tooltipShown });
 
     const cardsTop = top + headerH + LOOK.gap;
-    const cards = layoutCards(host, screen, layout, cardsTop, haloAround);
+    const cards = layoutCards(host, screen, layout, cardsTop, choiceAt);
     pieces.push(...cards.pieces);
 
     // "random" and "stay", side by side.
@@ -383,30 +382,30 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
 
     const highlights = {
         ...cards.highlights,
-        [CHOICE.STAY]: haloAround(rowRect[CHOICE.STAY]),
-        [CHOICE.RANDOM]: haloAround(rowRect[CHOICE.RANDOM]),
+        [CHOICE.STAY]: choiceAt(rowRect[CHOICE.STAY]),
+        [CHOICE.RANDOM]: choiceAt(rowRect[CHOICE.RANDOM]),
     };
     // The cross's tooltip sits on its left, the Avatar's on its right,
     // where the header is empty; their rects leave room for it.
     const crossX = inner.x + inner.w - LOOK.cross;
     const crossRoom = LOOK.crossTooltipRoom;
-    highlights[CHOICE.CLOSE] = highlightPiece(
-        { x: crossX - crossRoom, y: top - M, w: crossRoom + LOOK.cross + M, h: LOOK.cross + 2 * M },
-        dc => {
-            selectionHalo(dc, crossRoom, M, LOOK.cross, LOOK.cross);
-            tooltip(host, dc, screen.labels[CHOICE.CLOSE], crossRoom - 18, M + LOOK.cross / 2, "left");
-        }
+    highlights[CHOICE.CLOSE] = choiceAt(
+        { x: crossX, y: top, w: LOOK.cross, h: LOOK.cross },
+        tooltipPiece(
+            { x: crossX - crossRoom, y: top - M, w: crossRoom + LOOK.cross + M, h: LOOK.cross + 2 * M },
+            dc => tooltip(host, dc, screen.labels[CHOICE.CLOSE], crossRoom - 18, M + LOOK.cross / 2, "left")
+        )
     );
     if (screen.picker) {
         // Around the frame, when the Avatar wears one.
         const room = LOOK.avatarTooltipRoom;
         const side = avatarRoomOf(screen);
-        highlights[CHOICE.AVATAR] = highlightPiece(
-            { x: inner.x - M, y: top - M, w: M + side + room, h: side + 2 * M },
-            dc => {
-                selectionHalo(dc, M, M, side, side);
-                tooltip(host, dc, screen.labels[CHOICE.AVATAR], M + side + 18, M + side / 2, "right");
-            }
+        highlights[CHOICE.AVATAR] = choiceAt(
+            { x: inner.x, y: top, w: side, h: side },
+            tooltipPiece(
+                { x: inner.x - M, y: top - M, w: M + side + room, h: side + 2 * M },
+                dc => tooltip(host, dc, screen.labels[CHOICE.AVATAR], M + side + 18, M + side / 2, "right")
+            )
         );
     }
     return { pieces, highlights };
