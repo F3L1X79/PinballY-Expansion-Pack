@@ -4,14 +4,15 @@
 // wears: one row per Avatar Frame in tier order around the player's own
 // Avatar, then "None", laid out by the Avatar Frame list painter. A locked
 // row shows the greyed frame and its unlock condition; the worn row is
-// marked and the list opens on it. Next / Prev move a gold halo through
-// the rows, looping, with PinballY's navigation sound (it may open on
-// another row, such as the Reward Prompt's new frame); Select or Launch
+// marked and the list opens on it. Next / Prev move the Selection Marker
+// (a gold glow flowing round the row) through the rows, looping, with
+// PinballY's navigation sound (it may open on another row, such as the
+// Reward Prompt's new frame); Select or Launch
 // (the plunger) on an unlocked row or "None" saves the choice through the
 // Profile Rewards module, on a locked row does nothing; Exit changes
 // nothing. Both then close the list and call the return given to open();
-// attract mode only closes it. While open it swallows every button
-// through "commandbuttondown".
+// attract mode only closes it, the marker's layer and timer going with
+// it. While open it swallows every button through "commandbuttondown".
 // Every layer is drawn ahead from startup through the shared drawing
 // ahead, kept from one opening to the next and redrawn only when what it
 // shows or the window size changed; what the list shows is read again on
@@ -26,8 +27,9 @@ import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";
+import { createSelectionMarker } from "../drawing/selection_marker.js";
 import {
-    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, haloRectOf, drawTitle, drawRow, drawHalo,
+    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, drawTitle, drawRow,
 } from "./avatar_frame_list_painter.js";
 import { drawBackdrop } from "../drawing/steamball_drawing.js";
 
@@ -53,7 +55,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         return layer;
     };
     const backdropLayer = hiddenLayer(AVATAR_FRAME_LIST_Z_INDEX.backdrop);
-    // By key ("title", "halo", or a row's), each with the signature of what
+    // By key ("title" or a row's), each with the signature of what
     // it was drawn with.
     const layers = new Map();
     // What the list shows and its layout: null until first read. Stale once
@@ -61,8 +63,8 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     // list is closed.
     let content = null;
     let isContentStale = true;
-    // The open list, null when closed: the highlighted row's index and what
-    // Select and Exit return to.
+    // The open list, null when closed: the selected row's index, its
+    // Selection Marker and what Select and Exit return to.
     let shown = null;
     const closedListeners = createClosedListeners(SCRIPT_NAME);
 
@@ -104,17 +106,13 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         isContentStale = false;
     }
 
-    // Every piece: the title, the halo, then each row, each { key, rect,
-    // zIndex, look, draw(dc) } in its rect's own coordinates. The halo is
-    // drawn once for the rows' size and only moved.
+    // Every piece: the title, then each row, each { key, rect, zIndex,
+    // look, draw(dc) } in its rect's own coordinates.
     function pieces() {
         const { rows, geometry } = content;
-        const haloRect = haloRectOf(geometry.rows[0]);
         return [
             { key: "title", zIndex: AVATAR_FRAME_LIST_Z_INDEX.title, rect: geometry.title, look: TEXT.title,
                 draw: dc => drawTitle(host, dc, TEXT.title, geometry.title.w, geometry.title.h) },
-            { key: "halo", zIndex: AVATAR_FRAME_LIST_Z_INDEX.highlight, rect: haloRect, look: null,
-                draw: dc => drawHalo(dc, haloRect.w, haloRect.h) },
             ...rows.map((row, index) => ({
                 key: row.key, zIndex: AVATAR_FRAME_LIST_Z_INDEX.rows, rect: geometry.rows[index], look: row,
                 draw: dc => drawRow(host, dc, row, geometry.rows[index].w, geometry.rows[index].h),
@@ -172,11 +170,6 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         wakeDrawingAhead();
     }
 
-    function placeHalo() {
-        const halo = pieces().find(piece => piece.key === "halo");
-        place(layerOf(halo), haloRectOf(content.geometry.rows[shown.selected]));
-    }
-
     // onBack: what Select and Exit return to, called once the list is
     // closed; selectedTier (optional): the frame row it opens on instead of
     // the worn one; onClosed (optional): called whenever it closes, attract
@@ -195,14 +188,21 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
             layer.alpha = 1;
         }
         const isOpenedOn = row => (selectedTier === null ? row.isWorn : row.tier === selectedTier);
-        shown = { onBack, onClosed, selected: Math.max(0, content.rows.findIndex(isOpenedOn)) };
-        placeHalo();
+        // Not drawn ahead: it lives only while the list is open, its timer
+        // with it.
+        const marker = createSelectionMarker(host, {
+            zIndex: AVATAR_FRAME_LIST_Z_INDEX.marker, referenceWidth: content.referenceWidth, referenceHeight: REFERENCE_HEIGHT,
+        });
+        shown = { onBack, onClosed, marker, selected: Math.max(0, content.rows.findIndex(isOpenedOn)) };
+        marker.moveTo(content.geometry.rows[shown.selected]);
+        marker.setOpacity(1);
     }
 
     function close() {
         if (!shown) return;
-        const { onClosed } = shown;
+        const { onClosed, marker } = shown;
         shown = null;
+        marker.remove();
         hide(backdropLayer);
         for (const { layer } of layers.values()) hide(layer);
         // What changed while it was open is read again once it is closed.
@@ -216,7 +216,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         navigationSound.play();
         const count = content.rows.length;
         shown.selected = (shown.selected + direction + count) % count;
-        placeHalo();
+        shown.marker.moveTo(content.geometry.rows[shown.selected]);
     }
 
     function back() {

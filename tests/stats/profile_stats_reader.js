@@ -10,8 +10,8 @@
 // as a player would. Opens them from the main menu entry, or reads one
 // section of the active Profile's screen and closes it again. Reads the
 // Avatar Frame list opened from the Frame button too: whether it is open,
-// its rows (name, status and frame image) and the highlighted one, and
-// picks a row as a player would.
+// its rows (name, status and frame image) and the one the Selection
+// Marker surrounds, and picks a row as a player would.
 // Never loaded by PinballY.
 // ============================================================
 
@@ -188,12 +188,17 @@ export const frameRows = fake => rowLayers(fake).map(layer => {
     return { name, status, frame: frame && fileNameOf(frame), avatar };
 });
 
-// The name of the row under the gold halo.
+// The Avatar Frame list's Selection Marker layers, shown or not.
+export const frameListMarkerLayerCount = fake => fake.drawingLayers().filter(layer => layer.zIndex === AVATAR_FRAME_LIST_Z_INDEX.marker).length;
+
+// The name of the row the Selection Marker surrounds (both centred on the
+// same point, give or take the marker's canvas rounded up to whole pixels;
+// rows are far further apart).
 export function highlightedRow(fake) {
-    const lit = shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.highlight);
-    assert.equal(lit.length, 1, "exactly one row is highlighted");
-    const same = (a, b) => Math.abs(a - b) < 1e-9;
-    const row = rowLayers(fake).find(layer => same(layer.position().x, lit[0].position().x) && same(layer.position().y, lit[0].position().y));
+    const marked = shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.marker);
+    assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one row");
+    const same = (a, b) => Math.abs(a - b) < 0.001;
+    const row = rowLayers(fake).find(layer => same(layer.position().x, marked[0].position().x) && same(layer.position().y, marked[0].position().y));
     return row ? row.texts()[0] : null;
 }
 

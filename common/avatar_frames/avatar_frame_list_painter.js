@@ -4,16 +4,16 @@
 // height is REFERENCE_HEIGHT), in the Profile Stats' own look: the
 // centred Steamball panel (drawn by steamball_drawing.js's backdrop), its title, one row per frame
 // (the player's Avatar in that frame, the frame's name, and the worn mark
-// or the unlock condition) and the gold halo of the highlighted row. Only
-// drawing: no layer, no event, no side effect.
+// or the unlock condition); the Selection Marker surrounds the selected
+// row. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
-import { oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, selectionHalo } from "../drawing/steamball_drawing.js";
+import { oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide } from "../drawing/steamball_drawing.js";
 
 // Above the Profile Stats' band, which never shows at the same time, so
 // each reader sees only its own layers.
-export const AVATAR_FRAME_LIST_Z_INDEX = Object.freeze({ backdrop: 6140, title: 6141, rows: 6142, highlight: 6150 });
+export const AVATAR_FRAME_LIST_Z_INDEX = Object.freeze({ backdrop: 6140, title: 6141, rows: 6142, marker: 6150 });
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -26,7 +26,6 @@ const LOOK = Object.freeze({
     // side, inset from the row's left edge.
     avatar: 80, frameInset: 20,
     textGap: 28, nameY: 26, nameSize: 26, minNameSize: 18, statusY: 70, statusSize: 18,
-    haloMargin: 20,
 });
 
 const FRAME_SIZE = avatarFrameSide(LOOK.avatar);
@@ -43,12 +42,6 @@ export function layoutFrameList(referenceWidth, rowCount) {
     const rows = Array.from({ length: rowCount }, (_, index) =>
         ({ x, y: title.y + title.h + index * (LOOK.rowH + LOOK.rowGap), w: rowW, h: LOOK.rowH }));
     return { panel, title, rows };
-}
-
-// The halo's rect around a row's, centred on it as the reader expects.
-export function haloRectOf(rect) {
-    const M = LOOK.haloMargin;
-    return { x: rect.x - M, y: rect.y - M, w: rect.w + 2 * M, h: rect.h + 2 * M };
 }
 
 export function drawTitle(host, dc, title, w, h) {
@@ -77,9 +70,4 @@ export function drawRow(host, dc, row, w, h) {
             x: textX, y: LOOK.statusY, width: textW, size: LOOK.statusSize, weight: 600, color: row.isWorn ? COLORS.gold : COLORS.description,
         });
     }
-}
-
-export function drawHalo(dc, w, h) {
-    const M = LOOK.haloMargin;
-    selectionHalo(dc, M, M, w - 2 * M, h - 2 * M);
 }
