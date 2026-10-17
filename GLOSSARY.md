@@ -22,6 +22,7 @@ _Avoid_: filter menu (each group's own list is a filter menu too), filter groups
 
 **Selection Marker**:
 The soft gold glow around the current choice of a drawn screen (Welcome Screen, Profile Stats, Household Stats, the Avatar Frame list), whose golds, from bronze to a white gleam, flow round it without end, always the same way, so the player sees at once where they are; it jumps straight to a new choice. Drawn Menus mark their selected entry their own way.
+The choice it surrounds is the current (or highlighted) choice; only the glow itself is never called a highlight.
 _Avoid_: halo, cursor, highlight
 
 ### Wheel
