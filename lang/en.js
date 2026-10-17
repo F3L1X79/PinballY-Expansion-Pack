@@ -28,7 +28,15 @@ export default {
         "init": "",
         "launching": "Loading...",
         "running": "Launching table...",
-        "terminating": "Returning to game list...",
+        "terminating": "Returning to tables…",
+    },
+
+    // The step under way, written in gold beneath the Loader while a
+    // table launches or closes (Seamless Launch Overlay).
+    launchSteps: {
+        loading: "Loading…",
+        closing: "Returning to tables…",
+        capturing: "Capturing…",
     },
 
     // Functions that build translated titles for PinballY's dynamically

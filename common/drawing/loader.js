@@ -13,10 +13,12 @@ import { LOADER_IMAGE } from "./loader_image.js";
 // 7 % of the window's height, by height only: PinballY keeps the image's
 // proportions without the window being measured, which is not laid out
 // yet at startup.
-const LOADER_SCALE = Object.freeze({ ySpan: 0.07 });
+export const LOADER_HEIGHT = 0.07;
+const LOADER_SCALE = Object.freeze({ ySpan: LOADER_HEIGHT });
 // Where the comet turns, chosen at creation: the centre of the playfield
 // screen, or the centre of its top third (PinballY's y axis points up, in
-// window heights).
+// window heights); another height can be given, such as the launch's
+// placement above its text.
 export const LOADER_PLACEMENT = Object.freeze({ CENTRED: 0, TOP_THIRD: 1 / 6 });
 
 export function createLoader(host, { zIndex, placement = LOADER_PLACEMENT.CENTRED }) {

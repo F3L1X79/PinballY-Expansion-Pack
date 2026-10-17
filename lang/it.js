@@ -151,6 +151,15 @@ export default {
         "terminating": "Ritorno all'elenco dei giochi...",
     },
 
+    // The step under way, written in gold beneath the Loader while a
+    // table launches or closes (Seamless Launch Overlay).
+    // TODO: translation pass
+    launchSteps: {
+        loading: "Loading…",
+        closing: "Returning to tables…",
+        capturing: "Capturing…",
+    },
+
     // Functions that build translated titles for PinballY's dynamically
     // generated menu text (category names, star ratings, etc.).
     dynamicLabelBuilders: {
