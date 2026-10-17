@@ -14,9 +14,11 @@ With Change Player, each of you picks your own Profile and Avatar, and the Welco
 
 ### Profile Stats
 
-<img src="docs/images/profile_stats.png" alt="The Profile Stats of Guest" width="480">
+<img src="docs/images/profile_stats.png" alt="The Profile Stats of a Profile: Player Level, Collection Mastery, games, Streaks, tastes and first, most and last played tables" width="480">
 
 **Your Stats**, in the main menu, sums up your pinball life: games played and total time, your Player Level and Collection Mastery, average game length, favourite manufacturer, decade and table, the first table you ever played, how much of the collection you have tried, your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, the Challenges you completed, the Avatar Frame you wear, and the way to your most played tables and to the ones still to discover. Once two of you have a Profile, **Household Stats** sets every Profile but Guest side by side, Avatars in their frames, the best of each line in gold; pick a column to see that Profile's own stats.
+
+<img src="docs/images/household_stats.png" alt="The Household Stats with three Profiles side by side, the best of each line in gold" width="400">
 
 ### Welcome Screen: Table of the Day, Table of the Week
 
@@ -26,7 +28,7 @@ Every day there is a table nobody in the house has played yet, or the one left a
 
 ### Weekly Challenges
 
-<img src="docs/images/challenges.png" alt="The week's Challenge Card under the Profile badge" width="376">
+<img src="docs/images/challenges.png" alt="The week's Challenge Card under the Profile badge" width="380">
 
 A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, half an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward. Completing it brings a shower of confetti across the wheel screen.
 
@@ -37,6 +39,8 @@ Every minute you play a table builds your Table Mastery of it, through ten Maste
 ### High Scores
 
 When you enter a table's high score board, the place is yours: the pack reads the board before and after each game and, for a game of a minute or more, credits every new score to the Profile that was playing, whatever initials were typed, the other players of a multiplayer game included. A toast announces your best place, or the Table Record and whom you took it from. When someone else takes one of yours, Guest included, your next Welcome Screen tells you who, once, so you know which record to win back. The scores already on the board at the first read, factory ones included, belong to no one, and a ROM reset that brings them back is never credited. A High Score stays won even once later scores push it off the board, and earns its own Achievements; **Your Stats** shows the High Scores and Table Records you still hold, and **Household Stats** who holds the most Table Records. Tables without a ROM (community originals) count too: the pack reads their board in Visual Pinball X's `User` folder (`VPReg.stg`, or the text file some tables keep there), learns where each table keeps it during its first game, and hands it to PinballY, so the DMD and the table's info box show it as well. Their board appears once such a table has been played with the pack.
+
+<img src="docs/images/high_score_board.png" alt="A table's High Score Board: the podium under its three crowns, then the other places, one of them won by a Profile" width="400">
 
 **High Scores** in the main menu (or PinballY's `HighScores` button, if mapped) opens the selected table's board, drawn in the Steamball look in place of PinballY's own window: the three first places on a podium under a Gold, Silver and Bronze crown, the others in rows below, each with its rank, score, initials and the Profile that won it (name, Avatar and Avatar Frame), or "Default score" with a portrait picked by its initials, the same on every table. The board is read again from the table each time you open it, so it always shows what the table holds now; the flippers scroll a board too long for the screen.
 
@@ -52,7 +56,7 @@ Each Achievement earns points toward your **Player Level**, the more the higher 
 
 ### PinballY in 6 languages
 
-<img src="docs/images/translation.png" alt="PinballY's Exit menu in French" width="480">
+<img src="docs/images/main_menu.png" alt="The drawn main menu in French, sorted into sections" width="400">
 
 PinballY's own menus and messages in French, German, Spanish, Italian or Portuguese.
 

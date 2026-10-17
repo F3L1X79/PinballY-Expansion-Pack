@@ -15,7 +15,7 @@ Extension non officielle de [PinballY](http://mjrnet.org/pinscape/PinballY.php),
 
 ### PinballY en 6 langues
 
-<img src="docs/images/translation.png" alt="Le menu Quitter de PinballY en français" width="480">
+<img src="docs/images/main_menu.png" alt="Le menu principal dessiné, en français, rangé en sections" width="400">
 
 Les menus et messages de PinballY enfin en français, mais aussi en allemand, espagnol, italien et portugais.
 
@@ -27,7 +27,7 @@ Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran
 
 ### Vos statistiques
 
-<img src="docs/images/profile_stats.png" alt="Les statistiques du Profil Invité" width="480">
+<img src="docs/images/profile_stats.png" alt="Les statistiques d'un Profil : niveau, maîtrise de la collection, parties, séries, goûts et tables jouées en premier, le plus et en dernier" width="480">
 
 **Vos statistiques**, dans le menu principal, résument votre vie de flippeur :
 - parties jouées, temps total et durée moyenne d'une partie ;
@@ -40,6 +40,8 @@ Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran
 
 Dès que vous êtes deux à avoir un Profil, **Stats de la maison** montre tous les Profils côte à côte, sauf Invité, chaque Avatar dans son cadre, le meilleur de chaque ligne en doré ; choisissez une colonne pour voir les statistiques de ce Profil.
 
+<img src="docs/images/household_stats.png" alt="Stats de la maison : trois Profils côte à côte, le meilleur de chaque ligne en doré" width="400">
+
 ### Écran d'accueil : table du jour, table de la semaine
 
 <img src="docs/images/welcome_screen.png" alt="L'écran d'accueil avec la table du jour et la table de la semaine" width="480">
@@ -48,7 +50,7 @@ Chaque jour une table que personne à la maison n'a encore jouée, ou celle dél
 
 ### Défis de la semaine
 
-<img src="docs/images/challenges.png" alt="La carte du Défi de la semaine sous le badge du Profil" width="376">
+<img src="docs/images/challenges.png" alt="La carte du Défi de la semaine sous le badge du Profil" width="380">
 
 Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une demi-heure sur une même table… Sa carte suit votre progression sur l'écran de la roue. **Tables du défi**, juste sous « Toutes les tables » dans le menu principal, ne garde que les tables qui le font avancer. Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
 
@@ -59,6 +61,8 @@ Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur
 ### Meilleurs scores
 
 Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie et, pour une partie d'au moins une minute, attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris. Un encart annonce votre meilleure place, ou le record et à qui vous l'avez pris. Quand quelqu'un d'autre vous prend un record, Invité compris, votre prochain écran d'accueil vous dit qui, une seule fois, pour que vous sachiez quel record reprendre. Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée. Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès ; **Vos statistiques** montrent les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records. Les tables sans ROM (créations originales) comptent aussi : le pack lit leur tableau dans le dossier `User` de Visual Pinball X (`VPReg.stg`, ou le fichier texte que certaines tables y gardent), apprend où chaque table le range pendant sa première partie, et le passe à PinballY, pour que le DMD et la fiche de la table l'affichent aussi. Leur tableau apparaît dès qu'une telle table a été jouée avec le pack.
+
+<img src="docs/images/high_score_board.png" alt="Le tableau des meilleurs scores d'une table : le podium sous ses trois couronnes, puis les autres places, dont une gagnée par un Profil" width="400">
 
 **Meilleurs scores** dans le menu principal (ou le bouton `HighScores` de PinballY, s'il est affecté) ouvre le tableau de la table sélectionnée, dessiné dans le style Steamball à la place de la fenêtre de PinballY : les trois premières places sur un podium sous une couronne d'or, d'argent et de bronze, les autres en lignes en dessous, chacune avec son rang, son score, ses initiales et le Profil qui l'a gagnée (nom, Avatar et cadre d'Avatar), ou « Score par défaut » avec un portrait choisi d'après ses initiales, le même sur toutes les tables. Le tableau est relu sur la table à chaque ouverture, il montre donc toujours ce qu'elle contient ; les flippers font défiler un tableau trop long pour l'écran.
 
