@@ -165,6 +165,7 @@ export default function init() {
         profileStore,
         householdStats,
         achievementList,
+        drawingAhead: getDrawingAhead(),
         profileRewards,
         frameList,
         // Read on each opening, for the active Profile or another one.

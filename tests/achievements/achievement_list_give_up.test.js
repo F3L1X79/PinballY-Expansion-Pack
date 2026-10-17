@@ -12,9 +12,11 @@ import { assertNoErrorLogged } from "../support/error_log.js";
 import { readVeil } from "../support/opening_reader.js";
 import { readLoader } from "../support/loader_reader.js";
 import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
-import { startPack, startOpeningFromMainMenu } from "./achievement_list_opening_scenario.js";
+import { startPack, startOpeningFromMainMenu, LIST_VEIL } from "./achievement_list_opening_scenario.js";
 import { isListOpen, press } from "./achievement_list_reader.js";
-import { openProfileStats, choose, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
+import {
+    openProfileStats, choose, isProfileStatsOpen, untilProfileStatsFadedIn, PROFILE_STATS_OPEN_MS,
+} from "../stats/profile_stats_reader.js";
 
 const LIST_Z_INDEXES = Object.values(ACHIEVEMENT_LIST_Z_INDEX);
 
@@ -46,9 +48,10 @@ test("Exit while the list gets ready goes back where it was opened from; attract
     // From the Profile Stats, back to them.
     openProfileStats(fake, lang);
     choose(fake, lang.profileStats.buttons.achievements);
-    assert.equal(readVeil(fake).shown, true, "getting ready again");
+    assert.deepEqual(readVeil(fake), LIST_VEIL, "getting ready again");
     press(fake, "Exit");
-    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    // The Profile Stats get ready in turn, under their own veil.
+    untilProfileStatsFadedIn(fake);
     assertNothingLeft(fake);
     assert.equal(isProfileStatsOpen(fake), true, "back to the Profile Stats");
 

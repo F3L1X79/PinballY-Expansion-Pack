@@ -1,8 +1,8 @@
 // ============================================================
 // Giving up the Household Stats while they get ready, through main.js on
 // the fake PinballY globals: Next, Prev and Select are swallowed; Exit
-// gives up (no veil, no Loader, no layer of the screen left) and goes back
-// to the Profile Stats, as Exit would once open; attract mode gives up the
+// gives up (no Loader, no layer of the screen left, only the Profile
+// Stats' own veil) and goes back to the Profile Stats, as Exit would once open; attract mode gives up the
 // same way without going back anywhere.
 // ============================================================
 
@@ -12,7 +12,8 @@ import { startHousehold } from "./household_stats_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { readVeil } from "../support/opening_reader.js";
 import { readLoader, loaderLayerCount } from "../support/loader_reader.js";
-import { isProfileStatsOpen, highlighted, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
+import { isProfileStatsOpen, highlighted, untilProfileStatsFadedIn } from "./profile_stats_reader.js";
+import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { startOpeningHouseholdStats, isHouseholdStatsOpen, householdStatsLayerCount, press } from "./household_stats_reader.js";
 
 const DRAW_MS = 60;
@@ -39,8 +40,9 @@ test("Exit while the Household Stats get ready gives up and goes back; attract m
 
     const exit = press(fake, "Exit");
     assert.ok(exit.defaultPrevented);
-    assertNothingLeft(fake);
-    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+    assert.equal(householdStatsLayerCount(fake), 0, "no layer of the screen");
+    assert.equal(readVeil(fake).zIndex, PROFILE_STATS_Z_INDEX.backdrop - 2, "the Profile Stats' veil, as they get ready in turn");
+    untilProfileStatsFadedIn(fake);
     assertNothingLeft(fake);
     assert.equal(isHouseholdStatsOpen(fake), false);
     assert.equal(isProfileStatsOpen(fake), true, "back to the Profile Stats");

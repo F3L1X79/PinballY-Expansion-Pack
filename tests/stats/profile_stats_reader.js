@@ -7,7 +7,8 @@
 // it, and its images), the highlighted choice (the button the Selection
 // Marker surrounds, or the cross's tooltip on its own layer), whether the
 // marker surrounds the cross, and picks a choice with Next and Select
-// as a player would. Opens them from the main menu entry, or reads one
+// as a player would. Opens them from the main menu entry (letting them get
+// ready and fade in, or not), or reads one
 // section of the active Profile's screen and closes it again. Reads the
 // Avatar Frame list opened from the Frame button too: whether it is open,
 // its rows (name, status and frame image) and the one the Selection
@@ -19,6 +20,7 @@ import assert from "node:assert/strict";
 import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { untilFadedIn } from "../support/opening_reader.js";
 
 // Past the fade in.
 export const PROFILE_STATS_OPEN_MS = 300;
@@ -33,11 +35,21 @@ export const isProfileStatsOpen = fake => shownLayers(fake, PROFILE_STATS_Z_INDE
 export const profileStatsLayerCount = fake => fake.drawingLayers()
     .filter(layer => Object.values(PROFILE_STATS_Z_INDEX).includes(layer.zIndex)).length;
 
-// Opens the main menu, selects the Profile Stats entry and lets the fade end.
-export function openProfileStats(fake, lang) {
+// Lets the clock run until the Profile Stats have faded in, their veil gone.
+export const untilProfileStatsFadedIn = fake => untilFadedIn(fake, PROFILE_STATS_Z_INDEX.backdrop);
+
+// Opens the main menu and selects the Profile Stats entry, which start
+// getting ready: the clock does not run.
+export function startOpeningProfileStats(fake, lang) {
     fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     fake.selectMenuItem(lang.profileStats.menuEntry);
-    fake.advanceTime(PROFILE_STATS_OPEN_MS);
+}
+
+// Opens the main menu, selects the Profile Stats entry and lets them get
+// ready and fade in.
+export function openProfileStats(fake, lang) {
+    startOpeningProfileStats(fake, lang);
+    untilProfileStatsFadedIn(fake);
 }
 
 // The card's texts, top to bottom: the Profile's name first.
