@@ -1,21 +1,14 @@
 // ============================================================
 // Drawn screen: the layer plumbing the Profile Stats, the Household Stats
-// and the High Score Board share. Each piece goes on its own hidden layer
-// placed in reference pixels, after the backdrop, which measures the
-// window; the layers fade in together on the clock and are all removed on
-// close. openDrawnScreen() draws them all at once (the High Score Board,
-// which has its own Loader); prepareDrawnScreen() is the shared opening of a
-// screen the player waits for (docs/adr/0014): the wheel dims at once under
-// a veil, the reading and drawing steps run in the drawing ahead's
-// foreground queue, the Loader turns over the veil if they last more than
-// 150 ms, then goes before the fade in, the veil once it is over. Logs each
-// such opening's time, reading and drawing apart. Listens to no event and
-// writes nothing.
+// and the High Score Board share: hidden layers placed in reference pixels
+// after the backdrop (which measures the window), faded in together and
+// removed on close. openDrawnScreen() draws at once; prepareDrawnScreen()
+// goes through the shared screen opening (docs/adr/0014). Writes nothing.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";
-import { createOpeningVeil } from "../drawing/opening_veil.js";
+import { createScreenOpening } from "../drawing/screen_opening.js";
 
 const FADE_MS = 220;
 export const FRAME_MS = 16;
@@ -102,34 +95,29 @@ export function openDrawnScreen(host, scriptName, { referenceHeight, backdropZIn
 
 // The shared opening of a screen the player waits for. referenceHeight:
 // the window's height in reference pixels; drawingAhead: the shared drawing
-// ahead (common/core/drawing_ahead.js); whose: what the timing line says
-// was opened ("Alice's"), null for nothing. The screen queues its steps with
-// read(step) and draw(step), each doing one thing (a step may queue more),
-// draws within them with drawBackdrop(draw) and drawPiece(), then calls
-// start(). The veil and Loader sit just under the backdrop.
-export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdropZIndex, drawingAhead, whose = null }) {
+// ahead (common/core/drawing_ahead.js); profileName and isReadOnly: whose
+// screen the timing line names (common/drawing/screen_opening.js). The
+// screen queues its steps with read(step) and draw(step), each doing one
+// thing (a step may queue more), draws within them with drawBackdrop(draw)
+// and drawPiece(), then calls start(). The veil and Loader sit just under
+// the backdrop.
+export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdropZIndex, drawingAhead, profileName = null, isReadOnly = false }) {
     const screen = createScreenLayers(host, scriptName, referenceHeight);
-    const veil = createOpeningVeil(host, scriptName, { zIndex: backdropZIndex - 2 });
+    const opening = createScreenOpening(host, scriptName, { zIndex: backdropZIndex - 2, drawingAhead });
     // Each step with whether it reads or draws, first come first run.
     const steps = [];
-    const spentMs = { read: 0, draw: 0 };
-    let cancel = null;
 
     // Gives up the opening or closes the open screen: the veil, the Loader
     // and the layers go, those of other included; safe to call again.
     function close(other = []) {
-        if (cancel) cancel();
-        cancel = null;
-        veil.remove();
+        opening.remove();
         screen.close(other);
     }
 
     // One step of the foreground queue: the next one, timed by its kind.
     function runNextStep() {
         const { kind, step } = steps.shift();
-        const startMs = host.now().getTime();
-        step();
-        spentMs[kind] += host.now().getTime() - startMs;
+        opening[kind](step);
         return steps.length > 0;
     }
 
@@ -146,21 +134,19 @@ export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdrop
         // through setOpacity(opacity). onFailed(): a step threw (logged)
         // and the opening is given up, everything already removed.
         start({ onReady, setOpacity, onFailed }) {
-            const openedAt = host.now().getTime();
-            veil.show();
-            const onDone = () => {
-                cancel = null;
-                const readyAt = host.now().getTime();
-                host.log(`[${scriptName}] Opened ${whose === null ? "" : `${whose} `}in ${readyAt - openedAt} ms: read in ${spentMs.read} ms, drawn in ${spentMs.draw} ms.`);
-                veil.hideLoader();
-                onReady();
-                screen.fadeIn(setOpacity, veil.remove);
-            };
-            cancel = drawingAhead.runInForeground(runNextStep, { onDone, onFailed: () => {
-                cancel = null;
-                close();
-                onFailed();
-            } });
+            opening.begin();
+            opening.runVeiled(runNextStep, {
+                onDone: () => {
+                    opening.logOpened({ profileName, isReadOnly });
+                    opening.hideLoader();
+                    onReady();
+                    screen.fadeIn(setOpacity, opening.remove);
+                },
+                onFailed: () => {
+                    close();
+                    onFailed();
+                },
+            });
         },
         close,
     };

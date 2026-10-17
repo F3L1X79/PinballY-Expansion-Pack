@@ -6,13 +6,8 @@
 // per Profile (its Avatar in the Avatar Frame it wears; the active one
 // first unless it is Guest, then the Profile picker's order) and one line
 // per stat where more is better, the best of each line in gold. Every
-// value is read again on each opening, through the Profile Stats' reader.
-// It opens through the drawn screen's shared opening (docs/adr/0014): the
-// wheel dims at once, one step per Profile read then one per piece drawn
-// run in the drawing ahead's foreground queue, with the Loader if they
-// take a while, then every layer fades in together. While getting ready it
-// counts as open and swallows every button: Exit gives up and calls the
-// return given to open(), attract mode only gives up. While open
+// value is read again on each opening, through the Profile Stats' reader,
+// one Profile per step of the shared screen opening (docs/adr/0014). While open
 // it swallows every button through "commandbuttondown": Next / Prev move
 // the Selection Marker (a gold glow flowing round the choice) through the
 // cross at the top right (its tooltip says Back), then from column to

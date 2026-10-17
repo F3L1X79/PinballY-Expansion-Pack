@@ -30,14 +30,8 @@
 // Every layer is drawn ahead from startup through the shared drawing
 // ahead, nearest the highlighted line first, kept from one opening to the
 // next and redrawn only when what it shows or the window size changed.
-// The list opens at once when what it shows first (the mask, the header's
-// emblems, the scrollbar's thumb and the items of the first screen and the
-// one below) is drawn ahead and up to date; otherwise (right after
-// startup, a Profile switch or a game) the wheel dims under the opening
-// veil, with the Loader after 150 ms, while the drawing ahead's foreground
-// queue draws what is missing (docs/adr/0014), then the list shows. While
-// it gets ready it counts as open: buttons swallowed, Exit gives up and
-// calls the return, attract mode gives up.
+// It opens at once when its first screens are drawn ahead, otherwise
+// through the shared screen opening (docs/adr/0014).
 // What the list shows is read again on each opening, and ahead after a
 // Profile switch or a change of a Profile's data; the other Profiles'
 // files only when their Notified Achievements may have changed.
@@ -51,7 +45,7 @@ import { safeHandler } from "../core/safe_handler.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { displayNameOf } from "../profiles/profile_name.js";
-import { createOpeningVeil } from "../drawing/opening_veil.js";
+import { createScreenOpening } from "../drawing/screen_opening.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
 import {
     LIST_LOOK, AVATAR_FRAME_WIDTH, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
@@ -122,9 +116,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // scroll it glides to, what Exit returns to and whether it is still
     // getting ready.
     let shown = null;
-    // Cancels the foreground drawing of a list getting ready; null otherwise.
-    let cancelPreparing = null;
-    const openingVeil = createOpeningVeil(host, SCRIPT_NAME, { zIndex: ACHIEVEMENT_LIST_Z_INDEX.backdrop - 2 });
+    const opening = createScreenOpening(host, SCRIPT_NAME, { zIndex: ACHIEVEMENT_LIST_Z_INDEX.backdrop - 2, drawingAhead });
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     // Where the list and the highlighted line are while gliding, in pixels.
     const glide = { scroll: 0, highlightTop: 0, timer: null, lastMs: 0 };
@@ -639,53 +631,40 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         stopGlide();
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
-        const openedAt = host.now().getTime();
-        content = readContent();
+        opening.begin();
+        content = opening.read(readContent);
         isContentStale = false;
-        const readAt = host.now().getTime();
-        measure();
-        shown = { onExit, scroll: 0, highlighted: content.items.findIndex(item => item.kind === ITEM_KIND.ROW), isPreparing: false };
         // Drawn: only what was not drawn ahead yet.
-        let drawnMs = host.now().getTime() - readAt;
-        const logOpening = () => host.log(`[${SCRIPT_NAME}] Opened in ${host.now().getTime() - openedAt} ms: `
-            + `read in ${readAt - openedAt} ms, drawn in ${drawnMs} ms.`);
+        opening.draw(measure);
+        shown = { onExit, scroll: 0, highlighted: content.items.findIndex(item => item.kind === ITEM_KIND.ROW), isPreparing: false };
         if (!nextFirstScreenDrawing()) {
             show();
-            logOpening();
+            opening.logOpened();
             return;
         }
         shown.isPreparing = true;
-        openingVeil.show();
         const step = () => {
             const drawing = nextFirstScreenDrawing();
             if (!drawing) return false;
-            const startMs = host.now().getTime();
-            drawing();
-            drawnMs += host.now().getTime() - startMs;
+            opening.draw(drawing);
             return nextFirstScreenDrawing() !== null;
         };
-        cancelPreparing = drawingAhead.runInForeground(step, {
+        opening.runVeiled(step, {
             onDone: () => {
-                cancelPreparing = null;
                 shown.isPreparing = false;
-                openingVeil.remove();
+                opening.remove();
                 show();
-                logOpening();
+                opening.logOpened();
             },
             // Logged by the drawing ahead: given up rather than left veiled.
-            onFailed: () => {
-                cancelPreparing = null;
-                close();
-            },
+            onFailed: close,
         });
     }
 
     // Closes the open list or gives up the one getting ready.
     function close() {
         if (!shown) return;
-        if (cancelPreparing) cancelPreparing();
-        cancelPreparing = null;
-        openingVeil.remove();
+        opening.remove();
         stopGlide();
         shown = null;
         for (const layer of [backdropLayer, mask.layer]) layer.alpha = 0;

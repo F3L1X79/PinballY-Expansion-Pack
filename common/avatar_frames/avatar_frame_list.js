@@ -32,6 +32,7 @@ import {
     AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, drawTitle, drawRow,
 } from "./avatar_frame_list_painter.js";
 import { drawBackdrop } from "../drawing/steamball_drawing.js";
+import { openingTimeLine } from "../drawing/screen_opening.js";
 
 const SCRIPT_NAME = "AvatarFrameList";
 const NONE_KEY = "none";
@@ -200,7 +201,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         marker.setOpacity(1);
         // Drawn: the backdrop, and any row not drawn ahead yet.
         const drawnAt = host.now().getTime();
-        host.log(`[${SCRIPT_NAME}] Opened in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
+        host.log(openingTimeLine(SCRIPT_NAME, { totalMs: drawnAt - openedAt, readMs: readAt - openedAt, drawnMs: drawnAt - readAt }));
     }
 
     function close() {

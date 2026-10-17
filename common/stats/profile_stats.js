@@ -8,13 +8,7 @@
 // and TASTES sections on its right (PROGRESSION ending with the High Scores
 // and Table Records held, TASTES with the first, favourite and
 // last table strips, read from the Play Log, the Hall of Fame and the plays). Every stat is read again on each
-// opening, through the drawn screen's shared opening (docs/adr/0014): the
-// wheel dims at once, one step per section read (the card, then each
-// section, the tastes last) then one per piece drawn run in the drawing
-// ahead's foreground queue, with the Loader if they take a while, then
-// every layer fades in together. While getting ready they count as open
-// and swallow every button: Exit gives up and goes where it would once
-// open, attract mode only gives up.
+// opening, one section per step of the shared screen opening (docs/adr/0014).
 // Created from the PinballY host, the Profile store, readers of a named
 // Profile's Player Level and Achievements Unlocked, the Achievement List
 // (opening it from the Achievements button, Exit there showing this screen
@@ -88,25 +82,47 @@ export function createProfileStats(host, {
         };
     }
 
-    // Every value of the Profile Stats that another Profile's can be set
-    // beside, for the named Profile (the active one by default): one reader,
-    // so a value never differs between screens. Reads only.
-    function readStats(profileName = profileStore.getActiveProfile().name) {
-        const data = profileStore.getProfileDataOf(profileName);
-        // Over the tables the Profile can see; a tier it reached stays.
-        const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore, profileName);
+    // The named Profile's data and the tables it can see, whoever looks
+    // (looking is not picking a table); a tier it reached stays.
+    function readProfileData(profileName) {
         return {
-            plays: sumPlays(data),
+            data: profileStore.getProfileDataOf(profileName),
+            profileTables: tablesVisibleTo(host.getVisibleTables(), profileStore, profileName),
+        };
+    }
+
+    // The card's values that another Profile's can be set beside.
+    function readCardStats(profileName, { data, profileTables }) {
+        return {
             playerLevel: readPlayerLevel(profileName),
             collectionMastery: collectionMasteryOfProfile(profileTables, data),
+            achievements: countAchievements(profileName),
+        };
+    }
+
+    // The PROGRESSION section's values that another Profile's can be set beside.
+    function readProgressionStats(profileName, { data, profileTables }) {
+        return {
             // The Collection Achievements' rule, so the two never disagree.
             collection: { played: countPlayedTablesIn(profileTables, data.plays), total: profileTables.length },
-            achievements: countAchievements(profileName),
             dailyStreak: dailyStreak.read(profileName),
             // Null without the Challenges Add-on.
             challenges: challenges ? challenges.getRecord(profileName) : null,
             // Where it stands on the boards; null without the High Scores Add-on.
             boards: highScores ? highScores.heldBy(profileName) : null,
+        };
+    }
+
+    // Every value of the Profile Stats that another Profile's can be set
+    // beside, for the named Profile (the active one by default): the same
+    // readers as the screen's, so a value never differs between screens.
+    // Reads only.
+    function readStats(profileName = profileStore.getActiveProfile().name) {
+        const profileData = readProfileData(profileName);
+        return {
+            plays: sumPlays(profileData.data),
+            ...readCardStats(profileName, profileData),
+            ...readProgressionStats(profileName, profileData),
         };
     }
 
@@ -289,14 +305,12 @@ export function createProfileStats(host, {
 
     // The card: the Profile, its Player Level, Collection Mastery and
     // buttons (none when isReadOnly: another Profile's screen, to look at
-    // only), with what the sections read after it (its tables as that
-    // Profile sees them, whoever looks: looking is not picking a table).
+    // only), with what the sections read after it.
     function readCard(profile, isReadOnly) {
-        const profileTables = tablesVisibleTo(host.getVisibleTables(), profileStore, profile.name);
-        const profilePlays = profileStore.getPlaysOf(profile.name);
+        const { data, profileTables } = readProfileData(profile.name);
+        const profilePlays = data.plays;
         const getPlay = configId => profilePlays[configId] || NO_PLAY;
-        const stats = readStats(profile.name);
-        const { achievements, playerLevel } = stats;
+        const { achievements, playerLevel, collectionMastery } = readCardStats(profile.name, { data, profileTables });
         const hallOfFame = getHallOfFame(profileTables, getPlay);
         const buttons = isReadOnly ? [] : [
             { choice: CHOICE.ACHIEVEMENTS, label: TEXT.buttons.achievements, count: TEXT.fraction(achievements.unlocked, achievements.total) },
@@ -306,7 +320,7 @@ export function createProfileStats(host, {
             ...householdButton(),
         ];
         return {
-            read: { profileTables, profilePlays, getPlay, stats, hallOfFame },
+            profileData: { data, profileTables, profilePlays, getPlay, hallOfFame },
             card: {
                 name: displayNameOf(profile),
                 avatarPath: profile.avatarPath,
@@ -319,7 +333,7 @@ export function createProfileStats(host, {
                     current: TEXT.playerLevel.current(TEXT.number(playerLevel.points), TEXT.number(playerLevel.to)),
                 },
                 collectionTitle: TEXT.collectionTitle,
-                collection: collectionTextsOf(stats.collectionMastery),
+                collection: collectionTextsOf(collectionMastery),
                 buttons,
                 // Another Profile's screen goes back to the Household Stats.
                 closeLabel: isReadOnly ? TEXT.backTooltip : TEXT.closeTooltip,
@@ -329,7 +343,7 @@ export function createProfileStats(host, {
         };
     }
 
-    function gameSection({ plays }) {
+    function gameSection(plays) {
         return {
             title: TEXT.sections.game,
             rows: [[
@@ -372,12 +386,13 @@ export function createProfileStats(host, {
             referenceHeight: REFERENCE_HEIGHT,
             backdropZIndex: PROFILE_STATS_Z_INDEX.backdrop,
             drawingAhead,
-            whose: viewed ? `${profile.name}'s, read only,` : `${profile.name}'s`,
+            profileName: profile.name,
+            isReadOnly: viewed !== null,
         });
         // Completed by setUp() once every step ran.
         const opening = { viewed, drawn, isPreparing: true, marker: null, tooltipLayers: [], opacity: 0 };
         shown = opening;
-        let read = null;
+        let profileData = null;
         let screen = null;
         let highlights = null;
         const tooltipLayers = [];
@@ -406,15 +421,17 @@ export function createProfileStats(host, {
             Object.assign(opening, { isPreparing: false, screen, tooltipLayers, marker, targets, choices: screen.choices, selected });
         }
 
-        // One step per section: the card, then the game, the progression and the tastes.
+        // One step per section, each reading its own values: the card, then
+        // the game, the progression and the tastes.
         drawn.read(() => {
             const card = readCard(profile, viewed !== null);
-            read = card.read;
+            profileData = card.profileData;
             screen = { ...card.card, sections: [] };
         });
-        drawn.read(() => screen.sections.push(gameSection(read.stats)));
-        drawn.read(() => screen.sections.push(progressionSection(read.stats, profile.name)));
-        drawn.read(() => screen.sections.push(tastesSection(profile, read.profileTables, read.profilePlays, read.getPlay, read.hallOfFame)));
+        drawn.read(() => screen.sections.push(gameSection(sumPlays(profileData.data))));
+        drawn.read(() => screen.sections.push(progressionSection(readProgressionStats(profile.name, profileData), profile.name)));
+        drawn.read(() => screen.sections.push(
+            tastesSection(profile, profileData.profileTables, profileData.profilePlays, profileData.getPlay, profileData.hallOfFame)));
         drawn.draw(() => drawn.drawBackdrop((dc, size, referenceWidth) => drawBackdrop(host, dc, size, referenceWidth, screen)));
         drawn.draw(queuePieces);
         drawn.start({ onReady: setUp, setOpacity: opacity => setOpacity(opening, opacity), onFailed: close });
