@@ -18,7 +18,7 @@
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    text, oneLine, textInBox, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
     drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsBand, buttonHintsFooterRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
@@ -42,7 +42,9 @@ const LOOK = Object.freeze({
     // The Lost Records line, when there is one, under the greeting and the
     // Daily Streak line.
     lostRecordsGap: 4, lostRecordsSize: 20, minLostRecordsSize: 15,
-    rowH: 120, rowSize: 26, rowIcon: 76,
+    // A bottom row's label, wrapped and shrunk to keep rowTextInset free
+    // above and below it (a long table name in a narrow portrait panel).
+    rowH: 120, rowSize: 26, minRowSize: 18, rowTextInset: 12, rowIcon: 76,
     // A Period Table card, from its top: period, name, Mastery card (the
     // Mastery Bar's, scaled by cardK), then the grey line, if any.
     cardTop: 30, nameY: 78, masteryY: 134, lineGap: 18, lineH: 34, cardBottom: 34,
@@ -384,7 +386,9 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
                 } else {
                     iconBox(host, dc, x + 16, iconY, LOOK.rowIcon);
                 }
-                text(host, dc, screen.labels[choice], { x: x + LOOK.rowIcon + 36, y: 0, width: r.w - LOOK.rowIcon - 56, height: r.h, size: LOOK.rowSize, weight: 600 });
+                textInBox(host, dc, screen.labels[choice], {
+                    x: x + LOOK.rowIcon + 36, y: LOOK.rowTextInset, width: r.w - LOOK.rowIcon - 56, height: r.h - 2 * LOOK.rowTextInset, size: LOOK.rowSize, minSize: LOOK.minRowSize,
+                });
             }
         },
     });

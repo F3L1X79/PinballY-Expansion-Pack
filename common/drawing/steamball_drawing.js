@@ -53,6 +53,23 @@ export function oneLine(host, dc, str, { x, y, width, height, size, minSize = si
     return measured.width;
 }
 
+// Text wrapped in the box and centred in its height: the size goes down
+// to minSize until every line fits, then the end gives way to "…".
+export function textInBox(host, dc, str, { x, y, width, height, size, minSize = size, weight = 600, color = COLORS.title, font = FONTS.body }) {
+    const styledAt = (candidate, fontSize) => {
+        const styled = host.createStyledText({ textAlign: "left", textStyle: { font, size: fontSize, weight, color } });
+        styled.add(candidate);
+        return styled;
+    };
+    const fits = styled => styled.measure(width).height <= height;
+    let fontSize = size;
+    let styled = styledAt(str, fontSize);
+    while (!fits(styled) && fontSize > minSize) styled = styledAt(str, --fontSize);
+    for (let cut = str.length - 1; !fits(styled) && cut > 1; cut--) styled = styledAt(`${str.slice(0, cut).trimEnd()}…`, fontSize);
+    const measured = styled.measure(width).height;
+    styled.draw(dc, { x, y: y + (height - measured) / 2, width, height: measured });
+}
+
 export function fillDisc(dc, cx, cy, r, color) {
     for (let dy = -r; dy < r; dy++) {
         const half = Math.round(Math.sqrt(r * r - (dy + 0.5) * (dy + 0.5)));
@@ -217,19 +234,22 @@ function drawCross(dc, x, y, size) {
     }
 }
 
-// The Button Hints' look at scale 1, in the Achievement List's layout pixels.
-const BUTTON_HINTS = Object.freeze({ keySize: 15, keyPadding: 8, keyRadius: 6, labelSize: 18, keyGap: 8, labelGap: 12, groupGap: 48 });
+// The Button Hints' look at scale 1, in the Achievement List's layout
+// pixels; sideMargin: the room kept free on each side of the box.
+const BUTTON_HINTS = Object.freeze({ keySize: 15, keyPadding: 8, keyRadius: 6, labelSize: 18, keyGap: 8, labelGap: 12, groupGap: 48, sideMargin: 24 });
 
 const piecesWidth = pieces => pieces.reduce((sum, piece) => sum + (piece.gap || piece.width), 0);
 
 // The Button Hints centred in the box, both ways: groups ([{ keys: [key
 // cap texts], label }]) of key caps then what they do, side by side.
 // scale: the look's size against the Achievement List's; shrunk further
-// when the hints would not fit in the box's width.
+// when the hints would not fit in the box's width less its side margins
+// (a narrow portrait panel).
 export function drawButtonHints(host, dc, groups, { x, y, width, height, scale = 1 }) {
+    const room = width - 2 * Math.round(BUTTON_HINTS.sideMargin * scale);
     let pieces = buttonHintPieces(host, groups, width, scale);
     const total = piecesWidth(pieces);
-    if (total > width) pieces = buttonHintPieces(host, groups, width, scale * width / total);
+    if (total > room) pieces = buttonHintPieces(host, groups, width, scale * room / total);
     let pieceX = x + (width - piecesWidth(pieces)) / 2;
     for (const piece of pieces) {
         if (piece.gap) {
