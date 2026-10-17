@@ -15,7 +15,8 @@ const TOOLTIP = Object.freeze({ color: 0xFF0C0C0E, size: 22, weight: 400, height
 
 // Measured unbounded: within a width, it would wrap instead.
 export const UNBOUNDED = 100000;
-const OVERLAY = 0xD0080A0E;
+// The wheel dimmed behind a drawn screen's panel.
+export const DIMMED_WHEEL = 0xD0080A0E;
 
 // Wraps within width, centred in height when given.
 export function text(host, dc, str, { x, y, width, height, size, weight = 400, color = COLORS.title, font = FONTS.body, align = "left" }) {
@@ -182,7 +183,7 @@ export function tooltip(host, dc, str, tipX, tipY, side) {
 // pixels), with a soft gold glow.
 export function drawBackdrop(dc, { width, height }, referenceHeight, panel) {
     const scale = height / referenceHeight;
-    dc.fillRect(0, 0, width, height, OVERLAY);
+    dc.fillRect(0, 0, width, height, DIMMED_WHEEL);
     const [x, y, w, h] = [panel.x, panel.y, panel.w, panel.h].map(value => Math.round(value * scale));
     glow(dc, x, y, w, h, COLORS.gold, 6, 0x30);
     fillGradient(dc, x, y, w, h, COLORS.panelTop, COLORS.panel);

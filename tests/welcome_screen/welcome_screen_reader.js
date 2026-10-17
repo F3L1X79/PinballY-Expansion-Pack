@@ -2,7 +2,7 @@
 // Reads the drawn Welcome Screen the way the player sees it, on the fake
 // PinballY host: whether it is open, its greeting, its Daily Streak line,
 // its Lost Records line and the Avatar on it, where its layers sit,
-// its Collection Mastery card, its Period Table cards (period, name,
+// its Collection Mastery card, the startup veil, its Period Table cards (period, name,
 // Mastery head, grey line, logo), its bottom row's labels, the highlighted choice (the label
 // the Selection Marker surrounds, the period of the card whose button it
 // surrounds, or the tooltip of the Avatar or the cross, on its tooltip
@@ -25,6 +25,17 @@ export const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { c
 const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
 export const isWelcomeScreenOpen = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.backdrop).length > 0;
+
+// The startup veil dimming the wheel: a shown layer cleared to a
+// translucent colour, with nothing drawn on it. { shown: false } without
+// one, else { shown: true, zIndex, color }.
+export function startupVeil(fake) {
+    const veils = fake.drawingLayers().filter(layer => layer.alpha > 0 && layer.clearColor() !== null
+        && layer.clearColor() >>> 24 > 0 && layer.strokes().length === 0 && layer.loadedImage() === null);
+    assert.ok(veils.length <= 1, "a single veil at a time");
+    if (veils.length === 0) return { shown: false };
+    return { shown: true, zIndex: veils[0].zIndex, color: veils[0].clearColor() };
+}
 
 // Its layers, shown or not: none once it closed.
 export const welcomeScreenLayerCount = fake => fake.drawingLayers()
