@@ -309,24 +309,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="sliced-stats-screens" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Le Loader aussi sur les Profile Stats, les Household Stats et l'Achievement List</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
-          </div>
-          <p>Ces écrans (et l'Avatar Frame list) se dessinent d'un bloc (mesuré sur la borne le 17/10 : Household Stats 954 ms, Profile Stats 316 à 419 ms) : le Loader y resterait figé, il n'y est donc pas. Les dessiner par tranches via <code>getDrawingAhead()</code> permettrait de l'y afficher. Les Household Stats approchent la seconde. L'Achievement List, elle, dessine sur-le-champ à l'ouverture les lignes que le dessin d'avance n'a pas encore faites : il faudrait l'ouvrir d'abord, avec le Loader, et laisser le dessin d'avance finir malgré sa pause après un appui.</p>
-          <div class="stepper"><span>idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/241">#241</a>, implémentée sur la branche <code>spec-241</code> ; reste la mesure sur la borne (<a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/246">#246</a>, tâche humaine), qui décide du sort de l'Avatar Frame list</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Reporté pendant le grill du Loader, le 17/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-play" id="back-buttons" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -1057,7 +1039,7 @@
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
       <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne. Le 16/10, les Default Scores ont reçu 28 portraits libres de droits ; les anciens, non libres, ne restent que sur la borne de Félix (<code>assets/images/default_scores/local/</code>, hors git). Le 17/10, le <strong>Selection Marker</strong> (un halo flou d'ors qui défile autour du choix courant) remplace <code>selectionHalo</code> sur le Welcome Screen, les Profile Stats, les Household Stats et la liste des Avatar Frames ; reste à le voir sur la borne. Le 17/10 encore, le <strong>Loader</strong> (une comète dorée qui tourne au tiers haut de l'écran de jeu) accompagne le lancement et la fermeture d'une table, le démarrage jusqu'au fondu du Welcome Screen, et la lecture fraîche du High Score Board ; reste à le voir sur la borne.</p>
-      <span class="next">Le 17/10 aussi, le Loader accompagne les Profile Stats, les Household Stats et l'Achievement List pendant leur préparation (branche <code>spec-241</code>), reste la mesure sur la borne. Ensuite : <a href="#back-buttons">boutons Retour (n° <span data-ref="back-buttons"></span>)</a></span>
+      <span class="next">Le 17/10 aussi, le Loader accompagne les Profile Stats, les Household Stats, l'Achievement List et l'Avatar Frame list pendant leur préparation (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/241">#241</a>, branche <code>spec-241</code>), reste à le voir sur la borne. Ensuite : <a href="#back-buttons">boutons Retour (n° <span data-ref="back-buttons"></span>)</a></span>
     </div>
   </section>
 
