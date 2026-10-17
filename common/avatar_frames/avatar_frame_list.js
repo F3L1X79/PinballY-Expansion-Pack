@@ -86,10 +86,9 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         return rows;
     }
 
-    // Reads what the list shows, then draws the backdrop, which measures
-    // the window the layout depends on.
-    function readContent() {
-        const rows = readRows();
+    // Reads what the list shows (rows, when already read), then draws the
+    // backdrop, which measures the window the layout depends on.
+    function readContent(rows = readRows()) {
         let geometry = null;
         let referenceWidth = 0;
         backdropLayer.clear(STEAMBALL_COLORS.transparent);
@@ -179,7 +178,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         if (shown) return;
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
-        readContent();
+        const openedAt = host.now().getTime();
+        const rows = readRows();
+        const readAt = host.now().getTime();
+        readContent(rows);
         backdropLayer.setScale(WINDOW_SCALE);
         backdropLayer.alpha = 1;
         for (const piece of pieces()) {
@@ -196,6 +198,9 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         shown = { onBack, onClosed, marker, selected: Math.max(0, content.rows.findIndex(isOpenedOn)) };
         marker.moveTo(content.geometry.rows[shown.selected]);
         marker.setOpacity(1);
+        // Drawn: the backdrop, and any row not drawn ahead yet.
+        const drawnAt = host.now().getTime();
+        host.log(`[${SCRIPT_NAME}] Opened in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
     }
 
     function close() {

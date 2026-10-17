@@ -351,6 +351,7 @@ export function createProfileStats(host, {
             return;
         }
         const screen = readScreen(profile, viewed !== null);
+        const readAt = host.now().getTime();
         const drawn = openDrawnScreen(host, SCRIPT_NAME, {
             referenceHeight: REFERENCE_HEIGHT,
             backdropZIndex: PROFILE_STATS_Z_INDEX.backdrop,
@@ -370,7 +371,9 @@ export function createProfileStats(host, {
         const opened = { screen, viewed, drawn, tooltipLayers, marker, targets, choices: screen.choices, selected, opacity: 0 };
         shown = opened;
         drawn.fadeIn(opacity => setOpacity(opened, opacity));
-        log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
+        const drawnAt = host.now().getTime();
+        const whose = viewed ? `${profile.name}'s, read only,` : `${profile.name}'s`;
+        log(`Opened ${whose} in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
     }
 
     // The marker and every layer to the same opacity, except the unselected

@@ -162,6 +162,7 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         if (shown) return;
         const openedAt = host.now().getTime();
         const screen = readScreen();
+        const readAt = host.now().getTime();
         let geometry = null;
         const drawn = openDrawnScreen(host, SCRIPT_NAME, {
             referenceHeight: REFERENCE_HEIGHT,
@@ -195,7 +196,8 @@ export function createHouseholdStats(host, { profileStore, readStats, openProfil
         shown = opened;
         placeColumns(opened);
         drawn.fadeIn(opacity => setOpacity(opened, opacity));
-        log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
+        const drawnAt = host.now().getTime();
+        log(`Opened in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
     }
 
     // Where the columns glide to: the first one in view at the view's left.

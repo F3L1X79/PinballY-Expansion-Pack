@@ -596,15 +596,20 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         stopGlide();
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
-        measure();
+        const openedAt = host.now().getTime();
         content = readContent();
         isContentStale = false;
+        const readAt = host.now().getTime();
+        measure();
         backdropLayer.alpha = 1;
         if (mask.signature !== maskSignature()) drawMaskLayer();
         mask.layer.alpha = 1;
         showHeaderEmblems();
         shown = { onExit, scroll: 0, highlighted: content.items.findIndex(item => item.kind === ITEM_KIND.ROW) };
         jumpToTarget();
+        // Drawn: only what was not drawn ahead yet.
+        const drawnAt = host.now().getTime();
+        host.log(`[${SCRIPT_NAME}] Opened in ${drawnAt - openedAt} ms: read in ${readAt - openedAt} ms, drawn in ${drawnAt - readAt} ms.`);
     }
 
     function close() {
