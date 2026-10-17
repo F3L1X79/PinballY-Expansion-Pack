@@ -2,8 +2,8 @@
 // Screen opening: the shared opening of a screen the player waits for
 // (docs/adr/0014). Dims the wheel at once under a veil, runs the screen's
 // steps in the drawing ahead's foreground queue, turns the Loader over the
-// veil if they last more than 150 ms, and times the reading and drawing
-// for the one line logged per opening. Listens to no event, writes nothing.
+// veil if they last more than 150 ms, fades the screen in whole and times
+// the reading and drawing for the one line logged per opening. Listens to no event, writes nothing.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";
@@ -12,6 +12,27 @@ import { createLoader } from "./loader.js";
 
 // A screen ready sooner shows no Loader: no flash of comet on a fast cabinet.
 const LOADER_DELAY_MS = 150;
+const FADE_MS = 220;
+export const FRAME_MS = 16;
+
+// setOpacity(opacity) every frame, from 0 to 1, then onFaded(); timed on
+// the clock, since Windows timers fire late. Returns a way to stop it.
+export function fadeIn(host, scriptName, setOpacity, onFaded = () => {}) {
+    const startMs = host.now().getTime();
+    let timer = null;
+    const stop = () => {
+        host.clearInterval(timer);
+        timer = null;
+    };
+    timer = host.setInterval(safeHandler(scriptName, () => {
+        const opacity = Math.min(1, (host.now().getTime() - startMs) / FADE_MS);
+        setOpacity(opacity);
+        if (opacity < 1) return;
+        stop();
+        onFaded();
+    }), FRAME_MS);
+    return stop;
+}
 
 // The line every slow screen logs once open; profileName: whose screen it
 // is (null: nobody's), isReadOnly: another Profile's, to look at only.
@@ -27,6 +48,7 @@ export function createScreenOpening(host, scriptName, { zIndex, drawingAhead }) 
     let veil = null;
     let loaderTimer = null;
     let cancel = null;
+    let stopFade = null;
     let openedAt = 0;
     const spentMs = { read: 0, draw: 0 };
 
@@ -53,11 +75,13 @@ export function createScreenOpening(host, scriptName, { zIndex, drawingAhead }) 
         }), LOADER_DELAY_MS);
     }
 
-    // Stops the foreground run, takes the veil and the Loader away; safe
-    // to call again.
+    // Stops the foreground run and the fade in, takes the veil and the
+    // Loader away; safe to call again.
     function remove() {
         if (cancel) cancel();
         cancel = null;
+        if (stopFade) stopFade();
+        stopFade = null;
         hideLoader();
         if (!veil) return;
         host.removeDrawingLayer(veil);
@@ -92,6 +116,12 @@ export function createScreenOpening(host, scriptName, { zIndex, drawingAhead }) 
             });
         },
         hideLoader,
+        // Once the steps are over: the Loader goes, the screen fades in
+        // through setOpacity(opacity), then the veil goes.
+        fadeIn(setOpacity) {
+            hideLoader();
+            stopFade = fadeIn(host, scriptName, setOpacity, remove);
+        },
         // whose: openingTimeLine()'s profileName and isReadOnly.
         logOpened(whose = {}) {
             host.log(openingTimeLine(scriptName, {

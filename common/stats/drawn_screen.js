@@ -6,18 +6,16 @@
 // goes through the shared screen opening (docs/adr/0014). Writes nothing.
 // ============================================================
 
-import { safeHandler } from "../core/safe_handler.js";
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";
-import { createScreenOpening } from "../drawing/screen_opening.js";
+import { createScreenOpening, fadeIn, FRAME_MS } from "../drawing/screen_opening.js";
 
-const FADE_MS = 220;
-export const FRAME_MS = 16;
+export { FRAME_MS };
 
 // The layers, their placing and fade in, shared by both openings.
 function createScreenLayers(host, scriptName, referenceHeight) {
     const layers = [];
     let referenceWidth = 0;
-    let fadeTimer = null;
+    let stopFade = () => {};
 
     function hiddenLayer(zIndex) {
         const layer = host.createDrawingLayer(zIndex);
@@ -30,11 +28,6 @@ function createScreenLayers(host, scriptName, referenceHeight) {
     function place(layer, rect) {
         layer.setScale({ ySpan: rect.h / referenceHeight });
         layer.setPos((rect.x + rect.w / 2) / referenceWidth - 0.5, 0.5 - (rect.y + rect.h / 2) / referenceHeight);
-    }
-
-    function stopFade() {
-        host.clearInterval(fadeTimer);
-        fadeTimer = null;
     }
 
     return {
@@ -62,17 +55,9 @@ function createScreenLayers(host, scriptName, referenceHeight) {
             into.push(layer);
             return layer;
         },
-        // setOpacity(opacity) every frame, from 0 to 1, then onFaded();
-        // timed on the clock, since Windows timers fire late.
-        fadeIn(setOpacity, onFaded = () => {}) {
-            const startMs = host.now().getTime();
-            fadeTimer = host.setInterval(safeHandler(scriptName, () => {
-                const opacity = Math.min(1, (host.now().getTime() - startMs) / FADE_MS);
-                setOpacity(opacity);
-                if (opacity < 1) return;
-                stopFade();
-                onFaded();
-            }), FRAME_MS);
+        // setOpacity(opacity) every frame, from 0 to 1, then onFaded().
+        fadeIn(setOpacity, onFaded) {
+            stopFade = fadeIn(host, scriptName, setOpacity, onFaded);
         },
         // Removes the layers, those of other included; safe to call again.
         close(other = []) {
@@ -138,9 +123,8 @@ export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdrop
             opening.runVeiled(runNextStep, {
                 onDone: () => {
                     opening.logOpened({ profileName, isReadOnly });
-                    opening.hideLoader();
                     onReady();
-                    screen.fadeIn(setOpacity, opening.remove);
+                    opening.fadeIn(setOpacity);
                 },
                 onFailed: () => {
                     close();

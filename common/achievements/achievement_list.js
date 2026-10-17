@@ -116,7 +116,9 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // scroll it glides to, what Exit returns to and whether it is still
     // getting ready.
     let shown = null;
-    const opening = createScreenOpening(host, SCRIPT_NAME, { zIndex: ACHIEVEMENT_LIST_Z_INDEX.backdrop - 2, drawingAhead });
+    // Below 1 only while a list that had to get ready fades in.
+    let opacity = 1;
+    const opening =createScreenOpening(host, SCRIPT_NAME, { zIndex: ACHIEVEMENT_LIST_Z_INDEX.backdrop - 2, drawingAhead });
     const closedListeners = createClosedListeners(SCRIPT_NAME);
     // Where the list and the highlighted line are while gliding, in pixels.
     const glide = { scroll: 0, highlightTop: 0, timer: null, lastMs: 0 };
@@ -505,7 +507,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
             // A section header is never highlighted: always dimmed, even
             // right above the highlighted row.
             const distance = item.kind === ITEM_KIND.SECTION ? 1 : Math.min(1, Math.abs(item.top - glide.highlightTop) / ROW_PITCH);
-            layer.alpha = 1 - (1 - DIMMED_ALPHA) * distance;
+            layer.alpha = opacity * (1 - (1 - DIMMED_ALPHA) * distance);
             shownLayers.add(layer);
             for (const piece of item.pieces) {
                 const placedLayer = pieceLayer(index, piece);
@@ -530,7 +532,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
             const layer = thumbLayer(bar);
             const top = thumbTopAt(bar, glide.scroll);
             layer.setPos(bar.centerX / geometry.width - 0.5, 0.5 - (top + bar.thumbHeight / 2) / geometry.height);
-            layer.alpha = 1;
+            layer.alpha = opacity;
             shownLayers.add(layer);
         }
         hideAllExcept(thumbLayers, shownLayers);
@@ -610,7 +612,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         for (const emblem of headerEmblems()) {
             const layer = headerEmblemLayer(emblem);
             layer.setPos((emblem.x + emblem.width / 2) / geometry.width - 0.5, 0.5 - (emblem.y + emblem.height / 2) / geometry.height);
-            layer.alpha = 1;
+            layer.alpha = opacity;
             shownLayers.add(layer);
         }
         hideAllExcept(headerEmblemLayers, shownLayers);
@@ -618,10 +620,19 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
 
     // Shows the list drawn for it.
     function show() {
-        backdropLayer.alpha = 1;
-        mask.layer.alpha = 1;
+        backdropLayer.alpha = opacity;
+        mask.layer.alpha = opacity;
         showHeaderEmblems();
         jumpToTarget();
+    }
+
+    // Each frame of the fade in; leaves a glide the player started going.
+    function setOpacity(newOpacity) {
+        opacity = newOpacity;
+        backdropLayer.alpha = opacity;
+        mask.layer.alpha = opacity;
+        showHeaderEmblems();
+        placeItems();
     }
 
     // onExit: what Exit returns to, called once the list is closed.
@@ -652,9 +663,10 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         opening.runVeiled(step, {
             onDone: () => {
                 shown.isPreparing = false;
-                opening.remove();
+                opacity = 0;
                 show();
                 opening.logOpened();
+                opening.fadeIn(setOpacity);
             },
             // Logged by the drawing ahead: given up rather than left veiled.
             onFailed: close,
@@ -665,6 +677,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     function close() {
         if (!shown) return;
         opening.remove();
+        opacity = 1;
         stopGlide();
         shown = null;
         for (const layer of [backdropLayer, mask.layer]) layer.alpha = 0;
