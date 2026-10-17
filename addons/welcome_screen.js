@@ -116,22 +116,22 @@ export default function init() {
     // From the first frame the pack can show, while the startup screen is
     // prepared: cleared, not drawn, so nothing measures the window, which
     // is not laid out yet.
-    function showStartupWait() {
+    function showStartupVeilAndLoader() {
         startupVeil = host.createDrawingLayer(STARTUP_VEIL_Z_INDEX);
         startupVeil.clear(DIMMED_WHEEL);
         startupLoader.show();
     }
 
-    function removeStartupVeil() {
+    function hideStartupVeil() {
         if (!startupVeil) return;
         host.removeDrawingLayer(startupVeil);
         startupVeil = null;
     }
 
-    // Safe to call again, and once the startup wait is over.
-    function endStartupWait() {
+    // Safe to call again, and once both are already gone.
+    function hideStartupVeilAndLoader() {
         startupLoader.hide();
-        removeStartupVeil();
+        hideStartupVeil();
     }
 
     // The grey line: played this Period, or else a Streak of at least 2.
@@ -314,7 +314,7 @@ export default function init() {
             setOpacity(screen, opacity);
             if (opacity >= 1) {
                 stopFade(screen);
-                removeStartupVeil();
+                hideStartupVeil();
             }
         }), FRAME_MS);
     }
@@ -332,7 +332,7 @@ export default function init() {
             if (host.getUIMode() === "wheel") draw();
             else {
                 isWaitingForWheel = true;
-                endStartupWait();
+                hideStartupVeilAndLoader();
             }
         }), STARTUP_PAUSE_MS);
     }
@@ -349,7 +349,7 @@ export default function init() {
         host.clearTimeout(pauseTimer);
         pauseTimer = null;
         isWaitingForWheel = false;
-        endStartupWait();
+        hideStartupVeilAndLoader();
         if (shown) {
             stopFade(shown);
             shown.marker.remove();
@@ -392,7 +392,7 @@ export default function init() {
     }
 
     submit(null);
-    showStartupWait();
+    showStartupVeilAndLoader();
 
     // Fires on every switch, which the Profile picker makes only to another
     // Profile: the new player is welcomed too, read again when the screen
@@ -428,13 +428,13 @@ export default function init() {
 
     // Fire when a menu opens or a table starts launching (whose overlay has
     // its own Loader): the startup veil and Loader must not sit over them.
-    host.on("menuopen", safeHandler(SCRIPT_NAME, endStartupWait));
-    host.on("launchoverlayshow", safeHandler(SCRIPT_NAME, endStartupWait));
+    host.on("menuopen", safeHandler(SCRIPT_NAME, hideStartupVeilAndLoader));
+    host.on("launchoverlayshow", safeHandler(SCRIPT_NAME, hideStartupVeilAndLoader));
 
     // Fires when the cabinet sits idle: the screen must not stay over
     // attract mode nor keep the buttons.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, () => {
-        endStartupWait();
+        hideStartupVeilAndLoader();
         if (closeDialog) close();
     }));
 }

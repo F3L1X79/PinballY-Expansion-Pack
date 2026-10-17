@@ -14,7 +14,8 @@
 // "not supported" when PINemHi says so or no board is known, or "Play a
 // game to bring up this table's high scores" for a table without a ROM
 // whose VPReg.stg section or text file is not learned yet. The Loader
-// turns above the board while the fresh read runs. The screen
+// turns above the board while the fresh read runs, from the end of the
+// board's fade in. The screen
 // is drawn at once on all its layers, then faded in; the crowns, drawn
 // ahead once on their own layers through the shared drawing ahead
 // (PinballY reads an image file again on every draw), are only placed,
@@ -212,19 +213,24 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
             backdropZIndex: Z_INDEX.backdrop,
             drawBackdrop,
         });
-        const opened = { drawn, onBack, opacity: 0, content: [], geometry: null, rowLayers: [], crownLayers: [], firstRow: 0 };
+        const opened = {
+            drawn, onBack, opacity: 0, content: [], geometry: null, rowLayers: [], crownLayers: [], firstRow: 0, isReading: Boolean(game),
+        };
         shown = opened;
         const defaultImages = readDefaultScoreImages(host, logImageLine);
         drawContent(opened, screenFor(game, game ? "reading" : "read", defaultImages));
+        // The Loader waits for the end of the fade in: at full opacity over a
+        // board still fading, it would stand out alone. close() stops the fade.
         drawn.fadeIn(opacity => {
             opened.opacity = opacity;
             for (const layer of drawn.layers) layer.alpha = opacity;
             showContent(opened);
+            if (opacity >= 1 && opened.isReading) loader.show();
         });
         log(`High Score Board opened, drawn in ${host.now().getTime() - openedAt} ms.`);
         if (!game) return;
-        loader.show();
         refresh(game.configId).then(safeHandler(SCRIPT_NAME, (status) => {
+            opened.isReading = false;
             if (shown !== opened) return;
             loader.hide();
             for (const layer of opened.content) host.removeDrawingLayer(layer);

@@ -4,7 +4,8 @@
 // opened table's board is read fresh, and goes as soon as the board is
 // redrawn with the read's outcome (fresh board, no score, failed, not
 // supported, not learned) or closed by Exit or attract mode; a read ending
-// after close does not bring it back.
+// after close does not bring it back. It waits for the board's fade in,
+// and never comes when the read ends or the board closes before then.
 // ============================================================
 
 import { test } from "node:test";
@@ -57,6 +58,43 @@ test("the comet turns while the board is read fresh and goes with every outcome 
     fake.setWheelGame(TABLES.length);
     assert.deepEqual(await readFor(1000), redrawnWith("Play a game to bring up this table's high scores"), "not learned");
     fake.setWheelGame(-TABLES.length);
+
+    // The board's fade in lasts under BOARD_OPEN_MS: the comet waits for its end.
+    const DURING_FADE_MS = 100;
+    const startOpening = () => {
+        fake.openMainMenu();
+        fake.selectMenuItem(lang.highScores.board.menuEntry);
+        fake.advanceTime(DURING_FADE_MS);
+    };
+    setBoard(MEDIEVAL, FACTORY, { durationMs: 5000 });
+    startOpening();
+    assert.ok(isBoardOpen(fake));
+    assert.deepEqual(readLoader(fake), GONE, "not over the board while it fades in");
+    fake.advanceTime(BOARD_OPEN_MS - DURING_FADE_MS);
+    assert.deepEqual(readLoader(fake), SHOWN, "turning once the board is fully in");
+    fake.advanceTime(5000);
+    await settle();
+    press(fake, "Exit");
+    fake.advanceTime(BOARD_OPEN_MS);
+    fake.closeMenu();
+
+    setBoard(MEDIEVAL, FACTORY, { durationMs: 5000 });
+    startOpening();
+    press(fake, "Exit");
+    fake.advanceTime(BOARD_OPEN_MS);
+    assert.equal(loaderLayerCount(fake), 0, "never shown when Exit comes during the fade in");
+    fake.advanceTime(5000);
+    await settle();
+    fake.closeMenu();
+
+    setBoard(MEDIEVAL, FACTORY, { durationMs: 10 });
+    startOpening();
+    await settle();
+    fake.advanceTime(BOARD_OPEN_MS);
+    assert.equal(loaderLayerCount(fake), 0, "never shown when the read ends during the fade in");
+    press(fake, "Exit");
+    fake.advanceTime(BOARD_OPEN_MS);
+    fake.closeMenu();
 
     setBoard(MEDIEVAL, FACTORY, { durationMs: 5000 });
     openBoard(fake, lang);

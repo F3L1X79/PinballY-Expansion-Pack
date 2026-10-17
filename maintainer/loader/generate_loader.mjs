@@ -1,8 +1,8 @@
 // ============================================================
 // Maintainer's tool, never loaded by PinballY. Paints the Loader's gold
-// comet (prototype variant "comet", branch prototype/loader) from the
-// Steamball golds: a white-gold head with a soft glow and a tail of 300
-// degrees that thins and fades from gold to bronze, turning clockwise.
+// comet from the Steamball golds: a white-gold head with a soft glow and
+// a tail of 300 degrees that thins and fades from gold to bronze,
+// turning clockwise.
 // Writes it as a looping APNG with alpha, at the place, size and frame
 // count given by common/drawing/loader_image.js, through its own small
 // APNG encoder on Node's zlib.
@@ -34,7 +34,7 @@ const TAIL_RAMP = [[0, GLEAM], [0.12, LIGHT_GOLD], [0.45, GOLD], [1, BRONZE]];
 
 const CENTRE = SIZE / 2;
 const RADIUS = SIZE * 0.38;
-const WIDTH = SIZE * 0.075;
+const STROKE_WIDTH = SIZE * 0.075;
 const TAIL_LENGTH = TAU * 300 / 360;
 
 const clamp = (value, low = 0, high = 1) => (value < low ? low : value > high ? high : value);
@@ -59,13 +59,13 @@ function cometLayers(x, y, t) {
     const r = Math.hypot(x - CENTRE, y - CENTRE);
     const behind = mod(head - Math.atan2(y - CENTRE, x - CENTRE), TAU);
     const toHead = Math.hypot(x - (CENTRE + RADIUS * Math.cos(head)), y - (CENTRE + RADIUS * Math.sin(head)));
-    const layers = [[LIGHT_GOLD, 0.45 * Math.exp(-((toHead / (1.6 * WIDTH)) ** 2))]];
+    const layers = [[LIGHT_GOLD, 0.45 * Math.exp(-((toHead / (1.6 * STROKE_WIDTH)) ** 2))]];
     if (behind <= TAIL_LENGTH) {
         const b = behind / TAIL_LENGTH;
-        const width = WIDTH * (1 - 0.85 * b);
+        const width = STROKE_WIDTH * (1 - 0.85 * b);
         layers.push([ramp(TAIL_RAMP, b), (1 - b) ** 1.6 * coverage(Math.abs(r - RADIUS) - width / 2)]);
     }
-    layers.push([GLEAM, coverage(toHead - 0.62 * WIDTH)]);
+    layers.push([GLEAM, coverage(toHead - 0.62 * STROKE_WIDTH)]);
     return layers;
 }
 

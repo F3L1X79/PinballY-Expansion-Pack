@@ -491,35 +491,31 @@ export function createFakePinballYHost({
                 strokes.push({ text, rect: rect && { ...rect }, color, size });
             },
         };
+        // A draw, a clear or a loaded image starts from an empty layer.
+        function replaceContent() {
+            texts = [];
+            images = [];
+            frames = [];
+            strokes = [];
+            loadedImage = null;
+            clearColor = null;
+        }
         const layer = {
             zIndex,
             alpha: 1,
             draw(drawFunction, width, height) {
-                texts = [];
-                images = [];
-                frames = [];
-                strokes = [];
+                replaceContent();
                 canvasSize = width === undefined ? { ...currentLayoutSize } : { width, height };
-                loadedImage = null;
-                clearColor = null;
                 drawFunction(dc);
                 drawingList.push({ zIndex, texts: [...texts], images: [...images] });
             },
             clear(color) {
-                texts = [];
-                images = [];
-                frames = [];
-                strokes = [];
-                loadedImage = null;
+                replaceContent();
                 clearColor = color === undefined ? null : color;
             },
             // A fully qualified path, as the DrawingLayer help asks.
             loadImage(path) {
-                texts = [];
-                images = [];
-                frames = [];
-                strokes = [];
-                clearColor = null;
+                replaceContent();
                 loadedImage = path;
             },
             setPos(x, y, align) { position = align === undefined ? { x, y } : { x, y, align }; },
