@@ -39,7 +39,10 @@ const PINEMHI_KILL_MS = 7500;
 const realClearTimeout = clearTimeout;
 
 // Lets the zero-delay timers (deferred checks, dialogs) run for real.
-export const settle = () => new Promise(resolve => realSetTimeout(resolve, 10));
+// Node delays them by 1 ms, as this wait, and runs timers of the same
+// delay in order: every one set before settle() has run. A longer wait
+// only slowed down the scenarios that settle hundreds of times.
+export const settle = () => new Promise(resolve => realSetTimeout(resolve, 1));
 
 // PinballY's own commands used by the add-ons; custom ones start above them.
 const BUILT_IN_COMMANDS = {
