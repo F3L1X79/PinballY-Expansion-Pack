@@ -3,7 +3,7 @@
 // pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
 // from the prototype validated on the cabinet: the dimmed backdrop with
 // the centred Steamball panel, the header (Avatar in its worn Avatar
-// Frame, with its Player Level pip, close cross, greeting with the
+// Frame, with its Player Level pip, Exit Button, greeting with the
 // Profile's name in gold, Daily Streak line, Lost Records line in the
 // alert colour with the taker's Avatar, Collection Mastery on the Mastery Bar's card), one card
 // per Period Table (logo, period, name on one line, Table Mastery card
@@ -11,15 +11,15 @@
 // the bottom row ("random" and "stay"), the Button Hints in a footer
 // under it and, for each choice, its own rect
 // (which the Selection Marker surrounds) and, for the Avatar and the
-// cross, the tooltip shown while it is selected. Only drawing: no layer,
+// Exit Button, the tooltip shown while it is selected. Only drawing: no layer,
 // no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
-    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, drawExitButton, EXIT_BUTTON_LOOK, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
-    drawButtonHints,
+    text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsFooter, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
@@ -29,12 +29,12 @@ export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 61
 
 export const REFERENCE_HEIGHT = 1920;
 
-export const CHOICE = Object.freeze({ AVATAR: "avatar", CLOSE: "close", DAY: "day", WEEK: "week", STAY: "stay", RANDOM: "random" });
+export const CHOICE = Object.freeze({ AVATAR: "avatar", EXIT_BUTTON: "exitButton", DAY: "day", WEEK: "week", STAY: "stay", RANDOM: "random" });
 
 
 const LOOK = Object.freeze({
     pad: 40, gap: 26,
-    avatar: 120, cross: 56,
+    avatar: 120,
     greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
     // The Daily Streak line, when there is one, between the greeting and
     // Collection Mastery.
@@ -49,18 +49,14 @@ const LOOK = Object.freeze({
     periodSize: 21, nameSize: 22, minNameSize: 18, lineSize: 18, minLineSize: 15, lineTile: 28,
     cardK: 1.25, masteryCardH: 74,
     button: Object.freeze({ w: 140, h: 52, size: 22 }),
-    // The Button Hints' footer under the bottom row, a rule on its top;
-    // their look at hintsScale times the Achievement List's, as on the
-    // Household Stats.
-    footerGap: 16, footerH: 96, hintsScale: 1.5,
     // The logo column, narrower inside a window under narrowBelow (a
     // portrait playfield), then the details at most detailsMaxW wide.
     logoInset: 24, logoTop: 20, logoW: 360, narrowLogoShare: 0.26, narrowBelow: 1300, detailsGap: 32, detailsMaxW: 640,
     // The panel's width: a share of the window's, at most maxWidth.
     widthShare: 0.9, maxWidth: 1800,
-    // Room around the Avatar and the cross on their tooltip's layer, and
-    // beside them for the tooltip.
-    tooltipMargin: 20, avatarTooltipRoom: 380, crossTooltipRoom: 240,
+    // Room around the Avatar on its tooltip's layer, and beside it for the
+    // tooltip.
+    avatarTooltipMargin: 20, avatarTooltipRoom: 380,
     // Room around the Collection Mastery card for its square's halo.
     squareHaloMargin: 24,
 });
@@ -217,7 +213,7 @@ function iconBox(host, dc, x, y, size) {
 function geometry(referenceWidth, screen) {
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
     const inner = { x: Math.round((referenceWidth - w) / 2) + LOOK.pad, w: w - 2 * LOOK.pad };
-    // Under the Avatar; without one, on the top line, beside the cross.
+    // Under the Avatar; without one, on the top line, beside the Exit Button.
     const greetingY = screen.picker ? avatarRoomOf(screen) + LOOK.greetingGap : 0;
     const greetingEndY = greetingY + Math.round(LOOK.greetingSize * 1.4);
     const dailyStreakY = greetingEndY + LOOK.dailyStreakGap;
@@ -235,7 +231,7 @@ function geometry(referenceWidth, screen) {
     const logoW = inner.w < LOOK.narrowBelow ? Math.round(inner.w * LOOK.narrowLogoShare) : LOOK.logoW;
     // Where a card's details start, which Collection Mastery lines up with.
     const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
-    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + LOOK.footerGap + LOOK.footerH + LOOK.pad;
+    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH + LOOK.pad;
     const panel = { x: inner.x - LOOK.pad, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     return { panel, inner, headerH, greetingY, dailyStreakY, lostRecordsY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
 }
@@ -295,14 +291,16 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
 // (each { choice, period, title, logoPath, mastery, masteryHead ({ text,
 // color }, as the Mastery Bar's), line
 // (null, or { played, streak, text }), goLabel }), choices, labels (by
-// choice), buttonHints (the footer's groups) }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn in
+// choice), exitLook (the Exit Button's EXIT_BUTTON_LOOK), buttonHints
+// (the footer's groups) }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn in
 // its rect's own coordinates, and the highlight of each choice.
 export function layoutWelcomeScreen(host, screen, referenceWidth) {
     const layout = geometry(referenceWidth, screen);
     const { inner, headerH, greetingY, dailyStreakY, lostRecordsY, collectionY, masteryCardH, detailsX, panel, cardsH } = layout;
     const top = panel.y + LOOK.pad;
-    // The greeting and the lines under it stop short of the cross.
-    const greetingW = inner.w - LOOK.cross - 40;
+    // The greeting and the lines under it stop short of the Exit Button.
+    const exitSide = EXIT_AND_HINTS.exitButton;
+    const greetingW = inner.w - exitSide - 40;
     const pieces = [{
         zIndex: WELCOME_SCREEN_Z_INDEX.header,
         rect: { x: inner.x, y: top, w: inner.w, h: headerH },
@@ -316,7 +314,7 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
                     drawLevelPip(host, dc, screen.level, pip.cx, pip.cy, pip.size);
                 }
             }
-            drawExitButton(dc, EXIT_BUTTON_LOOK.CLOSE, inner.w - LOOK.cross, 0, LOOK.cross);
+            drawExitButton(dc, screen.exitLook, inner.w - exitSide, 0, exitSide);
             const parts = screen.greeting.map(([str, gold]) => [str, gold ? COLORS.gold : COLORS.title]);
             runs(host, dc, parts, { x: 0, y: greetingY, width: greetingW, size: LOOK.greetingSize });
         },
@@ -347,7 +345,6 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         draw: dc => drawCollectionCard(host, dc, screen.collection, squareRoom, squareRoom, collectionW),
     });
 
-    const M = LOOK.tooltipMargin;
     const tooltipPiece = (rect, draw) => ({ zIndex: WELCOME_SCREEN_Z_INDEX.tooltips, rect, draw });
     // target: the choice's own rect; tooltip: a piece shown while it is selected.
     const choiceAt = (target, tooltipShown = null) => ({ target, tooltip: tooltipShown });
@@ -386,14 +383,11 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         },
     });
 
-    const footerTop = rowsTop + LOOK.rowH + LOOK.footerGap;
+    const footerTop = rowsTop + LOOK.rowH + EXIT_AND_HINTS.footerGap;
     pieces.push({
         zIndex: WELCOME_SCREEN_Z_INDEX.buttonHints,
-        rect: { x: inner.x, y: footerTop, w: inner.w, h: LOOK.footerH },
-        draw: dc => {
-            dc.fillRect(0, 0, inner.w, 1, COLORS.border);
-            drawButtonHints(host, dc, screen.buttonHints, { x: 0, y: 0, width: inner.w, height: LOOK.footerH, scale: LOOK.hintsScale });
-        },
+        rect: { x: inner.x, y: footerTop, w: inner.w, h: EXIT_AND_HINTS.footerH },
+        draw: dc => drawButtonHintsFooter(host, dc, screen.buttonHints, { width: inner.w, height: EXIT_AND_HINTS.footerH }),
     });
 
     const highlights = {
@@ -401,26 +395,23 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         [CHOICE.STAY]: choiceAt(rowRect[CHOICE.STAY]),
         [CHOICE.RANDOM]: choiceAt(rowRect[CHOICE.RANDOM]),
     };
-    // The cross's tooltip sits on its left, the Avatar's on its right,
+    // The Exit Button's tooltip sits on its left, the Avatar's on its right,
     // where the header is empty; their rects leave room for it.
-    const crossX = inner.x + inner.w - LOOK.cross;
-    const crossRoom = LOOK.crossTooltipRoom;
-    highlights[CHOICE.CLOSE] = choiceAt(
-        { x: crossX, y: top, w: LOOK.cross, h: LOOK.cross },
-        tooltipPiece(
-            { x: crossX - crossRoom, y: top - M, w: crossRoom + LOOK.cross + M, h: LOOK.cross + 2 * M },
-            dc => tooltip(host, dc, screen.labels[CHOICE.CLOSE], crossRoom - 18, M + LOOK.cross / 2, "left")
-        )
+    const exitButton = { x: inner.x + inner.w - exitSide, y: top, w: exitSide, h: exitSide };
+    highlights[CHOICE.EXIT_BUTTON] = choiceAt(
+        exitButton,
+        tooltipPiece(exitTooltipRectOf(exitButton), dc => drawExitTooltip(host, dc, screen.labels[CHOICE.EXIT_BUTTON]))
     );
     if (screen.picker) {
         // Around the frame, when the Avatar wears one.
         const room = LOOK.avatarTooltipRoom;
+        const margin = LOOK.avatarTooltipMargin;
         const side = avatarRoomOf(screen);
         highlights[CHOICE.AVATAR] = choiceAt(
             { x: inner.x, y: top, w: side, h: side },
             tooltipPiece(
-                { x: inner.x - M, y: top - M, w: M + side + room, h: side + 2 * M },
-                dc => tooltip(host, dc, screen.labels[CHOICE.AVATAR], M + side + 18, M + side / 2, "right")
+                { x: inner.x - margin, y: top - margin, w: margin + side + room, h: side + 2 * margin },
+                dc => tooltip(host, dc, screen.labels[CHOICE.AVATAR], margin + side + 18, margin + side / 2, "right")
             )
         );
     }

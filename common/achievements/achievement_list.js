@@ -15,14 +15,11 @@
 // Achievement Progress, and its Unlock Rate: the Avatars of the other Profiles Notified of it,
 // once the household has two Profiles besides Guest.
 // Next / Prev glide the highlighted line from one Achievement to the next,
-// with PinballY's navigation sound; the other lines are dimmed. The Exit
-// Button (the back arrow, its tooltip saying Back) at the header's top
-// right closes the loop: past the last row or before the first, the
-// Selection Marker surrounds it and no line is lit. The footer's Button
-// Hints name the flippers, Select and Exit.
-// Exit, or Select or Launch on the Exit Button, closes the list and calls
-// the return given to open(); attract mode closes it too. While it is
-// open, every button is swallowed through "commandbuttondown".
+// wrapping through the Exit Button, with PinballY's navigation sound; the other
+// lines are dimmed.
+// Exit closes the list and calls the return given to open(); attract mode
+// closes it too. While it is open, every button is swallowed through
+// "commandbuttondown".
 // Each item (a row or a section header) has its own layer, only moved and
 // faded while the list is open; the header and footer sit on a mask layer
 // above the rows, the header's small emblem images on layers above it. Each
@@ -51,13 +48,14 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { displayNameOf } from "../profiles/profile_name.js";
 import { createScreenOpening } from "../drawing/screen_opening.js";
-import { EXIT_BUTTON_LOOK } from "../drawing/steamball_drawing.js";
-import { buttonHintGroupsOf, exitButtonWordOf, FLIPPER_HINT } from "../drawing/button_hints.js";
+import { EXIT_BUTTON_LOOK, drawExitButton, drawExitTooltip } from "../drawing/steamball_drawing.js";
+import { buttonHintGroupsOf, exitButtonLookOf, exitButtonWordOf, FLIPPER_HINT } from "../drawing/button_hints.js";
+import { EXIT_BUTTON } from "../drawing/exit_button_loop.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
 import {
     LIST_LOOK, AVATAR_FRAME_WIDTH, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
-    drawPiece, layoutScrollbar, thumbTopAt, drawScrollbarThumb, drawExitButton, drawExitTooltip, SHARED_SCALE, EXIT_BUTTON_CANVAS, EXIT_TOOLTIP_CANVAS,
+    drawPiece, layoutScrollbar, thumbTopAt, drawScrollbarThumb, SHARED_SCALE, EXIT_BUTTON_CANVAS, EXIT_TOOLTIP_CANVAS,
 } from "./achievement_list_painter.js";
 
 const SCRIPT_NAME = "AchievementList";
@@ -83,10 +81,6 @@ const ROW_PITCH = LIST_LOOK.rowHeight + LIST_LOOK.itemGap;
 const MAX_OWNER_AVATARS = 4;
 // The file name's ending of each rank's emblem image, by where it shows.
 const EMBLEM_VARIANT = Object.freeze({ UNLOCKED: "_plain", MISSING: "_missing", HEADER: "_plain" });
-// The list always brings back the main menu or the Profile Stats.
-const EXIT_LOOK = EXIT_BUTTON_LOOK.BACK;
-// The highlighted item's index while the Exit Button is selected.
-const EXIT_BUTTON = -1;
 
 // drawingAhead: the shared drawing ahead (common/core/drawing_ahead.js).
 export function createAchievementList(host, { getAchievements, profileStore, drawingAhead, profileRewards = null }) {
@@ -111,6 +105,9 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     const thumbLayers = new Map();
     // The Exit Button and its tooltip, by EXIT_PIECES key.
     const exitLayers = new Map();
+    // The Exit Button's look of the last opening, drawn ahead for the next
+    // one: every caller gives a return so far.
+    let exitLook = EXIT_BUTTON_LOOK.BACK;
     const imagesFolder = `${host.getProjectFolder()}\\assets\\images`;
     // Each emblem image's path, or null when its file is missing: checked
     // once per session.
@@ -326,7 +323,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
 
     function readContent() {
         const entries = readEntries();
-        const footer = buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_LOOK });
+        const footer = buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook });
         return { ...buildItems(entries), header: describeHeader(entries), footer };
     }
 
@@ -411,17 +408,17 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     // The Exit Button and its tooltip, each drawn in the reference pixels of
     // the other drawn screens and shown at its rect in the geometry.
     const EXIT_PIECES = Object.freeze({
-        button: { zIndex: ACHIEVEMENT_LIST_Z_INDEX.exitButton, canvas: EXIT_BUTTON_CANVAS, rectOf: g => g.exitButton, draw: dc => drawExitButton(dc, EXIT_LOOK) },
+        button: { zIndex: ACHIEVEMENT_LIST_Z_INDEX.exitButton, canvas: EXIT_BUTTON_CANVAS, rectOf: g => g.exitButton, draw: dc => drawExitButton(dc, exitLook) },
         tooltip: {
             zIndex: ACHIEVEMENT_LIST_Z_INDEX.tooltip, canvas: EXIT_TOOLTIP_CANVAS, rectOf: g => g.exitTooltip,
-            draw: dc => drawExitTooltip(host, dc, exitButtonWordOf(EXIT_LOOK)),
+            draw: dc => drawExitTooltip(host, dc, exitButtonWordOf(exitLook)),
         },
     });
-    const isExitPieceDrawn = key => isDrawn(exitLayers, key, EXIT_LOOK, EXIT_PIECES[key].canvas.width, EXIT_PIECES[key].canvas.height);
+    const isExitPieceDrawn = key => isDrawn(exitLayers, key, exitLook, EXIT_PIECES[key].canvas.width, EXIT_PIECES[key].canvas.height);
 
     function exitLayer(key) {
         const { zIndex, canvas, rectOf, draw } = EXIT_PIECES[key];
-        return signedLayer(exitLayers, key, zIndex, EXIT_LOOK, canvas.width, canvas.height, draw, rectOf(geometry).h);
+        return signedLayer(exitLayers, key, zIndex, exitLook, canvas.width, canvas.height, draw, rectOf(geometry).h);
     }
 
     // The rail's place only depends on the geometry; whether it shows, on
@@ -705,8 +702,11 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         placeExitButton();
     }
 
-    // onExit: what Exit returns to, called once the list is closed.
-    function open(onExit = () => {}) {
+    // onExit: what Exit returns to, called once the list is closed (null:
+    // the bare wheel, the Exit Button then a cross).
+    function open(onExit = null) {
+        // Before the content is read: the Exit Button and the footer follow it.
+        exitLook = exitButtonLookOf(onExit !== null);
         // A native menu left open would sit over or under the list.
         if (host.getUIMode() === "menu") host.doCommand(host.getBuiltInCommand("MenuReturn"));
         stopGlide();
@@ -770,7 +770,7 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
         } else if (ev.command === "Exit" || (isOnExitButton && (ev.command === "Select" || ev.command === "Launch"))) {
             const { onExit } = shown;
             close();
-            onExit();
+            if (onExit) onExit();
         }
     }));
 

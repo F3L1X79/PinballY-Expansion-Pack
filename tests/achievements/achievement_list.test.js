@@ -701,7 +701,8 @@ test("after a new unlock and after a Profile switch, the next opening shows the 
     profileStore.switchTo("Bob");
     fake.advanceTime(IDLE_ENOUGH_MS);
     const drawnBeforeOpening = listDrawings(fake).length;
-    list.open();
+    // With a return, as every caller: the Exit Button drawn ahead is the back arrow.
+    list.open(() => {});
     untilListShown(fake);
     assert.equal(listDrawings(fake).length, drawnBeforeOpening, "the switch was drawn ahead");
     assert.ok(chromeTexts(fake).includes("Bob"));

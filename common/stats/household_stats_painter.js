@@ -17,7 +17,7 @@
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import {
-    oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, drawExitButton as drawExitButtonTile, drawButtonHints as drawButtonHintsCentred, tooltip, UNBOUNDED,
+    oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, UNBOUNDED, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
@@ -43,12 +43,6 @@ const LOOK = Object.freeze({
     avatar: 104, nameGap: 4, nameH: 40, nameSize: 24, minNameSize: 16, headerH: 212,
     // Each line: its height, its value at valueSize, a thin rule under it.
     lineH: 76, valueSize: 28, minValueSize: 18, squareK: 0.6, squareGap: 10,
-    // The Exit Button at the title's right end, as on the Profile Stats,
-    // with room on its left for its tooltip, and round it on the tooltip's layer.
-    exitButton: 56, exitTooltipRoom: 240, tooltipMargin: 16,
-    // The Button Hints' footer under the columns, a rule on its top; their
-    // look at hintsScale times the Achievement List's.
-    footerGap: 16, footerH: 96, hintsScale: 1.5,
 });
 
 // How wide a column's Avatar Frame is drawn, for its image's size.
@@ -58,10 +52,10 @@ export const AVATAR_FRAME_WIDTH = avatarFrameSide(LOOK.avatar);
 const AVATAR_Y = LOOK.avatar * AVATAR_FRAME_MARGIN;
 const NAME_Y = AVATAR_FRAME_WIDTH + LOOK.nameGap;
 
-// The panel, its title, the Exit Button, the labels' column, each column as if
+// The panel, its title, the Exit Button at the title's right end, the labels' column, each column as if
 // none were scrolled (the first ones in view, the others lined up after
 // them), the view the columns show through and their pitch, the Button
-// Hints' footer, in a window
+// Hints' footer under the columns, in a window
 // referenceWidth wide, for columnCount columns and lineCount lines.
 export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     const widest = Math.round(referenceWidth * LOOK.widthShare);
@@ -71,42 +65,20 @@ export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     const columnW = Math.max(LOOK.columnMinW, Math.min(LOOK.columnMaxW, Math.floor(room / shown)));
     const w = 2 * LOOK.pad + LOOK.labelsW + shown * (LOOK.columnGap + columnW);
     const tableH = LOOK.headerH + lineCount * LOOK.lineH;
-    const h = 2 * LOOK.pad + LOOK.titleH + LOOK.titleGap + tableH + LOOK.footerGap + LOOK.footerH;
+    const h = 2 * LOOK.pad + LOOK.titleH + LOOK.titleGap + tableH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     const x = panel.x + LOOK.pad;
     const title = { x, y: panel.y + LOOK.pad, w: w - 2 * LOOK.pad, h: LOOK.titleH };
-    const exitButton = { x: panel.x + w - LOOK.pad - LOOK.exitButton, y: title.y + Math.round((title.h - LOOK.exitButton) / 2), w: LOOK.exitButton, h: LOOK.exitButton };
+    const side = EXIT_AND_HINTS.exitButton;
+    const exitButton = { x: panel.x + w - LOOK.pad - side, y: title.y + Math.round((title.h - side) / 2), w: side, h: side };
     const tableY = title.y + title.h + LOOK.titleGap;
     const labels = { x, y: tableY, w: LOOK.labelsW, h: tableH };
     const pitch = columnW + LOOK.columnGap;
     const firstX = x + LOOK.labelsW + LOOK.columnGap;
     const columns = Array.from({ length: columnCount }, (_, index) => ({ x: firstX + index * pitch, y: tableY, w: columnW, h: tableH }));
     const view = { x: firstX, w: shown * pitch - LOOK.columnGap, count: shown };
-    const buttonHints = { x, y: tableY + tableH + LOOK.footerGap, w: w - 2 * LOOK.pad, h: LOOK.footerH };
+    const buttonHints = { x, y: tableY + tableH + EXIT_AND_HINTS.footerGap, w: w - 2 * LOOK.pad, h: EXIT_AND_HINTS.footerH };
     return { panel, title, exitButton, labels, columns, view, pitch, buttonHints };
-}
-
-// The Exit Button's tooltip layer, with the tooltip on the button's left:
-// its rect leaves room for it.
-export function exitTooltipRectOf(exitButton) {
-    const M = LOOK.tooltipMargin;
-    return { x: exitButton.x - LOOK.exitTooltipRoom, y: exitButton.y - M, w: LOOK.exitTooltipRoom + exitButton.w + M, h: exitButton.h + 2 * M };
-}
-
-// look: an EXIT_BUTTON_LOOK.
-export function drawExitButton(dc, look) {
-    drawExitButtonTile(dc, look, 0, 0, LOOK.exitButton);
-}
-
-export function drawExitTooltip(host, dc, label) {
-    const M = LOOK.tooltipMargin;
-    tooltip(host, dc, label, LOOK.exitTooltipRoom - 18, M + LOOK.exitButton / 2, "left");
-}
-
-// The footer w by h: a rule on its top, the Button Hints (groups) centred.
-export function drawButtonHints(host, dc, groups, w, h) {
-    dc.fillRect(0, 0, w, 1, COLORS.border);
-    drawButtonHintsCentred(host, dc, groups, { x: 0, y: 0, width: w, height: h, scale: LOOK.hintsScale });
 }
 
 export function drawTitle(host, dc, title, w, h) {

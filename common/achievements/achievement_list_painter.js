@@ -2,9 +2,8 @@
 // Achievement List painter: draws the pieces of the drawn Achievement List
 // (the dimmed backdrop and panel, the header and footer, a section header,
 // an Achievement row, a rank emblem, a row's Unlock Rate, an emblem image,
-// the scrollbar's rail and thumb, the Exit Button and its tooltip)
-// into a drawing layer's context, in the Steamball look validated with the
-// prototype, and says where the pieces on layers of their own sit. It only
+// the scrollbar's rail and thumb) into a drawing layer's context, in the
+// Steamball look validated with the prototype, and says where the pieces on layers of their own sit. It only
 // draws what it is given: it holds no state, reads no Achievement and
 // listens to no event. Sizes are in layout pixels, fonts in points.
 // ============================================================
@@ -12,7 +11,7 @@
 import { ACHIEVEMENT_RANK, RANKS_IN_ORDER } from "./achievements.js";
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
 import {
-    drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawButtonHints, drawExitButton as drawExitButtonTile, tooltip,
+    drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawButtonHintsFooter, exitTooltipRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 
 // The wheel shows dimmed through it.
@@ -81,19 +80,16 @@ export const LIST_LOOK = Object.freeze({
 
 // The Exit Button and its tooltip are drawn at the other drawn screens'
 // size, in their reference pixels (1920 high), which are SHARED_SCALE times
-// the list's layout pixels, as for the Household Stats' Button Hints; their
-// layers are scaled down to the list's size.
-export const SHARED_SCALE = 1.5;
-const EXIT_LOOK = Object.freeze({ button: 56, tooltipRoom: 240, tooltipMargin: 16 });
+// the list's layout pixels, the scale of their Button Hints against the
+// list's; their layers are scaled down to the list's size.
+export const SHARED_SCALE = EXIT_AND_HINTS.hintsScale;
 
 // The canvases of the Exit Button and of its tooltip (on the button's left),
 // in reference pixels.
-export const EXIT_BUTTON_CANVAS = Object.freeze({ width: EXIT_LOOK.button, height: EXIT_LOOK.button });
-export const EXIT_TOOLTIP_CANVAS = Object.freeze({
-    width: EXIT_LOOK.tooltipRoom + EXIT_LOOK.button + EXIT_LOOK.tooltipMargin,
-    height: EXIT_LOOK.button + 2 * EXIT_LOOK.tooltipMargin,
-});
-const EXIT_BUTTON_SIZE = EXIT_LOOK.button / SHARED_SCALE;
+const EXIT_BUTTON_SIDE = EXIT_AND_HINTS.exitButton;
+export const EXIT_BUTTON_CANVAS = Object.freeze({ width: EXIT_BUTTON_SIDE, height: EXIT_BUTTON_SIDE });
+const exitTooltipCanvasRect = exitTooltipRectOf({ x: 0, y: 0, w: EXIT_BUTTON_SIDE, h: EXIT_BUTTON_SIDE });
+export const EXIT_TOOLTIP_CANVAS = Object.freeze({ width: exitTooltipCanvasRect.w, height: exitTooltipCanvasRect.h });
 
 function mixColors(from, to, ratio) {
     let color = 0;
@@ -230,14 +226,13 @@ export function computeGeometry({ width, height }) {
     const panelHeight = Math.round(height * look.panelRatio);
     const x = Math.round((width - panelWidth) / 2);
     const y = Math.round((height - panelHeight) / 2);
-    const exitButton = { x: x + panelWidth - look.padding - EXIT_BUTTON_SIZE, y: y + look.padding, w: EXIT_BUTTON_SIZE, h: EXIT_BUTTON_SIZE };
-    const M = EXIT_LOOK.tooltipMargin / SHARED_SCALE;
+    const side = EXIT_BUTTON_SIDE / SHARED_SCALE;
+    const exitButton = { x: x + panelWidth - look.padding - side, y: y + look.padding, w: side, h: side };
     return {
         width, height, x, y, panelWidth, panelHeight, exitButton,
-        exitTooltip: {
-            x: exitButton.x - EXIT_LOOK.tooltipRoom / SHARED_SCALE, y: exitButton.y - M,
-            w: EXIT_TOOLTIP_CANVAS.width / SHARED_SCALE, h: EXIT_TOOLTIP_CANVAS.height / SHARED_SCALE,
-        },
+        exitTooltip: exitTooltipRectOf(exitButton, {
+            room: EXIT_AND_HINTS.exitTooltipRoom / SHARED_SCALE, margin: EXIT_AND_HINTS.tooltipMargin / SHARED_SCALE,
+        }),
         areaTop: y + look.headerHeight,
         areaHeight: panelHeight - look.headerHeight - look.footerHeight,
         rowX: x + look.rowsInset,
@@ -346,8 +341,7 @@ function drawFooter(host, dc, g, footer) {
     const { x, panelWidth: width } = g;
     const y = g.y + g.panelHeight - look.footerHeight;
     fillGradient(dc, x, y, width, look.footerHeight, FOOTER_TOP_COLOR, COLORS.panel);
-    dc.fillRect(x, y, width, 1, COLORS.border);
-    drawButtonHints(host, dc, footer, { x, y, width, height: look.footerHeight });
+    drawButtonHintsFooter(host, dc, footer, { x, y, width, height: look.footerHeight, scale: 1 });
 }
 
 // The whole window, transparent between the header and the footer, so a
@@ -501,16 +495,4 @@ export function drawPiece(host, dc, { imagePath, avatarPath, moreText, width, he
     }
     dc.fillRect(0, 0, width, height, COLORS.border);
     dc.drawImage(avatarPath, 1, 1, width - 2, height - 2);
-}
-
-// The Exit Button on its own layer, at EXIT_BUTTON_CANVAS's size; look: an
-// EXIT_BUTTON_LOOK.
-export function drawExitButton(dc, look) {
-    drawExitButtonTile(dc, look, 0, 0, EXIT_LOOK.button);
-}
-
-// Its tooltip on its own layer, at EXIT_TOOLTIP_CANVAS's size, pointing at
-// the button on its right.
-export function drawExitTooltip(host, dc, word) {
-    tooltip(host, dc, word, EXIT_LOOK.tooltipRoom - 18, EXIT_LOOK.tooltipMargin + EXIT_LOOK.button / 2, "left");
 }

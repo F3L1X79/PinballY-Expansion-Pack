@@ -15,7 +15,8 @@
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
 import {
-    text, oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, drawExitButton as drawExitButtonTile, drawButtonHints as drawButtonHintsCentred, tooltip,
+    text, oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, exitTooltipRectOf,
+    drawExitTooltip as drawExitTooltipOn, drawButtonHintsFooter, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 import { ACHIEVEMENT_RANK } from "../achievements/achievements.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER, DRAWN_MENU_PANEL_WIDTH, DRAWN_MENU_FACE_INSET, DRAWN_MENU_LIST_INSET } from "../drawn_menu/drawn_menu_images.js";
@@ -48,6 +49,11 @@ export const CROWN_CANVAS = 512;
 const LIGHT_GOLD = 0xFFFFE6A6;
 const DIMMING = 0xB0080A0E;
 
+// The Exit Button, its tooltip and the Button Hints are drawn on a canvas
+// this many times their board size: the board's zoom in a landscape
+// window, where they then match the other drawn screens' in reference pixels.
+export const CANVAS_ZOOM = 2;
+
 const LOOK = Object.freeze({
     // From the panel's edges to the content, as the Drawn Menu's entries;
     // at the bottom, to the footer, which takes most of the room the
@@ -65,19 +71,14 @@ const LOOK = Object.freeze({
     // The rows from the 4th place on.
     rowsGap: 18, rowH: 64, rowGap: 8, rowPad: 8, tile: 48, rowAvatar: 48, cellGap: 14, rowInitialsW: 80, rowScoreW: 200,
     rowRankSize: 18, rowNameSize: 18, rowInitialsSize: 15, rowScoreSize: 20,
-    // The Exit Button at the title's right end, with room on its left for
-    // its tooltip, and round it on the tooltip's layer; the title keeps
-    // the same room on both sides, so it stays centred.
-    exitButton: 28, exitTooltipRoom: 100, tooltipMargin: 8,
-    // The Button Hints' footer under the board, a rule on its top; their
-    // look at hintsScale times the Achievement List's, on its canvas.
-    footerGap: 6, footerH: 40, hintsScale: 1.5,
+    // The Exit Button at the title's right end, the other drawn screens'
+    // once on its canvas, with less room on its left for its tooltip;
+    // the title keeps the same room on both sides, so it stays centred.
+    exitButton: EXIT_AND_HINTS.exitButton / CANVAS_ZOOM, exitTooltipRoom: 100, tooltipMargin: EXIT_AND_HINTS.tooltipMargin / CANVAS_ZOOM,
+    // The Button Hints' footer under the board, shorter than the other
+    // drawn screens' so a 5-place board still fits a landscape window.
+    footerGap: 6, footerH: 40,
 });
-
-// The Exit Button, its tooltip and the Button Hints are drawn on a canvas
-// this many times their board size: the board's zoom in a landscape
-// window, where they then match the other drawn screens' in reference pixels.
-export const CANVAS_ZOOM = 2;
 
 // How wide an Avatar Frame is drawn at most, for its image's size.
 export const AVATAR_FRAME_WIDTH = avatarFrameSide(Math.max(...LOOK.avatar, LOOK.rowAvatar));
@@ -128,8 +129,7 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     const exitRoom = LOOK.exitTooltipRoom + LOOK.exitButton;
     const title = { x: x + exitRoom, y: LOOK.topInset, w: contentW - 2 * exitRoom, h: LOOK.titleH };
     const exitButton = { x: x + contentW - LOOK.exitButton, y: title.y + (title.h - LOOK.exitButton) / 2, w: LOOK.exitButton, h: LOOK.exitButton };
-    const M = LOOK.tooltipMargin;
-    const exitTooltip = { x: exitButton.x - LOOK.exitTooltipRoom, y: exitButton.y - M, w: LOOK.exitTooltipRoom + exitButton.w + M, h: exitButton.h + 2 * M };
+    const exitTooltip = exitTooltipRectOf(exitButton, { room: LOOK.exitTooltipRoom, margin: LOOK.tooltipMargin });
     const note = { x, y: title.y + title.h, w: contentW, h: LOOK.noteH };
     const bodyY = note.y + note.h + LOOK.titleGap;
     const message = { x, y: bodyY, w: contentW, h: LOOK.messageH };
@@ -151,23 +151,16 @@ export function layoutHighScoreBoard(referenceWidth, placeCount) {
     return { zoom, origin, panel, title, note, message, steps, crowns, rows, rowsInView, rowPitch, exitButton, exitTooltip, buttonHints };
 }
 
-// look: the Exit Button's (EXIT_BUTTON_LOOK), on its canvas.
-export function drawExitButton(dc, look) {
-    drawExitButtonTile(dc, look, 0, 0, LOOK.exitButton * CANVAS_ZOOM);
-}
-
 // On the Exit Button's left, on its tooltip's canvas.
-export function drawExitTooltip(host, dc, label) {
-    const M = LOOK.tooltipMargin * CANVAS_ZOOM;
-    tooltip(host, dc, label, (LOOK.exitTooltipRoom - 9) * CANVAS_ZOOM, M + LOOK.exitButton * CANVAS_ZOOM / 2, "left");
+export function drawExitTooltip(host, dc, word) {
+    drawExitTooltipOn(host, dc, word, {
+        buttonSize: LOOK.exitButton * CANVAS_ZOOM, room: LOOK.exitTooltipRoom * CANVAS_ZOOM, margin: LOOK.tooltipMargin * CANVAS_ZOOM,
+    });
 }
 
-// The footer w by h board pixels, on its canvas: a rule on its top, the
-// Button Hints (groups) centred.
+// The footer w by h board pixels, on its canvas.
 export function drawButtonHints(host, dc, groups, w, h) {
-    const width = w * CANVAS_ZOOM;
-    dc.fillRect(0, 0, width, 1, COLORS.border);
-    drawButtonHintsCentred(host, dc, groups, { x: 0, y: 0, width, height: h * CANVAS_ZOOM, scale: LOOK.hintsScale });
+    drawButtonHintsFooter(host, dc, groups, { width: w * CANVAS_ZOOM, height: h * CANVAS_ZOOM });
 }
 
 // A rect of the layout in reference pixels from the window's top left,

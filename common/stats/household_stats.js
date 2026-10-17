@@ -10,8 +10,7 @@
 // one Profile per step of the shared screen opening (docs/adr/0014). While open
 // it swallows every button through "commandbuttondown": Next / Prev move
 // the Selection Marker (a gold glow flowing round the choice) through the
-// Exit Button at the top right (the back arrow, its tooltip saying Back),
-// then from column to
+// Exit Button at the top right, then from column to
 // column, looping, with PinballY's navigation sound. Past five columns
 // (fewer in a narrow window), the columns glide sideways to keep the
 // marker in view, the marker following its column on every frame, the ones cut by the view's edges
@@ -31,12 +30,12 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { prepareDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
-import { drawBackdrop, EXIT_BUTTON_LOOK } from "../drawing/steamball_drawing.js";
-import { exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
+import { drawBackdrop, drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsFooter } from "../drawing/steamball_drawing.js";
+import { exitButtonLookOf, exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
+import { EXIT_BUTTON, stepThroughExitButton } from "../drawing/exit_button_loop.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import {
-    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, exitTooltipRectOf,
-    drawTitle, drawLabels, drawColumn, drawExitButton, drawExitTooltip, drawButtonHints,
+    HOUSEHOLD_STATS_Z_INDEX, REFERENCE_HEIGHT, AVATAR_FRAME_WIDTH, layoutHouseholdStats, drawTitle, drawLabels, drawColumn,
 } from "./household_stats_painter.js";
 
 const SCRIPT_NAME = "HouseholdStats";
@@ -46,11 +45,6 @@ const MINUTES_PER_HOUR = 60;
 // the Achievement List's does.
 const GLIDE_TIME_CONSTANT_MS = 40;
 const GLIDE_SNAP_PX = 0.5;
-// The selection on the Exit Button rather than on a column; first in the
-// Next / Prev loop, as on the Profile Stats.
-const EXIT_BUTTON = -1;
-// Exit always brings one's own Profile Stats back.
-const EXIT_LOOK = EXIT_BUTTON_LOOK.BACK;
 
 // readStats(profileName): the Profile Stats' values for that Profile
 // (common/stats/profile_stats.js); openProfileStats(profileName, onBack): opens
@@ -142,8 +136,9 @@ export function createHouseholdStats(host, {
             .map(profile => ({ profile, isActive: isActive(profile) }));
     }
 
-    // entries: readProfiles()'s; allStats: each one's stats, in the same order.
-    function describeScreen(entries, allStats) {
+    // entries: readProfiles()'s; allStats: each one's stats, in the same
+    // order; exitLook: the Exit Button's.
+    function describeScreen(entries, allStats, exitLook) {
         const lines = LINES.filter(line => allStats.every(stats => line.isShown(stats)));
         const goldByLine = lines.map(line => {
             const scores = allStats.map(line.scoreOf);
@@ -153,8 +148,8 @@ export function createHouseholdStats(host, {
         });
         return {
             title: TEXT.household.title,
-            exitWord: exitButtonWordOf(EXIT_LOOK),
-            buttonHints: buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_LOOK }),
+            exitLook,
+            buttonHints: buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook }),
             labels: lines.map(line => line.label),
             columns: entries.map(({ profile, isActive }, column) => ({
                 profileName: profile.name,
@@ -168,11 +163,12 @@ export function createHouseholdStats(host, {
     }
 
     // onBack: what Exit returns to, called once the screen is closed (or
-    // given up); selectedName: the Profile whose column the marker
+    // given up; null: the bare wheel, the Exit Button then a cross);
+    // selectedName: the Profile whose column the marker
     // surrounds, brought into view (the first column when null or no longer
     // there). Reads and draws every layer hidden, step by step, then fades
     // them in together: it never shows up half drawn.
-    function open(onBack = () => {}, selectedName = null) {
+    function open(onBack = null, selectedName = null) {
         if (shown) return;
         const drawn = prepareDrawnScreen(host, SCRIPT_NAME, {
             referenceHeight: REFERENCE_HEIGHT, backdropZIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop, drawingAhead,
@@ -195,20 +191,20 @@ export function createHouseholdStats(host, {
         function queueSteps(entries) {
             const allStats = [];
             for (const { profile } of entries) drawn.read(() => allStats.push(readStats(profile.name)));
-            drawn.read(() => { screen = describeScreen(entries, allStats); });
+            drawn.read(() => { screen = describeScreen(entries, allStats, exitButtonLookOf(onBack !== null)); });
             drawn.draw(() => drawn.drawBackdrop((dc, size, referenceWidth) => {
                 geometry = layoutHouseholdStats(referenceWidth, screen.columns.length, screen.labels.length);
                 drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);
             }));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, () => geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
-            drawPiece(HOUSEHOLD_STATS_Z_INDEX.exitButton, () => geometry.exitButton, dc => drawExitButton(dc, EXIT_LOOK));
+            drawPiece(HOUSEHOLD_STATS_Z_INDEX.exitButton, () => geometry.exitButton, dc => drawExitButton(dc, screen.exitLook));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.buttonHints, () => geometry.buttonHints,
-                dc => drawButtonHints(host, dc, screen.buttonHints, geometry.buttonHints.w, geometry.buttonHints.h));
+                dc => drawButtonHintsFooter(host, dc, screen.buttonHints, { width: geometry.buttonHints.w, height: geometry.buttonHints.h }));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, () => geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
             entries.forEach((entry, index) => drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, () => geometry.columns[index],
                 dc => drawColumn(host, dc, screen.columns[index], geometry.columns[index].w), columnLayers));
             drawn.draw(() => {
-                exitTooltip = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.tooltip, exitTooltipRectOf(geometry.exitButton), dc => drawExitTooltip(host, dc, screen.exitWord));
+                exitTooltip = drawn.drawPiece(HOUSEHOLD_STATS_Z_INDEX.tooltip, exitTooltipRectOf(geometry.exitButton), dc => drawExitTooltip(host, dc, exitButtonWordOf(screen.exitLook)));
             });
         }
 
@@ -313,9 +309,7 @@ export function createHouseholdStats(host, {
         const screen = shown;
         const { columns, view } = screen.geometry;
         const previous = screen.selected;
-        // The loop's places: the Exit Button at 0, then the columns.
-        const places = columns.length + 1;
-        screen.selected = ((previous + 1 + direction + places) % places) - 1;
+        screen.selected = stepThroughExitButton(previous, direction, columns.length);
         if (screen.selected === EXIT_BUTTON) return placeColumns(screen);
         screen.first = Math.min(screen.selected, Math.max(screen.first, screen.selected - view.count + 1));
         if (previous === EXIT_BUTTON) {
@@ -331,7 +325,7 @@ export function createHouseholdStats(host, {
     function back() {
         const { onBack } = shown;
         close();
-        onBack();
+        if (onBack) onBack();
     }
 
     // Another Profile's column opens its Profile Stats, whose Exit comes

@@ -55,7 +55,7 @@ import { STEAMBALL_COLORS } from "../common/drawing/steamball_palette.js";
 import { createSelectionMarker } from "../common/drawing/selection_marker.js";
 import { createLoader } from "../common/drawing/loader.js";
 import { DIMMED_WHEEL, EXIT_BUTTON_LOOK } from "../common/drawing/steamball_drawing.js";
-import { buttonHintGroupsOf, FLIPPER_HINT } from "../common/drawing/button_hints.js";
+import { buttonHintGroupsOf, exitButtonWordOf, FLIPPER_HINT } from "../common/drawing/button_hints.js";
 import {
     WELCOME_SCREEN_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutWelcomeScreen,
 } from "../common/welcome_screen/welcome_screen_painter.js";
@@ -73,6 +73,8 @@ const MAX_NAMED_LOST_RECORDS = 3;
 // backdrop will, the Loader turns over it.
 const STARTUP_VEIL_Z_INDEX = WELCOME_SCREEN_Z_INDEX.backdrop - 2;
 const STARTUP_LOADER_Z_INDEX = WELCOME_SCREEN_Z_INDEX.backdrop - 1;
+// Exit always leaves the bare wheel.
+const EXIT_LOOK = EXIT_BUTTON_LOOK.CLOSE;
 
 // The greeting by the hour: from 5 h, 12 h, 19 h and 22 h.
 function partOfDay(hour) {
@@ -232,15 +234,15 @@ export default function init() {
             cards,
             // The flippers' loop; the first one is selected on opening,
             // unless firstChoice is one of them.
-            choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.CLOSE, ...cards.map(card => card.choice), CHOICE.RANDOM, CHOICE.STAY],
+            choices: [...(picker ? [CHOICE.AVATAR] : []), CHOICE.EXIT_BUTTON, ...cards.map(card => card.choice), CHOICE.RANDOM, CHOICE.STAY],
             labels: {
                 [CHOICE.AVATAR]: lang.profiles.menuEntry,
-                [CHOICE.CLOSE]: lang.buttonHints.close,
+                [CHOICE.EXIT_BUTTON]: exitButtonWordOf(EXIT_LOOK),
                 [CHOICE.STAY]: stay ? TEXT.stayOn(stay) : TEXT.stayOnWheel,
                 [CHOICE.RANDOM]: TEXT.randomTable,
             },
-            // Exit always leaves the bare wheel: the cross, and Close.
-            buttonHints: buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_BUTTON_LOOK.CLOSE }),
+            exitLook: EXIT_LOOK,
+            buttonHints: buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook: EXIT_LOOK }),
         };
     }
 
@@ -282,7 +284,7 @@ export default function init() {
         };
         const { pieces, highlights } = layoutWelcomeScreen(host, screen, referenceWidth);
         pieces.forEach(drawPiece);
-        // Only the Avatar and the cross have a tooltip: null for the others.
+        // Only the Avatar and the Exit Button have a tooltip: null for the others.
         const tooltipLayers = screen.choices.map(choice => (highlights[choice].tooltip ? drawPiece(highlights[choice].tooltip) : null));
         // Seen once drawn, even if the screen closes at once.
         if (highScores) highScores.markLostRecordsSeen(profile.name);
@@ -402,7 +404,7 @@ export default function init() {
     // Profile: the new player is welcomed too, read again when the screen
     // opens. Once only when the screen is still waiting or open.
     store.onSwitch(safeHandler(SCRIPT_NAME, () => {
-        if (!isSubmitted && !closeDialog) submit(CHOICE.CLOSE);
+        if (!isSubmitted && !closeDialog) submit(CHOICE.EXIT_BUTTON);
     }));
 
     // Fires on every mapped button press; drives the screen while it is

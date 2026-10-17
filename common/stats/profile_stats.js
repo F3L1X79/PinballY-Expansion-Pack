@@ -26,16 +26,13 @@
 // this screen again on that button). While open it swallows every button through
 // "commandbuttondown": Next / Prev move the Selection Marker (a gold glow
 // flowing round the choice) through the Exit Button and the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes
-// and brings back what open() was given (the main menu on "Your Stats"),
-// kept across the round trips to those lists; attract mode only closes it.
-// The Exit Button shows the back arrow when Exit brings something back,
-// the cross when it leaves the bare wheel; the Button Hints' footer names
-// the flippers, Select and Exit. Opens directly, not through the wheel dialog module:
+// and calls the return given to open(); attract mode only closes it.
+// Opens directly, not through the wheel dialog module:
 // the player asked for it. Can also open the frame list straight away, for
 // the Reward Prompt. openReadOnly() opens another Profile's screen from its
 // Household Stats column: its own values and tables (Adult Tables
 // included, whoever looks), no button at the card's foot, Exit or Select
-// on the Exit Button (the back arrow) going back there. isOpen() and onClosed() let the wheel
+// on the Exit Button going back there. isOpen() and onClosed() let the wheel
 // dialogs wait for it. readStats() reads the values it shows for any
 // named Profile, writing nothing.
 // ============================================================
@@ -343,7 +340,6 @@ export function createProfileStats(host, {
                 collection: collectionTextsOf(collectionMastery),
                 buttons,
                 exitLook,
-                exitWord: exitButtonWordOf(exitLook),
                 // Read-only, the Exit Button is the only choice: the flippers
                 // do nothing and Select does what Exit does, so Exit says it all.
                 buttonHints: buttonHintGroupsOf({ flippers: isReadOnly ? null : FLIPPER_HINT.BROWSE, select: !isReadOnly, exitLook }),
@@ -413,7 +409,7 @@ export function createProfileStats(host, {
         // then one per choice's tooltip (only the Exit Button has one: null for
         // the buttons).
         function queuePieces() {
-            const layout = layoutProfileStats(host, screen, drawn.referenceWidth);
+            const layout = layoutProfileStats(host, screen, drawn.referenceWidth, exitButtonWordOf(screen.exitLook));
             highlights = layout.highlights;
             for (const piece of layout.pieces) drawn.draw(() => drawn.drawPiece(piece.zIndex, piece.rect, piece.draw));
             screen.choices.forEach((choice, index) => drawn.draw(() => {

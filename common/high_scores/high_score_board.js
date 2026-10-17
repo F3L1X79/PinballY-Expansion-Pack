@@ -20,15 +20,11 @@
 // ahead once on their own layers through the shared drawing ahead
 // (PinballY reads an image file again on every draw), are only placed,
 // and wait hidden, shrunk to a point, while the board is closed. The Exit
-// Button at the top right is the board's only choice, always under the
-// Selection Marker with its tooltip: the back arrow, "Back", when open()
-// was given a return, the cross, "Close", when Exit leaves the bare
-// wheel. The Button Hints' footer names the flippers (Scroll) only on a
-// board longer than the window, then Exit. While
+// Button is its only choice. While
 // open it swallows every button through "commandbuttondown"; when the
 // rows below the podium do not all fit the window, the flippers (Next /
-// Prev) scroll them, the podium staying in place; Exit, Select or Launch
-// close it and call the return given to open(); attract mode only closes it. Opens directly,
+// Prev) scroll them, the podium staying in place; Exit closes it and calls
+// the return given to open(); attract mode only closes it. Opens directly,
 // not through the wheel dialog module: the player asked for it. isOpen() and
 // onClosed() let the wheel dialogs wait for it.
 // ============================================================
@@ -40,12 +36,13 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { openDrawnScreen } from "../stats/drawn_screen.js";
 import { createLoader } from "../drawing/loader.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
+import { drawExitButton } from "../drawing/steamball_drawing.js";
 import { exitButtonLookOf, exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { SCRIPT_NAME } from "./high_score_store.js";
 import { readDefaultScoreImages, pickDefaultScoreImages } from "./default_score_images.js";
 import {
     HIGH_SCORE_BOARD_Z_INDEX as Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX, HIGH_SCORE_BOARD_LOADER_Z_INDEX, CROWN_IMAGES, CROWN_CANVAS, REFERENCE_HEIGHT, PODIUM_PLACES, AVATAR_FRAME_WIDTH, CANVAS_ZOOM,
-    layoutHighScoreBoard, placedRect, drawBackdrop, drawPanel, drawGlass, drawCrown, drawTitle, drawNote, drawMessage, drawStep, drawRow, drawExitButton, drawExitTooltip, drawButtonHints,
+    layoutHighScoreBoard, placedRect, drawBackdrop, drawPanel, drawGlass, drawCrown, drawTitle, drawNote, drawMessage, drawStep, drawRow, drawExitTooltip, drawButtonHints,
 } from "./high_score_board_painter.js";
 
 const TRANSPARENT = 0x00000000;
@@ -195,6 +192,7 @@ export function createHighScoreBoard(host, { highScores, profileRewards, drawing
         const flippers = geometry.rows.length > geometry.rowsInView ? FLIPPER_HINT.SCROLL : null;
         const hints = buttonHintGroupsOf({ flippers, exitLook });
         finePiece(Z_INDEX.buttonHints, geometry.buttonHints, dc => drawButtonHints(host, dc, hints, geometry.buttonHints.w, geometry.buttonHints.h));
+        // At its default size: the board's Exit Button, CANVAS_ZOOM times.
         finePiece(Z_INDEX.exitButton, geometry.exitButton, dc => drawExitButton(dc, exitLook));
         finePiece(Z_INDEX.tooltip, geometry.exitTooltip, dc => drawExitTooltip(host, dc, exitButtonWordOf(exitLook)));
         // The panel's height follows the board: the Exit Button may have moved.

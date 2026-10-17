@@ -2,8 +2,8 @@
 // Steamball drawing helpers shared by the drawn screens (Welcome Screen,
 // Profile Stats) and the Profile badge: text on one or several lines,
 // rounded and gradient fills, glows, the dimmed backdrop with its panel,
-// the Avatar, a wheel logo, the Exit Button (its cross or back arrow), a
-// tooltip, the Button Hints, the Avatar Frame around an Avatar and the
+// the Avatar, a wheel logo, the Exit Button (its cross or back arrow) and
+// its tooltip, the Button Hints and their footer, the Avatar Frame around an Avatar and the
 // Player Level pip. Each
 // draws on the drawing context it is given, in its coordinates. Only drawing: no layer, no event, no side effect.
 // ============================================================
@@ -152,8 +152,18 @@ export function drawAvatar(dc, path, x, y, size) {
 // screen or a menu, the cross where it leaves the bare wheel.
 export const EXIT_BUTTON_LOOK = Object.freeze({ BACK: "back", CLOSE: "close" });
 
+// The Exit Button and the Button Hints' footer of a drawn screen, in
+// reference pixels (the window's height is 1920): the button's side, the
+// room on its left for its tooltip and the margin round both on the
+// tooltip's layer; the footer's gap above it, its height, and the hints'
+// look at hintsScale times the Achievement List's.
+export const EXIT_AND_HINTS_METRICS = Object.freeze({
+    exitButton: 56, exitTooltipRoom: 240, tooltipMargin: 16,
+    footerGap: 16, footerH: 96, hintsScale: 1.5,
+});
+
 // The Exit Button on a small tile, size pixels wide: the cross or the back arrow.
-export function drawExitButton(dc, look, x, y, size) {
+export function drawExitButton(dc, look, x = 0, y = 0, size = EXIT_AND_HINTS_METRICS.exitButton) {
     fillGradient(dc, x, y, size, size, COLORS.rowUnlocked, COLORS.tile);
     dc.frameRect(x, y, size, size, 2, COLORS.border);
     if (look === EXIT_BUTTON_LOOK.BACK) drawBackArrow(dc, x, y, size);
@@ -260,6 +270,28 @@ export function tooltip(host, dc, str, tipX, tipY, side) {
     }
     const th = styled.measure(w).height;
     styled.draw(dc, { x, y: y + (height - th) / 2, width: w, height: th });
+}
+
+// The Exit Button's tooltip layer: round the button, room wide on its
+// left for the tooltip.
+export function exitTooltipRectOf(exitButton, { room = EXIT_AND_HINTS_METRICS.exitTooltipRoom, margin = EXIT_AND_HINTS_METRICS.tooltipMargin } = {}) {
+    return { x: exitButton.x - room, y: exitButton.y - margin, w: room + exitButton.w + margin, h: exitButton.h + 2 * margin };
+}
+
+// The Exit Button's tooltip on that layer, in the layer's own pixels,
+// pointing at the button on its right.
+export function drawExitTooltip(host, dc, word, {
+    buttonSize = EXIT_AND_HINTS_METRICS.exitButton, room = EXIT_AND_HINTS_METRICS.exitTooltipRoom, margin = EXIT_AND_HINTS_METRICS.tooltipMargin,
+} = {}) {
+    // The tip short of the button by the same share of its side on every screen.
+    tooltip(host, dc, word, room - buttonSize * 9 / 28, margin + buttonSize / 2, "left");
+}
+
+// A drawn screen's footer in the box: a rule on its top, the Button Hints
+// centred under it (see drawButtonHints()).
+export function drawButtonHintsFooter(host, dc, groups, { x = 0, y = 0, width, height, scale = EXIT_AND_HINTS_METRICS.hintsScale }) {
+    dc.fillRect(x, y, width, 1, COLORS.border);
+    drawButtonHints(host, dc, groups, { x, y, width, height, scale });
 }
 
 // A drawn screen's backdrop, on a window-sized canvas whose height is
