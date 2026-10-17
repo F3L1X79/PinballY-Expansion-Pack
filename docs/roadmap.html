@@ -102,8 +102,9 @@
   .decisions li::before { content: ""; position: absolute; left: 13px; top: 16px; width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
   .decisions strong { display: block; font-weight: 600; }
   .decisions span { color: var(--muted); font-size: .9rem; }
-  .matrix-wrap { padding: 16px 18px; }
-  .matrix { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 5px; font-size: .84rem; }
+  .matrix-wrap { padding: 16px 18px; max-width: 720px; margin: 0 auto; }
+  .matrix { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); grid-template-rows: auto repeat(3, 1fr); aspect-ratio: 1; gap: 5px; font-size: .84rem; }
+  @media (max-width: 640px) { .matrix { aspect-ratio: auto; } }
   .matrix .ax { color: var(--muted); font-family: var(--cond); font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; padding: 4px; }
   .matrix .ax.row { writing-mode: vertical-rl; transform: rotate(180deg); }
   .cell { background: var(--row-alt); border: 1px solid #252e3d; min-height: 74px; padding: 7px; display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; }
