@@ -155,12 +155,17 @@ export const EXIT_BUTTON_LOOK = Object.freeze({ BACK: "back", CLOSE: "close" });
 // The Exit Button and the Button Hints' footer of a drawn screen, in
 // reference pixels (the window's height is 1920): the button's side, the
 // room on its left for its tooltip and the margin round both on the
-// tooltip's layer; the footer's gap above it, its height, and the hints'
-// look at hintsScale times the Achievement List's.
+// tooltip's layer; the footer's gap above it, its height down to the
+// panel's bottom (the Achievement List's band, 112, at hintsScale, so the
+// hints keep its room above and below them), and the hints' look at
+// hintsScale times the Achievement List's.
 export const EXIT_AND_HINTS_METRICS = Object.freeze({
     exitButton: 56, exitTooltipRoom: 240, tooltipMargin: 16,
-    footerGap: 16, footerH: 96, hintsScale: 1.5,
+    footerGap: 16, footerH: 168, hintsScale: 1.5,
 });
+
+// The footer band's gradient top, a step lighter than the panel.
+const FOOTER_TOP_COLOR = 0xFF1C2330;
 
 // The Exit Button on a small tile, size pixels wide: the cross or the back arrow.
 export function drawExitButton(dc, look, x = 0, y = 0, size = EXIT_AND_HINTS_METRICS.exitButton) {
@@ -170,30 +175,36 @@ export function drawExitButton(dc, look, x = 0, y = 0, size = EXIT_AND_HINTS_MET
     else drawCross(dc, x, y, size);
 }
 
-// A gold U-turn pointing left (↩): its head at the bottom left, its shaft
-// running right, then a short hook round a half circle up and back left.
+// The back arrow's centre line in a 128-pixel box: a chevron pointing
+// left on the top stroke, which runs right, turns down round a half circle
+// and comes back left, all in round-ended strokes 12 pixels thick.
+const BACK_ARROW = Object.freeze({
+    box: 128, thickness: 12, extent: { x: 10, y: 18, w: 98, h: 82 },
+    lines: [[16, 46, 38, 24], [16, 46, 38, 68], [16, 46, 78, 46], [78, 94, 58, 94]],
+    hook: { cx: 78, cy: 70, r: 24 },
+});
+
+// The back arrow, its strokes as thick as the cross's and its width this
+// share of the tile, centred on it.
+const BACK_ARROW_SHARE = 0.46;
+
+// In the cross's colour: both are the same button, only Exit's way differs.
 function drawBackArrow(dc, x, y, size) {
-    const t = Math.max(3, Math.round(size / 14));
-    const half = Math.floor(t / 2);
-    const inset = Math.round(size * 0.22);
-    const r = Math.round(size * 0.16);
-    const bottom = y + Math.round(size * 0.62);
-    const top = bottom - 2 * r;
-    const cx = x + size - inset - r;
-    const tipX = x + inset;
-    const head = Math.round(size * 0.2);
-    for (let i = 0; i <= head; i++) {
-        const spread = Math.round(i * 0.8);
-        dc.fillRect(tipX + i, bottom - spread, 1, 2 * spread + 1, COLORS.gold);
+    const { extent, lines, hook } = BACK_ARROW;
+    const k = size * BACK_ARROW_SHARE / extent.w;
+    const left = x + (size - extent.w * k) / 2 - extent.x * k;
+    const top = y + (size - extent.h * k) / 2 - extent.y * k;
+    const r = Math.max(3, Math.round(size / 14)) / 2;
+    // A round brush stamped every pixel along the line.
+    const dab = (px, py) => fillDisc(dc, left + px * k, top + py * k, r, COLORS.description);
+    for (const [x0, y0, x1, y1] of lines) {
+        const steps = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) * k));
+        for (let step = 0; step <= steps; step++) dab(x0 + (x1 - x0) * step / steps, y0 + (y1 - y0) * step / steps);
     }
-    dc.fillRect(tipX + head, bottom - half, cx - tipX - head, t, COLORS.gold);
-    const tail = Math.round(r * 0.8);
-    dc.fillRect(cx - tail, top - half, tail, t, COLORS.gold);
-    // In small squares round the half circle, close enough to touch.
-    const steps = Math.ceil(Math.PI * r / Math.max(1, half));
+    const steps = Math.ceil(Math.PI * hook.r * k);
     for (let step = 0; step <= steps; step++) {
         const angle = -Math.PI / 2 + Math.PI * step / steps;
-        dc.fillRect(Math.round(cx + r * Math.cos(angle)) - half, Math.round(top + r + r * Math.sin(angle)) - half, t, t, COLORS.gold);
+        dab(hook.cx + hook.r * Math.cos(angle), hook.cy + hook.r * Math.sin(angle));
     }
 }
 
@@ -292,6 +303,20 @@ export function drawExitTooltip(host, dc, word, {
 export function drawButtonHintsFooter(host, dc, groups, { x = 0, y = 0, width, height, scale = EXIT_AND_HINTS_METRICS.hintsScale }) {
     dc.fillRect(x, y, width, 1, COLORS.border);
     drawButtonHints(host, dc, groups, { x, y, width, height, scale });
+}
+
+// A drawn screen's footer band: the panel's whole width inside its border,
+// from footerH above the panel's bottom.
+export function buttonHintsFooterRectOf(panel) {
+    const height = EXIT_AND_HINTS_METRICS.footerH;
+    return { x: panel.x + 1, y: panel.y + panel.h - height, w: panel.w - 2, h: height - 1 };
+}
+
+// The footer band in the box: a gradient from a step lighter than the
+// panel down to the panel, the rule from end to end, the Button Hints.
+export function drawButtonHintsBand(host, dc, groups, { x = 0, y = 0, width, height, scale = EXIT_AND_HINTS_METRICS.hintsScale }) {
+    fillGradient(dc, x, y, width, height, FOOTER_TOP_COLOR, COLORS.panel);
+    drawButtonHintsFooter(host, dc, groups, { x, y, width, height, scale });
 }
 
 // A drawn screen's backdrop, on a window-sized canvas whose height is

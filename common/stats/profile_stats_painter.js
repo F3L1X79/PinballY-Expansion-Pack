@@ -23,7 +23,7 @@ import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing
 import { metalOf, tierMetalOf, tierOf, mix, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
     text, oneLine, fillGradient, fillRounded, glow, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawExitButton, exitTooltipRectOf, drawExitTooltip,
-    drawButtonHintsFooter, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
+    drawButtonHintsBand, buttonHintsFooterRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
     UNBOUNDED,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
@@ -189,7 +189,7 @@ function geometry(host, referenceWidth, screen) {
         block.y = Math.round(y);
         y += block.h + (block.isSpread ? spare : 0);
     }
-    const h = innerH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH + 2 * LOOK.pad;
+    const h = LOOK.pad + innerH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     return { panel, innerW, innerH, cardW, contentW, avatar, columnX, columnW, blocks };
 }
@@ -418,11 +418,11 @@ export function layoutProfileStats(host, screen, referenceWidth, exitWord) {
         draw: dc => drawExitTooltip(host, dc, exitWord),
     });
 
-    const footer = { x: cardX, y: top + innerH + EXIT_AND_HINTS.footerGap, w: panel.w - 2 * LOOK.pad, h: EXIT_AND_HINTS.footerH };
+    const footer = buttonHintsFooterRectOf(panel);
     pieces.push({
         zIndex: PROFILE_STATS_Z_INDEX.buttonHints,
         rect: footer,
-        draw: dc => drawButtonHintsFooter(host, dc, screen.buttonHints, { width: footer.w, height: footer.h }),
+        draw: dc => drawButtonHintsBand(host, dc, screen.buttonHints, { width: footer.w, height: footer.h }),
     });
     return { pieces, highlights };
 }

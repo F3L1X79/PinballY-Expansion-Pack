@@ -19,7 +19,7 @@ import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing
 import { metalOf, tierMetalOf, tierOf, MASTERY_STEPS, MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
 import {
     text, oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawLevelPip, levelPipOn, tooltip, drawBackdrop as drawPanelBackdrop, drawWheelLogo,
-    drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsFooter, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
+    drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsBand, buttonHintsFooterRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
@@ -59,6 +59,8 @@ const LOOK = Object.freeze({
     avatarTooltipMargin: 20, avatarTooltipRoom: 380,
     // Room around the Collection Mastery card for its square's halo.
     squareHaloMargin: 24,
+    // The header layer's transparent edge, on every side.
+    layerEdge: 4,
 });
 
 // How wide the header's Avatar Frame is drawn, for its image's size.
@@ -231,7 +233,7 @@ function geometry(referenceWidth, screen) {
     const logoW = inner.w < LOOK.narrowBelow ? Math.round(inner.w * LOOK.narrowLogoShare) : LOOK.logoW;
     // Where a card's details start, which Collection Mastery lines up with.
     const detailsX = LOOK.logoInset + logoW + LOOK.detailsGap;
-    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH + LOOK.pad;
+    const h = LOOK.pad + headerH + LOOK.gap + cardsH + LOOK.rowH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
     const panel = { x: inner.x - LOOK.pad, y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     return { panel, inner, headerH, greetingY, dailyStreakY, lostRecordsY, collectionY, masteryCardH, cardHs, cardsH, lineY, logoW, detailsX };
 }
@@ -301,12 +303,16 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
     // The greeting and the lines under it stop short of the Exit Button.
     const exitSide = EXIT_AND_HINTS.exitButton;
     const greetingW = inner.w - exitSide - 40;
+    // A transparent edge round the header: PinballY's scaling blends a
+    // layer's edge with the opposite one, which drew the Avatar's border
+    // as a dark line under the Exit Button.
+    const E = LOOK.layerEdge;
     const pieces = [{
         zIndex: WELCOME_SCREEN_Z_INDEX.header,
-        rect: { x: inner.x, y: top, w: inner.w, h: headerH },
+        rect: { x: inner.x - E, y: top - E, w: inner.w + 2 * E, h: headerH + 2 * E },
         draw: dc => {
             if (screen.picker) {
-                const inset = avatarInsetOf(screen);
+                const inset = E + avatarInsetOf(screen);
                 drawAvatar(dc, screen.avatarPath, inset, inset, LOOK.avatar);
                 drawAvatarFrame(dc, screen.framePath, inset, inset, LOOK.avatar);
                 if (screen.level !== null) {
@@ -314,9 +320,9 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
                     drawLevelPip(host, dc, screen.level, pip.cx, pip.cy, pip.size);
                 }
             }
-            drawExitButton(dc, screen.exitLook, inner.w - exitSide, 0, exitSide);
+            drawExitButton(dc, screen.exitLook, E + inner.w - exitSide, E, exitSide);
             const parts = screen.greeting.map(([str, gold]) => [str, gold ? COLORS.gold : COLORS.title]);
-            runs(host, dc, parts, { x: 0, y: greetingY, width: greetingW, size: LOOK.greetingSize });
+            runs(host, dc, parts, { x: E, y: E + greetingY, width: greetingW, size: LOOK.greetingSize });
         },
     }];
     // Under the greeting, on a layer of its own.
@@ -383,11 +389,11 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
         },
     });
 
-    const footerTop = rowsTop + LOOK.rowH + EXIT_AND_HINTS.footerGap;
+    const footer = buttonHintsFooterRectOf(panel);
     pieces.push({
         zIndex: WELCOME_SCREEN_Z_INDEX.buttonHints,
-        rect: { x: inner.x, y: footerTop, w: inner.w, h: EXIT_AND_HINTS.footerH },
-        draw: dc => drawButtonHintsFooter(host, dc, screen.buttonHints, { width: inner.w, height: EXIT_AND_HINTS.footerH }),
+        rect: footer,
+        draw: dc => drawButtonHintsBand(host, dc, screen.buttonHints, { width: footer.w, height: footer.h }),
     });
 
     const highlights = {

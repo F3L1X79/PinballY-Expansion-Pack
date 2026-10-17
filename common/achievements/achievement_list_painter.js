@@ -11,13 +11,11 @@
 import { ACHIEVEMENT_RANK, RANKS_IN_ORDER } from "./achievements.js";
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";
 import {
-    drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawButtonHintsFooter, exitTooltipRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
+    drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawButtonHintsBand, exitTooltipRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 
 // The wheel shows dimmed through it.
 const OVERLAY_COLOR = 0xD0080A0E;
-// The footer's gradient top, a step lighter than the panel.
-const FOOTER_TOP_COLOR = 0xFF1C2330;
 const HEADER_BOTTOM_COLOR = 0xFF222B3A;
 const BLACK = 0xFF000000;
 // The gem in the middle of each rank's emblem.
@@ -340,8 +338,7 @@ function drawFooter(host, dc, g, footer) {
     const look = LIST_LOOK;
     const { x, panelWidth: width } = g;
     const y = g.y + g.panelHeight - look.footerHeight;
-    fillGradient(dc, x, y, width, look.footerHeight, FOOTER_TOP_COLOR, COLORS.panel);
-    drawButtonHintsFooter(host, dc, footer, { x, y, width, height: look.footerHeight, scale: 1 });
+    drawButtonHintsBand(host, dc, footer, { x, y, width, height: look.footerHeight, scale: 1 });
 }
 
 // The whole window, transparent between the header and the footer, so a

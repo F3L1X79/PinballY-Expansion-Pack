@@ -30,7 +30,7 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { createNavigationSound } from "../core/navigation_sound.js";
 import { prepareDrawnScreen, FRAME_MS } from "./drawn_screen.js";
 import { MAX_MASTERY_LEVEL } from "../mastery/table_mastery.js";
-import { drawBackdrop, drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsFooter } from "../drawing/steamball_drawing.js";
+import { drawBackdrop, drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsBand } from "../drawing/steamball_drawing.js";
 import { exitButtonLookOf, exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { EXIT_BUTTON, stepThroughExitButton } from "../drawing/exit_button_loop.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
@@ -199,7 +199,7 @@ export function createHouseholdStats(host, {
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.title, () => geometry.title, dc => drawTitle(host, dc, screen.title, geometry.title.w, geometry.title.h));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.exitButton, () => geometry.exitButton, dc => drawExitButton(dc, screen.exitLook));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.buttonHints, () => geometry.buttonHints,
-                dc => drawButtonHintsFooter(host, dc, screen.buttonHints, { width: geometry.buttonHints.w, height: geometry.buttonHints.h }));
+                dc => drawButtonHintsBand(host, dc, screen.buttonHints, { width: geometry.buttonHints.w, height: geometry.buttonHints.h }));
             drawPiece(HOUSEHOLD_STATS_Z_INDEX.labels, () => geometry.labels, dc => drawLabels(host, dc, screen.labels, geometry.labels.w));
             entries.forEach((entry, index) => drawPiece(HOUSEHOLD_STATS_Z_INDEX.columns, () => geometry.columns[index],
                 dc => drawColumn(host, dc, screen.columns[index], geometry.columns[index].w), columnLayers));

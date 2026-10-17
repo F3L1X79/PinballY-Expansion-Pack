@@ -12,7 +12,7 @@
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import {
-    oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
+    oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, buttonHintsFooterRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 
 // Above the Profile Stats' band, which never shows at the same time, so
@@ -40,7 +40,7 @@ const FRAME_SIZE = avatarFrameSide(LOOK.avatar);
 export function layoutFrameList(referenceWidth, rowCount) {
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
     const rowsH = rowCount * (LOOK.rowH + LOOK.rowGap) - LOOK.rowGap;
-    const h = 2 * LOOK.pad + LOOK.titleH + rowsH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
+    const h = LOOK.pad + LOOK.titleH + rowsH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     const x = panel.x + LOOK.pad;
     const rowW = w - 2 * LOOK.pad;
@@ -49,7 +49,7 @@ export function layoutFrameList(referenceWidth, rowCount) {
     const exitButton = { x: x + rowW - side, y: title.y + Math.round((title.h - side) / 2), w: side, h: side };
     const rows = Array.from({ length: rowCount }, (_, index) =>
         ({ x, y: title.y + title.h + index * (LOOK.rowH + LOOK.rowGap), w: rowW, h: LOOK.rowH }));
-    const buttonHints = { x, y: title.y + title.h + rowsH + EXIT_AND_HINTS.footerGap, w: rowW, h: EXIT_AND_HINTS.footerH };
+    const buttonHints = buttonHintsFooterRectOf(panel);
     return { panel, title, exitButton, rows, buttonHints };
 }
 

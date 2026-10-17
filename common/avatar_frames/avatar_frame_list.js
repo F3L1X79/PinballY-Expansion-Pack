@@ -35,7 +35,7 @@ import {
     AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, drawTitle, drawRow,
 } from "./avatar_frame_list_painter.js";
 import {
-    drawBackdrop, drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsFooter, EXIT_BUTTON_LOOK,
+    drawBackdrop, drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsBand, EXIT_BUTTON_LOOK,
 } from "../drawing/steamball_drawing.js";
 import { exitButtonLookOf, exitButtonWordOf, buttonHintGroupsOf, FLIPPER_HINT } from "../drawing/button_hints.js";
 import { EXIT_BUTTON, stepThroughExitButton } from "../drawing/exit_button_loop.js";
@@ -135,7 +135,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
             { key: EXIT_TOOLTIP, zIndex: AVATAR_FRAME_LIST_Z_INDEX.tooltip, rect: exitTooltipRectOf(geometry.exitButton), look: exitWord,
                 draw: dc => drawExitTooltip(host, dc, exitWord) },
             { key: "buttonHints", zIndex: AVATAR_FRAME_LIST_Z_INDEX.buttonHints, rect: geometry.buttonHints, look: hints,
-                draw: dc => drawButtonHintsFooter(host, dc, hints, { width: geometry.buttonHints.w, height: geometry.buttonHints.h }) },
+                draw: dc => drawButtonHintsBand(host, dc, hints, { width: geometry.buttonHints.w, height: geometry.buttonHints.h }) },
             ...rows.map((row, index) => ({
                 key: row.key, zIndex: AVATAR_FRAME_LIST_Z_INDEX.rows, rect: geometry.rows[index], look: row,
                 draw: dc => drawRow(host, dc, row, geometry.rows[index].w, geometry.rows[index].h),

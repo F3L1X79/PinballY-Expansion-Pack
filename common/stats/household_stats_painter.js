@@ -17,7 +17,7 @@
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 import {
-    oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, UNBOUNDED, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
+    oneLine, drawAvatar, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN, UNBOUNDED, buttonHintsFooterRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
 import { drawMasterySquare, masterySquareSize } from "../mastery/mastery_square.js";
 
@@ -65,7 +65,7 @@ export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     const columnW = Math.max(LOOK.columnMinW, Math.min(LOOK.columnMaxW, Math.floor(room / shown)));
     const w = 2 * LOOK.pad + LOOK.labelsW + shown * (LOOK.columnGap + columnW);
     const tableH = LOOK.headerH + lineCount * LOOK.lineH;
-    const h = 2 * LOOK.pad + LOOK.titleH + LOOK.titleGap + tableH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
+    const h = LOOK.pad + LOOK.titleH + LOOK.titleGap + tableH + EXIT_AND_HINTS.footerGap + EXIT_AND_HINTS.footerH;
     const panel = { x: Math.round((referenceWidth - w) / 2), y: Math.round((REFERENCE_HEIGHT - h) / 2), w, h };
     const x = panel.x + LOOK.pad;
     const title = { x, y: panel.y + LOOK.pad, w: w - 2 * LOOK.pad, h: LOOK.titleH };
@@ -77,7 +77,7 @@ export function layoutHouseholdStats(referenceWidth, columnCount, lineCount) {
     const firstX = x + LOOK.labelsW + LOOK.columnGap;
     const columns = Array.from({ length: columnCount }, (_, index) => ({ x: firstX + index * pitch, y: tableY, w: columnW, h: tableH }));
     const view = { x: firstX, w: shown * pitch - LOOK.columnGap, count: shown };
-    const buttonHints = { x, y: tableY + tableH + EXIT_AND_HINTS.footerGap, w: w - 2 * LOOK.pad, h: EXIT_AND_HINTS.footerH };
+    const buttonHints = buttonHintsFooterRectOf(panel);
     return { panel, title, exitButton, labels, columns, view, pitch, buttonHints };
 }
 
