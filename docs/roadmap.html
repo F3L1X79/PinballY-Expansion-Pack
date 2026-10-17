@@ -228,7 +228,7 @@
     <p class="eyebrow">En cours</p>
     <div class="panel now" id="now">
       <p><strong>High Scores</strong> : les trois chantiers sont faits sur <code>main</code> le 15/10 : les records par Profile, le tableau des meilleurs scores dessiné, et les tables sans ROM (<code>VPReg.stg</code> et fichiers texte du dossier <code>User\</code>, tableau passé à PinballY pour le DMD et la fiche de la table). <strong>Rivalités</strong> faites aussi le 15/10 : le Welcome Screen dit à un Profile ses Lost Records, et le High Score Toast nomme à qui le record a été pris. Reste à essayer tout cela sur la borne. Le 16/10, les Default Scores ont reçu 28 portraits libres de droits ; les anciens, non libres, ne restent que sur la borne de Félix (<code>assets/images/default_scores/local/</code>, hors git). Le 17/10, le <strong>Selection Marker</strong> (un halo flou d'ors qui défile autour du choix courant) remplace <code>selectionHalo</code> sur le Welcome Screen, les Profile Stats, les Household Stats et la liste des Avatar Frames ; reste à le voir sur la borne.</p>
-      <span class="next">Ensuite : <a href="#loader">écran de chargement (n° <span data-ref="loader"></span>)</a>, en tête de file</span>
+      <span class="next">Ensuite : <a href="#loader">Loader (n° <span data-ref="loader"></span>)</a>, en tête de file</span>
     </div>
   </section>
 
@@ -258,24 +258,28 @@
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Un écran de chargement Steamball</h3>
+            <h3>Le Loader : une comète dorée pendant les chargements</h3>
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Un loader partagé dans <code>common/</code>, affiché dans cet ordre :</p>
+          <p>Une comète dorée qui tourne en boucle, au centre de l'écran, en transparence (APNG généré par un script de mainteneur, animé par PinballY lui-même). Affichée seulement là où elle peut tourner :</p>
           <ul>
-            <li>avant l'apparition du Welcome Screen, au démarrage, où l'écran reste vide un moment ;</li>
-            <li>avant les autres écrans Steamball longs à dessiner (High Score Board, Achievement List, Profile Stats…) ;</li>
-            <li>pendant le lancement d'une table, dans le Seamless Launch Overlay, qui n'affiche aujourd'hui qu'un fond uni.</li>
+            <li>au démarrage, jusqu'au fondu du Welcome Screen ;</li>
+            <li>pendant le lancement d'une table, dans le Seamless Launch Overlay (rien sans cet Add-on) ;</li>
+            <li>à l'ouverture des écrans dessinés d'avance par tranches (Achievement List, High Score Board).</li>
           </ul>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (mesurer les temps sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <div class="stepper"><span>idée</span><i>›</i><span class="here">grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> (en cours) → <code>/prototype</code> visuel (2 ou 3 comètes) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Décidé au grill du 17/10/2026</summary>
             <ul>
-              <li>Quels écrans sont vraiment « longs » ? À mesurer sur la borne avant de choisir où l'afficher (un seuil, par exemple 300 ms).</li>
-              <li>Le dessin de PinballY est synchrone : le loader doit être affiché avant le travail (<code>setTimeout(..., 0)</code> pour laisser passer une image), et ne bouge qu'entre les tranches de <code>getDrawingAhead()</code>. Une jauge qui se remplit une fois, comme celles des Profile Stats, plutôt qu'un rouage qui tourne (règle du 09/10 contre les animations en boucle) ?</li>
-              <li>Au lancement d'une table, rien ne dit où en est le chargement : une jauge sur la durée du dernier lancement de la table, ou un simple logo animé une fois ?</li>
-              <li>Le Seamless Launch Overlay est un Add-on désactivable : le loader de lancement en dépend-il, ou devient-il un réglage à part ?</li>
+              <li>Une seule spec, un seul Loader partagé dans <code>common/</code>, sans mesures de temps préalables.</li>
+              <li>Exception à la règle contre les animations en boucle : un anneau moderne façon Windows 11, doré, en comète. APNG plutôt que GIF (transparence alpha pour la traîne).</li>
+              <li>Le dessin JS fige l'affichage : pas de Loader sur les écrans dessinés d'un bloc (Profile Stats, Household Stats, Avatar Frame list), voir <a href="#sliced-stats-screens">n° <span data-ref="sliced-stats-screens"></span></a>.</li>
+              <li>Centré, environ 6 à 8 % de la hauteur, sans texte ni fond ; au lancement, sous le texte de PinballY s'il y en a. <code>setScale({ ySpan })</code> seul : PinballY garde les proportions, aucune mesure de fenêtre, donc pas de déformation au démarrage.</li>
+              <li>Démarrage : l'Add-on Welcome Screen pose dès son init un voile sombre (<code>clear(...)</code>) et la comète ; le panneau arrive en fondu par-dessus et le Loader disparaît. Abandonné avec le Welcome Screen ; rien si cet Add-on est éteint ; rien après Change Player (dessin d'un bloc).</li>
+              <li>Lancement : de <code>launchoverlayshow</code> à <code>launchoverlayhide</code>, sans durée estimée.</li>
+              <li>Écrans dessinés d'avance : seulement s'ils ne sont pas prêts quand le joueur les ouvre, jusqu'au fondu de l'écran.</li>
+              <li>Écran de jeu seulement (ni backglass, ni DMD, ni topper) ; ne prend jamais les boutons.</li>
             </ul>
             <p class="ctx">Idée de Félix du 16/10/2026.</p>
           </details>
@@ -664,6 +668,24 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Relevé par la revue Standards du ticket #236, le 17/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="sliced-stats-screens" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Le Loader aussi sur les Profile Stats et les Household Stats</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Ces écrans (et l'Avatar Frame list) se dessinent d'un bloc : le <a href="#loader">Loader (n° <span data-ref="loader"></span>)</a> y resterait figé, il n'y est donc pas. Les dessiner par tranches via <code>getDrawingAhead()</code> permettrait de l'y afficher, seulement si leur ouverture paraît lente sur la borne.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Reporté pendant le grill du Loader, le 17/10/2026.</p>
           </details>
         </div>
       </li>

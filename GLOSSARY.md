@@ -25,6 +25,10 @@ The soft gold glow around the current choice of a drawn screen (Welcome Screen, 
 The choice it surrounds is the current (or highlighted) choice; only the glow itself is never called a highlight.
 _Avoid_: halo (for the selection; a Rank emblem's or a Mastery square's halo stays a halo), cursor, highlight
 
+**Loader**:
+A small gold comet that circles without end in the middle of the playfield screen, with no text nor backdrop, over whatever is already there, while something the player waits for gets ready: PinballY starting up until the Welcome Screen shows (over the wheel already dimmed for it), a table launching, a drawn screen not yet ready when the player opens it. It only shows where it can keep turning, never on a screen drawn all at once, nor when the Welcome Screen comes back after Change Player. It never takes the player's buttons. Shown as "Indicateur de chargement" in French.
+_Avoid_: spinner, loading screen, splash screen (it is not a screen, only a ring over the current one)
+
 ### Wheel
 
 **Wheel Arc**:
