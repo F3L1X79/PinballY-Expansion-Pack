@@ -1,6 +1,8 @@
 // ============================================================
 // Where a Drawn Menu's panel stands in the window: a short menu's middle
-// a third of the way down, a tall one within the margins it scrolls in.
+// a third of the way down, a tall one within the margins it scrolls in;
+// under a footer the content ends as far from the bottom as it starts
+// from the top.
 // ============================================================
 
 import { test } from "node:test";
@@ -28,4 +30,10 @@ test("a menu too tall for the third never goes above the top margin", () => {
     const { panel } = computeGeometry(WINDOW, menuOf(20), noMessage);
     assert.ok(panel.y >= WINDOW.height * (1 - DRAWN_MENU_LOOK.maxHeightShare) / 2 - 0.5);
     assert.ok(panel.y + panel.height <= WINDOW.height);
+});
+
+test("under a footer, the content ends as far from the panel's bottom as it starts from its top", () => {
+    const model = { ...menuOf(4), footer: { label: "Active filter:", name: "All Tables" } };
+    const { panel, contentTop, contentHeight } = computeGeometry(WINDOW, model, noMessage);
+    assert.ok(Math.abs((panel.y + panel.height - contentTop - contentHeight) - (contentTop - panel.y)) < 1e-6);
 });

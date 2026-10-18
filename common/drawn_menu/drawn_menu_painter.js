@@ -50,10 +50,11 @@ export const DRAWN_MENU_LOOK = Object.freeze({
     entry: Object.freeze({ size: 36, minSize: 28, weight: 600 }),
     heading: Object.freeze({ size: 24, minSize: 20, weight: 600 }),
     message: Object.freeze({ size: 33, weight: 400, gap: 14 }),
-    // Under the list, after a separator's height holding its rule, in
-    // place of listBottom: its line sits halfway between the rule and the
-    // face's gold frame, at the entries' size.
-    footer: Object.freeze({ height: 76, size: 36, minSize: 20, weight: 600 }),
+    // Under the list, after a separator's height holding its rule: a row
+    // as tall as an entry, at the entries' size, then listTop down to the
+    // face's gold frame, so its text sits as far from the frame as the
+    // first entry's.
+    footer: Object.freeze({ height: DRAWN_MENU_ENTRY_HEIGHT, size: 36, minSize: 20, weight: 600 }),
     mark: Object.freeze({ size: 30, weight: 600, right: 36, width: 40 }),
     separatorWidth: 320,
     // The rows fading at an edge the list scrolls past.
@@ -103,7 +104,7 @@ export function computeGeometry({ width, height }, model, messageHeightAt) {
     const messageHeightRef = model.message === null ? 0 : messageHeightAt(listWidth, LOOK.message.size * k) / k;
     const messageBlockRef = model.message === null ? 0 : messageHeightRef + LOOK.message.gap + LOOK.rowHeights.separator;
     const footerBlockRef = model.footer ? LOOK.rowHeights.separator + LOOK.footer.height : 0;
-    const listBottomRef = model.footer ? 0 : LOOK.listBottom;
+    const listBottomRef = model.footer ? LOOK.listTop : LOOK.listBottom;
     const fixedRef = 2 * DRAWN_MENU_FACE_INSET + LOOK.listTop + listBottomRef + messageBlockRef + footerBlockRef;
     const maxPanelRef = LOOK.maxHeightShare * LOOK.referenceHeight / zoom;
     const areaHeightRef = Math.max(LOOK.rowHeights.entry, Math.min(rowsHeightRef, maxPanelRef - fixedRef));
@@ -195,7 +196,7 @@ function drawSeparator(dc, x, y, width, height, k, alpha) {
 }
 
 // The footer's label in its muted colour and the name in gold, on one
-// line centred between the rule and the face's gold frame: shrunk when estimated too wide, then the name cut with an
+// centred line: shrunk when estimated too wide, then the name cut with an
 // ellipsis (two colours on one line, which oneLine() cannot draw).
 function drawFooter(host, dc, { label, name }, { x, y, width, k }) {
     const separatorHeight = LOOK.rowHeights.separator * k;
@@ -216,8 +217,8 @@ function drawFooter(host, dc, { label, name }, { x, y, width, k }) {
     const styled = host.createStyledText({ textAlign: "center", textStyle });
     styled.add(Object.assign({}, textStyle, { text: labelPart }));
     styled.add(Object.assign({}, textStyle, { color: LOOK.colors.gold, text: shownName }));
-    const ruleToFrame = separatorHeight / 2 + LOOK.footer.height * k;
-    styled.draw(dc, { x, y: y + separatorHeight / 2 + (ruleToFrame - lineHeight) / 2, width, height: lineHeight });
+    const height = LOOK.footer.height * k;
+    styled.draw(dc, { x, y: y + separatorHeight + (height - lineHeight) / 2, width, height: lineHeight });
 }
 
 const markGlyphOf = row => DRAWN_MENU_MARKS[row.mark] || null;
