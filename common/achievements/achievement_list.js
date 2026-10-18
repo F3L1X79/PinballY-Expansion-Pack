@@ -704,8 +704,9 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
     }
 
     // onExit: what Exit returns to, called once the list is closed (null:
-    // the bare wheel, the Exit Button then a cross).
-    function open(onExit = null) {
+    // the bare wheel, the Exit Button then a cross); onFailed: called once
+    // an opening given up on a failing drawing is closed.
+    function open(onExit = null, { onFailed = () => {} } = {}) {
         // Before the content is read: the Exit Button and the footer follow it.
         exitLook = exitButtonLookOf(onExit !== null);
         // A native menu left open would sit over or under the list.
@@ -741,7 +742,10 @@ export function createAchievementList(host, { getAchievements, profileStore, dra
                 opening.fadeIn(setOpacity);
             },
             // Logged by the drawing ahead: given up rather than left veiled.
-            onFailed: close,
+            onFailed: () => {
+                close();
+                onFailed();
+            },
         });
     }
 

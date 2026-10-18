@@ -25,10 +25,14 @@ const VEIL = { shown: true, zIndex: PROFILE_STATS_Z_INDEX.backdrop - 2, color: D
 const DRAW_MS = 60;
 const TICK_MS = 4;
 
-// The screen's layers that fade in, the tooltips and marker left out.
+const isSetAside = layer => layer.scale().xSpan === 0.001 && layer.scale().ySpan === 0.001;
+
+// The screen's layers that fade in, the tooltips and marker left out, and
+// so are those of the active Profile's screen set aside under the
+// Household Stats.
 const fadingLayers = fake => fake.drawingLayers().filter(layer =>
     [PROFILE_STATS_Z_INDEX.backdrop, PROFILE_STATS_Z_INDEX.card, PROFILE_STATS_Z_INDEX.sections,
-        PROFILE_STATS_Z_INDEX.buttons, PROFILE_STATS_Z_INDEX.exitButton].includes(layer.zIndex));
+        PROFILE_STATS_Z_INDEX.buttons, PROFILE_STATS_Z_INDEX.exitButton].includes(layer.zIndex) && !isSetAside(layer));
 
 // Runs the clock a tick at a time until the screen starts fading in.
 function untilFadeStarts(fake) {

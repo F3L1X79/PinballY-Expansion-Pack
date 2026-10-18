@@ -166,9 +166,11 @@ export function createHouseholdStats(host, {
     // given up; null: the bare wheel, the Exit Button then a cross);
     // selectedName: the Profile whose column the marker
     // surrounds, brought into view (the first column when null or no longer
-    // there). Reads and draws every layer hidden, step by step, then fades
+    // there); onFailed: called once an opening given up on a failing step
+    // is closed, kept for the round trips to another Profile's Profile
+    // Stats. Reads and draws every layer hidden, step by step, then fades
     // them in together: it never shows up half drawn.
-    function open(onBack = null, selectedName = null) {
+    function open(onBack = null, { selectedName = null, onFailed = () => {} } = {}) {
         if (shown) return;
         const drawn = prepareDrawnScreen(host, SCRIPT_NAME, {
             referenceHeight: REFERENCE_HEIGHT, backdropZIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop, drawingAhead,
@@ -177,7 +179,7 @@ export function createHouseholdStats(host, {
         const columnLayers = [];
         // Completed by setUp() once every step ran.
         const opening = {
-            onBack, drawn, columnLayers, isPreparing: true, marker: null, glideTimer: null, glideMs: 0, opacity: 0,
+            onBack, onFailed, drawn, columnLayers, isPreparing: true, marker: null, glideTimer: null, glideMs: 0, opacity: 0,
         };
         shown = opening;
         let screen = null;
@@ -224,7 +226,14 @@ export function createHouseholdStats(host, {
         }
 
         drawn.read(() => queueSteps(readProfiles()));
-        drawn.start({ onReady: setUp, setOpacity: opacity => setOpacity(opening, opacity), onFailed: close });
+        drawn.start({
+            onReady: setUp,
+            setOpacity: opacity => setOpacity(opening, opacity),
+            onFailed: () => {
+                close();
+                onFailed();
+            },
+        });
     }
 
     // Where the columns glide to: the first one in view at the view's left.
@@ -331,12 +340,12 @@ export function createHouseholdStats(host, {
     // Another Profile's column opens its Profile Stats, whose Exit comes
     // back here on that column; one's own and the Exit Button go back as Exit does.
     function choose() {
-        const { onBack, columns, selected } = shown;
+        const { onBack, onFailed, columns, selected } = shown;
         if (selected === EXIT_BUTTON) return back();
         const column = columns[selected];
         if (column.isActive) return back();
         close();
-        openProfileStats(column.profileName, () => open(onBack, column.profileName));
+        openProfileStats(column.profileName, () => open(onBack, { selectedName: column.profileName, onFailed }));
     }
 
     // Fires on every mapped button press; drives the screen while it is open.

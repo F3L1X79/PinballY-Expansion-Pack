@@ -18,13 +18,15 @@ import {
 test("Exit while another Profile's Profile Stats get ready goes back to the Household Stats", async () => {
     const { fake, lang } = await startHousehold({ profiles: { Alice: {}, Bob: {} }, active: "Alice" });
     openHouseholdStats(fake, lang);
+    // The active Profile's, set aside under the Household Stats.
+    const setAsideLayers = profileStatsLayerCount(fake);
     fake.setDrawMs(60);
     chooseColumn(fake, "Bob");
     fake.advanceTime(200);
     assert.equal(readLoader(fake).shown, true, "getting ready");
 
     assert.ok(press(fake, "Exit").defaultPrevented);
-    assert.equal(profileStatsLayerCount(fake), 0, "nothing of them left");
+    assert.equal(profileStatsLayerCount(fake), setAsideLayers, "nothing of them left");
     untilHouseholdStatsFadedIn(fake);
     assert.equal(isProfileStatsOpen(fake), false);
     assert.equal(isHouseholdStatsOpen(fake), true, "back to the Household Stats");

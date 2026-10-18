@@ -12,7 +12,7 @@
 // Created from the PinballY host, the Profile store, readers of a named
 // Profile's Player Level and Achievements Unlocked, the Achievement List
 // (opening it from the Achievements button, Exit there showing this screen
-// again on that button), the Profile Rewards module (the worn Avatar
+// again at once, as it was left), the Profile Rewards module (the worn Avatar
 // Frame around the Avatar; null: none), the Avatar Frame list (its count,
 // and opening it from the Frame button, Select or Exit there showing this screen again on
 // that button; null or without frames: no button), the Daily Streak, the Table of the Day and Table
@@ -23,7 +23,9 @@
 // Fame and Tables to Discover filters (null when their Add-on is
 // disabled: no button) and the Household Stats (opened from the Household
 // button, shown while the Household has two Profiles; Exit there shows
-// this screen again on that button). While open it swallows every button through
+// this screen again at once). While the Achievement List or the Household
+// Stats is open, this screen waits set aside, hidden; attract mode, the
+// child failing to open or a final Exit removes it. While open it swallows every button through
 // "commandbuttondown": Next / Prev move the Selection Marker (a gold glow
 // flowing round the choice) through the Exit Button and the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes
 // and calls the return given to open(); attract mode only closes it.
@@ -72,6 +74,9 @@ export function createProfileStats(host, {
     // The screen on show, or getting ready (isPreparing): its layers,
     // choices and selection; null when closed.
     let shown = null;
+    // The active Profile's screen, ready but hidden while the Achievement
+    // List or the Household Stats it opened is on show; null otherwise.
+    let screenSetAside = null;
     const closedListeners = createClosedListeners(SCRIPT_NAME);
 
     // Over every table the Profile played, hidden or no longer listed ones
@@ -442,7 +447,8 @@ export function createProfileStats(host, {
             tastesSection(profile, profileData.profileTables, profileData.profilePlays, profileData.getPlay, profileData.hallOfFame)));
         drawn.draw(() => drawn.drawBackdrop((dc, size, referenceWidth) => drawBackdrop(host, dc, size, referenceWidth, screen)));
         drawn.draw(queuePieces);
-        drawn.start({ onReady: setUp, setOpacity: opacity => setOpacity(opening, opacity), onFailed: close });
+        // A read-only screen failing also takes away the one set aside under it.
+        drawn.start({ onReady: setUp, setOpacity: opacity => setOpacity(opening, opacity), onFailed: closeAll });
     }
 
     // The marker and every layer to the same opacity, except the unselected
@@ -461,6 +467,50 @@ export function createProfileStats(host, {
         shown.drawn.close();
         shown = null;
         closedListeners.tell();
+    }
+
+    // The screen on show hidden, keeping its state, while a child screen
+    // opens over it: no closed listener told, the screen is still open.
+    function setShownAside() {
+        shown.drawn.setAside();
+        shown.marker.setAside();
+        screenSetAside = shown;
+        shown = null;
+    }
+
+    // The child's Exit: the screen set aside shows again at once, as it was left.
+    function showAgain() {
+        if (!screenSetAside) return;
+        shown = screenSetAside;
+        screenSetAside = null;
+        shown.marker.showAgain();
+        shown.drawn.showAgain(opacity => setOpacity(shown, opacity));
+    }
+
+    function discardSetAside() {
+        if (!screenSetAside) return;
+        screenSetAside.marker.remove();
+        screenSetAside.drawn.close();
+        screenSetAside = null;
+        closedListeners.tell();
+    }
+
+    // The screen on show and the one set aside under it.
+    function closeAll() {
+        close();
+        discardSetAside();
+    }
+
+    // openChild(onExit, onFailed) opens a child screen over this one, set
+    // aside; a child failing to open, even at once, takes it away.
+    function openChildOver(openChild) {
+        setShownAside();
+        try {
+            openChild(showAgain, discardSetAside);
+        } catch (error) {
+            discardSetAside();
+            throw error;
+        }
     }
 
     // direction: 1 for Next, -1 for Prev.
@@ -483,22 +533,25 @@ export function createProfileStats(host, {
         const choice = shown.choices[shown.selected];
         const entry = shown.screen.buttons.find(button => button.choice === choice);
         if (choice === CHOICE.EXIT_BUTTON) return back();
+        // Exit from the Achievement List or the Household Stats shows this
+        // screen again as it was left, Exit here still bringing back what it
+        // was first opened from.
+        if (choice === CHOICE.ACHIEVEMENTS) return openChildOver((onExit, onFailed) => achievementList.open(onExit, { onFailed }));
+        if (choice === CHOICE.HOUSEHOLD) return openChildOver((onExit, onFailed) => householdStats.open(onExit, { onFailed }));
         const { onReturn } = shown;
         close();
-        // Exit from the list comes back here, on its button, Exit here still
-        // bringing back what the screen was first opened from.
-        const reopenOn = button => () => open(button, { onReturn });
-        if (choice === CHOICE.ACHIEVEMENTS) achievementList.open(reopenOn(CHOICE.ACHIEVEMENTS));
-        else if (choice === CHOICE.FRAME) frameList.open(reopenOn(CHOICE.FRAME));
-        else if (choice === CHOICE.HOUSEHOLD) householdStats.open(reopenOn(CHOICE.HOUSEHOLD));
+        // A frame equipped changes the card: Exit from the frame list opens
+        // this screen again, on its button.
+        if (choice === CHOICE.FRAME) frameList.open(() => open(CHOICE.FRAME, { onReturn }));
         else if (entry) host.setCurrentFilter(entry.filterId);
     }
 
     // Fires on every mapped button press; drives the screen while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
         // Already handled: the Achievement List's, Avatar Frame list's or
-        // Household Stats' Exit (or Select) opens this screen within the
-        // same press, which must not act on it again.
+        // Household Stats' Exit (or Select) shows this screen within the
+        // same press, which must not act on it again. Set aside, the
+        // screen is not shown: the child takes the buttons.
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing choice still never reaches the wheel.
         ev.preventDefault();
@@ -515,7 +568,7 @@ export function createProfileStats(host, {
 
     // Fires when the cabinet sits idle: the screen must not stay over
     // attract mode nor keep the buttons.
-    host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
+    host.on("attractmodestart", safeHandler(SCRIPT_NAME, closeAll));
 
     return {
         // onReturn: what Exit brings back, such as the main menu on its entry.
@@ -523,7 +576,7 @@ export function createProfileStats(host, {
         // Another Profile's screen, read-only; onBack: what Exit returns to.
         openReadOnly: (profileName, onBack) => open(CHOICE.EXIT_BUTTON, { viewedName: profileName, onReturn: onBack }),
         readStats,
-        isOpen: () => shown !== null,
+        isOpen: () => shown !== null || screenSetAside !== null,
         onClosed: closedListeners.onClosed,
         // Opens the frame list straight away on that tier's row, onClosed
         // called once it closes; Select or Exit there shows this screen on the

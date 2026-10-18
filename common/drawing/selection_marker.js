@@ -3,7 +3,8 @@
 // current choice, its golds flowing round it without end, always the same
 // way, one lap every 6 seconds. One small layer per open screen, redrawn
 // with fillRect on a tick of about 33 ms until remove(), which stops the
-// tick and removes the layer. Validated on the cabinet by the prototype
+// tick and removes the layer; setAside() stills and hides it while its
+// screen waits hidden, showAgain() starts it again. Validated on the cabinet by the prototype
 // (spec #231): about 2 ms a draw, the wheel behind stays smooth.
 // ============================================================
 
@@ -104,22 +105,40 @@ export function createSelectionMarker(host, { zIndex, referenceWidth, referenceH
         return { canvasW, canvasH };
     }
 
-    const timer = host.setInterval(safeHandler(SCRIPT_NAME, () => {
-        if (choice) draw();
-    }), TICK_MS);
+    let timer = null;
+    const startTurning = () => {
+        timer = host.setInterval(safeHandler(SCRIPT_NAME, () => {
+            if (choice) draw();
+        }), TICK_MS);
+    };
+    startTurning();
+
+    // rect: the choice itself, in reference pixels; drawn at once.
+    function moveTo(rect) {
+        choice = { ...rect };
+        const { canvasW, canvasH } = draw();
+        layer.setScale({ ySpan: canvasH / referenceHeight });
+        const left = rect.x - MARGIN;
+        const top = rect.y - MARGIN;
+        layer.setPos((left + canvasW / 2) / referenceWidth - 0.5, 0.5 - (top + canvasH / 2) / referenceHeight);
+    }
 
     return {
-        // rect: the choice itself, in reference pixels; drawn at once.
-        moveTo(rect) {
-            choice = { ...rect };
-            const { canvasW, canvasH } = draw();
-            layer.setScale({ ySpan: canvasH / referenceHeight });
-            const left = rect.x - MARGIN;
-            const top = rect.y - MARGIN;
-            layer.setPos((left + canvasW / 2) / referenceWidth - 0.5, 0.5 - (top + canvasH / 2) / referenceHeight);
-        },
+        moveTo,
         setOpacity(alpha) {
             layer.alpha = alpha;
+        },
+        // While its screen is set aside: still and hidden, reduced to a point.
+        setAside() {
+            host.clearInterval(timer);
+            timer = null;
+            layer.alpha = 0;
+            layer.setScale(HIDDEN_SPAN);
+        },
+        // Back on the same choice, turning again; its opacity is the screen's to set.
+        showAgain() {
+            if (timer === null) startTurning();
+            if (choice) moveTo(choice);
         },
         remove() {
             host.clearInterval(timer);
