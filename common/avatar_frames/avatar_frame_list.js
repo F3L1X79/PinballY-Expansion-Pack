@@ -11,7 +11,8 @@
 // buttons (see GLOSSARY.md). Select or Launch (the plunger) on an
 // unlocked row or "None" saves the choice through the Profile Rewards
 // module, on a locked row does nothing; Exit changes nothing. Both then
-// close the list and call the return given to open();
+// close the list and call the return given to open(), telling it whether
+// the worn frame changed;
 // attract mode only closes it, the marker's layer and timer going with
 // it. While open it swallows every button through "commandbuttondown".
 // Every layer is drawn ahead from startup through the shared drawing
@@ -220,12 +221,14 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         shown.marker.setOpacity(opacity);
     }
 
-    // onBack: what Select and Exit return to, called once the list is
-    // closed (null: the bare wheel, the Exit Button then a cross); selectedTier (optional): the frame row it opens on instead of
-    // the worn one; onClosed (optional): called whenever it closes, attract
-    // mode included, before onBack. Opens at once when every row is drawn
+    // onBack(isWornChanged): what Select and Exit return to, called once the
+    // list is closed, true when the frame worn changed (null: the bare wheel,
+    // the Exit Button then a cross); selectedTier (optional): the frame row
+    // it opens on instead of the worn one; onClosed (optional): called whenever it closes, attract
+    // mode included, before onBack; onFailed (optional): called once an
+    // opening that failed is given up. Opens at once when every row is drawn
     // ahead; otherwise the missing ones are drawn under the veil first.
-    function open(onBack = null, { selectedTier = null, onClosed = () => {} } = {}) {
+    function open(onBack = null, { selectedTier = null, onClosed = () => {}, onFailed = () => {} } = {}) {
         if (shown) return;
         // Before anything is drawn: the Exit Button and the footer follow it.
         exitLook = exitButtonLookOf(onBack !== null);
@@ -258,9 +261,17 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
                 opening.fadeIn(setOpacity);
             },
             // Logged by the drawing ahead: given up rather than left veiled.
-            onFailed: close,
+            onFailed: () => {
+                close();
+                onFailed();
+            },
         });
     }
+
+    const wornTier = () => {
+        const worn = profileRewards.wornFrameOf();
+        return worn ? worn.tier : null;
+    };
 
     // Closes the open list or gives up the one getting ready.
     function close() {
@@ -286,10 +297,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         setOpacity(shown.opacity);
     }
 
-    function back() {
+    function back(isWornChanged = false) {
         const { onBack } = shown;
         close();
-        if (onBack) onBack();
+        if (onBack) onBack(isWornChanged);
     }
 
     // A locked row cannot be worn: the list stays as it is. The Exit
@@ -298,8 +309,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         if (shown.selected === EXIT_BUTTON) return back();
         const row = content.rows[shown.selected];
         if (row.isLocked) return;
+        // The frame already worn changes nothing.
+        const wornBefore = wornTier();
         profileRewards.choose(row.tier);
-        back();
+        back(wornTier() !== wornBefore);
     }
 
     // Fires on every mapped button press; drives the list while it is open.

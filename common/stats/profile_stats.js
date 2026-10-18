@@ -14,8 +14,9 @@
 // (opening it from the Achievements button, Exit there showing this screen
 // again at once, as it was left), the Profile Rewards module (the worn Avatar
 // Frame around the Avatar; null: none), the Avatar Frame list (its count,
-// and opening it from the Frame button, Select or Exit there showing this screen again on
-// that button; null or without frames: no button), the Daily Streak, the Table of the Day and Table
+// and opening it from the Frame button, Select or Exit there showing this
+// screen again at once on that button, or opening it again when the worn
+// frame changed; null or without frames: no button), the Daily Streak, the Table of the Day and Table
 // of the Week (their Streaks), the Challenge module (null when the
 // Challenges Add-on is disabled: no completed Challenges), the High Score
 // store (null when the High Scores Add-on is disabled: no High Scores nor
@@ -23,8 +24,9 @@
 // Fame and Tables to Discover filters (null when their Add-on is
 // disabled: no button) and the Household Stats (opened from the Household
 // button, shown while the Household has two Profiles; Exit there shows
-// this screen again at once). While the Achievement List or the Household
-// Stats is open, this screen waits set aside, hidden; attract mode, the
+// this screen again at once). While the Achievement List, the Avatar
+// Frame list or the Household Stats is open, this screen waits set aside,
+// hidden; attract mode, the
 // child failing to open or a final Exit removes it. While open it swallows every button through
 // "commandbuttondown": Next / Prev move the Selection Marker (a gold glow
 // flowing round the choice) through the Exit Button and the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes
@@ -75,7 +77,8 @@ export function createProfileStats(host, {
     // choices and selection; null when closed.
     let shown = null;
     // The active Profile's screen, ready but hidden while the Achievement
-    // List or the Household Stats it opened is on show; null otherwise.
+    // List, the Avatar Frame list or the Household Stats it opened is on
+    // show; null otherwise.
     let screenSetAside = null;
     const closedListeners = createClosedListeners(SCRIPT_NAME);
 
@@ -529,27 +532,32 @@ export function createProfileStats(host, {
         if (onReturn) onReturn();
     }
 
+    // A new frame worn changes the card: the screen set aside is read and
+    // drawn again, on the Frame button.
+    function openSetAsideAgain() {
+        const { onReturn } = screenSetAside;
+        discardSetAside();
+        open(CHOICE.FRAME, { onReturn });
+    }
+
     function choose() {
         const choice = shown.choices[shown.selected];
         const entry = shown.screen.buttons.find(button => button.choice === choice);
         if (choice === CHOICE.EXIT_BUTTON) return back();
-        // Exit from the Achievement List or the Household Stats shows this
-        // screen again as it was left, Exit here still bringing back what it
-        // was first opened from.
+        // Exit from a child shows this screen again as it was left, Exit
+        // here still bringing back what it was first opened from.
         if (choice === CHOICE.ACHIEVEMENTS) return openChildOver((onExit, onFailed) => achievementList.open(onExit, { onFailed }));
         if (choice === CHOICE.HOUSEHOLD) return openChildOver((onExit, onFailed) => householdStats.open(onExit, { onFailed }));
-        const { onReturn } = shown;
+        if (choice === CHOICE.FRAME) return openChildOver((onExit, onFailed) => frameList.open(
+            isWornChanged => (isWornChanged ? openSetAsideAgain() : onExit()), { onFailed }));
         close();
-        // A frame equipped changes the card: Exit from the frame list opens
-        // this screen again, on its button.
-        if (choice === CHOICE.FRAME) frameList.open(() => open(CHOICE.FRAME, { onReturn }));
-        else if (entry) host.setCurrentFilter(entry.filterId);
+        if (entry) host.setCurrentFilter(entry.filterId);
     }
 
     // Fires on every mapped button press; drives the screen while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
         // Already handled: the Achievement List's, Avatar Frame list's or
-        // Household Stats' Exit (or Select) shows this screen within the
+        // Household Stats' Exit (or Select) shows or opens this screen within the
         // same press, which must not act on it again. Set aside, the
         // screen is not shown: the child takes the buttons.
         if (!shown || ev.defaultPrevented) return;

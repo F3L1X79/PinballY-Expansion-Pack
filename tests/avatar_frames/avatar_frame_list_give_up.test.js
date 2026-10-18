@@ -2,8 +2,8 @@
 // Giving up the Avatar Frame list while it gets ready, through main.js on
 // the fake PinballY globals with slow draws: Next, Prev and Select are
 // swallowed and choose nothing; Exit gives up (no veil, no Loader, nothing
-// of the list shown) and goes back to the Profile Stats it was opened
-// from; attract mode gives up without going back anywhere.
+// of the list shown) and shows the Profile Stats it was opened from again
+// at once; attract mode gives up without going back anywhere.
 // ============================================================
 
 import { test } from "node:test";
@@ -14,7 +14,7 @@ import { readLoader } from "../support/loader_reader.js";
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 import { profileFile } from "../mastery/mastery_bar_scenario.js";
 import {
-    press, isFrameListOpen, isProfileStatsOpen, untilProfileStatsFadedIn,
+    press, isFrameListOpen, isProfileStatsOpen, markerLayer,
 } from "../stats/profile_stats_reader.js";
 import { startPack, startOpeningFrameList, FRAME_LIST_VEIL } from "./avatar_frame_list_opening_scenario.js";
 
@@ -39,11 +39,14 @@ test("Exit while the list gets ready goes back to the Profile Stats; attract mod
     }
     assert.equal(readLoader(fake).shown, true, "still getting ready");
     assert.equal(wornTier(fake), 2, "nothing chosen");
+    const mark = fake.logLines().length;
     assert.ok(press(fake, "Exit").defaultPrevented);
-    // The Profile Stats get ready in turn, under their own veil.
-    untilProfileStatsFadedIn(fake);
     assertNothingLeft(fake);
-    assert.equal(isProfileStatsOpen(fake), true, "back to the Profile Stats");
+    assert.equal(isProfileStatsOpen(fake), true, "back to the Profile Stats in the same step");
+    assert.equal(markerLayer(fake).alpha, 1);
+    fake.advanceTime(2000);
+    assert.deepEqual(readLoader(fake), { shown: false });
+    assert.deepEqual(fake.logLines().slice(mark).filter(line => line.includes("] Opened")), [], "no opening time line");
 
     press(fake, "Exit");
     startOpeningFrameList(fake, lang, { drawMs: 60 });
