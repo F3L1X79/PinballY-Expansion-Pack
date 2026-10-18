@@ -16,9 +16,13 @@ _Avoid_: plugin, script (a script is just a `.js` file)
 A menu the player sees drawn in the pack's own style instead of PinballY's native one, with the same entries and the same effect when one is chosen: the menus a player meets (main, Exit, filter choices, power off), the table's setup and categories, the Operator Menu, and those the Add-ons open. The capture, media and elevation menus that look after the cabinet and the pause menu of a running game stay native, and so does every menu when the Add-on is turned off or a menu cannot be drawn. Shown simply as "menu".
 _Avoid_: Steamball menu (Steamball is the palette), custom menu, popup (a popup shows information, a menu offers choices)
 
-**Filter Tables**:
-The submenu, opened by the player from the main menu, that gathers PinballY's filter groups (by era, manufacturer, category, rating, and the others the player kept), each opening PinballY's own list of filters for that group. Back or Exit goes up one level at a time: from a group to "Filter Tables" on that group, from "Filter Tables" to the main menu on its entry. The entry and the group are marked when the current filter belongs to that group. Shown as "Filtrer les tables" in French.
-_Avoid_: filter menu (each group's own list is a filter menu too), filter groups (the groups are what it lists)
+**Filter Picker**:
+The submenu, opened by the player from the main menu's "Change Filter" entry, that lists the wheel selections (All Tables and the pack's own, each only while it has tables), then PinballY's filter groups (by era, manufacturer, category, rating, and the others the player kept), each opening PinballY's own list of filters for that group. Choosing a selection or a filter closes the menus on the filtered wheel. Back or Exit goes up one level at a time: from a group to the Filter Picker on that group, from the Filter Picker to the main menu on its entry. The current selection, and the group the Active Filter belongs to, are marked. Shown as "Changer de filtre" in French.
+_Avoid_: Filter Tables, filter menu (each group's own list is a filter menu too), filter groups (the groups are what it lists)
+
+**Active Filter**:
+The filter the wheel applies right now, a wheel selection or a filter from one of PinballY's groups, named in the main menu: under its entries in a Drawn Menu ("Active filter: <name>"), on the entry itself in PinballY's native menu. Shown as "Filtre actif" in French.
+_Avoid_: current filter, current selection
 
 **Selection Marker**:
 The soft gold glow around the current choice of a drawn screen (Welcome Screen, Profile Stats, Household Stats, the Avatar Frame list, and the Exit Button of the Achievement List and High Score Board), whose golds, from bronze to a white gleam, flow round it without end, always the same way, so the player sees at once where they are; it jumps straight to a new choice. Drawn Menus mark their selected entry their own way.
@@ -141,23 +145,23 @@ A table drawn at random from the current wheel selection and launched right away
 _Avoid_: random table, lucky pick
 
 **Tables to Discover**:
-The tables the active Profile can see that it has never played, offered as a wheel selection from the main menu and from the Profile Stats. Shown as "Tables à découvrir" in French.
+The tables the active Profile can see that it has never played, offered as a wheel selection from the Filter Picker and from the Profile Stats. Shown as "Tables à découvrir" in French.
 _Avoid_: never played tables, unplayed tables, new tables
 
 **Hall of Fame**:
-The ten tables the active Profile can see that it has spent the most time on, ranked from the most played, offered as a wheel selection from the main menu. Shown as "Most Played Tables" ("Tables les plus jouées" in French), like the same tables in the Profile Stats.
+The ten tables the active Profile can see that it has spent the most time on, ranked from the most played, offered as a wheel selection from the Filter Picker. Shown as "Most Played Tables" ("Tables les plus jouées" in French), like the same tables in the Profile Stats.
 _Avoid_: top played, most played, leaderboard
 
 **My High Scores**:
-The tables the active Profile can see on whose high score board it still holds a High Score, ranked by the best place it holds there, then by title, offered as a wheel selection from the main menu, right under the Hall of Fame; the entry is in the menu only while there is at least one. Shown as "Mes meilleurs scores" in French.
+The tables the active Profile can see on whose high score board it still holds a High Score, ranked by the best place it holds there, then by title, offered as a wheel selection from the Filter Picker, right under the Hall of Fame; the entry is in the Filter Picker only while there is at least one. Shown as "Mes meilleurs scores" in French.
 _Avoid_: my records, Mes records (a record is only the Table Record)
 
 **Favorite Tables**:
-The tables the household has added to PinballY's favourites, offered as a wheel selection from the main menu, right under My High Scores. Shown as "Tables favorites" in French.
+The tables the household has added to PinballY's favourites, offered as a wheel selection from the Filter Picker, right under My High Scores. Shown as "Tables favorites" in French.
 _Avoid_: Favorites, favourites filter
 
 **Hidden Tables**:
-The tables carrying PinballY's Hidden flag, for the whole cabinet, offered to every Profile as a wheel selection from the main menu, right under the Favorite Tables, Adult Tables left out for a Child Profile; the entry is in the menu only while at least one table is hidden. A Hidden Table is not one a Profile can see: it is left out of every other selection and list. Shown as "Tables masquées" in French.
+The tables carrying PinballY's Hidden flag, for the whole cabinet, offered to every Profile as a wheel selection from the Filter Picker, right under the Favorite Tables, Adult Tables left out for a Child Profile; the entry is in the Filter Picker only while at least one table is hidden. A Hidden Table is not one a Profile can see: it is left out of every other selection and list. Shown as "Tables masquées" in French.
 _Avoid_: masked tables, operator tables
 
 **Period Table Streak**:
@@ -182,7 +186,7 @@ The small card at the top right of the wheel screen, under the Profile badge whe
 _Avoid_: challenge widget, challenge popup, status line
 
 **Challenge Tables**:
-The tables the active Profile can see that would move its Challenge forward if played now, offered as a wheel selection from the main menu, right under "All Tables"; only some Challenges have them, for example not one about total play time. The entry is in the main menu only while the active Profile's Challenge has Challenge Tables, so neither once the Challenge is completed nor for a Challenge without any; when none is left while they are on the wheel, every table comes back.
+The tables the active Profile can see that would move its Challenge forward if played now, offered as a wheel selection from the Filter Picker, right under "All Tables"; only some Challenges have them, for example not one about total play time. The entry is in the Filter Picker only while the active Profile's Challenge has Challenge Tables, so neither once the Challenge is completed nor for a Challenge without any; when none is left while they are on the wheel, every table comes back.
 _Avoid_: challenge filter, eligible tables
 
 **Challenge Toast**:
