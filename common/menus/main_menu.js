@@ -3,7 +3,7 @@
 // entries (label, action, position, and optionally "shown when" and
 // "marked when" predicates checked on each opening); on each opening it
 // sorts them and PinballY's own items into fixed sections split by
-// separators: Play and the launches, the player, the selected table, the
+// separators: Play and the launches, the selected table, the player, the
 // table lists, "Filter Tables", any item it does not know, then Return. A
 // section with no item shown goes with its separator, and the Add-on
 // order in main.js never decides where an entry lands. PinballY's filter
@@ -36,13 +36,13 @@ const UNKNOWN = { matches: () => false };
 // Sections from the top down, each listing its slots in menu order.
 const SECTIONS = [
     [builtIn("PlayGame"), packEntry("TABLE_OF_THE_DAY"), packEntry("TABLE_OF_THE_WEEK"), packEntry("RANDOM_GAME")],
-    [packEntry("PROFILE_PICKER"), packEntry("ACHIEVEMENT_LIST"), packEntry("PROFILE_STATS")],
     [
         packEntry("HIGH_SCORE_BOARD"),
         builtIn("GameInfo"), builtIn("Flyer"), builtIn("HighScores"), builtIn("Instructions"),
         builtIn("RateGame"), builtIn("AddFavorite", "RemoveFavorite"),
         packEntry("TABLE_SETUP"),
     ],
+    [packEntry("PROFILE_PICKER"), packEntry("PROFILE_STATS"), packEntry("ACHIEVEMENT_LIST")],
     [FILTERS],
     [packEntry("FILTER_TABLES")],
     [UNKNOWN],

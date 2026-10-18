@@ -1,8 +1,8 @@
 // ============================================================
 // The main menu's sections, through main.js on the fake PinballY globals,
-// Menu Cleanup off: Play and the launches, the player, the selected table
-// (High Score Board, PinballY's table entries, Rate Table, Add to
-// Favorites, Table Setup last for an Admin Profile only), the table lists,
+// Menu Cleanup off: Play and the launches, the selected table (High Score
+// Board, PinballY's table entries, Rate Table, Add to Favorites, Table
+// Setup last for an Admin Profile only), the player, the table lists,
 // "Filter Tables", any entry the pack does not know, then Return; a
 // section with no entry shown goes with its separator. The one test of the
 // whole order: the others read their own section (support/main_menu_reader.js).
@@ -59,18 +59,18 @@ test("setup", async () => {
 });
 
 const launches = () => ["Play", lang.customMenuLabels.tableOfTheDay, lang.customMenuLabels.tableOfTheWeek, lang.customMenuLabels.randomGame];
-const player = () => [lang.profiles.menuEntry, lang.achievementList.menuEntry, lang.profileStats.menuEntry];
+const player = () => [lang.profiles.menuEntry, lang.profileStats.menuEntry, lang.achievementList.menuEntry];
 const tableLists = () => {
     const { challengeTables, tablesToDiscoverFilter, hallOfFameFilter } = lang.customMenuLabels;
     return ["All Tables", challengeTables, tablesToDiscoverFilter, hallOfFameFilter, "Favorite Tables"];
 };
 
-test("the main menu runs launches, player, selected table, table lists, Filter Tables, then Return", () => {
+test("the main menu runs launches, selected table, player, table lists, Filter Tables, then Return", () => {
     assert.deepEqual(mainMenuTitles(), [
         ...launches(), SEPARATOR,
-        ...player(), SEPARATOR,
         lang.highScores.board.menuEntry, "Information", "Flyer", "Instruction Card", "Rate Table", "Add to Favorites",
         lang.customMenuLabels.tableSetup, SEPARATOR,
+        ...player(), SEPARATOR,
         ...tableLists(), SEPARATOR,
         lang.customMenuLabels.filterTables, SEPARATOR,
         "Return",
@@ -79,7 +79,7 @@ test("the main menu runs launches, player, selected table, table lists, Filter T
 
 test("once the household has an Admin Profile, Table Setup is the selected table's last line for it only", () => {
     fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({ version: 1, isAdmin: true }));
-    const selectedTable = titles => titles.slice(titles.indexOf(lang.highScores.board.menuEntry), titles.indexOf("All Tables"));
+    const selectedTable = titles => titles.slice(titles.indexOf(lang.highScores.board.menuEntry), titles.indexOf(lang.profiles.menuEntry));
 
     assert.deepEqual(selectedTable(mainMenuTitles()),
         [lang.highScores.board.menuEntry, "Information", "Flyer", "Instruction Card", "Rate Table", "Add to Favorites", SEPARATOR]);
@@ -102,7 +102,7 @@ test("PinballY's table entries keep its order wherever it lists them, Remove fro
         { title: "Information", cmd: GameInfo },
         { title: "Return", cmd: MenuReturn },
     ]));
-    assert.deepEqual(titles.slice(titles.indexOf(lang.highScores.board.menuEntry), titles.indexOf("Return")),
+    assert.deepEqual(titles.slice(titles.indexOf(lang.highScores.board.menuEntry), titles.indexOf(lang.profiles.menuEntry)),
         [lang.highScores.board.menuEntry, "Information", "Flyer", "Instruction Card", "Rate Table", "Remove from Favorites", SEPARATOR]);
 });
 
@@ -128,7 +128,7 @@ test("no section leaves a doubled, leading or trailing separator when PinballY l
         { title: "", cmd: -1 },
     ]));
     assert.deepEqual(titles, [
-        ...launches(), SEPARATOR, ...player(), SEPARATOR, lang.highScores.board.menuEntry,
+        ...launches(), SEPARATOR, lang.highScores.board.menuEntry, SEPARATOR, ...player(),
     ]);
     assertNoErrorLogged(fake);
 });

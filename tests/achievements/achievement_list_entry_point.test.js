@@ -1,6 +1,6 @@
 ﻿// ============================================================
 // The Achievement List, started through main.js on the fake PinballY
-// globals: its main menu entry sits in the personal section, before the
+// globals: its main menu entry sits in the player section, after the
 // Profile Stats entry, and opens the drawn list of the real
 // Achievements (the Unlocked ones first, the missing ones in natural order
 // with their Achievement Progress). Exit reopens the main menu on the entry; opened
@@ -46,7 +46,7 @@ const GUEST_NOTIFIED = ["collectionMilestone:10percent", "collectionMilestone:fi
 
 const ADD_ONS_UNDER_TEST = ["customMenuCommands", "achievements"];
 
-test("the Achievement List entry sits in the personal section, lists the real Achievements and Exit goes back one level", async () => {
+test("the Achievement List entry sits in the player section, lists the real Achievements and Exit goes back one level", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
     fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({ version: 1, plays: GUEST_PLAYS, notified: GUEST_NOTIFIED }));
     // Never uninstalled: node --test runs each test file in its own process.
@@ -64,7 +64,7 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
     await settle();
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }, { title: "Exit", cmd: 99 }]);
-    assert.deepEqual(mainMenuSection(fake, TEXT.menuEntry, openMainMenu), [TEXT.menuEntry, lang.profileStats.menuEntry]);
+    assert.deepEqual(mainMenuSection(fake, TEXT.menuEntry, openMainMenu), [lang.profileStats.menuEntry, TEXT.menuEntry]);
 
     openMainMenu();
     fake.selectMenuItem(TEXT.menuEntry);

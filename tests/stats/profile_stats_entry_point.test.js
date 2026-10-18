@@ -1,6 +1,6 @@
 // ============================================================
 // The Profile Stats, started through main.js on the fake PinballY globals:
-// their main menu entry sits right after the Achievement List entry, the
+// their main menu entry sits right before the Achievement List entry, the
 // Achievements button agrees with the real Achievement List and opens it,
 // Exit there bringing the Profile Stats back on that button, and the Most
 // Played Tables and Tables to Discover buttons close them and put the
@@ -50,7 +50,7 @@ test("the Achievements button opens the Achievement List and the selection butto
     await settle();
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }, { title: "Exit", cmd: 99 }]);
-    assert.deepEqual(mainMenuSection(fake, TEXT.menuEntry, openMainMenu), [lang.achievementList.menuEntry, TEXT.menuEntry]);
+    assert.deepEqual(mainMenuSection(fake, TEXT.menuEntry, openMainMenu), [TEXT.menuEntry, lang.achievementList.menuEntry]);
 
     // The Achievement List's own total, read from its header.
     const readListTotal = () => chromeTexts(fake).find(text => /^\d+ \/ \d+ /.test(text)).match(/\d+/g).slice(0, 2).join("/");

@@ -42,7 +42,7 @@ test("a non-admin Profile's main menu shows the final entries, translated and cl
     assert.equal(fake.currentMenu(), null);
     const section = entry => sectionHolding(drawnMenuLines(fake), entry);
     assert.deepEqual(section("Jouer"), ["Jouer", "Lancer la table du jour", "Lancer la table de la semaine", "Lancer une table au hasard"]);
-    assert.deepEqual(section("Vos succès"), ["Vos succès", "Vos statistiques"]);
+    assert.deepEqual(section("Vos succès"), ["Vos statistiques", "Vos succès"]);
     assert.deepEqual(section("Noter la table"), ["Noter la table", "Ajouter aux favoris"]);
     assert.deepEqual(section("Filtrer les tables"), ["Filtrer les tables"]);
     assert.deepEqual(section("Retour"), ["Retour"]);

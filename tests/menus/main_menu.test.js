@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // Main menu module tests: entries added through its interface appear in
 // PinballY's main menu in their sections (Play and the launches, the
-// player, the selected table) split by separators, in their fixed position
+// selected table, the player) split by separators, in their fixed position
 // order whatever order the Add-ons added them in, PinballY's other items
 // in their own sections below; selecting one runs its action; reopening
 // on an entry puts the cursor on it. Other menus are left alone.
@@ -39,7 +39,7 @@ test("entries sit in their sections and position order, whatever order they were
     openMainMenu();
 
     assert.deepEqual(titles(fake.currentMenu()),
-        ["Play", "Day", "Week", "Random", SEPARATOR, "Player", "List", "Stats", SEPARATOR, "Setup", SEPARATOR, "Return"]);
+        ["Play", "Day", "Week", "Random", SEPARATOR, "Setup", SEPARATOR, "Player", "Stats", "List", SEPARATOR, "Return"]);
     assert.ok(fake.currentMenu().items.filter(item => item.title === SEPARATOR).every(item => item.cmd === -1));
 });
 
@@ -50,7 +50,7 @@ test("a section with no shown entry adds no separator", () => {
     mainMenu.add({ name: "list", label: "List", position: MAIN_MENU_POSITION.ACHIEVEMENT_LIST, action: () => {} });
 
     openMainMenu();
-    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "List", SEPARATOR, "Setup", SEPARATOR, "Return"]);
+    assert.deepEqual(titles(fake.currentMenu()), ["Play", SEPARATOR, "Setup", SEPARATOR, "List", SEPARATOR, "Return"]);
     fake.closeMenu();
 
     setupShown = false;
