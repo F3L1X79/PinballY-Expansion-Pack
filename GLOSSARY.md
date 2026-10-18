@@ -121,7 +121,7 @@ _Avoid_: daily pick, featured table, table of period
 
 **Adult Table**:
 A table in the PinballY category set aside for adults ("NSFW" unless configured otherwise). A Child Profile never sees one, and it counts in none of its groups for completion Achievements.
-_Avoid_: NSFW table, hidden table (Hidden is PinballY's own flag, for the whole cabinet)
+_Avoid_: NSFW table, hidden table (one of the Hidden Tables, PinballY's own flag for the whole cabinet; only the Adult Table category keeps a table from a Child Profile)
 
 **Table of the Day**:
 The Period Table whose Period is a day; prefers tables never played, otherwise the one played longest ago.
@@ -148,9 +148,17 @@ _Avoid_: never played tables, unplayed tables, new tables
 The ten tables the active Profile can see that it has spent the most time on, ranked from the most played, offered as a wheel selection from the main menu. Shown as "Most Played Tables" ("Tables les plus jouées" in French), like the same tables in the Profile Stats.
 _Avoid_: top played, most played, leaderboard
 
+**My High Scores**:
+The tables the active Profile can see on whose high score board it still holds a High Score, ranked by the best place it holds there, then by title, offered as a wheel selection from the main menu, right under the Hall of Fame; the entry is in the menu only while there is at least one. Shown as "Mes meilleurs scores" in French.
+_Avoid_: my records, Mes records (a record is only the Table Record)
+
 **Favorite Tables**:
-The tables the household has added to PinballY's favourites, offered as a wheel selection from the main menu, right under the Hall of Fame. Shown as "Tables favorites" in French.
+The tables the household has added to PinballY's favourites, offered as a wheel selection from the main menu, right under My High Scores. Shown as "Tables favorites" in French.
 _Avoid_: Favorites, favourites filter
+
+**Hidden Tables**:
+The tables carrying PinballY's Hidden flag, for the whole cabinet, offered to every Profile as a wheel selection from the main menu, right under the Favorite Tables, Adult Tables left out for a Child Profile; the entry is in the menu only while at least one table is hidden. A Hidden Table is not one a Profile can see: it is left out of every other selection and list. Shown as "Tables masquées" in French.
+_Avoid_: masked tables, operator tables
 
 **Period Table Streak**:
 The number of consecutive Periods in which the active Profile made a Play on the Period Table that started during its Period, however it was launched. A Period whose Period Table is an Adult Table neither extends nor breaks a Child Profile's Period Table Streak.
@@ -174,7 +182,7 @@ The small card at the top right of the wheel screen, under the Profile badge whe
 _Avoid_: challenge widget, challenge popup, status line
 
 **Challenge Tables**:
-The tables the active Profile can see that would move its Challenge forward if played now, offered as a wheel selection from the main menu, right under "All Tables"; only some Challenges have them, for example not one about total play time. The entry is always in the main menu: chosen with no Challenge Tables, or when none is left while they are on the wheel, every table comes back.
+The tables the active Profile can see that would move its Challenge forward if played now, offered as a wheel selection from the main menu, right under "All Tables"; only some Challenges have them, for example not one about total play time. The entry is in the main menu only while the active Profile's Challenge has Challenge Tables, so neither once the Challenge is completed nor for a Challenge without any; when none is left while they are on the wheel, every table comes back.
 _Avoid_: challenge filter, eligible tables
 
 **Challenge Toast**:
