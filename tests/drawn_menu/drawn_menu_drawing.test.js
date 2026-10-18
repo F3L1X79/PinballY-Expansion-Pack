@@ -15,6 +15,7 @@ import config from "../../common/core/config.js";
 import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu/drawn_menu_painter.js";
 import { DRAWN_MENU_IMAGES } from "../../common/drawn_menu/drawn_menu_images.js";
 import { isDrawnMenuShown, drawnMenuLines, openMainMenu, press, OPEN_OVER_MS } from "./drawn_menu_reader.js";
+import { whileDrawsFail, FAILING_DRAW_MESSAGE } from "../support/failing_draws.js";
 
 const IMAGES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\drawn_menu";
 const DOT = { xSpan: 0.001, ySpan: 0.001 };
@@ -117,19 +118,11 @@ test("a line that clearly fits is drawn without being measured; only a title tha
 });
 
 test("a menu that fails to draw logs the error and shows natively", () => {
-    const RealStyledText = globalThis.StyledText;
-    globalThis.StyledText = class {
-        constructor() { throw new Error("DirectWrite is gone"); }
-    };
-    try {
-        fake.openMainMenu();
-    } finally {
-        globalThis.StyledText = RealStyledText;
-    }
+    whileDrawsFail(() => fake.openMainMenu());
 
     assert.equal(fake.currentMenu().id, "main", "the native menu shows");
     assert.ok(!isDrawnMenuShown(fake));
-    assert.ok(fake.logLines().some(line => line.startsWith("[DrawnMenus] ERROR") && line.includes("DirectWrite is gone")));
+    assert.ok(fake.logLines().some(line => line.startsWith("[DrawnMenus] ERROR") && line.includes(FAILING_DRAW_MESSAGE)));
     for (const layer of menuLayers()) assert.deepEqual(layer.scale(), DOT);
     assert.ok(!press(fake, "Next").defaultPrevented, "the buttons are left to the native menu");
 });

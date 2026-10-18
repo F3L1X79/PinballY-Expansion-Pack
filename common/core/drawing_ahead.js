@@ -57,7 +57,7 @@ export function createDrawingAhead(host) {
             if (!work.step()) work.awake = false;
         } catch (error) {
             work.awake = false;
-            host.log(`[${SCRIPT_NAME}] A drawing step failed, paused until new work: ${error.stack || error.message}`);
+            host.log(`[${SCRIPT_NAME}] ERROR in a drawing step, paused until new work: ${error.stack || error.message}`);
         }
     }
 
@@ -72,7 +72,7 @@ export function createDrawingAhead(host) {
         try {
             hasMore = job.step();
         } catch (error) {
-            host.log(`[${SCRIPT_NAME}] A foreground step failed, its work given up: ${error.stack || error.message}`);
+            host.log(`[${SCRIPT_NAME}] ERROR in a foreground step, its work given up: ${error.stack || error.message}`);
             finish(job, job.onFailed);
             return;
         }

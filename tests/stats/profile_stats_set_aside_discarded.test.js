@@ -8,7 +8,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHousehold } from "./household_stats_scenario.js";
-import { assertNoErrorLogged } from "../support/error_log.js";
+import { errorLines } from "../support/error_log.js";
+import { whileDrawsFail, FAILING_DRAW_MESSAGE } from "../support/failing_draws.js";
 import { readVeil } from "../support/opening_reader.js";
 import { isListOpen } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, startOpeningProfileStats, untilProfileStatsFadedIn, profileStatsLayerCount, isProfileStatsOpen, choose } from "./profile_stats_reader.js";
@@ -34,17 +35,13 @@ test("attract mode and a child failing to open leave no layer of the Profile Sta
     untilProfileStatsFadedIn(fake);
     assert.equal(openingLinesSince(fake, mark).length, 1);
 
-    const RealStyledText = globalThis.StyledText;
-    globalThis.StyledText = class {
-        constructor() { throw new Error("DirectWrite is gone"); }
-    };
-    try {
+    whileDrawsFail(() => {
         choose(fake, TEXT.buttons.household);
         fake.advanceTime(1000);
-    } finally {
-        globalThis.StyledText = RealStyledText;
-    }
-    assert.ok(fake.logLines().some(line => line.startsWith("[DrawingAhead] A foreground step failed") && line.includes("DirectWrite is gone")), "the failure is logged");
+    });
+    const errors = errorLines(fake);
+    assert.equal(errors.length, 1);
+    assert.ok(errors[0].startsWith("[DrawingAhead] ERROR") && errors[0].includes(FAILING_DRAW_MESSAGE), "the failure is logged");
     assert.equal(householdStatsLayerCount(fake), 0);
     assert.equal(profileStatsLayerCount(fake), 0, "no layer of the Profile Stats, hidden or not");
     assert.deepEqual(readVeil(fake), { shown: false });
@@ -53,5 +50,5 @@ test("attract mode and a child failing to open leave no layer of the Profile Sta
     openProfileStats(fake, lang);
     assert.equal(isProfileStatsOpen(fake), true);
     assert.equal(openingLinesSince(fake, mark).length, 1, "read afresh");
-    assertNoErrorLogged(fake);
+    assert.deepEqual(errorLines(fake), errors, "no other error");
 });
