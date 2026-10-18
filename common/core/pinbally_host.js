@@ -317,6 +317,9 @@ export function createPinballYHost() {
         // PinballY prefixes the id with "User."; a filter without a group is
         // listed in no filter menu. Returns its command ID.
         createFilter: (desc) => gameList.createFilter(desc),
+        // The filter by its id ("All", "User.<id>"...); its cmd is its main
+        // menu item's command, for this session only.
+        getFilterInfo: (filterId) => gameList.getFilterInfo(filterId),
         getCurrentFilterId: () => gameList.getCurFilter().id,
         // The command of the main menu item opening the current filter's
         // group (FilterByEra...); undefined for a top-level filter.

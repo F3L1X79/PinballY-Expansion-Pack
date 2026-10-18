@@ -5,6 +5,8 @@
 // right under "All Tables", and choosing it puts on the wheel the visible
 // tables that would move the Challenge forward, or every table back when
 // there is none (other templates, not followed yet, no Challenge, completed).
+// Its main menu entry is there only while the active Profile's Challenge
+// has Challenge Tables, checked at each opening.
 // ============================================================
 
 import { test } from "node:test";
@@ -16,6 +18,9 @@ import { createRandomGame } from "../../common/tables/random_game.js";
 import { createChallenges } from "../../common/challenges/challenge.js";
 import { createChallengeTables } from "../../common/challenges/challenge_tables.js";
 import { createAchievementToasts } from "../../common/achievements/achievement_toast.js";
+import { createMainMenu } from "../../common/menus/main_menu.js";
+import { mainMenuSection } from "../support/main_menu_reader.js";
+import lang from "../../common/core/i18n.js";
 
 // Monday 21 September 2026, 20:00; its week is keyed "2026-09-21".
 const MONDAY = new Date(2026, 8, 21, 20, 0, 0);
@@ -60,7 +65,7 @@ function setUp({ challenge, active = "Alice", plays = {}, now = MONDAY } = {}) {
     const randomGame = createRandomGame(fake, store, { animateTo: async () => {}, skipAnimation: true });
     const challenges = createChallenges(fake, store,
         { tableOfTheDay, tableOfTheWeek, randomGame, toasts: createAchievementToasts(fake) });
-    createChallengeTables(fake, challenges);
+    createChallengeTables(fake, challenges, createMainMenu(fake));
     return { fake, store, tableOfTheDay, tableOfTheWeek };
 }
 
@@ -229,4 +234,40 @@ test("another filter shown is left alone", async () => {
     play(fake, TABLES[1]);
 
     assert.equal(fake.currentFilterId(), "Favorites");
+});
+
+// The main menu's table lists, or null without the Challenge Tables entry.
+const challengeTablesSection = fake => mainMenuSection(fake, lang.customMenuLabels.challengeTables);
+
+test("with a Challenge that has Challenge Tables, the entry is in the main menu, under All Tables", () => {
+    const { fake } = setUp({ challenge: challengeOf("manufacturerTables", "Stern") });
+
+    assert.deepEqual(challengeTablesSection(fake), ["All Tables", lang.customMenuLabels.challengeTables, "Favorites"]);
+});
+
+test("once the active Profile completes its Challenge, the entry is gone at the next opening", () => {
+    const { fake } = setUp({ challenge: challengeOf("manufacturerTables", "Stern", 2) });
+    play(fake, TABLES[0]);
+    assert.notEqual(challengeTablesSection(fake), null);
+
+    play(fake, TABLES[1]);
+
+    assert.equal(challengeTablesSection(fake), null);
+    assert.deepEqual(mainMenuSection(fake, "All Tables"), ["All Tables", "Favorites"]);
+});
+
+test("with a Challenge that has no Challenge Tables, such as a total play time one, the entry is absent", () => {
+    const { fake } = setUp({ challenge: challengeOf("endurance") });
+
+    assert.equal(challengeTablesSection(fake), null);
+});
+
+test("switching to a Profile whose Challenge has no Challenge Tables removes the entry; switching back brings it back", () => {
+    const { fake, store } = setUp({ challenge: challengeOf("manufacturerTables", "Stern") });
+
+    store.switchTo("Bob");
+    assert.equal(challengeTablesSection(fake), null);
+
+    store.switchTo("Alice");
+    assert.notEqual(challengeTablesSection(fake), null);
 });

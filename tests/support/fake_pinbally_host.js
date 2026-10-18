@@ -986,11 +986,23 @@ export function createFakePinballYHost({
         return groupName ? BUILT_IN_COMMANDS[groupName] : undefined;
     }
 
+    // A filter's command: All Tables', Favorites' or a script filter's.
+    function commandOf(filterId) {
+        if (filterId === "All") return ALL_TABLES_FILTER_CMD;
+        if (filterId === "Favorites") return FAVORITES_FILTER_CMD;
+        return filterCommands.get(filterId);
+    }
+
     // The command of the current filter, for its radio mark in the main menu.
-    function currentFilterCmd() {
-        if (currentFilterId === "All") return ALL_TABLES_FILTER_CMD;
-        if (currentFilterId === "Favorites") return FAVORITES_FILTER_CMD;
-        return filterCommands.get(currentFilterId);
+    const currentFilterCmd = () => commandOf(currentFilterId);
+
+    // Like gameList.getFilterInfo(): the filter by its id, with its
+    // session-only command (FilterInfo.cmd). Only All Tables, Favorites and
+    // the script filters: the fake has no other filter's command.
+    function getFilterInfo(filterId) {
+        const cmd = commandOf(filterId);
+        if (cmd === undefined) throw new Error(`The fake host knows no filter ${filterId}.`);
+        return { id: filterId, cmd };
     }
 
     function allocateCommand(name) {
@@ -1016,6 +1028,7 @@ export function createFakePinballYHost({
         getWheelImage: wheelImageOf,
         setCurrentFilter,
         createFilter,
+        getFilterInfo,
         getCurrentFilterId: () => currentFilterId,
         getCurrentFilterGroupCmd: currentFilterGroupCmd,
         refreshFilter,
@@ -1389,6 +1402,7 @@ export function createFakePinballYHost({
                     getWheelCount: () => host.getWheelTables().length,
                     createFilter,
                     getCurFilter: () => ({ id: currentFilterId, groupCmd: currentFilterGroupCmd() }),
+                    getFilterInfo,
                     setCurFilter: setCurrentFilter,
                     setWheelGame: (offset) => { setWheelGame(offset); },
                     refreshFilter,

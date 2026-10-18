@@ -10,8 +10,10 @@
 // groups go to the "Filter Tables" submenu (common/menus/filter_tables.js),
 // which it creates. It owns the entry commands and runs the matching
 // action when one is selected, and can reopen the main menu with the
-// cursor on an entry (a screen going back one level). Listens to
-// "menuopen" and "command".
+// cursor on an entry (a screen going back one level). A [Top] script
+// filter's entry (by its full id, "User.<id>") can be given a condition,
+// checked on each opening, that leaves it out while false; a failing one
+// is logged and the entry stays shown. Listens to "menuopen" and "command".
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";
@@ -60,6 +62,8 @@ const comparePositions = (a, b) => a.section - b.section || a.order - b.order;
 export function createMainMenu(host) {
     // Sorted by position.
     const entries = [];
+    // One per conditioned filter: its item's command when it is left out this time.
+    const leftOutFilterCmdReaders = [];
     // The entry the cursor goes to on the next main menu opening, or null.
     let entryToSelect = null;
 
@@ -77,6 +81,11 @@ export function createMainMenu(host) {
         const insertAt = entries.findIndex(other => comparePositions(other.position, position) > 0);
         if (insertAt === -1) entries.push(entry);
         else entries.splice(insertAt, 0, entry);
+    }
+
+    // The filter's command lasts only a session, so it is read at each opening.
+    function showFilterWhen(filterId, shownWhen) {
+        leftOutFilterCmdReaders.push(safeHandler(SCRIPT_NAME, () => (shownWhen() ? undefined : host.getFilterInfo(filterId).cmd)));
     }
 
     // Opens the main menu with the cursor on the named entry.
@@ -108,6 +117,7 @@ export function createMainMenu(host) {
     host.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
         if (ev.id !== "main") return;
         const shown = entries.filter(entry => entry.shownWhen());
+        const leftOutCmds = leftOutFilterCmdReaders.map(readCmd => readCmd()).filter(cmd => cmd !== undefined);
         const selected = shown.find(entry => entry.name === entryToSelect);
         entryToSelect = null;
         // Array sort is stable: items sharing a slot keep their order.
@@ -119,7 +129,7 @@ export function createMainMenu(host) {
                 return { item, position: entry.position };
             }),
             ...ev.items
-                .filter(item => !isSeparator(item) && !filterTables.isGroupItem(item))
+                .filter(item => !isSeparator(item) && !filterTables.isGroupItem(item) && !leftOutCmds.includes(item.cmd))
                 .map(item => ({ item, position: nativePositionOf(item.cmd) })),
         ].sort((a, b) => comparePositions(a.position, b.position));
         const items = [];
@@ -141,7 +151,7 @@ export function createMainMenu(host) {
     }));
 
     // filterTables.back(): out of "Filter Tables", for a Drawn one's Exit.
-    return { add, reopenOn, filterTables };
+    return { add, showFilterWhen, reopenOn, filterTables };
 }
 
 let sharedMainMenu = null;

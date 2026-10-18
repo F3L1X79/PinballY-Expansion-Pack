@@ -6,6 +6,8 @@
 // "Filter Tables", any entry the pack does not know, then Return; a
 // section with no entry shown goes with its separator. The one test of the
 // whole order: the others read their own section (support/main_menu_reader.js).
+// A never played table and a Challenge about never played tables keep the
+// Challenge Tables entry in the menu.
 // ============================================================
 
 import { test } from "node:test";
@@ -23,7 +25,9 @@ const SEPARATOR = "---";
 // Any command the pack does not know.
 const OTHER_SCRIPT_CMD = 3000;
 
-const fake = createFakePinballYHost({ now: new Date(2026, 8, 30, 20, 0, 0) });
+const TABLES = [{ id: 1, configId: "Medieval Madness", title: "Medieval Madness", manufacturer: "Williams", year: 1997 }];
+
+const fake = createFakePinballYHost({ now: new Date(2026, 8, 30, 20, 0, 0), tables: TABLES });
 let lang;
 let store;
 
@@ -38,6 +42,10 @@ function mainMenuTitles(open = () => fake.openMainMenu()) {
 test("setup", async () => {
     fake.addFolder(`${PROFILES}\\Alice`);
     fake.addFolder(`${PROFILES}\\Bob`);
+    fake.addFile(`${PROFILES}\\cabinet.json`, JSON.stringify({
+        version: 1,
+        challenge: { current: { week: "2026-09-28", template: "neverPlayedTables", param: null, target: 3 }, previous: null },
+    }));
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
