@@ -71,16 +71,17 @@ function createScreenLayers(host, scriptName, referenceHeight) {
         fadeIn(setOpacity, onFaded) {
             stopFade = fadeIn(host, scriptName, setOpacity, onFaded);
         },
-        // Every layer hidden and reduced to a point.
-        setAside() {
+        // Every layer hidden and reduced to a point, those of other included.
+        setAside(other = []) {
             stopFade();
-            for (const layer of layers) {
+            for (const layer of [...layers, ...other]) {
                 layer.alpha = 0;
                 layer.setScale(HIDDEN_SPAN);
             }
         },
         // Every layer back in its place, then setOpacity(1): the screen
-        // decides which layers show.
+        // decides which layers show, and must place again those it set
+        // aside apart (other), which stay reduced to a point until then.
         showAgain(setOpacity) {
             for (const layer of layers) {
                 if (rects.has(layer)) place(layer, rects.get(layer));
@@ -146,9 +147,9 @@ export function prepareDrawnScreen(host, scriptName, { referenceHeight, backdrop
         draw(step) { steps.push({ kind: "draw", step }); },
         // Once ready: hidden while a child screen is open, the veil and the
         // fade in gone.
-        setAside() {
+        setAside(other = []) {
             opening.remove();
-            screen.setAside();
+            screen.setAside(other);
         },
         // At once, without a veil, a fade in nor an opening time line.
         showAgain: screen.showAgain,

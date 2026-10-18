@@ -17,8 +17,11 @@
 // faded, and coming from the Exit Button jumps instead of gliding across
 // them all. The Button Hints' footer names the flippers, Select and Exit. Select or Launch on another Profile's column opens its Profile
 // Stats read-only, whose Exit shows this screen again on that column; on
-// one's own column or the Exit Button it goes back as Exit does. Exit closes it
-// and calls the return given to open(); attract mode only closes it. Opens directly, not through the
+// one's own column or the Exit Button it goes back as Exit does. While
+// that screen is open, this one waits set aside, hidden (as the Profile
+// Stats do under their children, see common/stats/drawn_screen.js).
+// Exit closes it and calls the return given to open(); attract mode only
+// closes it. Opens directly, not through the
 // wheel dialog module: the player asked for it. isOpen() and onClosed()
 // let the wheel dialogs wait for it.
 // ============================================================
@@ -47,8 +50,9 @@ const GLIDE_TIME_CONSTANT_MS = 40;
 const GLIDE_SNAP_PX = 0.5;
 
 // readStats(profileName): the Profile Stats' values for that Profile
-// (common/stats/profile_stats.js); openProfileStats(profileName, onBack): opens
-// that Profile's Profile Stats, read-only, onBack called on its Exit;
+// (common/stats/profile_stats.js); openProfileStats(profileName, onBack, onFailed):
+// opens that Profile's Profile Stats, read-only, onBack called on its Exit,
+// onFailed once their opening failed and was given up;
 // profileRewards: the worn Avatar Frames (null: none);
 // hasCollectionMastery: false without the Table Mastery Add-on, which
 // takes the Collection Mastery line away; drawingAhead: the shared drawing
@@ -63,6 +67,9 @@ export function createHouseholdStats(host, {
     // The screen on show, or getting ready (isPreparing): its layers,
     // columns' rects and selection; null when closed.
     let shown = null;
+    // The screen hidden while another Profile's Profile Stats are open over
+    // it, its state kept; null otherwise.
+    let screenSetAside = null;
 
     // Every Profile but Guest, in the Profile picker's order, from either
     // of the store's lists: Guest always comes first in both.
@@ -164,13 +171,11 @@ export function createHouseholdStats(host, {
 
     // onBack: what Exit returns to, called once the screen is closed (or
     // given up; null: the bare wheel, the Exit Button then a cross);
-    // selectedName: the Profile whose column the marker
-    // surrounds, brought into view (the first column when null or no longer
-    // there); onFailed: called once an opening given up on a failing step
-    // is closed, kept for the round trips to another Profile's Profile
-    // Stats. Reads and draws every layer hidden, step by step, then fades
-    // them in together: it never shows up half drawn.
-    function open(onBack = null, { selectedName = null, onFailed = () => {} } = {}) {
+    // onFailed: called once an opening given up on a failing step is
+    // closed, or once another Profile's Profile Stats failed to open over
+    // this screen. Reads and draws every layer hidden, step by step, then
+    // fades them in together: it never shows up half drawn.
+    function open(onBack = null, { onFailed = () => {} } = {}) {
         if (shown) return;
         const drawn = prepareDrawnScreen(host, SCRIPT_NAME, {
             referenceHeight: REFERENCE_HEIGHT, backdropZIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop, drawingAhead,
@@ -215,12 +220,10 @@ export function createHouseholdStats(host, {
             const marker = createSelectionMarker(host, { zIndex: HOUSEHOLD_STATS_Z_INDEX.marker, referenceWidth: drawn.referenceWidth, referenceHeight: REFERENCE_HEIGHT });
             // Here rather than on the first move, which it would slow down.
             navigationSound.load();
-            const column = Math.max(0, screen.columns.findIndex(entry => entry.profileName === selectedName));
-            const first = Math.max(0, column - geometry.view.count + 1);
             // first: the first column in view once the glide is over; scroll:
             // how far the columns have glided, in reference pixels.
             Object.assign(opening, {
-                isPreparing: false, columns: screen.columns, exitTooltip, marker, marked: null, geometry, selected: column, first, scroll: first * geometry.pitch,
+                isPreparing: false, columns: screen.columns, exitTooltip, marker, marked: null, geometry, selected: 0, first: 0, scroll: 0,
             });
             placeColumns(opening);
         }
@@ -310,6 +313,51 @@ export function createHouseholdStats(host, {
         closedListeners.tell();
     }
 
+    // The screen on show hidden, keeping its state, while another Profile's
+    // Profile Stats open over it: no closed listener told, the screen is
+    // still open. The glide ends at once, so the columns come back still.
+    function setShownAside() {
+        stopGlide(shown);
+        shown.scroll = targetScroll(shown);
+        shown.drawn.setAside(shown.columnLayers);
+        shown.marker.setAside();
+        screenSetAside = shown;
+        shown = null;
+    }
+
+    // Exit on those Profile Stats: the screen set aside shows again at once, as it was left.
+    function showAgain() {
+        if (!screenSetAside) return;
+        shown = screenSetAside;
+        screenSetAside = null;
+        shown.marker.showAgain();
+        shown.drawn.showAgain(opacity => setOpacity(shown, opacity));
+    }
+
+    // Removes the screen set aside, which is then closed.
+    function discardSetAside() {
+        if (!screenSetAside) return;
+        screenSetAside.marker.remove();
+        screenSetAside.drawn.close(screenSetAside.columnLayers);
+        screenSetAside = null;
+        closedListeners.tell();
+    }
+
+    // Those Profile Stats failed to open: the screen set aside goes, then
+    // what it was opened over.
+    function discardSetAsideAfterFailure() {
+        if (!screenSetAside) return;
+        const { onFailed } = screenSetAside;
+        discardSetAside();
+        onFailed();
+    }
+
+    // The screen on show and the one set aside under it.
+    function closeAll() {
+        close();
+        discardSetAside();
+    }
+
     // direction: 1 for Next, -1 for Prev, through the Exit Button then each
     // column. Brings the selected column into view, gliding unless it comes
     // from the Exit Button: the columns then stay where they were.
@@ -337,21 +385,28 @@ export function createHouseholdStats(host, {
         if (onBack) onBack();
     }
 
-    // Another Profile's column opens its Profile Stats, whose Exit comes
-    // back here on that column; one's own and the Exit Button go back as Exit does.
+    // Another Profile's column opens its Profile Stats over this screen,
+    // set aside, whose Exit shows it again on that column; one's own and
+    // the Exit Button go back as Exit does.
     function choose() {
-        const { onBack, onFailed, columns, selected } = shown;
+        const { columns, selected } = shown;
         if (selected === EXIT_BUTTON) return back();
         const column = columns[selected];
         if (column.isActive) return back();
-        close();
-        openProfileStats(column.profileName, () => open(onBack, { selectedName: column.profileName, onFailed }));
+        setShownAside();
+        try {
+            openProfileStats(column.profileName, showAgain, discardSetAsideAfterFailure);
+        } catch (error) {
+            discardSetAsideAfterFailure();
+            throw error;
+        }
     }
 
     // Fires on every mapped button press; drives the screen while it is open.
     host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
-        // Already handled: the Profile Stats' button or Exit opened this
-        // screen within the same press, which must not act here too.
+        // Already handled: the Profile Stats' button or Exit opened or showed
+        // this screen within the same press, which must not act here too.
+        // Set aside, the screen is not shown: the Profile Stats take the buttons.
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
@@ -368,14 +423,14 @@ export function createHouseholdStats(host, {
 
     // Fires when the cabinet sits idle: the screen must not stay over
     // attract mode nor keep the buttons.
-    host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
+    host.on("attractmodestart", safeHandler(SCRIPT_NAME, closeAll));
 
     return {
         open,
         // How many Profiles the screen sets side by side; offered from two.
         // By name only: listing the Profiles also checks their Avatars.
         countProfiles: () => householdOf(profileStore.listProfileNames()).length,
-        isOpen: () => shown !== null,
+        isOpen: () => shown !== null || screenSetAside !== null,
         onClosed: closedListeners.onClosed,
     };
 }

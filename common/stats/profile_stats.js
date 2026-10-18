@@ -387,10 +387,11 @@ export function createProfileStats(host, {
     // the active Profile's. onReturn: what Exit brings back (the main menu,
     // the Household Stats), called once the screen is closed or given up;
     // null: Exit leaves the bare wheel. Kept across the round trips to the
-    // Achievement List, the Avatar Frame list and the Household Stats. Reads
-    // and draws every layer hidden, step by step through the drawn screen's
+    // Achievement List, the Avatar Frame list and the Household Stats.
+    // onFailed: called once an opening given up on a failing step is
+    // closed. Reads and draws every layer hidden, step by step through the drawn screen's
     // shared opening, then fades them in together: it never shows up half drawn.
-    function open(selectedChoice, { viewedName = null, onReturn = null } = {}) {
+    function open(selectedChoice, { viewedName = null, onReturn = null, onFailed = () => {} } = {}) {
         if (shown) return;
         const profile = viewedName ? profileNamed(viewedName) : profileStore.getActiveProfile();
         if (!profile) {
@@ -450,8 +451,16 @@ export function createProfileStats(host, {
             tastesSection(profile, profileData.profileTables, profileData.profilePlays, profileData.getPlay, profileData.hallOfFame)));
         drawn.draw(() => drawn.drawBackdrop((dc, size, referenceWidth) => drawBackdrop(host, dc, size, referenceWidth, screen)));
         drawn.draw(queuePieces);
-        // A read-only screen failing also takes away the one set aside under it.
-        drawn.start({ onReady: setUp, setOpacity: opacity => setOpacity(opening, opacity), onFailed: closeAll });
+        // A read-only screen failing also takes away the screen set aside
+        // here and, through onFailed, the Household Stats set aside under it.
+        drawn.start({
+            onReady: setUp,
+            setOpacity: opacity => setOpacity(opening, opacity),
+            onFailed: () => {
+                closeAll();
+                onFailed();
+            },
+        });
     }
 
     // The marker and every layer to the same opacity, except the unselected
@@ -581,8 +590,9 @@ export function createProfileStats(host, {
     return {
         // onReturn: what Exit brings back, such as the main menu on its entry.
         open: onReturn => open(CHOICE.EXIT_BUTTON, { onReturn }),
-        // Another Profile's screen, read-only; onBack: what Exit returns to.
-        openReadOnly: (profileName, onBack) => open(CHOICE.EXIT_BUTTON, { viewedName: profileName, onReturn: onBack }),
+        // Another Profile's screen, read-only; onBack: what Exit returns to;
+        // onFailed: called once its opening failed and was given up.
+        openReadOnly: (profileName, onBack, onFailed) => open(CHOICE.EXIT_BUTTON, { viewedName: profileName, onReturn: onBack, onFailed }),
         readStats,
         isOpen: () => shown !== null || screenSetAside !== null,
         onClosed: closedListeners.onClosed,

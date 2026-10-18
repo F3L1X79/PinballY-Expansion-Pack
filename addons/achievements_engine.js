@@ -157,7 +157,7 @@ export default function init() {
     const householdStats = createHouseholdStats(createPinballYHost(), {
         profileStore,
         readStats: profileName => profileStats.readStats(profileName),
-        openProfileStats: (profileName, onBack) => profileStats.openReadOnly(profileName, onBack),
+        openProfileStats: (profileName, onBack, onFailed) => profileStats.openReadOnly(profileName, onBack, onFailed),
         profileRewards,
         drawingAhead: getDrawingAhead(),
         hasCollectionMastery: config.addOns.tableMastery !== false,

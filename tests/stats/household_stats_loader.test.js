@@ -3,8 +3,7 @@
 // globals, with draws slow enough to take more than 150 ms in all: the
 // wheel dims at once under the veil, the Loader turns over it after
 // 150 ms, then goes before every layer fades in together, the veil going
-// once the fade in is over. Coming back from another Profile's Profile
-// Stats goes through the same opening.
+// once the fade in is over.
 // ============================================================
 
 import { test } from "node:test";
@@ -15,9 +14,8 @@ import { readVeil, shownLayers } from "../support/opening_reader.js";
 import { readLoader } from "../support/loader_reader.js";
 import { DIMMED_WHEEL } from "../../common/drawing/steamball_drawing.js";
 import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/stats/household_stats_painter.js";
-import { PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import {
-    startOpeningHouseholdStats, untilHouseholdStatsFadedIn, chooseColumn, isHouseholdStatsOpen, press, title,
+    startOpeningHouseholdStats, untilHouseholdStatsFadedIn, isHouseholdStatsOpen, title,
 } from "./household_stats_reader.js";
 
 const VEIL = { shown: true, zIndex: HOUSEHOLD_STATS_Z_INDEX.backdrop - 2, color: DIMMED_WHEEL };
@@ -71,18 +69,5 @@ test("the wheel dims at once, the Loader turns after 150 ms, then the screen fad
     assert.ok(fadingLayers(fake).every(layer => layer.alpha === 1));
     assert.equal(title(fake), "Household Stats");
 
-    // Exit from another Profile's Profile Stats comes back through the same opening.
-    fake.setDrawMs(0);
-    chooseColumn(fake, "Bob");
-    fake.advanceTime(PROFILE_STATS_OPEN_MS);
-    fake.setDrawMs(DRAW_MS);
-    press(fake, "Exit");
-    assert.deepEqual(readVeil(fake), VEIL, "the wheel dimmed at once again");
-    assert.equal(isHouseholdStatsOpen(fake), false);
-    fake.advanceTime(160);
-    assert.equal(readLoader(fake).shown, true);
-    untilHouseholdStatsFadedIn(fake);
-    assert.deepEqual(readLoader(fake), { shown: false });
-    assert.deepEqual(readVeil(fake), { shown: false });
     assertNoErrorLogged(fake);
 });
