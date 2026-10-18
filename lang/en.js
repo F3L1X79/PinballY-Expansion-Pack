@@ -160,6 +160,7 @@ export default {
     customMenuLabels: {
         challengeTables: "Challenge Tables",
         hallOfFameFilter: "Most Played Tables",
+        myHighScoresFilter: "My High Scores",
         tablesToDiscoverFilter: "Tables to Discover",
         originalTablesFilter: "Original Tables",
         randomGame: "Start Random Game",

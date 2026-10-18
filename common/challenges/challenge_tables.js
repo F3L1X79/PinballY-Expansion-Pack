@@ -15,7 +15,7 @@ const UNDER_ALL_TABLES_SORT_KEY = "5000";
 
 export function createChallengeTables(host, challenges, mainMenu) {
     const selectConfigIds = () => challenges.getTablesToPlay().map(table => table.configId);
-    const filterId = createSelectionFilter(host, {
+    const { filterId } = createSelectionFilter(host, {
         scriptName: SCRIPT_NAME,
         id: "project.ChallengeTables",
         title: lang.customMenuLabels.challengeTables,

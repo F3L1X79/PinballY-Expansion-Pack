@@ -25,7 +25,9 @@
 // read outside a Play; a VPX table without a ROM and nothing learned yet
 // asks for a game instead. Replaces PinballY's own "High Scores": removes
 // its main menu entry and cancels the HighScores command, which opens the
-// board instead, Exit going back to the wheel. The rules live in
+// board instead, Exit going back to the wheel. Adds the "My High Scores"
+// selection under the Hall of Fame, while the active Profile holds a
+// place (common/high_scores/my_high_scores.js). The rules live in
 // common/high_scores/.
 // ============================================================
 
@@ -38,6 +40,7 @@ import { readCompoundFile } from "../common/high_scores/compound_file_reader.js"
 import { readSectionBoard, readTextBoard } from "../common/high_scores/romless_board_reader.js";
 import { getHighScoreStore, SCRIPT_NAME } from "../common/high_scores/high_score_store.js";
 import { createHighScoreBoard } from "../common/high_scores/high_score_board.js";
+import { createMyHighScores } from "../common/high_scores/my_high_scores.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { isSeparator } from "../common/menus/menu_separator.js";
@@ -76,6 +79,7 @@ export default function init() {
         // Exit goes back one level: the main menu, on this entry.
         action: () => board.open(() => mainMenu.reopenOn(BOARD_ENTRY)),
     });
+    createMyHighScores(host, { highScores, profileStore, mainMenu });
     // Drawn over the wheel without leaving its UI mode: a waiting dialog
     // shows only once the player is back on the wheel.
     getWheelDialogs().waitFor(board);

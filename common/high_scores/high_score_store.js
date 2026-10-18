@@ -17,7 +17,8 @@
 // its Profile Reset (its High Scores stay its own); the Achievements read
 // what each Profile won since then, and hear when a Play credited High
 // Scores; the Profile Stats read the tables where each Profile still holds
-// a place or the Table Record; the High Score Board reads a table's last
+// a place or the Table Record, and My High Scores each such table with the
+// best place held there; the High Score Board reads a table's last
 // known board with each place's owner. Per Profile, the date the Welcome
 // Screen last told it its Lost Records (the Table Records another Profile
 // took from it since), set only when it shows. Per table without a board PinballY
@@ -40,6 +41,8 @@ export const SCRIPT_NAME = "HighScores";
 
 // Profile names ignore case.
 const profileKeyOf = name => name.toLowerCase();
+// Whether a board place belongs to the named Profile.
+const isPlaceOf = profileName => place => typeof place.owner === "string" && profileKeyOf(place.owner) === profileKeyOf(profileName);
 const isRecord = value => value !== null && typeof value === "object" && !Array.isArray(value);
 const countPlaces = count => (count === 1 ? "1 new place" : `${count} new places`);
 
@@ -243,12 +246,24 @@ export function createHighScoreStore(host, profileStore) {
         // removed table's too: hiding a table never erases a record.
         heldBy(profileName) {
             if (!profileExists(profileName)) return { highScores: 0, tableRecords: 0 };
-            const isOwn = place => typeof place.owner === "string" && profileKeyOf(place.owner) === profileKeyOf(profileName);
+            const isOwn = isPlaceOf(profileName);
             const boards = Object.keys(data.tables).map(knownBoardOf).filter(board => board !== null);
             return {
                 highScores: boards.filter(board => board.some(isOwn)).length,
                 tableRecords: boards.filter(board => board.length > 0 && isOwn(board[0])).length,
             };
+        },
+        // The same tables as heldBy() counts, for My High Scores: each one
+        // where the named Profile has a place on the last known board, with
+        // the best place it holds there ({ configId, bestPlace }), in the
+        // file's table order.
+        placesHeldBy(profileName) {
+            if (!profileExists(profileName)) return [];
+            const isOwn = isPlaceOf(profileName);
+            return Object.keys(data.tables)
+                .map(configId => ({ configId, own: (knownBoardOf(configId) || []).filter(isOwn) }))
+                .filter(({ own }) => own.length > 0)
+                .map(({ configId, own }) => ({ configId, bestPlace: Math.min(...own.map(place => place.rank)) }));
         },
         // The table's last known board as the High Score Board shows it, in
         // board order: { rank, initials, score, owner }, the owner the

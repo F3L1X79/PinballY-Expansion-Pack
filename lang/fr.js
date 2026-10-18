@@ -274,6 +274,7 @@ export default {
     customMenuLabels: {
         challengeTables: "Tables du défi",
         hallOfFameFilter: "Tables les plus jouées",
+        myHighScoresFilter: "Mes meilleurs scores",
         tablesToDiscoverFilter: "Tables à découvrir",
         originalTablesFilter: "Tables Originales",
         randomGame: "Lancer une table au hasard",

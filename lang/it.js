@@ -276,6 +276,7 @@ export default {
     customMenuLabels: {
         challengeTables: "Tavoli della sfida",
         hallOfFameFilter: "Hall of Fame",
+        myHighScoresFilter: "My High Scores", // TODO: translation pass
         tablesToDiscoverFilter: "Tables to Discover", // TODO: translation pass
         originalTablesFilter: "Tavoli originali",
         randomGame: "Avvia un tavolo casuale",
