@@ -30,7 +30,7 @@ Every day there is a table nobody in the house has played yet, or the one left a
 
 <img src="docs/images/challenges.png" alt="The week's Challenge Card with its progress and the days left" width="368">
 
-A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, half an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward. Completing it brings a shower of confetti across the wheel screen.
+A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, half an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward, and leaves the menu once there are none. Completing it brings a shower of confetti across the wheel screen.
 
 ### Table Mastery
 
@@ -74,7 +74,7 @@ Everything stays in one folder, with no change to PinballY itself.
 **And also**:
 - PinballY's menus (main menu, Exit, filters, power off, table setup, Operator Menu) drawn in the pack's Steamball look, same entries, sorted into sections, and same buttons;
 - a Random Game spun on a wheel of fortune;
-- "Tables to Discover", "Most Played Tables", "Favorite Tables" and "Original Tables" in the menus;
+- "Tables to Discover", "Most Played Tables", "My High Scores" (the tables where you hold a place on the board), "Favorite Tables", "Hidden Tables" (while a table is hidden) and "Original Tables" in the menus;
 - a clock, a gold arc under the wheel (the Wheel Arc) and a richer status line;
 - a reminder to rate a table;
 - launches without a black flash, with a gold comet turning while you wait, the step under way written in gold beneath it while a table launches or closes ("Loading…", "Returning to tables…"): during a launch, at startup, while a high score board is read and while the Profile Stats, the Household Stats, the Achievement List or the Avatar Frame list get ready;
@@ -91,7 +91,6 @@ Here is what we are thinking about for the pack's future. Nothing is promised: p
 - **Holiday and year Avatar Frames**: Christmas, Halloween, "2026"… earned by coming to play at the right time.
 - **Install in 30 seconds and updates**, without git.
 - **The language picked from a menu**, and the latest texts translated into German, Spanish, Italian and Portuguese.
-- **New filters**: My Records, Hidden Tables.
 
 ## Install
 

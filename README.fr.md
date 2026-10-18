@@ -52,7 +52,7 @@ Chaque jour une table que personne à la maison n'a encore jouée, ou celle dél
 
 <img src="docs/images/challenges.png" alt="La carte du Défi de la semaine avec sa progression et les jours restants" width="368">
 
-Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une demi-heure sur une même table… Sa carte suit votre progression sur l'écran de la roue. **Tables du défi**, juste sous « Toutes les tables » dans le menu principal, ne garde que les tables qui le font avancer. Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
+Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une demi-heure sur une même table… Sa carte suit votre progression sur l'écran de la roue. **Tables du défi**, juste sous « Toutes les tables » dans le menu principal, ne garde que les tables qui le font avancer, et quitte le menu quand il n'y en a plus. Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
 
 ### Maîtrise des tables
 
@@ -97,7 +97,7 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 **Et aussi** :
 - les menus de PinballY (menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur) dessinés dans le style Steamball du pack, mêmes entrées, rangées en sections, et mêmes boutons ;
 - une table au hasard sur une roue de la fortune ;
-- « Tables à découvrir », « Tables les plus jouées », « Tables favorites » et « Tables Originales » dans les menus ;
+- « Tables à découvrir », « Tables les plus jouées », « Mes meilleurs scores » (les tables où vous avez une place au tableau), « Tables favorites », « Tables masquées » (tant qu'une table est masquée) et « Tables Originales » dans les menus ;
 - une horloge, l'arc doré de la roue et une ligne d'état enrichie ;
 - un rappel pour noter une table ;
 - un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente, l'étape en cours écrite en doré dessous quand une table se lance ou se ferme (« Chargement en cours… », « Retour aux tables… ») : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar ;
@@ -114,7 +114,6 @@ Voici ce que nous envisageons pour la suite du pack. Rien n'est promis : les pro
 - **Cadres d'Avatar de fête et d'année** : Noël, Halloween, « 2026 »… gagnés en venant jouer au bon moment.
 - **Installation en 30 secondes et mises à jour**, sans git.
 - **La langue choisie depuis un menu**, et les textes récents traduits en allemand, espagnol, italien et portugais.
-- **De nouveaux filtres** : Mes records, Tables masquées.
 
 ## Installation
 
