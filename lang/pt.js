@@ -278,6 +278,7 @@ export default {
         challengeTables: "Mesas do desafio",
         hallOfFameFilter: "Hall of Fame",
         myHighScoresFilter: "My High Scores", // TODO: translation pass
+        hiddenTablesFilter: "Hidden Tables", // TODO: translation pass
         tablesToDiscoverFilter: "Tables to Discover", // TODO: translation pass
         originalTablesFilter: "Mesas originais",
         randomGame: "Iniciar uma mesa aleatória",

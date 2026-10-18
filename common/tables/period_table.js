@@ -17,7 +17,7 @@
 import { safeHandler } from "../core/safe_handler.js";
 import { createPinballYHost, ALL_TABLES_FILTER } from "../core/pinbally_host.js";
 import { getProfileStore } from "../profiles/profile_store.js";
-import { isAdultTable } from "./adult_tables.js";
+import { isAdultTable, isKeptFromChild } from "./adult_tables.js";
 
 const SCRIPT_NAME = "PeriodTable";
 
@@ -144,12 +144,12 @@ export function createPeriodTable(host, definition, profileStore) {
 
     // Not offered to a Child Profile while it is an Adult Table. Like
     // getTable(), it may pick this Period's table and lock it.
-    const isKeptFromChild = game => game !== null && isAdultTable(game) && profileStore.isChild();
-    const isOffered = () => !isKeptFromChild(getTable());
+    const isKeptFromChildProfile = game => game !== null && isKeptFromChild(game, profileStore);
+    const isOffered = () => !isKeptFromChildProfile(getTable());
     // This Period's table, or null when it is not offered to the active Profile.
     function getOfferedTable() {
         const game = getTable();
-        return isKeptFromChild(game) ? null : game;
+        return isKeptFromChildProfile(game) ? null : game;
     }
 
     // Whether currentPeriod follows lastPeriod in the Streak of the named

@@ -21,6 +21,7 @@ import * as customMenuCommands from "./addons/custom_menu_commands.js";
 import * as customFilter from "./addons/custom_filter.js";
 import * as hallOfFame from "./addons/hall_of_fame.js";
 import * as tablesToDiscover from "./addons/tables_to_discover.js";
+import * as hiddenTables from "./addons/hidden_tables.js";
 import * as menuCleanup from "./addons/menu_cleanup.js";
 import * as profilePicker from "./addons/profile_picker.js";
 import * as clock from "./addons/clock.js";
@@ -72,6 +73,7 @@ const SCRIPTS = [
     { key: "customFilter", module: customFilter },
     { key: "hallOfFame", module: hallOfFame },
     { key: "tablesToDiscover", module: tablesToDiscover },
+    { key: "hiddenTables", module: hiddenTables },
     { key: "profilePicker", module: profilePicker },
     { key: "clock", module: clock },
     { key: "wheelArc", module: wheelArc },

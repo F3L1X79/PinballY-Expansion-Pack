@@ -76,6 +76,7 @@ const DEFAULTS = {
         customFilter: true,
         hallOfFame: true,
         tablesToDiscover: true,
+        hiddenTables: true,
         sessionStatsTracker: true,
         achievements: true,
         seamlessLaunchOverlay: true,

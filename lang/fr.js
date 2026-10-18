@@ -275,6 +275,7 @@ export default {
         challengeTables: "Tables du défi",
         hallOfFameFilter: "Tables les plus jouées",
         myHighScoresFilter: "Mes meilleurs scores",
+        hiddenTablesFilter: "Tables masquées",
         tablesToDiscoverFilter: "Tables à découvrir",
         originalTablesFilter: "Tables Originales",
         randomGame: "Lancer une table au hasard",

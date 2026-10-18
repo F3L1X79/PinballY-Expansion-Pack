@@ -882,7 +882,7 @@ export function createFakePinballYHost({
     }
 
     // PinballY's wheel never shows hidden or unconfigured tables.
-    const canBeOnWheel = game => !game.isHidden && game.isConfigured !== false;
+    const canBeOnWheel = (game, { includeHidden = false } = {}) => (includeHidden || !game.isHidden) && game.isConfigured !== false;
 
     // Runs the metafilters over every table, in ascending priority. Narrowing
     // metafilters only: a table stays when every one keeps it, which is what
@@ -902,15 +902,16 @@ export function createFakePinballYHost({
         : wheelConfigIds);
 
     // Runs the filter like PinballY: before(), then select() over the
-    // visible, configured tables, sorted with compareForSort(); the wheel
-    // then shows them from the first one.
+    // visible, configured tables (the hidden ones too with includeHidden,
+    // FilterInfo), sorted with compareForSort(); the wheel then shows them
+    // from the first one.
     function applyFilter(filterId) {
         const filter = filters.get(filterId);
         if (!filter) throw new Error(`The fake host has no filter "${filterId}".`);
         currentFilterId = filterId;
         if (filter.before) filter.before();
         const selected = allTables
-            .filter(game => canBeOnWheel(game) && filter.select(game));
+            .filter(game => canBeOnWheel(game, filter) && filter.select(game));
         if (filter.compareForSort) selected.sort(filter.compareForSort);
         if (filter.after) filter.after();
         wheelConfigIds = selected.map(game => game.configId);
@@ -925,7 +926,7 @@ export function createFakePinballYHost({
         if (filterId === "All") {
             currentFilterId = filterId;
             wheelConfigIds = allTables
-                .filter(canBeOnWheel)
+                .filter(game => canBeOnWheel(game))
                 .map(game => game.configId);
             runMetaFilters();
         } else if (nativeGroupOf(filterId)) {

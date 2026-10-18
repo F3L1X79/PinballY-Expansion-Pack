@@ -11,12 +11,11 @@
 
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { getProfileStore } from "../profiles/profile_store.js";
-import { isAdultTable } from "./adult_tables.js";
+import { isKeptFromChild } from "./adult_tables.js";
 
 // Whether the named Profile (the active one by default) can see this table.
-// The mark is only read for an Adult Table.
 export const isVisibleTo = (game, profileStore, profileName) =>
-    !game.isHidden && !(isAdultTable(game) && profileStore.isChild(profileName));
+    !game.isHidden && !isKeptFromChild(game, profileStore, profileName);
 
 // The tables, among the household's visible ones, that the named Profile
 // (the active one by default) can see.

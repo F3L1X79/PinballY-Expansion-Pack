@@ -21,6 +21,11 @@ const CHILD_WHEEL_FILTER_PRIORITY = 100000;
 
 export const isAdultTable = game => (game.categories || []).includes(config.adultCategory);
 
+// Whether the named Profile (the active one by default) never sees this
+// table: an Adult Table, for a Child Profile. The mark is only read for an Adult Table.
+export const isKeptFromChild = (game, profileStore, profileName) =>
+    isAdultTable(game) && profileStore.isChild(profileName);
+
 function createChildWheelFilter(host, profileStore) {
     // Read once per filter run rather than once per table.
     let childIsActive = profileStore.isChild();
