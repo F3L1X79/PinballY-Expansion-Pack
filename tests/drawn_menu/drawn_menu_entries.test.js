@@ -44,7 +44,7 @@ test("a non-admin Profile's main menu shows the final entries, translated and cl
     assert.deepEqual(section("Jouer"), ["Jouer", "Lancer la table du jour", "Lancer la table de la semaine", "Lancer une table au hasard"]);
     assert.deepEqual(section("Vos succès"), ["Vos statistiques", "Vos succès"]);
     assert.deepEqual(section("Noter la table"), ["Noter la table", "Ajouter aux favoris"]);
-    assert.deepEqual(section("Filtre actif : Toutes les tables"), ["Filtre actif : Toutes les tables"]);
+    assert.deepEqual(section("Changer de filtre"), ["Changer de filtre"]);
     assert.deepEqual(section("Retour"), ["Retour"]);
     assert.equal(section(lang.customMenuLabels.tableSetup), null, "no Table Setup for a non-admin Profile");
 });

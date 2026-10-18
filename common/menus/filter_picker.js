@@ -36,7 +36,8 @@ export const FILTER_GROUPS = Object.freeze([
     { command: "FilterByAdded", menuId: "filter by when added" },
 ]);
 
-// The main menu module's: addMainMenuEntry adds the entry at position;
+// The main menu module's: addMainMenuEntry adds the entry at position and
+// returns its command;
 // reopenMainMenuOn(name) opens the main menu with the cursor on an entry.
 export function createFilterPicker(host, { addMainMenuEntry, position, reopenMainMenuOn }) {
     const groupCmds = FILTER_GROUPS.map(group => host.getBuiltInCommand(group.command));
@@ -122,7 +123,7 @@ export function createFilterPicker(host, { addMainMenuEntry, position, reopenMai
         if (groupCmd === null) openedGroupCmd = null;
     }));
 
-    addMainMenuEntry({
+    const entryCmd = addMainMenuEntry({
         name: FILTER_PICKER_ENTRY,
         label: () => lang.customMenuLabels.activeFilter(activeFilterName()),
         position,
@@ -165,5 +166,5 @@ export function createFilterPicker(host, { addMainMenuEntry, position, reopenMai
         openedGroupCmd = null;
     }));
 
-    return { isGroupItem, mainMenuOpened, back };
+    return { isGroupItem, mainMenuOpened, back, entryCmd, activeFilterName };
 }

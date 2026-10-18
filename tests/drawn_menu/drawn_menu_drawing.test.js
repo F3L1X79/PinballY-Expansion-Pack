@@ -93,7 +93,8 @@ function measuresOnOpening(items) {
         }
     };
     try {
-        fake.openMenu("main", items);
+        // A menu the main menu module leaves as it is.
+        fake.openMenu("game setup", items);
     } finally {
         globalThis.StyledText = RealStyledText;
     }

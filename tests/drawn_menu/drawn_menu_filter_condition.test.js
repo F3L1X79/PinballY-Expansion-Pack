@@ -45,7 +45,7 @@ test("setup", async () => {
     config.language = "en";
     const { default: lang } = await import("../../common/core/i18n.js");
     challengeTables = lang.customMenuLabels.challengeTables;
-    filterPickerEntry = lang.customMenuLabels.activeFilter("All Tables");
+    filterPickerEntry = lang.customMenuLabels.changeFilter;
     await import("../../main.js");
     await settle();
     // Registered after every Add-on, so it reads the entries they built.

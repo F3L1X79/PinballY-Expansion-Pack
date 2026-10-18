@@ -284,6 +284,9 @@ export default {
         tableSetup: "Configurer la table",
         filterPickerBack: "Retour",
         activeFilter: (name) => `Filtre actif : ${name}`,
+        // The Drawn main menu's "Change Filter" entry, and its footer's label before the Active Filter.
+        changeFilter: "Changer de filtre",
+        activeFilterLabel: "Filtre actif :",
     },
 
     achievements: {

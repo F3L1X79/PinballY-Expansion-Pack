@@ -2,6 +2,7 @@
 // Reads the Drawn Menu the way the player sees it, on the fake PinballY
 // host: whether one is shown, its message, its rows from top to bottom
 // (an entry with its title and its gold mark, a heading or a separator),
+// its footer,
 // the highlighted entry (the one written in gold on the selection), and
 // helpers to open a menu, press buttons and choose an entry by its
 // title, letting the fade in and the glide end.
@@ -25,14 +26,26 @@ export const isDrawnMenuShown = fake => textsLayer(fake) !== null;
 // The message above the list (null when none; its wrapped lines joined
 // as drawn, without the spaces between them) and the rows from top to
 // bottom: { kind: "entry", title, mark } (mark: "check", "radio",
-// "submenu" or null), { kind: "heading", title } or { kind: "separator" }.
+// "submenu" or null), { kind: "heading", title } or { kind: "separator" };
+// and the footer under the list ({ label, name }, null when none).
 export function readDrawnMenu(fake) {
     const layer = textsLayer(fake);
     if (!layer) throw new Error("No Drawn Menu is shown.");
     let message = null;
+    let footer = null;
     const rows = [];
     let inSeparator = false;
     for (const stroke of layer.strokes()) {
+        if (footer !== null) {
+            if ("text" in stroke) footer = { ...footer, [stroke.color === COLORS.gold ? "name" : "label"]: stroke.text.trim() };
+            continue;
+        }
+        if ("text" in stroke && stroke.color === COLORS.footerLabel && rows.length > 0) {
+            // The rule above the footer is not a row.
+            if (rows.at(-1).kind === "separator") rows.pop();
+            footer = { label: stroke.text.trim(), name: null };
+            continue;
+        }
         if ("fill" in stroke) {
             // The gold line under a dialog's message is not a row.
             if (message !== null && rows.length === 0) continue;
@@ -47,7 +60,7 @@ export function readDrawnMenu(fake) {
         else if (stroke.color === COLORS.gold) rows.at(-1).mark = MARK_NAMES.get(stroke.text);
         else rows.push({ kind: "entry", title: stroke.text, mark: null });
     }
-    return { message, rows };
+    return { message, rows, footer };
 }
 
 // A message as readDrawnMenu gives it, to compare with its full text.

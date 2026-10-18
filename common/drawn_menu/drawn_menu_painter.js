@@ -4,10 +4,11 @@
 // of the way down when short, scrolling past 90 % of the window's height)
 // and draws its live parts: the texts (the message, the entries in white
 // with their gold mark, the headings, the separators as a gold line
-// fading at both ends), the selected entry's gold text, the dimming
-// backdrop and the painted images (common/drawn_menu/drawn_menu_images.js). A line
-// estimated to fit is drawn without being measured; each text style's
-// line height is measured once and kept for the session.
+// fading at both ends, the footer under a rule), the selected entry's
+// gold text, the dimming backdrop and the painted images
+// (common/drawn_menu/drawn_menu_images.js). A line estimated to fit is
+// drawn without being measured; each text style's line height is
+// measured once and kept for the session.
 // Only drawing: no layer, no event.
 // ============================================================
 
@@ -49,6 +50,8 @@ export const DRAWN_MENU_LOOK = Object.freeze({
     entry: Object.freeze({ size: 36, minSize: 28, weight: 600 }),
     heading: Object.freeze({ size: 24, minSize: 20, weight: 600 }),
     message: Object.freeze({ size: 33, weight: 400, gap: 14 }),
+    // Under the list, after a separator's height holding its rule.
+    footer: Object.freeze({ height: 44, size: 27, minSize: 20, weight: 400 }),
     mark: Object.freeze({ size: 30, weight: 600, right: 36, width: 40 }),
     separatorWidth: 320,
     // The rows fading at an edge the list scrolls past.
@@ -57,6 +60,7 @@ export const DRAWN_MENU_LOOK = Object.freeze({
         entry: COLORS.title,
         heading: COLORS.dim,
         message: COLORS.description,
+        footerLabel: COLORS.description,
         gold: COLORS.gold,
         backdrop: 0xB0080A0E,
     }),
@@ -90,7 +94,8 @@ export function computeGeometry({ width, height }, model, messageHeightAt) {
     const rowsHeightRef = rowTopRef;
     const messageHeightRef = model.message === null ? 0 : messageHeightAt(listWidth, LOOK.message.size * k) / k;
     const messageBlockRef = model.message === null ? 0 : messageHeightRef + LOOK.message.gap + LOOK.rowHeights.separator;
-    const fixedRef = 2 * DRAWN_MENU_FACE_INSET + LOOK.listTop + LOOK.listBottom + messageBlockRef;
+    const footerBlockRef = model.footer ? LOOK.rowHeights.separator + LOOK.footer.height : 0;
+    const fixedRef = 2 * DRAWN_MENU_FACE_INSET + LOOK.listTop + LOOK.listBottom + messageBlockRef + footerBlockRef;
     const maxPanelRef = LOOK.maxHeightShare * LOOK.referenceHeight / zoom;
     const areaHeightRef = Math.max(LOOK.rowHeights.entry, Math.min(rowsHeightRef, maxPanelRef - fixedRef));
     const panelHeightRef = Math.max(LOOK.minPanelHeight, fixedRef + areaHeightRef);
@@ -103,9 +108,9 @@ export function computeGeometry({ width, height }, model, messageHeightAt) {
         panel: { x: (width - DRAWN_MENU_PANEL_WIDTH * k) / 2, y: panelTop, width: DRAWN_MENU_PANEL_WIDTH * k, height: panelHeightRef * k },
         listX: (width - listWidth) / 2,
         listWidth,
-        // The texts' layer: from the message down to the list's bottom edge.
+        // The texts' layer: from the message down to the footer.
         contentTop: panelTop + contentTopRef * k,
-        contentHeight: (messageBlockRef + areaHeightRef) * k,
+        contentHeight: (messageBlockRef + areaHeightRef + footerBlockRef) * k,
         messageHeight: messageHeightRef * k,
         // From the content's top to the list's.
         areaOffset: messageBlockRef * k,
@@ -180,6 +185,32 @@ function drawSeparator(dc, x, y, width, height, k, alpha) {
     }
 }
 
+// The footer's label in its muted colour and the name in gold, on one
+// centred line: shrunk when estimated too wide, then the name cut with an
+// ellipsis (two colours on one line, which oneLine() cannot draw).
+function drawFooter(host, dc, { label, name }, { x, y, width, k }) {
+    const separatorHeight = LOOK.rowHeights.separator * k;
+    drawSeparator(dc, x, y, width, separatorHeight, k, 0xFF);
+    const labelPart = `${label} `;
+    const fullSize = LOOK.footer.size * k;
+    const estimated = estimatedWidthPx(labelPart + name, fullSize);
+    const size = Math.max(LOOK.footer.minSize * k, estimated > width ? fullSize * width / estimated : fullSize);
+    let shownName = name;
+    if (estimatedWidthPx(labelPart + name, size) > width) {
+        // The ellipsis counted as one em: past the Latin letters, the
+        // estimate takes any character for too wide.
+        while (shownName.length > 1 && estimatedWidthPx(labelPart + shownName, size) + size > width) shownName = shownName.slice(0, -1);
+        shownName = `${shownName.trimEnd()}\u2026`;
+    }
+    const textStyle = { font: FONTS.body, size: pointsOf(size), weight: LOOK.footer.weight, color: LOOK.colors.footerLabel };
+    const lineHeight = lineHeightOf(host, textStyle);
+    const styled = host.createStyledText({ textAlign: "center", textStyle });
+    styled.add(Object.assign({}, textStyle, { text: labelPart }));
+    styled.add(Object.assign({}, textStyle, { color: LOOK.colors.gold, text: shownName }));
+    const height = LOOK.footer.height * k;
+    styled.draw(dc, { x, y: y + separatorHeight + (height - lineHeight) / 2, width, height: lineHeight });
+}
+
 const markGlyphOf = row => DRAWN_MENU_MARKS[row.mark] || null;
 
 // An entry's title and mark, in its colour, in the box.
@@ -199,7 +230,7 @@ function drawEntry(host, dc, row, { x, y, width, height, k, color, markColor }) 
 
 // The texts' layer, on a canvas of the content's size: the message, then
 // the rows shown at this scroll (whole rows only), those at an edge the
-// list scrolls past faded.
+// list scrolls past faded, then the footer.
 export function drawTexts(host, dc, geometry, model, scroll) {
     const { k, listWidth, areaOffset, areaHeight } = geometry;
     if (model.message !== null) {
@@ -231,6 +262,7 @@ export function drawTexts(host, dc, geometry, model, scroll) {
             drawEntry(host, dc, row, { ...box, k, color: shade(LOOK.colors.entry), markColor: shade(LOOK.colors.gold) });
         }
     });
+    if (model.footer) drawFooter(host, dc, model.footer, { x: 0, y: areaOffset + areaHeight, width: listWidth, k });
 }
 
 // The selected entry in gold, on a canvas of one entry's size.

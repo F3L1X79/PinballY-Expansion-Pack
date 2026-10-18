@@ -172,6 +172,9 @@ export default {
         // The Filter Picker's way back, and its main menu entry naming the Active Filter.
         filterPickerBack: "Back",
         activeFilter: (name) => `Active filter: ${name}`,
+        // The Drawn main menu's "Change Filter" entry, and its footer's label before the Active Filter.
+        changeFilter: "Change Filter",
+        activeFilterLabel: "Active filter:",
     },
 
     // Thresholded titles are keyed by their threshold, which is part of the

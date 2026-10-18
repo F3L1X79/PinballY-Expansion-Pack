@@ -16,8 +16,9 @@ import { readDrawnMenu, highlightedEntry, press, OPEN_OVER_MS } from "./drawn_me
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 10, 20, 0, 0) });
 let COMMAND;
 
-function openMain(items) {
-    fake.openMenu("main", items);
+// A menu the main menu module leaves as it is.
+function openDrawnMenu(items) {
+    fake.openMenu("game setup", items);
     fake.advanceTime(OPEN_OVER_MS);
 }
 
@@ -31,7 +32,7 @@ test("setup", async () => {
 });
 
 test("paging entries are gone, separators collapse, and a heading is shown but skipped", () => {
-    openMain([
+    openDrawnMenu([
         { title: "", cmd: -1 },
         { title: "Eras", cmd: -1 },
         { title: "1970s", cmd: 101 },
@@ -58,7 +59,7 @@ test("paging entries are gone, separators collapse, and a heading is shown but s
 });
 
 test("checked and radio entries carry a gold mark, a submenu entry a chevron, and the cursor opens on the selected item", () => {
-    openMain([
+    openDrawnMenu([
         { title: "Play", cmd: COMMAND.PlayGame },
         { title: "In Favorites", cmd: COMMAND.AddFavorite, checked: true },
         { title: "Classic", cmd: 201, radio: true, selected: true },

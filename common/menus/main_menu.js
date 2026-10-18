@@ -75,7 +75,7 @@ export function createMainMenu(host) {
     // radioWhen: optional, the entry is marked radio when it returns true.
     // Each function is guarded on its own, so a failing one only touches
     // its own entry (a failing label leaves it out). hasSubmenu: the entry
-    // opens a submenu (the arrow).
+    // opens a submenu (the arrow). Returns the entry's command.
     function add({ name, label, position, action, shownWhen = () => true, radioWhen = () => false, hasSubmenu = false }) {
         const entry = {
             name, position, action, hasSubmenu,
@@ -87,6 +87,7 @@ export function createMainMenu(host) {
         const insertAt = entries.findIndex(other => comparePositions(other.position, position) > 0);
         if (insertAt === -1) entries.push(entry);
         else entries.splice(insertAt, 0, entry);
+        return entry.cmd;
     }
 
     // The filter's command lasts only a session, so it is read at each opening.
@@ -163,7 +164,8 @@ export function createMainMenu(host) {
         if (entry) await entry.action();
     }));
 
-    // filterPicker.back(): out of the Filter Picker, for a Drawn one's Exit.
+    // filterPicker: back() out of the Filter Picker, for a Drawn one's Exit;
+    // entryCmd and activeFilterName(), for the Drawn main menu's footer.
     return { add, showFilterWhen, reopenOn, filterPicker };
 }
 

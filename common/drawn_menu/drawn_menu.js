@@ -5,7 +5,10 @@
 // a titled static item into a heading the cursor skips, collapses the
 // separators and draws one centred list in a panel over a dimmed wheel,
 // with a glass over it, the cursor on the item marked "selected" (else
-// the first entry); a dialog's message shows above the list. When the
+// the first entry); a dialog's message shows above the list, and an
+// optional footer under it (one line the cursor never reaches, after a
+// rule, centred and smaller than the entries: its label in a muted colour,
+// then a name in gold; only the main menu has one). When the
 // Drawn Menus Add-on is off, or the menu cannot be drawn (logged), it
 // shows PinballY's native menu instead, and reports its "menuclose"
 // through the same onClose. draw(), for the Drawn Menus Add-on, returns
@@ -76,9 +79,9 @@ const markNameOf = item => {
 };
 
 // What the menu shows: its message (dialogs only: the first static
-// item) and its rows, the cursor on the selected entry; null when it has
-// no entry to choose.
-export function buildMenuModel(items, { dialogStyle = false, pagingCommands = [] } = {}) {
+// item), its rows, the cursor on the selected entry, and its footer
+// ({ label, name } or null); null when it has no entry to choose.
+export function buildMenuModel(items, { dialogStyle = false, pagingCommands = [], footer = null } = {}) {
     let message = null;
     const rows = [];
     for (const item of items.map(copyItem)) {
@@ -97,7 +100,7 @@ export function buildMenuModel(items, { dialogStyle = false, pagingCommands = []
     const entries = rows.map((row, index) => index).filter(index => rows[index].kind === ROW_KIND.ENTRY);
     if (entries.length === 0) return null;
     const selected = entries.find(index => rows[index].selected);
-    return { message, rows, entries, selected: selected === undefined ? entries[0] : selected };
+    return { message, rows, entries, selected: selected === undefined ? entries[0] : selected, footer };
 }
 
 // PinballY's own menus, behind the same show() as the Drawn Menus: each
@@ -254,7 +257,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         const width = Math.max(1, Math.round(geometry.listWidth));
         const height = Math.max(1, Math.round(geometry.contentHeight));
         const rows = model.rows.map(({ kind, title, mark }) => [kind, title, mark]);
-        const signature = JSON.stringify([model.message, rows, shown.scroll, width, height, geometry.k]);
+        const signature = JSON.stringify([model.message, rows, model.footer, shown.scroll, width, height, geometry.k]);
         if (signature !== textsSignature) {
             textsLayer.clear(TRANSPARENT);
             textsLayer.draw(dc => drawTexts(host, dc, geometry, model, shown.scroll), width, height);
@@ -401,8 +404,9 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // drawn, when it cannot, or when it has no entry to choose.
     // onBack: what Exit and a MenuReturn entry run instead of only closing
     // (a submenu going back to its menu); selectedCmd: the entry the cursor
-    // opens on, over the one PinballY marks.
-    function draw(id, items, { dialogStyle = false, onClose = null, onBack = null, selectedCmd = null } = {}) {
+    // opens on, over the one PinballY marks; footer: { label, name } under
+    // the list.
+    function draw(id, items, { dialogStyle = false, onClose = null, onBack = null, selectedCmd = null, footer = null } = {}) {
         const startMs = host.now().getTime();
         // The same menu shown again over itself (PinballY refreshing it after
         // a stayOpen entry, as when ticking a category): no fade, and the
@@ -410,7 +414,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         const refreshedCmd = shown && shown.id === id ? shown.model.rows[shown.model.selected].cmd : null;
         close();
         try {
-            const model = buildMenuModel(items, { dialogStyle, pagingCommands });
+            const model = buildMenuModel(items, { dialogStyle, pagingCommands, footer });
             if (!model) return false;
             const kept = model.entries.find(index => model.rows[index].cmd === refreshedCmd);
             if (kept !== undefined && !model.entries.some(index => model.rows[index].selected)) model.selected = kept;

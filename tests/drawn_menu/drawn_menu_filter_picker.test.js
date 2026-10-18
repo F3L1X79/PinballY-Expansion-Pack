@@ -29,7 +29,7 @@ test("setup", async () => {
     config.language = "en";
     const { default: lang } = await import("../../common/core/i18n.js");
     LABELS = lang.customMenuLabels;
-    ENTRY = LABELS.activeFilter("All Tables");
+    ENTRY = LABELS.changeFilter;
     await import("../../main.js");
     await settle();
     const COMMAND = globalThis.command;

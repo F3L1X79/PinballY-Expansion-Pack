@@ -287,6 +287,9 @@ export default {
         tableSetup: "Configuración de la mesa",
         filterPickerBack: "Back", // TODO: translation pass
         activeFilter: (name) => `Active filter: ${name}`, // TODO: translation pass
+        // The Drawn main menu's "Change Filter" entry, and its footer's label before the Active Filter.
+        changeFilter: "Change Filter", // TODO: translation pass
+        activeFilterLabel: "Active filter:", // TODO: translation pass
     },
 
     achievements: {

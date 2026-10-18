@@ -9,10 +9,12 @@
 // other menu stays native, and replaces an open Drawn Menu. Exit or a
 // Cancel entry in a filter submenu goes back to the menu that opened it
 // (the Filter Picker for a group), the cursor on its entry; Exit in the
-// Filter Picker goes back to the main menu, on its entry.
+// Filter Picker goes back to the main menu, on its entry. A Drawn main
+// menu shows the "Change Filter" entry and a footer naming the Active Filter.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";
+import lang from "../common/core/i18n.js";
 import { getDrawnMenus } from "../common/drawn_menu/drawn_menu.js";
 import { getMainMenu } from "../common/menus/main_menu.js";
 import { FILTER_GROUPS, FILTER_PICKER_MENU_ID } from "../common/menus/filter_picker.js";
@@ -28,6 +30,8 @@ const DRAWN_MENU_IDS = ["main", FILTER_PICKER_MENU_ID, "exit", "power off", "gam
 
 export default function init() {
     const drawnMenus = getDrawnMenus();
+    // Created now, for its "menuopen" listener to run before ours.
+    const { filterPicker } = getMainMenu();
     const showMainMenu = command.ShowMainMenu;
     // The last command run, as the one that opened a filter submenu; and
     // the main menu's entry to put the cursor on when going back to it.
@@ -50,6 +54,7 @@ export default function init() {
         }
         const options = ev.options || {};
         const drawOptions = { dialogStyle: Boolean(options.dialogStyle) };
+        let items = [...ev.items];
         if (FILTER_MENU_IDS.includes(ev.id)) {
             const parentCmd = lastCommand;
             drawOptions.onBack = () => {
@@ -60,12 +65,15 @@ export default function init() {
             // Back from a group menu lands here: the main menu module puts
             // the cursor on that group itself.
             mainMenuSelectedCmd = null;
-            drawOptions.onBack = () => { getMainMenu().filterPicker.back(); };
+            drawOptions.onBack = () => { filterPicker.back(); };
         } else if (ev.id === "main") {
             drawOptions.selectedCmd = mainMenuSelectedCmd;
             mainMenuSelectedCmd = null;
+            const labels = lang.customMenuLabels;
+            items = items.map(item => (item.cmd === filterPicker.entryCmd ? Object.assign({}, item, { title: labels.changeFilter }) : item));
+            drawOptions.footer = { label: labels.activeFilterLabel, name: filterPicker.activeFilterName() };
         }
-        if (!drawnMenus.draw(ev.id, [...ev.items], drawOptions)) return;
+        if (!drawnMenus.draw(ev.id, items, drawOptions)) return;
         ev.preventDefault();
         // PinballY shows a menu marked updated even when "menuopen" is
         // cancelled (FireMenuEvent checks menuUpdated first), and the other
