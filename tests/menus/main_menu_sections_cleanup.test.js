@@ -41,8 +41,7 @@ test("a non-Admin Profile's cleaned main menu runs in its sections, in French", 
     assert.deepEqual(section("Vos succès"), [lang.profiles.menuEntry, "Vos statistiques", "Vos succès"]);
     assert.deepEqual(section(lang.highScores.board.menuEntry), [lang.highScores.board.menuEntry, "Noter la table", "Ajouter aux favoris"]);
     const filterPicker = "Filtre actif : Toutes les tables";
-    assert.deepEqual(section(filterPicker), [filterPicker]);
-    assert.deepEqual(section("Retour"), ["Retour"]);
+    assert.deepEqual(section("Retour"), [filterPicker, "Retour"]);
     assert.equal(section(LABELS.tableSetup), null, "no Table Setup for a non-Admin Profile");
 
     fake.openMainMenu();

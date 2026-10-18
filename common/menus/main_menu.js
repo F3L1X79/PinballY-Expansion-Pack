@@ -3,8 +3,8 @@
 // entries (label, action, position, and optionally "shown when" and
 // "marked when" predicates checked on each opening); on each opening it
 // sorts them and PinballY's own items into fixed sections split by
-// separators: Play and the launches, the selected table, the player, the
-// Filter Picker, any item it does not know, then Return. A section with
+// separators: Play and the launches, the selected table, the player, any
+// item it does not know, then the Filter Picker with Return. A section with
 // no item shown goes with its separator, and the Add-on order in main.js
 // never decides where an entry lands. The wheel selections (PinballY's
 // [Top] filters) and the filter groups go to the Filter Picker
@@ -44,9 +44,8 @@ const SECTIONS = [
         packEntry("TABLE_SETUP"),
     ],
     [packEntry("PROFILE_PICKER"), packEntry("PROFILE_STATS"), packEntry("ACHIEVEMENT_LIST")],
-    [packEntry("FILTER_PICKER")],
     [UNKNOWN],
-    [builtIn("MenuReturn")],
+    [packEntry("FILTER_PICKER"), builtIn("MenuReturn")],
 ];
 
 const SLOTS = SECTIONS.flatMap((slots, section) => slots.map((slot, order) => ({ slot, position: Object.freeze({ section, order }) })));

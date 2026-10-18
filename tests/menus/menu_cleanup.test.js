@@ -39,8 +39,7 @@ function titlesOf(open) {
 function assertCleanedMainMenu(selectedTable) {
     assert.deepEqual(INFORMATION_ENTRIES.filter(entry => mainMenuSection(fake, entry) !== null), [], "no information entry");
     assert.deepEqual(mainMenuSection(fake, "Rate Table"), selectedTable);
-    assert.deepEqual(mainMenuSection(fake, FILTER_PICKER), [FILTER_PICKER]);
-    assert.deepEqual(mainMenuSection(fake, "Return"), ["Return"]);
+    assert.deepEqual(mainMenuSection(fake, "Return"), [FILTER_PICKER, "Return"]);
     assert.equal(mainMenuHasStraySeparator(fake), false);
 }
 const exitMenuTitles = () => titlesOf(() => fake.openExitMenu());

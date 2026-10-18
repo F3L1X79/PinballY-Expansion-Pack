@@ -7,7 +7,7 @@
 // with a glass over it, the cursor on the item marked "selected" (else
 // the first entry); a dialog's message shows above the list, and an
 // optional footer under it (one line the cursor never reaches, after a
-// rule, centred and smaller than the entries: its label in a muted colour,
+// rule, centred at the entries' size: its label in a muted colour,
 // then a name in gold; only the main menu has one). When the
 // Drawn Menus Add-on is off, or the menu cannot be drawn (logged), it
 // shows PinballY's native menu instead, and reports its "menuclose"
@@ -235,7 +235,9 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             hide(middle.layer);
             return [top.layer, bottom.layer];
         }
-        place(middle.layer, { ...box, y: box.y + topHeight, height: middleHeight }, true);
+        // A pixel into each end: the ends meet the middle between two
+        // pixels, where PinballY's filtering leaves a faint seam row.
+        place(middle.layer, { ...box, y: box.y + topHeight - 1, height: middleHeight + 2 }, true);
         return [top.layer, middle.layer, bottom.layer];
     }
 

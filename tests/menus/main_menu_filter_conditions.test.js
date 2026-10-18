@@ -53,7 +53,7 @@ test("a failing condition is logged and leaves the filter listed, the rest of th
     assert.ok(errorLines(fake).length > 0);
     for (const line of errorLines(fake)) assert.match(line, /broken/);
     const entry = lang.customMenuLabels.activeFilter("All Tables");
-    assert.deepEqual(mainMenuSection(fake, entry), [entry]);
+    assert.deepEqual(mainMenuSection(fake, entry), [entry, "Return"]);
 });
 
 test("a filter left out keeps working while it is current", () => {

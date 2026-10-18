@@ -75,7 +75,7 @@ test("PinballY's separators give way to the sections': none doubled, leading or 
     assert.deepEqual(titles(fake.currentMenu()), ["Play", "Day", SEPARATOR, "Board"]);
 });
 
-test("PinballY's items go to their sections: the selected table's around the pack's, the Filter Picker for the selections and the groups, the unknown ones, then Return", () => {
+test("PinballY's items go to their sections: the selected table's around the pack's, the unknown ones, then the Filter Picker for the selections and the groups with Return", () => {
     const { fake, mainMenu } = setUp();
     mainMenu.add({ name: "board", label: "Board", position: MAIN_MENU_POSITION.HIGH_SCORE_BOARD, action: () => {} });
     mainMenu.add({ name: "setup", label: "Setup", position: MAIN_MENU_POSITION.TABLE_SETUP, action: () => {} });
@@ -96,7 +96,7 @@ test("PinballY's items go to their sections: the selected table's around the pac
 
     assert.deepEqual(titles(fake.currentMenu()), [
         "Play", SEPARATOR, "Board", "Info", "Favorite", "Setup", SEPARATOR,
-        lang.customMenuLabels.activeFilter("All Tables"), SEPARATOR, "Other", "Another", SEPARATOR, "Return",
+        "Other", "Another", SEPARATOR, lang.customMenuLabels.activeFilter("All Tables"), "Return",
     ]);
 });
 

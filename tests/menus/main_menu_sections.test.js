@@ -2,8 +2,8 @@
 // The main menu's sections, through main.js on the fake PinballY globals,
 // Menu Cleanup off: Play and the launches, the selected table (High Score
 // Board, PinballY's table entries, Rate Table, Add to Favorites, Table
-// Setup last for an Admin Profile only), the player, the Filter Picker's
-// entry, any entry the pack does not know, then Return; a section with no
+// Setup last for an Admin Profile only), the player, any entry the pack
+// does not know, then the Filter Picker's entry with Return; a section with no
 // entry shown goes with its separator. The one test of the whole order:
 // the others read their own section (support/main_menu_reader.js).
 // ============================================================
@@ -54,14 +54,13 @@ test("setup", async () => {
 const launches = () => ["Play", lang.customMenuLabels.tableOfTheDay, lang.customMenuLabels.tableOfTheWeek, lang.customMenuLabels.randomGame];
 const player = () => [lang.profiles.menuEntry, lang.profileStats.menuEntry, lang.achievementList.menuEntry];
 
-test("the main menu runs launches, selected table, player, the Filter Picker's entry, then Return", () => {
+test("the main menu runs launches, selected table, player, then the Filter Picker's entry with Return", () => {
     assert.deepEqual(mainMenuTitles(), [
         ...launches(), SEPARATOR,
         lang.highScores.board.menuEntry, "Information", "Flyer", "Instruction Card", "Rate Table", "Add to Favorites",
         lang.customMenuLabels.tableSetup, SEPARATOR,
         ...player(), SEPARATOR,
-        lang.customMenuLabels.activeFilter("All Tables"), SEPARATOR,
-        "Return",
+        lang.customMenuLabels.activeFilter("All Tables"), "Return",
     ]);
 });
 
@@ -94,7 +93,7 @@ test("PinballY's table entries keep its order wherever it lists them, Remove fro
         [lang.highScores.board.menuEntry, "Information", "Flyer", "Instruction Card", "Rate Table", "Remove from Favorites", SEPARATOR]);
 });
 
-test("entries the pack does not know keep their order in their own section, just above Return", () => {
+test("entries the pack does not know keep their order in their own section, just above the Filter Picker's entry", () => {
     const { PlayGame, Quit, FilterByEra, MenuReturn } = globalThis.command;
     const titles = mainMenuTitles(() => fake.openMenu("main", [
         { title: "Play", cmd: PlayGame },
@@ -104,8 +103,8 @@ test("entries the pack does not know keep their order in their own section, just
         { title: "Another script's entry", cmd: OTHER_SCRIPT_CMD },
         { title: "Return", cmd: MenuReturn },
     ]));
-    assert.deepEqual(titles.slice(titles.indexOf(lang.customMenuLabels.activeFilter("All Tables"))),
-        [lang.customMenuLabels.activeFilter("All Tables"), SEPARATOR, "Quit PinballY", "Another script's entry", SEPARATOR, "Return"]);
+    assert.deepEqual(titles.slice(titles.indexOf(lang.achievementList.menuEntry) + 1),
+        [SEPARATOR, "Quit PinballY", "Another script's entry", SEPARATOR, lang.customMenuLabels.activeFilter("All Tables"), "Return"]);
 });
 
 test("no section leaves a doubled, leading or trailing separator when PinballY lists nothing but Play", () => {

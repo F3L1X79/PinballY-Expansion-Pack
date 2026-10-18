@@ -4,7 +4,7 @@
 // on, in a cabinet's portrait window: StyledText takes its size in
 // points (PinballY multiplies it by 4/3), so an entry the prototype
 // draws at 36 px is given 27 pt, its gold copy on the selection too; the
-// main menu's footer is smaller.
+// main menu's footer at the entries' size.
 // ============================================================
 
 import { test } from "node:test";
@@ -44,10 +44,10 @@ test("the entries are drawn at the prototype's 36 px, given in points", () => {
     for (const stroke of strokes) assert.ok(Math.abs(pixelsOf(stroke) - 36 * K) < 0.01, `"${stroke.text}" at ${pixelsOf(stroke)} px`);
 });
 
-test("the footer is drawn smaller, at 27 px", () => {
+test("the footer is drawn at the entries' 36 px", () => {
     const strokes = textStrokesOn(DRAWN_MENU_Z_INDEX.texts).filter(stroke => stroke.color !== DRAWN_MENU_LOOK.colors.entry);
     assert.equal(strokes.length, 2, "its label and the Active Filter");
-    for (const stroke of strokes) assert.ok(Math.abs(pixelsOf(stroke) - 27 * K) < 0.01, `"${stroke.text}" at ${pixelsOf(stroke)} px`);
+    for (const stroke of strokes) assert.ok(Math.abs(pixelsOf(stroke) - 36 * K) < 0.01, `"${stroke.text}" at ${pixelsOf(stroke)} px`);
 });
 
 test("the selected entry's gold text is drawn at the same size", () => {

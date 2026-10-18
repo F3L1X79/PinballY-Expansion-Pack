@@ -71,7 +71,7 @@ test("setup", async () => {
 });
 
 test("the selections and the groups leave the main menu for one entry naming the Active Filter, with the arrow and no mark", () => {
-    assert.deepEqual(mainMenuSection(fake, entry()), [entry()]);
+    assert.deepEqual(mainMenuSection(fake, entry()), [entry(), "Return"]);
 
     fake.openMainMenu();
     const titles = currentTitles();
@@ -106,7 +106,7 @@ test("choosing a selection applies it and closes the menus, and the entry then n
 
     assert.equal(fake.currentMenu(), null);
     assert.equal(fake.currentFilterId(), "User.project.HallOfFame");
-    assert.deepEqual(mainMenuSection(fake, entry(lang.customMenuLabels.hallOfFameFilter)), [entry(lang.customMenuLabels.hallOfFameFilter)]);
+    assert.deepEqual(mainMenuSection(fake, entry(lang.customMenuLabels.hallOfFameFilter)), [entry(lang.customMenuLabels.hallOfFameFilter), "Return"]);
     fake.setCurrentFilter("All");
 });
 

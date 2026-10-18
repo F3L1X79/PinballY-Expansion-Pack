@@ -61,6 +61,20 @@ test("the opening's time is logged", () => {
     assert.ok(fake.logLines().some(line => /^\[DrawnMenus\] "main" opened in \d+ ms/.test(line)), fake.logLines().join("\n"));
 });
 
+test("the stretched middle of the panel and the glass overlaps both ends, so no seam shows between them", () => {
+    // In window fractions, downwards.
+    const spanOf = file => {
+        const layer = menuLayers().find(candidate => candidate.alpha > 0 && candidate.images().includes(`${IMAGES_FOLDER}\\${file}`));
+        const top = 0.5 - layer.position().y - layer.scale().ySpan / 2;
+        return { top, bottom: top + layer.scale().ySpan };
+    };
+    for (const stack of [DRAWN_MENU_IMAGES.panel, DRAWN_MENU_IMAGES.glass]) {
+        const [top, middle, bottom] = [stack.top, stack.middle, stack.bottom].map(image => spanOf(image.file));
+        assert.ok(middle.top < top.bottom - 1e-6, `${stack.middle.file} starts inside the top`);
+        assert.ok(middle.bottom > bottom.top + 1e-6, `${stack.middle.file} ends inside the bottom`);
+    }
+});
+
 test("closed, every layer is hidden and shrunk to a dot again", () => {
     press(fake, "Exit");
 

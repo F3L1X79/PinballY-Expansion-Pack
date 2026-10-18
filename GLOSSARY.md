@@ -153,7 +153,7 @@ The ten tables the active Profile can see that it has spent the most time on, ra
 _Avoid_: top played, most played, leaderboard
 
 **My High Scores**:
-The tables the active Profile can see on whose high score board it still holds a High Score, ranked by the best place it holds there, then by title, offered as a wheel selection from the Filter Picker, right under the Hall of Fame; the entry is in the Filter Picker only while there is at least one. Shown as "Mes meilleurs scores" in French.
+The tables the active Profile can see on whose high score board it still holds a High Score, ranked by the best place it holds there, then by title, offered as a wheel selection from the Filter Picker, right under the Hall of Fame; the entry is in the Filter Picker only while there is at least one. Shown as "Tables de mes High-Scores" in French.
 _Avoid_: my records, Mes records (a record is only the Table Record)
 
 **Favorite Tables**:
