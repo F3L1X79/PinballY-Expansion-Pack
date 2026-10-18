@@ -1,6 +1,6 @@
 // ============================================================
 // Hidden Tables, through main.js on the fake PinballY globals: the entry
-// sits in the main menu right under Favorites while at least one table is
+// sits in the Filter Picker right under Favorites while at least one table is
 // hidden, for a Profile with no mark as for an Admin Profile; choosing it
 // puts the hidden tables on the wheel. Back on the wheel it runs again
 // only when its tables changed (a table unhidden with "Hide this game"),
@@ -11,7 +11,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { mainMenuSection } from "../support/main_menu_reader.js";
+import { filterPickerSection } from "../support/main_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -26,7 +26,7 @@ let lang;
 let store;
 
 const wheel = () => fake.getWheelTables().map(game => game.configId);
-const hiddenTablesSection = () => mainMenuSection(fake, lang.customMenuLabels.hiddenTablesFilter);
+const hiddenTablesSection = () => filterPickerSection(fake, lang.customMenuLabels.hiddenTablesFilter);
 // Chooses the filter, then the menu closes.
 function chooseFilter() {
     fake.setCurrentFilter(FILTER_ID);

@@ -7,7 +7,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { mainMenuSection } from "../support/main_menu_reader.js";
+import { filterPickerSection } from "../support/main_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const TABLES = [{ id: 1, configId: "Table 1", title: "Table 1", manufacturer: "Williams", year: 1990, isHidden: true }];
@@ -22,6 +22,6 @@ test("the French entry reads Tables masquées", async () => {
     await import("../../main.js");
     await settle();
 
-    assert.deepEqual(mainMenuSection(fake, "Tables masquées"), ["All Tables", "Favorites", "Tables masquées"]);
+    assert.deepEqual(filterPickerSection(fake, "Tables masquées"), ["All Tables", "Favorites", "Tables masquées"]);
     assertNoErrorLogged(fake);
 });

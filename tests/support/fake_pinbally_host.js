@@ -997,6 +997,19 @@ export function createFakePinballYHost({
     // The command of the current filter, for its radio mark in the main menu.
     const currentFilterCmd = () => commandOf(currentFilterId);
 
+    // Like FilterInfo.title: the filter's title as the menus show it, in
+    // English. A script filter's own title; an Era filter reads like
+    // PinballY's decade filters ("1980s Tables"); any other of PinballY's
+    // group filters, which the fake does not name, its id.
+    function filterTitleOf(filterId) {
+        if (filterId === "All") return "All Tables";
+        if (filterId === "Favorites") return "Favorites";
+        const filter = filters.get(filterId);
+        if (filter) return filter.title;
+        const era = filterId.match(/^YearRange\.(\d+)\./);
+        return era ? `${era[1]}s Tables` : filterId;
+    }
+
     // Like gameList.getFilterInfo(): the filter by its id, with its
     // session-only command (FilterInfo.cmd). Only All Tables, Favorites and
     // the script filters: the fake has no other filter's command.
@@ -1031,6 +1044,7 @@ export function createFakePinballYHost({
         createFilter,
         getFilterInfo,
         getCurrentFilterId: () => currentFilterId,
+        getCurrentFilterTitle: () => filterTitleOf(currentFilterId),
         getCurrentFilterGroupCmd: currentFilterGroupCmd,
         refreshFilter,
         createMetaFilter,
@@ -1402,7 +1416,7 @@ export function createFakePinballYHost({
                     getWheelGame: (offset) => host.getWheelTables()[offset] || null,
                     getWheelCount: () => host.getWheelTables().length,
                     createFilter,
-                    getCurFilter: () => ({ id: currentFilterId, groupCmd: currentFilterGroupCmd() }),
+                    getCurFilter: () => ({ id: currentFilterId, title: filterTitleOf(currentFilterId), groupCmd: currentFilterGroupCmd() }),
                     getFilterInfo,
                     setCurFilter: setCurrentFilter,
                     setWheelGame: (offset) => { setWheelGame(offset); },

@@ -1,8 +1,8 @@
 // ============================================================
-// The active filter's mark as a Drawn Menu, through main.js on the fake
-// PinballY globals: with an Era filter on, the main menu draws the gold
-// dot on "Filter Tables" (in place of its arrow, like any marked entry)
-// and "Filter Tables" draws it on "Filter by Era" alone.
+// The Active Filter as a Drawn Menu, through main.js on the fake PinballY
+// globals: with an Era filter on, the main menu draws no gold dot, its
+// Filter Picker entry naming the filter with its arrow, and the Filter
+// Picker draws the dot on "Filter by Era" alone.
 // ============================================================
 
 import { test } from "node:test";
@@ -33,14 +33,16 @@ test("setup", async () => {
     fake.setCurrentFilter(ERA_1980S_FILTER);
 });
 
-test("the main menu draws the gold dot on Filter Tables", () => {
+test("the main menu draws no gold dot, the entry naming the Era filter with its arrow", () => {
     openMainMenu(fake);
 
-    assert.deepEqual(markedRows(), [LABELS.filterTables]);
+    assert.deepEqual(markedRows(), []);
+    const row = readDrawnMenu(fake).rows.find(candidate => candidate.title === LABELS.activeFilter("1980s Tables"));
+    assert.equal(row.mark, "submenu");
 });
 
-test("Filter Tables draws it on Filter by Era alone", () => {
-    chooseEntry(fake, LABELS.filterTables);
+test("the Filter Picker draws it on Filter by Era alone", () => {
+    chooseEntry(fake, LABELS.activeFilter("1980s Tables"));
     fake.advanceTime(OPEN_OVER_MS);
 
     assert.deepEqual(markedRows(), ["Filter by Era"]);

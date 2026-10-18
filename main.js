@@ -54,7 +54,7 @@ import * as drawnMenus from "./addons/drawn_menus.js";
 // - menuCleanup must come before customMenuCommands, the first script
 //   using the main menu module: that module's "menuopen" listener must
 //   see the main menu as Menu Cleanup left it, so that the filter groups
-//   it removes stay out of "Filter Tables".
+//   it removes stay out of the Filter Picker.
 // - profilePicker must come before the Welcome Screen, which offers
 //   "Change Player" only when the picker registered itself at init.
 // - drawnMenus must come last, so its "menuopen" listener draws the final

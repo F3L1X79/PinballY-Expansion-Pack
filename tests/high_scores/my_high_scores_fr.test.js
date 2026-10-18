@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHighScores, HIGH_SCORES_FILE, MEDIEVAL } from "./high_scores_scenario.js";
-import { mainMenuSection } from "../support/main_menu_reader.js";
+import { filterPickerSection } from "../support/main_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const HIGH_SCORES = {
@@ -25,7 +25,7 @@ test("the French entry reads Mes meilleurs scores", async () => {
         language: "fr",
     });
 
-    assert.deepEqual(mainMenuSection(fake, "Mes meilleurs scores"),
+    assert.deepEqual(filterPickerSection(fake, "Mes meilleurs scores"),
         ["All Tables", "Tables les plus jouées", "Mes meilleurs scores", "Favorites"]);
 
     assertNoErrorLogged(fake);

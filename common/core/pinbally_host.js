@@ -321,6 +321,10 @@ export function createPinballYHost() {
         // menu item's command, for this session only.
         getFilterInfo: (filterId) => gameList.getFilterInfo(filterId),
         getCurrentFilterId: () => gameList.getCurFilter().id,
+        // The current filter's title as PinballY's menus show it, in English
+        // (FilterInfo.title; FilterInfo has no menuTitle): for display only,
+        // never to recognise a filter by.
+        getCurrentFilterTitle: () => gameList.getCurFilter().title,
         // The command of the main menu item opening the current filter's
         // group (FilterByEra...); undefined for a top-level filter.
         getCurrentFilterGroupCmd: () => gameList.getCurFilter().groupCmd,

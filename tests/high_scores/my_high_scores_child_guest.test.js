@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHighScores, HIGH_SCORES_FILE, MEDIEVAL, AFM, TABLES } from "./high_scores_scenario.js";
-import { mainMenuSection } from "../support/main_menu_reader.js";
+import { filterPickerSection } from "../support/main_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { settle } from "../support/fake_pinbally_host.js";
 
@@ -38,18 +38,18 @@ test("Guest and a Child Profile get My High Scores, the Adult Tables left out fo
     const { default: lang } = await import("../../common/core/i18n.js");
     const { myHighScoresFilter } = lang.customMenuLabels;
 
-    assert.notEqual(mainMenuSection(fake, myHighScoresFilter), null, "the child's entry");
+    assert.notEqual(filterPickerSection(fake, myHighScoresFilter), null, "the child's entry");
     fake.selectFilter(FILTER_ID);
     fake.fire("wheelmode");
     assert.deepEqual(wheelTitles(fake), ["Medieval Madness"], "her Table Record on an Adult Table left out");
 
     switchTo("Bob");
     await settle();
-    assert.equal(mainMenuSection(fake, myHighScoresFilter), null, "no entry: his only place is on an Adult Table");
+    assert.equal(filterPickerSection(fake, myHighScoresFilter), null, "no entry: his only place is on an Adult Table");
 
     switchTo("guest");
     await settle();
-    assert.notEqual(mainMenuSection(fake, myHighScoresFilter), null, "Guest's entry");
+    assert.notEqual(filterPickerSection(fake, myHighScoresFilter), null, "Guest's entry");
     fake.selectFilter(FILTER_ID);
     fake.fire("wheelmode");
     assert.deepEqual(wheelTitles(fake), ["Medieval Madness"]);

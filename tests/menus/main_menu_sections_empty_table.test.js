@@ -53,7 +53,7 @@ test("with no selected-table entry shown, the main menu has no selected-table se
         assert.equal(section(entry), null, entry);
     }
     assert.deepEqual(section(lang.profiles.menuEntry), [lang.profiles.menuEntry]);
-    assert.deepEqual(section("All Tables"), ["All Tables"]);
+    assert.deepEqual(section(LABELS.activeFilter("All Tables")), [LABELS.activeFilter("All Tables")]);
     assert.equal(mainMenuHasStraySeparator(fake, openMainMenu), false);
     assertNoErrorLogged(fake);
 });

@@ -2,12 +2,10 @@
 // The main menu's sections, through main.js on the fake PinballY globals,
 // Menu Cleanup off: Play and the launches, the selected table (High Score
 // Board, PinballY's table entries, Rate Table, Add to Favorites, Table
-// Setup last for an Admin Profile only), the player, the table lists,
-// "Filter Tables", any entry the pack does not know, then Return; a
-// section with no entry shown goes with its separator. The one test of the
-// whole order: the others read their own section (support/main_menu_reader.js).
-// A never played table and a Challenge about never played tables keep the
-// Challenge Tables entry in the menu.
+// Setup last for an Admin Profile only), the player, the Filter Picker's
+// entry, any entry the pack does not know, then Return; a section with no
+// entry shown goes with its separator. The one test of the whole order:
+// the others read their own section (support/main_menu_reader.js).
 // ============================================================
 
 import { test } from "node:test";
@@ -18,7 +16,6 @@ import { assertNoErrorLogged } from "../support/error_log.js";
 
 const ADD_ONS_UNDER_TEST = [
     "uiTranslation", "customMenuCommands", "profilePicker", "achievements", "highScores",
-    "hallOfFame", "tablesToDiscover", "challenges",
 ];
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const SEPARATOR = "---";
@@ -42,10 +39,6 @@ function mainMenuTitles(open = () => fake.openMainMenu()) {
 test("setup", async () => {
     fake.addFolder(`${PROFILES}\\Alice`);
     fake.addFolder(`${PROFILES}\\Bob`);
-    fake.addFile(`${PROFILES}\\cabinet.json`, JSON.stringify({
-        version: 1,
-        challenge: { current: { week: "2026-09-28", template: "neverPlayedTables", param: null, target: 3 }, previous: null },
-    }));
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
@@ -60,19 +53,14 @@ test("setup", async () => {
 
 const launches = () => ["Play", lang.customMenuLabels.tableOfTheDay, lang.customMenuLabels.tableOfTheWeek, lang.customMenuLabels.randomGame];
 const player = () => [lang.profiles.menuEntry, lang.profileStats.menuEntry, lang.achievementList.menuEntry];
-const tableLists = () => {
-    const { challengeTables, tablesToDiscoverFilter, hallOfFameFilter } = lang.customMenuLabels;
-    return ["All Tables", challengeTables, tablesToDiscoverFilter, hallOfFameFilter, "Favorite Tables"];
-};
 
-test("the main menu runs launches, selected table, player, table lists, Filter Tables, then Return", () => {
+test("the main menu runs launches, selected table, player, the Filter Picker's entry, then Return", () => {
     assert.deepEqual(mainMenuTitles(), [
         ...launches(), SEPARATOR,
         lang.highScores.board.menuEntry, "Information", "Flyer", "Instruction Card", "Rate Table", "Add to Favorites",
         lang.customMenuLabels.tableSetup, SEPARATOR,
         ...player(), SEPARATOR,
-        ...tableLists(), SEPARATOR,
-        lang.customMenuLabels.filterTables, SEPARATOR,
+        lang.customMenuLabels.activeFilter("All Tables"), SEPARATOR,
         "Return",
     ]);
 });
@@ -116,8 +104,8 @@ test("entries the pack does not know keep their order in their own section, just
         { title: "Another script's entry", cmd: OTHER_SCRIPT_CMD },
         { title: "Return", cmd: MenuReturn },
     ]));
-    assert.deepEqual(titles.slice(titles.indexOf(lang.customMenuLabels.filterTables)),
-        [lang.customMenuLabels.filterTables, SEPARATOR, "Quit PinballY", "Another script's entry", SEPARATOR, "Return"]);
+    assert.deepEqual(titles.slice(titles.indexOf(lang.customMenuLabels.activeFilter("All Tables"))),
+        [lang.customMenuLabels.activeFilter("All Tables"), SEPARATOR, "Quit PinballY", "Another script's entry", SEPARATOR, "Return"]);
 });
 
 test("no section leaves a doubled, leading or trailing separator when PinballY lists nothing but Play", () => {

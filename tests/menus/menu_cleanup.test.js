@@ -3,7 +3,7 @@
 // by default, PinballY's native menus keep Help, About and the information
 // entries; turned on, they are gone for every Profile, Admin Profiles
 // included, from the Operator menu too, as are the filter submenus by
-// system, last played and date added, which stay out of "Filter Tables";
+// system, last played and date added, which stay out of the Filter Picker;
 // Rate Table and Add to Favorites stay, the Operator Menu rules
 // are unchanged, and no doubled, leading or trailing separator is left.
 // ============================================================
@@ -13,7 +13,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { mainMenuSection, mainMenuHasStraySeparator } from "../support/main_menu_reader.js";
+import { mainMenuSection, mainMenuHasStraySeparator, filterPickerSection } from "../support/main_menu_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const markAdmin = (fake, name) =>
@@ -21,7 +21,8 @@ const markAdmin = (fake, name) =>
 
 // Separators, titled "" (PinballY's) or untitled (the main menu module's), read "---".
 const SEPARATOR = "---";
-const FILTER_TABLES = "Filter Tables";
+// The Filter Picker's entry, naming the Active Filter.
+const FILTER_PICKER = "Active filter: All Tables";
 const INFORMATION_ENTRIES = ["Information", "Flyer", "High Scores", "Instruction Card"];
 const CLEANED_ADMIN_EXIT_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Operator Menu", "Reset profile", SEPARATOR, "Cancel"];
 const CLEANED_EXIT_MENU_WITHOUT_OPERATOR_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Cancel"];
@@ -34,11 +35,11 @@ function titlesOf(open) {
     fake.closeMenu();
     return titles;
 }
-// The main menu's sections Menu Cleanup leaves, around the table lists.
+// The main menu's sections Menu Cleanup leaves, around the Filter Picker's entry.
 function assertCleanedMainMenu(selectedTable) {
     assert.deepEqual(INFORMATION_ENTRIES.filter(entry => mainMenuSection(fake, entry) !== null), [], "no information entry");
     assert.deepEqual(mainMenuSection(fake, "Rate Table"), selectedTable);
-    assert.deepEqual(mainMenuSection(fake, FILTER_TABLES), [FILTER_TABLES]);
+    assert.deepEqual(mainMenuSection(fake, FILTER_PICKER), [FILTER_PICKER]);
     assert.deepEqual(mainMenuSection(fake, "Return"), ["Return"]);
     assert.equal(mainMenuHasStraySeparator(fake), false);
 }
@@ -96,15 +97,10 @@ test("no doubled, leading or trailing separator is left, titled or not", async (
     fake.closeMenu();
 });
 
-test("the filter submenus by system, last played and date added stay out of Filter Tables, the others are there", () => {
-    fake.setNativeCommand(globalThis.command.ShowMainMenu, () => fake.openMainMenu());
-    fake.openMainMenu();
-    fake.selectMenuItem(FILTER_TABLES);
-
-    assert.deepEqual(fake.currentMenu().items.map(item => (item.cmd === -1 ? SEPARATOR : item.title)), [
-        "Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating", SEPARATOR, "Back",
+test("the filter submenus by system, last played and date added stay out of the Filter Picker, the others are there", () => {
+    assert.deepEqual(filterPickerSection(fake, "Filter by Era"), [
+        "Filter by Era", "Filter by Manufacturer", "Filter by Category", "Filter by Rating",
     ]);
-    fake.closeMenu();
     assertNoErrorLogged(fake);
 });
 

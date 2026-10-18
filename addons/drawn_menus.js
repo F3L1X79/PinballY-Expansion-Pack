@@ -8,14 +8,14 @@
 // so the native menu shows on any error. Any
 // other menu stays native, and replaces an open Drawn Menu. Exit or a
 // Cancel entry in a filter submenu goes back to the menu that opened it
-// ("Filter Tables" for a group), the cursor on its entry; Exit in "Filter
-// Tables" goes back to the main menu, on "Filter Tables".
+// (the Filter Picker for a group), the cursor on its entry; Exit in the
+// Filter Picker goes back to the main menu, on its entry.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";
 import { getDrawnMenus } from "../common/drawn_menu/drawn_menu.js";
 import { getMainMenu } from "../common/menus/main_menu.js";
-import { FILTER_GROUPS, FILTER_TABLES_MENU_ID } from "../common/menus/filter_tables.js";
+import { FILTER_GROUPS, FILTER_PICKER_MENU_ID } from "../common/menus/filter_picker.js";
 
 const SCRIPT_NAME = "DrawnMenus";
 
@@ -24,7 +24,7 @@ const SCRIPT_NAME = "DrawnMenus";
 // menu, and the operator menu, from the Exit menu. The capture, media
 // drop and elevation menus and the pause menu stay native.
 const FILTER_MENU_IDS = FILTER_GROUPS.map(group => group.menuId);
-const DRAWN_MENU_IDS = ["main", FILTER_TABLES_MENU_ID, "exit", "power off", "game setup", "game categories", "operator", ...FILTER_MENU_IDS];
+const DRAWN_MENU_IDS = ["main", FILTER_PICKER_MENU_ID, "exit", "power off", "game setup", "game categories", "operator", ...FILTER_MENU_IDS];
 
 export default function init() {
     const drawnMenus = getDrawnMenus();
@@ -56,11 +56,11 @@ export default function init() {
                 mainMenuSelectedCmd = parentCmd;
                 mainWindow.doCommand(showMainMenu);
             };
-        } else if (ev.id === FILTER_TABLES_MENU_ID) {
+        } else if (ev.id === FILTER_PICKER_MENU_ID) {
             // Back from a group menu lands here: the main menu module puts
             // the cursor on that group itself.
             mainMenuSelectedCmd = null;
-            drawOptions.onBack = () => { getMainMenu().filterTables.back(); };
+            drawOptions.onBack = () => { getMainMenu().filterPicker.back(); };
         } else if (ev.id === "main") {
             drawOptions.selectedCmd = mainMenuSelectedCmd;
             mainMenuSelectedCmd = null;

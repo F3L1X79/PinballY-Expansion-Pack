@@ -3,7 +3,8 @@
 // PinballY's main menu in their sections (Play and the launches, the
 // selected table, the player) split by separators, in their fixed position
 // order whatever order the Add-ons added them in, PinballY's other items
-// in their own sections below; selecting one runs its action; reopening
+// in their own sections below; a label given as a function is read at
+// each opening; selecting one runs its action; reopening
 // on an entry puts the cursor on it. Other menus are left alone.
 // ============================================================
 
@@ -12,6 +13,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import { createMainMenu, MAIN_MENU_POSITION } from "../../common/menus/main_menu.js";
 import lang from "../../common/core/i18n.js";
+import { mainMenuSection } from "../support/main_menu_reader.js";
 
 function setUp() {
     const fake = createFakePinballYHost();
@@ -73,7 +75,7 @@ test("PinballY's separators give way to the sections': none doubled, leading or 
     assert.deepEqual(titles(fake.currentMenu()), ["Play", "Day", SEPARATOR, "Board"]);
 });
 
-test("PinballY's items go to their sections: the selected table's around the pack's, the table lists, Filter Tables for the groups, the unknown ones, then Return", () => {
+test("PinballY's items go to their sections: the selected table's around the pack's, the Filter Picker for the selections and the groups, the unknown ones, then Return", () => {
     const { fake, mainMenu } = setUp();
     mainMenu.add({ name: "board", label: "Board", position: MAIN_MENU_POSITION.HIGH_SCORE_BOARD, action: () => {} });
     mainMenu.add({ name: "setup", label: "Setup", position: MAIN_MENU_POSITION.TABLE_SETUP, action: () => {} });
@@ -93,9 +95,20 @@ test("PinballY's items go to their sections: the selected table's around the pac
     ]);
 
     assert.deepEqual(titles(fake.currentMenu()), [
-        "Play", SEPARATOR, "Board", "Info", "Favorite", "Setup", SEPARATOR, "All Tables", "Favorites", SEPARATOR,
-        lang.customMenuLabels.filterTables, SEPARATOR, "Other", "Another", SEPARATOR, "Return",
+        "Play", SEPARATOR, "Board", "Info", "Favorite", "Setup", SEPARATOR,
+        lang.customMenuLabels.activeFilter("All Tables"), SEPARATOR, "Other", "Another", SEPARATOR, "Return",
     ]);
+});
+
+test("an entry's label given as a function is read at each opening", () => {
+    const { fake, mainMenu } = setUp();
+    let label = "First";
+    mainMenu.add({ name: "board", label: () => label, position: MAIN_MENU_POSITION.HIGH_SCORE_BOARD, action: () => {} });
+    const open = () => fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
+
+    assert.deepEqual(mainMenuSection(fake, "First", open), ["First"]);
+    label = "Second";
+    assert.deepEqual(mainMenuSection(fake, "Second", open), ["Second"]);
 });
 
 test("the entries are added again each time the main menu opens, and only to the main menu", () => {

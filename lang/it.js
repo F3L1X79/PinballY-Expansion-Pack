@@ -284,8 +284,8 @@ export default {
         tableOfTheDay: "Avvia il tavolo del giorno",
         tableOfTheWeek: "Avvia il tavolo della settimana",
         tableSetup: "Configurazione del tavolo",
-        filterTables: "Filter Tables", // TODO: translation pass
-        filterTablesBack: "Back", // TODO: translation pass
+        filterPickerBack: "Back", // TODO: translation pass
+        activeFilter: (name) => `Active filter: ${name}`, // TODO: translation pass
     },
 
     achievements: {

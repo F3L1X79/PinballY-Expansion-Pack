@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { mainMenuSection } from "../support/main_menu_reader.js";
+import { filterPickerSection } from "../support/main_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -24,7 +24,7 @@ let lang;
 let store;
 
 const wheel = () => fake.getWheelTables().map(game => game.configId);
-const hiddenTablesSection = () => mainMenuSection(fake, lang.customMenuLabels.hiddenTablesFilter);
+const hiddenTablesSection = () => filterPickerSection(fake, lang.customMenuLabels.hiddenTablesFilter);
 
 test("setup", async () => {
     fake.addFolder(`${PROFILES}\\Alice`);

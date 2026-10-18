@@ -4,21 +4,24 @@
 // "marked when" predicates checked on each opening); on each opening it
 // sorts them and PinballY's own items into fixed sections split by
 // separators: Play and the launches, the selected table, the player, the
-// table lists, "Filter Tables", any item it does not know, then Return. A
-// section with no item shown goes with its separator, and the Add-on
-// order in main.js never decides where an entry lands. PinballY's filter
-// groups go to the "Filter Tables" submenu (common/menus/filter_tables.js),
-// which it creates. It owns the entry commands and runs the matching
+// Filter Picker, any item it does not know, then Return. A section with
+// no item shown goes with its separator, and the Add-on order in main.js
+// never decides where an entry lands. The wheel selections (PinballY's
+// [Top] filters) and the filter groups go to the Filter Picker
+// (common/menus/filter_picker.js), which it creates and hands each
+// opening. An entry's label is a text or a function read on each
+// opening. It owns the entry commands and runs the matching
 // action when one is selected, and can reopen the main menu with the
 // cursor on an entry (a screen going back one level). A [Top] script
-// filter's entry (by its full id, "User.<id>") can be given a condition,
-// checked on each opening, that leaves it out while false; a failing one
-// is logged and the entry stays shown. Listens to "menuopen" and "command".
+// filter (by its full id, "User.<id>") can be given a condition, checked
+// on each opening, that leaves it out of the Filter Picker while false; a
+// failing one is logged and the filter stays listed. Listens to "menuopen"
+// and "command".
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
-import { createFilterTables } from "./filter_tables.js";
+import { createFilterPicker } from "./filter_picker.js";
 import { SEPARATOR_CMD, isSeparator } from "./menu_separator.js";
 
 const SCRIPT_NAME = "MainMenu";
@@ -28,8 +31,6 @@ const SCRIPT_NAME = "MainMenu";
 // a pack entry's slot names its position and matches none.
 const packEntry = name => ({ name, matches: () => false });
 const builtIn = (...names) => ({ matches: (cmd, host) => names.some(name => host.getBuiltInCommand(name) === cmd) });
-// Every filter's command: the [Top] filters, the only ones in the main menu.
-const FILTERS = { matches: (cmd, host) => cmd >= host.getBuiltInCommand("FilterFirst") && cmd <= host.getBuiltInCommand("FilterLast") };
 // Where an item no other slot matches goes.
 const UNKNOWN = { matches: () => false };
 
@@ -43,8 +44,7 @@ const SECTIONS = [
         packEntry("TABLE_SETUP"),
     ],
     [packEntry("PROFILE_PICKER"), packEntry("PROFILE_STATS"), packEntry("ACHIEVEMENT_LIST")],
-    [FILTERS],
-    [packEntry("FILTER_TABLES")],
+    [packEntry("FILTER_PICKER")],
     [UNKNOWN],
     [builtIn("MenuReturn")],
 ];
@@ -59,6 +59,9 @@ const UNKNOWN_POSITION = SLOTS.find(({ slot }) => slot === UNKNOWN).position;
 
 const comparePositions = (a, b) => a.section - b.section || a.order - b.order;
 
+// Every filter's command: the [Top] filters, the only ones in the main menu.
+const isFilterItem = (item, host) => item.cmd >= host.getBuiltInCommand("FilterFirst") && item.cmd <= host.getBuiltInCommand("FilterLast");
+
 export function createMainMenu(host) {
     // Sorted by position.
     const entries = [];
@@ -67,13 +70,16 @@ export function createMainMenu(host) {
     // The entry the cursor goes to on the next main menu opening, or null.
     let entryToSelect = null;
 
-    // shownWhen: optional, the entry is left out of the menu when it returns
-    // false; radioWhen: optional, the entry is marked radio when it returns
-    // true. Each is guarded on its own, so a failing one only touches its
-    // own entry. hasSubmenu: the entry opens a submenu (the arrow).
+    // label: a text, or a function returning it on each opening; shownWhen:
+    // optional, the entry is left out of the menu when it returns false;
+    // radioWhen: optional, the entry is marked radio when it returns true.
+    // Each function is guarded on its own, so a failing one only touches
+    // its own entry (a failing label leaves it out). hasSubmenu: the entry
+    // opens a submenu (the arrow).
     function add({ name, label, position, action, shownWhen = () => true, radioWhen = () => false, hasSubmenu = false }) {
         const entry = {
-            name, label, position, action, hasSubmenu,
+            name, position, action, hasSubmenu,
+            label: typeof label === "function" ? safeHandler(SCRIPT_NAME, label) : () => label,
             shownWhen: safeHandler(SCRIPT_NAME, shownWhen),
             radioWhen: safeHandler(SCRIPT_NAME, radioWhen),
             cmd: host.allocateCommand(name),
@@ -94,11 +100,9 @@ export function createMainMenu(host) {
         host.doCommand(host.getBuiltInCommand("ShowMainMenu"));
     }
 
-    // Created before this module's "menuopen" listener is registered, so
-    // its own runs first and may turn the opening into "Filter Tables".
-    const filterTables = createFilterTables(host, {
+    const filterPicker = createFilterPicker(host, {
         addMainMenuEntry: add,
-        position: MAIN_MENU_POSITION.FILTER_TABLES,
+        position: MAIN_MENU_POSITION.FILTER_PICKER,
         reopenMainMenuOn: reopenOn,
     });
 
@@ -108,28 +112,37 @@ export function createMainMenu(host) {
         return found ? found.position : UNKNOWN_POSITION;
     }
 
-    // Fires when any menu opens, with a fresh item list each time: sorts the
-    // entries shown this time and PinballY's items into their sections.
-    // Items removed by a listener registered earlier (Menu Cleanup, before
-    // every Add-on using this module in main.js) stay removed; one
-    // registered later (the High Scores) tidies the separators its
-    // removals leave.
+    // Fires when any menu opens, with a fresh item list each time: hands the
+    // filters shown this time to the Filter Picker, which may take the
+    // opening over, else sorts the entries shown and PinballY's other items
+    // into their sections. Items removed by a listener registered earlier
+    // (Menu Cleanup, before every Add-on using this module in main.js) stay
+    // removed; one registered later (the High Scores) tidies the separators
+    // its removals leave.
     host.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
         if (ev.id !== "main") return;
-        const shown = entries.filter(entry => entry.shownWhen());
         const leftOutCmds = leftOutFilterCmdReaders.map(readCmd => readCmd()).filter(cmd => cmd !== undefined);
-        const selected = shown.find(entry => entry.name === entryToSelect);
+        const selections = ev.items.filter(item => isFilterItem(item, host) && !leftOutCmds.includes(item.cmd));
+        if (filterPicker.mainMenuOpened(ev, selections)) {
+            entryToSelect = null;
+            return;
+        }
+        const labeled = entries
+            .filter(entry => entry.shownWhen())
+            .map(entry => ({ entry, title: entry.label() }))
+            .filter(({ title }) => title !== undefined);
+        const selected = labeled.find(({ entry }) => entry.name === entryToSelect);
         entryToSelect = null;
         // Array sort is stable: items sharing a slot keep their order.
         const placed = [
-            ...shown.map(entry => {
-                const item = { title: entry.label, cmd: entry.cmd };
+            ...labeled.map(({ entry, title }) => {
+                const item = { title, cmd: entry.cmd };
                 if (entry.hasSubmenu) item.hasSubmenu = true;
                 if (entry.radioWhen()) item.radio = true;
                 return { item, position: entry.position };
             }),
             ...ev.items
-                .filter(item => !isSeparator(item) && !filterTables.isGroupItem(item) && !leftOutCmds.includes(item.cmd))
+                .filter(item => !isSeparator(item) && !isFilterItem(item, host) && !filterPicker.isGroupItem(item))
                 .map(item => ({ item, position: nativePositionOf(item.cmd) })),
         ].sort((a, b) => comparePositions(a.position, b.position));
         const items = [];
@@ -137,7 +150,7 @@ export function createMainMenu(host) {
             if (index > 0 && placed[index - 1].position.section !== position.section) items.push({ cmd: SEPARATOR_CMD });
             items.push(item);
         });
-        if (selected) for (const item of items) item.selected = item.cmd === selected.cmd;
+        if (selected) for (const item of items) item.selected = item.cmd === selected.entry.cmd;
         ev.items = items;
         // PinballY ignores edits to ev.items unless menuUpdated is set.
         ev.menuUpdated = true;
@@ -150,8 +163,8 @@ export function createMainMenu(host) {
         if (entry) await entry.action();
     }));
 
-    // filterTables.back(): out of "Filter Tables", for a Drawn one's Exit.
-    return { add, showFilterWhen, reopenOn, filterTables };
+    // filterPicker.back(): out of the Filter Picker, for a Drawn one's Exit.
+    return { add, showFilterWhen, reopenOn, filterPicker };
 }
 
 let sharedMainMenu = null;

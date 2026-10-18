@@ -14,6 +14,7 @@ export default {
     // PinballY's native menu titles are already in English; only the ones
     // renamed by this project are listed.
     nativeMenuLabels: {
+        "All Games": "All Tables",
         "Favorites": "Favorite Tables",
     },
     mediaCaptureItemLabels: {},
@@ -168,9 +169,9 @@ export default {
         tableOfTheDay: "Launch Table of the Day",
         tableOfTheWeek: "Launch Table of the Week",
         tableSetup: "Set Up Table",
-        // The main menu entry gathering PinballY's filter groups, and its submenu's way back.
-        filterTables: "Filter Tables",
-        filterTablesBack: "Back",
+        // The Filter Picker's way back, and its main menu entry naming the Active Filter.
+        filterPickerBack: "Back",
+        activeFilter: (name) => `Active filter: ${name}`,
     },
 
     // Thresholded titles are keyed by their threshold, which is part of the

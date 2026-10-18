@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHighScores, HIGH_SCORES_FILE } from "./high_scores_scenario.js";
-import { mainMenuSection } from "../support/main_menu_reader.js";
+import { filterPickerSection } from "../support/main_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { settle } from "../support/fake_pinbally_host.js";
 
@@ -58,7 +58,7 @@ test("My High Scores lists the active Profile's places, best first, and follows 
     const { default: lang } = await import("../../common/core/i18n.js");
     const { hallOfFameFilter, myHighScoresFilter } = lang.customMenuLabels;
 
-    assert.deepEqual(mainMenuSection(fake, myHighScoresFilter), ["All Tables", hallOfFameFilter, myHighScoresFilter, "Favorites"]);
+    assert.deepEqual(filterPickerSection(fake, myHighScoresFilter), ["All Tables", hallOfFameFilter, myHighScoresFilter, "Favorites"]);
 
     chooseFilter(fake);
     assert.deepEqual(wheelTitles(fake), ["Attack from Mars", "Addams Family", "Medieval Madness"]);
@@ -70,7 +70,7 @@ test("My High Scores lists the active Profile's places, best first, and follows 
     switchTo("Carol");
     await settle();
     assert.equal(fake.getWheelTables().length, 5, "every table back for a Profile with no place");
-    assert.equal(mainMenuSection(fake, myHighScoresFilter), null, "no entry for a Profile with no place");
+    assert.equal(filterPickerSection(fake, myHighScoresFilter), null, "no entry for a Profile with no place");
 
     assertNoErrorLogged(fake);
 });

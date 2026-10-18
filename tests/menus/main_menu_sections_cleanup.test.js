@@ -2,7 +2,8 @@
 // The main menu's sections in French with Menu Cleanup on, through main.js
 // on the fake PinballY globals, for a non-Admin Profile once the household
 // has an Admin: PinballY's information entries are gone, Table Setup too,
-// the filter groups are behind "Filtrer les tables", and no separator is
+// the wheel selections and the filter groups are behind one entry reading
+// "Filtre actif : Toutes les tables", and no separator is
 // doubled; the Achievement List entry reads "Vos succès".
 // ============================================================
 
@@ -39,14 +40,15 @@ test("a non-Admin Profile's cleaned main menu runs in its sections, in French", 
     assert.deepEqual(section("Jouer"), ["Jouer", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame]);
     assert.deepEqual(section("Vos succès"), [lang.profiles.menuEntry, "Vos statistiques", "Vos succès"]);
     assert.deepEqual(section(lang.highScores.board.menuEntry), [lang.highScores.board.menuEntry, "Noter la table", "Ajouter aux favoris"]);
-    assert.deepEqual(section("Filtrer les tables"), ["Filtrer les tables"]);
+    const filterPicker = "Filtre actif : Toutes les tables";
+    assert.deepEqual(section(filterPicker), [filterPicker]);
     assert.deepEqual(section("Retour"), ["Retour"]);
     assert.equal(section(LABELS.tableSetup), null, "no Table Setup for a non-Admin Profile");
 
     fake.openMainMenu();
     const groups = fake.currentMenu().items.filter(item => item.hasSubmenu).map(item => item.title);
     fake.closeMenu();
-    assert.deepEqual(groups, ["Filtrer les tables"], "the filter groups are behind it");
+    assert.deepEqual(groups, [filterPicker], "the filter groups are behind it");
     assert.equal(mainMenuHasStraySeparator(fake), false);
     assertNoErrorLogged(fake);
 });

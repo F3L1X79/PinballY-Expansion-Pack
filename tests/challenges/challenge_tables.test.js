@@ -1,11 +1,11 @@
 // ============================================================
 // Challenge Tables, through the Challenge module and the Challenge Tables
 // filter on the fake PinballY host, with a real Profile store, real Period
-// Tables and a real Random Game module: the filter sits in the main menu
-// right under "All Tables", and choosing it puts on the wheel the visible
+// Tables and a real Random Game module: the filter sits in the Filter
+// Picker right under "All Tables", and choosing it puts on the wheel the visible
 // tables that would move the Challenge forward, or every table back when
 // there is none (other templates, not followed yet, no Challenge, completed).
-// Its main menu entry is there only while the active Profile's Challenge
+// It is listed there only while the active Profile's Challenge
 // has Challenge Tables, checked at each opening.
 // ============================================================
 
@@ -19,7 +19,7 @@ import { createChallenges } from "../../common/challenges/challenge.js";
 import { createChallengeTables } from "../../common/challenges/challenge_tables.js";
 import { createAchievementToasts } from "../../common/achievements/achievement_toast.js";
 import { createMainMenu } from "../../common/menus/main_menu.js";
-import { mainMenuSection } from "../support/main_menu_reader.js";
+import { filterPickerSection } from "../support/main_menu_reader.js";
 import lang from "../../common/core/i18n.js";
 
 // Monday 21 September 2026, 20:00; its week is keyed "2026-09-21".
@@ -172,7 +172,7 @@ test("a Challenge not followed yet, no Challenge and a completed Challenge offer
 
 // PinballY's "All Tables" has sort key "3000", the Hall of Fame "6000" and
 // "Favorites" "7000" in the [Top] group.
-test("the Challenge Tables filter sits in the main menu right under All Tables", () => {
+test("the Challenge Tables filter sits in the Filter Picker right under All Tables", () => {
     const { fake } = setUp({ challenge: challengeOf("manufacturerTables", "Stern") });
 
     assert.equal(fake.scriptFilters().length, 1);
@@ -236,10 +236,10 @@ test("another filter shown is left alone", async () => {
     assert.equal(fake.currentFilterId(), "Favorites");
 });
 
-// The main menu's table lists, or null without the Challenge Tables entry.
-const challengeTablesSection = fake => mainMenuSection(fake, lang.customMenuLabels.challengeTables);
+// The Filter Picker's wheel selections, or null without the Challenge Tables entry.
+const challengeTablesSection = fake => filterPickerSection(fake, lang.customMenuLabels.challengeTables);
 
-test("with a Challenge that has Challenge Tables, the entry is in the main menu, under All Tables", () => {
+test("with a Challenge that has Challenge Tables, the entry is in the Filter Picker, under All Tables", () => {
     const { fake } = setUp({ challenge: challengeOf("manufacturerTables", "Stern") });
 
     assert.deepEqual(challengeTablesSection(fake), ["All Tables", lang.customMenuLabels.challengeTables, "Favorites"]);
@@ -253,7 +253,7 @@ test("once the active Profile completes its Challenge, the entry is gone at the 
     play(fake, TABLES[1]);
 
     assert.equal(challengeTablesSection(fake), null);
-    assert.deepEqual(mainMenuSection(fake, "All Tables"), ["All Tables", "Favorites"]);
+    assert.deepEqual(filterPickerSection(fake, "All Tables"), ["All Tables", "Favorites"]);
 });
 
 test("with a Challenge that has no Challenge Tables, such as a total play time one, the entry is absent", () => {

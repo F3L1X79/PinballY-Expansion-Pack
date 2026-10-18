@@ -1,10 +1,10 @@
 // ============================================================
-// The active filter's mark in the main menu and in "Filter Tables",
-// through main.js on the fake PinballY globals with PinballY's native
-// menus and Menu Cleanup off: a filter from a group (an Era) marks
-// "Filter Tables" and that group alone in the submenu; a top-level filter
-// keeps its own mark and leaves "Filter Tables" unmarked; a group PinballY
-// marks itself is marked once.
+// The Active Filter in the main menu and in the Filter Picker, through
+// main.js on the fake PinballY globals with PinballY's native menus and
+// Menu Cleanup off: the main menu marks nothing and its entry names the
+// Active Filter as the menus show it; in the Filter Picker a top-level
+// filter keeps PinballY's mark, a filter from a group (an Era) marks that
+// group alone, and a group PinballY marks itself is marked once.
 // ============================================================
 
 import { test } from "node:test";
@@ -22,6 +22,7 @@ let lang;
 let COMMAND;
 
 const markedTitles = () => fake.currentMenu().items.filter(item => item.radio).map(item => item.title);
+const entryTitle = () => fake.currentMenu().items.find(item => item.cmd === fake.commandId("filterPicker")).title;
 
 test("setup", async () => {
     // Never uninstalled: node --test runs each test file in its own process.
@@ -35,26 +36,26 @@ test("setup", async () => {
     fake.setNativeCommand(COMMAND.ShowMainMenu, () => fake.openMainMenu());
 });
 
-test("a top-level filter keeps its mark and Filter Tables has none", () => {
+test("with a top-level filter, the main menu marks nothing and the Filter Picker keeps PinballY's mark", () => {
     fake.openMainMenu();
+    assert.deepEqual(markedTitles(), []);
+    assert.equal(entryTitle(), "Active filter: All Tables");
 
+    fake.selectMenuItem(entryTitle());
     assert.deepEqual(markedTitles(), ["All Tables"]);
     fake.closeMenu();
-});
-
-test("an Era filter marks Filter Tables in the main menu, and nothing else", () => {
-    fake.setCurrentFilter(ERA_1980S_FILTER);
-    fake.openMainMenu();
-
-    assert.deepEqual(markedTitles(), [lang.customMenuLabels.filterTables]);
     fake.closeMenu();
 });
 
-test("in Filter Tables, only Filter by Era is marked", () => {
+test("with an Era filter, the main menu still marks nothing and the Filter Picker marks Filter by Era alone", () => {
+    fake.setCurrentFilter(ERA_1980S_FILTER);
     fake.openMainMenu();
-    fake.selectMenuItem(lang.customMenuLabels.filterTables);
+    assert.deepEqual(markedTitles(), []);
+    assert.equal(entryTitle(), "Active filter: 1980s Tables");
 
+    fake.selectMenuItem(entryTitle());
     assert.deepEqual(markedTitles(), ["Filter by Era"]);
+    fake.closeMenu();
     fake.closeMenu();
 });
 
@@ -71,10 +72,11 @@ test("a group PinballY marks itself is marked once", () => {
     ]);
     fake.setNativeCommand(COMMAND.ShowMainMenu, mainMenu);
     mainMenu();
-    assert.deepEqual(markedTitles(), [lang.customMenuLabels.filterTables]);
-    fake.selectMenuItem(lang.customMenuLabels.filterTables);
+    assert.deepEqual(markedTitles(), []);
+    fake.selectMenuItem(lang.customMenuLabels.activeFilter("1980s Tables"));
 
     assert.deepEqual(markedTitles(), ["Filter by Era"]);
+    fake.closeMenu();
     fake.closeMenu();
     assertNoErrorLogged(fake);
 });

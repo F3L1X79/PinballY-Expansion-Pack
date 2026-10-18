@@ -53,7 +53,7 @@ test("the main menu is drawn instead of the native one, with the pack's sections
     assert.deepEqual(section("Play"), ["Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame]);
     assert.deepEqual(section("Information"),
         ["Information", "Flyer", "High Scores", "Instruction Card", "Rate Table", "Add to Favorites", LABELS.tableSetup]);
-    assert.deepEqual(section(LABELS.filterTables), [LABELS.filterTables]);
+    assert.deepEqual(section(LABELS.activeFilter("All Tables")), [LABELS.activeFilter("All Tables")]);
     assert.deepEqual(section("Return"), ["Return"]);
     assert.equal(readDrawnMenu(fake).message, null);
     assert.equal(highlightedEntry(fake), "Play", "the cursor opens on the first entry");

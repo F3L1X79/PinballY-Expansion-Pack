@@ -1,16 +1,16 @@
 // ============================================================
-// The main menu as a Drawn Menu, through main.js on the fake PinballY
+// The Filter Picker as a Drawn Menu, through main.js on the fake PinballY
 // globals, with the Challenges Add-on: the Drawn Menu lists exactly the
-// entries of the main menu the pack built, so the Challenge Tables entry
-// is there while the active Profile's Challenge has Challenge Tables and
-// left out once none is left.
+// entries of the Filter Picker the pack built, so the Challenge Tables
+// entry is there while the active Profile's Challenge has Challenge
+// Tables and left out once none is left.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { drawnMenuLines, openMainMenu } from "./drawn_menu_reader.js";
+import { OPEN_OVER_MS, drawnMenuLines, openMainMenu, chooseEntry } from "./drawn_menu_reader.js";
 import { sectionHolding } from "../support/main_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -24,7 +24,8 @@ const TABLES = [
 
 const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0), tables: TABLES });
 let challengeTables;
-// The main menu's lines as the pack handed them to the Drawn Menus, at its last opening.
+let filterPickerEntry;
+// The Filter Picker's lines as the pack handed them to the Drawn Menus, at its last opening.
 let builtLines = null;
 
 test("setup", async () => {
@@ -44,23 +45,33 @@ test("setup", async () => {
     config.language = "en";
     const { default: lang } = await import("../../common/core/i18n.js");
     challengeTables = lang.customMenuLabels.challengeTables;
+    filterPickerEntry = lang.customMenuLabels.activeFilter("All Tables");
     await import("../../main.js");
     await settle();
     // Registered after every Add-on, so it reads the entries they built.
     fake.on("menuopen", ev => {
-        if (ev.id === "main") builtLines = ev.items.map(item => (item.cmd === -1 ? "---" : item.title));
+        if (ev.id === "filter picker") builtLines = ev.items.map(item => (item.cmd === -1 ? "---" : item.title));
     });
 });
 
-function drawnMainMenu() {
+// PinballY opens the main menu on ShowMainMenu, which the Filter Picker
+// runs to show itself.
+function drawnFilterPicker() {
+    fake.setNativeCommand(globalThis.command.ShowMainMenu, () => fake.openMainMenu());
     openMainMenu(fake);
+    chooseEntry(fake, filterPickerEntry);
+    fake.advanceTime(OPEN_OVER_MS);
     const lines = drawnMenuLines(fake);
-    fake.fire("commandbuttondown", { command: "Exit", repeat: false });
+    // Exit goes back to the main menu, then closes it.
+    for (let count = 0; count < 2; count++) {
+        fake.fire("commandbuttondown", { command: "Exit", repeat: false });
+        fake.advanceTime(OPEN_OVER_MS);
+    }
     return lines;
 }
 
 test("with Challenge Tables, the Drawn Menu shows the entry under All Tables, as the pack built it", () => {
-    const lines = drawnMainMenu();
+    const lines = drawnFilterPicker();
 
     assert.deepEqual(sectionHolding(lines, challengeTables), ["All Tables", challengeTables, FAVORITE_TABLES]);
     assert.deepEqual(lines, builtLines);
@@ -72,7 +83,7 @@ test("once no Challenge Table is left, the Drawn Menu leaves the entry out too",
     fake.gameOver(TABLES[0]);
     fake.fire("wheelmode");
 
-    const lines = drawnMainMenu();
+    const lines = drawnFilterPicker();
 
     assert.equal(lines.indexOf(challengeTables), -1);
     assert.deepEqual(sectionHolding(lines, "All Tables"), ["All Tables", FAVORITE_TABLES]);
