@@ -30,7 +30,7 @@ Every day there is a table nobody in the house has played yet, or the one left a
 
 <img src="docs/images/challenges.png" alt="The week's Challenge Card with its progress and the days left" width="368">
 
-A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, half an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" in the main menu, keeps only the tables that would move it forward, and leaves the menu once there are none. Completing it brings a shower of confetti across the wheel screen.
+A new Challenge comes every Monday, the same for the whole household: five different Stern tables, three tables you have never played, half an hour on a single table... Its card on the wheel screen tracks your progress. **Challenge Tables**, right under "All Tables" behind "Change Filter" in the main menu, keeps only the tables that would move it forward, and leaves the list once there are none. Completing it brings a shower of confetti across the wheel screen.
 
 ### Table Mastery
 
@@ -72,9 +72,9 @@ PinballY's own menus and messages in French, German, Spanish, Italian or Portugu
 Everything stays in one folder, with no change to PinballY itself.
 
 **And also**:
-- PinballY's menus (main menu, Exit, filters, power off, table setup, Operator Menu) drawn in the pack's Steamball look, same entries, sorted into sections, and same buttons;
+- PinballY's menus (main menu, Exit, filters, power off, table setup, Operator Menu) drawn in the pack's Steamball look, same entries, sorted into sections, and same buttons; a shorter main menu gathers every wheel selection and filter group behind one "Change Filter" entry, and names the filter the wheel shows under its list ("Active filter: All Tables");
 - a Random Game spun on a wheel of fortune;
-- "Tables to Discover", "Most Played Tables", "My High Scores" (the tables where you hold a place on the board), "Favorite Tables", "Hidden Tables" (while a table is hidden) and "Original Tables" in the menus;
+- "Tables to Discover", "Most Played Tables", "My High Scores" (the tables where you hold a place on the board), "Favorite Tables", "Hidden Tables" (while a table is hidden) and "Original Tables" behind "Change Filter";
 - a clock, a gold arc under the wheel (the Wheel Arc) and a richer status line;
 - a reminder to rate a table;
 - launches without a black flash, with a gold comet turning while you wait, the step under way written in gold beneath it while a table launches or closes ("Loading…", "Returning to tables…"): during a launch, at startup, while a high score board is read and while the Profile Stats, the Household Stats, the Achievement List or the Avatar Frame list get ready;
@@ -153,7 +153,7 @@ To keep the Adult Tables away from a child, tag them in PinballY with the catego
 
 ### Menu Cleanup
 
-Menu Cleanup lightens PinballY's menus for every Profile, Admin Profiles included: it removes Help and About from the Exit and Operator menus, Information, Flyer and Instruction Card from the main menu (Rate Table and Add to Favorites stay), PinballY's own High Scores entry when the pack's High Scores are turned off, and the Filter by System, Filter by Last Played and Filter by Date Added groups from "Filter Tables". It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
+Menu Cleanup lightens PinballY's menus for every Profile, Admin Profiles included: it removes Help and About from the Exit and Operator menus, Information, Flyer and Instruction Card from the main menu (Rate Table and Add to Favorites stay), PinballY's own High Scores entry when the pack's High Scores are turned off, and the Filter by System, Filter by Last Played and Filter by Date Added groups from "Change Filter". It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
 
 ## Contributing
 
