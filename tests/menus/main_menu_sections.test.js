@@ -4,7 +4,8 @@
 // (High Score Board, PinballY's table entries, Rate Table, Add to
 // Favorites, Table Setup last for an Admin Profile only), the table lists,
 // "Filter Tables", any entry the pack does not know, then Return; a
-// section with no entry shown goes with its separator.
+// section with no entry shown goes with its separator. The one test of the
+// whole order: the others read their own section (support/main_menu_reader.js).
 // ============================================================
 
 import { test } from "node:test";

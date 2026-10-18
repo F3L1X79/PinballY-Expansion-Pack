@@ -14,6 +14,7 @@ import config from "../../common/core/config.js";
 import { chromeTexts, pressAndGlide, isListOpen, untilListShown } from "../achievements/achievement_list_reader.js";
 import { isProfileStatsOpen, openProfileStats, buttons, highlighted, choose, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection } from "../support/main_menu_reader.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
@@ -33,9 +34,6 @@ const GUEST_PLAYS = {
     [MEDIEVAL.configId]: { count: 3, seconds: 5400, lastPlayed: "2026-09-20T20:00:00" },
 };
 
-// A separator has no title.
-const SEPARATOR = undefined;
-
 test("the Achievements button opens the Achievement List and the selection buttons set the wheel's filter", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: [MEDIEVAL, MARS, GODZILLA] });
     fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({ version: 1, plays: GUEST_PLAYS, notified: [] }));
@@ -51,11 +49,8 @@ test("the Achievements button opens the Achievement List and the selection butto
     await import("../../main.js");
     await settle();
 
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }, { title: "Exit", cmd: 99 }]);
-    const mainMenu = fake.currentMenu().items.map(item => item.title);
-    assert.deepEqual(mainMenu.slice(mainMenu.indexOf(lang.achievementList.menuEntry)), [
-        lang.achievementList.menuEntry, TEXT.menuEntry, SEPARATOR, lang.customMenuLabels.tableSetup, SEPARATOR, "Exit",
-    ]);
+    const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }, { title: "Exit", cmd: 99 }]);
+    assert.deepEqual(mainMenuSection(fake, TEXT.menuEntry, openMainMenu), [lang.achievementList.menuEntry, TEXT.menuEntry]);
 
     // The Achievement List's own total, read from its header.
     const readListTotal = () => chromeTexts(fake).find(text => /^\d+ \/ \d+ /.test(text)).match(/\d+/g).slice(0, 2).join("/");

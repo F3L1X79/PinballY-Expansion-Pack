@@ -1,7 +1,7 @@
 // ============================================================
 // The main menu as a Drawn Menu, through main.js on the fake PinballY
-// globals: it is drawn instead of the native one with the same entries in
-// the same order, the cursor on the first entry; Next and Prev move it,
+// globals: it is drawn instead of the native one with the pack's sections,
+// the cursor on the first entry; Next and Prev move it,
 // wrapping, with PinballY's navigation sound, the gold title landing at
 // once on the new entry while the outline glides to it; Select or Launch runs the
 // entry's command with the Select sound, Exit and attract mode close it
@@ -17,6 +17,7 @@ import {
     isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, press, openMainMenu, chooseEntry, GLIDE_OVER_MS,
 } from "./drawn_menu_reader.js";
 import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu/drawn_menu_painter.js";
+import { sectionHolding } from "../support/main_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "drawnMenus"];
 const BUTTON_SOUNDS = "C:\\PinballY\\Assets\\Button Sounds";
@@ -43,18 +44,17 @@ test("setup", async () => {
     await settle();
 });
 
-test("the main menu is drawn instead of the native one, with the same entries in the same order", () => {
+test("the main menu is drawn instead of the native one, with the pack's sections", () => {
     openMainMenu(fake);
 
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.ok(isDrawnMenuShown(fake));
-    assert.deepEqual(drawnMenuLines(fake), [
-        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, "---",
-        "Information", "Flyer", "High Scores", "Instruction Card", "Rate Table", "Add to Favorites", LABELS.tableSetup, "---",
-        "All Tables", "Favorite Tables", "---",
-        LABELS.filterTables, "---",
-        "Return",
-    ]);
+    const section = entry => sectionHolding(drawnMenuLines(fake), entry);
+    assert.deepEqual(section("Play"), ["Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame]);
+    assert.deepEqual(section("Information"),
+        ["Information", "Flyer", "High Scores", "Instruction Card", "Rate Table", "Add to Favorites", LABELS.tableSetup]);
+    assert.deepEqual(section(LABELS.filterTables), [LABELS.filterTables]);
+    assert.deepEqual(section("Return"), ["Return"]);
     assert.equal(readDrawnMenu(fake).message, null);
     assert.equal(highlightedEntry(fake), "Play", "the cursor opens on the first entry");
 });

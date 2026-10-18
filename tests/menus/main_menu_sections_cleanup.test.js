@@ -11,13 +11,13 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection, mainMenuHasStraySeparator } from "../support/main_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = [
     "uiTranslation", "customMenuCommands", "menuCleanup", "profilePicker", "achievements", "highScores",
     "hallOfFame", "tablesToDiscover", "challenges",
 ];
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
-const SEPARATOR = "---";
 
 test("a non-Admin Profile's cleaned main menu runs in its sections, in French", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 30, 20, 0, 0) });
@@ -34,16 +34,19 @@ test("a non-Admin Profile's cleaned main menu runs in its sections, in French", 
     getProfileStore().switchTo("Alice");
     const LABELS = lang.customMenuLabels;
 
-    fake.openMainMenu();
-    const titles = fake.currentMenu().items.map(item => (item.cmd === -1 && !item.title ? SEPARATOR : item.title));
+    const section = entry => mainMenuSection(fake, entry);
 
-    assert.deepEqual(titles, [
-        "Jouer", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR,
-        lang.profiles.menuEntry, "Vos succès", "Vos statistiques", SEPARATOR,
-        lang.highScores.board.menuEntry, "Noter la table", "Ajouter aux favoris", SEPARATOR,
-        "Toutes les tables", LABELS.challengeTables, LABELS.tablesToDiscoverFilter, LABELS.hallOfFameFilter, "Tables favorites", SEPARATOR,
-        "Filtrer les tables", SEPARATOR,
-        "Retour",
-    ]);
+    assert.deepEqual(section("Jouer"), ["Jouer", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame]);
+    assert.deepEqual(section("Vos succès"), [lang.profiles.menuEntry, "Vos succès", "Vos statistiques"]);
+    assert.deepEqual(section(lang.highScores.board.menuEntry), [lang.highScores.board.menuEntry, "Noter la table", "Ajouter aux favoris"]);
+    assert.deepEqual(section("Filtrer les tables"), ["Filtrer les tables"]);
+    assert.deepEqual(section("Retour"), ["Retour"]);
+    assert.equal(section(LABELS.tableSetup), null, "no Table Setup for a non-Admin Profile");
+
+    fake.openMainMenu();
+    const groups = fake.currentMenu().items.filter(item => item.hasSubmenu).map(item => item.title);
+    fake.closeMenu();
+    assert.deepEqual(groups, ["Filtrer les tables"], "the filter groups are behind it");
+    assert.equal(mainMenuHasStraySeparator(fake), false);
     assertNoErrorLogged(fake);
 });

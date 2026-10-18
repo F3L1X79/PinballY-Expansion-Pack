@@ -2,7 +2,7 @@
 // The "Filter Tables" submenu, through main.js on the fake PinballY
 // globals with PinballY's native menus and Menu Cleanup off: the filter
 // groups leave the main menu for one "Filter Tables" entry with the
-// submenu arrow, above Return; it lists every group in PinballY's order;
+// submenu arrow, in its own section; it lists every group in PinballY's order;
 // a group opens PinballY's own group menu, a filter value applies there;
 // Back and Exit go up one level at a time, the cursor on the entry left
 // (PinballY's own Back in a group menu, MenuReturn, only closes it); with
@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection } from "../support/main_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands"];
 const SEPARATOR = "---";
@@ -55,11 +56,11 @@ test("setup", async () => {
     });
 });
 
-test("the filter groups leave the main menu for one Filter Tables entry with the arrow, above Return", () => {
+test("the filter groups leave the main menu for one Filter Tables entry with the arrow, in its own section", () => {
+    assert.deepEqual(mainMenuSection(fake, lang.customMenuLabels.filterTables), [lang.customMenuLabels.filterTables]);
+
     fake.openMainMenu();
     const items = fake.currentMenu().items;
-
-    assert.deepEqual(currentTitles().slice(-5), ["Favorite Tables", SEPARATOR, lang.customMenuLabels.filterTables, SEPARATOR, "Return"]);
     assert.ok(!currentTitles().some(title => title.startsWith("Filter by")), "no group line left");
     assert.equal(items.find(item => item.title === lang.customMenuLabels.filterTables).hasSubmenu, true);
     fake.closeMenu();

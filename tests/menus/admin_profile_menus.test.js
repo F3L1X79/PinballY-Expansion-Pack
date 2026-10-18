@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection } from "../support/main_menu_reader.js";
 
 const NOW = new Date(2026, 8, 30, 20, 0, 0);
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -41,8 +42,9 @@ test("only the Admin Profiles keep the setup entries, once the household has one
     await import("../../main.js");
     const store = getProfileStore();
 
+    const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
     const mainMenuTitles = () => {
-        fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
+        openMainMenu();
         const titles = fake.currentMenu().items.map(item => item.title);
         fake.closeMenu();
         return titles;
@@ -65,8 +67,9 @@ test("only the Admin Profiles keep the setup entries, once the household has one
     assert.ok(fake.logLines().some(line => line.includes("Bob\\profile.json") && line.includes("isAdmin")));
 
     markFile(fake, "Bob", true);
-    assert.deepEqual(mainMenuTitles(), ["Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame],
-        "a non-admin loses Table Setup, the rest of the launch section stays");
+    assert.equal(mainMenuSection(fake, TABLE_SETUP, openMainMenu), null, "a non-admin loses Table Setup");
+    assert.deepEqual(mainMenuSection(fake, "Play", openMainMenu), ["Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame],
+        "the launch section stays");
     assert.deepEqual(exitMenuTitles(), EXIT_MENU_WITHOUT_OPERATOR_MENU, "and the Operator Menu, nothing else");
 
     store.switchTo("Bob");

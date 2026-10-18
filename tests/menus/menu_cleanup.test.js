@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection, mainMenuHasStraySeparator } from "../support/main_menu_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const markAdmin = (fake, name) =>
@@ -21,7 +22,7 @@ const markAdmin = (fake, name) =>
 // Separators, titled "" (PinballY's) or untitled (the main menu module's), read "---".
 const SEPARATOR = "---";
 const FILTER_TABLES = "Filter Tables";
-const CLEANED_TABLE_LISTS_AND_FILTERS = [SEPARATOR, "All Tables", "Favorites", SEPARATOR, FILTER_TABLES, SEPARATOR, "Return"];
+const INFORMATION_ENTRIES = ["Information", "Flyer", "High Scores", "Instruction Card"];
 const CLEANED_ADMIN_EXIT_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Operator Menu", "Reset profile", SEPARATOR, "Cancel"];
 const CLEANED_EXIT_MENU_WITHOUT_OPERATOR_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Cancel"];
 
@@ -33,7 +34,14 @@ function titlesOf(open) {
     fake.closeMenu();
     return titles;
 }
-const mainMenuTitles = () => titlesOf(() => fake.openMainMenu());
+// The main menu's sections Menu Cleanup leaves, around the table lists.
+function assertCleanedMainMenu(selectedTable) {
+    assert.deepEqual(INFORMATION_ENTRIES.filter(entry => mainMenuSection(fake, entry) !== null), [], "no information entry");
+    assert.deepEqual(mainMenuSection(fake, "Rate Table"), selectedTable);
+    assert.deepEqual(mainMenuSection(fake, FILTER_TABLES), [FILTER_TABLES]);
+    assert.deepEqual(mainMenuSection(fake, "Return"), ["Return"]);
+    assert.equal(mainMenuHasStraySeparator(fake), false);
+}
 const exitMenuTitles = () => titlesOf(() => fake.openExitMenu());
 
 test("Menu Cleanup is the only Add-on off by default", () => {
@@ -59,17 +67,12 @@ test("turned on, Menu Cleanup lightens the menus for every Profile, Admin includ
     markAdmin(fake, "Bob");
 
     store.switchTo("Alice");
-    assert.deepEqual(mainMenuTitles(), [
-        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR,
-        "Rate Table", "Add to Favorites", ...CLEANED_TABLE_LISTS_AND_FILTERS,
-    ]);
+    assert.deepEqual(mainMenuSection(fake, "Play"), ["Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame]);
+    assertCleanedMainMenu(["Rate Table", "Add to Favorites"]);
     assert.deepEqual(exitMenuTitles(), CLEANED_EXIT_MENU_WITHOUT_OPERATOR_MENU);
 
     store.switchTo("Bob");
-    assert.deepEqual(mainMenuTitles(), [
-        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR,
-        "Rate Table", "Add to Favorites", LABELS.tableSetup, ...CLEANED_TABLE_LISTS_AND_FILTERS,
-    ]);
+    assertCleanedMainMenu(["Rate Table", "Add to Favorites", LABELS.tableSetup]);
     assert.deepEqual(exitMenuTitles(), CLEANED_ADMIN_EXIT_MENU);
 
     assertNoErrorLogged(fake);

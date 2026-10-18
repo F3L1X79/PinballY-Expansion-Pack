@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // The Achievement List, started through main.js on the fake PinballY
-// globals: its main menu entry sits in the personal section, after the
-// launch section and a separator, and opens the drawn list of the real
+// globals: its main menu entry sits in the personal section, before the
+// Profile Stats entry, and opens the drawn list of the real
 // Achievements (the Unlocked ones first, the missing ones in natural order
 // with their Achievement Progress). Exit reopens the main menu on the entry; opened
 // from the Profile Stats' Achievements button, Exit shows the Profile Stats again.
@@ -14,6 +14,7 @@ import config from "../../common/core/config.js";
 import { pressAndGlide, readRows, isListOpen, untilListShown } from "./achievement_list_reader.js";
 import { openProfileStats, buttons, choose, isProfileStatsOpen } from "../stats/profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection } from "../support/main_menu_reader.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 const SECONDS_PER_HOUR = 3600;
@@ -45,9 +46,6 @@ const GUEST_NOTIFIED = ["collectionMilestone:10percent", "collectionMilestone:fi
 
 const ADD_ONS_UNDER_TEST = ["customMenuCommands", "achievements"];
 
-// A separator has no title.
-const SEPARATOR = undefined;
-
 test("the Achievement List entry sits in the personal section, lists the real Achievements and Exit goes back one level", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
     fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({ version: 1, plays: GUEST_PLAYS, notified: GUEST_NOTIFIED }));
@@ -61,27 +59,14 @@ test("the Achievement List entry sits in the personal section, lists the real Ac
     const { default: lang } = await import("../../common/core/i18n.js");
     const TEXT = lang.achievementList;
     const ACHIEVEMENT = lang.achievements;
-    const MENU_LABELS = lang.customMenuLabels;
     const progress = (unit, current, target) => TEXT.progressUnits[unit].short(current, target);
     await import("../../main.js");
     await settle();
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }, { title: "Exit", cmd: 99 }]);
-    openMainMenu();
-    assert.deepEqual(fake.currentMenu().items.map(item => item.title), [
-        "Play",
-        MENU_LABELS.tableOfTheDay,
-        MENU_LABELS.tableOfTheWeek,
-        MENU_LABELS.randomGame,
-        SEPARATOR,
-        TEXT.menuEntry,
-        lang.profileStats.menuEntry,
-        SEPARATOR,
-        MENU_LABELS.tableSetup,
-        SEPARATOR,
-        "Exit",
-    ]);
+    assert.deepEqual(mainMenuSection(fake, TEXT.menuEntry, openMainMenu), [TEXT.menuEntry, lang.profileStats.menuEntry]);
 
+    openMainMenu();
     fake.selectMenuItem(TEXT.menuEntry);
     untilListShown(fake);
     const rows = readRows(fake, TEXT);

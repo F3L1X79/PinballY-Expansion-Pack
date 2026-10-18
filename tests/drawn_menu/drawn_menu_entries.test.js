@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { isDrawnMenuShown, drawnMenuLines, highlightedEntry, openMainMenu, chooseEntry } from "./drawn_menu_reader.js";
+import { sectionHolding } from "../support/main_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "achievements", "menuCleanup", "drawnMenus"];
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -39,14 +40,13 @@ test("a non-admin Profile's main menu shows the final entries, translated and cl
     openMainMenu(fake);
 
     assert.equal(fake.currentMenu(), null);
-    assert.deepEqual(drawnMenuLines(fake), [
-        "Jouer", "Lancer la table du jour", "Lancer la table de la semaine", "Lancer une table au hasard", "---",
-        "Vos succès", "Vos statistiques", "---",
-        "Noter la table", "Ajouter aux favoris", "---",
-        "Toutes les tables", "Tables favorites", "---",
-        "Filtrer les tables", "---",
-        "Retour",
-    ]);
+    const section = entry => sectionHolding(drawnMenuLines(fake), entry);
+    assert.deepEqual(section("Jouer"), ["Jouer", "Lancer la table du jour", "Lancer la table de la semaine", "Lancer une table au hasard"]);
+    assert.deepEqual(section("Vos succès"), ["Vos succès", "Vos statistiques"]);
+    assert.deepEqual(section("Noter la table"), ["Noter la table", "Ajouter aux favoris"]);
+    assert.deepEqual(section("Filtrer les tables"), ["Filtrer les tables"]);
+    assert.deepEqual(section("Retour"), ["Retour"]);
+    assert.equal(section(lang.customMenuLabels.tableSetup), null, "no Table Setup for a non-admin Profile");
 });
 
 test("back from the Achievement List, the menu opens again on its entry", () => {

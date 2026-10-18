@@ -11,10 +11,10 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection, mainMenuHasStraySeparator } from "../support/main_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "menuCleanup", "profilePicker"];
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
-const SEPARATOR = "---";
 
 test("with no selected-table entry shown, the main menu has no selected-table section", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 30, 20, 0, 0) });
@@ -32,7 +32,7 @@ test("with no selected-table entry shown, the main menu has no selected-table se
     const LABELS = lang.customMenuLabels;
     const { PlayGame, GameInfo, Flyer, HighScores, Instructions, FilterFirst, FilterByEra, MenuReturn } = globalThis.command;
 
-    fake.openMenu("main", [
+    const openMainMenu = () => fake.openMenu("main", [
         { title: "Play", cmd: PlayGame },
         { title: "", cmd: -1 },
         { title: "Information", cmd: GameInfo },
@@ -47,14 +47,13 @@ test("with no selected-table entry shown, the main menu has no selected-table se
         { title: "", cmd: -1 },
         { title: "Return", cmd: MenuReturn },
     ]);
-    const titles = fake.currentMenu().items.map(item => (item.cmd === -1 && !item.title ? SEPARATOR : item.title));
+    const section = entry => mainMenuSection(fake, entry, openMainMenu);
 
-    assert.deepEqual(titles, [
-        "Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame, SEPARATOR,
-        lang.profiles.menuEntry, SEPARATOR,
-        "All Tables", SEPARATOR,
-        LABELS.filterTables, SEPARATOR,
-        "Return",
-    ]);
+    for (const entry of ["Information", "Flyer", "High Scores", "Instruction Card", LABELS.tableSetup]) {
+        assert.equal(section(entry), null, entry);
+    }
+    assert.deepEqual(section(lang.profiles.menuEntry), [lang.profiles.menuEntry]);
+    assert.deepEqual(section("All Tables"), ["All Tables"]);
+    assert.equal(mainMenuHasStraySeparator(fake, openMainMenu), false);
     assertNoErrorLogged(fake);
 });

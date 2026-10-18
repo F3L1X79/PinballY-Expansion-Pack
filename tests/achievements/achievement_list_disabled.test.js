@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { mainMenuSection } from "../support/main_menu_reader.js";
 
 test("no Achievement List or Profile Stats entry when the achievements Add-on is disabled", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 10, 0, 0) });
@@ -23,14 +24,10 @@ test("no Achievement List or Profile Stats entry when the achievements Add-on is
     const MENU_LABELS = lang.customMenuLabels;
     await import("../../main.js");
 
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    assert.deepEqual(fake.currentMenu().items.map(item => item.title), [
-        "Play",
-        MENU_LABELS.tableOfTheDay,
-        MENU_LABELS.tableOfTheWeek,
-        MENU_LABELS.randomGame,
-        undefined,
-        MENU_LABELS.tableSetup,
-    ]);
+    const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
+    assert.equal(mainMenuSection(fake, lang.achievementList.menuEntry, openMainMenu), null);
+    assert.equal(mainMenuSection(fake, lang.profileStats.menuEntry, openMainMenu), null);
+    assert.deepEqual(mainMenuSection(fake, "Play", openMainMenu),
+        ["Play", MENU_LABELS.tableOfTheDay, MENU_LABELS.tableOfTheWeek, MENU_LABELS.randomGame]);
     assertNoErrorLogged(fake);
 });
