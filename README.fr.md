@@ -97,7 +97,7 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 **Et aussi** :
 - les menus de PinballY (menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur) dessinés dans le style Steamball du pack, mêmes entrées, rangées en sections, et mêmes boutons ; un menu principal plus court range toutes les sélections de la roue et les groupes de filtres derrière une seule entrée « Changer de filtre », et nomme sous sa liste le filtre affiché par la roue (« Filtre actif : Toutes les tables ») ;
 - une table au hasard sur une roue de la fortune ;
-- « Tables à découvrir », « Tables les plus jouées », « Tables de mes High-Scores » (les tables où vous avez une place au tableau), « Tables favorites », « Tables masquées » (tant qu'une table est masquée) et « Tables Originales » derrière « Changer de filtre » ;
+- « Tables à découvrir », « Tables les plus jouées », « Mes meilleurs scores » (les tables où vous avez une place au tableau), « Tables favorites », « Tables masquées » (tant qu'une table est masquée) et « Tables Originales » derrière « Changer de filtre » ;
 - une horloge, l'arc doré de la roue et une ligne d'état enrichie ;
 - un rappel pour noter une table ;
 - un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente, l'étape en cours écrite en doré dessous quand une table se lance ou se ferme (« Chargement en cours… », « Retour aux tables… ») : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar ;

@@ -79,13 +79,19 @@ export const pointsOf = px => px * 72 / 96;
 
 const heightOf = row => LOOK.rowHeights[row.kind];
 
+// Window pixels per reference pixel in a window ({ width, height }): its
+// height's scale, zoomed out when the panel would take too much of its width.
+export function menuScaleOf({ width, height }) {
+    const windowScale = height / LOOK.referenceHeight;
+    return windowScale * Math.min(1, LOOK.maxWidthShare * (width / windowScale) / DRAWN_MENU_PANEL_WIDTH);
+}
+
 // The menu's layout in the window ({ width, height }), in window pixels
 // unless named "Ref" (reference pixels): k turns the one into the other.
 // messageHeightAt(widthPx, sizePx) measures the message, when there is one.
 export function computeGeometry({ width, height }, model, messageHeightAt) {
-    const windowScale = height / LOOK.referenceHeight;
-    const zoom = Math.min(1, LOOK.maxWidthShare * (width / windowScale) / DRAWN_MENU_PANEL_WIDTH);
-    const k = windowScale * zoom;
+    const k = menuScaleOf({ width, height });
+    const zoom = k / (height / LOOK.referenceHeight);
     const listWidth = DRAWN_MENU_LIST_WIDTH * k;
     let rowTopRef = 0;
     const rowTopsRef = model.rows.map(row => {

@@ -1,6 +1,6 @@
 // ============================================================
 // My High Scores in French, through main.js on the fake PinballY globals:
-// the entry reads "Tables de mes High-Scores", right under "Tables les plus
+// the entry reads "Mes meilleurs scores", right under "Tables les plus
 // jouées".
 // ============================================================
 
@@ -16,7 +16,7 @@ const HIGH_SCORES = {
     highScores: [],
 };
 
-test("the French entry reads Tables de mes High-Scores", async () => {
+test("the French entry reads Mes meilleurs scores", async () => {
     const { fake } = await startHighScores({
         addOns: ["highScores", "hallOfFame"],
         profiles: { Alice: {} },
@@ -25,8 +25,8 @@ test("the French entry reads Tables de mes High-Scores", async () => {
         language: "fr",
     });
 
-    assert.deepEqual(filterPickerSection(fake, "Tables de mes High-Scores"),
-        ["All Tables", "Tables les plus jouées", "Tables de mes High-Scores", "Favorites"]);
+    assert.deepEqual(filterPickerSection(fake, "Mes meilleurs scores"),
+        ["All Tables", "Tables les plus jouées", "Mes meilleurs scores", "Favorites"]);
 
     assertNoErrorLogged(fake);
 });

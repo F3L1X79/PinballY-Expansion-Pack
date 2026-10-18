@@ -43,7 +43,7 @@ import { getDrawingAhead } from "../core/drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "../core/navigation_sound.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER } from "./drawn_menu_images.js";
 import {
-    DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, pointsOf, computeGeometry, rowHeightIn, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
+    DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, pointsOf, computeGeometry, menuScaleOf, rowHeightIn, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
 } from "./drawn_menu_painter.js";
 import { STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 
@@ -178,13 +178,14 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         });
     }
 
-    // At its size in this window, stretched later for a middle slice.
+    // At the menu's size in this window, stretched later for a middle slice.
     function drawImage(record) {
-        const k = windowSize.height / DRAWN_MENU_LOOK.referenceHeight;
+        const k = menuScaleOf(windowSize);
         const width = Math.max(1, Math.round(record.image.width * k));
         const height = Math.max(1, Math.round(record.image.height * k));
         record.layer.clear(TRANSPARENT);
         record.layer.draw(dc => dc.drawImage(`${imagesFolder}\\${record.image.file}`, 0, 0, width, height), width, height);
+        record.size = { width, height };
         record.signature = windowSignature();
     }
 
@@ -224,20 +225,23 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     }
 
     // A top, a middle stretched to the panel's length and a bottom; the
-    // middle is hidden when the ends already meet.
-    function placeStack([top, middle, bottom], box, k) {
-        const topHeight = top.image.height * k;
-        const bottomHeight = bottom.image.height * k;
-        const middleHeight = box.height - topHeight - bottomHeight;
-        place(top.layer, { ...box, height: topHeight }, false);
-        place(bottom.layer, { ...box, y: box.y + box.height - bottomHeight, height: bottomHeight }, false);
-        if (middleHeight < 0.5) {
+    // middle is hidden when the ends already meet. The ends are shown at
+    // their drawn size on whole pixels: resampled, PinballY's filtering
+    // blends an end's first row with its last (the panel's light edge, the
+    // glass's dark one), a 1 px line across the panel.
+    function placeStack([top, middle, bottom], box) {
+        const x = Math.round(box.x);
+        const topY = Math.round(box.y);
+        const bottomY = Math.round(box.y + box.height) - bottom.size.height;
+        const width = top.size.width;
+        place(top.layer, { x, y: topY, width, height: top.size.height }, false);
+        place(bottom.layer, { x, y: bottomY, width, height: bottom.size.height }, false);
+        const middleY = topY + top.size.height;
+        if (bottomY - middleY < 1) {
             hide(middle.layer);
             return [top.layer, bottom.layer];
         }
-        // A pixel into each end: the ends meet the middle between two
-        // pixels, where PinballY's filtering leaves a faint seam row.
-        place(middle.layer, { ...box, y: box.y + topHeight - 1, height: middleHeight + 2 }, true);
+        place(middle.layer, { x, y: middleY, width, height: bottomY - middleY }, true);
         return [top.layer, middle.layer, bottom.layer];
     }
 
@@ -366,9 +370,9 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         backdrop.setPos(0, 0);
         shown.layers = [
             backdrop,
-            ...placeStack(panel, geometry.panel, geometry.k),
+            ...placeStack(panel, geometry.panel),
             textsLayer, outline.layer, selectedTextLayer,
-            ...placeStack(glass, geometry.panel, geometry.k),
+            ...placeStack(glass, geometry.panel),
         ];
         if (!fadeIn) {
             setAlpha(1);
