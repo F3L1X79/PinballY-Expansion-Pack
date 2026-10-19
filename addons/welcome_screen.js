@@ -381,17 +381,17 @@ export default function init() {
 
     // Read again when the screen opens, the cursor on the cross; nothing
     // more while the screen is still waiting or open.
-    function submitAgain() {
+    function reopenWelcomeScreen() {
         if (!isSubmitted && !closeDialog) submit(CHOICE.EXIT_BUTTON);
     }
 
     // Through the wheel dialog module rather than opened directly, so that
     // toasts and other dialogs wait for it.
-    getMainMenu().add({ name: "welcomeScreen", label: TEXT.menuEntry, position: MAIN_MENU_POSITION.WELCOME_SCREEN, action: submitAgain });
+    getMainMenu().add({ name: "welcomeScreen", label: TEXT.menuEntry, position: MAIN_MENU_POSITION.WELCOME_SCREEN, action: reopenWelcomeScreen });
 
     // Fires on every switch, which the Profile picker makes only to another
     // Profile: the new player is welcomed too.
-    store.onSwitch(safeHandler(SCRIPT_NAME, submitAgain));
+    store.onSwitch(safeHandler(SCRIPT_NAME, reopenWelcomeScreen));
 
     // Fires on every mapped button press; drives the screen while it is
     // open. Async because the Random Game animates the wheel, so its

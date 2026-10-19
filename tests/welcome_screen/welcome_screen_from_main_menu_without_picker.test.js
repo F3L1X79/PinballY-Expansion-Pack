@@ -29,5 +29,6 @@ test("without the Profile picker, the Welcome Screen from the main menu has no C
     assert.equal(isWelcomeScreenOpen(fake), true, "Guest gets the entry");
     assert.deepEqual(readChoices(fake), [lang.buttonHints.close, TEXT.randomTable, TEXT.stayOnWheel]);
     press(fake, "Exit");
+    await settle();
     assertNoErrorLogged(fake);
 });
