@@ -1,26 +1,12 @@
 ﻿// ============================================================
-// Profile store: the only module that knows the Profiles folder
-// (Scripts\ExpansionPack\profiles). Each Profile is a sub-folder named
-// after it, with its Avatar and its profile.json; cabinet.json, next to them, holds what the
-// household shares: the active Profile and the Period Table locks. Files
-// are read at startup and on each switch, kept in memory, and rewritten
-// whole on every change (tmp, backup, rename). A broken file comes back
-// from its backup, or is set aside under a dated name when the backup is
-// broken too; every such problem is logged to logfile.log. A Profile's
-// marks (isAdmin, isChild), set by hand in its profile.json, are read and kept
-// through every rewrite, never written. A Profile Reset erases a Profile's
-// play-based data, after keeping a dated copy of its former profile.json
-// and renaming its Play Log year files to dated reset copies.
-// Listens to "gamestarted" / "gameover" to decide whether a game is a Play
-// (at least a minute, its start seen): only a Play enters the table totals
-// of the Profile active when it started, and that Profile's Play Log: one
-// play-log-<year>.json per year of the Plays' start (ADR 0007), saved like
-// profile.json, read only when a Play is added or asked for. At startup,
-// creates the Guest folder and writes cabinet.json when they are missing.
-// Tells its listeners of every switch (onSwitch), every saved change of a
-// Profile's data (onUpdate) and every Play (onPlay, ADR 0008). Another
-// module's cabinet-level file (such as table_roms.json) sits next to
-// cabinet.json, read and saved the same way, and no Profile Reset touches it.
+// Profile store: the only module that knows the Profiles folder: one
+// sub-folder per Profile (Avatar, profile.json, Play Log), and cabinet.json
+// for the household. Decides which game is a Play (ADR 0007) and tells its
+// listeners of each switch, update and Play (onPlay, ADR 0008). Handles the
+// Profile Reset. Listens to "gamestarted" / "gameover".
+// - Every write is whole: tmp, backup, rename; a broken file comes back from its backup.
+// - isAdmin and isChild are set by hand: read and kept, never written.
+// - Other cabinet-level files sit next to cabinet.json; no Profile Reset touches them.
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";

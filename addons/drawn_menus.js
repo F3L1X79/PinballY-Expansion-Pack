@@ -1,16 +1,10 @@
 // ============================================================
-// Drawn Menus (on by default, ADD_ON_DRAWN_MENUS): the player's menus are
-// drawn in the pack's Steamball look by the Drawn Menu module instead of
-// PinballY's native ones (see docs/adr/0013). Listens to "menuopen" last
-// of all the Add-ons, so it sees the final entries; for one of the menus
-// it draws, it hands over a copy of them and cancels the native menu only
-// once drawing succeeded (preventDefault() and menuUpdated back to false),
-// so the native menu shows on any error. Any
-// other menu stays native, and replaces an open Drawn Menu. Exit or a
-// Cancel entry in a filter submenu goes back to the menu that opened it
-// (the Filter Picker for a group), the cursor on its entry; Exit in the
-// Filter Picker goes back to the main menu, on its entry. A Drawn main
-// menu shows the "Change Filter" entry and a footer naming the Active Filter.
+// Drawn Menus (on by default): draws the player's menus in the Steamball
+// look through the Drawn Menu module instead of PinballY's native ones
+// (see docs/adr/0013). Listens to "menuopen".
+// - Listens last of all the Add-ons, so it sees the final entries.
+// - Cancels the native menu only once drawing succeeded: any error shows the native one.
+// - Any other menu stays native and replaces an open Drawn Menu.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";

@@ -1,15 +1,9 @@
 // ============================================================
-// The Profile Stats' TASTES section in French, through main.js on the fake
-// PinballY globals: the favourite manufacturer and decade with their play
-// time in a pill (by play seconds, then games, then alphabetical order,
-// never the community tables manufacturer), then the first table played
-// strip (the earliest Play across the Play Log's years, reset copies left
-// out, with its date), the favourite table strip (the Hall of Fame's first
-// table) and the last table played strip (the latest lastPlayed of the
-// Profile's plays, with its date), each with its wheel logo, or else the scrambled TV of the
-// missing image (its cleaned title when that asset is unreadable), next to
-// its cleaned name; "—" everywhere for a Profile with no Play and an empty
-// Play Log.
+// The Profile Stats' TASTES section in French: favourite manufacturer and
+// decade by play time, then the first, favourite and last table strips with
+// wheel logo or the missing image; "—" everywhere with no Play.
+// - The community tables manufacturer is never the favourite.
+// - Reset copies of the Play Log are left out of the first table played.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,11 +1,8 @@
 // ============================================================
-// Adds a "Hall of Fame" filter to PinballY's main menu, after the
-// Tables to Discover and right before the Favorite Tables: the wheel then
-// shows the active Profile's Hall of Fame tables, among the tables it can
-// see, in rank order, each table its own Next/Previous Page stop.
-// Registered once at init; the ranking is recomputed each time the filter
-// is activated, and on a Profile switch or a Profile Reset of the active
-// Profile while the filter is on the wheel.
+// Adds a "Hall of Fame" filter to the main menu, before Favorite Tables:
+// the active Profile's Hall of Fame tables it can see, in rank order.
+// The ranking is recomputed when the filter is activated, and on a Profile
+// switch or Reset while the filter is on the wheel.
 // ============================================================
 
 import lang from "../common/core/i18n.js";

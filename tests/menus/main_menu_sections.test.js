@@ -1,11 +1,8 @@
 // ============================================================
-// The main menu's sections, through main.js on the fake PinballY globals,
-// Menu Cleanup off: Play and the launches, the selected table (High Score
-// Board, PinballY's table entries, Rate Table, Add to Favorites, Table
-// Setup last for an Admin Profile only), the player, any entry the pack
-// does not know, then the Filter Picker's entry with Return; a section with no
-// entry shown goes with its separator. The one test of the whole order:
-// the others read their own section (support/main_menu_reader.js).
+// The main menu's sections through main.js, Menu Cleanup off: Play and
+// launches, the selected table, the player, unknown entries, then the Filter
+// Picker with Return; an empty section goes with its separator.
+// - The one test of the whole order: others read their own section (support/main_menu_reader.js).
 // ============================================================
 
 import { test } from "node:test";

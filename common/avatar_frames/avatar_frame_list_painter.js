@@ -1,13 +1,7 @@
 // ============================================================
-// Avatar Frame list painter: the layout and drawing of the list opened
-// from the Profile Stats' Frame button, in reference pixels (the window's
-// height is REFERENCE_HEIGHT), in the Profile Stats' own look: the
-// centred Steamball panel (drawn by steamball_drawing.js's backdrop), its title, one row per frame
-// (the player's Avatar in that frame, the frame's name, and the worn mark
-// or the unlock condition), the Exit Button at the title's right end with
-// its tooltip shown while it is selected, and the Button Hints in a footer
-// under the rows; the Selection Marker surrounds the selected row or the
-// Exit Button. Only drawing: no layer, no event, no side effect.
+// Avatar Frame list painter: layout and drawing of the frame list, in the
+// Profile Stats' look, in reference pixels (window height = REFERENCE_HEIGHT).
+// Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";

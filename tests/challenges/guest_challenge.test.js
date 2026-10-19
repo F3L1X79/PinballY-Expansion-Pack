@@ -1,10 +1,7 @@
 // ============================================================
-// Guest follows the weekly Challenge like any other Profile, through
-// main.js on the fake PinballY globals: the Challenge Card, the counted
-// games, the Challenge Toast, the Challenge Tables, the Challenges
-// Achievements, the Profile Stats' completed Challenges and the verdict on the previous week. Guest
-// still never shows in the Unlock Rate, and each Profile keeps its own
-// progress across switches.
+// Guest follows the weekly Challenge like any Profile through main.js: card,
+// counted games, toast, Challenge Tables, Achievements, Profile Stats and
+// verdict. Guest never shows in the Unlock Rate; progress is per Profile.
 // ============================================================
 
 import { test } from "node:test";

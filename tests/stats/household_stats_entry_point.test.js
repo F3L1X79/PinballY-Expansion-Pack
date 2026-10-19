@@ -1,10 +1,7 @@
 // ============================================================
-// The Household Stats' way in, through main.js on the fake PinballY
-// globals: the Profile Stats' "Household Stats" button, after the other
-// foot buttons, shows once the Household has two Profiles, Guest seeing it
-// too, with the count of Profiles they set side by side (Guest left out);
-// Exit on the Household Stats shows the Profile Stats again on that button,
-// and attract mode closes them.
+// The way into the Household Stats: the Profile Stats' "Household Stats"
+// button shows from two Profiles, with their count; Exit goes back to the
+// Profile Stats on that button; attract mode closes both.
 // ============================================================
 
 import { test } from "node:test";

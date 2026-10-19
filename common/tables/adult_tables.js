@@ -1,12 +1,8 @@
 ﻿// ============================================================
-// Adult Tables: the tables in the category set aside for adults
-// (config.adultCategory, "NSFW" by default, matched exactly like
-// PinballY's category tags), which a Child Profile never sees.
-// installChildWheelFilter() puts a PinballY metafilter on top of every
-// filter, leaving the Adult Tables off the wheel (and so out of the Random
-// Game) while a Child Profile is active; it listens to the Profile
-// switches to run the filter again at once, which also moves the wheel off
-// an Adult Table that was current.
+// Adult Tables: the tables in config.adultCategory ("NSFW" by default), which
+// a Child Profile never sees. installChildWheelFilter() adds a metafilter
+// that hides them from the wheel while a Child Profile is active.
+// - The filter runs again on each Profile switch, moving off a current Adult Table.
 // ============================================================
 
 import config from "../core/config.js";

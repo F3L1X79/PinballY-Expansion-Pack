@@ -1,14 +1,9 @@
 // ============================================================
 // Mastery Bar: the selected table's Table Mastery at the top right of the
-// wheel screen, a Steamball panel headed by the Mastery Level's name in
-// its metal, a bar filling toward the next level and the level's number
-// in a square with a halo at the bar's end; "To discover" over an empty
-// bar for a table never played. Every state is drawn ahead on its own
-// layer through the Drawing ahead module (ADR 0010), then only shown or
-// hidden; a state still missing is drawn on the spot. Its place (under
-// the Challenge Card or in its place) is asked for on each show. Lights
-// up on demand for about 1.2 s, drawn on the spot on a layer of its own.
-// Also gives the Collection Mastery's texts to the screens that show it.
+// wheel screen (level name, bar, level square). Lights up on demand. Also
+// gives the Collection Mastery's texts to the screens that show it.
+// - Every state is drawn ahead on its own layer (ADR 0010), then only shown or hidden.
+// - Its place (under the Challenge Card or in its place) is asked on each show.
 // ============================================================
 
 import lang from "../core/i18n.js";

@@ -1,12 +1,7 @@
 // ============================================================
-// Reads the Drawn Menu the way the player sees it, on the fake PinballY
-// host: whether one is shown, its message, its rows from top to bottom
-// (an entry with its title and its gold mark, a heading or a separator),
-// its footer,
-// the highlighted entry (the one written in gold on the selection), and
-// helpers to open a menu, press buttons and choose an entry by its
-// title, letting the fade in and the glide end.
-// Never loaded by PinballY.
+// Reads the Drawn Menu as the player sees it, on the fake host: message,
+// rows, footer, highlighted entry; plus helpers to open a menu, press
+// buttons and choose an entry by title. Never loaded by PinballY.
 // ============================================================
 
 import { DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, DRAWN_MENU_MARKS } from "../../common/drawn_menu/drawn_menu_painter.js";

@@ -1,10 +1,7 @@
 // ============================================================
-// Active-Profile badge, through main.js on the fake PinballY globals: the
-// active Profile's Avatar and name drawn at the top right of the wheel
-// screen (Guest's name translated), redrawn right after a switch, hidden
-// while a game runs and shown again back on the wheel. Its proportions
-// never depend on the window size at the time it was drawn (at startup the
-// window is not laid out yet).
+// Active-Profile badge through main.js: Avatar and name at the top right,
+// redrawn after a switch, hidden during a game, shown back on the wheel.
+// - Its proportions never depend on the startup window size, not laid out yet.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,44 +1,13 @@
 ﻿// ============================================================
-// Profile Stats module: the drawn screen the player opens from the main
-// menu to sum up the active Profile's own plays: a centred Steamball
-// panel over the dimmed wheel, laid out by the Profile Stats painter,
-// with the Avatar, the Profile's name, the Player Level and the
-// Collection Mastery on a card whose foot holds the Achievements, Frame,
-// Most Played Tables, Tables to Discover and Household buttons, and the GAME, PROGRESSION
-// and TASTES sections on its right (PROGRESSION ending with the High Scores
-// and Table Records held, TASTES with the first, favourite and
-// last table strips, read from the Play Log, the Hall of Fame and the plays). Every stat is read again on each
-// opening, one section per step of the shared screen opening (docs/adr/0014).
-// Created from the PinballY host, the Profile store, readers of a named
-// Profile's Player Level and Achievements Unlocked, the Achievement List
-// (opening it from the Achievements button, Exit there showing this screen
-// again at once, as it was left), the Profile Rewards module (the worn Avatar
-// Frame around the Avatar; null: none), the Avatar Frame list (its count,
-// and opening it from the Frame button, Select or Exit there showing this
-// screen again at once on that button, or opening it again when the worn
-// frame changed; null or without frames: no button), the Daily Streak, the Table of the Day and Table
-// of the Week (their Streaks), the Challenge module (null when the
-// Challenges Add-on is disabled: no completed Challenges), the High Score
-// store (null when the High Scores Add-on is disabled: no High Scores nor
-// Table Records held) and the full ids of the Hall of
-// Fame and Tables to Discover filters (null when their Add-on is
-// disabled: no button) and the Household Stats (opened from the Household
-// button, shown while the Household has two Profiles; Exit there shows
-// this screen again at once). While the Achievement List, the Avatar
-// Frame list or the Household Stats is open, this screen waits set aside,
-// hidden; attract mode, the
-// child failing to open or a final Exit removes it. While open it swallows every button through
-// "commandbuttondown": Next / Prev move the Selection Marker (a gold glow
-// flowing round the choice) through the Exit Button and the buttons, looping, with PinballY's navigation sound; Select or Launch (the plunger) runs the choice, Exit closes
-// and calls the return given to open(); attract mode only closes it.
-// Opens directly, not through the wheel dialog module:
-// the player asked for it. Can also open the frame list straight away, for
-// the Reward Prompt. openReadOnly() opens another Profile's screen from its
-// Household Stats column: its own values and tables (Adult Tables
-// included, whoever looks), no button at the card's foot, Exit or Select
-// on the Exit Button going back there. isOpen() and onClosed() let the wheel
-// dialogs wait for it. readStats() reads the values it shows for any
-// named Profile, writing nothing.
+// Profile Stats: the drawn screen summing up the active Profile's plays
+// (card with Player Level and Collection Mastery, GAME, PROGRESSION and
+// TASTES sections). Its buttons open the Achievement List, the Avatar Frame
+// list, the filters and the Household Stats; this screen waits set aside
+// meanwhile. openReadOnly() shows another Profile's, readStats() reads any.
+// - Read again on each opening, one section per step (docs/adr/0014).
+// - Swallows every button through "commandbuttondown" while open.
+// - A null dependency (disabled Add-on) hides its line or button.
+// - Opens directly, not through the wheel dialog module; isOpen() / onClosed() for the dialogs.
 // ============================================================
 
 import lang from "../core/i18n.js";

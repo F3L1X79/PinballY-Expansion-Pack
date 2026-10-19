@@ -1,15 +1,8 @@
 ﻿// ============================================================
-// Achievement Toast module on the fake host: a batch stacks with the
-// newest card lowest, at most five cards on screen, the others arriving as
-// the oldest ones leave, on drawing layers reused from a pool. A card holds
-// for the configured duration (4 s when out of range, with a log line), the
-// configured scale enlarges the whole card (1 when out of range, logged)
-// and the configured sound plays once per card, a failing one only logged.
-// A Challenge Toast shares the queue, with its own header and target icon.
-// A celebrated toast starts the Confetti Shower, unless it went stale; a
-// Level Toast starts the Fireworks, and failing ones never stop it.
-// An Achievement Toast shows its Achievement Rank's emblem in the Rank's
-// colour, the trophy when that emblem's file is missing (logged once).
+// Achievement Toast module on the fake host: stacking (at most five), hold
+// duration, scale and sound settings (out of range values logged), Challenge
+// Toasts in the same queue, Confetti Shower and Fireworks starts, and rank
+// emblems with the trophy fallback.
 // ============================================================
 
 import { test } from "node:test";

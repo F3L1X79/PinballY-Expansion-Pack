@@ -1,10 +1,7 @@
 // ============================================================
-// The main menu in English, through main.js on the fake PinballY globals:
-// the Achievement List and Profile Stats entries read "Your Achievements" and
-// "Your Stats", PinballY's Favorites filter reads "Favorite Tables",
-// and the screens keep their own titles. Among the [Top] filters, the
-// Tables to Discover and the Hall of Fame sit, in that order, after the
-// Challenge Tables and before the Favorite Tables.
+// The main menu in English through main.js: "Your Achievements", "Your
+// Stats", "Favorite Tables", the screens keeping their own titles, and
+// Tables to Discover then Hall of Fame between Challenge Tables and Favorites.
 // ============================================================
 
 import { test } from "node:test";

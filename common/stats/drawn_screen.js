@@ -1,11 +1,8 @@
 // ============================================================
-// Drawn screen: the layer plumbing the Profile Stats, the Household Stats
-// and the High Score Board share: hidden layers placed in reference pixels
-// after the backdrop (which measures the window), faded in together and
-// removed on close; a prepared screen can also be set aside (hidden while
-// a child screen is open) and shown again at once. openDrawnScreen() draws
-// at once; prepareDrawnScreen() goes through the shared screen opening
-// (docs/adr/0014). Writes nothing.
+// Drawn screen: the layer plumbing shared by the Profile Stats, the Household
+// Stats and the High Score Board: placing, fading in, setting aside and
+// removing. openDrawnScreen() draws at once; prepareDrawnScreen() goes
+// through the shared screen opening (docs/adr/0014). Writes nothing.
 // ============================================================
 
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";

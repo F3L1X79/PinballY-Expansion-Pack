@@ -1,13 +1,8 @@
 // ============================================================
-// Table ROM record: the Table ROMs Add-on's memory, in table_roms.json next
-// to cabinet.json (through the Profile store, so no Profile Reset touches
-// it), rewritten whole on each change. Per table (by config ID): the
-// state of its game file (and of the .vbs beside it) when its script was
-// last read, with the ROM found or null for "no ROM"; and the ROM the
-// Add-on last wrote into PinballY, with its source. A finding goes through
-// the single rule of decideRomWrite(): written into PinballY's ROM field
-// with the game's update(), or a disagreement logged, every write logged.
-// A table is "no ROM" when its script loads none and no .nv confirmed one.
+// Table ROM record: the Table ROMs Add-on's memory in table_roms.json next to
+// cabinet.json: per table, its file state when last read, the ROM found and
+// the ROM last written into PinballY. Every write goes through decideRomWrite().
+// - Saved through the Profile store, so no Profile Reset touches it.
 // ============================================================
 
 const RECORD_NAME = "table_roms";

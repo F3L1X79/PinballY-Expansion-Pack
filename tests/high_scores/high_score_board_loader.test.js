@@ -1,11 +1,7 @@
 // ============================================================
-// The High Score Board's Loader, through main.js on the fake PinballY
-// globals: the comet turns on the top third, above the board, while the
-// opened table's board is read fresh, and goes as soon as the board is
-// redrawn with the read's outcome (fresh board, no score, failed, not
-// supported, not learned) or closed by Exit or attract mode; a read ending
-// after close does not bring it back. It waits for the board's fade in,
-// and never comes when the read ends or the board closes before then.
+// High Score Board Loader: turns above the board while it is read fresh,
+// after the fade in, and goes with the read's outcome, Exit or attract mode;
+// a read ending after close never brings it back.
 // ============================================================
 
 import { test } from "node:test";

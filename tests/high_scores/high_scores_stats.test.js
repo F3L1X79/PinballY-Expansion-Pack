@@ -1,11 +1,7 @@
 // ============================================================
-// The High Scores lines of the Profile Stats and the Household Stats,
-// through main.js on the fake PinballY globals: High Scores held and
-// Table Records held, counted in tables still on the last known boards,
-// the same on a Profile's own screen and its read-only one; a Profile
-// pushed off a board stops counting that table while its High Score stays
-// in the file; a Profile Reset changes nothing; the Household's Table
-// Records held line, the most in gold.
+// High Scores lines of the Profile Stats and Household Stats: High Scores and
+// Table Records held, counted on the last known boards, the same read-only;
+// a pushed-off place stops counting; a Profile Reset changes nothing.
 // ============================================================
 
 import { test } from "node:test";

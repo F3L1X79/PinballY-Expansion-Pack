@@ -1,10 +1,7 @@
 // ============================================================
-// What a Drawn Menu shows of PinballY's items, through main.js on the
-// fake PinballY globals with only the Drawn Menus Add-on on: the paging
-// entries are gone, a titled static item is a heading the cursor skips,
-// runs of separators collapse to one and none starts or ends the list,
-// checked and radio entries carry a gold mark and a submenu entry a gold
-// chevron, and the cursor opens on the item marked "selected".
+// What a Drawn Menu keeps of PinballY's items: no paging entries, titled
+// static items as headings, collapsed separators, gold marks and chevrons,
+// the cursor on the item marked "selected".
 // ============================================================
 
 import { test } from "node:test";

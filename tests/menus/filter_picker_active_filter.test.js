@@ -1,10 +1,7 @@
 // ============================================================
-// The Active Filter in the main menu and in the Filter Picker, through
-// main.js on the fake PinballY globals with PinballY's native menus and
-// Menu Cleanup off: the main menu marks nothing and its entry names the
-// Active Filter as the menus show it; in the Filter Picker a top-level
-// filter keeps PinballY's mark, a filter from a group (an Era) marks that
-// group alone, and a group PinballY marks itself is marked once.
+// The Active Filter with native menus: the main menu entry names it; in the
+// Filter Picker a top-level filter keeps PinballY's mark, a group's filter
+// marks that group alone, once.
 // ============================================================
 
 import { test } from "node:test";

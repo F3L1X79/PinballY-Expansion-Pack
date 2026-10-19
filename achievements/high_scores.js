@@ -1,10 +1,9 @@
 // ============================================================
-// High Scores family: Achievements for High Scores on 1, 3, 5 and 10
-// tables, Table Records on 1 and 3 tables, and a Table Record taken from
-// another Profile. Reads, from the High Score store, what the Profile won
-// since its last Profile Reset, counted in tables (also shown as
-// Achievement Progress); writes nothing. achievements_engine.js leaves the
-// family out when the High Scores Add-on is disabled.
+// High Scores family: High Scores on 1, 3, 5 and 10 tables, Table Records on
+// 1 and 3 tables, and a Table Record taken from another Profile. Reads what
+// the Profile won since its last Profile Reset from the High Score store.
+// Writes nothing.
+// - achievements_engine.js leaves the family out while the High Scores Add-on is off.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, countedAchievement, standaloneAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";

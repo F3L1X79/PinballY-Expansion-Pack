@@ -1,11 +1,7 @@
 // ============================================================
-// Table ROMs confirmed by a Play without vpxtool, through main.js on the
-// fake PinballY globals: when exactly one .nv file of VPinMAME's NVRAM
-// folder changes during a game, even one under a minute, its name is the
-// ROM the table really ran, written into an empty ROM field before the
-// Add-ons registered later handle "postlaunch"; a hand-typed ROM is never
-// changed (a different one is logged). No .nv changed, or several,
-// writes nothing.
+// Table ROMs confirmed by a Play without vpxtool: exactly one changed .nv
+// gives the ROM, written into an empty field before later Add-ons handle
+// "postlaunch"; a hand-typed ROM is never changed; zero or several write nothing.
 // ============================================================
 
 import { test } from "node:test";

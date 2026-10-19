@@ -1,12 +1,8 @@
 // ============================================================
 // Player Level: turns a Profile's Notified Achievements into its level,
-// worked out afresh each time from the Achievements that still exist, at
-// their current Achievement Rank. Pure: takes the Notified ids and the
-// current Achievements, returns { level, points, from, to }. For a Child
-// Profile, also takes the Achievements a Profile that is not a child would
-// have with the same collection, and scales the points up by what those
-// are worth over the current ones, so the child climbs the same curve as
-// fast for the same share of play. Nothing is persisted.
+// worked out afresh each time from the current Achievements and ranks.
+// Pure: returns { level, points, from, to }. Nothing is persisted.
+// - A Child Profile's points are scaled by what a non-child Profile's set is worth.
 // ============================================================
 
 import { ACHIEVEMENT_RANK } from "../achievements/achievements.js";

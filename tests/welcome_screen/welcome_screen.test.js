@@ -1,12 +1,8 @@
 ﻿// ============================================================
-// Welcome Screen, through main.js on the fake PinballY globals, at 5 h
-// with the Profile picker on: it opens after the startup pause and not
-// before, greets the active Profile by the hour with its Avatar, selects
-// the Avatar (its tooltip showing only while selected, like the cross's),
-// loops through its choices with Next / Prev and the navigation sound,
-// names the table selected on the wheel (title cleaned), not the Last
-// Played Table, swallows every button while open so the wheel never moves, and closes
-// on Select on Stay, leaving no layer nor timer behind.
+// Welcome Screen through main.js at 5 h: opens after the startup pause,
+// greets by the hour, loops through its choices with the navigation sound,
+// names the table on the wheel, swallows every button, and closes on Stay
+// leaving no layer nor timer.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,10 +1,7 @@
 // ============================================================
-// The "Every Profile" line of the Profile Reset list, started through
-// main.js on the fake PinballY globals: absent with Guest alone; with two
-// Profiles or more, one confirmation citing their number, then every
-// Profile starts over (Guest and the active Admin Profile included), each
-// keeping its dated copy and its marks. A failing Profile does not stop the
-// others, and the final message names it.
+// "Every Profile" in the Profile Reset list: absent with Guest alone; with
+// two or more, one confirmation, then every Profile starts over with its
+// dated copy and marks. A failing Profile is named and does not stop others.
 // ============================================================
 
 import { test } from "node:test";

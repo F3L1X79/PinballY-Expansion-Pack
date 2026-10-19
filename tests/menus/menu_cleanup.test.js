@@ -1,11 +1,7 @@
 // ============================================================
-// Menu Cleanup, started through main.js on the fake PinballY globals: off
-// by default, PinballY's native menus keep Help, About and the information
-// entries; turned on, they are gone for every Profile, Admin Profiles
-// included, from the Operator menu too, as are the filter submenus by
-// system, last played and date added, which stay out of the Filter Picker;
-// Rate Table and Add to Favorites stay, the Operator Menu rules
-// are unchanged, and no doubled, leading or trailing separator is left.
+// Menu Cleanup through main.js: off by default, native menus keep everything;
+// on, Help, About, information entries and some filter submenus are gone for
+// every Profile and out of the Filter Picker, with no stray separator.
 // ============================================================
 
 import { test } from "node:test";

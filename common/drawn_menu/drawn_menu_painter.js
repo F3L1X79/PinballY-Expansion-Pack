@@ -1,15 +1,8 @@
 // ============================================================
-// Drawn Menu painter: the look and the layout of a Drawn Menu. Lays a
-// menu out in the window (one panel sized to its rows, its middle a third
-// of the way down when short, scrolling past 90 % of the window's height)
-// and draws its live parts: the texts (the message, the entries in white
-// with their gold mark, the headings, the separators as a gold line
-// fading at both ends, the footer under a rule), the selected entry's
-// gold text, the dimming backdrop and the painted images
-// (common/drawn_menu/drawn_menu_images.js). A line estimated to fit is
-// drawn without being measured; each text style's line height is
-// measured once and kept for the session.
+// Drawn Menu painter: the layout of a Drawn Menu in the window and the
+// drawing of its live parts (texts, selected entry, backdrop, images).
 // Only drawing: no layer, no event.
+// - A line estimated to fit is drawn unmeasured; each style's line height is measured once.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";

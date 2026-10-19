@@ -1,11 +1,8 @@
 // ============================================================
-// Reads the main menu the way PinballY shows it, on the fake PinballY
-// host: the titles of the section (between separators) holding an entry,
-// so that a test checks its own entry without copying the whole menu
-// order, which tests/menus/main_menu_sections.test.js alone pins, and
-// whether a separator is left stray; and a section of the Filter Picker,
-// opened from it. Also reads a section from a Drawn Menu's lines. Never
-// loaded by PinballY.
+// Reads the main menu as PinballY shows it, on the fake host: the section
+// holding an entry, stray separators, a Filter Picker section, and a section
+// of a Drawn Menu. Never loaded by PinballY.
+// - Lets a test check its own entry without copying the whole menu order.
 // ============================================================
 
 // How a separator reads among the lines, as in drawn_menu_reader.js.

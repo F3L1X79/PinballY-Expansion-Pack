@@ -1,34 +1,12 @@
 // ============================================================
-// High Scores: credits each score that entered a table's board during a
-// Play to the Profile active when the Play started, whatever initials
-// were typed. At "prelaunch" the board is read fresh and becomes the last
-// known board; a little after "postlaunch" it is read again and the Play
-// settled against it. A failed launch read leaves the last known board to
-// compare with; a failed read after the game credits nothing. When
-// PinballY reads no board (a table without a ROM), the board comes from
-// VPX's User folder (VPReg.stg and its "5 scores + 5 initials" text
-// files), read whole at "prelaunch" and again after the game, never while
-// VPX runs: the table's section or file is learned from the one board the
-// Play changed (of a section and a file, the one with more places), kept
-// for good, and the board it held before the Play recorded first, so its
-// places are Default Scores. PinballY shows no board of its own for a
-// table with a learned section or file: its known board is handed to it
-// as plain lines (DMD, info box) at startup and after each read of that
-// source, after a Play or from the High Score Board; at startup a ROM
-// table's is not, PINemHi may read it now. A Play that won places submits
-// one High Score Toast, for the best place, naming the Profile a Table
-// Record was taken from. Writes high_scores.json next
-// to cabinet.json and logfile.log. Adds the "High Scores" main menu
-// entry, which opens the High Score Board on the selected table, Exit
-// there going back to the menu on that entry; each opening reads the board again without PinballY's cache, or, when
-// PINemHi gives none, the learned section or file, recorded as a board
-// read outside a Play; a VPX table without a ROM and nothing learned yet
-// asks for a game instead. Replaces PinballY's own "High Scores": removes
-// its main menu entry and cancels the HighScores command, which opens the
-// board instead, Exit going back to the wheel. Adds the "My High Scores"
-// selection under the Hall of Fame, while the active Profile holds a
-// place (common/high_scores/my_high_scores.js). The rules live in
-// common/high_scores/.
+// High Scores: credits each score that entered a table's board during a Play
+// to the Profile active when it started, whatever initials were typed, and
+// submits a High Score Toast for the best place won. Adds "High Scores"
+// (opens the High Score Board) and "My High Scores" to the main menu.
+// Writes high_scores.json next to cabinet.json. Rules in common/high_scores/.
+// - The board is read at "prelaunch" and again a little after "postlaunch".
+// - Without a ROM, the board comes from VPX's User folder, never read while VPX runs.
+// - Replaces PinballY's own "High Scores": removes its entry, cancels HighScores.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";

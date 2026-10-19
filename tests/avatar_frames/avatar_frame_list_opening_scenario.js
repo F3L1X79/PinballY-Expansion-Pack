@@ -1,11 +1,8 @@
 // ============================================================
-// Starts the pack through main.js on the fake PinballY globals for the
-// Avatar Frame list's opening tests: Table Mastery, the Achievements and
-// the main menu commands on, the frame images there, Guest at Collection
-// Tier 3 wearing "Steam and Gears". The Profile Stats open with instant
-// draws, then each layer draw takes drawMs on the clock while the Frame
-// button opens the list: right after startup, nothing of it is drawn
-// ahead yet. Never loaded by PinballY.
+// Avatar Frame list opening scenario: main.js on the fake globals, Guest at
+// Collection Tier 3 wearing a frame. The Profile Stats open with instant
+// draws, then each draw takes drawMs while the Frame button opens the list.
+// Never loaded by PinballY.
 // ============================================================
 
 import { startScenario } from "../mastery/mastery_bar_scenario.js";

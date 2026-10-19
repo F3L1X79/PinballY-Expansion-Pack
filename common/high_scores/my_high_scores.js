@@ -1,12 +1,8 @@
 // ============================================================
-// My High Scores: a selection filter (common/tables/selection_filter.js)
-// in the main menu, right under the Hall of Fame, that puts on the wheel
-// the tables the active Profile can see where it holds a place on the last
-// known board, best place first, then by title, each table its own
-// Next/Previous Page stop. Its entry is in the main menu only while there
-// are some, checked at each opening. Besides each return to the wheel, it
-// runs again when a Play credits High Scores (settled after the return),
-// on a Profile switch and after a Profile Reset of the active Profile.
+// My High Scores: a selection filter under the Hall of Fame putting on the
+// wheel the tables where the active Profile holds a place, best place first.
+// Runs again on a credited Play, a Profile switch and a Profile Reset.
+// - Its entry shows only while there are some, checked at each opening.
 // ============================================================
 
 import lang from "../core/i18n.js";

@@ -1,10 +1,7 @@
 // ============================================================
-// Mastery square: the Mastery Level's number in a square in its metal,
-// with a see-through halo wider and stronger from one level to the next,
-// or a dim "0" for a table never played. Drawn at the end of the wheel's
-// Mastery Bar and of the Welcome Screen's Mastery cards, where it also
-// shows the Collection Tier, in level 1's metal at tier 0. Only drawing: no
-// text from the language files, no layer, no side effect.
+// Mastery square: the Mastery Level's number in a square in its metal, with
+// a halo growing with the level, for the Mastery Bar and the Welcome
+// Screen's cards. Only drawing: no text, no layer, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS, STEAMBALL_FONTS } from "../drawing/steamball_palette.js";

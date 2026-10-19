@@ -1,18 +1,8 @@
 // ============================================================
-// Household Stats painter: the layout and drawing of the Household Stats'
-// pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
-// in the Profile Stats' look: the centred Steamball panel (drawn by
-// steamball_drawing.js's backdrop), its title, the line labels in a column
-// on the left, then one column per Profile (its Avatar in its worn Avatar
-// Frame, with no Player Level pip, and its name as a header, then one cell
-// per line, the best values in gold, the Collection Mastery with its
-// Collection Tier square, the pair centred), the Exit Button at the top
-// right with its tooltip shown while it is selected (the Selection
-// Marker surrounds the selected column or the Exit Button), and the
-// Button Hints in a footer under the columns.
-// Past five columns, or fewer in a narrow window, the layout also gives
-// the view the columns show through and their pitch, for the module to
-// glide them sideways. Only drawing: no layer, no event, no side effect.
+// Household Stats painter: layout and drawing of the Household Stats, in
+// reference pixels, in the Profile Stats' look; past five columns, also
+// gives the view and pitch for the sideways glide.
+// Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";

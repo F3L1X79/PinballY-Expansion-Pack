@@ -1,13 +1,8 @@
 // ============================================================
-// Table ROMs at a first startup, through main.js on the fake PinballY
-// globals: every Visual Pinball X table whose game file exists, hidden or
-// not, has its
-// script read by vpxtool, one at a time; an empty ROM field gets the ROM
-// found (two tables sharing one ROM both get it), a hand-typed ROM is
-// never changed (a different finding is logged), a script loading no ROM
-// is logged and remembered, and only the last non-empty line of vpxtool's
-// standard output counts. The record file keeps each table's file state,
-// its finding and the ROM the Add-on wrote.
+// Table ROMs at a first startup: every VPX table with a game file is read by
+// vpxtool, one at a time; empty fields get the ROM, hand-typed ones never
+// change, "no ROM" is remembered, the record keeps each finding.
+// - Only the last non-empty line of vpxtool's output counts.
 // ============================================================
 
 import { test } from "node:test";

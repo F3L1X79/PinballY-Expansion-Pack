@@ -1,14 +1,9 @@
 ﻿// ============================================================
-// Random Game module: draws a table from the current wheel selection,
-// never the active Profile's Last Played Table unless it is the only one,
-// animates the wheel to it and launches it. Created from the PinballY host,
-// the Profile store and an animator (skipped when the player turned the
-// animation off); the "Start Random Game" menu command and the startup
-// choice prompt share one instance through getRandomGame(). Calls made
-// while an animation is already running are ignored. Tells whether the
-// game that just started is a Random Game (on "gamestarted", never after
-// "launcherror"), and counts it in "randomGames" only when the Profile
-// store announces its Play, for the Profile active at its start.
+// Random Game: draws a table from the current wheel selection, animates the
+// wheel to it and launches it. Shared through getRandomGame(); counts
+// "randomGames" on the Play announcement.
+// - Never the Last Played Table unless it is the only one.
+// - Calls made while an animation runs are ignored.
 // ============================================================
 
 import { animateWheelTo, sleep } from "./wheel_navigator.js";

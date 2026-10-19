@@ -1,12 +1,8 @@
 // ============================================================
-// The Household Stats' table, through main.js on the fake PinballY
-// globals: the active Profile's column first, then the Profile picker's
-// order without Guest; each value as that Profile's own Profile Stats show
-// it, a Profile with no Play showing zeros; the best value of each line in
-// gold, ties included, none on an all-zero line, the Collection Mastery's
-// tier square and value centred together; Next / Prev move the marker
-// through the cross (its tooltip saying Back), then from column to column,
-// looping, and no button reaches the wheel.
+// The Household Stats through main.js: active Profile first, then the picker's
+// order without Guest, each value as that Profile's Stats show it, the best
+// of each line in gold; the marker loops through Exit and the columns, and
+// no button reaches the wheel.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,11 +1,8 @@
 ﻿// ============================================================
-// Hides the wheel and clears the underlay while a table is launching, to
-// avoid a jarring black screen flash between the wheel view and the table's
-// own loading screen, and shows the Loader with the step under way written
-// in gold beneath it while the table loads and again while it closes.
-// Cancels PinballY's own launch message (its text and the table's wheel
-// icon). Listens to "launchoverlayshow", "launchoverlaymessage" and
-// "launchoverlayhide".
+// Hides the wheel while a table launches and closes, showing the Loader and
+// the current step in gold instead of PinballY's launch message, to avoid a
+// black flash before the table's own loading screen. Listens to
+// "launchoverlayshow", "launchoverlaymessage" and "launchoverlayhide".
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";

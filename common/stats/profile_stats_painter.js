@@ -1,22 +1,9 @@
 // ============================================================
-// Profile Stats painter: the layout and drawing of the Profile Stats'
-// pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
-// from the prototype validated on the cabinet: the dimmed backdrop with
-// the centred Steamball panel, the card on the left framed in the Player
-// Level colour with a soft glow (Avatar in its worn Avatar Frame, the
-// Profile's name in gold, the Player Level in big digits with its bar and points, a rule, the
-// Collection Mastery stacked like the Mastery Bar, the buttons at its
-// foot), the Exit Button at the top right and the right column's sections (a title, then
-// rows of stats, label over value (every label at one size, the largest
-// at which they all fit), with a pill beside the value, or every pill of the row under its
-// value when one does not fit, and a thin bar,
-// then wide strips with a table's wheel logo or the missing image, or else
-// its title),
-// the spare height shared evenly between the column's gaps, and, for each
-// choice, its own rect (which the Selection Marker surrounds) and, for the
-// Exit Button, the tooltip shown while it is selected; the Button Hints in
-// a footer across the panel's foot, under the card and the column. Only
-// drawing: no layer, no event, no side effect.
+// Profile Stats painter: layout and drawing of the Profile Stats (card,
+// sections, buttons, Exit Button, Button Hints), in reference pixels, from
+// the prototype validated on the cabinet.
+// Only drawing: no layer, no event, no side effect.
+// - Every label of a row shares one size, the largest at which they all fit.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";

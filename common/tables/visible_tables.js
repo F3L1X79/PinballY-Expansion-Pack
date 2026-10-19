@@ -1,12 +1,8 @@
 ﻿// ============================================================
-// Single source for "the tables the active Profile can see": every game in
-// PinballY's list except the ones the player has hidden and, for a Child
-// Profile, the Adult Tables. Used by the achievement builders, the Profile
-// Stats, the Hall of Fame and the Challenges, with the one rule for
-// collection completion. The Period Table pick deliberately reads the
-// household's visible tables instead. getActiveProfileTables() can also
-// give the tables as a Profile that is not a child, or another named
-// Profile, would see them, for the Player Level. Read-only, no side effects.
+// Single source for "the tables the active Profile can see": PinballY's list
+// without the hidden tables and, for a Child Profile, the Adult Tables.
+// Read-only, no side effects.
+// - The Period Table pick deliberately reads the household's visible tables instead.
 // ============================================================
 
 import { createPinballYHost } from "../core/pinbally_host.js";

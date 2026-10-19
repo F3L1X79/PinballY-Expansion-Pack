@@ -1,10 +1,7 @@
 // ============================================================
-// The Daily Streak tile of the drawn Profile Stats, through main.js on the
-// fake PinballY globals, in English, with the session stats tracker Add-on
-// off: the streak row shows the Daily Streak first, then the Table of the
-// Day and Table of the Week Streaks; the longest run of the whole Play Log
-// (New Year's Eve included) in a pill, the gold record pill while the
-// current one sets it, and 0 with its longest once broken.
+// The Profile Stats' Daily Streak tile in English: the Daily Streak, then the
+// Period Streaks; the longest run of the whole Play Log in a pill, the gold
+// record pill while the current one sets it, 0 once broken.
 // ============================================================
 
 import { test } from "node:test";

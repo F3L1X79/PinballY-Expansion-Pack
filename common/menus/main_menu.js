@@ -1,22 +1,10 @@
 ﻿// ============================================================
-// Main menu module: owns the whole main menu order. Add-ons add their
-// entries (label, action, position, and optionally "shown when" and
-// "marked when" predicates checked on each opening); on each opening it
-// sorts them and PinballY's own items into fixed sections split by
-// separators: Play and the launches, the selected table, the player, any
-// item it does not know, then the Filter Picker with Return. A section with
-// no item shown goes with its separator, and the Add-on order in main.js
-// never decides where an entry lands. The wheel selections (PinballY's
-// [Top] filters) and the filter groups go to the Filter Picker
-// (common/menus/filter_picker.js), which it creates and hands each
-// opening. An entry's label is a text or a function read on each
-// opening. It owns the entry commands and runs the matching
-// action when one is selected, and can reopen the main menu with the
-// cursor on an entry (a screen going back one level). A [Top] script
-// filter (by its full id, "User.<id>") can be given a condition, checked
-// on each opening, that leaves it out of the Filter Picker while false; a
-// failing one is logged and the filter stays listed. Listens to "menuopen"
-// and "command".
+// Main menu module: owns the main menu's order. Add-ons add entries with a
+// position; on each opening it sorts them and PinballY's items into fixed
+// sections, sends the selections and groups to the Filter Picker, and runs
+// the chosen entry's action. Listens to "menuopen" and "command".
+// - main.js's order never decides where an entry lands.
+// - A [Top] filter's condition is checked on each opening; a failing one is logged and kept.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

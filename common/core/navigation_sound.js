@@ -1,10 +1,9 @@
 // ============================================================
 // Navigation sound: PinballY's own Next.wav, played on each move through a
-// drawn list or carousel (Achievement List, Profile picker, Drawn Menu),
-// and PinballY's other button sounds (Select.wav, Deselect.wav) through
-// createButtonSound(). load() reads it once, ahead of the first press,
-// which it would slow down; a missing or unplayable file is logged once
-// and then stays silent, never stopping the navigation.
+// drawn list or carousel, and its other button sounds through
+// createButtonSound().
+// - load() reads the file ahead of the first press, which it would slow down.
+// - A missing or unplayable file is logged once, then stays silent.
 // ============================================================
 
 // Relative to PinballY's program folder.

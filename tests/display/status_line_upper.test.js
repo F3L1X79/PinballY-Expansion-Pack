@@ -1,10 +1,7 @@
 // ============================================================
-// The upper status line, through main.js on the fake PinballY globals: after
-// the player's own messages from PinballY's options, the status line Add-on
-// adds a welcome naming the active Profile (Guest by its translated name),
-// the table count, how to launch and browse, and a sign-off, in the
-// interface language. A Profile switch updates the welcome at once, even
-// with a temporary message inserted among the player's messages.
+// The upper status line through main.js: after the player's own messages, a
+// welcome naming the active Profile, the table count, how to play and a
+// sign-off, in the interface language, updated at once on a Profile switch.
 // ============================================================
 
 import { test } from "node:test";

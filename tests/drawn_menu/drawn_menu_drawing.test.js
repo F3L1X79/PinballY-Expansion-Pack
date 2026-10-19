@@ -1,11 +1,7 @@
 // ============================================================
-// How a Drawn Menu is drawn, through main.js on the fake PinballY globals
-// with only the Drawn Menus Add-on on: its painted images are drawn ahead
-// while the wheel sits idle, then only placed on opening, and every
-// layer is shrunk to a dot while hidden; the texts are drawn again only
-// when they changed; a line that clearly fits is drawn without being
-// measured; each opening's time is logged;
-// a menu that fails to draw logs the error and shows natively.
+// How a Drawn Menu is drawn, through main.js: images drawn ahead while idle
+// and only placed on opening, hidden layers shrunk to a dot, texts redrawn
+// only when changed, opening time logged, native fallback on failure.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,12 +1,8 @@
 // ============================================================
-// The Profile Reset from the Exit menu, started through main.js on the fake
-// PinballY globals: "Reset profile" shows for an active Admin Profile only,
-// lists every Profile (Guest and the admin included), and asks once,
-// cursor on "No". "No" changes nothing; "Yes" keeps a dated copy of the
-// former profile.json, then saves empty Profile data with the marks kept,
-// renames each of its Play Log year files to a dated reset copy (its
-// backups go, unless a backup stands in for a lost year file), and the other Profiles' Unlock Rate drops; the other
-// Profiles' Play Logs are untouched, and its next Play starts a fresh file.
+// Profile Reset from the Exit menu through main.js: shown to an active Admin
+// only, lists every Profile, asks once on "No". "Yes" keeps a dated copy,
+// saves empty data with the marks kept, renames its Play Log year files;
+// the other Profiles' Play Logs are untouched.
 // ============================================================
 
 import { test } from "node:test";

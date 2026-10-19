@@ -1,10 +1,7 @@
 // ============================================================
-// The High Score Board, through main.js on the fake PinballY globals: the
-// Gold crown over the Table Record in the middle of the podium, Silver
-// over the 2nd on the left, Bronze over the 3rd on the right, each
-// centred on its step above where its Avatar's frame reaches; none over
-// the rows. The crowns are drawn ahead once, wait hidden and shrunk to a
-// point while the board is closed, and are only placed on each opening.
+// High Score Board crowns: Gold, Silver and Bronze over the podium's steps,
+// none over the rows; drawn ahead once, kept hidden and shrunk while the
+// board is closed, only placed on each opening.
 // ============================================================
 
 import { test } from "node:test";

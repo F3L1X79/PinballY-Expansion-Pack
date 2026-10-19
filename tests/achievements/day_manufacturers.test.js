@@ -1,11 +1,7 @@
 // ============================================================
-// Multi-manufacturer day Achievements, started through main.js on the fake
-// PinballY globals: tables of three different manufacturers played the
-// same day unlock the first one; a game under a minute, a table with no
-// manufacturer and a repeated manufacturer don't count; a Play started
-// before midnight counts for the day it started; a new calendar day starts
-// over, and the Achievement stays Unlocked in the Achievement List, the
-// next ones showing the day's record.
+// Day's Manufacturers Achievements through main.js: three manufacturers in a
+// day unlock the first; short games, unknown or repeated manufacturers don't
+// count; a Play counts for the day it started; a new day starts over.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,10 +1,7 @@
 ﻿// ============================================================
-// Achievement List scrollbar tests: over the fake PinballY host, opens
-// lists of several lengths and checks the gold thumb in the panel's right
-// margin: shown only when the list overflows the rows area, as tall as the
-// visible part of the list (with a minimum), at the top on opening, at the
-// bottom on the last row, gliding with the rows, drawn ahead, redrawn only
-// when the list's length or the window size changes, hidden on closing.
+// Achievement List scrollbar over the fake host: the gold thumb shows only
+// when the list overflows, is sized to the visible part, follows the glide,
+// is drawn ahead and redrawn only on a length or window change.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,10 +1,7 @@
 ﻿// ============================================================
-// The Achievements add-on, started through main.js on the fake PinballY
-// globals, announces its unlocks with Achievement Toasts: never while a
-// game runs, staggered, over an open menu without taking it
-// over, each one Notified when it starts, with its Achievement Rank's
-// emblem, and a toast still waiting when a table launches is announced
-// after that game.
+// The Achievements Add-on's toasts through main.js: never during a game,
+// staggered, over an open menu without taking it, each Notified when it
+// starts; one still waiting at a launch is announced after that game.
 // ============================================================
 
 import { test } from "node:test";

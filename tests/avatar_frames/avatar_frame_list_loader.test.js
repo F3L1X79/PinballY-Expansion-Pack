@@ -1,10 +1,7 @@
 // ============================================================
-// The Avatar Frame list opened right after startup, before its drawing
-// ahead, through main.js on the fake PinballY globals with slow draws: the
-// wheel dims at once under the veil, the Loader turns over it after
-// 150 ms, then the list fades in whole with every row and the Selection
-// Marker on the worn frame, the Loader gone first, the veil once the fade
-// in is over.
+// The Avatar Frame list opened before its drawing ahead, with slow draws:
+// the veil at once, the Loader after 150 ms, then the whole list fades in on
+// the worn frame, the Loader gone first, the veil after the fade.
 // ============================================================
 
 import { test } from "node:test";

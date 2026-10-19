@@ -1,11 +1,7 @@
 // ============================================================
-// Achievements per Profile, through main.js on the fake PinballY globals:
-// two Profiles playing different tables each unlock only their own
-// completion and play-time Achievements, each Profile is announced an
-// Achievement once even if another one already had it, a toast waiting
-// at a switch is Notified for the Profile that unlocked it, a switch
-// announces what the new Profile has newly unlocked (but no Player Level), and the Achievement
-// List shows the active Profile's Achievements.
+// Achievements per Profile through main.js: each Profile unlocks and is
+// announced its own, once; a toast waiting at a switch stays the unlocker's;
+// a switch announces the new Profile's unlocks but no Player Level.
 // ============================================================
 
 import { test } from "node:test";

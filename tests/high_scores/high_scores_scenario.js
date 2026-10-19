@@ -1,17 +1,9 @@
 // ============================================================
-// High Scores tests' scenario: main.js on the fake PinballY globals, with
-// the chosen Add-ons and Profiles. Sets what PINemHi reads in each
-// table's NVRAM, and the VPReg.stg and text files of VPX's User folder,
-// before and after a Play, plays a table as PinballY
-// launches it (the reads after "postlaunch" included), switches the
-// active Profile, resets a Profile, and reads back the High Scores file,
-// the toasts drawn, the Achievements Notified and shown in the Achievement
-// List, and the Add-on's log lines. Never loaded by PinballY.
-// Changing the cabinet mid-test goes through the fake host: remove a
-// Profile with fake.removeFolder(`${PROFILES_FOLDER}\\Name`); hide or
-// remove a table with fake.setTables(...) ({ ...table, isHidden: true },
-// or leave it out); make an Adult Table with categories: ["NSFW"]
-// (config.adultCategory).
+// High Scores tests' scenario: main.js on the fake globals with chosen
+// Add-ons and Profiles. Sets the NVRAM, VPReg.stg and text boards before and
+// after a Play, plays, switches and resets Profiles, and reads back the file,
+// toasts, Achievements and log lines. Never loaded by PinballY.
+// - Change the cabinet mid-test through the fake host (removeFolder, setTables).
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";

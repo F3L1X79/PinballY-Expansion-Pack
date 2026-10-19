@@ -1,10 +1,8 @@
 // ============================================================
-// Table Mastery: the Mastery Level a Profile has reached on a table,
-// computed from that Profile's table totals (the time and number of its
-// Plays, ADR 0008), what a Play changed (a step further, a new level),
-// and the metal each level shows in; and Collection Mastery, from the
-// levels of the tables a Profile can see. No data of its own and no side
-// effect: the caller keeps the Collection Tier reached.
+// Table Mastery: a Profile's Mastery Level on a table, from its table totals
+// (ADR 0008), what a Play changed, and each level's metal; and Collection
+// Mastery over the tables it can see. No data of its own, no side effect.
+// - The caller keeps the Collection Tier reached.
 // ============================================================
 
 import { ACHIEVEMENT_RANK } from "../achievements/achievements.js";

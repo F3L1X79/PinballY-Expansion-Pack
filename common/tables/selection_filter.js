@@ -1,14 +1,9 @@
 // ============================================================
-// Selection filter: a script filter putting on the wheel a list of tables
-// the Add-on computes (Challenge Tables, My High Scores), selected again
-// each time it runs. Listens to "wheelmode": while it is the current
-// filter, it runs again only when its tables or their order changed, so
-// that closing a menu does not move the wheel, and brings every table back
-// once none is left. selectConfigIds gives the tables' config IDs in
-// order; ranked keeps that order on the wheel, each table its own
-// Next/Previous Page stop; the other fields go to createFilter() as they
-// are. Returns the filter's full id, "User.<id>", and runAgainIfCurrent,
-// the same check for the Add-on's own events (a Profile switch...).
+// Selection filter: a script filter putting on the wheel a list of tables an
+// Add-on computes (Challenge Tables, My High Scores). Returns the filter's
+// full id ("User.<id>") and runAgainIfCurrent. Listens to "wheelmode".
+// - Runs again only when its tables changed, so closing a menu never moves the wheel.
+// - ranked gives each table its own Next/Previous Page stop.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

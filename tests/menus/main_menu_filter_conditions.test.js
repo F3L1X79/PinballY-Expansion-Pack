@@ -1,10 +1,7 @@
 // ============================================================
-// Main menu module tests: a [Top] script filter given a condition is
-// listed in the Filter Picker only while the condition holds, checked at
-// each opening; a failing condition is logged and leaves it listed. The
-// filters without a condition, PinballY's own and the Filter Picker's
-// entry are unchanged, and a left-out filter keeps working while it is
-// current.
+// Main menu filter conditions: a [Top] script filter with a condition is in
+// the Filter Picker only while it holds, checked at each opening; a failing
+// one is logged and keeps it listed. A left-out filter still works while current.
 // ============================================================
 
 import { test } from "node:test";

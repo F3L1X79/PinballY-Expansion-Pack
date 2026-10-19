@@ -1,10 +1,7 @@
 // ============================================================
-// Challenges, through the Challenge module and the Challenge Card
-// on the fake PinballY host, with a real Profile store, real Period
-// Tables, a real Random Game module and a scripted random source: the
-// week's draw locked in cabinet.json, the games that count in each
-// Profile's profile.json, what the card shows (and when it lights up), the
-// Challenge Toast on completion and the verdict on the previous Challenge.
+// Challenges over the fake host with real modules and a scripted random
+// source: the week's draw in cabinet.json, counted games in profile.json,
+// the card, the Challenge Toast and the previous week's verdict.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,19 +1,11 @@
 // ============================================================
-// Table Mastery: shows the Mastery Bar of the selected table for the
-// active Profile, computed from the Profile store's table totals (no data
-// of its own). The bar sits under the Challenge Card when the card shows,
-// in its place otherwise, and under the Profile badge when the Profile
-// picker is on. Follows "gameselect", hides on "gamestarted", comes back
-// on "wheelmode" and follows Profile switches. After a Play that moved a
-// table's bar forward (onPlay, ADR 0008), lights it up once on the return
-// to the wheel; after one that reached a new Mastery Level, submits a
-// Mastery Toast for the highest one, with the Confetti Shower at level 10.
-// After one that raised the Collection Tier above the one kept in the
-// Profile's profile.json ("collectionTier"), keeps the new tier there and
-// submits its Mastery Toast, with the Confetti Shower unless a level 10
-// toast of the same Play brings it, and a line naming the Avatar Frames
-// it unlocks (every one, when the Play raised it by more than a tier),
-// followed by the Reward Prompt when it brings the Profile's first frame.
+// Table Mastery: shows the selected table's Mastery Bar for the active
+// Profile (under the Challenge Card or the badge), from the Profile store's
+// totals. After a Play, lights the bar up and submits a Mastery Toast for a
+// new Mastery Level or Collection Tier, kept in profile.json ("collectionTier").
+// Follows "gameselect", hides on "gamestarted", comes back on "wheelmode".
+// - Plays come from onPlay (ADR 0008).
+// - A Collection Tier toast names the Avatar Frames it unlocks, then the Reward Prompt for a first frame.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";

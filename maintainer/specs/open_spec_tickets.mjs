@@ -1,11 +1,9 @@
 // ============================================================
-// Lists the tickets of a spec still to do: open on GitHub, whose
-// "## Parent" section names the spec, minus those a commit not on
-// origin/main yet closes ("Closes #N"), which GitHub closes only once the
-// commit reaches it: unpushed on main, or on a branch not merged yet.
-// Without that remote, the commits since main. Tells whether the next commit closes the spec too. A maintainer's
-// tool (node maintainer/specs/open_spec_tickets.mjs <spec>), run through
-// the gh CLI, never loaded by PinballY.
+// Lists a spec's tickets still to do: open on GitHub with the spec as
+// "## Parent", minus those an unpushed commit closes ("Closes #N"). Tells
+// whether the next commit closes the spec too. Uses the gh CLI; never
+// loaded by PinballY.
+// Run: node maintainer/specs/open_spec_tickets.mjs <spec>
 // ============================================================
 
 import { execFileSync } from "node:child_process";

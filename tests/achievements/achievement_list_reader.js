@@ -1,14 +1,8 @@
 ﻿// ============================================================
-// Reads the drawn Achievement List the way the player sees it, on the fake
-// PinballY host: the texts of its header and footer, the footer's Button
-// Hints, the items shown in
-// the rows area from top to bottom, the highlighted one (the only one not
-// dimmed, none while the Exit Button is selected), whether the Selection
-// Marker surrounds the Exit Button and its tooltip, the whole list, walked with Next as a player would, with the
-// colours each row is drawn in, its rank emblem image and its Unlock Rate
-// (the Avatars and the "+N" pill beside it, from left to right), and the
-// header's count per Achievement Rank and its emblem images.
-// Never loaded by PinballY.
+// Reads the drawn Achievement List as the player sees it, on the fake host:
+// header and footer texts, Button Hints, visible rows, highlighted item,
+// Exit Button and tooltip, and the whole list walked with Next, with each
+// row's colours, emblem and Unlock Rate. Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";

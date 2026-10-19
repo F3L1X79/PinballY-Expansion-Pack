@@ -1,16 +1,9 @@
 // ============================================================
-// World Tour tracker: keeps in memory only the tables the player selected
-// on PinballY's "All Tables" filter, in wheel mode, in one go. The table
-// selected when the tour starts counts as seen. Listens to the game list's
-// "gameselect", which the add-ons' own wheel moves (setWheelGame) never
-// fire. The tour starts over on a launch ("gamestarted"), a filter change
-// ("filterselect"), a Profile switch, attract mode ("attractmodestart") and
-// a change in the wheel's contents (a settings reload, a refreshed filter);
-// a tour waiting for its starting table takes it back on the wheel
-// ("wheelmode"), or on the next tick after a filter change or a reload.
-// When every table of the wheel the active Profile sees (at least two)
-// has been seen, sets that Profile's worldTour flag in its profile.json
-// and calls onCompleted, once per tour.
+// World Tour tracker: keeps in memory the tables selected in one go on the
+// "All Tables" filter; once every table the Profile sees has been seen, sets
+// its worldTour flag in profile.json and calls onCompleted.
+// - Listens to "gameselect", which the Add-ons' own wheel moves never fire.
+// - Starts over on a launch, filter change, Profile switch, attract mode or wheel reload.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

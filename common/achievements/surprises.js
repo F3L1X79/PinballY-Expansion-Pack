@@ -1,11 +1,9 @@
 // ============================================================
-// Surprises tracker: records, in each Profile's profile.json "surprises"
-// part, what the Surprises family's Secret Achievements need: flags, the
-// seasons seen and the current One More Game! and Time Travel runs. Listens
-// to the Profile store's Play announcement (ADR 0008) and writes for the
-// Profile active when the Play started; only Plays made since the update
-// count, the Play Log is never replayed. A missing "surprises" part reads
-// as empty; a Profile Reset erases it with the rest.
+// Surprises tracker: records in each Profile's "surprises" part what the
+// Surprises family needs (flags, seasons seen, current runs). Listens to the
+// Profile store's Play announcement (ADR 0008).
+// - Only Plays made since the update count: the Play Log is never replayed.
+// - A missing "surprises" part reads as empty.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

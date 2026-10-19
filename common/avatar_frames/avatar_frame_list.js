@@ -1,29 +1,12 @@
 // ============================================================
-// Avatar Frame list module: the drawn list the player opens from the
-// Profile Stats' Frame button to choose what the active Profile's Avatar
-// wears: one row per Avatar Frame in tier order around the player's own
-// Avatar, then "None", laid out by the Avatar Frame list painter. A locked
-// row shows the greyed frame and its unlock condition; the worn row is
-// marked and the list opens on it. Next / Prev move the Selection Marker
-// (a gold glow flowing round the choice) through the Exit Button and the
-// rows, looping, with PinballY's navigation sound (it may open on another
-// row, such as the Reward Prompt's new frame); the Button Hints name the
-// buttons (see GLOSSARY.md). Select or Launch (the plunger) on an
-// unlocked row or "None" saves the choice through the Profile Rewards
-// module, on a locked row does nothing; Exit changes nothing. Both then
-// close the list and call the return given to open(), telling it whether
-// the worn frame changed;
-// attract mode only closes it, the marker's layer and timer going with
-// it. While open it swallows every button through "commandbuttondown".
-// Every layer is drawn ahead from startup through the shared drawing
-// ahead, kept from one opening to the next and redrawn only when what it
-// shows or the window size changed; what the list shows is read again on
-// each opening, and ahead after a Profile switch or a change of a
-// Profile's data. It opens at once when its rows are drawn ahead,
-// otherwise through the shared screen opening (docs/adr/0014), counting
-// as open while it gets ready. Opens directly, not through the wheel
-// dialog module: the player asked for it. isOpen() and onClosed() let the
-// wheel dialogs wait for it.
+// Avatar Frame list: the drawn list opened from the Profile Stats' Frame
+// button to choose the Avatar Frame the active Profile wears. Select on an
+// unlocked row saves it through the Profile Rewards module; Exit changes
+// nothing. Both call the return given to open().
+// Opens directly, not through the wheel dialog module: the player asked for it.
+// - Every layer is drawn ahead from startup and kept between openings.
+// - Swallows every button through "commandbuttondown" while open.
+// - Opens through the shared screen opening when not drawn ahead (docs/adr/0014).
 // ============================================================
 
 import lang from "../core/i18n.js";

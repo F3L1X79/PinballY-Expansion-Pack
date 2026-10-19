@@ -1,10 +1,7 @@
 ﻿// ============================================================
-// The Achievement List, started through main.js on the fake PinballY
-// globals: its main menu entry sits in the player section, after the
-// Profile Stats entry, and opens the drawn list of the real
-// Achievements (the Unlocked ones first, the missing ones in natural order
-// with their Achievement Progress). Exit reopens the main menu on the entry; opened
-// from the Profile Stats' Achievements button, Exit shows the Profile Stats again.
+// The Achievement List through main.js on the fake globals: its entry in the
+// player section after Profile Stats, the real Achievements in order, and
+// Exit going back to the main menu or to the Profile Stats it came from.
 // ============================================================
 
 import { test } from "node:test";

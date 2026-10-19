@@ -1,10 +1,8 @@
 // ============================================================
-// Starts the Welcome Screen through main.js on the fake PinballY globals
-// for its Collection Mastery card: numbered tables, each at the Mastery
-// Level asked for, played by one Profile (with a kept Collection Tier, or
-// as a Child Profile), the screen open and its card read. Each test file
-// calls it once: node --test runs each file in its own process. Never
-// loaded by PinballY.
+// Welcome Screen Collection Mastery scenario: numbered tables at the Mastery
+// Levels asked for, played by one Profile, the screen open and its card read.
+// Never loaded by PinballY.
+// - Call it once per test file: node --test runs each file in its own process.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";

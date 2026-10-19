@@ -1,11 +1,7 @@
 // ============================================================
-// Maintainer's tool, never loaded by PinballY. Paints the Loader's gold
-// comet from the Steamball golds: a white-gold head with a soft glow and
-// a tail of 300 degrees that thins and fades from gold to bronze,
-// turning clockwise.
-// Writes it as a looping APNG with alpha, at the place, size and frame
-// count given by common/drawing/loader_image.js, through its own small
-// APNG encoder on Node's zlib.
+// Maintainer's tool, never loaded by PinballY. Paints the Loader's gold comet
+// as a looping APNG with alpha, at the size and frame count given by
+// common/drawing/loader_image.js, with its own APNG encoder on Node's zlib.
 // Run: node maintainer/loader/generate_loader.mjs
 // ============================================================
 

@@ -1,14 +1,9 @@
 // ============================================================
-// Script reading queue of the Table ROMs Add-on: once started, lists the
-// Visual Pinball X tables (hidden ones too) whose game file exists and whose script the
-// record says to read (never read, or its .vpx or .vbs changed), then runs
-// "tools\vpxtool.exe romname <table>" hidden for each, one at a time,
-// polling for its answer on a timer so PinballY never waits. A failure
-// (exit code, no answer in time, output that is no ROM name) is logged and
-// not recorded, so the table is read again at the next startup. Without
-// vpxtool, one line is logged and nothing is read. No run starts from a
-// table's launch ("prelaunch") until PinballY is back on the wheel; the run
-// already started then finishes, its time limit waiting for the game.
+// Script reading queue of the Table ROMs Add-on: runs tools\vpxtool.exe
+// hidden on each VPX table whose script needs reading, one at a time,
+// polling for the answer so PinballY never waits.
+// - A failure is logged, not recorded: the table is read again next startup.
+// - No run starts from "prelaunch" until back on the wheel.
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";

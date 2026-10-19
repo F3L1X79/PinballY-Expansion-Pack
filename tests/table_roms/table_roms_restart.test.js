@@ -1,11 +1,7 @@
 // ============================================================
-// Table ROMs across a restart, through main.js on the fake PinballY
-// globals: a first startup runs in a child process, and the second one
-// starts from its record file and ROM fields. An unchanged table is not
-// read again, "no ROM" included; a table whose .vpx or .vbs changed is
-// read again, and the ROM the Add-on wrote itself is updated; a table
-// vpxtool failed on (exit code, no answer in time, output that is no ROM
-// name) was logged, not recorded, and is read again.
+// Table ROMs across a restart (first run in a child process): unchanged
+// tables are not read again; a changed .vpx or .vbs is, and the Add-on's own
+// ROM updated; a vpxtool failure was not recorded and is read again.
 // ============================================================
 
 import { test } from "node:test";

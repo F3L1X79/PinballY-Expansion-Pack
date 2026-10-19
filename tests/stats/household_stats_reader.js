@@ -1,13 +1,8 @@
 // ============================================================
-// Reads the drawn Household Stats the way the player sees it, on the fake
-// PinballY host: whether they are open, the title, the line labels, the
-// columns from left to right (the Profile's name, its Avatar image, the
-// Avatar Frame around it, and each line's cell: its texts and whether its
-// value is gold), the highlighted column (the one the Selection Marker
-// surrounds, or the Exit Button's tooltip on its own layer), whether the marker
-// surrounds the Exit Button, the Button Hints, the columns in view and those faded at the edges
-// while gliding, opens them from the Profile Stats' "Household Stats" button and picks
-// a column as a player would (letting them get ready and fade in, or not), and goes back to the wheel. Never loaded by PinballY.
+// Reads the drawn Household Stats as the player sees them, on the fake host:
+// title, labels, columns and cells, highlighted column, Exit Button, Button
+// Hints, columns in view while gliding; opens them and picks a column like a
+// player. Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";

@@ -1,11 +1,10 @@
 ﻿// ============================================================
 // Entry point loaded by PinballY: loads the Profile store, keeps the Adult
 // Tables off a Child Profile's wheel, switches to Guest when the Profile
-// picker is disabled, then initializes
-// every project script listed in SCRIPTS, in order, skipping those disabled
-// in config.addOns.
-// A script whose init() throws is logged to logfile.log and skipped so the
-// others still load; LOG_STARTUP_TIMING logs each init time.
+// picker is off, then initializes every script of SCRIPTS in order,
+// skipping those disabled in config.addOns.
+// - A script whose init() throws is logged and skipped, so the others still load.
+// - LOG_STARTUP_TIMING logs each init time.
 // ============================================================
 
 import config from "./common/core/config.js";

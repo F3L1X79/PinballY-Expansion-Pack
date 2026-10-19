@@ -1,46 +1,13 @@
 ﻿// ============================================================
-// Achievement List module: the screen the player opens (from the main menu
-// or the Profile Stats) to browse every Achievement of the active Profile
-// in one drawn scrolling list over a dimmed wheel (see docs/adr/0005): a
-// header with the Profile (its Avatar in its worn Avatar Frame, from the
-// Profile Rewards module), its total and its count per Achievement Rank,
-// then the Unlocked Achievements (a toast still waiting first, then the
-// most recently Notified) and the missing ones (the highest Unlock Rate
-// first, then the furthest Achievement Progress), each part under its
-// section header. A missing Secret Achievement's row shows "???" and its
-// hint instead of its title and description. Each row shows its rank
-// emblem (the owner's image, without its halo since the colour and the
-// rank edge already tell an Unlocked row; greyed when missing; drawn when
-// its file is missing, logged once per file), when missing its
-// Achievement Progress, and its Unlock Rate: the Avatars of the other Profiles Notified of it,
-// once the household has two Profiles besides Guest.
-// It opens at its top on the Exit Button, as the Profile Stats do. Next /
-// Prev glide the highlighted line from one Achievement to the next,
-// wrapping through the Exit Button, with PinballY's navigation sound; the other
-// lines are dimmed.
-// Exit closes the list and calls the return given to open(); attract mode
-// closes it too. While it is open, every button is swallowed through
-// "commandbuttondown".
-// Each item (a row or a section header) has its own layer, only moved and
-// faded while the list is open; the header and footer sit on a mask layer
-// above the rows, the header's small emblem images on layers above it. Each
-// emblem image, Avatar and "+N" pill of the rows sits on a small layer of
-// its own, one set per on-screen slot, moved with the rows; the Exit Button
-// and its tooltip on layers of their own too. When the list
-// overflows the rows area, a gold scrollbar sits in the panel's right
-// margin: its rail on the mask, its thumb on a layer of its own, moved with
-// the glide.
-// Every layer is drawn ahead from startup through the shared drawing
-// ahead, nearest the highlighted line first, kept from one opening to the
-// next and redrawn only when what it shows or the window size changed.
-// It opens at once when its first screens are drawn ahead, otherwise
-// through the shared screen opening (docs/adr/0014).
-// What the list shows is read again on each opening, and ahead after a
-// Profile switch or a change of a Profile's data; the other Profiles'
-// files only when their Notified Achievements may have changed.
-// The Profile Rewards module gives the header's Avatar Frame (null: none).
-// Opens directly, not through the wheel dialog module: the player asked
-// for it. isOpen() and onClosed() let the wheel dialogs wait for it.
+// Achievement List: the drawn scrolling list of every Achievement of the
+// active Profile (see docs/adr/0005), opened from the main menu or the
+// Profile Stats. Unlocked ones first, then missing ones by Unlock Rate and
+// Achievement Progress. Exit calls the return given to open().
+// Opens directly, not through the wheel dialog module: the player asked for it.
+// - Every layer is drawn ahead from startup and kept between openings.
+// - Swallows every button through "commandbuttondown" while open.
+// - Opens at once when drawn ahead, else through the shared screen opening (docs/adr/0014).
+// - isOpen() and onClosed() let the wheel dialogs wait for it.
 // ============================================================
 
 import lang from "../core/i18n.js";

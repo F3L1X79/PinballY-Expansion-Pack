@@ -1,10 +1,7 @@
 // ============================================================
-// The wheel dialogs as Drawn Menus, through main.js on the fake PinballY
-// globals: the rating prompt is drawn with its message above its buttons,
-// each button runs its action and Exit dismisses it, the next queued
-// dialog following once it closed, in priority order; a dialog that
-// fails to draw logs the error and shows natively, the queue still
-// advancing on its close.
+// Wheel dialogs as Drawn Menus through main.js: message above the buttons,
+// each button runs its action, Exit dismisses, the queue advances in priority
+// order; a dialog that fails to draw is logged and shows natively.
 // ============================================================
 
 import { test } from "node:test";

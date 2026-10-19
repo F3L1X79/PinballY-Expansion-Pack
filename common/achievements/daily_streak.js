@@ -1,11 +1,9 @@
 // ============================================================
-// Daily Streak: a Profile's days in a row on the cabinet (the active
-// Profile's by default), read from its Play Log (every year file) whenever it is asked, so nothing is
-// persisted and a Profile Reset, which sets the Play Log aside, brings it
-// back to 0, its longest too. A day counts when a Play started on it; the
-// day key changes at midnight, as the Table of the Day's. Created from the
-// PinballY host (for the time) and the Profile store; the Add-ons share one
-// instance through getDailyStreak(). No event, no side effect.
+// Daily Streak: a Profile's days in a row on the cabinet, read from its Play
+// Log whenever asked, so nothing is persisted. Shared through getDailyStreak().
+// No event, no side effect.
+// - A Profile Reset sets the Play Log aside, so it brings the streak back to 0.
+// - The day changes at midnight, as for the Table of the Day.
 // ============================================================
 
 import { createPinballYHost } from "../core/pinbally_host.js";

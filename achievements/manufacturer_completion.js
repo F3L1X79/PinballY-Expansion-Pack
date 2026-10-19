@@ -1,12 +1,10 @@
 ﻿// ============================================================
-// One achievement per manufacturer found in the collection (including
-// the fictional "VPX Community" manufacturer, treated like any other):
-// unlocked once the active Profile has played every table it can see from
-// that manufacturer at least once, with the tables played of that
-// manufacturer as Achievement Progress and an Achievement Rank from the
-// number of its tables. Sorted by manufacturer. asNonChild builds them as
-// a Profile that is not a child would see them (for the Player Level's
-// scaling), profileName as that Profile would. Called by achievements_engine.js; no side effects.
+// One Achievement per manufacturer in the collection: unlocked once the
+// active Profile has played every table it can see from it, with an
+// Achievement Rank from the manufacturer's table count.
+// Called by achievements_engine.js at each check; no side effects.
+// - "VPX Community" is treated like any other manufacturer.
+// - asNonChild builds them as a non-child Profile would see them (Player Level scaling).
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";

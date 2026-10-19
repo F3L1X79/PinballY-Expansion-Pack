@@ -1,10 +1,7 @@
 // ============================================================
-// ROM-less boards handed to PinballY after a Play, through main.js on the
-// fake PinballY globals: once a Play on an original table is settled, its
-// board is handed as plain lines (the DMD and the info box show it),
-// changed or not, since the launch made PinballY forget it; so is a ROM
-// table's whose PINemHi read gave none, from its learned section. A ROM
-// table whose board PinballY reads itself never gets one.
+// ROM-less boards handed to PinballY after a Play: a learned board is handed
+// as plain lines once the Play is settled, changed or not; a ROM table whose
+// board PinballY reads itself never gets one.
 // ============================================================
 
 import { test } from "node:test";

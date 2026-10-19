@@ -1,14 +1,10 @@
 ﻿// ============================================================
-// Drawing ahead: runs the add-ons' drawing work in the background, in
-// slices of about 12 ms, only once no button has been pressed for 400 ms
-// and no game is running (see docs/adr/0005): a draw blocks PinballY while
-// it runs, so it must never make the wheel stutter or slow a game down.
-// Each piece of work is a step function that draws one thing and returns
-// false once nothing is left; it sleeps until woken again. A screen the
-// player waits for runs its opening in the foreground queue instead
-// (docs/adr/0014): at once, in slices of about 30 ms with a pause of a
-// frame for the Loader to turn, the background work waiting until it is over.
-// Listens to "commandbuttondown" to note the last button press.
+// Drawing ahead: runs the Add-ons' drawing work in the background, in slices
+// of about 12 ms, only when no button was pressed for 400 ms and no game
+// runs (see docs/adr/0005). A screen the player waits for runs in the
+// foreground queue instead (docs/adr/0014). Listens to "commandbuttondown".
+// - A draw blocks PinballY while it runs: it must never make the wheel stutter.
+// - A step draws one thing and returns false once nothing is left.
 // ============================================================
 
 import { createPinballYHost } from "./pinbally_host.js";

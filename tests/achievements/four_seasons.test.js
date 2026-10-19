@@ -1,11 +1,7 @@
 // ============================================================
-// Four Seasons, a secret of the Surprises family, started through main.js
-// on the fake PinballY globals: Plays in three meteorological seasons
-// unlock nothing, a Play in the fourth unlocks it, the seasons seen
-// surviving a restart (a first run in a child process, whose files the
-// second run starts from). A game under a minute counts for no season; a
-// Profile Reset erases the seasons seen. While missing, its row shows
-// "???" and its hint.
+// Four Seasons (Surprises family) through main.js: Plays in four
+// meteorological seasons unlock it, the seasons surviving a restart (run in a
+// child process); a short game counts for none; a Profile Reset erases them.
 // ============================================================
 
 import { test } from "node:test";

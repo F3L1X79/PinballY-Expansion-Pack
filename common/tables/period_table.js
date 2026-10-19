@@ -1,17 +1,10 @@
 ﻿// ============================================================
-// Period Table module: picks a table once per Period and keeps it for the
-// whole Period, launches it (selected on the wheel first), and keeps its Streak and its Periods Played.
-// Created from the PinballY host, a Period definition (TABLE_OF_THE_DAY,
-// TABLE_OF_THE_WEEK) and the Profile store; the add-ons share one instance
-// of each through getTableOfTheDay() and getTableOfTheWeek(). The table is
-// the same for the whole household and locked in cabinet.json; the Streak
-// and Periods Played belong to a Profile (its profile.json). A Period
-// counts only through a Play of its table, however it was launched: the
-// table is noted at "gamestarted", and the Profile store's Play
-// announcement (onPlay) records the Period the Play started in for the
-// Profile active then. While the table is an Adult
-// Table, it is not offered to a Child Profile, and cabinet.json keeps that
-// Period next to the lock so the child's Streak goes on across it.
+// Period Table: picks a table once per Period (day or week), launches it,
+// and keeps each Profile's Streak and Periods Played. Shared through
+// getTableOfTheDay() and getTableOfTheWeek().
+// - The table is the household's, locked in cabinet.json.
+// - A Period counts only through a Play of its table, however it was launched.
+// - An Adult Table is not offered to a Child Profile, whose Streak goes on across it.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

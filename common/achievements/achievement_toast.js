@@ -1,25 +1,11 @@
 ﻿// ============================================================
-// Achievement Toast module: announces each unlocked Achievement with a
-// small Steam-like card in the bottom-right corner of the playfield window,
-// drawn on a main-window drawing layer above menus and popups (see
-// docs/adr/0003). It takes no input and leaves on its own: it rises from
-// the bottom edge, holds a few seconds, then fades out. Cards stack, the
-// newest at the bottom, arrive staggered, at most five on screen, and
-// the oldest leaves first. Toasts wait while a game starts, runs or exits,
-// and while a drawn dialog such as the Welcome Screen is open (docs/adr/0011);
-// waiting ones start on "wheelmode" or when that dialog closes. The hold
-// duration and an optional sound played with each card and the card's
-// scale come from the player settings. An Achievement Toast shows its Achievement Rank's emblem in
-// the Rank's colour, or the trophy when that emblem's file is missing
-// (logged once). A Challenge Toast shares the queue and the card, with its
-// own accent colour, header and target icon instead of the trophy; a Mastery
-// Toast its own header (Collection Mastery's for a Collection Tier, with an
-// extra line naming the Avatar Frame it unlocks), the reached level's metal
-// as its accent and the level's number drawn in its tile; a Level Toast the
-// Player Level's colour and the reached level's number in its tile; a High
-// Score Toast its own accent and the place won in its tile. A celebrated toast starts the
-// Confetti Shower when it starts, a Level Toast the Fireworks; while a shower
-// falls, a Level Toast waits until a second before its end.
+// Achievement Toast: announces each unlocked Achievement with a small card
+// in the bottom-right corner, on a non-blocking drawing layer (see
+// docs/adr/0003). Also shows the Challenge, Mastery, Level and High Score
+// Toasts, which share its queue. Cards stack, at most five on screen.
+// - Toasts wait during a game and while a drawn dialog is open (docs/adr/0011).
+// - A celebrated toast starts the Confetti Shower, a Level Toast the Fireworks.
+// - A Level Toast waits until a second before the shower ends.
 // ============================================================
 
 import lang from "../core/i18n.js";

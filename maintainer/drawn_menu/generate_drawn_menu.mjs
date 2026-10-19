@@ -1,18 +1,9 @@
 // ============================================================
 // Maintainer's tool, never loaded by PinballY. Paints the Drawn Menu look
-// (prototype V4, "room lights", branch prototype/drawn-menu-styles) with
-// the Avatar Frames' painting kit, at twice the size then halved, and
-// writes, in assets/images/drawn_menu/, the images and sizes listed by
-// common/drawn_menu/drawn_menu_images.js: the panel (slate gradient, thin border,
-// thin gold frame, square gold corners, soft gold glow from the top) and
-// the glass laid over it (the room's lights out of focus: two warm spots
-// top left, a cold one on the right, a neon along the top, a faint warm
-// one at the bottom), each cut into a top, a stretchable middle and a
-// bottom; and the chosen entry's glowing, pointed gold outline.
-// Run: node maintainer/drawn_menu/generate_drawn_menu.mjs [--sheet], --sheet
-// also writing sheet.png next to them (not committed): a short and a
-// long menu built from the slices, to check by eye that they join
-// without a seam.
+// (panel, glass, selection outline) with the Avatar Frames' kit, and writes
+// the images listed by common/drawn_menu/drawn_menu_images.js.
+// Run: node maintainer/drawn_menu/generate_drawn_menu.mjs [--sheet]
+// - --sheet writes an uncommitted sheet.png to check by eye that the slices join without a seam.
 // ============================================================
 
 import path from "node:path";

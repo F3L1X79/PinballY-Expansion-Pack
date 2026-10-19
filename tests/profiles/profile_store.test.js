@@ -1,10 +1,7 @@
 // ============================================================
-// Profile store at the PinballY host seam, on the fake host's in-memory
-// file system: every Play (a game of at least a minute whose start was
-// seen) is recorded for the Profile active at its start in its own
-// profile.json and announced to the onPlay listeners, cabinet.json
-// remembers the active Profile across restarts, saves go through tmp /
-// backup / rename, and Profiles are listed with their Avatar.
+// Profile store at the host seam, on the fake file system: each Play is
+// recorded for the Profile active at its start and announced to onPlay;
+// cabinet.json remembers the active Profile; saves use tmp / backup / rename.
 // ============================================================
 
 import { test } from "node:test";

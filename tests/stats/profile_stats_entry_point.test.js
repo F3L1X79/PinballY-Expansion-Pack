@@ -1,10 +1,7 @@
 // ============================================================
-// The Profile Stats, started through main.js on the fake PinballY globals:
-// their main menu entry sits right before the Achievement List entry, the
-// Achievements button agrees with the real Achievement List and opens it,
-// Exit there bringing the Profile Stats back on that button, and the Most
-// Played Tables and Tables to Discover buttons close them and put the
-// wheel on their selection.
+// The Profile Stats through main.js: the entry sits before the Achievement
+// List's; the Achievements button opens the real list and Exit comes back on
+// it; Most Played and Tables to Discover close them and select the filter.
 // ============================================================
 
 import { test } from "node:test";

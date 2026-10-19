@@ -1,13 +1,9 @@
 ﻿// ============================================================
 // Records the session stats of a Profile in the "sessions" part of its
-// profile.json. Longest / shortest session, the "grand return" flag (a
-// table replayed after a long break) and the Day's Manufacturers with
-// their one-day record count only Plays: facts are noted at "gamestarted"
-// and recorded when the Profile store announces the Play (onPlay), for the
-// Profile active at its start. The "rage quit" flag times every game itself,
-// from "gamestarted" to "gameover". All of it runs synchronously within
-// those events, so it finishes before achievements_engine's check, which
-// is deferred with setTimeout(fn, 0).
+// profile.json: longest / shortest session, "grand return", "rage quit"
+// and the Day's Manufacturers.
+// - Facts are noted at "gamestarted" and recorded on the Play (onPlay), for the Profile active at its start.
+// - Runs synchronously so it finishes before achievements_engine's deferred check.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";

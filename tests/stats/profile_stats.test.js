@@ -1,12 +1,8 @@
 // ============================================================
-// The drawn Profile Stats, through main.js on the fake PinballY globals:
-// "Your Stats" in the main menu opens them over the wheel, no native menu;
-// the card names the active Profile under its Avatar, with the Achievements,
-// Most Played Tables and Tables to Discover buttons at its foot; the GAME
-// section sums every table played, hidden and removed ones included; the
-// Exit Button (Back) is selected on opening, Next / Prev loop with the
-// navigation sound, every button is swallowed, Exit and Select on the Exit
-// Button close them, attract mode too, and every number is read again on each opening.
+// The drawn Profile Stats through main.js: opened from "Your Stats", the card
+// and its buttons, GAME summing every table played (hidden and removed too),
+// Exit Button selected first, Next / Prev looping, every button swallowed,
+// numbers read again on each opening.
 // ============================================================
 
 import { test } from "node:test";

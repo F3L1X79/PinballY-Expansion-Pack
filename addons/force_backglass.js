@@ -1,10 +1,8 @@
 ﻿// ============================================================
-// Forces the backglass window visible at startup, hides it while a table is
-// running (VPX renders its own backglass), and shows it again once back at
-// the wheel. Listens to "gamestarted" and "gameover". On a single screen it
-// hides the backglass instead at each of these moments: it has no monitor of
-// its own there, PinballY reopens it from its saved setting, and it then
-// covers the whole playfield.
+// Forces the backglass window visible at startup, hides it while a table
+// runs (VPX draws its own) and shows it again back at the wheel.
+// Listens to "gamestarted" and "gameover".
+// - On a single screen it hides the backglass instead: PinballY reopens it over the playfield.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";

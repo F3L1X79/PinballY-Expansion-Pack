@@ -1,11 +1,7 @@
 // ============================================================
-// The drawn Profile Stats in French, through main.js on the fake PinballY
-// globals, with the Tables to Discover Add-on off: a Profile with no Play
-// shows "—" for its average, no Most Played Tables button and its
-// PROGRESSION at zero, without a gold record pill at Streak 0, and no
-// Tables to Discover button ever shows; another Profile's games of over an
-// hour show their average in hours, its totals thousands separated, and an
-// average just under an hour rounds up to "1 h 00".
+// The Profile Stats in French without Tables to Discover: a Profile with no
+// Play shows "—" and zeros, no Most Played button; long averages show in
+// hours, totals with thousands separators, just under an hour as "1 h 00".
 // ============================================================
 
 import { test } from "node:test";

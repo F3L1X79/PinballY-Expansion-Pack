@@ -1,11 +1,7 @@
 // ============================================================
-// Coming back to the Profile Stats, through main.js on the fake PinballY
-// globals, with slow draws: Exit from the Achievement List, the Household
-// Stats and the Avatar Frame list, and choosing the frame already worn,
-// show them again at once, fully opaque, on the button they were left
-// from, with no veil, no Loader and no opening time line; only equipping
-// another frame dims the wheel under the veil, turns the Loader after
-// 150 ms, then fades them in with the new frame on the card.
+// Coming back to the Profile Stats with slow draws: Exit from a child screen
+// shows them at once on the button left, with no veil or Loader; only
+// equipping another frame goes through the veil, Loader and fade.
 // ============================================================
 
 import { test } from "node:test";

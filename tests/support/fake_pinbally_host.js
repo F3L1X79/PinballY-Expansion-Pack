@@ -1,33 +1,12 @@
 ﻿// ============================================================
-// In-memory fake PinballY host for the node tests. Offers the same
-// interface as common/core/pinbally_host.js, plus controls for the tests: set
-// the date (a manual clock that also runs the host's timers, and that each
-// layer draw can move on), the monitor
-// count, the table list, the wheel selection (and its filter, and the
-// player's wheel moves) and the
-// layout size, seed settings, fire PinballY events (the settings' own
-// included), apply the metafilters
-// to the wheel selection and a filter's games, enter and leave attract
-// mode, open the Exit menu
-// or main menu with their native items, pick menu items, play launched games, and inspect shown menus, launches, written settings keys,
-// drawing layers, what was drawn, the underlay set by a script, the wheel
-// shown or hidden, the launch overlay's layers, running intervals, sounds played (and on which player), the
-// backglass window shown or hidden, and the lower status line (which can
-// start with the player's own messages, and get a temporary one as
-// PinballY's show() puts it); script filters are shown with selectFilter().
-// Its in-memory file system is seeded with files (with their modified
-// date) and folders (and unreadable images) and inspected (file contents,
-// reads, writes, renames and deletes, Kernel32 handles left open), and
-// registry values seeded.
-// Programs run hidden are described by the tests (output, exit code, run
-// time) and their runs inspected. The board PINemHi reads in each table's
-// NVRAM is set by the tests; a game's getHighScores() reads it like
-// PinballY (cache, highscoresrequest / highscoresready, failed or killed runs).
-// installGlobals() also exposes it as PinballY's globals (and the global
-// Date and timers, and the COM file objects over the same file system), so
-// code not yet on the host runs too. settle() waits on a real timer for
-// the deferred work to run.
+// In-memory fake PinballY host for the node tests: the same interface as
+// common/core/pinbally_host.js, plus controls to drive it (clock and timers,
+// tables, wheel, menus, events, attract mode, games, file system, registry,
+// programs, PINemHi boards) and inspect what the code did.
 // Never loaded by PinballY.
+// - Reproduces only behaviours written in docs/pinbally/ or an ADR.
+// - installGlobals() also exposes it as PinballY's globals, for code not yet on the host.
+// - settle() waits on a real timer for deferred work to run.
 // ============================================================
 
 import { projectFolderOf } from "../../common/core/pinbally_host.js";

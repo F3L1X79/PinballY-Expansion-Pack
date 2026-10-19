@@ -1,10 +1,7 @@
 // ============================================================
-// The High Score Board, through main.js on the fake PinballY globals: the
-// "High Scores" main menu entry, first of the selected table's section
-// (PinballY's own information entries after it), opens the
-// selected table's last known board, the 1st in the middle of the podium,
-// the 2nd on its left, the 3rd on its right, each with its owner's name
-// and Avatar or "Default score", the places after them in rows below.
+// The High Score Board through main.js: the "High Scores" entry heads the
+// table's section and opens the last known board, the podium (2nd, 1st, 3rd)
+// with names and Avatars or "Default score", then the rows below.
 // ============================================================
 
 import { test } from "node:test";

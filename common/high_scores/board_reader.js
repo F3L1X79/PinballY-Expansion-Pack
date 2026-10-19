@@ -1,12 +1,8 @@
 // ============================================================
 // Board reader: turns the raw lines PinballY returns for a table's high
-// scores (getHighScores() / highscoresready) into a board of places, and
-// tells which places of an "after" board are new against a "before" one,
-// and whether a place vanished that no new place beat (a reset).
-// Pure: reads no PinballY global, writes nothing.
-// The rule follows vpin-studio's RawScoreParser (MIT, (c) Matthias Faust /
-// syd711, github.com/syd711/vpin-studio), validated on the cabinet's 107
-// tables by the prototype/high-scores-probe branch.
+// scores into a board of places, and compares two boards (new places,
+// reset). Pure: reads no PinballY global, writes nothing.
+// - The rule follows vpin-studio's RawScoreParser (MIT, (c) Matthias Faust / syd711).
 // ============================================================
 
 // vpin-studio's highscoreTitles: an unranked score counts only under one.

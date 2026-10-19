@@ -1,10 +1,8 @@
 // ============================================================
-// The Child Profile's wheel, started through main.js on the fake PinballY
-// globals: while a Profile marked isChild in its profile.json is active,
-// no Adult Table (category "NSFW") is on the wheel, under any filter, nor
-// drawn by the Random Game, and the Welcome Screen's stay choice never
-// leaves the child on one. Switching Profiles brings them back or moves the wheel off them
-// at once. A mark on Guest is logged and ignored.
+// The Child Profile's wheel through main.js: no Adult Table under any filter,
+// in the Random Game or under the Welcome Screen's stay choice; a switch
+// brings them back or moves the wheel off at once.
+// - An isChild mark on Guest is logged and ignored.
 // ============================================================
 
 import { test } from "node:test";

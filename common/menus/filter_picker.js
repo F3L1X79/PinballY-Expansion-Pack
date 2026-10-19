@@ -1,17 +1,10 @@
 // ============================================================
-// The Filter Picker: the wheel selections (PinballY's [Top] filters) and
-// the filter groups leave the main menu for this submenu, which lists the
-// selections the main menu module still shows (as Menu Cleanup and the
-// filter conditions left them, PinballY's mark on the current one), the
-// groups (the one holding the Active Filter marked), then Back. The main
-// menu module creates it, hands it each main menu opening and the way to
-// reopen the main menu on an entry. Its main menu entry names the Active
-// Filter as the menus show it. It is shown by turning a main menu opening
-// into it (ev.id and ev.items edited in "menuopen"), not with showMenu,
-// which fires no "menuopen": so the Drawn Menus Add-on draws it like any
-// other menu. Back and Exit go up one level at a time (see docs/adr/0013).
-// Listens to "menuopen", "menuclose", "command", "attractmodestart" and
-// the game list's "filterselect".
+// Filter Picker: the submenu that takes the wheel selections and filter
+// groups out of the main menu. Created by the main menu module; its entry
+// names the Active Filter. Listens to "menuopen", "menuclose", "command",
+// "attractmodestart" and "filterselect".
+// - Shown by turning a main menu opening into it, not with showMenu (no "menuopen").
+// - Back and Exit go up one level at a time (see docs/adr/0013).
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

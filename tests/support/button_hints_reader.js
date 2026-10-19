@@ -1,10 +1,7 @@
 // ============================================================
-// Reads the Button Hints of a drawn screen the way the player sees them,
-// on the fake PinballY host: from a footer's text strokes, the groups of
-// key caps (drawn in the title's colour) each followed by the word saying
-// what they do (in the descriptions' colour), left to right; the
-// Exit Button's tooltip on a screen's tooltip layer; and where a layer
-// shows in the window, to check that a footer fits. Never loaded by PinballY.
+// Reads a drawn screen's Button Hints as the player sees them, on the fake
+// host: the key caps groups and their words, the Exit Button's tooltip, and
+// where a layer shows, to check that a footer fits. Never loaded by PinballY.
 // ============================================================
 
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";

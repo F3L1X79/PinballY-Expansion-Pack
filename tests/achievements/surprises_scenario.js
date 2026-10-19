@@ -1,10 +1,8 @@
 // ============================================================
-// Surprises tests' scenario: main.js on the fake globals with the session
-// stats and the Achievements only, two tables without a manufacturer or a
-// year (or the test's own tables), Guest active, Alice and Bob (a Child
-// Profile) beside it. Moves the clock to a given moment, plays one of the
-// tables and reads the toasts it brought, opens the Achievement List and
-// reads its rows. Never loaded by PinballY.
+// Surprises tests' scenario: main.js on the fake globals with session stats
+// and Achievements only, Guest, Alice and Bob (a Child Profile). Moves the
+// clock, plays a table, reads the toasts and the Achievement List's rows.
+// Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";

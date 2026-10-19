@@ -1,11 +1,8 @@
 ﻿// ============================================================
-// The Welcome Screen's random choice and the "Start Random Game" main menu
-// entry, started through main.js on the fake PinballY globals, never launch
-// the active Profile's Last Played Table when the wheel selection holds
-// another table, and every one played a minute counts in the Random Games
-// played.
-// Runs with the Random Game animation turned off (the fake has no wheel
-// buttons).
+// The Welcome Screen's random choice and "Start Random Game" never launch the
+// Last Played Table when another is there, and each Play counts in the
+// Random Games played.
+// - Runs with the animation off: the fake has no wheel buttons.
 // ============================================================
 
 import { test } from "node:test";

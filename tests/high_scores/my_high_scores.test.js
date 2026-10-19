@@ -1,11 +1,7 @@
 // ============================================================
-// My High Scores, through main.js on the fake PinballY globals: its entry
-// sits right under Most Played Tables while the active Profile holds a
-// place on a board, and picking it puts on the wheel the tables it can
-// see where it still holds one, best place first, then by title. A High
-// Score pushed off the board and a hidden table are left out. A Profile
-// switch while it is current shows the new Profile's tables, or every
-// table when it holds no place.
+// My High Scores through main.js: the entry shows while the Profile holds a
+// place and puts those tables on the wheel, best place first. Pushed-off
+// places and hidden tables are left out; a Profile switch updates it.
 // ============================================================
 
 import { test } from "node:test";

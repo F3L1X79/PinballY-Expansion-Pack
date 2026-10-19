@@ -1,10 +1,8 @@
 // ============================================================
-// Achievement Progress of the Period Tables Achievements, through main.js
-// on the fake PinballY globals: a Streak Achievement the record reached
-// stays Unlocked when the Streak breaks; a missing one follows the current
-// Streak (0 after a break, then 1 on the next play), never the record;
-// Periods Played Achievements count every Period, for the day and the
-// week; the first-play Achievements (a target of 1) show none.
+// Achievement Progress of the Period Tables Achievements through main.js:
+// a Streak Achievement stays Unlocked when the Streak breaks; a missing one
+// follows the current Streak, never the record; Periods Played counts every
+// Period; first-play Achievements show none.
 // ============================================================
 
 import { test } from "node:test";

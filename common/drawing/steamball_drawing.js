@@ -1,11 +1,8 @@
 ﻿// ============================================================
-// Steamball drawing helpers shared by the drawn screens (Welcome Screen,
-// Profile Stats) and the Profile badge: text on one or several lines,
-// rounded and gradient fills, glows, the dimmed backdrop with its panel,
-// the Avatar, a wheel logo, the Exit Button (its cross or back arrow) and
-// its tooltip, the Button Hints and their footer, the Avatar Frame around an Avatar and the
-// Player Level pip. Each
-// draws on the drawing context it is given, in its coordinates. Only drawing: no layer, no event, no side effect.
+// Steamball drawing helpers shared by the drawn screens and the Profile
+// badge: texts, fills, glows, backdrop and panel, Avatar and Avatar Frame,
+// wheel logo, Exit Button, Button Hints, Player Level pip.
+// Only drawing, on the context given: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "./steamball_palette.js";

@@ -1,14 +1,8 @@
 // ============================================================
-// Reads the drawn Welcome Screen the way the player sees it, on the fake
-// PinballY host: whether it is open, its greeting, its Daily Streak line,
-// its Lost Records line and the Avatar on it, where its layers sit,
-// its Collection Mastery card, the startup veil, its Period Table cards (period, name,
-// Mastery head, grey line, logo), its bottom row's labels, the highlighted choice (the label
-// the Selection Marker surrounds, the period of the card whose button it
-// surrounds, or the tooltip of the Avatar or the cross, on its tooltip
-// layer), its Button Hints and where its footer sits, and picks a choice
-// with Next and Select as a player would.
-// Never loaded by PinballY.
+// Reads the drawn Welcome Screen as the player sees it, on the fake host:
+// greeting, Daily Streak and Lost Records lines, Collection Mastery and
+// Period cards, bottom row, highlighted choice, Button Hints, startup veil;
+// picks a choice like a player. Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";

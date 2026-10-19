@@ -1,13 +1,8 @@
 ﻿// ============================================================
-// Period Tables family: Achievements for playing the Table of the Day / the
-// Table of the Week. First play (once during its Period, Bronze as the
-// family's easiest step), Periods Played (10, 25, 50 and 100 days; 4, 10,
-// 26 and 52 weeks, consecutive or not) and Streaks (3, 7, 14 and 30 consecutive days; 4 and 12 consecutive
-// weeks).
-// Periods Played and Streaks show those counters as Achievement Progress,
-// the current Streak for a Streak; a Streak Achievement is unlocked by the
-// longest Streak, so a broken Streak never takes it back. Reads the
-// counters kept by common/tables/period_table.js; writes nothing.
+// Period Tables family: first play, Periods Played and Streaks on the Table
+// of the Day and the Table of the Week, from the counters kept by
+// common/tables/period_table.js. Writes nothing.
+// - A Streak Achievement is unlocked by the longest Streak: a broken Streak never takes it back.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements/achievements.js";

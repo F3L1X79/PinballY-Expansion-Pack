@@ -1,10 +1,7 @@
 // ============================================================
-// The worn Avatar Frame in the Achievement List header, through main.js on
-// the fake PinballY globals: the header's Avatar wears it (the 192 px
-// image) instead of its double gold frame, a quarter of its size beyond
-// it, inside the header and left of its texts; the Unlock Rate Avatars of
-// the other Profiles wearing a frame stay plain. A frame chosen in the
-// Profile Stats shows at the list's next opening.
+// The worn Avatar Frame in the Achievement List header through main.js: the
+// header's Avatar wears it, the Unlock Rate Avatars stay plain, and a frame
+// chosen in the Profile Stats shows at the next opening.
 // ============================================================
 
 import { test } from "node:test";

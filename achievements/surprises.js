@@ -1,14 +1,10 @@
 // ============================================================
-// The Surprises family: Secret Achievements that hang on no Add-on but the
-// Achievements themselves. Each one is unlocked by what the Surprises
-// tracker (common/achievements/surprises.js) recorded in the active Profile's
-// "surprises" part: a flag, or for Four Seasons every season seen. Night
-// Owl and Full Moon Night are absent for a Child Profile, whatever their
-// flags say; Time Travel is absent while the active Profile's tables cover
-// fewer decades than its run needs. asNonChild builds the set as a Profile
-// that is not a child would see it, profileName as that Profile would. No
-// Achievement Progress. Called by
-// achievements_engine.js at each check; no side effects.
+// The Surprises family: Secret Achievements unlocked from what the Surprises
+// tracker (common/achievements/surprises.js) recorded in the Profile's
+// "surprises" part. Called by achievements_engine.js; no side effects.
+// - Night Owl and Full Moon Night are absent for a Child Profile.
+// - Time Travel is absent while the Profile's tables cover too few decades.
+// - asNonChild builds the set as a non-child Profile would see it.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, standaloneAchievement } from "../common/achievements/achievements.js";

@@ -1,11 +1,7 @@
 // ============================================================
-// The startup veil and Loader, through main.js on the fake PinballY
-// globals with the Welcome Screen and the Profile picker on: from the
-// first frame, the wheel is dimmed as under the panel and the comet turns
-// in the middle of the playfield screen, both just under the panel's
-// backdrop; the comet goes when the panel starts fading in, the veil once
-// the fade-in is complete. Buttons behave as before meanwhile. After
-// Change Player, the screen opens with neither.
+// The startup veil and Loader: from the first frame the wheel is dimmed and
+// the comet turns just under the panel; the comet goes when the panel fades
+// in, the veil once it is in. None after Change Player.
 // ============================================================
 
 import { test } from "node:test";

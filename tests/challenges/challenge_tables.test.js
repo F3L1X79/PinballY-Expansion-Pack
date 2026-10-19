@@ -1,12 +1,8 @@
 // ============================================================
-// Challenge Tables, through the Challenge module and the Challenge Tables
-// filter on the fake PinballY host, with a real Profile store, real Period
-// Tables and a real Random Game module: the filter sits in the Filter
-// Picker right under "All Tables", and choosing it puts on the wheel the visible
-// tables that would move the Challenge forward, or every table back when
-// there is none (other templates, not followed yet, no Challenge, completed).
-// It is listed there only while the active Profile's Challenge
-// has Challenge Tables, checked at each opening.
+// Challenge Tables over the fake host with real modules: the filter sits
+// under "All Tables" and puts on the wheel the tables that move the
+// Challenge forward, or every table when there are none.
+// - Listed only while the Challenge has Challenge Tables, checked at each opening.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,12 +1,7 @@
 // ============================================================
-// The main menu as a Drawn Menu, through main.js on the fake PinballY
-// globals: it is drawn instead of the native one with the pack's sections,
-// the cursor on the first entry; Next and Prev move it,
-// wrapping, with PinballY's navigation sound, the gold title landing at
-// once on the new entry while the outline glides to it; Select or Launch runs the
-// entry's command with the Select sound, Exit and attract mode close it
-// without running anything, and no button reaches the wheel while it is
-// open.
+// The main menu as a Drawn Menu through main.js: drawn with the pack's
+// sections, Next / Prev wrap with the navigation sound, Select runs the
+// entry, Exit and attract mode close it, no button reaches the wheel.
 // ============================================================
 
 import { test } from "node:test";

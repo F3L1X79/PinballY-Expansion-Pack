@@ -1,12 +1,8 @@
 ﻿// ============================================================
-// Fills PinballY's two status lines, after the player's own messages from
-// PinballY's options, never in their place. The upper line adds a welcome
-// naming the active Profile, the table count, how to launch and browse, and
-// a sign-off. The lower line adds rotating info about the selected table:
-// its alphabetical position within the active filter, release year,
-// manufacturer, and the active Profile's play count and total play time.
-// Refreshes on "gameselect", "filterselect", "wheelmode" (back from a game)
-// and on a Profile switch.
+// Fills PinballY's two status lines after the player's own messages: a
+// welcome on the upper line, rotating info on the selected table on the
+// lower one. Refreshes on "gameselect", "filterselect", "wheelmode" and a
+// Profile switch.
 // ============================================================
 
 import lang from "../common/core/i18n.js";

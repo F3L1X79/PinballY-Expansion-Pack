@@ -1,10 +1,7 @@
 // ============================================================
-// Welcome Screen with the Profile picker on, through main.js on the fake
-// PinballY globals: Select on the Avatar closes the screen and opens the
-// carousel on the active Profile; picking another Profile there, or from
-// the main menu's Change Player, brings the screen back for that Profile
-// instead of the Profile Greeting. Leaving the carousel on the same
-// Profile, by Select or Exit, brings back neither.
+// Welcome Screen and Change Player: Select on the Avatar opens the carousel;
+// picking another Profile brings the screen back for it instead of the
+// Profile Greeting; leaving on the same Profile brings back neither.
 // ============================================================
 
 import { test } from "node:test";

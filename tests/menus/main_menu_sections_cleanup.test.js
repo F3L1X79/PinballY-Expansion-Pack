@@ -1,10 +1,7 @@
 // ============================================================
-// The main menu's sections in French with Menu Cleanup on, through main.js
-// on the fake PinballY globals, for a non-Admin Profile once the household
-// has an Admin: PinballY's information entries are gone, Table Setup too,
-// the wheel selections and the filter groups are behind one entry reading
-// "Filtre actif : Toutes les tables", and no separator is
-// doubled; the Achievement List entry reads "Vos succès".
+// The main menu's sections in French with Menu Cleanup on, for a non-Admin
+// Profile: information entries and Table Setup gone, selections and groups
+// behind "Filtre actif : Toutes les tables", no doubled separator.
 // ============================================================
 
 import { test } from "node:test";

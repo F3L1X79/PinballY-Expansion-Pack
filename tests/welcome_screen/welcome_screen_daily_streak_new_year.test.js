@@ -1,10 +1,7 @@
 // ============================================================
-// Daily Streak across New Year's Eve on the Welcome Screen, through
-// main.js on the fake PinballY globals, with the Profile picker off: a
-// Play started on 31 December at 23:50 and ended after midnight counts
-// for the day it started, so on 1 January the Daily Streak is still alive
-// from yesterday; a Play on 1 January, in the next year's Play Log file,
-// keeps it going.
+// Daily Streak across New Year's Eve: a Play started at 23:50 on 31 December
+// counts for that day, so the streak is alive on 1 January, and a Play in the
+// next year's Play Log file keeps it going.
 // ============================================================
 
 import { test } from "node:test";

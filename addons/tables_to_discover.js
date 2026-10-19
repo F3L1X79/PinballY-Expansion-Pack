@@ -1,10 +1,8 @@
 // ============================================================
-// Adds a "Tables to Discover" filter to PinballY's main menu, right before
-// the Hall of Fame: the wheel then shows the tables the active Profile can
-// see and never played, by title.
-// Registered once at init; the selection is recomputed each time the
-// filter is activated, and on a Profile switch or a Profile Reset of the
-// active Profile while the filter is on the wheel.
+// Adds a "Tables to Discover" filter to the main menu, before the Hall of
+// Fame: the tables the active Profile can see and never played, by title.
+// Recomputed when the filter is activated, and on a Profile switch or Reset
+// while the filter is on the wheel.
 // ============================================================
 
 import lang from "../common/core/i18n.js";

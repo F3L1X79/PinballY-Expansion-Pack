@@ -1,10 +1,7 @@
 // ============================================================
-// The High Score Board in place of PinballY's own "High Scores", through
-// main.js on the fake PinballY globals, Menu Cleanup on and the Drawn
-// Menus off: the main menu shows only the pack's "High Scores" entry, and
-// the HighScores button opens the drawn board on the selected table
-// instead of PinballY's window, Exit going straight back to the wheel;
-// pressed over a menu, it does nothing.
+// The High Score Board replacing PinballY's "High Scores", with Menu Cleanup
+// on and native menus: only the pack's entry, the HighScores button opens
+// the drawn board, Exit goes back to the wheel; over a menu it does nothing.
 // ============================================================
 
 import { test } from "node:test";

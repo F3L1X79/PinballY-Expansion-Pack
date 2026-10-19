@@ -1,31 +1,13 @@
 ﻿// ============================================================
-// Checks all registered achievements for the active Profile at startup,
-// after every "gamestarted" and "gameover" event, on every Profile
-// switch, when the World Tour tracker, started here, completes a tour and
-// when a Play credited High Scores, and hands each newly unlocked one to
-// the Achievement Toast module, which announces it with a card in the bottom-right corner once no
-// game is running, with a Confetti Shower for a Platinum; an Achievement
-// becomes Notified, for the Profile that unlocked it, when its toast starts. A Profile Reset forgets what was
-// announced to that Profile and drops its toasts still waiting. When the
-// toasts of a check bring a higher Player Level, one Level Toast for the
-// highest level follows them; the level at startup, at a Profile switch
-// and after a Profile Reset is the baseline, never announced, and so is a
-// rise that comes without new Achievements (a change in the collection). A
-// Child Profile's level is read with its points scaled up by the set a
-// Profile that is not a child would have, built only to be counted.
-// Keeps the shown Player Level (the level pip's): the baseline, then each
-// Level Toast's level as it starts.
-// Also adds the Achievement List and Profile Stats entries to the main
-// menu's player section, and lets the Profile Rewards
-// module submit its Reward Prompt, which opens the Profile Stats' frame
-// list; the Profile Stats open the Household Stats. No wheel dialog shows
-// while one of these drawn screens is open.
-// The Challenges family and the
-// Profile Stats line on completed Challenges exist only while the
-// Challenges Add-on is enabled, the High Scores family and the Profile
-// Stats and Household Stats lines on the boards only while the High
-// Scores Add-on is. Also starts the Surprises tracker, which
-// records each Play for the Surprises family.
+// Checks the active Profile's Achievements and hands the new ones to the
+// Achievement Toast module, followed by one Level Toast when they raise the
+// Player Level. Runs at startup, after "gamestarted" / "gameover", on a
+// Profile switch, a completed World Tour and a Play that credited High Scores.
+// Also adds Achievement List and Profile Stats to the main menu and starts the World Tour and Surprises trackers.
+// - An Achievement becomes Notified when its toast starts, not when it unlocks.
+// - The level at startup, at a switch or after a Profile Reset is a baseline, never announced.
+// - A Child Profile's level scales its points by the set a non-child Profile would have.
+// - The Challenges / High Scores families exist only while their Add-on is on.
 // ============================================================
 
 import { evaluateAchievements, markNotified, ACHIEVEMENT_RANK } from "../common/achievements/achievements.js";

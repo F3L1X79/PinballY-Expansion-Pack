@@ -1,29 +1,13 @@
 // ============================================================
-// Household Stats module: the drawn screen the player opens from the
-// Profile Stats' "Household Stats" button to set the Household's Profiles (every
-// Profile but Guest) side by side: a centred Steamball panel over the
-// dimmed wheel, laid out by the Household Stats painter, with one column
-// per Profile (its Avatar in the Avatar Frame it wears; the active one
-// first unless it is Guest, then the Profile picker's order) and one line
-// per stat where more is better, the best of each line in gold. Every
-// value is read again on each opening, through the Profile Stats' reader,
-// one Profile per step of the shared screen opening (docs/adr/0014). While open
-// it swallows every button through "commandbuttondown": Next / Prev move
-// the Selection Marker (a gold glow flowing round the choice) through the
-// Exit Button at the top right, then from column to
-// column, looping, with PinballY's navigation sound. Past five columns
-// (fewer in a narrow window), the columns glide sideways to keep the
-// marker in view, the marker following its column on every frame, the ones cut by the view's edges
-// faded, and coming from the Exit Button jumps instead of gliding across
-// them all. The Button Hints' footer names the flippers, Select and Exit. Select or Launch on another Profile's column opens its Profile
-// Stats read-only, whose Exit shows this screen again on that column; on
-// one's own column or the Exit Button it goes back as Exit does. While
-// that screen is open, this one waits set aside, hidden (as the Profile
-// Stats do under their children, see common/stats/drawn_screen.js).
-// Exit closes it and calls the return given to open(); attract mode only
-// closes it. Opens directly, not through the
-// wheel dialog module: the player asked for it. isOpen() and onClosed()
-// let the wheel dialogs wait for it.
+// Household Stats: the drawn screen opened from the Profile Stats that sets
+// every Profile but Guest side by side, one column each, the best value of
+// each line in gold. Select on a column opens that Profile's Stats
+// read-only. Exit calls the return given to open().
+// Opens directly, not through the wheel dialog module: the player asked for it.
+// - Read again on each opening, one Profile per step (docs/adr/0014).
+// - Swallows every button through "commandbuttondown" while open.
+// - Past five columns, they glide sideways to keep the marker in view.
+// - isOpen() and onClosed() let the wheel dialogs wait for it.
 // ============================================================
 
 import lang from "../core/i18n.js";

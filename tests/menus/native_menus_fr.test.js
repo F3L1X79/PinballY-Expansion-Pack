@@ -1,10 +1,8 @@
 // ============================================================
-// PinballY's own menus in French, through main.js on the fake PinballY
-// globals: the texts it builds around a name or a duration (Batch Capture
-// ready, game details deletion, a custom window's "Show" command, a
-// media type's capture line), the filters the generic "... Tables" rule
-// used to mangle, and the "Filter by Last Played" periods. An unknown title
-// is logged only when logUntranslatedMenuTitles is on.
+// PinballY's own menus in French through main.js: texts built around a name
+// or a duration, filters the generic "... Tables" rule used to mangle, and
+// the "Filter by Last Played" periods.
+// - An unknown title is logged only when logUntranslatedMenuTitles is on.
 // ============================================================
 
 import { test } from "node:test";

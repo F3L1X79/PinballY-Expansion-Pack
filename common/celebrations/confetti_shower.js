@@ -1,14 +1,9 @@
 // ============================================================
-// Confetti Shower: about 8 s of confetti across the wheel screen, on
-// main-window layers above toasts and menus, started with a celebrated toast;
-// it does not check for a drawn dialog itself: the toast waits for one.
-// It tells when the falling shower is due to end, and when it stops, so a
-// Level Toast can follow it.
-// Each confetto (front and back) is drawn ahead, then only moved, stretched
-// and shown or hidden; it waits shrunk to a dot, never as a hidden layer
-// the size of the window. An optional sound plays once as a shower starts.
+// Confetti Shower: about 8 s of confetti over the wheel screen, started with
+// a celebrated toast; tells when it is due to end so a Level Toast can follow.
 // Vanishes on "prelaunch", "gamestarted" and "attractmodestart".
-// CONFETTI=false prepares, draws and plays nothing.
+// - Confetti wait shrunk to a dot: a hidden full-window layer still costs every frame.
+// - Does not check for a drawn dialog itself: the toast waits for one.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

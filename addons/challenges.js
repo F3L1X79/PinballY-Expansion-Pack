@@ -1,12 +1,9 @@
 // ============================================================
-// Challenges: wires the shared Challenge module (the week's draw,
-// locked in cabinet.json, and each Profile's counted games in its
-// profile.json) to the Challenge Card (under the Profile badge, or in the
-// top right corner when the Profile picker is off and there is no badge)
-// and to the Challenge Tables entry of the main menu, shown only while
-// the Challenge has Challenge Tables. At startup the
-// week's Challenge is drawn if needed and the card drawn; the card follows
-// Profile switches, hides on "gamestarted" and comes back on "wheelmode".
+// Challenges: wires the shared Challenge module to the Challenge Card and to
+// the Challenge Tables main menu entry. Draws the week's Challenge at
+// startup if needed; the card follows Profile switches, hides on
+// "gamestarted" and comes back on "wheelmode".
+// - The Challenge Tables entry shows only while the Challenge has Challenge Tables.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";

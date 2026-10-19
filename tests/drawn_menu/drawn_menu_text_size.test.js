@@ -1,10 +1,7 @@
 // ============================================================
-// A Drawn Menu's texts at the prototype's sizes in pixels, through
-// main.js on the fake PinballY globals with only the Drawn Menus Add-on
-// on, in a cabinet's portrait window: StyledText takes its size in
-// points (PinballY multiplies it by 4/3), so an entry the prototype
-// draws at 36 px is given 27 pt, its gold copy on the selection too; the
-// main menu's footer at the entries' size.
+// A Drawn Menu's text sizes in a portrait window: an entry the prototype
+// draws at 36 px is given 27 pt, the footer at the entries' size.
+// - StyledText takes points: PinballY multiplies them by 4/3.
 // ============================================================
 
 import { test } from "node:test";

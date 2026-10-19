@@ -1,13 +1,8 @@
 // ============================================================
-// Shown Player Level: the level the household has been shown, for each
-// Profile (the baseline at startup, at a Profile switch and after a
-// Profile Reset, then the level of each Level Toast as it starts), so the
-// level pip never runs ahead of the Level Toast nor shows a drop out of
-// nowhere. A Profile not shown yet this session (in the Profile picker)
-// gets the level the Achievements engine reads for it, kept from then on.
-// The Achievements engine is its only writer; listeners hear
-// when the active Profile's shown level changes. No level while the
-// Achievements Add-on is off. Nothing is persisted.
+// Shown Player Level: the level the household has been shown, per Profile,
+// so the level pip never runs ahead of the Level Toast. Nothing is persisted.
+// - The Achievements engine is its only writer.
+// - No level while the Achievements Add-on is off.
 // ============================================================
 
 import { getProfileStore } from "../profiles/profile_store.js";

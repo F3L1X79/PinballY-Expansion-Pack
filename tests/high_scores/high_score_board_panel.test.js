@@ -1,10 +1,7 @@
 // ============================================================
-// The High Score Board, through main.js on the fake PinballY globals: the
-// panel's middle slice, stretched from an image a few pixels high, keeps
-// its opaque part down to the bottom slice. GDI+ fades a stretched
-// image's last source row into transparency: drawn to the bottom slice's
-// top only, it left a band where the wheel showed through (seen on the
-// cabinet).
+// High Score Board panel: the stretched middle slice stays opaque down to the
+// bottom slice.
+// - GDI+ fades a stretched image's last row: drawn short, the wheel showed through.
 // ============================================================
 
 import { test } from "node:test";

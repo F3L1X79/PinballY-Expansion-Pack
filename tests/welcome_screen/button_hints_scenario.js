@@ -1,10 +1,8 @@
 // ============================================================
-// Button Hints tests' scenario: main.js on the fake PinballY globals with
-// the Welcome Screen and the Profile picker on, Alice active with a Daily
-// Streak and both Period Table cards showing their grey line, so the
-// screen is as full as it gets without the High Scores Add-on. Set
-// config.language before importing this file for another language.
+// Button Hints tests' scenario: the Welcome Screen as full as it gets without
+// High Scores (Alice with a Daily Streak, both cards with their grey line).
 // Never loaded by PinballY.
+// - Set config.language before importing this file for another language.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";

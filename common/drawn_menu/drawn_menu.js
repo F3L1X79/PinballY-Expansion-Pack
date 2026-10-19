@@ -1,38 +1,13 @@
 // ============================================================
-// Drawn Menu module: the single place that shows a menu in the pack's
-// Steamball look (see docs/adr/0013) instead of PinballY's native one.
-// show() takes PinballY's own menu items, drops the paging entries, turns
-// a titled static item into a heading the cursor skips, collapses the
-// separators and draws one centred list in a panel over a dimmed wheel,
-// with a glass over it, the cursor on the item marked "selected" (else
-// the first entry); a dialog's message shows above the list, and an
-// optional footer under it (one line the cursor never reaches, after a
-// rule, centred at the entries' size: its label in a muted colour,
-// then a name in gold; only the main menu has one). When the
-// Drawn Menus Add-on is off, or the menu cannot be drawn (logged), it
-// shows PinballY's native menu instead, and reports its "menuclose"
-// through the same onClose. draw(), for the Drawn Menus Add-on, returns
-// false instead of showing the native menu.
-// While it is open, every button is swallowed through
-// "commandbuttondown": Next / Prev move the selection, wrapping, with
-// PinballY's navigation sound, the gold text landing at once on the new
-// entry while the gold outline glides to it;
-// NextPage / PrevPage move by a page; Select or Launch plays the Select
-// sound, closes the menu (unless the entry stays open) and runs the
-// entry's command through runCommand, as a native menu would, then
-// reports the close; Exit plays the Deselect sound and closes it. A menu
-// drawn with onBack (a submenu) goes back instead, on Exit and on its
-// MenuReturn entry. Attract
-// mode closes it too, and so does a menu shown in its place. isOpen() and
-// onClosed() let what waits for a free wheel wait for it.
-// The button sounds are loaded and the painted images (panel, glass,
-// selection outline) drawn on layers ahead through the shared drawing
-// ahead; the images are drawn again when the window size changes, only
-// placed and scaled on each opening, and shrunk to a dot while hidden.
-// The texts are drawn on opening, again only when they changed. The menu
-// fades in, unless it is the same menu shown again over itself (then the
-// cursor stays on its entry); it never changes PinballY's UI mode. Each opening's time is
-// logged, part by part.
+// Drawn Menu: the single place that shows a menu in the Steamball look (see
+// docs/adr/0013) instead of PinballY's native one. show() takes PinballY's
+// own menu items and runs the chosen entry's command as a native menu would;
+// it falls back to the native menu when the Add-on is off or drawing fails.
+// draw() returns false instead. Never changes PinballY's UI mode.
+// - Swallows every button through "commandbuttondown" while open.
+// - A menu with onBack (a submenu) goes back on Exit and on its MenuReturn entry.
+// - Images are drawn ahead, only placed on opening, shrunk to a dot while hidden.
+// - isOpen() and onClosed() let what waits for a free wheel wait for it.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

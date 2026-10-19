@@ -1,10 +1,7 @@
 // ============================================================
-// The Profile Reset of the active Profile, started through main.js on the
-// fake PinballY globals: an Admin Profile resetting itself starts over at
-// once, as if it had never played. Its Admin mark stays, no Achievement
-// Toast replays its old Achievements (not even one still waiting), the
-// Challenge Card and the Most Played Tables show the fresh data, and its
-// next game earns its Achievements again.
+// Profile Reset of the active Profile: it starts over at once, keeps its
+// Admin mark, no toast replays its old Achievements, the card and lists show
+// fresh data, and its next game earns them again.
 // ============================================================
 
 import { test } from "node:test";

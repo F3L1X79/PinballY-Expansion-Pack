@@ -1,13 +1,9 @@
 ﻿// ============================================================
-// Achievements for the number of DISTINCT tables the active Profile played
-// at least once:
-// a special "first table ever" achievement, plus one per percentage of the
-// full collection in COLLECTION_PERCENT_THRESHOLDS, with the tables played
-// against the count the percentage needs as Achievement Progress.
-// asNonChild builds them as a Profile that is not
-// a child would see them (for the Player Level's scaling), profileName as
-// that Profile would. Called by achievements_engine.js at each check;
-// no side effects.
+// Achievements for the number of distinct tables the active Profile played:
+// a "first table ever" one, then one per percentage of the collection in
+// COLLECTION_PERCENT_THRESHOLDS, with tables played as Achievement Progress.
+// Called by achievements_engine.js at each check; no side effects.
+// - asNonChild builds them as a non-child Profile would see them (Player Level scaling).
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, countedAchievement, PROGRESS_UNIT } from "../common/achievements/achievements.js";

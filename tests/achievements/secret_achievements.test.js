@@ -1,11 +1,7 @@
 // ============================================================
-// Secret Achievements (the Rage Quit, the World Tour, the Grand Return and
-// the Surprises family), started
-// through main.js on the fake PinballY globals: while missing, their rows
-// show "???" and their hint, never their real title or description, with
-// their muted rank emblem and the Avatars of the other Profiles that have
-// them, ordered and counted like any other Achievement; once Unlocked, the
-// Achievement Toast and the row show the real title and description.
+// Secret Achievements through main.js: while missing, their rows show "???"
+// and their hint with a muted emblem, ordered and counted like any other;
+// once Unlocked, the toast and row show the real title and description.
 // ============================================================
 
 import { test } from "node:test";

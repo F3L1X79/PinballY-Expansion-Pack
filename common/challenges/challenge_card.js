@@ -1,16 +1,9 @@
 // ============================================================
-// Challenge Card: the week's Challenge and the active Profile's progress
-// (title, bar, value / target, days left), always in view at the top
-// right of the wheel screen, under the Profile badge or, with no badge
-// (Profile picker off), right in the corner, on its own drawing layer
-// (see docs/adr/0003). One title line high, one line higher when the
-// title wraps; hidden when there is no Challenge and while a game runs. When there is something new
-// (a Challenge to follow, a Profile switch, progress after a game) its
-// content changes in place and it lights up once. Once the Challenge is
-// completed, it says so until the end of the week. The first time a
-// Profile shows up in a later week, it first shows the verdict on the
-// previous Challenge for a few seconds. Redrawn at startup, on every
-// Profile switch and on "wheelmode".
+// Challenge Card: the week's Challenge and the active Profile's progress at
+// the top right of the wheel screen, on its own layer (see docs/adr/0003).
+// Lights up once on something new; shows last week's verdict first in a new
+// week. Redrawn at startup, on a Profile switch and on "wheelmode".
+// - Hidden with no Challenge and while a game runs.
 // ============================================================
 
 import lang from "../core/i18n.js";

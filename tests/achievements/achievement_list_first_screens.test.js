@@ -1,10 +1,8 @@
 // ============================================================
-// The Achievement List opened right after startup, through main.js on the
-// fake PinballY globals with slow draws: once it shows, the first screen
-// and the one below are drawn, so the first Next presses draw nothing on
-// the spot; the rest of the list is drawn ahead in the background
-// afterwards, so walking the whole list then draws nothing either (but the
-// Selection Marker on the Exit Button, which redraws itself on its tick).
+// The Achievement List opened right after startup with slow draws: its first
+// two screens are drawn on opening, the rest ahead in the background, so
+// walking the list then draws nothing on the spot.
+// - The Selection Marker on the Exit Button still redraws on its own tick.
 // ============================================================
 
 import { test } from "node:test";

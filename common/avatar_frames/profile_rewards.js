@@ -1,19 +1,11 @@
 // ============================================================
 // Profile Rewards: the only module that knows the Avatar Frames, one per
-// Collection Tier from 1 to 10, unlocked by reaching the Collection Tier
-// kept in profile.json ("collectionTier"), never the one computed from the
-// tables, so a frame never locks again short of a Profile Reset. Unlocking
-// is worked out afresh every time and never stored. No frames while the
-// Table Mastery Add-on is off, since no Collection Tier is kept then.
-// Writes only the active Profile's choice ("avatarFrame": the worn frame's
-// tier, or null for none), through the Profile store. A missing frame
-// image is logged once and read as none.
-// Once given a way to open the frame list (enablePrompts), submits the
-// Reward Prompt through the wheel dialog module for a Profile with a frame
-// unlocked and no "avatarFrame" key yet: at startup and on each Profile
-// switch, and after the Mastery Toast that announces a first frame. The
-// prompt sets the key to null when it shows, so it never comes back short
-// of a Profile Reset.
+// Collection Tier, unlocked by the tier kept in profile.json. Writes the
+// active Profile's choice ("avatarFrame"), and submits the Reward Prompt
+// through the wheel dialog module for a first unlocked frame.
+// - A frame never locks again short of a Profile Reset.
+// - No frames while the Table Mastery Add-on is off.
+// - The prompt sets "avatarFrame" to null when shown, so it never comes back.
 // ============================================================
 
 import { createPinballYHost } from "../core/pinbally_host.js";

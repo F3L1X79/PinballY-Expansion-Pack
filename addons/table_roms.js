@@ -1,13 +1,10 @@
 // ============================================================
-// Table ROMs: fills PinballY's ROM field of each Visual Pinball X table by
-// itself, silently (its only output is logfile.log). A little after
-// startup, the tables never read or whose file changed have their script
-// read by vpxtool (tools\vpxtool.exe), hidden, one at a time, never while
-// a game runs; the ROM found goes into an empty field or one the Add-on
-// filled itself, never over a hand-typed one. After each game, the one
-// .nv file VPinMAME wrote confirms the ROM the table really ran, written
-// at once in "postlaunch" so the Add-ons registered later see it. Its
-// record is table_roms.json, next to cabinet.json.
+// Table ROMs: fills PinballY's ROM field of each VPX table silently, from
+// the table script read by tools\vpxtool.exe, one table at a time, never
+// during a game. After each game, the .nv file VPinMAME wrote confirms the
+// ROM. Writes table_roms.json next to cabinet.json, and logfile.log.
+// - Never overwrites a ROM typed by hand.
+// - The confirmation is written in "postlaunch" so later Add-ons see it.
 // ============================================================
 
 import { createPinballYHost } from "../common/core/pinbally_host.js";

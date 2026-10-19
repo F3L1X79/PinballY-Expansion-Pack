@@ -1,11 +1,7 @@
 // ============================================================
-// One More Game!, a secret of the Surprises family, started through main.js
-// on the fake PinballY globals: 5 Plays in a row on the same table unlock
-// it, 4 do not. The run belongs to the Profile: a restart (a first run in a
-// child process, whose files the second run starts from), a game under a
-// minute on another table, a switch of Profile and a new day leave it as
-// it is; a Play on another table starts it over; a Profile Reset erases
-// it. While missing, its row shows "???" and its hint.
+// One More Game! (Surprises family) through main.js: 5 Plays in a row on the
+// same table unlock it, 4 do not. A restart, a short game, a switch or a new
+// day keep the run; another table starts it over; a Profile Reset erases it.
 // ============================================================
 
 import { test } from "node:test";

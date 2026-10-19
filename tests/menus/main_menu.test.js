@@ -1,11 +1,8 @@
 ﻿// ============================================================
-// Main menu module tests: entries added through its interface appear in
-// PinballY's main menu in their sections (Play and the launches, the
-// selected table, the player) split by separators, in their fixed position
-// order whatever order the Add-ons added them in, PinballY's other items
-// in their own sections below; a label given as a function is read at
-// each opening; selecting one runs its action; reopening
-// on an entry puts the cursor on it. Other menus are left alone.
+// Main menu module tests: entries land in their sections in fixed position
+// order whatever the Add-ons' order, PinballY's other items below; a label
+// function is read at each opening; selecting runs the action; reopening on
+// an entry puts the cursor on it. Other menus are left alone.
 // ============================================================
 
 import { test } from "node:test";

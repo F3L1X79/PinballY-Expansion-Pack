@@ -1,13 +1,9 @@
 ﻿// ============================================================
-// Generic "the active Profile played every table in this group at least
-// once" achievement builder, used by the category and decade achievements,
-// with the tables played of the group as Achievement Progress and an
-// Achievement Rank from the size of the group. A game can belong
-// to multiple groups (e.g. multiple categories), in which case it counts
-// toward each of them. Groups are made of the tables the active Profile can
-// see, so a group with none of them gives no Achievement. The Achievements
-// come sorted by group key. asNonChild builds them as a Profile that is
-// not a child would see them, profileName as that Profile would. No side effects.
+// Generic "played every table of this group" Achievement builder, used by
+// the category and decade Achievements, with an Achievement Rank from the
+// group's size. No side effects.
+// - A game in several groups counts toward each.
+// - Groups hold only the tables the Profile can see: an empty group gives no Achievement.
 // ============================================================
 
 import { getActiveProfileTables } from "../tables/visible_tables.js";

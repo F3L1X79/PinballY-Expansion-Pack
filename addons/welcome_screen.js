@@ -1,35 +1,13 @@
 ﻿// ============================================================
-// Welcome Screen: at startup, and again whenever Change Player switches
-// to another Profile, a centred Steamball panel drawn over the
-// dimmed wheel greets the active Profile by the hour (its Avatar, in its
-// worn Avatar Frame, with the shown Player Level as a pip, and its name
-// in gold when the Profile picker is on), shows its Daily Streak under the greeting from 2 days
-// on, then its Lost Records (with the High Scores Add-on on: the Table
-// Records other Profiles took from it since its last Welcome Screen, the
-// three most recent named in one line and the others counted, seen
-// once the screen is drawn, the seen marker written to high_scores.json),
-// its Collection Mastery (the tier kept in profile.json when the
-// tables no longer reach it) and offers to close, to play the Table of the Day or of the Week
-// (one card each, with its Table Mastery and the active Profile's Streak;
-// reading them picks and locks this Period's tables, and Select launches
-// one, selected on the wheel first), to launch a Random Game or to stay on the table selected on the wheel. It
-// is a drawn dialog of the wheel dialog module (docs/adr/0011), submitted
-// at init with the startup priority, so it comes before any other dialog and the
-// toasts wait for it. It opens 500 ms after its turn comes, drawn at once
-// on all its layers, then faded in as a whole with the Profile Greeting's
-// sound, since it greets the Profile in its place. At startup only, from
-// init, a veil dims the wheel with the Loader turning over it, just under
-// the panel: the Loader goes as the panel fades in, the veil once it is
-// fully in; both go at once when a menu, a launch or attract mode comes up
-// first. While it is open it
-// swallows every button through "commandbuttondown": Next / Prev move the
-// Selection Marker (a gold glow flowing round the choice) through the
-// choices, looping, with PinballY's navigation sound, from Change Player
-// at startup and from Close after a change of player; Select or Launch
-// (the plunger) runs the selected choice, Exit
-// closes it; attract mode closes it too, and a game started during the
-// pause drops it. A footer of Button Hints names the flippers, Select and
-// Exit. Its layers and the marker are removed once it closes.
+// Welcome Screen: at startup and after Change Player, a drawn panel greets
+// the active Profile and shows its Daily Streak, Lost Records and Collection
+// Mastery, then offers to play the Table of the Day or Week, a Random Game,
+// or to stay. A drawn dialog of the wheel dialog module with the startup
+// priority (docs/adr/0011): other dialogs and toasts wait for it.
+// - At startup only, a veil and the Loader dim the wheel until the panel fades in.
+// - Swallows every button through "commandbuttondown" while open.
+// - Reading the Period cards picks and locks this Period's tables.
+// - Writes the Lost Records seen marker to high_scores.json.
 // ============================================================
 
 import lang from "../common/core/i18n.js";

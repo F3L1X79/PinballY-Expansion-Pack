@@ -1,20 +1,8 @@
 ﻿// ============================================================
-// Achievement List module tests: over the fake PinballY host with fake
-// Achievements and a real Profile store, drives the drawn list the way the
-// player does (open it, press buttons through "commandbuttondown", let
-// the glide run) and checks what the player sees: the header, the two
-// sections in their order (a waiting toast first, then the most recently
-// Notified, then the missing ones), the highlighted line moving, skipping
-// the section headers and looping through the Exit Button (its Selection
-// Marker, tooltip and place clear of the header, Select on it leaving), the
-// buttons swallowed only while it is open, Exit and attract mode closing it, the rank emblems and the
-// Achievement Progress bars on the rows, the header's counts per rank, the
-// Unlock Rate (the other Profiles' Avatars) and the missing section's
-// order by Unlock Rate, then Achievement Progress, the owner's emblem
-// images (and the drawn emblem for a missing file), PinballY's navigation
-// sound on each move, and the drawing ahead: everything drawn while idle
-// (never within 400 ms of a button press nor during a game), kept, and
-// redrawn only when what it shows changed.
+// Achievement List module tests over the fake host, with fake Achievements
+// and a real Profile store: drives the list like the player and checks the
+// header, section order, highlighted line, Exit Button, rank emblems,
+// Achievement Progress, Unlock Rate, navigation sound and drawing ahead.
 // ============================================================
 
 import { test } from "node:test";

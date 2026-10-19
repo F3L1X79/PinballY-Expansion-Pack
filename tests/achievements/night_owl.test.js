@@ -1,10 +1,7 @@
 // ============================================================
-// Night Owl, the first Secret Achievement of the Surprises family, started
-// through main.js on the fake PinballY globals: only a Play started from
-// 00:00 to 03:59 unlocks it, for the Profile active at its start, Guest
-// included; while missing, its row shows "???" and its hint. A Child
-// Profile never sees it, in the list or in a toast, even after a Play at
-// 01:00. A Profile Reset lets the reset Profile unlock it again.
+// Night Owl (Surprises family) through main.js: only a Play started 00:00 to
+// 03:59 unlocks it, for the Profile active at its start, Guest included.
+// A Child Profile never sees it; a Profile Reset lets it unlock again.
 // ============================================================
 
 import { test } from "node:test";

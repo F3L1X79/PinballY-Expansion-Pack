@@ -1,10 +1,7 @@
 // ============================================================
-// Reads the Avatar Frame list's Exit Button and Button Hints the way the
-// player sees them, on the fake PinballY host: the highlighted choice (the
-// Exit Button's tooltip, or the name of the row the Selection Marker
-// surrounds), whether the marker surrounds the Exit Button, the footer's
-// groups, and where the footer and the rows show in a window. Never
-// loaded by PinballY.
+// Reads the Avatar Frame list's Exit Button and Button Hints as the player
+// sees them, on the fake host: the highlighted choice, the footer's groups,
+// and where footer and rows sit. Never loaded by PinballY.
 // ============================================================
 
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";

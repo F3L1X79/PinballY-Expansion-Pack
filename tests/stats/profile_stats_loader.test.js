@@ -1,11 +1,7 @@
 // ============================================================
-// The Profile Stats getting ready, through main.js on the fake PinballY
-// globals, with draws slow enough to take more than 150 ms in all: opened
-// from the main menu, the wheel dims at once under the veil, the Loader
-// turns over it after 150 ms, then goes before every layer fades in
-// together, the veil going once the fade in is over. Another Profile's
-// Profile Stats, opened from its Household Stats column, go through the
-// same opening.
+// The Profile Stats getting ready with slow draws: the veil at once, the
+// Loader after 150 ms, gone before every layer fades in together, the veil
+// after the fade. Another Profile's read-only Stats open the same way.
 // ============================================================
 
 import { test } from "node:test";

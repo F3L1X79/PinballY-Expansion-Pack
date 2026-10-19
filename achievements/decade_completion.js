@@ -1,10 +1,9 @@
 ﻿// ============================================================
-// Builds one achievement per release decade (from game.year): unlocked once
-// the active Profile has played every table it can see released in that decade
-// at least once.
-// Sorted chronologically; tables without a year are ignored. asNonChild builds them as a Profile that is not
-// a child would see them (for the Player Level's scaling).
+// One Achievement per release decade (from game.year): unlocked once the
+// active Profile has played every table it can see from that decade.
 // Called by achievements_engine.js at each check; no side effects.
+// - Tables without a year are ignored.
+// - asNonChild builds them as a non-child Profile would see them (Player Level scaling).
 // ============================================================
 
 import { buildGroupedCompletionAchievements } from "../common/achievements/grouped_completion.js";

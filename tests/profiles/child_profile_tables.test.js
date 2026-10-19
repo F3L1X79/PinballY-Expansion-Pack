@@ -1,12 +1,8 @@
 // ============================================================
-// The tables a Child Profile can see, everywhere but the wheel, started
-// through main.js on the fake PinballY globals: no Adult Table (category
-// "NSFW") among its Challenge Tables, its Most Played Tables, its Tables
-// to Discover (both reached from the Profile Stats), its Collection in the
-// Profile Stats nor its completion
-// Achievements, where a group made only of Adult Tables has no row; a game
-// on an Adult Table never moves its Challenge forward. Switching to an
-// adult Profile brings every one of them back.
+// The tables a Child Profile sees off the wheel, through main.js: no Adult
+// Table in its Challenge Tables, Most Played, Tables to Discover, Collection
+// or completion Achievements; a game on one never moves its Challenge.
+// Switching to an adult Profile brings them back.
 // ============================================================
 
 import { test } from "node:test";

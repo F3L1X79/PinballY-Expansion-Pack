@@ -1,14 +1,10 @@
 ﻿// ============================================================
-// Adds the launch entries (table of the day, table of the week, random
-// table) and "Table Setup" to PinballY's main menu through the main menu
-// module, which places them in their sections and runs the matching action
-// when one is selected. A Child Profile does not get a Period Table's
-// entry while it is an Adult Table. Once the household has an Admin
-// Profile, only the Admin Profiles see "Table Setup" there and PinballY's
-// "Operator Menu" in the Exit menu (listens to "menuopen" and "command");
-// the coin door service button still opens the Operator Menu for anyone.
-// An Admin Profile also gets "Reset profile" there, which opens the
-// Profile Reset menus.
+// Adds the launch entries (Table of the Day, Table of the Week, Random Game)
+// and "Table Setup" to the main menu through the main menu module.
+// Listens to "menuopen" and "command".
+// - A Child Profile gets no Period Table entry while it is an Adult Table.
+// - With an Admin Profile, only Admins see "Table Setup", "Operator Menu" and "Reset profile".
+// - The coin door service button still opens the Operator Menu for anyone.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";

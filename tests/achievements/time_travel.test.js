@@ -1,11 +1,7 @@
 // ============================================================
-// Time Travel, a secret of the Surprises family, started through main.js
-// on the fake PinballY globals: 3 Plays in a row, each on a table from a
-// strictly older decade than the one before, unlock it. A Play in the same
-// decade or a newer one starts the run over from that Play, a table
-// without a year breaks it, a game under a minute leaves it as it is, and
-// a Profile Reset erases it. While missing, its row shows "???" and its
-// hint.
+// Time Travel (Surprises family) through main.js: 3 Plays in a row, each from
+// a strictly older decade, unlock it. Same or newer decade starts over, no
+// year breaks it, a short game keeps it, a Profile Reset erases it.
 // ============================================================
 
 import { test } from "node:test";

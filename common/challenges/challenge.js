@@ -1,32 +1,11 @@
 // ============================================================
-// Challenge module: owns the Challenges' state model. The week's
-// Challenge is drawn the first time it is needed in a week, among the
-// feasible templates other than the previous Challenge's (tables of a
-// manufacturer or decade, different tables, manufacturers or decades,
-// never the community tables' manufacturer as an option; tables never
-// played or not played for six months, reachable by every Profile that
-// sets the bar; the Table of the Day on different days or days played, never
-// more than the days left; games on the Table of the Week, on the same
-// table or launched as Random Games; minutes on one table or in total).
-// Its target is the same for every Profile, drawn in its template's own
-// range and capped by what can be reached (visible tables, tables of the
-// group, the least across the Profiles that set the bar, days left); a
-// cap below the range's minimum makes that option infeasible. It is
-// locked in cabinet.json with the previous one; each Profile, Guest
-// included, follows it in its own profile.json ("challenge"), where the
-// games that count are kept with their facts, progress being recomputed
-// from them. The game that first reaches the target completes the
-// Challenge: the Profile's completed count goes up and a Challenge Toast is
-// submitted, celebrated with the Confetti Shower. When a Profile first
-// shows up in a later week, the previous Challenge is judged
-// once and the verdict kept in its history. It also selects the Challenge
-// Tables among the tables the active Profile can see, for the templates
-// where some tables move the Challenge forward, and reads a Profile's
-// record of completed Challenges.
-// Created from the PinballY host, the Profile store, the Period Tables, the
-// Random Game module, the Achievement Toast module and a random source; the
-// Add-ons share one instance through getChallenges(). Notes each game's facts
-// on "gamestarted" and counts it when the Profile store announces its Play.
+// Challenge module: owns the Challenges' state. Draws the week's Challenge
+// (locked in cabinet.json), follows each Profile's games in its profile.json
+// ("challenge"), completes it with a celebrated Challenge Toast, judges the
+// previous one, and selects the Challenge Tables. Shared through getChallenges().
+// - The target is the same for every Profile, capped by what can be reached.
+// - Progress is recomputed from the counted games, never stored.
+// - Facts are noted on "gamestarted" and counted on the Play announcement.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

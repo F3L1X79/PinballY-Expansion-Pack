@@ -1,10 +1,7 @@
 // ============================================================
-// High Scores credited after a Play, through main.js on the fake PinballY
-// globals: the board read at launch is the one the Play is compared with,
-// the board read again after the game tells the new places, each credited
-// to the Profile active when the Play started, whatever the initials, and
-// kept in high_scores.json next to cabinet.json; every board change and
-// every High Score is logged.
+// High Scores credited after a Play through main.js: the board read at launch
+// against the one read after, new places credited to the Profile active at
+// the start whatever the initials, kept in high_scores.json and logged.
 // ============================================================
 
 import { test } from "node:test";

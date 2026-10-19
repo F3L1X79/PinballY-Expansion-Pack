@@ -1,10 +1,8 @@
 // ============================================================
-// Shared setup for the Table ROMs tests: starts main.js on the fake
-// PinballY globals with only the Table ROMs Add-on on, over tables whose
-// game files, record file and fake vpxtool the test describes; then lets
-// the script reading queue run, and reads back the ROM fields, the
-// Add-on's log lines, its record file and the tables vpxtool read. A
-// Play can change the dates of the fake NVRAM folder's .nv files.
+// Table ROMs tests' setup: main.js with only Table ROMs on, over tables whose
+// files, record and fake vpxtool the test describes; runs the reading queue
+// and reads back ROM fields, log lines, record and tables read.
+// Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";

@@ -1,11 +1,7 @@
 // ============================================================
-// The Household Stats set aside while another Profile's Profile Stats are
-// open, through main.js on the fake PinballY globals, with slow draws:
-// every layer hidden and reduced to a point, a glide still running
-// stopped at its target, the buttons pressed there never moving them;
-// Exit shows them again at once on that Profile's column with the same
-// scroll, and a second Exit the own Profile Stats at once on the
-// Household button, neither with a veil, a Loader nor an opening time line.
+// Household Stats set aside under another Profile's Stats, with slow draws:
+// hidden and shrunk, a running glide stopped, buttons never moving them; Exit
+// shows them again at once, with no veil, Loader or opening time.
 // ============================================================
 
 import { test } from "node:test";

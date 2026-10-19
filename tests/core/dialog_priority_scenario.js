@@ -1,10 +1,7 @@
 ﻿// ============================================================
-// Shared scenario for the dialog priority tests: starts the Welcome
-// Screen, Achievements and rating prompt add-ons on the fake PinballY
-// globals in a given init order (as main.js would), then checks that the
-// Welcome Screen comes first, the Achievements unlocked at startup waiting
-// for it to close before their toasts show, and that the rating prompt is
-// the only native dialog, the Achievements going on with toasts alongside it.
+// Dialog priority scenario: starts the Welcome Screen, Achievements and
+// rating prompt Add-ons in a given order, then checks the Welcome Screen
+// comes first, toasts wait for it, and the rating prompt is the only native dialog.
 // ============================================================
 
 import assert from "node:assert/strict";

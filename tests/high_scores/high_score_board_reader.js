@@ -1,14 +1,8 @@
 // ============================================================
-// Reads the drawn High Score Board the way the player sees it, on the fake
-// PinballY host: whether it is open, the title, the message shown in place
-// of the board, the podium's three steps (left, middle, right) and the rows
-// below it, each place with its rank, owner's name or "Default score",
-// Avatar image, initials, score text and whether it is marked as the Table
-// Record, the Avatar Frame drawn around its Avatar and the crown over it;
-// the Exit Button's tooltip, whether the Selection Marker surrounds it,
-// the Button Hints and where the footer shows in the window; and whether
-// every layer is gone after close, but the crowns' (drawn ahead, kept
-// hidden). Opens it from the main menu entry. Never loaded by PinballY.
+// Reads the drawn High Score Board as the player sees it, on the fake host:
+// title, message, podium and rows (rank, owner, Avatar, frame, crown,
+// score), Exit Button, Button Hints, and leftover layers after close.
+// Opens it from the main menu entry. Never loaded by PinballY.
 // ============================================================
 
 import { HIGH_SCORE_BOARD_Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX } from "../../common/high_scores/high_score_board_painter.js";

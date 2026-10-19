@@ -1,11 +1,7 @@
 // ============================================================
-// World Tour Achievement, started through main.js on the fake PinballY
-// globals: on "All Tables", Guest selects every table of the wheel, going
-// back and forth and jumping ahead, the starting table counting as seen;
-// the toast shows the moment the last table is selected, without any game,
-// with its real title. A Secret Achievement: while missing, its row shows
-// "???" and its hint. The add-ons' own wheel moves never count, the Achievement stays Unlocked,
-// and a Profile Reset erases it.
+// World Tour Achievement through main.js: on "All Tables", selecting every
+// table in one go unlocks it at once, the starting table counting as seen.
+// The Add-ons' own wheel moves never count; a Profile Reset erases it.
 // ============================================================
 
 import { test } from "node:test";

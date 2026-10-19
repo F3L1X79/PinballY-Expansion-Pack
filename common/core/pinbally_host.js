@@ -1,19 +1,9 @@
 ﻿// ============================================================
-// Production PinballY host: the single seam through which the deepened
-// modules reach PinballY (settings, clock, timers, visible tables, wheel
-// selection and its current table, wheel logos, global media and the
-// underlay, filter and metafilters, game list and settings events, main
-// window menus / UI mode / events / drawing layers, the wheel shown or
-// hidden and the launch overlay's background,
-// StyledText, commands and running them, table launch, program and pack folders,
-// monitor count, backglass window, sound playback (one-off or on players
-// in turn), logfile.log, the few file operations the Profile store
-// needs, a whole file's bytes, a file's modified date and size, a folder's files with theirs,
-// a program run hidden without waiting, whose output is read later, and a
-// registry value).
-// Every call passes straight through to PinballY's globals; tests use the
-// in-memory fake host from tests/support/fake_pinbally_host.js instead. No side
-// effects on import.
+// Production PinballY host: the single seam through which the shared modules
+// reach PinballY (settings, clock, timers, tables, wheel, menus, layers,
+// sounds, files, programs, registry, logfile.log).
+// Every call passes straight through to PinballY's globals; tests use
+// tests/support/fake_pinbally_host.js. No side effects on import.
 // ============================================================
 
 const ADODB_TEXT_TYPE = 2;

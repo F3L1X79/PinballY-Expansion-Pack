@@ -1,13 +1,10 @@
 // ============================================================
-// Fireworks: about 8 s of rockets shot up from the bottom of the wheel
-// screen, each bursting into rings of glowing streaks, on main-window
-// layers in front of everything (the Confetti Shower included), started
-// with a Level Toast; like the shower, it does not check for a drawn dialog
-// itself: the toast waits for one. Each burst is a film drawn ahead frame
-// by frame, one frame shown at a time (docs/adr/0012); only the rockets and
-// their trails are moved piece by piece. Every layer waits shrunk to a dot.
-// Vanishes on "prelaunch", "gamestarted" and "attractmodestart".
-// FIREWORKS=false prepares, draws and plays nothing.
+// Fireworks: about 8 s of rockets bursting over the wheel screen, in front
+// of everything, started with a Level Toast. Each burst is a film drawn
+// ahead (docs/adr/0012). Vanishes on "prelaunch", "gamestarted" and
+// "attractmodestart".
+// - Every layer waits shrunk to a dot.
+// - Does not check for a drawn dialog itself: the toast waits for one.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

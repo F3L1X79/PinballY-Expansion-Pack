@@ -1,11 +1,7 @@
 // ============================================================
-// World Tour done in one go, started through main.js on the fake PinballY
-// globals: a launch, a filter change, a Profile switch, attract mode, a
-// settings reload and a change in the wheel's contents each start the tour
-// over, the tables seen before no longer counting; a selection outside
-// wheel mode never counts; opening the main menu, the Achievement List or
-// the Profile Stats halfway does not interrupt it. The toast then shows its
-// real title.
+// World Tour starting over through main.js: a launch, filter change, Profile
+// switch, attract mode, settings reload or wheel change restarts it; opening
+// a menu or a drawn screen halfway does not.
 // ============================================================
 
 import { test } from "node:test";

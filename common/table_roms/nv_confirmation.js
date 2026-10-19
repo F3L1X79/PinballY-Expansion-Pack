@@ -1,12 +1,9 @@
 // ============================================================
-// .nv confirmation of the Table ROMs Add-on: at a Visual Pinball X table's
-// launch ("prelaunch"), notes the modified date of each .nv file in
-// VPinMAME's NVRAM folder; after the game ("postlaunch"), lists them again.
-// When exactly one .nv changed, its name is the ROM the table really ran,
-// handed to the record with the source "nv"; several changed are logged.
-// The NVRAM folder is found as PinballY finds it: the system's own NVRAM
-// path, otherwise VPinMAME's nvram_directory in the registry (current
-// user, then local machine); not found, it is logged once.
+// .nv confirmation of the Table ROMs Add-on: notes the NVRAM .nv files at a
+// VPX launch ("prelaunch") and lists them again after ("postlaunch"); the one
+// .nv that changed is the ROM the table really ran.
+// - Several changed .nv files are only logged.
+// - The NVRAM folder is found as PinballY finds it; not found, it is logged once.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

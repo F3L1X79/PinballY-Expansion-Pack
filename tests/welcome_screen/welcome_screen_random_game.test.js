@@ -1,10 +1,7 @@
 // ============================================================
-// Welcome Screen late at night, through main.js on the fake PinballY
-// globals: it greets the Profile with the late-night greeting, and Select
-// on the random choice closes it and launches a Random Game, never the
-// Last Played Table.
-// Runs with the Random Game animation turned off (the fake has no wheel
-// buttons).
+// Welcome Screen late at night: the late-night greeting, and the random
+// choice launches a Random Game, never the Last Played Table.
+// - Runs with the animation off: the fake has no wheel buttons.
 // ============================================================
 
 import { test } from "node:test";

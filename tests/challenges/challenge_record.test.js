@@ -1,11 +1,7 @@
 // ============================================================
-// Completed Challenges in the player's record, through main.js on the fake
-// PinballY globals: the Challenges Achievements in the Achievement List
-// unlock on the Profile's completed count and show their Achievement
-// Progress, counting the week's Challenge as soon as it is completed; the
-// Profile Stats show the completed Challenges over the weeks taken part in,
-// a missed week counting only with some progress toward it. Guest has its
-// own record, empty here.
+// Completed Challenges through main.js: the Challenges Achievements unlock on
+// the completed count with their Progress, and the Profile Stats show the
+// completed Challenges over the weeks taken part in. Guest has its own record.
 // ============================================================
 
 import { test } from "node:test";

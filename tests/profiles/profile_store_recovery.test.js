@@ -1,10 +1,7 @@
 // ============================================================
-// Profile store when Profile files or folders go wrong, at the PinballY
-// host seam: a broken profile.json or cabinet.json is restored from its
-// backup, or set aside under a dated name when the backup is broken too; a
-// missing active Profile folder makes Guest active; reserved and ignored
-// folder names; an unreadable Avatar falls back to the default Avatar.
-// Every case writes a log line.
+// Profile store recovery at the host seam: a broken file restored from its
+// backup or set aside, a missing active folder giving Guest, reserved folder
+// names, an unreadable Avatar giving the default. Every case is logged.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,11 +1,8 @@
 // ============================================================
-// Selection Marker: a soft gold glow just outside a drawn screen's
-// current choice, its golds flowing round it without end, always the same
-// way, one lap every 6 seconds. One small layer per open screen, redrawn
-// with fillRect on a tick of about 33 ms until remove(), which stops the
-// tick and removes the layer; setAside() stills and hides it while its
-// screen waits hidden, showAgain() starts it again. Validated on the cabinet by the prototype
-// (spec #231): about 2 ms a draw, the wheel behind stays smooth.
+// Selection Marker: a soft gold glow flowing round a drawn screen's current
+// choice, one lap every 6 s, on one small layer redrawn about every 33 ms
+// until remove(). setAside() stills and hides it, showAgain() restarts it.
+// - Validated on the cabinet (spec #231): about 2 ms a draw, the wheel stays smooth.
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";

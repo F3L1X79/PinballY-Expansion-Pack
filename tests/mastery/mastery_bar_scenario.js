@@ -1,10 +1,8 @@
 // ============================================================
-// Mastery Bar tests' scenario: main.js on the fake PinballY globals, with
-// the chosen Add-ons and Profiles, each Profile's earlier Plays seeded in
-// its profile.json. Reads what the Mastery Bar shows: its visible layers'
-// texts (the level's name, its number, "To discover"), how full its bar
-// is, whether it is lit and where it sits; the Mastery Toasts, the Level Toasts, the
-// Collection Tier kept in profile.json and the Confetti Shower starts. Never loaded by PinballY.
+// Mastery Bar tests' scenario: main.js on the fake globals with earlier Plays
+// seeded in profile.json. Reads the bar's texts, fill, light and place, the
+// Mastery and Level Toasts, the kept Collection Tier and Confetti starts.
+// Never loaded by PinballY.
 // ============================================================
 
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";

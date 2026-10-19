@@ -1,12 +1,7 @@
 // ============================================================
-// Daily Streak on the Welcome Screen, through main.js on the fake PinballY
-// globals, in English: the grey line under the greeting shows the active
-// Profile's days in a row on the cabinet from 2 days on, read from its
-// Play Log, asking to keep it going while today has no Play yet. A launch
-// under a minute does not count; a Play does, and the line comes back
-// without the call once a Profile switch (as Change Player makes) brings
-// the Profile back. Another
-// Profile keeps its own Daily Streak: a broken one shows no line.
+// Daily Streak on the Welcome Screen in English: the grey line shows from 2
+// days, read from the Play Log, asking to keep it going until today's Play;
+// a short launch does not count; each Profile keeps its own.
 // ============================================================
 
 import { test } from "node:test";

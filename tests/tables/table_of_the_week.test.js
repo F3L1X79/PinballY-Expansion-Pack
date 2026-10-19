@@ -1,10 +1,7 @@
 ﻿// ============================================================
-// Table of the Week behaviour, through the Period Table module's interface
-// with the fake PinballY host and the Profile store: the table is kept from
-// Monday to Sunday (locked in cabinet.json), replaced after the
-// Sunday-to-Monday rollover, and the active Profile's week Streak counts
-// once per week through a Play of the Table of the Week.
-// Run with "node --test" from the project folder.
+// Table of the Week through the Period Table module with the fake host: the
+// table is kept Monday to Sunday (locked in cabinet.json), replaced at the
+// rollover, and the week Streak counts once per week through a Play.
 // ============================================================
 
 import { test } from "node:test";

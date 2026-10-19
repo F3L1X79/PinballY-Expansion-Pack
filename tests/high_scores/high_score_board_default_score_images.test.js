@@ -1,10 +1,7 @@
 // ============================================================
-// The High Score Board, through main.js on the fake PinballY globals: each
-// Default Score shows a placeholder image picked by its initials, on the
-// podium and in the rows; the same initials show the same image on two
-// openings and on two tables, different initials on one board never share
-// one while one is free, and empty initials get one too. A Profile's place
-// keeps its Avatar.
+// High Score Board Default Score images: picked by initials, the same
+// initials always the same image, different ones on a board never sharing
+// one while one is free. A Profile's place keeps its Avatar.
 // ============================================================
 
 import { test } from "node:test";

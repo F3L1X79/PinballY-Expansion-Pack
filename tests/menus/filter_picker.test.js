@@ -1,14 +1,9 @@
 // ============================================================
-// The Filter Picker, through main.js on the fake PinballY globals with
-// PinballY's native menus and Menu Cleanup off: the wheel selections and
-// the filter groups leave the main menu for one entry with the submenu
-// arrow, in its own section, naming the Active Filter; the Filter Picker
-// lists the wheel selections in PinballY's order, then the groups, then
-// Back; a selection applies at once, a group opens PinballY's own group
-// menu where a filter applies; Back and Exit go up one level at a time,
-// the cursor on the entry left (PinballY's own Back in a group menu,
-// MenuReturn, only closes it); with no group the Filter Picker still
-// opens with the selections.
+// The Filter Picker through main.js with native menus: selections and groups
+// leave the main menu for one entry naming the Active Filter; a selection
+// applies at once, a group opens PinballY's group menu; Back and Exit go up
+// one level, the cursor on the entry left.
+// - PinballY's own Back in a group menu (MenuReturn) only closes it.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,19 +1,11 @@
 ﻿// ============================================================
-// Wheel dialog module: add-ons submit a dialog description (menu id,
-// message, buttons with optional actions, priority) and it shows them one
-// at a time, only when the wheel is free, highest priority first, so the
-// add-on order in main.js never decides which dialog comes first. It owns
-// the dialog layout, the button commands and their dispatch, shows the
-// dialog through the Drawn Menu module (a Drawn Menu, or PinballY's native
-// one), and advances the queue when it reports the dialog closed, whether
-// acknowledged or dismissed; tells whether any dialog is on screen or
-// waiting. A drawn dialog (see docs/adr/0011) draws itself when its turn
-// comes and holds the queue until it reports closed; listeners hear it close, so toasts can
-// wait for it from its submission on. A dialog not ready yet holds its
-// place, and every dialog after it, until it is; a stale one is dropped
-// unshown. A screen the pack draws over the wheel without leaving its UI
-// mode (a Drawn Menu, the Profile Stats…) keeps it busy while open, once
-// handed to waitFor(). Listens to "command" and "wheelmode".
+// Wheel dialog module: Add-ons submit a dialog with a priority; it shows them
+// one at a time through the Drawn Menu module, only when the wheel is free,
+// highest priority first, so main.js's order never decides. A drawn dialog
+// (see docs/adr/0011) draws itself and holds the queue until it closes.
+// Listens to "command" and "wheelmode".
+// - A dialog not ready yet holds its place and every dialog after it; a stale one is dropped.
+// - A screen drawn over the wheel keeps it busy once handed to waitFor().
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";

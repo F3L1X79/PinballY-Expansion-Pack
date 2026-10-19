@@ -1,10 +1,6 @@
 // ============================================================
-// The Filter Picker as a Drawn Menu, through main.js on the fake PinballY
-// globals: the main menu's entry carries the submenu arrow; the Filter
-// Picker is drawn with the wheel selections, the groups and Back; Exit or
-// Back in it goes back to the main menu, the cursor on its entry; Exit or
-// Back in a group menu goes back to the Filter Picker, the cursor on that
-// group.
+// The Filter Picker as a Drawn Menu through main.js: the entry carries the
+// submenu arrow; Exit or Back goes up one level, the cursor on the entry left.
 // ============================================================
 
 import { test } from "node:test";

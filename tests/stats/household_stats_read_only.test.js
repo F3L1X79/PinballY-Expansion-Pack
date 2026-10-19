@@ -1,12 +1,7 @@
 // ============================================================
-// Another Profile's Profile Stats, opened from its Household Stats column,
-// through main.js on the fake PinballY globals: the same card and sections
-// with that Profile's values, read-only (no button at the card's foot, the
-// Exit Button's tooltip saying Back, the Button Hints naming Exit alone,
-// the flippers and Select having nothing else to do); Exit, or Select on
-// the Exit Button, goes back to the Household Stats on that
-// column, and Exit there to one's own Profile Stats on the "Household Stats"
-// button.
+// Another Profile's Profile Stats from its Household Stats column: its own
+// values, read-only (no foot buttons, Exit alone); Exit goes back to the
+// Household Stats on that column, then to one's own Profile Stats.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,32 +1,12 @@
 // ============================================================
-// High Score Board module: the drawn screen the player opens from the main
-// menu or the HighScores button to see the selected table's board, as the
-// High Score store knows it: the table's title, the podium for the three
-// first places and compact rows for the others, laid out by the High Score
-// Board painter on the Drawn Menu's panel, a Gold, Silver and Bronze crown
-// over the podium's three steps. Each place shows its owner's name and
-// Avatar, in the Avatar Frame its Profile wears, or "Default score" with
-// the Default Score image of its initials, read again on every opening.
-// Opens at once on the last known board under a "Reading..." note (or a
-// "Reading..." message for a table never read) while the High Scores
-// Add-on reads it fresh, then redraws in place: the fresh board, "No score
-// yet" when empty, a "could not be refreshed" note when the read failed,
-// "not supported" when PINemHi says so or no board is known, or "Play a
-// game to bring up this table's high scores" for a table without a ROM
-// whose VPReg.stg section or text file is not learned yet. The Loader
-// turns above the board, on its top third, while the fresh read runs,
-// from the end of the board's fade in. The screen
-// is drawn at once on all its layers, then faded in; the crowns, drawn
-// ahead once on their own layers through the shared drawing ahead
-// (PinballY reads an image file again on every draw), are only placed,
-// and wait hidden, shrunk to a point, while the board is closed. The Exit
-// Button is its only choice. While
-// open it swallows every button through "commandbuttondown"; when the
-// rows below the podium do not all fit the window, the flippers (Next /
-// Prev) scroll them, the podium staying in place; Exit closes it and calls
-// the return given to open(); attract mode only closes it. Opens directly,
-// not through the wheel dialog module: the player asked for it. isOpen() and
-// onClosed() let the wheel dialogs wait for it.
+// High Score Board: the drawn screen opened from the main menu or the
+// HighScores button, showing the selected table's board (podium with crowns,
+// then compact rows) from the High Score store. Opens at once on the last
+// known board while the board is read fresh, then redraws in place.
+// Opens directly, not through the wheel dialog module: the player asked for it.
+// - Swallows every button through "commandbuttondown"; the flippers scroll the rows.
+// - Crowns are drawn ahead once: PinballY reads an image file again on every draw.
+// - isOpen() and onClosed() let the wheel dialogs wait for it.
 // ============================================================
 
 import lang from "../core/i18n.js";

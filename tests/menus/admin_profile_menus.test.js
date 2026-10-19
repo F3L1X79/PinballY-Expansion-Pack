@@ -1,10 +1,7 @@
 ﻿// ============================================================
-// The Admin Profile's menus, started through main.js on the fake PinballY
-// globals: while no Profile is marked isAdmin in its profile.json, every
-// Profile sees "Table Setup" in the main menu and "Operator Menu" in the
-// Exit menu; once one is, only the Admin Profiles keep them, and the Exit
-// menu keeps its other entries. A mark on Guest or a mark that is not a
-// boolean is logged and ignored.
+// Admin Profile menus through main.js: with no isAdmin mark, everyone sees
+// "Table Setup" and "Operator Menu"; once one is marked, only Admins do.
+// - A mark on Guest or a non-boolean mark is logged and ignored.
 // ============================================================
 
 import { test } from "node:test";

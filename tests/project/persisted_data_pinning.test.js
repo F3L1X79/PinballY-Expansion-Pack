@@ -1,23 +1,9 @@
 ﻿// ============================================================
-// Pinning test: starts the add-ons through main.js on the fake PinballY
-// globals, plays a scripted session on a fixture collection, and locks
-// every Achievement ID produced, and the Guest profile.json (play record,
-// Streaks and Periods Played, Random Games played, session stats and
-// Notified list) and cabinet.json (active Profile, Period Table locks and
-// their adult Periods)
-// written by the Profile store; no PinballY settings key is written. The
-// Admin and Child Profile marks (isAdmin, isChild) keep their keys through a rewrite. A
-// second test locks the Challenges' saved data: the week's lock in
-// cabinet.json, a Profile's "challenge" record and its counted games in
-// profile.json, and the template ids. A third locks a verdict on the
-// previous Challenge in a Profile's history, another the Challenges
-// Achievement IDs, one the Play Log's year file name and keys, and one the
-// World Tour's key in profile.json and its Achievement ID (the Surprises
-// part's are in persisted_data_pinning_surprises.test.js). These
-// strings are players' saved progress: this test must keep passing unchanged.
-// Another test locks the Avatar Frame choice's key in profile.json, and the
-// Table ROM record's file name and keys, and the last one the High Score
-// store's file name and keys.
+// Pinning test: plays a scripted session through main.js and locks every
+// persisted key and Achievement ID (profile.json, cabinet.json, Challenges,
+// Play Log, World Tour, Avatar Frame, Table ROMs, High Scores).
+// - These strings are players' saved progress: this test must keep passing unchanged.
+// - The Surprises part's keys are in persisted_data_pinning_surprises.test.js.
 // ============================================================
 
 import { test } from "node:test";

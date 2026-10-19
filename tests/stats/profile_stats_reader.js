@@ -1,20 +1,8 @@
 // ============================================================
-// Reads the drawn Profile Stats the way the player sees it, on the fake
-// PinballY host: whether they are open, the card's texts (the Profile's
-// name first) and Avatar, its Player Level and Collection Mastery blocks,
-// the buttons at the card's foot (label and grey count; none read-only), a section of the
-// right column by its title (each stat's label with the texts drawn after
-// it, and its images), the highlighted choice (the button the Selection
-// Marker surrounds, or the Exit Button's tooltip on its own layer), whether the
-// marker surrounds the Exit Button, the Button Hints and where their
-// footer sits beside the other pieces, and picks a choice with Next and Select
-// as a player would. Opens them from the main menu entry (letting them get
-// ready and fade in, or not), or reads one
-// section of the active Profile's screen and closes it again. Reads the
-// Avatar Frame list opened from the Frame button too: lets it get ready
-// and fade in, reads whether it is open, its rows (name, status and frame
-// image) and the one the Selection Marker surrounds, and picks a row as a
-// player would.
+// Reads the drawn Profile Stats as the player sees them, on the fake host:
+// card texts, Player Level, Collection Mastery, foot buttons, a section by
+// title, highlighted choice, Button Hints; also the Avatar Frame list opened
+// from the Frame button. Opens them and picks choices like a player.
 // Never loaded by PinballY.
 // ============================================================
 

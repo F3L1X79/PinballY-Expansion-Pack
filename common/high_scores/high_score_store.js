@@ -1,29 +1,12 @@
 // ============================================================
-// High Score store: the High Scores Add-on's memory, in high_scores.json
-// next to cabinet.json (through the Profile store, so no Profile Reset
-// touches it), rewritten whole on each change. Per table (by config ID):
-// the last known board, each place with its owner (a Profile name, or
-// null for a Default Score). Every High Score ever won, kept when later
-// scores push it off the board. A board read outside a Play becomes the
-// last known board; settling a Play credits its new places to the Profile
-// active when it started, unless the ROM was reset: more new places than
-// a 4-player game can make, or a place gone that no new place beat (in a
-// real game a place only leaves when beaten); they become Default Scores.
-// From the game's end until its Play is settled, a board read outside a
-// Play on that table waits, recorded after the Play: before it, it would
-// take the Play's new places as Default Scores. Every board change and
-// High Score is logged. Per Profile, the date its
-// High Score Achievements count from, set when the Profile store reports
-// its Profile Reset (its High Scores stay its own); the Achievements read
-// what each Profile won since then, and hear when a Play credited High
-// Scores; the Profile Stats read the tables where each Profile still holds
-// a place or the Table Record, and My High Scores each such table with the
-// best place held there; the High Score Board reads a table's last
-// known board with each place's owner. Per Profile, the date the Welcome
-// Screen last told it its Lost Records (the Table Records another Profile
-// took from it since), set only when it shows. Per table without a board PinballY
-// can read, the source it was learned from ({ kind: "vpreg", section }),
-// kept for good.
+// High Score store: the High Scores Add-on's memory in high_scores.json, next
+// to cabinet.json. Per table: the last known board with each place's owner,
+// and the learned board source of a table without ROM. Every High Score
+// ever won. Per Profile: the dates its Achievements and Lost Records count
+// from. Settles each Play against the board read after it.
+// - Saved through the Profile store, so no Profile Reset touches it.
+// - A ROM reset (too many new places, a place gone unbeaten) gives Default Scores.
+// - A board read outside a Play waits until the Play on that table is settled.
 // ============================================================
 
 import { hasUnbeatenGonePlace, newPlaces, placeKey } from "./board_reader.js";

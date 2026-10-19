@@ -1,12 +1,7 @@
 // ============================================================
-// The launch Loader and its gold text, through main.js on the fake
-// PinballY globals with the Seamless Launch Overlay on: the comet and the
-// step under way, written just beneath it, are centred together on the
-// playfield screen, under the menus, from the launch overlay's show until
-// the game plays, come back while the table closes and are gone with the
-// overlay; a launch that never plays keeps them until the overlay goes.
-// PinballY's own launch message is cancelled at each step. They never take
-// a button.
+// The launch Loader and its gold text through main.js with the Seamless
+// Launch Overlay: centred under the menus while the table loads and closes,
+// gone with the overlay; PinballY's own message is cancelled; no button taken.
 // ============================================================
 
 import { test } from "node:test";

@@ -1,16 +1,7 @@
 // ============================================================
-// High Score Board painter: the layout and drawing of the High Score
-// Board's pieces, in board pixels zoomed to fit the window (whose height
-// is REFERENCE_HEIGHT reference pixels), on the Drawn Menu's panel and
-// glass images: the table's title and a discreet note under it, then the
-// podium (the 2nd place on the left, the 1st in the middle and highest,
-// the 3rd on the right, each under its crown, above where an Avatar
-// Frame reaches), then the places from the 4th on in compact rows, as
-// many in view as the window's height leaves room for; or a message in place of the board. Each Avatar
-// wears its Profile's Avatar Frame, if any, as on the Profile Stats. The
-// Exit Button in the panel's top right corner, its tooltip on its left, and the
-// Button Hints in a footer at the panel's bottom. Only drawing: no layer,
-// no event, no side effect.
+// High Score Board painter: layout and drawing of the board (title, podium,
+// compact rows, or a message), in board pixels zoomed to the window, on the
+// Drawn Menu's panel images. Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } from "../drawing/steamball_palette.js";

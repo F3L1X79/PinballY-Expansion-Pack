@@ -1,13 +1,9 @@
 ﻿// ============================================================
-// Achievements based on session stats: "marathon" (longest single session),
-// "rage quit" (a short session given up) and "grand return" (a table
-// replayed after a long break), the last two being Secret Achievements,
-// and the Daily Streak ladder (3 to 30 days in a row on the cabinet).
-// Reads the active Profile's session stats, recorded by
-// session_stats_tracker.js, and its Daily Streak; writes nothing. A
-// marathon shows the longest session in whole minutes as Achievement
-// Progress; a Daily Streak Achievement shows the current Daily Streak and
-// is unlocked by the longest, so a broken Daily Streak never takes it back.
+// Session Achievements: "marathon", the Secret "rage quit" and "grand
+// return", and the Daily Streak ladder (3 to 30 days in a row). Reads the
+// session stats recorded by session_stats_tracker.js and the Daily Streak.
+// Writes nothing.
+// - A Daily Streak Achievement is unlocked by the longest streak: a broken one never takes it back.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, countedAchievement, PROGRESS_UNIT, standaloneAchievement } from "../common/achievements/achievements.js";

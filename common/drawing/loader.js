@@ -1,11 +1,8 @@
 // ============================================================
-// Loader: the small gold comet that turns in the middle of the playfield
-// screen while the player waits for something to get ready, or on its top
-// third over the High Score Board already shown, never hiding the scores.
-// show() creates one drawing layer at the Loader's z-index and loads the
-// comet's APNG into it, which PinballY plays by itself with no script per
-// frame; hide() removes the layer, so an idle Loader costs nothing per
-// frame. Both are safe to call again. Takes no button.
+// Loader: the small gold comet turning in the middle of the playfield while
+// the player waits, or on the top third over the High Score Board.
+// show() and hide() are safe to call again. Takes no button.
+// - The APNG plays by itself; hide() removes the layer, so an idle Loader costs nothing.
 // ============================================================
 
 import { LOADER_IMAGE } from "./loader_image.js";

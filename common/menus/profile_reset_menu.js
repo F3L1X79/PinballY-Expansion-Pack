@@ -1,11 +1,8 @@
 // ============================================================
-// Profile Reset menus, opened from PinballY's Exit menu: the list of every
-// Profile, ending with "Every Profile" when there are two or more, then one
-// confirmation, cursor on "No"; "Yes" resets them, a failure not stopping the
-// others, and a one-line message with "OK" tells the outcome (causes go to the
-// log only). The player asked for them, so they open directly through the
-// Drawn Menu module, not through the wheel dialog module. Listens to
-// "command".
+// Profile Reset menus, opened from the Exit menu: the list of Profiles (and
+// "Every Profile"), one confirmation on "No", then a one-line outcome.
+// Opens directly through the Drawn Menu module. Listens to "command".
+// - A failure does not stop the other resets; causes go to the log only.
 // ============================================================
 
 import lang from "../core/i18n.js";

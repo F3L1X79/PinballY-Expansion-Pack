@@ -1,16 +1,9 @@
 // ============================================================
-// The player's other menus as Drawn Menus, through main.js on the fake
-// PinballY globals: the Exit menu with the pack's entries (Change Player,
-// Reset profile for an Admin Profile), the power off menu, the filter
-// menus, the table's setup and categories menus (ticking a category
-// redraws it in place, the cursor kept) and the operator menu are drawn;
-// the capture and pause menus stay native, and a native menu opening
-// replaces a Drawn one. A command that opens another menu (a filter
-// submenu, its "Back" entry) gets it drawn in its place; Exit or a Cancel
-// entry in a filter submenu goes back to the main menu, the cursor on
-// that filter; the active filter carries its gold mark; a list too long
-// for the window scrolls with the selection and pages with NextPage /
-// PrevPage.
+// The player's other menus as Drawn Menus through main.js: Exit, power off,
+// filter, setup, categories and operator menus are drawn; capture and pause
+// stay native. Submenus open in place and go back to their parent entry;
+// long lists scroll and page.
+// - A native menu opening replaces a Drawn one.
 // ============================================================
 
 import { test } from "node:test";

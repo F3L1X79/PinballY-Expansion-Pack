@@ -1,10 +1,7 @@
 // ============================================================
-// The Confetti Shower, through main.js on the fake PinballY globals: no
-// confetti for the Gold Achievements announced at startup, none while a
-// game runs, then a single shower in front of everything with the toasts
-// of the three Platinum Achievements the game unlocked, gone after about
-// 8 s with no frame timer left running, never on the backglass, and with
-// no sound while CONFETTI_SOUND_FILE is empty.
+// Confetti Shower through main.js: none for startup Gold Achievements nor
+// during a game, then one shower with the game's Platinum toasts, gone after
+// about 8 s with no timer left, never on the backglass, silent by default.
 // ============================================================
 
 import { test } from "node:test";

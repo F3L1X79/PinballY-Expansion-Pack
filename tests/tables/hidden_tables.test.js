@@ -1,9 +1,6 @@
 // ============================================================
-// Hidden Tables, through main.js on the fake PinballY globals: the entry
-// sits in the Filter Picker right under Favorites while at least one table is
-// hidden, for a Profile with no mark as for an Admin Profile; choosing it
-// puts the hidden tables on the wheel. Back on the wheel it runs again
-// only when its tables changed (a table unhidden with "Hide this game"),
+// Hidden Tables through main.js: the entry sits under Favorites while a table
+// is hidden and puts them on the wheel; it runs again only when they change,
 // and every table comes back once none is left.
 // ============================================================
 

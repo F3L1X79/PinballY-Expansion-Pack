@@ -1,20 +1,11 @@
 ﻿// ============================================================
-// Generic achievement evaluation. An achievement is a plain object:
+// Generic Achievement evaluation. An Achievement is a plain object:
 //   { id, family, rank, getTitle(), getDescription(), checkUnlocked(), getProgress(), getHint() }
-// where family is one of ACHIEVEMENT_FAMILY, rank its Achievement Rank (one
-// of ACHIEVEMENT_RANK) and the optional getProgress() returns its
-// Achievement Progress, { current, target, unit } with unit one of
-// PROGRESS_UNIT, or null. The optional getHint() makes it a Secret
-// Achievement: the Achievement List shows "???" and the hint while it is
-// missing. countedAchievement() builds the unlock and the Achievement
-// Progress from one value (or from a value and its record, for a Streak)
-// and deduces the rank; standaloneAchievement() builds one that stands
-// alone, Gold unless its definition states a rank. The rank is never
-// persisted nor part of an ID.
-// "Unlocked" is computed live from the active Profile's progress; only the
-// fact that a Profile was Notified is persisted (its profile.json
-// "notified" list), so each Achievement is announced once per Profile.
-// The caller marks an achievement Notified when its toast starts.
+// countedAchievement() and standaloneAchievement() build the common shapes.
+// "Unlocked" is computed live; only Notified is persisted ("notified" in profile.json).
+// - The rank is never persisted nor part of an ID.
+// - getHint() makes it a Secret Achievement.
+// - The caller marks an Achievement Notified when its toast starts.
 // ============================================================
 
 // The kind of an Achievement; the Challenges and High Scores ones exist

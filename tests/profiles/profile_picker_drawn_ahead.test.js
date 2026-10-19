@@ -1,10 +1,7 @@
 // ============================================================
-// Profile picker drawn ahead, through main.js on the fake PinballY globals:
-// once the drawing ahead has run, opening the carousel and moving through
-// it (the Avatar entering from the edge, the gold frame changing hands, the
-// name leaving and coming back) draws nothing and only moves layers, since
-// on the cabinet each draw blocks PinballY for 20 to 45 ms. A pick redraws
-// the two names whose colour changes in the background, not on a move.
+// Profile picker drawn ahead: once drawn, opening and moving through the
+// carousel only moves layers; a pick redraws two names in the background.
+// - Each draw blocks PinballY for 20 to 45 ms on the cabinet.
 // ============================================================
 
 import { test } from "node:test";

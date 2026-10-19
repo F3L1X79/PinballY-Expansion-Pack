@@ -1,10 +1,7 @@
 // ============================================================
-// ROM-less High Scores, first Play on an original table, through main.js
-// on the fake PinballY globals: PinballY reads no board for it, so the
-// Add-on learns the VPReg.stg section the Play changed, takes that
-// section's board before the Play as its Default Scores and credits the
-// Play's new place to the active Profile, with the toast, the
-// Achievements and the stats lines of a ROM table.
+// ROM-less High Scores, first Play on an original table: the Add-on learns
+// the VPReg.stg section the Play changed, its earlier board as Default
+// Scores, and credits the new place with toast, Achievements and stats.
 // ============================================================
 
 import { test } from "node:test";

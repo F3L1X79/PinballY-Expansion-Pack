@@ -1,10 +1,8 @@
 // ============================================================
 // Lost Records tests' scenario: the High Scores scenario with the Welcome
-// Screen and the Profile picker on, so a Profile arriving (at startup, or
-// switched to as Change Player does) gets its Welcome Screen, or plays
-// before it shows. Builds a board whose Table Record is a Profile's. Reads the
-// Lost Records line the way the player sees it, and the seen markers in
-// high_scores.json. Never loaded by PinballY.
+// Screen and Profile picker on. Builds a board whose Table Record is a
+// Profile's, reads the Lost Records line and the seen markers.
+// Never loaded by PinballY.
 // ============================================================
 
 import { settle } from "../support/fake_pinbally_host.js";

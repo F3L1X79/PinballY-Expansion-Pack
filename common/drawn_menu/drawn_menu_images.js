@@ -1,12 +1,9 @@
 // ============================================================
-// Drawn Menu images: the PNG files of the Drawn Menu look, painted ahead
-// by maintainer/drawn_menu/generate_drawn_menu.mjs into assets/images/
-// drawn_menu/, with their size in pixels at the 1920 px reference height,
-// at which they are shown 1:1. The panel and the glass are each cut into
-// a top, a middle stretched to the menu's length and a bottom; the
-// selection's outline is one entry high, in a margin that holds its glow.
-// The ends are short enough for a menu of a single entry (250 px).
-// No side effect.
+// Drawn Menu images: the PNG files of the Drawn Menu look, painted by
+// maintainer/drawn_menu/generate_drawn_menu.mjs, with their size at the
+// 1920 px reference height. No side effect.
+// - Panel and glass are cut into top, stretched middle and bottom.
+// - The ends are short enough for a one-entry menu (250 px).
 // ============================================================
 
 export const DRAWN_MENU_IMAGES_FOLDER = "assets\\images\\drawn_menu";

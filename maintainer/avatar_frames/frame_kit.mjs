@@ -1,12 +1,9 @@
 // ============================================================
-// A tiny vector painter for the Avatar Frames, in plain Node.js:
-// shapes are signed distance functions (negative inside), painted with
-// anti-aliased edges, bevelled metal, gems, spheres, glows and noise on a
-// premultiplied RGBA canvas, saved as PNG with transparency. Coordinates:
-// the Avatar's image box is [-1, 1] on both axes, y pointing down; the
-// canvas spans [-EXTENT, EXTENT]. A rectangular canvas may instead be
-// painted in coordinates of its own (Canvas.rect). Run by
-// generate_frames.mjs and maintainer/drawn_menu/, never by PinballY.
+// A tiny vector painter for the Avatar Frames in plain Node.js: signed
+// distance shapes, anti-aliased, with metal, gems, glows and noise, saved as
+// transparent PNG. Run by generate_frames.mjs and maintainer/drawn_menu/,
+// never by PinballY.
+// - Coordinates: the Avatar's box is [-1, 1], y down; Canvas.rect uses its own.
 // ============================================================
 
 import zlib from "node:zlib";

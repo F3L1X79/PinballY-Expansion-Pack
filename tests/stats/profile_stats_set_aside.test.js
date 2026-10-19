@@ -1,11 +1,7 @@
 // ============================================================
-// The Profile Stats set aside while the Achievement List or the Household
-// Stats is open, through main.js on the fake PinballY globals: every layer
-// hidden and reduced to a point, the Selection Marker still; the buttons
-// pressed there never move nor choose anything on them; shown again, the
-// unselected choices' tooltips stay hidden, the Exit Button and the footer
-// look as when they first opened, the marker turns again, and Exit still
-// reopens the main menu on "Your Stats".
+// Profile Stats set aside under the Achievement List or Household Stats:
+// hidden and shrunk, the marker still, buttons choosing nothing; shown again
+// as first opened, and Exit still reopens the main menu on "Your Stats".
 // ============================================================
 
 import { test } from "node:test";

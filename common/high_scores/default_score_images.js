@@ -1,12 +1,8 @@
 // ============================================================
-// Default Score images: the placeholder images the High Score Board shows
-// in place of an Avatar for its Default Scores, picked by their initials
-// among the numbered default_score_NN.png of assets\images\default_scores\
-// and of its local\ folder (the owner's own, kept out of git), those
-// readable only. The same initials always get the same image, whatever the
-// table, as long as the images stay the same; on one board, different
-// initials share one only once none is free. Reads both folders and logs
-// an unreadable image, or none at all; draws nothing.
+// Default Score images: picks, by initials, the placeholder image the High
+// Score Board shows for a Default Score, among assets\images\default_scores\
+// and its local\ folder (kept out of git). Logs an unreadable image.
+// - The same initials always get the same image, whatever the table.
 // ============================================================
 
 export const DEFAULT_SCORE_IMAGES_FOLDER = "assets\\images\\default_scores";

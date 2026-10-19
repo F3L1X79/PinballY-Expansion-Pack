@@ -1,10 +1,7 @@
 // ============================================================
-// Profile Stats' Selection Marker, through main.js on the fake PinballY
-// globals with a Household of two: the marker surrounds the Exit Button on
-// opening and jumps to the first button on Next; back from the Achievement
-// List, the Avatar Frame list or the Household Stats, a single marker
-// surrounds the button the screen reopens on; it is gone, with its timer,
-// once Exit or attract mode closes the screen.
+// Profile Stats' Selection Marker: on the Exit Button at opening, the first
+// button on Next, a single marker on the button reopened from a child
+// screen, gone with its timer at close.
 // ============================================================
 
 import { test } from "node:test";

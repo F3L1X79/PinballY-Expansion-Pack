@@ -1,11 +1,9 @@
 // ============================================================
-// Maintainer's tool, never loaded by PinballY. Paints the ten Avatar
-// Frames of designs.mjs at 768 px, then writes, in assets/images/
-// avatar_frames/, each frame at 384 and 192 px (frame_NN_384.png,
-// frame_NN_192.png) and a greyed 192 px copy for locked frames
-// (frame_NN_192_locked.png). The Avatar's box is the middle two thirds.
-// Run: node maintainer/avatar_frames/generate_frames.mjs [numbers], numbers
-// such as 3,7 to paint only those frames.
+// Maintainer's tool, never loaded by PinballY. Paints the ten Avatar Frames
+// of designs.mjs and writes them in assets/images/avatar_frames/ at 384 and
+// 192 px, plus a greyed 192 px copy for locked frames.
+// Run: node maintainer/avatar_frames/generate_frames.mjs [numbers], e.g. 3,7.
+// - The Avatar's box is the middle two thirds.
 // ============================================================
 
 import path from "node:path";

@@ -1,14 +1,8 @@
 // ============================================================
-// Profile picker, through main.js on the fake PinballY globals: the
-// "Change Player" entry, first of the main menu's player section and right
-// after "Quit" in the exit menu, closes that menu and opens the drawn
-// carousel on the active Profile; the flipper buttons move through the
-// Profiles and wrap (the name shows once the Avatars have glided into
-// place, without redrawing anything), every button is swallowed while it is open, Select or Launch
-// switches to the highlighted Profile and leaves the carousel still until
-// the greeting replaces it, and Exit or attract mode close it without
-// switching. Folders added while PinballY runs show up on
-// the next open.
+// Profile picker through main.js: "Change Player" opens the carousel on the
+// active Profile; flippers move and wrap without redrawing, every button is
+// swallowed, Select switches, Exit or attract mode close it. Folders added
+// while PinballY runs show up on the next open.
 // ============================================================
 
 import { test } from "node:test";

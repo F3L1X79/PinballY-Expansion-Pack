@@ -1,12 +1,8 @@
 // ============================================================
-// Adult Period Tables for a Child Profile, through main.js on the fake
-// PinballY globals: while the Table of the Day is an Adult Table, the
-// child's Welcome Screen and main menu leave it out and an adult Profile
-// keeps it; the child's Streak goes on across that Period without counting
-// it (Profile Stats and Achievement Progress agree) and still breaks on an
-// ordinary missed Period, while an adult's Streak breaks as before.
-// cabinet.json keeps those Periods next to the Table of the Day's lock,
-// and drops one whose table is untagged during it.
+// Adult Period Tables for a Child Profile through main.js: the child's
+// Welcome Screen and main menu leave an Adult Table of the Day out; its
+// Streak goes on across that Period but breaks on an ordinary miss.
+// cabinet.json keeps those Periods next to the lock.
 // ============================================================
 
 import { test } from "node:test";

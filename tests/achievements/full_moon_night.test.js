@@ -1,10 +1,7 @@
 // ============================================================
-// Full Moon Night, a secret of the Surprises family, started through
-// main.js on the fake PinballY globals: only a Play started from 22:00 to
-// 05:59 on a night when the moon is at least 99% lit unlocks it, the moon
-// being computed on the cabinet. 21:59 or 06:00 that night, a new-moon
-// night, a full-moon afternoon or a game under a minute do not. While
-// missing, its row shows "???" and its hint; a Child Profile never sees it.
+// Full Moon Night (Surprises family) through main.js: only a Play started
+// 22:00 to 05:59 on a night at least 99% lit unlocks it; edge hours, new moon,
+// afternoon and short games don't. A Child Profile never sees it.
 // ============================================================
 
 import { test } from "node:test";

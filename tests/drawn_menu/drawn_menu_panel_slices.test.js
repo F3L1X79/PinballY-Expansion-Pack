@@ -1,10 +1,8 @@
 // ============================================================
-// A Drawn Menu's panel and glass slices, through main.js on the fake
-// PinballY globals with only the Drawn Menus Add-on on, in a cabinet's
-// portrait window (where the menu is zoomed out): each top and bottom is
-// drawn at the menu's size and shown at it, on whole pixels, the middle
-// filling the rows between them. Resampled, an end's first row would
-// blend with its last, a 1 px line across the panel.
+// A Drawn Menu's panel and glass slices in a portrait window: each end is
+// drawn and shown at the menu's size, on whole pixels, the middle filling
+// between them.
+// - Resampled, an end's first row blends with its last: a 1 px line across the panel.
 // ============================================================
 
 import { test } from "node:test";

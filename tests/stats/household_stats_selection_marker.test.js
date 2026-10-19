@@ -1,10 +1,7 @@
 // ============================================================
-// Household Stats' Selection Marker, through main.js on the fake PinballY
-// globals with a Household of seven: the marker surrounds the first
-// column on opening; while the columns glide after a move it is held in
-// the view, still on every frame where the selected column ends, and is on
-// that column once the glide is over; on the Exit Button it surrounds the Exit Button,
-// whose tooltip shows; it is gone, with its timer, once the screen closes.
+// Household Stats' Selection Marker with seven Profiles: on the first column
+// at opening, held in view while the columns glide, on the Exit Button with
+// its tooltip, and gone with its timer at close.
 // ============================================================
 
 import { test } from "node:test";

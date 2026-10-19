@@ -1,36 +1,12 @@
 // ============================================================
-// Profile picker: a "Change Player" entry, first of the main menu's player section
-// and right after "Quit" in the exit menu (and on the Welcome Screen,
-// through common/profiles/change_player.js), opens a drawn carousel of
-// the Profiles' Avatars above the menus, starting on the active Profile.
-// The flipper buttons move through it and wrap, with PinballY's navigation
-// sound (common/core/navigation_sound.js), Select or Launch switches
-// to the highlighted Profile, Exit closes it; while it is open every
-// button is swallowed through "commandbuttondown", so the wheel never moves
-// under it; attract mode closes it too. The Avatars glide to their new
-// places on each move, and the name shows once they arrive. The background,
-// each Avatar, each name and the gold frame have their own layer, drawn
-// ahead (common/core/drawing_ahead.js) and kept for the whole session, so opening
-// and moving only show, move, scale and dim layers: on the cabinet each draw
-// blocks PinballY for 20 to 45 ms. The Profiles are read again each time it
-// opens, and anything not drawn ahead yet is drawn on the spot.
-// A badge at the top right of the wheel screen shows the active Profile's
-// Avatar and name, with the shown Player Level as a pip at the Avatar's
-// bottom-right corner (each Avatar of the carousel has its own pip too); it is redrawn on every switch and whenever the
-// shown level or the worn Avatar Frame changes, hidden on "gamestarted"
-// and shown again on "wheelmode".
-// Each Avatar, on the badge, in the carousel and on the greeting, wears
-// its own Profile's Avatar Frame (common/avatar_frames/profile_rewards.js), under the
-// pip; while one is worn in the carousel, its Avatars spread out and the
-// texts under them move down, to leave each frame its room.
-// When the Welcome Screen Add-on is on, a pick closes the carousel and the
-// screen welcomes the new Profile (picking the active one changes nothing).
-// When it is off, a Profile Greeting (the Avatar growing slightly, a
-// greeting below, then a fade-out, with the optional
-// profileGreetingSoundFile) follows every pick after a short pause, the
-// carousel staying still meanwhile, and greets the restored Profile once
-// at startup, after the same pause, as soon as the wheel is free of menus
-// (drawn or native), drawn screens and dialogs; a game or the carousel started first cancels it.
+// Profile picker: "Change Player" (main menu, exit menu, Welcome Screen)
+// opens a drawn carousel of the Profiles' Avatars; Select or Launch switches
+// Profile, Exit closes it. Also shows the active Profile's badge (Avatar,
+// Avatar Frame, name, level pip) at the top right of the wheel, and greets
+// the Profile on each pick when the Welcome Screen Add-on is off.
+// - Swallows every button through "commandbuttondown" while open.
+// - Layers are drawn ahead and kept: each draw blocks PinballY 20 to 45 ms on the cabinet.
+// - The startup greeting waits for a wheel free of menus, screens and dialogs.
 // ============================================================
 
 import lang from "../common/core/i18n.js";

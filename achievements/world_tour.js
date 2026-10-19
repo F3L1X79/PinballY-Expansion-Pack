@@ -1,11 +1,8 @@
 // ============================================================
-// The World Tour Achievement: every table of the "All Tables" wheel
-// selected in one go, without launching any. Unlocked by the active
-// Profile's worldTour flag, set by the World Tour tracker
-// (common/achievements/world_tour.js); a missing flag reads as false. No Achievement
-// Progress. A Secret Achievement: the Achievement List shows its hint
-// while it is missing. Called by achievements_engine.js at each check; no
-// side effects.
+// The World Tour Secret Achievement: every table of the "All Tables" wheel
+// selected in one go, without launching any. Unlocked by the Profile's
+// worldTour flag, set by common/achievements/world_tour.js.
+// Called by achievements_engine.js at each check; no side effects.
 // ============================================================
 
 import { ACHIEVEMENT_FAMILY, ACHIEVEMENT_RANK, standaloneAchievement } from "../common/achievements/achievements.js";

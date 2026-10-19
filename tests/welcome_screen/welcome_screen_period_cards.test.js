@@ -1,11 +1,7 @@
 // ============================================================
-// Welcome Screen Period Table cards, through main.js on the fake PinballY
-// globals, in English: one card for the Table of the Day and one for the
-// Table of the Week, each with its wheel logo (its title without one), its
-// period, its cleaned name (cut with "…" when too long), its Table Mastery
-// head ("To discover" when never played) and its grey line (the Streak of
-// at least 2 not played yet, or played this Period). Next walks through
-// both cards' buttons, and Select on the day's launches it.
+// Welcome Screen Period Table cards in English: Day and Week cards with
+// logo, period, cleaned name, Mastery head and grey line; Next walks through
+// their buttons and Select on the day's launches it.
 // ============================================================
 
 import { test } from "node:test";

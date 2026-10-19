@@ -1,11 +1,8 @@
 ﻿// ============================================================
 // Achievement List painter: draws the pieces of the drawn Achievement List
-// (the dimmed backdrop and panel, the header and footer, a section header,
-// an Achievement row, a rank emblem, a row's Unlock Rate, an emblem image,
-// the scrollbar's rail and thumb) into a drawing layer's context, in the
-// Steamball look validated with the prototype, and says where the pieces on layers of their own sit. It only
-// draws what it is given: it holds no state, reads no Achievement and
-// listens to no event. Sizes are in layout pixels, fonts in points.
+// into a layer's context and says where the pieces on their own layers sit.
+// Holds no state, reads no Achievement, listens to no event.
+// - Sizes are in layout pixels, fonts in points.
 // ============================================================
 
 import { ACHIEVEMENT_RANK, RANKS_IN_ORDER } from "./achievements.js";

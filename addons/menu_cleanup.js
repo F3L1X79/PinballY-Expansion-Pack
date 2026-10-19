@@ -1,13 +1,9 @@
 // ============================================================
-// Menu Cleanup (off by default): lightens PinballY's native menus for
-// every Profile, Admin Profiles included. Listens to "menuopen" and
-// removes Help and About from the Exit and Operator menus, and Information,
-// Flyer, High Scores, Instruction Card and the filter submenus by system,
-// last played and date added from the main menu (so they stay out of the
-// main menu module's Filter Picker too). It leaves no doubled, leading
-// or trailing separator. PinballY's dedicated buttons still open
-// those screens (the HighScores one opens the High Score Board while the
-// High Scores Add-on is on).
+// Menu Cleanup (off by default): removes Help, About, Information, Flyer,
+// High Scores, Instruction Card and some filter submenus from PinballY's
+// native menus, for every Profile. Listens to "menuopen".
+// - Leaves no doubled, leading or trailing separator.
+// - PinballY's dedicated buttons still open those screens.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";

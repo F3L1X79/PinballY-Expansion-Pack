@@ -1,10 +1,7 @@
 // ============================================================
-// A long High Score Board, through main.js on the fake PinballY globals:
-// in a landscape window too short for a 10-place board, the flippers
-// scroll the rows under the podium one place at a time, from the 4th to
-// the last and back, the podium staying in place; a 5-place board fits,
-// so the flippers do nothing and never reach the wheel; a portrait window
-// shows all ten places at once.
+// A long High Score Board: in a short landscape window the flippers scroll
+// the rows one place at a time, the podium staying; a board that fits makes
+// the flippers do nothing; a portrait window shows all ten places.
 // ============================================================
 
 import { test } from "node:test";

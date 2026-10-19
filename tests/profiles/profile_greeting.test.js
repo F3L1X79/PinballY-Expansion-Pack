@@ -1,10 +1,7 @@
 // ============================================================
-// Profile Greeting on pick, through main.js on the fake PinballY globals:
-// picking a Profile in the carousel leaves it still for a short pause,
-// then greets the Profile with its Avatar and name (Guest by its translated
-// name), plays the configured sound, then fades out on its own, without
-// redrawing anything while it animates. No sound plays when the setting is
-// empty, and a missing sound file is logged and never stops the greeting.
+// Profile Greeting through main.js: after a pick and a short pause, the
+// Avatar and name with the configured sound, then a fade-out, with no redraw
+// while it animates. A missing sound file is logged, never stops it.
 // ============================================================
 
 import { test } from "node:test";

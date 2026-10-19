@@ -1,20 +1,10 @@
 // ============================================================
-// ROM-less board reader: turns the values of a table's VPReg.stg section
-// (from the compound file reader), or the text of a "5 scores + 5
-// initials" file of VPX's User folder, into the same board of places the
-// board reader gives for PINemHi: { rank, initials, score }, ordered by
-// score whatever slot the table stored them in, and renumbered. Reads the
-// HighScoreN / HighScoreNName family, of any length; when it gives no
-// place, a lone HighScore or HiScore makes a one-place board with empty
-// initials. Other families (WaffleScore..., SpecialHighScore...) are
-// feats or second boards, left out; a section without any score is not a
-// board. A text file's board is a block of five whole numbers followed by
-// five initials lines, after any leading settings lines; a file without
-// one (a LUT file) is not a board. Pure: reads no PinballY global, writes
-// nothing.
-// The rules follow vpin-studio's VPReg parsing (MIT, (c) Matthias Faust /
-// syd711, github.com/syd711/vpin-studio), limited to the families found
-// on the cabinet.
+// ROM-less board reader: turns a VPReg.stg section or a "5 scores + 5
+// initials" text file of VPX's User folder into the same board of places as
+// the board reader. Pure: reads no PinballY global, writes nothing.
+// - Other score families (WaffleScore..., SpecialHighScore...) are left out.
+// - A file without the five scores block (a LUT file) is not a board.
+// - Follows vpin-studio's VPReg parsing (MIT, (c) Matthias Faust / syd711).
 // ============================================================
 
 import { MIN_SCORE } from "./board_reader.js";

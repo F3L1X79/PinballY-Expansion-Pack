@@ -1,18 +1,8 @@
 ﻿// ============================================================
-// Welcome Screen painter: the layout and drawing of the Welcome Screen's
-// pieces, in reference pixels (the window's height is REFERENCE_HEIGHT),
-// from the prototype validated on the cabinet: the dimmed backdrop with
-// the centred Steamball panel, the header (Avatar in its worn Avatar
-// Frame, with its Player Level pip, Exit Button, greeting with the
-// Profile's name in gold, Daily Streak line, Lost Records line in the
-// alert colour with the taker's Avatar, Collection Mastery on the Mastery Bar's card), one card
-// per Period Table (logo, period, name on one line, Table Mastery card
-// around the Mastery Bar's square, grey line, "Go" button),
-// the bottom row ("random" and "stay"), the Button Hints in a footer
-// under it and, for each choice, its own rect
-// (which the Selection Marker surrounds) and, for the Avatar and the
-// Exit Button, the tooltip shown while it is selected. Only drawing: no layer,
-// no event, no side effect.
+// Welcome Screen painter: layout and drawing of the Welcome Screen (header,
+// Period Table cards, bottom row, Button Hints, each choice's rect and
+// tooltip), in reference pixels, from the prototype validated on the cabinet.
+// Only drawing: no layer, no event, no side effect.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
