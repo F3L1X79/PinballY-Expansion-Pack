@@ -66,7 +66,8 @@ test("setup", async () => {
 });
 
 test("the selections and the groups leave the main menu for one entry naming the Active Filter, with the arrow and no mark", () => {
-    assert.deepEqual(mainMenuSection(fake, entry()), [entry(), "Return"]);
+    assert.equal(mainMenuSection(fake, entry()).at(-1), entry(), "last of the table block");
+    assert.deepEqual(mainMenuSection(fake, "Return"), ["Return"]);
 
     fake.openMainMenu();
     const titles = currentTitles();
@@ -101,7 +102,7 @@ test("choosing a selection applies it and closes the menus, and the entry then n
 
     assert.equal(fake.currentMenu(), null);
     assert.equal(fake.currentFilterId(), "User.project.HallOfFame");
-    assert.deepEqual(mainMenuSection(fake, entry(lang.customMenuLabels.hallOfFameFilter)), [entry(lang.customMenuLabels.hallOfFameFilter), "Return"]);
+    assert.equal(mainMenuSection(fake, entry(lang.customMenuLabels.hallOfFameFilter)).at(-1), entry(lang.customMenuLabels.hallOfFameFilter));
     fake.setCurrentFilter("All");
 });
 

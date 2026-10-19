@@ -23,7 +23,7 @@ import { createScriptQueue } from "../../common/table_roms/script_queue.js";
 import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js";
 import { createHighScoreStore } from "../../common/high_scores/high_score_store.js";
 import { buildHighScoreAchievements } from "../../achievements/high_scores.js";
-import { WELCOME_SCREEN_PAUSE_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { WELCOME_SCREEN_PAUSE_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
@@ -207,24 +207,25 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
     const dayTable = await playLastLaunch(fake, 61 * 60);
     await closeEveryDialog(fake);
 
-    // Main menu: launch the Table of the Week and give up after 45 seconds.
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    fake.selectMenuItem(lang.customMenuLabels.tableOfTheWeek);
+    // The Welcome Screen from the main menu: launch the Table of the Week
+    // and give up after 45 seconds.
+    await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+    choose(fake, lang.welcomeScreen.periodCards.week.period);
     await settle();
     const weekTable = await playLastLaunch(fake, 45);
     await closeEveryDialog(fake);
 
-    // Main menu again: the Table of the Week, played for a minute this time,
-    // so its Period counts.
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    fake.selectMenuItem(lang.customMenuLabels.tableOfTheWeek);
+    // From the main menu again: the Table of the Week, played for a minute
+    // this time, so its Period counts.
+    await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+    choose(fake, lang.welcomeScreen.periodCards.week.period);
     await settle();
     await playLastLaunch(fake, 60);
     await closeEveryDialog(fake);
 
-    // Main menu again: a Random Game, played for a minute.
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    fake.selectMenuItem(lang.customMenuLabels.randomGame);
+    // From the main menu again: a Random Game, played for a minute.
+    await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+    choose(fake, lang.welcomeScreen.randomTable);
     await settle();
     const randomTable = await playLastLaunch(fake, 60);
     await closeEveryDialog(fake);
@@ -241,8 +242,8 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
     const expectedPlays = structuredClone(SEEDED_PLAYS);
     for (const [game, seconds, lastPlayed] of [
         [dayTable, 61 * 60, "2026-09-23T11:01:00"],
-        [weekTable, 60, "2026-09-23T11:02:45"],
-        [randomTable, 60, "2026-09-23T11:03:45"],
+        [weekTable, 60, "2026-09-23T11:02:47"],
+        [randomTable, 60, "2026-09-23T11:03:48"],
     ]) {
         const play = expectedPlays[game.configId];
         expectedPlays[game.configId] = { count: play.count + 1, seconds: play.seconds + seconds, lastPlayed };

@@ -1,7 +1,7 @@
 ﻿// ============================================================
-// The Welcome Screen's random choice and "Start Random Game" never launch the
-// Last Played Table when another is there, and each Play counts in the
-// Random Games played.
+// The Welcome Screen's random choice, at startup and from the main menu's
+// Welcome Screen entry, never launches the Last Played Table when another
+// is there, and each Play counts in the Random Games played.
 // - Runs with the animation off: the fake has no wheel buttons.
 // ============================================================
 
@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
 import { getRandomGame } from "../../common/tables/random_game.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -34,7 +34,7 @@ function playAndReturnToWheel(fake, game) {
     fake.gameOver(game);
 }
 
-test("the Welcome Screen and the main menu never launch the Last Played Table, and each Random Game counts", async () => {
+test("the Welcome Screen at startup and from the main menu never launches the Last Played Table, and each Random Game counts", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
     fake.setWheelTables([LAST_PLAYED_CONFIG_ID, "Medieval Madness (Williams 1997)", "Attack from Mars (Bally 1995)"]);
     fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({
@@ -60,8 +60,8 @@ test("the Welcome Screen and the main menu never launch the Last Played Table, a
     playAndReturnToWheel(fake, promptLaunch);
 
     for (let i = 0; i < MENU_LAUNCH_COUNT; i++) {
-        fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-        fake.selectMenuItem(lang.customMenuLabels.randomGame);
+        await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+        choose(fake, lang.welcomeScreen.randomTable);
         await settle();
         const launches = fake.launches();
         playAndReturnToWheel(fake, launches[launches.length - 1]);

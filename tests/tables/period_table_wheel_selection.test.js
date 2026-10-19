@@ -1,6 +1,6 @@
 // ============================================================
-// A Period Table launched from the Welcome Screen or the main menu
-// becomes the table selected on the wheel before it starts, so the wheel
+// A Period Table launched from the Welcome Screen, at startup or from the
+// main menu, becomes the table selected on the wheel before it starts, so the wheel
 // is on it when the game ends; when the current filter leaves it out, the
 // wheel goes back to all tables to show it.
 // ============================================================
@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -50,16 +50,16 @@ test("a launched Period Table becomes the table selected on the wheel", async ()
     await settle();
     assert.equal(current(), "Theatre of Magic", "and the wheel is on it after the game");
 
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    fake.selectMenuItem(lang.customMenuLabels.tableOfTheWeek);
+    await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+    choose(fake, lang.welcomeScreen.periodCards.week.period);
     const weekLaunch = fake.launches()[1];
-    assert.equal(current(), weekLaunch.title, "the main menu entry selects it on the wheel too");
+    assert.equal(current(), weekLaunch.title, "the screen reopened from the main menu selects it on the wheel too");
     playOut(weekLaunch);
     await settle();
 
     fake.setWheelTables(["Godzilla (Stern 2021)"], { filterId: "Manufacturer.Stern" });
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    fake.selectMenuItem(lang.customMenuLabels.tableOfTheDay);
+    await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+    choose(fake, lang.welcomeScreen.periodCards.day.period);
     assert.equal(fake.launches()[2].title, "Theatre of Magic");
     assert.equal(fake.currentFilterId(), "All", "a filter that leaves it out gives way to all tables");
     assert.equal(current(), "Theatre of Magic");

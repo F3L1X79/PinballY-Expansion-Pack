@@ -1,7 +1,8 @@
 // ============================================================
 // Adult Period Tables for a Child Profile through main.js: the child's
-// Welcome Screen and main menu leave an Adult Table of the Day out; its
-// Streak goes on across that Period but breaks on an ordinary miss.
+// Welcome Screen, at startup and from the main menu, leaves an Adult Table
+// of the Day out; its Streak goes on across that Period but breaks on an
+// ordinary miss.
 // cabinet.json keeps those Periods next to the lock.
 // ============================================================
 
@@ -10,7 +11,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { pressAndGlide, readRows, untilListShown } from "../achievements/achievement_list_reader.js";
-import { WELCOME_SCREEN_OPEN_MS, press, periodCards, readChoices } from "../welcome_screen/welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, press, periodCards, readChoices, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
 import { openProfileStats, section } from "../stats/profile_stats_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -57,7 +58,6 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     await import("../../main.js");
     await settle();
     const store = getProfileStore();
-    const LABELS = lang.customMenuLabels;
     const ACHIEVEMENTS = lang.achievements;
 
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
@@ -69,11 +69,13 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     press(fake, "Exit");
 
     const openMainMenu = () => fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    function mainMenuOffers() {
-        openMainMenu();
-        const titles = fake.currentMenu().items.map(item => item.title);
-        fake.closeMenu();
-        return [LABELS.tableOfTheDay, LABELS.tableOfTheWeek].filter(label => titles.includes(label));
+    // The Period cards of the Welcome Screen opened from the main menu.
+    async function cardsOffered() {
+        await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+        const periods = periodCards(fake).map(card => card.period);
+        press(fake, "Exit");
+        await settle();
+        return periods;
     }
     function dayStreakProgress() {
         openMainMenu();
@@ -95,8 +97,8 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     const PROGRESS = lang.achievementList.progressUnits;
     const progressOf = (streak, periodsPlayed) => [PROGRESS.daysInARow.short(streak, 7), PROGRESS.daysPlayed.short(periodsPlayed, 10)];
     async function playTableOfTheDay() {
-        openMainMenu();
-        fake.selectMenuItem(LABELS.tableOfTheDay);
+        await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+        choose(fake, CARDS.day.period);
         await settle();
         const launches = fake.launches();
         const game = launches[launches.length - 1];
@@ -116,22 +118,22 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     }
     async function goToDay(day) {
         fake.setNow(new Date(2026, 9, day, 20, 0, 0));
-        // Somebody opens PinballY's menu that day, which picks its table.
-        assert.ok(mainMenuOffers().includes(LABELS.tableOfTheWeek));
+        // Somebody opens the Welcome Screen that day, which picks its table.
+        assert.ok((await cardsOffered()).includes(CARDS.week.period));
         await settle();
     }
 
-    assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheWeek], "no Table of the Day entry for the child");
+    assert.deepEqual(await cardsOffered(), [CARDS.week.period], "no Table of the Day card from the main menu either");
     assert.deepEqual(dayStreakShown(), ["3", STATS.record(3)], "the child's Streak goes on across the adult day");
     assert.deepEqual(dayStreakProgress(), progressOf(3, 3));
 
     await switchTo("Bob");
-    assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek], "an adult Profile keeps it");
+    assert.deepEqual(await cardsOffered(), [CARDS.day.period, CARDS.week.period], "an adult Profile keeps it");
     await switchTo("Alice");
 
     // Thursday 1 October: back to an ordinary table, which extends the Streak.
     await goToDay(1);
-    assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek]);
+    assert.deepEqual(await cardsOffered(), [CARDS.day.period, CARDS.week.period]);
     assert.deepEqual(dayStreakShown(), ["3", STATS.record(3)], "today can still extend the Streak");
     assert.equal((await playTableOfTheDay()).configId, MEDIEVAL.configId);
     assert.deepEqual(dayStreakShown(), ["4", STATS.record(4)]);
@@ -144,9 +146,9 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
     // 2 October is an adult day, 3 October an ordinary day the child misses.
     await goToDay(2);
     await goToDay(3);
-    assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek]);
+    assert.deepEqual(await cardsOffered(), [CARDS.day.period, CARDS.week.period]);
     await goToDay(4);
-    assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheWeek]);
+    assert.deepEqual(await cardsOffered(), [CARDS.week.period]);
     assert.deepEqual(dayStreakShown(), ["0", STATS.record(4)], "an ordinary missed day breaks the Streak");
     assert.deepEqual(dayStreakProgress(), progressOf(0, 4));
 
@@ -158,7 +160,7 @@ test("a Child Profile is never offered an Adult Period Table and keeps its Strea
 
     // Untagged mid-day, the table is offered again and the day is an ordinary one.
     fake.setTables([{ ...PLAYBOY, categories: [] }, MEDIEVAL]);
-    assert.deepEqual(mainMenuOffers(), [LABELS.tableOfTheDay, LABELS.tableOfTheWeek]);
+    assert.deepEqual(await cardsOffered(), [CARDS.day.period, CARDS.week.period]);
     assert.deepEqual(JSON.parse(fake.readFile(CABINET)).tableOfTheDay.adultPeriods, ["2026-09-30", "2026-10-02"]);
     assertNoErrorLogged(fake);
 });

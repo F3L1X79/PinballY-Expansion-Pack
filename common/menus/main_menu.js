@@ -24,16 +24,17 @@ const UNKNOWN = { matches: () => false };
 
 // Sections from the top down, each listing its slots in menu order.
 const SECTIONS = [
-    [builtIn("PlayGame"), packEntry("TABLE_OF_THE_DAY"), packEntry("TABLE_OF_THE_WEEK"), packEntry("RANDOM_GAME")],
+    [builtIn("PlayGame"), packEntry("TABLE_SETUP"), packEntry("PROFILE_PICKER"), packEntry("WELCOME_SCREEN")],
+    [packEntry("PROFILE_STATS"), packEntry("ACHIEVEMENT_LIST")],
     [
         packEntry("HIGH_SCORE_BOARD"),
-        builtIn("GameInfo"), builtIn("Flyer"), builtIn("HighScores"), builtIn("Instructions"),
+        builtIn("GameInfo"), builtIn("Flyer"), builtIn("Instructions"), builtIn("HighScores"),
         builtIn("RateGame"), builtIn("AddFavorite", "RemoveFavorite"),
-        packEntry("TABLE_SETUP"),
+        packEntry("FILTER_PICKER"),
     ],
-    [packEntry("PROFILE_PICKER"), packEntry("WELCOME_SCREEN"), packEntry("PROFILE_STATS"), packEntry("ACHIEVEMENT_LIST")],
     [UNKNOWN],
-    [packEntry("FILTER_PICKER"), builtIn("MenuReturn")],
+    // Alone, so it never reads as one of the filter's entries.
+    [builtIn("MenuReturn")],
 ];
 
 const SLOTS = SECTIONS.flatMap((slots, section) => slots.map((slot, order) => ({ slot, position: Object.freeze({ section, order }) })));

@@ -281,9 +281,6 @@ export default {
         hiddenTablesFilter: "Hidden Tables", // TODO: translation pass
         tablesToDiscoverFilter: "Tables to Discover", // TODO: translation pass
         originalTablesFilter: "Tavoli originali",
-        randomGame: "Avvia un tavolo casuale",
-        tableOfTheDay: "Avvia il tavolo del giorno",
-        tableOfTheWeek: "Avvia il tavolo della settimana",
         tableSetup: "Configurazione del tavolo",
         filterPickerBack: "Back", // TODO: translation pass
         activeFilter: (name) => `Active filter: ${name}`, // TODO: translation pass

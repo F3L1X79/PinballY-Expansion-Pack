@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // With the achievements Add-on disabled, main.js adds neither the
 // Achievement List entry nor the Profile Stats entry: the other custom
-// entries follow "Play" alone in their section.
+// entries follow "Play" in their section.
 // ============================================================
 
 import { test } from "node:test";
@@ -28,6 +28,6 @@ test("no Achievement List or Profile Stats entry when the achievements Add-on is
     assert.equal(mainMenuSection(fake, lang.achievementList.menuEntry, openMainMenu), null);
     assert.equal(mainMenuSection(fake, lang.profileStats.menuEntry, openMainMenu), null);
     assert.deepEqual(mainMenuSection(fake, "Play", openMainMenu),
-        ["Play", MENU_LABELS.tableOfTheDay, MENU_LABELS.tableOfTheWeek, MENU_LABELS.randomGame]);
+        ["Play", MENU_LABELS.tableSetup]);
     assertNoErrorLogged(fake);
 });

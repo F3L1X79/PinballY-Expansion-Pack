@@ -38,6 +38,7 @@ test("the main menu draws the Change Filter entry and a footer naming the Active
     assert.equal(line.mark, "submenu");
     assert.ok(!rows.some(row => row.title && row.title.startsWith("Active filter")));
     assert.deepEqual(footer, { label: "Active filter:", name: "All Tables" });
+    assert.equal(rows.at(-1).title, "Return", "the footer under Return, the last line");
     press(fake, "Exit");
 });
 

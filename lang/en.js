@@ -166,9 +166,6 @@ export default {
         hiddenTablesFilter: "Hidden Tables",
         tablesToDiscoverFilter: "Tables to Discover",
         originalTablesFilter: "Original Tables",
-        randomGame: "Start Random Game",
-        tableOfTheDay: "Launch Table of the Day",
-        tableOfTheWeek: "Launch Table of the Week",
         tableSetup: "Set Up Table",
         // The Filter Picker's way back, and its main menu entry naming the Active Filter.
         filterPickerBack: "Back",

@@ -29,7 +29,7 @@ test("turned off, the main menu is native", () => {
     fake.openMainMenu();
 
     assert.equal(fake.currentMenu().id, "main");
-    assert.ok(fake.currentMenu().items.some(item => item.title === lang.customMenuLabels.tableOfTheDay));
+    assert.ok(fake.currentMenu().items.some(item => item.title === lang.customMenuLabels.tableSetup));
     assert.ok(!fake.drawingLayers().some(isMenuLayer));
     fake.closeMenu();
 });

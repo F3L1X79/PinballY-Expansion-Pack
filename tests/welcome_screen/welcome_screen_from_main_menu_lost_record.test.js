@@ -7,8 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startLostRecords } from "./lost_records_scenario.js";
-import { settle } from "../support/fake_pinbally_host.js";
-import { WELCOME_SCREEN_OPEN_MS } from "./welcome_screen_reader.js";
+import { openFromMainMenu } from "./welcome_screen_reader.js";
 import { board, avatarFiles, MEDIEVAL, FACTORY } from "../high_scores/high_scores_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -21,12 +20,7 @@ test("the Welcome Screen reopened from the main menu does not tell a seen Lost R
     });
     const { fake, setBoard, play, arrive, close, isOpen, line } = scenario;
     const { default: lang } = await import("../../common/core/i18n.js");
-    const reopenFromMainMenu = async () => {
-        fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
-        fake.selectMenuItem(lang.welcomeScreen.menuEntry);
-        await settle();
-        fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
-    };
+    const reopenFromMainMenu = () => openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
     setBoard(MEDIEVAL, FACTORY);
 
     await play(MEDIEVAL, { after: ALICE_RECORD });

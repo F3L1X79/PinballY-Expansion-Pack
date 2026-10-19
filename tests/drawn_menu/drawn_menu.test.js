@@ -45,10 +45,10 @@ test("the main menu is drawn instead of the native one, with the pack's sections
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.ok(isDrawnMenuShown(fake));
     const section = entry => sectionHolding(drawnMenuLines(fake), entry);
-    assert.deepEqual(section("Play"), ["Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame]);
+    assert.deepEqual(section("Play"), ["Play", LABELS.tableSetup]);
     assert.deepEqual(section("Information"),
-        ["Information", "Flyer", "High Scores", "Instruction Card", "Rate Table", "Add to Favorites", LABELS.tableSetup]);
-    assert.deepEqual(section("Return"), [LABELS.changeFilter, "Return"]);
+        ["Information", "Flyer", "Instruction Card", "High Scores", "Rate Table", "Add to Favorites", LABELS.changeFilter]);
+    assert.deepEqual(section("Return"), ["Return"]);
     assert.equal(readDrawnMenu(fake).message, null);
     assert.equal(highlightedEntry(fake), "Play", "the cursor opens on the first entry");
 });
@@ -59,9 +59,9 @@ test("Next and Prev move the cursor over the entries only, wrapping, with the na
     assert.equal(highlightedEntry(fake), "Return", "Prev from the first entry wraps to the last");
     press(fake, "Next");
     assert.equal(highlightedEntry(fake), "Play", "Next from the last entry wraps to the first");
-    for (let count = 0; count < 4; count++) press(fake, "Next");
+    for (let count = 0; count < 2; count++) press(fake, "Next");
     assert.equal(highlightedEntry(fake), "Information", "the separator is skipped");
-    assert.deepEqual(fake.soundsPlayed().slice(soundsBefore), Array(6).fill(NEXT_SOUND));
+    assert.deepEqual(fake.soundsPlayed().slice(soundsBefore), Array(4).fill(NEXT_SOUND));
 });
 
 test("the gold title lands at once on the new entry, while only the outline glides", () => {
@@ -108,17 +108,13 @@ test("Select runs the chosen entry's command as the native menu would, with the 
 });
 
 test("Launch chooses too, and a pack entry runs its action", async () => {
-    const launchesBefore = fake.launches().length;
     openMainMenu(fake);
-    chooseEntry(fake, LABELS.tableOfTheWeek, "Launch");
-    for (let step = 0; step < 20; step++) {
-        await settle();
-        fake.advanceTime(1000);
-    }
+    chooseEntry(fake, LABELS.tableSetup, "Launch");
+    await settle();
 
     assert.ok(!isDrawnMenuShown(fake));
-    assert.equal(fake.executedCommands().at(-1), fake.commandId("tableOfTheWeek"));
-    assert.equal(fake.launches().length, launchesBefore + 1, "the Table of the Week is launched");
+    assert.deepEqual(fake.executedCommands().slice(-2),
+        [globalThis.command.ShowGameSetupMenu, fake.commandId("showTableSetup")], "Table Setup opens PinballY's setup menu");
 });
 
 test("attract mode closes the menu without running anything", () => {

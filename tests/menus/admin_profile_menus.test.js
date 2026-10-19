@@ -65,8 +65,7 @@ test("only the Admin Profiles keep the setup entries, once the household has one
 
     markFile(fake, "Bob", true);
     assert.equal(mainMenuSection(fake, TABLE_SETUP, openMainMenu), null, "a non-admin loses Table Setup");
-    assert.deepEqual(mainMenuSection(fake, "Play", openMainMenu), ["Play", LABELS.tableOfTheDay, LABELS.tableOfTheWeek, LABELS.randomGame],
-        "the launch section stays");
+    assert.deepEqual(mainMenuSection(fake, "Play", openMainMenu), ["Play"], "Play stays");
     assert.deepEqual(exitMenuTitles(), EXIT_MENU_WITHOUT_OPERATOR_MENU, "and the Operator Menu, nothing else");
 
     store.switchTo("Bob");

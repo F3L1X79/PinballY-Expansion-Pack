@@ -1,16 +1,12 @@
 ﻿// ============================================================
-// Adds the launch entries (Table of the Day, Table of the Week, Random Game)
-// and "Table Setup" to the main menu through the main menu module.
-// Listens to "menuopen" and "command".
-// - A Child Profile gets no Period Table entry while it is an Adult Table.
+// Adds "Table Setup" to the main menu through the main menu module, and
+// "Reset profile" to the Exit menu. Listens to "menuopen" and "command".
 // - With an Admin Profile, only Admins see "Table Setup", "Operator Menu" and "Reset profile".
 // - The coin door service button still opens the Operator Menu for anyone.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
-import { getRandomGame } from "../common/tables/random_game.js";
-import { getTableOfTheDay, getTableOfTheWeek } from "../common/tables/period_table.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { createProfileResetMenu } from "../common/menus/profile_reset_menu.js";
 import { getDrawnMenus } from "../common/drawn_menu/drawn_menu.js";
@@ -21,9 +17,6 @@ const SCRIPT_NAME = "CustomMenuCommands";
 
 export default function init() {
     const { customMenuLabels: MENU_LABELS } = lang;
-    const tableOfTheDay = getTableOfTheDay();
-    const tableOfTheWeek = getTableOfTheWeek();
-    const randomGame = getRandomGame();
     const profileStore = getProfileStore();
     // Every Profile sees the setup entries until the household marks an Admin Profile.
     const showsSetupEntries = () => profileStore.isAdmin() || !profileStore.hasAdminProfile();
@@ -36,9 +29,6 @@ export default function init() {
             action: () => { mainWindow.doCommand(command.ShowGameSetupMenu); },
             shownWhen: showsSetupEntries,
         },
-        { name: "RandomGameStart", label: MENU_LABELS.randomGame, position: MAIN_MENU_POSITION.RANDOM_GAME, action: randomGame.launch },
-        { name: "tableOfTheDay", label: MENU_LABELS.tableOfTheDay, position: MAIN_MENU_POSITION.TABLE_OF_THE_DAY, action: tableOfTheDay.launch, shownWhen: tableOfTheDay.isOffered },
-        { name: "tableOfTheWeek", label: MENU_LABELS.tableOfTheWeek, position: MAIN_MENU_POSITION.TABLE_OF_THE_WEEK, action: tableOfTheWeek.launch, shownWhen: tableOfTheWeek.isOffered },
     ];
 
     const mainMenu = getMainMenu();

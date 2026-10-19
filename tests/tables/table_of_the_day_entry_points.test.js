@@ -1,15 +1,15 @@
 ﻿// ============================================================
-// The Welcome Screen's day card and the custom main menu entry, started
-// through main.js on the fake PinballY globals, launch the same Table of
-// the Day, and a Play launched from either counts once in the day Streak,
-// while a game under a minute does not count.
+// The Welcome Screen's day card, at startup and from the main menu's
+// Welcome Screen entry, started through main.js on the fake PinballY
+// globals, launches the same Table of the Day, and a Play launched from
+// either counts once in the day Streak, while a game under a minute does not.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -22,7 +22,7 @@ const TABLES = [
 
 const ADD_ONS_UNDER_TEST = ["customMenuCommands", "startupChoicePrompt"];
 
-test("the Welcome Screen and the main menu launch the same Table of the Day", async () => {
+test("the Welcome Screen at startup and from the main menu launches the same Table of the Day", async () => {
     const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
@@ -44,8 +44,8 @@ test("the Welcome Screen and the main menu launch the same Table of the Day", as
     fake.gameOver(firstLaunch);
     assert.equal(getTableOfTheDay().getStreak(), 0, "a game under a minute is not a Play");
 
-    fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-    fake.selectMenuItem(lang.customMenuLabels.tableOfTheDay);
+    await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+    choose(fake, lang.welcomeScreen.periodCards.day.period);
     const secondLaunch = fake.launches()[1];
     fake.gameStarted(secondLaunch);
     fake.advanceTime(60 * 1000);

@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { WELCOME_SCREEN_OPEN_MS, choose } from "../welcome_screen/welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const NOW = new Date(2026, 9, 1, 20, 0, 0);
@@ -76,8 +76,8 @@ test("a Child Profile never sees an Adult Table on the wheel, in the Random Game
 
     gameList.setCurFilter("All");
     for (let i = 0; i < RANDOM_GAME_COUNT; i++) {
-        fake.openMenu("main", [{ title: "Play", cmd: globalThis.command.PlayGame }]);
-        fake.selectMenuItem(lang.customMenuLabels.randomGame);
+        await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+        choose(fake, lang.welcomeScreen.randomTable);
         await settle();
         const launches = fake.launches();
         fake.gameStarted(launches[launches.length - 1]);

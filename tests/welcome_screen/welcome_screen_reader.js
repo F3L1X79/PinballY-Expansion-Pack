@@ -2,10 +2,12 @@
 // Reads the drawn Welcome Screen as the player sees it, on the fake host:
 // greeting, Daily Streak and Lost Records lines, Collection Mastery and
 // Period cards, bottom row, highlighted choice, Button Hints, startup veil;
-// picks a choice like a player. Never loaded by PinballY.
+// opens it from the main menu and picks a choice like a player. Never
+// loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";
+import { settle } from "../support/fake_pinbally_host.js";
 import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
 import { shownPip } from "../levels/level_pip_reader.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
@@ -17,6 +19,15 @@ export const WELCOME_SCREEN_PAUSE_MS = 500;
 export const WELCOME_SCREEN_OPEN_MS = 1000;
 
 export const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { command: buttonCommand, repeat: false });
+
+// Picks the native main menu's Welcome Screen entry, titled entryTitle, and
+// lets the screen open.
+export async function openFromMainMenu(fake, entryTitle) {
+    fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
+    fake.selectMenuItem(entryTitle);
+    await settle();
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+}
 
 const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
