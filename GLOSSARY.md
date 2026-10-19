@@ -94,7 +94,7 @@ The number of consecutive calendar days, up to today, in which the active Profil
 _Avoid_: Streak (alone: a Period Table Streak belongs to a Period Table), login streak, visit streak
 
 **Profile Stats**:
-The screen, opened by the player from the main menu, that sums up the active Profile's own plays (or, opened from the Household Stats, another Household Profile's, only to look at): games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Mon profil" ("My Profile").
+The screen, opened by the player from the main menu, that sums up the active Profile's own plays (or, opened from the Household Stats, another Household Profile's, only to look at): games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Opened from "Mon profil" ("My Profile"); the screen itself has no title.
 _Avoid_: Pinball Profile, player card, profile screen (a Profile is the identity, not the screen)
 
 **Household Stats**:
