@@ -387,13 +387,19 @@
             <h3>Menu de pause en Drawn Menu</h3>
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Le menu de pause d'une partie (Reprendre, Arrêter, Informations, Meilleurs scores…) reste natif : il détonne à côté des Drawn Menus.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <p>Le menu de pause d'une partie (Reprendre, Arrêter, Informations, Meilleurs scores…) reste natif : il détonne à côté des Drawn Menus. Grill commencé le 19/10/2026, en pause pour un prototype sur la borne : l'<a href="adr/0013-the-player-s-menus-are-drawn-menus-replacing-the-native-ones.md">ADR 0013</a> l'a gardé natif sans raison écrite, et rien ne dit si PinballY redessine sa fenêtre pendant une pause.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/handoff</code> → <code>/prototype</code> → <code>/handoff</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Questions ouvertes (1)</summary>
+            <summary>Décisions et prototype à faire</summary>
             <ul>
-              <li>L'<a href="adr/0013-the-player-s-menus-are-drawn-menus-replacing-the-native-ones.md">ADR 0013</a> l'a gardé natif exprès : pourquoi, et cette raison tient-elle encore (dessin pendant une partie, retour au jeu) ?</li>
+              <li>Même contenu que le menu natif : mêmes entrées, même ordre, même effet (« High Scores » gardé).</li>
+              <li>Prototype jetable : journaliser les entrées natives (titres, commandes) et <code>getUIMode()</code> pendant la pause ; dessiner un panneau par-dessus et vérifier qu'il est visible au-dessus de la table, que fondu et <code>setPos</code> s'animent, ce qu'il y a derrière (noir ou image figée), que <code>ResumeGame</code> rend le focus à la table ; relever l'effet du bouton Exit sur le menu natif et le délai d'ouverture.</li>
+              <li>Exit fait comme sur le menu natif ; ExitGame venu du même appui est avalé (pas de double effet).</li>
+              <li>Animations gelées : ouverture d'un bloc et sélection qui saute ; sinon comme les autres Drawn Menus.</li>
+              <li>Fond noir derrière : le panneau seul, sans décor propre à la pause.</li>
+              <li>Repli natif comme ailleurs (Add-on désactivé, dessin en échec).</li>
+              <li>Si même un dessin d'un bloc ne s'affiche pas : abandon, et l'ADR 0013 écrit pourquoi ce menu reste natif.</li>
             </ul>
             <p class="ctx">Vu sur une capture de la borne pendant le prototype du Loader, le 17/10/2026.</p>
           </details>
