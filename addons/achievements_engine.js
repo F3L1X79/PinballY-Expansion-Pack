@@ -27,6 +27,7 @@ import { buildWorldTourAchievements } from "../achievements/world_tour.js";
 import { createWorldTour } from "../common/achievements/world_tour.js";
 import { buildSurprisesAchievements } from "../achievements/surprises.js";
 import { createSurprises } from "../common/achievements/surprises.js";
+import { buildYoungPlayersAchievements } from "../achievements/young_players.js";
 import { getAchievementToasts, TOAST_KIND } from "../common/achievements/achievement_toast.js";
 import { getPlayerLevel, playerLevelOf } from "../common/levels/player_level.js";
 import { getShownPlayerLevel } from "../common/levels/shown_player_level.js";
@@ -88,6 +89,7 @@ export function getAllAchievements({ asNonChild = false, profileName } = {}) {
         ...(challenges ? buildChallengeAchievements(challenges) : []),
         ...(highScores ? buildHighScoreAchievements(highScores, seenBy) : []),
         ...buildSurprisesAchievements(seenBy),
+        ...buildYoungPlayersAchievements(seenBy),
     ];
 }
 

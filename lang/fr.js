@@ -390,6 +390,9 @@ export default {
         timeTravelTitle: () => "Voyage dans le temps",
         timeTravelDescription: (count) => `Jouer ${count} parties d'affilée, chacune sur une table d'une décennie plus ancienne que la précédente.`,
         timeTravelHint: () => "Et si on remontait le temps...",
+        snackTimeTitle: () => "L'heure du goûter",
+        snackTimeDescription: () => "Lancer une partie entre 16 h et 17 h.",
+        snackTimeHint: () => "Juste une partie avant les devoirs...",
         randomGamesTitles: {
             10: "Pifomètre",
             25: "Pile ou face",

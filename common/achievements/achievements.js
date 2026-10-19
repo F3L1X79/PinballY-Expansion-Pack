@@ -9,7 +9,8 @@
 // ============================================================
 
 // The kind of an Achievement; the Challenges and High Scores ones exist
-// only while their Add-on is enabled, Surprises whenever the Achievements do.
+// only while their Add-on is enabled, Surprises whenever the Achievements do,
+// Young Players only for a Child Profile.
 export const ACHIEVEMENT_FAMILY = Object.freeze({
     COLLECTION: "collection",
     PLAY_TIME: "playTime",
@@ -22,6 +23,7 @@ export const ACHIEVEMENT_FAMILY = Object.freeze({
     CHALLENGES: "challenges",
     HIGH_SCORES: "highScores",
     SURPRISES: "surprises",
+    YOUNG_PLAYERS: "youngPlayers",
 });
 
 // What an Achievement Progress counts; each one has its texts in the

@@ -394,6 +394,10 @@ export default {
         timeTravelTitle: () => "Time Travel",
         timeTravelDescription: (count) => `Play ${count} games in a row, each on a table from an older decade than the one before.`,
         timeTravelHint: () => "What if we went back in time...",
+        // TODO: translation pass
+        snackTimeTitle: () => "Snack Time",
+        snackTimeDescription: () => "Start a game between 4 and 5 pm.",
+        snackTimeHint: () => "Just one game before homework...",
         randomGamesTitles: {
             10: "E perché no?",
             25: "Testa o croce",

@@ -1,7 +1,8 @@
 // ============================================================
 // Surprises tracker: records in each Profile's "surprises" part what the
-// Surprises family needs (flags, seasons seen, current runs). Listens to the
-// Profile store's Play announcement (ADR 0008).
+// Surprises and Young Players families need (flags, seasons seen, current
+// runs). Listens to the Profile store's Play announcement (ADR 0008).
+// - The Young Players flags are recorded only for a Child Profile's Plays.
 // - Only Plays made since the update count: the Play Log is never replayed.
 // - A missing "surprises" part reads as empty.
 // ============================================================
@@ -18,6 +19,9 @@ export const NIGHT_OWL_LAST_HOUR = 3;
 // Same for Lunch Break, Monday to Friday; public holidays are not known.
 export const LUNCH_BREAK_FIRST_HOUR = 12;
 export const LUNCH_BREAK_LAST_HOUR = 13;
+// Same for Snack Time (Young Players family), only for a Child Profile.
+export const SNACK_TIME_FIRST_HOUR = 16;
+export const SNACK_TIME_LAST_HOUR = 16;
 // A Play started from FULL_MOON_NIGHT_FIRST_HOUR:00 to
 // FULL_MOON_NIGHT_LAST_HOUR:59 the next morning, while the moon is at least
 // FULL_MOON_MIN_LIT_PERCENT lit, earns Full Moon Night. That much light
@@ -63,8 +67,8 @@ function moonLitFraction(date) {
     return (1 - Math.cos(2 * Math.PI * age / SYNODIC_MONTH_MS)) / 2;
 }
 
-// The flags a Play started at that moment earns.
-function momentFlags(start) {
+// The flags a Play started at that moment earns, by a Child Profile or not.
+function momentFlags(start, isChild) {
     const hour = start.getHours();
     const day = start.getDay();
     const flags = {};
@@ -77,6 +81,7 @@ function momentFlags(start) {
     }
     // Hours only go up to 23, so this stops at 23:23.
     if (hour === start.getMinutes()) flags.mirrorHour = true;
+    if (isChild && isInHours(hour, SNACK_TIME_FIRST_HOUR, SNACK_TIME_LAST_HOUR)) flags.snackTime = true;
     return flags;
 }
 
@@ -100,7 +105,8 @@ export function createSurprises(host, profileStore) {
     // Fires after each Play is saved. Writes every time, since every Play
     // moves the runs.
     profileStore.onPlay(safeHandler(SCRIPT_NAME, ({ profileName, configId, start }) => {
-        const flags = momentFlags(start);
+        // A child at the time of the Play: a Profile marked later earns nothing from it.
+        const flags = momentFlags(start, profileStore.isChild(profileName));
         const season = SEASON_OF_MONTH[start.getMonth()];
         const surprises = surprisesOf(profileStore.getProfileDataOf(profileName));
         const seasons = surprises.seasons || [];
