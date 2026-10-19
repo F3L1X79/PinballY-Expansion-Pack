@@ -335,16 +335,20 @@
             <h3>Ordre des écrans au démarrage, choisi dans les options</h3>
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Choisir le premier écran vu au démarrage de PinballY : le Profile picker (quand il est activé), le Welcome Screen ou directement la roue. Par exemple, le Profile picker en premier pour que chacun choisisse son Profile avant de jouer. Aujourd'hui, PinballY démarre sur la Profile Greeting puis le Welcome Screen du dernier Profile actif, et le Profile picker ne s'ouvre que par Change Player ou le menu principal.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <p>Choisir le premier écran vu au démarrage de PinballY : le Profile picker (quand il est activé), le Welcome Screen ou directement la roue. Par exemple, le Profile picker en premier pour que chacun choisisse son Profile avant de jouer. Aujourd'hui, PinballY démarre sur le Welcome Screen du dernier Profile actif (la Profile Greeting seulement quand ce screen est désactivé), et le Profile picker ne s'ouvre que par Change Player ou le menu principal. Grillé le 19/10/2026 : Startup Screen dans le glossaire, réglage <code>startupScreen</code> (<code>welcome</code> par défaut, <code>profilePicker</code>, <code>wheel</code>).</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Le réglage rejoint les <a href="#operator-menu-options">options du menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a> une fois celles-ci faites ; d'ici là, une clé de <code>.env.local</code></div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Décisions du grill (8)</summary>
             <ul>
-              <li>Profile picker en premier : le Welcome Screen suit-il le choix du Profile, comme après Change Player, ou la roue directement ?</li>
-              <li>La Profile Greeting du démarrage disparaît-elle quand le Profile picker ouvre la séance ?</li>
-              <li>Roue en premier : le Welcome Screen reste-t-il joignable (menu principal), et les toasts en attente partent-ils tout de suite ?</li>
-              <li>Exit sur le Profile picker de démarrage : garde le dernier Profile actif, ou passe en Guest ?</li>
+              <li>Profile picker en premier : le Welcome Screen suit toujours, même si le Profile est gardé ; Exit garde le dernier Profile actif, puis même suite.</li>
+              <li>Pas de Profile Greeting quand le Profile picker ou le Welcome Screen ouvre la séance ; avec la roue en premier, la Greeting du dernier Profile actif, sans voile ni Loader, et le Welcome Screen reste dans le menu principal.</li>
+              <li>Le Profile picker de démarrage bloque toasts et prompts comme le Welcome Screen ; voile et Loader jusqu'au carrousel, roue assombrie jusqu'au Welcome Screen.</li>
+              <li>Écran choisi désactivé : on passe au suivant (Profile picker → Welcome Screen → roue), avec une ligne <code>[Config]</code> dans le log.</li>
+              <li>Maison vide (Guest seul) : le Profile picker est sauté.</li>
+              <li>Mode attract pendant le Profile picker de démarrage : il se ferme, rien ne change, le Welcome Screen est abandonné.</li>
+              <li>L'aide garde « Exit : annuler », sans texte propre au démarrage.</li>
+              <li>Roue en premier avec le Profile picker éteint : rien ne s'affiche.</li>
             </ul>
             <p class="ctx">Idée de Félix du 19/10/2026. <code>main.js</code> charge le Profile picker avant le Welcome Screen, qui ne propose « Change Player » que si le picker s'est enregistré.</p>
           </details>
