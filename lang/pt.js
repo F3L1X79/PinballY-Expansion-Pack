@@ -438,7 +438,7 @@ export default {
     },
 
     achievementList: {
-        menuEntry: "Lista de conquistas",
+        menuEntry: "Lista de conquistas", // TODO: translation pass, now My Achievements
         // The header's title and the section titles are shown in capitals.
         title: "Lista de conquistas",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} conquistas desbloqueadas (${percent}%)`,
@@ -486,7 +486,7 @@ export default {
     },
 
     profileStats: {
-        menuEntry: "Estatísticas",
+        menuEntry: "Estatísticas", // TODO: translation pass, now My Profile
         // TODO: translation pass
         // The buttons at the card's foot.
         buttons: {

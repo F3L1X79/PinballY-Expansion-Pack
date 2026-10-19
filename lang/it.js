@@ -437,7 +437,7 @@ export default {
     },
 
     achievementList: {
-        menuEntry: "Elenco degli obiettivi",
+        menuEntry: "Elenco degli obiettivi", // TODO: translation pass, now My Achievements
         // The header's title and the section titles are shown in capitals.
         title: "Elenco degli obiettivi",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} obiettivi sbloccati (${percent}%)`,
@@ -485,7 +485,7 @@ export default {
     },
 
     profileStats: {
-        menuEntry: "Statistiche",
+        menuEntry: "Statistiche", // TODO: translation pass, now My Profile
         // TODO: translation pass
         // The buttons at the card's foot.
         buttons: {
