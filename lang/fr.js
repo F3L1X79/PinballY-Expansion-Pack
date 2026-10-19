@@ -396,6 +396,8 @@ export default {
         wednesdayOffTitle: () => "Mercredi, c'est permis",
         wednesdayOffDescription: () => "Lancer une partie un mercredi après-midi.",
         wednesdayOffHint: () => "Pas d'école cet après-midi...",
+        grownUpRecordTakenTitle: () => "Plus fort que les grands",
+        grownUpRecordTakenDescription: () => "Prendre un record de table à un grand.",
         randomGamesTitles: {
             10: "Pifomètre",
             25: "Pile ou face",

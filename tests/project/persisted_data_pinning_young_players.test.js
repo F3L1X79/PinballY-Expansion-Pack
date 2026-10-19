@@ -12,6 +12,7 @@ import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import { createProfileStore } from "../../common/profiles/profile_store.js";
 import { buildYoungPlayersAchievements } from "../../achievements/young_players.js";
 import { createSurprises } from "../../common/achievements/surprises.js";
+import { createHighScoreStore } from "../../common/high_scores/high_score_store.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const KID_PROFILE_FILE = `${PROFILES}\\Kid\\profile.json`;
@@ -42,6 +43,7 @@ test("the Young Players family keeps its flags in the surprises part and its Ach
     assert.equal(surprises.snackTime, true);
     assert.equal(surprises.wednesdayOff, true);
     // Each pinned ID is still built; a new Young Players Achievement only adds one.
-    const ids = buildYoungPlayersAchievements({ profileName: "Kid" }).map(achievement => achievement.id);
-    for (const id of ["snackTime", "wednesdayOff"]) assert.ok(ids.includes(id), `${id} is still a Young Players Achievement ID`);
+    const highScores = createHighScoreStore(fake, store);
+    const ids = buildYoungPlayersAchievements({ profileName: "Kid", highScores }).map(achievement => achievement.id);
+    for (const id of ["snackTime", "wednesdayOff", "grownUpRecordTaken"]) assert.ok(ids.includes(id), `${id} is still a Young Players Achievement ID`);
 });

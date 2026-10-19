@@ -89,7 +89,7 @@ export function getAllAchievements({ asNonChild = false, profileName } = {}) {
         ...(challenges ? buildChallengeAchievements(challenges) : []),
         ...(highScores ? buildHighScoreAchievements(highScores, seenBy) : []),
         ...buildSurprisesAchievements(seenBy),
-        ...buildYoungPlayersAchievements(seenBy),
+        ...buildYoungPlayersAchievements({ ...seenBy, highScores }),
     ];
 }
 

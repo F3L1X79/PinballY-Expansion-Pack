@@ -207,18 +207,27 @@ export function createHighScoreStore(host, profileStore) {
         },
         // What the named Profile's High Score Achievements count, from the
         // High Scores it won since its last Profile Reset: the tables with
-        // one, the tables with a Table Record, and whether it took a Table
-        // Record from another Profile.
+        // one, the tables with a Table Record, whether it took a Table
+        // Record from another Profile, and from a grown-up: a Household
+        // Profile that is not a child, as the Profile store marks it now.
         achievementCountsOf(profileName) {
             const profileKey = profileKeyOf(profileName);
             const from = (isRecord(data.achievementsFrom) && data.achievementsFrom[profileKey]) || "";
             const won = data.highScores.filter(highScore => typeof highScore.profile === "string"
                 && profileKeyOf(highScore.profile) === profileKey && highScore.date >= from);
             const tablesOf = highScores => new Set(highScores.map(highScore => highScore.configId)).size;
+            const takings = won.filter(highScore => typeof highScore.takenFrom === "string");
+            // Only read when something was taken: most Profiles took nothing.
+            const profiles = takings.length > 0 ? profileStore.listProfiles() : [];
+            const isGrownUp = name => {
+                const profile = profileNamed(name, profiles);
+                return profile !== null && !profile.isGuest && !profileStore.isChild(profile.name);
+            };
             return {
                 highScoreTables: tablesOf(won),
                 tableRecordTables: tablesOf(won.filter(highScore => highScore.tableRecord)),
-                tookTableRecord: won.some(highScore => typeof highScore.takenFrom === "string"),
+                tookTableRecord: takings.length > 0,
+                tookGrownUpTableRecord: takings.some(highScore => isGrownUp(highScore.takenFrom)),
             };
         },
         // Where the named Profile stands on the last known boards today,

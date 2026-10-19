@@ -402,6 +402,8 @@ export default {
         wednesdayOffTitle: () => "Wednesday Off",
         wednesdayOffDescription: () => "Start a game on a Wednesday afternoon.",
         wednesdayOffHint: () => "No school this afternoon...",
+        grownUpRecordTakenTitle: () => "Beat the Grown-Ups",
+        grownUpRecordTakenDescription: () => "Take a Table Record from a grown-up.",
         randomGamesTitles: {
             10: "Warum nicht?",
             25: "Kopf oder Zahl",
