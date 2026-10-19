@@ -21,7 +21,7 @@ const TABLE = {
 };
 
 test("the Young Players family keeps its flags in the surprises part and its Achievement IDs", () => {
-    // Monday 5 October 2026, 16:30: Snack Time.
+    // Monday 5 October 2026, 16:30: Snack Time, then Wednesday Off below.
     const fake = createFakePinballYHost({ now: new Date(2026, 9, 5, 16, 30, 0), tables: [TABLE] });
     fake.addFile(`${PROFILES}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Kid" }));
     fake.addFile(KID_PROFILE_FILE, JSON.stringify({ version: 1, isChild: true }));
@@ -32,9 +32,16 @@ test("the Young Players family keeps its flags in the surprises part and its Ach
     fake.gameStarted(TABLE);
     fake.advanceTime(5 * 60 * 1000);
     fake.gameOver(TABLE);
+    // Wednesday 7 October 2026, 13:00: Wednesday Off.
+    fake.advanceTime(new Date(2026, 9, 7, 13, 0, 0) - fake.now());
+    fake.gameStarted(TABLE);
+    fake.advanceTime(5 * 60 * 1000);
+    fake.gameOver(TABLE);
 
-    assert.equal(JSON.parse(fake.readFile(KID_PROFILE_FILE)).surprises.snackTime, true);
+    const surprises = JSON.parse(fake.readFile(KID_PROFILE_FILE)).surprises;
+    assert.equal(surprises.snackTime, true);
+    assert.equal(surprises.wednesdayOff, true);
     // Each pinned ID is still built; a new Young Players Achievement only adds one.
     const ids = buildYoungPlayersAchievements({ profileName: "Kid" }).map(achievement => achievement.id);
-    for (const id of ["snackTime"]) assert.ok(ids.includes(id), `${id} is still a Young Players Achievement ID`);
+    for (const id of ["snackTime", "wednesdayOff"]) assert.ok(ids.includes(id), `${id} is still a Young Players Achievement ID`);
 });

@@ -393,6 +393,9 @@ export default {
         snackTimeTitle: () => "L'heure du goûter",
         snackTimeDescription: () => "Lancer une partie entre 16 h et 17 h.",
         snackTimeHint: () => "Juste une partie avant les devoirs...",
+        wednesdayOffTitle: () => "Mercredi, c'est permis",
+        wednesdayOffDescription: () => "Lancer une partie un mercredi après-midi.",
+        wednesdayOffHint: () => "Pas d'école cet après-midi...",
         randomGamesTitles: {
             10: "Pifomètre",
             25: "Pile ou face",

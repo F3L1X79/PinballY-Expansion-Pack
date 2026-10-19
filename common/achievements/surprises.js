@@ -22,6 +22,10 @@ export const LUNCH_BREAK_LAST_HOUR = 13;
 // Same for Snack Time (Young Players family), only for a Child Profile.
 export const SNACK_TIME_FIRST_HOUR = 16;
 export const SNACK_TIME_LAST_HOUR = 16;
+// Same for Wednesday Off (Young Players family), only for a Child Profile,
+// on a Wednesday.
+export const WEDNESDAY_OFF_FIRST_HOUR = 13;
+export const WEDNESDAY_OFF_LAST_HOUR = 18;
 // A Play started from FULL_MOON_NIGHT_FIRST_HOUR:00 to
 // FULL_MOON_NIGHT_LAST_HOUR:59 the next morning, while the moon is at least
 // FULL_MOON_MIN_LIT_PERCENT lit, earns Full Moon Night. That much light
@@ -35,6 +39,7 @@ export const FULL_MOON_MIN_LIT_PERCENT = 99;
 // true moon drifts from it by some hours, well inside that window.
 const REFERENCE_NEW_MOON_MS = Date.UTC(2000, 0, 6, 18, 14);
 const SYNODIC_MONTH_MS = 29.530588853 * 24 * 60 * 60 * 1000;
+const WEDNESDAY = 3;
 const FRIDAY = 5;
 const SATURDAY = 6;
 const SUNDAY = 0;
@@ -81,7 +86,10 @@ function momentFlags(start, isChild) {
     }
     // Hours only go up to 23, so this stops at 23:23.
     if (hour === start.getMinutes()) flags.mirrorHour = true;
-    if (isChild && isInHours(hour, SNACK_TIME_FIRST_HOUR, SNACK_TIME_LAST_HOUR)) flags.snackTime = true;
+    if (isChild) {
+        if (isInHours(hour, SNACK_TIME_FIRST_HOUR, SNACK_TIME_LAST_HOUR)) flags.snackTime = true;
+        if (day === WEDNESDAY && isInHours(hour, WEDNESDAY_OFF_FIRST_HOUR, WEDNESDAY_OFF_LAST_HOUR)) flags.wednesdayOff = true;
+    }
     return flags;
 }
 

@@ -29,8 +29,8 @@ const RANK_POINTS = {
 const NOTIFIED = ["fourSeasons"];
 // Night Owl and Full Moon Night, both Gold, which a child never has.
 export const KEPT_FROM_CHILD_POINTS = 100;
-// Snack Time, Bronze, which only a child has.
-export const CHILD_ONLY_POINTS = 10;
+// Snack Time and Wednesday Off, both Bronze, which only a child has.
+export const CHILD_ONLY_POINTS = 20;
 
 // tables: the collection, Adult Tables (category "NSFW") or not.
 export async function start(tables) {

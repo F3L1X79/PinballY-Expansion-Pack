@@ -26,5 +26,14 @@ export function buildYoungPlayersAchievements({ asNonChild = false, profileName 
             getHint: () => TEXT.snackTimeHint(),
             checkUnlocked: () => activeSurprises().snackTime === true,
         }),
+        standaloneAchievement({
+            id: "wednesdayOff",
+            family: ACHIEVEMENT_FAMILY.YOUNG_PLAYERS,
+            rank: ACHIEVEMENT_RANK.BRONZE,
+            getTitle: () => TEXT.wednesdayOffTitle(),
+            getDescription: () => TEXT.wednesdayOffDescription(),
+            getHint: () => TEXT.wednesdayOffHint(),
+            checkUnlocked: () => activeSurprises().wednesdayOff === true,
+        }),
     ];
 }

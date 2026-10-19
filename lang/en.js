@@ -283,6 +283,9 @@ export default {
         snackTimeTitle: () => "Snack Time",
         snackTimeDescription: () => "Start a game between 4 and 5 pm.",
         snackTimeHint: () => "Just one game before homework...",
+        wednesdayOffTitle: () => "Wednesday Off",
+        wednesdayOffDescription: () => "Start a game on a Wednesday afternoon.",
+        wednesdayOffHint: () => "No school this afternoon...",
         randomGamesTitles: {
             10: "Why Not?",
             25: "Heads or Tails",
