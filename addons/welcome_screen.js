@@ -1,9 +1,9 @@
 ﻿// ============================================================
-// Welcome Screen: at startup and after Change Player, a drawn panel greets
-// the active Profile and shows its Daily Streak, Lost Records and Collection
-// Mastery, then offers to play the Table of the Day or Week, a Random Game,
-// or to stay. A drawn dialog of the wheel dialog module with the startup
-// priority (docs/adr/0011): other dialogs and toasts wait for it.
+// Welcome Screen: at startup, after Change Player and from its main menu
+// entry, a drawn panel greets the active Profile with its Daily Streak, Lost
+// Records and Collection Mastery, then offers the Table of the Day or Week,
+// a Random Game, or to stay. A drawn dialog of the wheel dialog module with
+// the startup priority (docs/adr/0011): other dialogs and toasts wait for it.
 // - At startup only, a veil and the Loader dim the wheel until the panel fades in.
 // - Swallows every button through "commandbuttondown" while open.
 // - Reading the Period cards picks and locks this Period's tables.
@@ -15,6 +15,7 @@ import config from "../common/core/config.js";
 import { safeHandler } from "../common/core/safe_handler.js";
 import { createPinballYHost } from "../common/core/pinbally_host.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/core/wheel_dialog.js";
+import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
 import { getShownPlayerLevel } from "../common/levels/shown_player_level.js";
@@ -378,12 +379,19 @@ export default function init() {
     submit(null);
     showStartupVeilAndLoader();
 
-    // Fires on every switch, which the Profile picker makes only to another
-    // Profile: the new player is welcomed too, read again when the screen
-    // opens. Once only when the screen is still waiting or open.
-    store.onSwitch(safeHandler(SCRIPT_NAME, () => {
+    // Read again when the screen opens, the cursor on the cross; nothing
+    // more while the screen is still waiting or open.
+    function submitAgain() {
         if (!isSubmitted && !closeDialog) submit(CHOICE.EXIT_BUTTON);
-    }));
+    }
+
+    // Through the wheel dialog module rather than opened directly, so that
+    // toasts and other dialogs wait for it.
+    getMainMenu().add({ name: "welcomeScreen", label: TEXT.menuEntry, position: MAIN_MENU_POSITION.WELCOME_SCREEN, action: submitAgain });
+
+    // Fires on every switch, which the Profile picker makes only to another
+    // Profile: the new player is welcomed too.
+    store.onSwitch(safeHandler(SCRIPT_NAME, submitAgain));
 
     // Fires on every mapped button press; drives the screen while it is
     // open. Async because the Random Game animates the wheel, so its

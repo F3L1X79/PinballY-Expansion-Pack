@@ -31,7 +31,7 @@ const SECTIONS = [
         builtIn("RateGame"), builtIn("AddFavorite", "RemoveFavorite"),
         packEntry("TABLE_SETUP"),
     ],
-    [packEntry("PROFILE_PICKER"), packEntry("PROFILE_STATS"), packEntry("ACHIEVEMENT_LIST")],
+    [packEntry("PROFILE_PICKER"), packEntry("WELCOME_SCREEN"), packEntry("PROFILE_STATS"), packEntry("ACHIEVEMENT_LIST")],
     [UNKNOWN],
     [packEntry("FILTER_PICKER"), builtIn("MenuReturn")],
 ];
