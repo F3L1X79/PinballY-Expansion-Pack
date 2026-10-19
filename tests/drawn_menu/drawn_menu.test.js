@@ -47,7 +47,7 @@ test("the main menu is drawn instead of the native one, with the pack's sections
     const section = entry => sectionHolding(drawnMenuLines(fake), entry);
     assert.deepEqual(section("Play"), ["Play", LABELS.tableSetup]);
     assert.deepEqual(section("Information"),
-        ["Information", "Flyer", "Instruction Card", "High Scores", "Rate Table", "Add to Favorites", LABELS.changeFilter]);
+        ["Information", "Flyer", "Instruction Card", "Table Scores", "Rate Table", "Add to Favorites", LABELS.changeFilter]);
     assert.deepEqual(section("Return"), ["Return"]);
     assert.equal(readDrawnMenu(fake).message, null);
     assert.equal(highlightedEntry(fake), "Play", "the cursor opens on the first entry");

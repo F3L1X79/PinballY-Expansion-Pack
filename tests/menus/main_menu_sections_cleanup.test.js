@@ -36,7 +36,7 @@ test("a non-Admin Profile's cleaned main menu runs in its sections, in French", 
     const section = entry => mainMenuSection(fake, entry);
 
     assert.deepEqual(section("Jouer"), ["Jouer", lang.profiles.menuEntry]);
-    assert.deepEqual(section("Vos succès"), ["Vos statistiques", "Vos succès"]);
+    assert.deepEqual(section("Mes succès"), ["Mon profil", "Mes succès"]);
     const filterPicker = "Filtre actif : Toutes les tables";
     assert.deepEqual(section(lang.highScores.board.menuEntry),
         [lang.highScores.board.menuEntry, "Noter la table", "Ajouter aux favoris", filterPicker]);

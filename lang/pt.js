@@ -283,6 +283,7 @@ export default {
         tablesToDiscoverFilter: "Tables to Discover", // TODO: translation pass
         originalTablesFilter: "Mesas originais",
         tableSetup: "Configuração da mesa",
+        tableScores: "Table Scores", // TODO: translation pass
         filterPickerBack: "Back", // TODO: translation pass
         activeFilter: (name) => `Active filter: ${name}`, // TODO: translation pass
         // The Drawn main menu's "Change Filter" entry, and its footer's label before the Active Filter.

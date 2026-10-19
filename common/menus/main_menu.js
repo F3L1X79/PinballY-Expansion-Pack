@@ -4,9 +4,11 @@
 // sections, sends the selections and groups to the Filter Picker, and runs
 // the chosen entry's action. Listens to "menuopen" and "command".
 // - main.js's order never decides where an entry lands.
+// - PinballY's High Scores reads "Table Scores" in the main menu only; other menus keep UI Translation's title.
 // - A [Top] filter's condition is checked on each opening; a failing one is logged and kept.
 // ============================================================
 
+import lang from "../core/i18n.js";
 import { safeHandler } from "../core/safe_handler.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { createFilterPicker } from "./filter_picker.js";
@@ -101,6 +103,13 @@ export function createMainMenu(host) {
         return found ? found.position : UNKNOWN_POSITION;
     }
 
+    // PinballY's High Scores reads "Table Scores" here only, over UI
+    // Translation's title (registered first), so it never shares the High
+    // Score Board's name; the pause menu keeps "High Scores".
+    function withMainMenuTitle(item) {
+        return item.cmd === host.getBuiltInCommand("HighScores") ? { ...item, title: lang.customMenuLabels.tableScores } : item;
+    }
+
     // Fires when any menu opens, with a fresh item list each time: hands the
     // filters shown this time to the Filter Picker, which may take the
     // opening over, else sorts the entries shown and PinballY's other items
@@ -132,7 +141,7 @@ export function createMainMenu(host) {
             }),
             ...ev.items
                 .filter(item => !isSeparator(item) && !isFilterItem(item, host) && !filterPicker.isGroupItem(item))
-                .map(item => ({ item, position: nativePositionOf(item.cmd) })),
+                .map(item => ({ item: withMainMenuTitle(item), position: nativePositionOf(item.cmd) })),
         ].sort((a, b) => comparePositions(a.position, b.position));
         const items = [];
         placed.forEach(({ item, position }, index) => {

@@ -49,7 +49,7 @@ test("with no selected-table entry shown, the table block keeps only the Filter 
     ]);
     const section = entry => mainMenuSection(fake, entry, openMainMenu);
 
-    for (const entry of ["Information", "Flyer", "High Scores", "Instruction Card", LABELS.tableSetup]) {
+    for (const entry of ["Information", "Flyer", "Table Scores", "Instruction Card", LABELS.tableSetup]) {
         assert.equal(section(entry), null, entry);
     }
     assert.deepEqual(section(lang.profiles.menuEntry), ["Play", lang.profiles.menuEntry]);

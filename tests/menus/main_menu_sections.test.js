@@ -50,7 +50,8 @@ test("setup", async () => {
 });
 
 const startingPoints = () => ["Play", lang.customMenuLabels.tableSetup, lang.profiles.menuEntry, lang.welcomeScreen.menuEntry];
-const player = () => [lang.profileStats.menuEntry, lang.achievementList.menuEntry];
+// Written out: the menu must read these exact names (#274).
+const player = () => ["My Profile", "My Achievements"];
 const changeFilter = () => lang.customMenuLabels.activeFilter("All Tables");
 
 test("the main menu runs starting points, player, the wheel and its table, then Return alone", () => {

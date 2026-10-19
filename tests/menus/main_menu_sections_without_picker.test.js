@@ -28,7 +28,7 @@ test("without the player's Add-ons, the main menu leaves out their entries and t
     fake.closeMenu();
     assert.deepEqual(titles, [
         "Play", lang.customMenuLabels.tableSetup, SEPARATOR,
-        "Information", "Flyer", "Instruction Card", "High Scores", "Rate Table", "Add to Favorites",
+        "Information", "Flyer", "Instruction Card", "Table Scores", "Rate Table", "Add to Favorites",
         lang.customMenuLabels.activeFilter("All Tables"), SEPARATOR,
         "Return",
     ]);

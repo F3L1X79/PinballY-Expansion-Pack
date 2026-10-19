@@ -25,11 +25,11 @@ Les menus et messages de PinballY enfin en français, mais aussi en allemand, es
 
 Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran d'accueil vous salue par votre nom : vous savez pour qui les parties vont compter. Seules les parties d'au moins une minute comptent : un lancement par erreur ne fausse rien. Vos jours d'affilée sur la borne comptent les jours de suite où vous avez joué, sur n'importe quelle table. Le Profil Invité reste toujours là pour les visiteurs.
 
-### Vos statistiques
+### Mon profil
 
 <img src="docs/images/profile_stats.png" alt="Les statistiques d'un Profil : niveau, maîtrise de la collection, parties, séries, goûts et tables jouées en premier, le plus et en dernier" width="480">
 
-**Vos statistiques**, dans le menu principal, résument votre vie de flippeur :
+**Mon profil**, dans le menu principal, résume votre vie de flippeur :
 - parties jouées, temps total et durée moyenne d'une partie ;
 - votre niveau et la maîtrise de votre collection ;
 - fabricant, décennie et table préférés, et la toute première table jouée ;
@@ -58,11 +58,11 @@ Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq table
 
 <img src="docs/images/table_mastery.png" alt="La barre de maîtrise de la table sélectionnée : Rookie (Novice), niveau 1" width="297">
 
-Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis. Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Vos statistiques**, sous **Cadre**.
+Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis. Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Mon profil**, sous **Cadre**.
 
 ### Meilleurs scores
 
-Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie et, pour une partie d'au moins une minute, attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris. Un encart annonce votre meilleure place, ou le record et à qui vous l'avez pris. Quand quelqu'un d'autre vous prend un record, Invité compris, votre prochain écran d'accueil vous dit qui, une seule fois, pour que vous sachiez quel record reprendre. Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée. Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès ; **Vos statistiques** montrent les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records. Les tables sans ROM (créations originales) comptent aussi : le pack lit leur tableau dans le dossier `User` de Visual Pinball X (`VPReg.stg`, ou le fichier texte que certaines tables y gardent), apprend où chaque table le range pendant sa première partie, et le passe à PinballY, pour que le DMD et la fiche de la table l'affichent aussi. Leur tableau apparaît dès qu'une telle table a été jouée avec le pack.
+Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie et, pour une partie d'au moins une minute, attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris. Un encart annonce votre meilleure place, ou le record et à qui vous l'avez pris. Quand quelqu'un d'autre vous prend un record, Invité compris, votre prochain écran d'accueil vous dit qui, une seule fois, pour que vous sachiez quel record reprendre. Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée. Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès ; **Mon profil** montre les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records. Les tables sans ROM (créations originales) comptent aussi : le pack lit leur tableau dans le dossier `User` de Visual Pinball X (`VPReg.stg`, ou le fichier texte que certaines tables y gardent), apprend où chaque table le range pendant sa première partie, et le passe à PinballY, pour que le DMD et la fiche de la table l'affichent aussi. Leur tableau apparaît dès qu'une telle table a été jouée avec le pack.
 
 <img src="docs/images/high_score_board.png" alt="Le tableau des meilleurs scores d'une table : le podium sous ses trois couronnes, puis les autres places, dont une gagnée par un Profil" width="400">
 
@@ -79,7 +79,7 @@ Des dizaines de Succès, du Bronze au Platine :
 - Défis ;
 - tour complet de la roue…
 
-Chacun est annoncé par un petit encart dans un coin, sans interrompre vos parties ; un Succès Platine fait aussi pleuvoir des confettis sur tout l'écran de la roue. « Succès personnels » montre où vous en êtes de chaque Succès manquant, et quels avatars de la maison l'ont déjà. Quelques-uns restent secrets : vous ne voyez que « ??? » et un indice, jusqu'à ce que vous tombiez dessus.
+Chacun est annoncé par un petit encart dans un coin, sans interrompre vos parties ; un Succès Platine fait aussi pleuvoir des confettis sur tout l'écran de la roue. « Succès personnels », ouvert depuis **Mes succès** dans le menu principal, montre où vous en êtes de chaque Succès manquant, et quels avatars de la maison l'ont déjà. Quelques-uns restent secrets : vous ne voyez que « ??? » et un indice, jusqu'à ce que vous tombiez dessus.
 
 <img src="docs/images/toasts.png" alt="L'annonce d'un Succès" width="440">
 
@@ -176,7 +176,7 @@ Pour tenir les tables pour adultes à l'écart d'un enfant, donnez-leur dans Pin
 
 ### Nettoyage des menus
 
-Le nettoyage des menus allège les menus de PinballY pour tous les Profils, Profils admin compris : il retire Aide et À propos des menus de sortie et opérateur, Informations, Affiche et Carte d'instructions du menu principal (Noter la table et Ajouter aux favoris restent), l'entrée Meilleurs scores de PinballY quand les meilleurs scores du pack sont désactivés, et les groupes Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout de « Changer de filtre ». C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
+Le nettoyage des menus allège les menus de PinballY pour tous les Profils, Profils admin compris : il retire Aide et À propos des menus de sortie et opérateur, Informations, Affiche et Carte d'instructions du menu principal (Noter la table et Ajouter aux favoris restent), l'entrée Meilleurs scores de PinballY (nommée **Scores de la table** dans le menu principal) quand les meilleurs scores du pack sont désactivés, et les groupes Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout de « Changer de filtre ». C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
 
 ## Contribuer
 

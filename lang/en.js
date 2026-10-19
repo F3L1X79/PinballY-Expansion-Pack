@@ -167,6 +167,8 @@ export default {
         tablesToDiscoverFilter: "Tables to Discover",
         originalTablesFilter: "Original Tables",
         tableSetup: "Set Up Table",
+        // The native High Scores item, in the main menu only: other menus keep nativeMenuLabels.
+        tableScores: "Table Scores",
         // The Filter Picker's way back, and its main menu entry naming the Active Filter.
         filterPickerBack: "Back",
         activeFilter: (name) => `Active filter: ${name}`,
@@ -321,7 +323,7 @@ export default {
 
     // The Achievement List screen (see common/achievements/achievement_list.js).
     achievementList: {
-        menuEntry: "Your Achievements",
+        menuEntry: "My Achievements",
         // The header's title and the section titles are shown in capitals.
         title: "Achievement List",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} achievements unlocked (${percent}%)`,
@@ -369,7 +371,7 @@ export default {
     },
 
     profileStats: {
-        menuEntry: "Your Stats",
+        menuEntry: "My Profile",
         // The buttons at the card's foot.
         buttons: {
             achievements: "Achievements",

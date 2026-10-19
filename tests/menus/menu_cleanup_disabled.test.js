@@ -23,7 +23,7 @@ test("off by default, PinballY's native menu entries stay", async () => {
     fake.openMainMenu();
     const mainTitles = fake.currentMenu().items.map(item => item.title);
     fake.closeMenu();
-    for (const title of ["Information", "Flyer", "High Scores", "Instruction Card", "Rate Table", "Add to Favorites"]) {
+    for (const title of ["Information", "Flyer", "Table Scores", "Instruction Card", "Rate Table", "Add to Favorites"]) {
         assert.ok(mainTitles.includes(title), `${title} in ${mainTitles.join(" | ")}`);
     }
 

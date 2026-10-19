@@ -19,7 +19,7 @@ const markAdmin = (fake, name) =>
 const SEPARATOR = "---";
 // The Filter Picker's entry, naming the Active Filter.
 const FILTER_PICKER = "Active filter: All Tables";
-const INFORMATION_ENTRIES = ["Information", "Flyer", "High Scores", "Instruction Card"];
+const INFORMATION_ENTRIES = ["Information", "Flyer", "Table Scores", "Instruction Card"];
 const CLEANED_ADMIN_EXIT_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Operator Menu", "Reset profile", SEPARATOR, "Cancel"];
 const CLEANED_EXIT_MENU_WITHOUT_OPERATOR_MENU = ["Exit PinballY", "Shut Down", SEPARATOR, "Cancel"];
 

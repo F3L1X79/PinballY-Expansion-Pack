@@ -280,6 +280,8 @@ export default {
         tablesToDiscoverFilter: "Tables à découvrir",
         originalTablesFilter: "Tables Originales",
         tableSetup: "Configurer la table",
+        // The native High Scores item, in the main menu only: other menus keep nativeMenuLabels.
+        tableScores: "Scores de la table",
         filterPickerBack: "Retour",
         activeFilter: (name) => `Filtre actif : ${name}`,
         // The Drawn main menu's "Change Filter" entry, and its footer's label before the Active Filter.
@@ -430,7 +432,7 @@ export default {
     },
 
     achievementList: {
-        menuEntry: "Vos succès",
+        menuEntry: "Mes succès",
         // The header's title and the section titles are shown in capitals.
         title: "Succès personnels",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} succès débloqués (${percent} %)`,
@@ -478,7 +480,7 @@ export default {
     },
 
     profileStats: {
-        menuEntry: "Vos statistiques",
+        menuEntry: "Mon profil",
         // The buttons at the card's foot.
         buttons: {
             achievements: "Succès",

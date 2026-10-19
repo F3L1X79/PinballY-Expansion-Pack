@@ -1,13 +1,15 @@
 // ============================================================
-// The main menu in English through main.js: "Your Achievements", "Your
-// Stats", "Favorite Tables", the screens keeping their own titles, and
-// Tables to Discover then Hall of Fame between Challenge Tables and Favorites.
+// The main menu in English through main.js: "My Achievements", "My
+// Profile", "Table Scores", "Favorite Tables", the screens keeping their
+// own titles, and Tables to Discover then Hall of Fame between Challenge
+// Tables and Favorites.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { assertNoErrorLogged } from "../support/error_log.js";
 
 const ADD_ONS_UNDER_TEST = ["uiTranslation", "customMenuCommands", "achievements", "hallOfFame", "tablesToDiscover", "challenges"];
 // Any command id: only the title is translated.
@@ -18,7 +20,7 @@ const FAVORITES_SORT_KEY = "7000";
 
 const fake = createFakePinballYHost({ now: new Date(2026, 8, 30, 20, 0, 0), tables: [] });
 
-test("the main menu names the Achievements, the Stats and the Favorite Tables in English", async () => {
+test("the main menu names My Achievements, My Profile, the Table Scores and the Favorite Tables in English", async () => {
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
@@ -30,12 +32,13 @@ test("the main menu names the Achievements, the Stats and the Favorite Tables in
 
     fake.openMenu("main", [
         { title: "Play", cmd: globalThis.command.PlayGame },
+        { title: "High Scores", cmd: globalThis.command.HighScores },
         { cmd: -1 },
         { title: "Favorites", cmd: FAVORITES_FILTER_CMD },
     ]);
     const titles = fake.currentMenu().items.map(item => item.title);
 
-    for (const label of ["Your Achievements", "Your Stats", "Favorite Tables"]) {
+    for (const label of ["My Achievements", "My Profile", "Table Scores", "Favorite Tables"]) {
         assert.ok(titles.includes(label), `${label} in ${titles.join(" | ")}`);
     }
     assert.equal(lang.achievementList.title, "Achievement List");
@@ -51,4 +54,5 @@ test("the [Top] filters run All Tables, Challenge Tables, Tables to Discover, th
     assert.ok(ALL_TABLES_SORT_KEY < challengeTables, challengeTables);
     assert.ok(challengeTables < tablesToDiscover && tablesToDiscover < hallOfFame, tablesToDiscover);
     assert.ok(hallOfFame < FAVORITES_SORT_KEY, hallOfFame);
+    assertNoErrorLogged(fake);
 });
