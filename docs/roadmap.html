@@ -219,7 +219,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 18.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 19.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -235,9 +235,11 @@
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
+          <a class="chip tr-play" href="#menu-reorganization"><b></b>Menu réorganisé</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
+          <a class="chip tr-share" href="#operator-menu-options"><b></b>Options au menu opérateur</a>
         </div>
 
         <div class="ax row">Moyen</div>
@@ -246,6 +248,7 @@
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
+          <a class="chip tr-profiles" href="#startup-screens-order"><b></b>Écrans au démarrage</a>
           <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
           <a class="chip tr-play" href="#child-extra-challenges"><b></b>Succès en plus pour les enfants</a>
@@ -327,6 +330,53 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="menu-reorganization" data-track="play" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Réorganisation du menu principal, et des entrées renommées</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Revoir l'ordre et les sections du menu principal dessiné, et renommer certaines entrées pour qu'on les comprenne d'un coup d'œil (par exemple « Mon profil »). Félix a d'autres idées à y verser au grill.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Part du module du menu principal (<code>common/menus/main_menu.js</code>, qui fixe seul l'ordre par <code>MAIN_MENU_POSITION</code>) et des Drawn Menus (livrés)</div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Quelles autres idées de Félix : nouvelles sections, entrées déplacées, entrées regroupées dans un sous-menu ?</li>
+              <li>Quelles entrées renommer, et en quoi : « Mon profil » pour les Profile Stats ? Dans les six langues, ou en et fr d'abord, comme d'habitude ?</li>
+              <li>Les entrées natives de PinballY rangées par le module (Play, la table choisie…) changent-elles aussi de place ou de nom ?</li>
+              <li>Un nouveau nom de Drawn Menu touche-t-il aux termes du glossaire (<code>GLOSSARY.md</code>) ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 19/10/2026, juste après le Change Filter et le pied de page qui nomme l'Active Filter.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="startup-screens-order" data-track="profiles" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Ordre des écrans au démarrage, choisi dans les options</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Choisir le premier écran vu au démarrage de PinballY : le Profile picker (quand il est activé), le Welcome Screen ou directement la roue. Par exemple, le Profile picker en premier pour que chacun choisisse son Profile avant de jouer. Aujourd'hui, PinballY démarre sur la Profile Greeting puis le Welcome Screen du dernier Profile actif, et le Profile picker ne s'ouvre que par Change Player ou le menu principal.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Le réglage rejoint les <a href="#operator-menu-options">options du menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a> une fois celles-ci faites ; d'ici là, une clé de <code>.env.local</code></div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Profile picker en premier : le Welcome Screen suit-il le choix du Profile, comme après Change Player, ou la roue directement ?</li>
+              <li>La Profile Greeting du démarrage disparaît-elle quand le Profile picker ouvre la séance ?</li>
+              <li>Roue en premier : le Welcome Screen reste-t-il joignable (menu principal), et les toasts en attente partent-ils tout de suite ?</li>
+              <li>Exit sur le Profile picker de démarrage : garde le dernier Profile actif, ou passe en Guest ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 19/10/2026. <code>main.js</code> charge le Profile picker avant le Welcome Screen, qui ne propose « Change Player » que si le picker s'est enregistré.</p>
+          </details>
+        </div>
+      </li>
 
       <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -412,6 +462,31 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="operator-menu-options" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Les options du pack dans le menu opérateur</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
+          </div>
+          <p>Activer ou désactiver les Add-ons et régler les options du pack depuis le menu opérateur de PinballY, sans éditer <code>.env.local</code>. PinballY ne recharge jamais les scripts : un changement d'Add-on ne prend effet qu'au redémarrage de PinballY, que le menu pourrait proposer.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont le point d'accès unique <code>isAddOnOn(...)</code> et les sections de configuration donnent la liste du menu ; le <a href="#language-menu">choix de la langue (n° <span data-ref="language-menu"></span>)</a> pose les mêmes questions, un seul grill pour les deux est possible</div>
+          <details>
+            <summary>Questions ouvertes (5)</summary>
+            <ul>
+              <li>Où écrire les choix : <code>optionSettings</code> (sans <code>save()</code>), un fichier du pack, ou <code>.env.local</code> réécrit ? Lequel l'emporte quand <code>.env.local</code> dit autre chose ?</li>
+              <li>Tous les réglages de <code>common/core/config.js</code>, ou seulement les Add-ons et quelques options simples (oui/non, listes) ?</li>
+              <li>Redémarrer comment : un script peut-il relancer PinballY lui-même, ou le menu dit-il seulement « pris en compte au prochain démarrage » ?</li>
+              <li>Le menu opérateur natif reçoit-il une entrée « Expansion Pack » qui ouvre un Drawn Menu, et qui y a droit (l'Admin Profile seulement ?) ?</li>
+              <li>Comment montrer les liens entre Add-ons (« sans le Profile picker, les Challenges… ») au moment où on en désactive un ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 19/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas.</p>
           </details>
         </div>
       </li>
@@ -698,6 +773,15 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>19/10 <span class="count">(2)</span></summary>
+          <ol>
+            <li><strong>Menu réorganisé et écrans au démarrage juste après les cadres de fête</strong>
+              <span>Deux idées de Félix vues à chaque passage sur la borne : la réorganisation du menu principal (avec des entrées renommées, comme « Mon profil ») passe 2ᵉ, dans la foulée du Change Filter, puis l'ordre des écrans au démarrage (Profile picker, Welcome Screen ou roue), 3ᵉ. Les cadres de fête restent 1ᵉʳˢ pour être prêts avant Noël. Menu : effort moyen, impact fort ; écrans au démarrage : effort moyen, impact moyen.</span></li>
+            <li><strong>Les options du pack dans le menu opérateur, après la robustesse et avant la Distribution</strong>
+              <span>Activer les Add-ons et régler les options depuis le menu opérateur demande un redémarrage de PinballY, qui ne recharge jamais ses scripts. L'idée vient après la robustesse, dont le point d'accès <code>isAddOnOn(...)</code> lui donne la liste des Add-ons, juste avant le choix de la langue, qui pose les mêmes questions, et avant la Distribution, qu'elle rend plus simple (plus besoin d'éditer <code>.env.local</code>). Effort moyen-gros, impact fort.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>18/10 <span class="count">(2)</span></summary>
           <ol>
             <li><strong>Quatre idées du menu principal en une seule spec</strong>
