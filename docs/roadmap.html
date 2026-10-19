@@ -243,7 +243,6 @@
 
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
-          <a class="chip tr-play" href="#mastery-time-left"><b></b>Temps avant niveau</a>
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
@@ -351,28 +350,6 @@
               <li>Roue en premier avec le Profile picker éteint : rien ne s'affiche.</li>
             </ul>
             <p class="ctx">Idée de Félix du 19/10/2026. <code>main.js</code> charge le Profile picker avant le Welcome Screen, qui ne propose « Change Player » que si le picker s'est enregistré.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="mastery-time-left" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Table Mastery : le temps restant avant le prochain niveau</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
-          </div>
-          <p>Dire combien de minutes de jeu il manque sur une table pour atteindre le Mastery Level suivant (« Niveau 8 dans 12 min »). C'est la seule info vraiment nouvelle de l'idée d'un moteur de recommandation, dont le reste existe déjà (Table of the Day, Tables to Discover, Challenge Tables, Random Game).</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> court → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur la Mastery Bar et le Welcome Screen (livrés)</div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>Où l'afficher : dans la Mastery Bar sous la jauge, sur les Period Tables du Welcome Screen, ou les deux ?</li>
-              <li>À partir de quand : toujours, ou seulement quand le niveau suivant est proche (moins d'une partie ou deux) ?</li>
-            </ul>
-            <p class="ctx">Idée externe du 08/10/2026. Écartés en même temps : un moteur de suggestion de plus, les objectifs de session quotidiens, les quêtes (doublons des Achievements Manufacturers et Decades) et des annonces de progression supplémentaires.</p>
           </details>
         </div>
       </li>
@@ -729,8 +706,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>19/10 <span class="count">(3)</span></summary>
+          <summary>19/10 <span class="count">(4)</span></summary>
           <ol>
+            <li><strong>Le temps restant de Table Mastery quitte la roadmap</strong>
+              <span>Abandonné par Félix au début de son grill : l'idée (« Niveau 8 dans 12 min ») sort de la file et de la matrice.</span></li>
             <li><strong>Nouvel ordre de Félix : le menu en tête, les cadres de fête 5ᵉ, les Titres de profil retirés</strong>
               <span>Ordre choisi par Félix : la réorganisation du menu (spec #272) passe 1ʳᵉ, suivie des trois Achievements pour les enfants, de l'ordre des écrans au démarrage et du temps restant de Table Mastery. Les cadres de fête passent 5ᵉ, puis le menu de pause dessiné remonte avant la robustesse. Les Notes et favoris par Profile passent avant le choix de la langue. Les Titres de profil, mis de côté, quittent la roadmap.</span></li>
             <li><strong>Menu réorganisé et écrans au démarrage juste après les cadres de fête</strong>
