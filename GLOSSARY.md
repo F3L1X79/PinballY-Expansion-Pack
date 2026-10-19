@@ -94,7 +94,7 @@ The number of consecutive calendar days, up to today, in which the active Profil
 _Avoid_: Streak (alone: a Period Table Streak belongs to a Period Table), login streak, visit streak
 
 **Profile Stats**:
-The screen, opened by the player from the main menu, that sums up the active Profile's own plays (or, opened from the Household Stats, another Household Profile's, only to look at): games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Vos statistiques" ("Your Stats").
+The screen, opened by the player from the main menu, that sums up the active Profile's own plays (or, opened from the Household Stats, another Household Profile's, only to look at): games played, total time, its Player Level and Collection Mastery, average game length, favourite manufacturer (community tables aside), decade and table, its first table played, collection completion, Achievements Unlocked, Daily Streak, Period Table Streaks, completed Challenges, and the way to its Hall of Fame and Tables to Discover. Shown as "Statistiques" in French, opened from "Mon profil" ("My Profile").
 _Avoid_: Pinball Profile, player card, profile screen (a Profile is the identity, not the screen)
 
 **Household Stats**:
@@ -110,7 +110,7 @@ A frame drawn around the Avatar wherever it is shown, one for each Collection Ti
 _Avoid_: skin, border, badge (the Profile badge is the Avatar shown at the top right of the wheel screen), gold frame
 
 **Reward Prompt**:
-The dialog that follows the toast of a Profile's first Avatar Frame, once: it names the frame and says where to equip it (Your Stats, then Frame), with a "Go equip it" button that opens that list and a "Got it" button that closes it; it never comes back, equipped or not. Later frames get only their toast line. A Profile Reset brings it back with the next first reward. Waits its turn after the Welcome Screen and before the rating prompt.
+The dialog that follows the toast of a Profile's first Avatar Frame, once: it names the frame and says where to equip it (My Profile, then Frame), with a "Go equip it" button that opens that list and a "Got it" button that closes it; it never comes back, equipped or not. Later frames get only their toast line. A Profile Reset brings it back with the next first reward. Waits its turn after the Welcome Screen and before the rating prompt.
 _Avoid_: popup, notification, reward toast (a toast never waits for the player)
 
 ### Choosing what to play
@@ -134,7 +134,7 @@ The Period Table whose Period is a day; prefers tables never played, otherwise t
 The Period Table whose Period is a week; picked purely at random.
 
 **Welcome Screen**:
-The screen shown over the dimmed wheel when PinballY starts, and again after Change Player picked another Profile, that greets the active Profile by its Avatar and name, tells it its Lost Records, shows the Table of the Day and the Table of the Week with what they mean for that Profile, and offers to stay on the table selected on the wheel, to change player or to launch a Period Table or a Random Game. While it is open, toasts and Confetti Showers wait for it to close. Shown as "Écran d'accueil" in French.
+The screen shown over the dimmed wheel when PinballY starts, again after Change Player picked another Profile, and whenever the player opens it from the main menu, that greets the active Profile by its Avatar and name, tells it its Lost Records, shows the Table of the Day and the Table of the Week with what they mean for that Profile, and offers to stay on the table selected on the wheel, to change player or to launch a Period Table or a Random Game. While it is open, toasts and Confetti Showers wait for it to close. Shown as "Écran d'accueil" in French.
 _Avoid_: startup prompt, splash screen, dialog (it does more than ask a question)
 
 **Last Played Table**:
@@ -260,7 +260,7 @@ An Achievement whose condition holds right now. It can be lost again, for exampl
 _Avoid_: earned, obtained
 
 **Achievement List**:
-The screen, opened by the player, that shows every Achievement in one scrolling list of two sections: the Unlocked ones, the most recently Notified at the top, then the missing ones, the highest Unlock Rate first. Each Achievement shows its Achievement Rank. Shown as "Succès personnels" in French, opened from "Vos succès" ("Your Achievements").
+The screen, opened by the player, that shows every Achievement in one scrolling list of two sections: the Unlocked ones, the most recently Notified at the top, then the missing ones, the highest Unlock Rate first. Each Achievement shows its Achievement Rank. Shown as "Succès personnels" in French, opened from "Mes succès" ("My Achievements").
 _Avoid_: My Achievements, trophy room
 
 **Achievement Family**:
