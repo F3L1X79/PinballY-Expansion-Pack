@@ -98,7 +98,7 @@ The screen, opened by the player from the main menu, that sums up the active Pro
 _Avoid_: Pinball Profile, player card, profile screen (a Profile is the identity, not the screen)
 
 **Household Stats**:
-The screen, opened from the Profile Stats, that sets the Household's Profiles side by side, one column each (the active Profile first, then in the Profile picker's order), on the stats where more is better: Player Level, Collection Mastery, Achievements Unlocked, games played, total time, Daily Streak and completed Challenges; the best of each line is in gold, every Profile tied for it too, and a line where nobody has anything has none. Each column shows the Profile's Avatar, in its Avatar Frame, and name. Picking a column opens that Profile's Profile Stats. Offered once the Household has two Profiles, to Guest too, which has no column of its own. Shown as "Statistiques de la maison" in French, opened from "La maison".
+The screen, opened from the Profile Stats, that sets the Household's Profiles side by side, one column each (the active Profile first, then in the Profile picker's order), on the stats where more is better: Player Level, Collection Mastery, Achievements Unlocked, games played, total time, Daily Streak, completed Challenges and Table Records held; the best of each line is in gold, every Profile tied for it too, and a line where nobody has anything has none. Each column shows the Profile's Avatar, in its Avatar Frame, and name. Picking a column opens that Profile's Profile Stats. Offered once the Household has two Profiles, to Guest too, which has no column of its own. Shown as "Statistiques de la maison" in French, opened from "La maison".
 _Avoid_: leaderboard, ranking, comparison
 
 **Profile Reward**:
@@ -264,7 +264,7 @@ The screen, opened by the player, that shows every Achievement in one scrolling 
 _Avoid_: My Achievements, trophy room
 
 **Achievement Family**:
-A kind of Achievement, absent as a whole when the Add-on it depends on is turned off: Collection, Play Time, Period Tables, Sessions, Random Game, Manufacturers, Decades, Categories, Challenges, Surprises. Surprises gathers Secret Achievements that hang on no Add-on but the Achievements themselves, such as a Play started at an unusual hour. Period Tables gathers every Achievement about playing the Table of the Day or the Table of the Week (first play, total Periods played, Period Table Streaks).
+A kind of Achievement, absent as a whole when the Add-on it depends on is turned off: Collection, Play Time, Period Tables, Sessions, Random Game, Manufacturers, Decades, Categories, Challenges, High Scores, Surprises, Young Players. Young Players exists only for Child Profiles, in place of the Achievements a child never gets: a Play started at snack time, a Play started on a Wednesday afternoon (both Secret Achievements), and a Table Record taken from a Profile that is not a child (absent when High Scores are turned off); a Profile no longer marked as a child loses them like a family turned off. Surprises gathers Secret Achievements that hang on no Add-on but the Achievements themselves, such as a Play started at an unusual hour. Period Tables gathers every Achievement about playing the Table of the Day or the Table of the Week (first play, total Periods played, Period Table Streaks).
 _Avoid_: group (a group is the set of tables a completion Achievement covers, such as one manufacturer's tables), category (a PinballY table category)
 
 **Notified**:
