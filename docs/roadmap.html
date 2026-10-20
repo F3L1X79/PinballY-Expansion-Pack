@@ -262,6 +262,7 @@
           <a class="chip tr-share" href="#launch-events-order"><b></b>Ordre des événements</a>
           <a class="chip tr-play" href="#quiet-wheel"><b></b>Quiet Wheel</a>
           <a class="chip tr-play" href="#quiet-wheel-other-screens"><b></b>Son baissé ailleurs</a>
+          <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
           <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
         </div>
         <div class="cell">
@@ -402,6 +403,31 @@
               <li>Onze dessins générés hors ligne, un thème par fête.</li>
             </ul>
             <p class="ctx">Idée de Félix du 08/10/2026, inspirée des cadres de fête de Mobile Legends (planches de newjer53 sur DeviantArt), dont on s'inspire sans les reprendre. Écartés pendant le grilling : les cadres d'ancienneté (pas de sens sur une borne familiale), Diwali et Hanoukka (dates à tenir dans une table, ou différentes selon les régions).</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="easter-eggs" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Easter eggs : une rare apparition au lancement, et son succès secret</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Un ou deux easter eggs tirés au hasard : par exemple une petite image qui apparaît au lancement avec une chance sur 1000, et un Secret Achievement de la famille Surprises débloqué par le Profile qui l'a vue.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend le tracker des Surprises (<code>common/achievements/surprises.js</code>, livré) et le style Steamball. Avant la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a>, qui traduira ses textes</div>
+          <details>
+            <summary>Questions ouvertes (5)</summary>
+            <ul>
+              <li>« Au lancement » : au démarrage de PinballY, ou au lancement d'une table (bien plus fréquent, donc vu plus souvent à 1 sur 1000) ?</li>
+              <li>Quelle image, où (roue, backglass, DMD, topper), combien de temps, et avec quel mouvement (une seule fois, pas d'animation sans fin) ?</li>
+              <li>Le second easter egg : une autre image, ou un autre déclencheur (une combinaison de boutons, une date) ?</li>
+              <li>Qui débloque le succès : le Profile actif au moment de l'apparition ; et au démarrage, avant le choix du Profile ?</li>
+              <li>Un réglage pour forcer l'apparition, utile pour la vérifier sur la borne ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 20/10/2026.</p>
           </details>
         </div>
       </li>
@@ -713,8 +739,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>20/10 <span class="count">(5)</span></summary>
+          <summary>20/10 <span class="count">(6)</span></summary>
           <ol>
+            <li><strong>Easter eggs 5ᵉ, juste avant la passe de traduction</strong>
+              <span>Idée de Félix : une petite image qui apparaît au lancement avec une chance sur 1000, et un Secret Achievement pour qui la voit. Placée après les chantiers déjà en tickets et avant la passe de traduction, pour que ses textes (titre et indice du succès) y soient traduits ; elle reprend la famille Surprises sans brique nouvelle. Effort petit, impact faible.</span></li>
             <li><strong>Cadres de fête seuls, remis 4ᵉ, spec #297</strong>
               <span>Choix de Félix : les cadres d'ancienneté (années à la borne) sont écartés, car ils n'ont pas de sens sur une borne familiale ; seuls les cadres de fête restent, à leur 4ᵉ place d'avant, avec onze fêtes au lieu de cinq (Nouvel An chinois, Mardi Gras, Saint-Patrick, Fête de la musique, Día de los Muertos et Thanksgiving ajoutés). Effort moyen, impact moyen, inchangés.</span></li>
             <li><strong>La Quiet Wheel 1ʳᵉ de la file, le son baissé sur les autres écrans dessinés grillé et dernier</strong>
