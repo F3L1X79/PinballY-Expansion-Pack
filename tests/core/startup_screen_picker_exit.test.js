@@ -1,11 +1,11 @@
 // ============================================================
 // Startup Screen "profilePicker": Exit keeps the last active Profile, even
-// after browsing, and its Welcome Screen follows.
+// after browsing, and its Welcome Screen follows, Close highlighted.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { press, isWelcomeScreenOpen, startupVeil, greeting, WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
+import { press, isWelcomeScreenOpen, startupVeil, greeting, highlighted, WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
 
@@ -24,5 +24,6 @@ test("Exit in the startup Profile picker keeps the last active Profile and its W
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true, "the Welcome Screen follows");
     assert.ok(greeting(fake).includes("Bob"));
+    assert.equal(highlighted(fake).tooltip, lang.buttonHints.close, "Close, as after a pick");
     assertNoErrorLogged(fake);
 });

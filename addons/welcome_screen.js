@@ -87,7 +87,7 @@ export default function init() {
     let isWaitingForWheel = false;
     // The screen on show: its layers, choices and selection; null when closed.
     let shown = null;
-    // Highlighted on opening: Close once the player was just changed.
+    // Highlighted on opening: Close once the player was just changed or picked.
     let firstChoice = null;
     const startupVeil = getStartupVeil();
 
@@ -356,10 +356,11 @@ export default function init() {
         startupVeil.show();
     }
     // The startup Profile picker hands over on a pick or Exit, before any
-    // switch, so the switch below adds no second screen.
+    // switch, so the switch below adds no second screen. The player was
+    // just chosen: the cursor on the cross, as after Change Player.
     if (startupScreen === STARTUP_SCREEN.PROFILE_PICKER) {
         onStartupPickerDone(safeHandler(SCRIPT_NAME, () => {
-            if (!isSubmitted && !closeDialog) submit(null);
+            if (!isSubmitted && !closeDialog) submit(CHOICE.EXIT_BUTTON);
         }));
     }
 
