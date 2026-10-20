@@ -245,6 +245,7 @@
         <div class="cell sweet">
         </div>
         <div class="cell">
+          <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
           <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
           <a class="chip tr-play" href="#drawn-pause-menu"><b></b>Menu de pause dessiné</a>
@@ -373,6 +374,34 @@
               <li>Repli : dessin en échec, le natif jamais annulé reste ; Add-on Drawn Menus désactivé, natif. Pas de réglage à part.</li>
             </ul>
             <p class="ctx">Vu sur une capture de la borne pendant le prototype du Loader, le 17/10/2026. Questions de la reprise : <a href="research/pause-menu-prototype-handoff.md">handoff</a>.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="event-frames" data-track="profiles" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Cadres de fête : onze fêtes, de Nouvel An à Noël</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Des Holiday Frames en plus des cadres des Collection Tiers : un cadre par fête, gagné une fois pour toutes par une Play commencée ou finie ce jour-là, annoncé par un toast au retour sur la roue et choisi dans la liste des Profile Stats. Grillé le 20/10/2026, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/297">spec #297</a>.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. Reprend les Avatar Frames et la liste de choix des récompenses de profil (livrées).</div>
+          <details>
+            <summary>Décisions du grilling</summary>
+            <ul>
+              <li>Onze fêtes, un jour chacune (deux pour Noël et le Día de los Muertos), sans réglage : Nouvel An (01/01), Nouvel An chinois (calculé, approximatif : un jour d'écart accepté), Saint-Valentin (14/02), Mardi Gras (47 jours avant Pâques), Saint-Patrick (17/03), dimanche de Pâques (calculé), Fête de la musique (21/06), Halloween (31/10), Día de los Muertos (01–02/11), Thanksgiving (4ᵉ jeudi de novembre), Noël (24–25/12).</li>
+              <li>Une Play à cheval sur deux fêtes (nuit du 31/10) gagne les deux cadres, deux toasts.</li>
+              <li>Une vraie Play (au moins une minute) qui commence ou finit ce jour-là ; un passage sans jouer ne compte pas. Relu dans le Play Log, jamais stocké : une Profile Reset le reprend.</li>
+              <li>Gagné une fois, sans variante par année, et indépendant du Table Mastery.</li>
+              <li>Un toast à lui au retour sur la roue ; la Reward Prompt suit si c'est le premier cadre du Profile.</li>
+              <li>Liste : Collection, puis les onze fêtes dans l'ordre du calendrier, verrouillées avec leur condition ; la liste défile.</li>
+              <li><code>avatarFrame</code> accepte un identifiant texte (<code>"christmas"</code>), sans changer de <code>version</code>.</li>
+              <li>Onze dessins générés hors ligne, un thème par fête.</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 08/10/2026, inspirée des cadres de fête de Mobile Legends (planches de newjer53 sur DeviantArt), dont on s'inspire sans les reprendre. Écartés pendant le grilling : les cadres d'ancienneté (pas de sens sur une borne familiale), Diwali et Hanoukka (dates à tenir dans une table, ou différentes selon les régions).</p>
           </details>
         </div>
       </li>
@@ -686,8 +715,8 @@
         <details open>
           <summary>20/10 <span class="count">(5)</span></summary>
           <ol>
-            <li><strong>Cadres de fête et d'année retirés de la roadmap</strong>
-              <span>Choix de Félix, pendant leur grilling : des cadres d'ancienneté n'ont pas de sens sur une borne familiale, et le chantier entier est abandonné, sans spec. Les traductions passent 4ᵉ ; la matrice perd sa puce.</span></li>
+            <li><strong>Cadres de fête seuls, remis 4ᵉ, spec #297</strong>
+              <span>Choix de Félix : les cadres d'ancienneté (années à la borne) sont écartés, car ils n'ont pas de sens sur une borne familiale ; seuls les cadres de fête restent, à leur 4ᵉ place d'avant, avec onze fêtes au lieu de cinq (Nouvel An chinois, Mardi Gras, Saint-Patrick, Fête de la musique, Día de los Muertos et Thanksgiving ajoutés). Effort moyen, impact moyen, inchangés.</span></li>
             <li><strong>La Quiet Wheel 1ʳᵉ de la file, le son baissé sur les autres écrans dessinés grillé et dernier</strong>
               <span>Choix de Félix. La 1ʳᵉ place ne couvre que la spec #286 (Profile picker et Welcome Screen, tickets #287 → #289), qui n'avait pas d'item ; effort petit, impact faible. La même baisse sur les autres écrans devient un chantier à part, en fin de file : les cinq écrans dessinés qui voilent la roue, jamais les Drawn Menus, une seule baisse pour une navigation entre écrans ; « Quiet Wheel » reste le nom de la baisse des écrans d'accueil. Effort petit, impact faible, inchangés.</span></li>
             <li><strong>Nouvel ordre de tête : robustesse 2ᵉ, menu de pause 3ᵉ, cadres de fête 4ᵉ</strong>
