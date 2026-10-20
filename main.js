@@ -1,8 +1,8 @@
 ﻿// ============================================================
 // Entry point loaded by PinballY: loads the Profile store, keeps the Adult
 // Tables off a Child Profile's wheel, switches to Guest when the Profile
-// picker is off, then initializes every script of SCRIPTS in order,
-// skipping those disabled in config.addOns.
+// picker is off, resolves the Startup Screen, then initializes every script
+// of SCRIPTS in order, skipping those disabled in config.addOns.
 // - A script whose init() throws is logged and skipped, so the others still load.
 // - LOG_STARTUP_TIMING logs each init time.
 // ============================================================
@@ -10,6 +10,7 @@
 import config from "./common/core/config.js";
 import { getProfileStore } from "./common/profiles/profile_store.js";
 import { installChildWheelFilter } from "./common/tables/adult_tables.js";
+import { getStartupScreen } from "./common/core/startup_screen.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;
@@ -131,6 +132,16 @@ if (store && ENABLED_SCRIPTS.profilePicker === false) {
         }
     } catch (error) {
         logfile.log(`[Startup] ERROR switching to Guest: ${error.message}`);
+    }
+}
+
+// Before any Add-on, so its fallbacks are logged once even with both its
+// screens turned off.
+if (store) {
+    try {
+        getStartupScreen();
+    } catch (error) {
+        logfile.log(`[Startup] ERROR resolving the Startup Screen: ${error.message}`);
     }
 }
 

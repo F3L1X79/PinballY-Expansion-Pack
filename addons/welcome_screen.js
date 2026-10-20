@@ -15,6 +15,7 @@ import config from "../common/core/config.js";
 import { safeHandler } from "../common/core/safe_handler.js";
 import { createPinballYHost } from "../common/core/pinbally_host.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/core/wheel_dialog.js";
+import { getStartupScreen, STARTUP_SCREEN } from "../common/core/startup_screen.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
@@ -376,8 +377,10 @@ export default function init() {
         getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open });
     }
 
-    submit(null);
-    showStartupVeilAndLoader();
+    if (getStartupScreen() !== STARTUP_SCREEN.WHEEL) {
+        submit(null);
+        showStartupVeilAndLoader();
+    }
 
     // Read again when the screen opens, the cursor on the cross; nothing
     // more while the screen is still waiting or open.

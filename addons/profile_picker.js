@@ -16,6 +16,7 @@ import { getProfileStore } from "../common/profiles/profile_store.js";
 import { displayNameOf } from "../common/profiles/profile_name.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { getWheelDialogs } from "../common/core/wheel_dialog.js";
+import { getStartupScreen, STARTUP_SCREEN } from "../common/core/startup_screen.js";
 import { registerChangePlayer } from "../common/profiles/change_player.js";
 import { drawShadowedText } from "../common/drawing/shadowed_text.js";
 import { getDrawingAhead } from "../common/core/drawing_ahead.js";
@@ -162,7 +163,7 @@ export default function init() {
     // The Welcome Screen already greets the Profile by name, at startup and
     // after a switch: a second greeting right after it would be too much.
     const isWelcomeScreenOn = config.addOns.startupChoicePrompt !== false;
-    let startupGreetingPending = !isWelcomeScreenOn;
+    let startupGreetingPending = !isWelcomeScreenOn || getStartupScreen() === STARTUP_SCREEN.WHEEL;
     // A sound that cannot play is logged and never stops the greeting.
     const playGreetingSound = safeHandler(SCRIPT_NAME, () => {
         if (config.profileGreetingSoundFile) host.playSound(config.profileGreetingSoundFile);

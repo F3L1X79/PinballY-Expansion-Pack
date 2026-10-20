@@ -42,6 +42,11 @@ const DEFAULTS = {
 
     // --- Optional preferences ---
 
+    // The first screen PinballY shows: "welcome" (the Welcome Screen),
+    // "profilePicker" (the Profile picker, then the Welcome Screen) or
+    // "wheel" (the bare wheel). One whose Add-on is off gives way to the
+    // next, from the Profile picker to the Welcome Screen to the wheel.
+    startupScreen: "welcome",
     // true = the random game jumps straight to the table, without the wheel animation.
     skipRandomGameAnimation: false,
     // Total play time (in minutes) on a table before you're asked to rate it.
