@@ -1,7 +1,7 @@
 // ============================================================
 // Startup Screen "profilePicker" with a PROFILE_PICKER_SOUND_FILE: the
 // sound plays once, as the carousel appears at the end of the startup
-// pause, on its own player, so the greeting after a quick pick never cuts it.
+// pause; the greeting after a quick pick takes over without an error.
 // ============================================================
 
 import { test } from "node:test";
@@ -12,7 +12,7 @@ import { startOnProfilePicker, isCarouselOpen, PICKER_SOUND, pickerSounds, CAROU
 
 const GREETING_SOUND = "C:\\Sounds\\greeting.mp3";
 
-test("the Profile picker sound plays once, as the startup carousel appears, and the greeting does not cut it", async () => {
+test("the Profile picker sound plays once, as the startup carousel appears, and the greeting follows without an error", async () => {
     const { fake, lang, settle } = await startOnProfilePicker({
         settings: { profilePickerSoundFile: PICKER_SOUND, profileGreetingSoundFile: GREETING_SOUND }, files: [PICKER_SOUND, GREETING_SOUND],
     });
@@ -28,8 +28,6 @@ test("the Profile picker sound plays once, as the startup carousel appears, and 
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
-    assert.deepEqual(fake.soundsPlayed(), [PICKER_SOUND, GREETING_SOUND]);
-    const [pickerPlayer, greetingPlayer] = fake.soundPlayers();
-    assert.notEqual(pickerPlayer, greetingPlayer, "the greeting plays beside it");
+    assert.deepEqual(fake.soundsPlayed(), [PICKER_SOUND, GREETING_SOUND], "the greeting follows");
     assertNoErrorLogged(fake);
 });

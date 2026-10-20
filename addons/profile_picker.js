@@ -183,10 +183,10 @@ export default function init() {
     const playGreetingSound = safeHandler(SCRIPT_NAME, () => {
         if (config.profileGreetingSoundFile) host.playSound(config.profileGreetingSoundFile);
     });
-    // A sound that cannot play is logged and never stops the carousel. On
-    // its own player: the greeting after a quick pick would cut it on the shared one.
+    // A sound that cannot play is logged and never stops the carousel. The
+    // greeting after a quick pick may cut it: wanted.
     const playPickerSound = safeHandler(SCRIPT_NAME, () => {
-        if (config.profilePickerSoundFile) host.createSoundRotation(config.profilePickerSoundFile, 1).play();
+        if (config.profilePickerSoundFile) host.playSound(config.profilePickerSoundFile);
     });
 
     function readProfiles() {
