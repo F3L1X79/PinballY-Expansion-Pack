@@ -16,9 +16,12 @@ const PICKER_Z_RANGE = [6500, 6502];
 export const CAROUSEL_PAUSE_MS = 500;
 export const GLIDE_OVER_MS = 500;
 
-// addOns: the Add-ons turned on; profiles: the Household's folders.
-export async function startOnProfilePicker({ addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], activeProfile = "Bob" } = {}) {
-    const fake = createFakePinballYHost();
+// addOns: the Add-ons turned on; profiles: the Household's folders;
+// tables: the wheel's, as the fake host takes them.
+export async function startOnProfilePicker({
+    addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], activeProfile = "Bob", tables,
+} = {}) {
+    const fake = createFakePinballYHost(tables ? { tables } : {});
     for (const name of profiles) fake.addFolder(`${PROFILES_FOLDER}\\${name}`);
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile }));
     // Never uninstalled: node --test runs each test file in its own process.
