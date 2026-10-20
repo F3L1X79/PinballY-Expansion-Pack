@@ -1,10 +1,10 @@
 ﻿// ============================================================
-// Welcome Screen: at startup, after Change Player and from its main menu
-// entry, a drawn panel greets the active Profile with its Daily Streak, Lost
-// Records and Collection Mastery, then offers the Table of the Day or Week,
-// a Random Game, or to stay. A drawn dialog of the wheel dialog module with
-// the startup priority (docs/adr/0011): other dialogs and toasts wait for it.
-// - At startup only, a veil and the Loader dim the wheel until the panel fades in.
+// Welcome Screen: at startup (alone or after the startup Profile picker),
+// after Change Player and from its main menu entry, a drawn panel greets the
+// active Profile with its Daily Streak, Lost Records and Collection Mastery,
+// then offers a Period Table, a Random Game, or to stay. A drawn dialog of
+// the wheel dialog module at the startup priority (docs/adr/0011).
+// - At startup only, the startup veil dims the wheel until the panel is in.
 // - Swallows every button through "commandbuttondown" while open.
 // - Reading the Period cards picks and locks this Period's tables.
 // - Writes the Lost Records seen marker to high_scores.json.
@@ -15,7 +15,7 @@ import config from "../common/core/config.js";
 import { safeHandler } from "../common/core/safe_handler.js";
 import { createPinballYHost } from "../common/core/pinbally_host.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/core/wheel_dialog.js";
-import { getStartupScreen, STARTUP_SCREEN } from "../common/core/startup_screen.js";
+import { getStartupScreen, onStartupPickerDone, STARTUP_SCREEN } from "../common/core/startup_screen.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
@@ -33,8 +33,8 @@ import { masteryHeadOf, collectionTextsOf } from "../common/mastery/mastery_bar.
 import { createNavigationSound } from "../common/core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/drawing/steamball_palette.js";
 import { createSelectionMarker } from "../common/drawing/selection_marker.js";
-import { createLoader } from "../common/drawing/loader.js";
-import { DIMMED_WHEEL, EXIT_BUTTON_LOOK } from "../common/drawing/steamball_drawing.js";
+import { getStartupVeil } from "../common/drawing/startup_veil.js";
+import { EXIT_BUTTON_LOOK } from "../common/drawing/steamball_drawing.js";
 import { buttonHintGroupsOf, exitButtonWordOf, FLIPPER_HINT } from "../common/drawing/button_hints.js";
 import {
     WELCOME_SCREEN_Z_INDEX, REFERENCE_HEIGHT, CHOICE, AVATAR_FRAME_WIDTH, drawBackdrop, layoutWelcomeScreen,
@@ -49,10 +49,6 @@ const FADE_MS = 220;
 const FRAME_MS = 16;
 // The Lost Records line names this many tables at most, then counts the others.
 const MAX_NAMED_LOST_RECORDS = 3;
-// Just under the panel's backdrop: the startup veil dims the wheel as the
-// backdrop will, the Loader turns over it.
-const STARTUP_VEIL_Z_INDEX = WELCOME_SCREEN_Z_INDEX.backdrop - 2;
-const STARTUP_LOADER_Z_INDEX = WELCOME_SCREEN_Z_INDEX.backdrop - 1;
 // Exit always leaves the bare wheel.
 const EXIT_LOOK = EXIT_BUTTON_LOOK.CLOSE;
 
@@ -93,30 +89,7 @@ export default function init() {
     let shown = null;
     // Highlighted on opening: Close once the player was just changed.
     let firstChoice = null;
-    const startupLoader = createLoader(host, { zIndex: STARTUP_LOADER_Z_INDEX });
-    // The startup veil's layer, null once it is gone.
-    let startupVeil = null;
-
-    // From the first frame the pack can show, while the startup screen is
-    // prepared: cleared, not drawn, so nothing measures the window, which
-    // is not laid out yet.
-    function showStartupVeilAndLoader() {
-        startupVeil = host.createDrawingLayer(STARTUP_VEIL_Z_INDEX);
-        startupVeil.clear(DIMMED_WHEEL);
-        startupLoader.show();
-    }
-
-    function hideStartupVeil() {
-        if (!startupVeil) return;
-        host.removeDrawingLayer(startupVeil);
-        startupVeil = null;
-    }
-
-    // Safe to call again, and once both are already gone.
-    function hideStartupVeilAndLoader() {
-        startupLoader.hide();
-        hideStartupVeil();
-    }
+    const startupVeil = getStartupVeil();
 
     // The grey line: played this Period, or else a Streak of at least 2.
     function greyLineOf(periodTable, texts) {
@@ -277,7 +250,7 @@ export default function init() {
         shown = { layers, tooltipLayers, marker, targets, choices: screen.choices, selected, opacity: 0, fadeTimer: null };
         // The comet would freeze while the screen is drawn on the UI thread:
         // it goes as the panel fades in, the veil once the panel is fully in.
-        startupLoader.hide();
+        startupVeil.hideLoader();
         fadeIn(shown);
         playGreetingSound();
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
@@ -300,7 +273,7 @@ export default function init() {
             setOpacity(screen, opacity);
             if (opacity >= 1) {
                 stopFade(screen);
-                hideStartupVeil();
+                startupVeil.hideVeil();
             }
         }), FRAME_MS);
     }
@@ -318,7 +291,7 @@ export default function init() {
             if (host.getUIMode() === "wheel") draw();
             else {
                 isWaitingForWheel = true;
-                hideStartupVeilAndLoader();
+                startupVeil.hide();
             }
         }), STARTUP_PAUSE_MS);
     }
@@ -335,7 +308,7 @@ export default function init() {
         host.clearTimeout(pauseTimer);
         pauseTimer = null;
         isWaitingForWheel = false;
-        hideStartupVeilAndLoader();
+        startupVeil.hide();
         if (shown) {
             stopFade(shown);
             shown.marker.remove();
@@ -377,9 +350,17 @@ export default function init() {
         getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open });
     }
 
-    if (getStartupScreen() !== STARTUP_SCREEN.WHEEL) {
+    const startupScreen = getStartupScreen();
+    if (startupScreen === STARTUP_SCREEN.WELCOME) {
         submit(null);
-        showStartupVeilAndLoader();
+        startupVeil.show();
+    }
+    // The startup Profile picker hands over on a pick or Exit, before any
+    // switch, so the switch below adds no second screen.
+    if (startupScreen === STARTUP_SCREEN.PROFILE_PICKER) {
+        onStartupPickerDone(safeHandler(SCRIPT_NAME, () => {
+            if (!isSubmitted && !closeDialog) submit(null);
+        }));
     }
 
     // Read again when the screen opens, the cursor on the cross; nothing
@@ -421,15 +402,9 @@ export default function init() {
         if (closeDialog && !shown) close();
     }));
 
-    // Fire when a menu opens or a table starts launching (whose overlay has
-    // its own Loader): the startup veil and Loader must not sit over them.
-    host.on("menuopen", safeHandler(SCRIPT_NAME, hideStartupVeilAndLoader));
-    host.on("launchoverlayshow", safeHandler(SCRIPT_NAME, hideStartupVeilAndLoader));
-
     // Fires when the cabinet sits idle: the screen must not stay over
     // attract mode nor keep the buttons.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, () => {
-        hideStartupVeilAndLoader();
         if (closeDialog) close();
     }));
 }

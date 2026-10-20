@@ -1,9 +1,9 @@
 // ============================================================
 // Startup Screen: turns the startupScreen setting, the Add-ons turned on
 // and the Household into the first screen PinballY shows, through the
-// chain Profile picker -> Welcome Screen -> wheel. Read by the Profile
-// picker and the Welcome Screen; the first read writes each fallback to
-// the PinballY log, once.
+// chain Profile picker -> Welcome Screen -> wheel; the first read writes
+// each fallback to the PinballY log, once. Also relays the startup Profile
+// picker's close to the Welcome Screen, which follows it.
 // - An empty Household skips the Profile picker without being logged: it is no misconfiguration.
 // ============================================================
 
@@ -43,6 +43,18 @@ export function resolveStartupScreen(host, { setting, addOns, isHouseholdEmpty }
         screen = next;
     }
     return screen;
+}
+
+const pickerDoneListeners = [];
+
+// listener: runs when the startup Profile picker closes on a pick or Exit,
+// before any switch; never when attract mode or a game drops it.
+export function onStartupPickerDone(listener) {
+    pickerDoneListeners.push(listener);
+}
+
+export function startupPickerDone() {
+    for (const listener of pickerDoneListeners) listener();
 }
 
 let sharedStartupScreen = null;

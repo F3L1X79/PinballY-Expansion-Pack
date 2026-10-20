@@ -1,9 +1,10 @@
 // ============================================================
-// Profile picker: "Change Player" (main menu, exit menu, Welcome Screen)
-// opens a drawn carousel of the Profiles' Avatars; Select or Launch switches
-// Profile, Exit closes it. Also shows the active Profile's badge (Avatar,
-// Avatar Frame, name, level pip) at the top right of the wheel, and greets
-// the Profile on each pick when the Welcome Screen Add-on is off.
+// Profile picker: "Change Player" (main menu, exit menu, Welcome Screen),
+// or the Startup Screen, opens a drawn carousel of the Profiles' Avatars;
+// Select or Launch switches Profile, Exit closes it. Also shows the active
+// Profile's badge at the top right of the wheel, and greets the Profile on
+// each pick when the Welcome Screen Add-on is off.
+// - As the Startup Screen only, a drawn dialog of the wheel dialog module, which the Welcome Screen follows.
 // - Swallows every button through "commandbuttondown" while open.
 // - Layers are drawn ahead and kept: each draw blocks PinballY 20 to 45 ms on the cabinet.
 // - The startup greeting waits for a wheel free of menus, screens and dialogs.
@@ -15,8 +16,9 @@ import { createPinballYHost } from "../common/core/pinbally_host.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
 import { displayNameOf } from "../common/profiles/profile_name.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
-import { getWheelDialogs } from "../common/core/wheel_dialog.js";
-import { getStartupScreen, STARTUP_SCREEN } from "../common/core/startup_screen.js";
+import { getWheelDialogs, DIALOG_PRIORITY } from "../common/core/wheel_dialog.js";
+import { getStartupScreen, startupPickerDone, STARTUP_SCREEN } from "../common/core/startup_screen.js";
+import { getStartupVeil } from "../common/drawing/startup_veil.js";
 import { registerChangePlayer } from "../common/profiles/change_player.js";
 import { drawShadowedText } from "../common/drawing/shadowed_text.js";
 import { getDrawingAhead } from "../common/core/drawing_ahead.js";
@@ -106,6 +108,9 @@ const BADGE_NAME = Object.freeze({ size: 14, weight: 600 });
 const GREETING = Object.freeze({ delayMs: 500, grownSize: 260, growMs: 250, holdMs: 700, fadeMs: 550 });
 const GREETING_TEXT = Object.freeze({ size: 28, weight: 700, gap: 24 });
 const FRAME_MS = 16;
+// At startup the window is not laid out yet, and the carousel's background
+// measures it: it waits as long as the Welcome Screen does.
+const STARTUP_PAUSE_MS = 500;
 
 export default function init() {
     const { profiles: TEXT } = lang;
@@ -163,7 +168,17 @@ export default function init() {
     // The Welcome Screen already greets the Profile by name, at startup and
     // after a switch: a second greeting right after it would be too much.
     const isWelcomeScreenOn = config.addOns.startupChoicePrompt !== false;
-    let startupGreetingPending = !isWelcomeScreenOn || getStartupScreen() === STARTUP_SCREEN.WHEEL;
+    const startupScreen = getStartupScreen();
+    let startupGreetingPending = startupScreen === STARTUP_SCREEN.WHEEL;
+    const startupVeil = getStartupVeil();
+    // The startup carousel's close in the wheel dialog module, from its
+    // turn until a pick, Exit or a drop; the pause before it shows.
+    let closeStartupDialog = null;
+    let startupPauseTimer = null;
+    // The pause ended away from the wheel: it starts again on the next return.
+    let isStartupWaitingForWheel = false;
+    // From startup until the startup carousel is left or dropped.
+    let isStartupPending = startupScreen === STARTUP_SCREEN.PROFILE_PICKER;
     // A sound that cannot play is logged and never stops the greeting.
     const playGreetingSound = safeHandler(SCRIPT_NAME, () => {
         if (config.profileGreetingSoundFile) host.playSound(config.profileGreetingSoundFile);
@@ -580,11 +595,84 @@ export default function init() {
         placeCarousel();
     }
 
+    // Frees the wheel dialog queue held by the startup carousel. Without
+    // the Welcome Screen to follow, the veil goes with it.
+    function releaseStartupDialog() {
+        isStartupPending = false;
+        if (!closeStartupDialog) return;
+        const done = closeStartupDialog;
+        closeStartupDialog = null;
+        if (!isWelcomeScreenOn) startupVeil.hide();
+        done();
+    }
+
     function close() {
         stopGlide();
         profiles = null;
         stopGreeting();
         markAheadStale();
+        releaseStartupDialog();
+    }
+
+    function startStartupPause() {
+        isStartupWaitingForWheel = false;
+        startupPauseTimer = host.setTimeout(safeHandler(SCRIPT_NAME, () => {
+            startupPauseTimer = null;
+            // A menu or a game came up during the pause.
+            if (host.getUIMode() !== "wheel") {
+                isStartupWaitingForWheel = true;
+                startupVeil.hide();
+                return;
+            }
+            open();
+            startupVeil.hideLoader();
+        }), STARTUP_PAUSE_MS);
+    }
+
+    // Its turn in the wheel dialog module: the wheel is free.
+    function openAtStartup(closeDialog) {
+        closeStartupDialog = closeDialog;
+        startStartupPause();
+    }
+
+    // While the startup carousel waits its turn or its pause: it never
+    // shows, and nothing follows it. The active Profile stays.
+    function dropStartup() {
+        host.clearTimeout(startupPauseTimer);
+        startupPauseTimer = null;
+        isStartupWaitingForWheel = false;
+        startupVeil.hide();
+        releaseStartupDialog();
+    }
+
+    // Select on a Profile. Later in the session the Welcome Screen welcomes
+    // a new Profile itself, on the switch, and a Profile kept by nothing;
+    // the startup carousel hands over to it before the switch, whatever the
+    // pick, so it follows once.
+    function pick(chosen) {
+        if (isWelcomeScreenOn) {
+            if (closeStartupDialog) startupPickerDone();
+            close();
+            if (chosen.name !== profileStore.getActiveProfile().name) profileStore.switchTo(chosen.name);
+            return;
+        }
+        const atStartup = closeStartupDialog !== null;
+        // The carousel stays drawn, at rest, until the greeting replaces it.
+        stopGlide();
+        placeCarousel();
+        profiles = null;
+        profileStore.switchTo(chosen.name);
+        releaseStartupDialog();
+        greetAfterPause({ atStartup });
+    }
+
+    // Exit keeps the active Profile; at startup it is welcomed or greeted
+    // all the same.
+    function exit() {
+        const atStartup = closeStartupDialog !== null;
+        if (atStartup && isWelcomeScreenOn) startupPickerDone();
+        close();
+        if (atStartup && !isWelcomeScreenOn) greetAfterPause({ atStartup });
     }
 
     getMainMenu().add({ name: "profilePicker", label: TEXT.menuEntry, position: MAIN_MENU_POSITION.PROFILE_PICKER, action: open });
@@ -613,22 +701,9 @@ export default function init() {
         if (ev.command === "Next" || ev.command === "Prev") {
             move(ev.command === "Next" ? 1 : -1);
         } else if (ev.command === "Select" || ev.command === "Launch") {
-            const chosen = profiles[highlighted];
-            if (isWelcomeScreenOn) {
-                // The Welcome Screen welcomes a new Profile itself, on the
-                // switch; a Profile kept is welcomed by nothing.
-                close();
-                if (chosen.name !== profileStore.getActiveProfile().name) profileStore.switchTo(chosen.name);
-            } else {
-                // The carousel stays drawn, at rest, until the greeting replaces it.
-                stopGlide();
-                placeCarousel();
-                profiles = null;
-                profileStore.switchTo(chosen.name);
-                greetAfterPause();
-            }
+            pick(profiles[highlighted]);
         } else if (ev.command === "Exit") {
-            close();
+            exit();
         }
     }));
 
@@ -652,14 +727,18 @@ export default function init() {
 
     // The badge and the greeting must never cover a game; a player who
     // started one from the Welcome Screen was greeted by it already.
+    // A table launched from a native menu before the startup carousel
+    // showed: the player already chose, so it must not show after the game.
     host.on("gamestarted", safeHandler(SCRIPT_NAME, () => {
         badgeLayer.alpha = 0;
         startupGreetingPending = false;
         stopGreeting();
+        if (isStartupPending && !profiles) dropStartup();
     }));
     // Fires back on the wheel, after a game, a menu or a dialog.
     host.on("wheelmode", safeHandler(SCRIPT_NAME, () => {
         badgeLayer.alpha = 1;
+        if (isStartupWaitingForWheel) startStartupPause();
         greetAtStartupIfFree();
     }));
     // No "wheelmode" follows the close of a Drawn Menu or a drawn screen.
@@ -667,11 +746,20 @@ export default function init() {
 
     // Fires when the cabinet sits idle: the player left without picking, so
     // the carousel must not stay drawn over attract mode or keep the buttons.
-    host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
+    host.on("attractmodestart", safeHandler(SCRIPT_NAME, () => {
+        if (isStartupPending) dropStartup();
+        close();
+    }));
 
     // Last, so the Welcome Screen never opens a carousel whose listeners are missing.
     registerChangePlayer(open);
     drawBadge();
+    // Through the wheel dialog module, so toasts and prompts wait for it as
+    // for the Welcome Screen; later openings are the player's own.
+    if (isStartupPending) {
+        startupVeil.show();
+        getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open: openAtStartup, isStale: () => !isStartupPending });
+    }
     // One tick after the inits, so the dialogs every Add-on submits at
     // startup are already waiting, whatever the order in main.js.
     host.setTimeout(safeHandler(SCRIPT_NAME, greetAtStartupIfFree), 0);
