@@ -79,7 +79,7 @@ Des dizaines de Succès, du Bronze au Platine :
 - Défis ;
 - tour complet de la roue…
 
-Chacun est annoncé par un petit encart dans un coin, sans interrompre vos parties ; un Succès Platine fait aussi pleuvoir des confettis sur tout l'écran de la roue. « Succès personnels », ouvert depuis **Mes succès** dans le menu principal, montre où vous en êtes de chaque Succès manquant, et quels avatars de la maison l'ont déjà. Quelques-uns restent secrets : vous ne voyez que « ??? » et un indice, jusqu'à ce que vous tombiez dessus.
+Chacun est annoncé par un petit encart dans un coin, sans interrompre vos parties ; un Succès Platine fait aussi pleuvoir des confettis sur tout l'écran de la roue. « Succès personnels », ouvert depuis **Mes succès** dans le menu principal, montre où vous en êtes de chaque Succès manquant, et quels avatars de la maison l'ont déjà. Quelques-uns restent secrets : vous ne voyez que « ??? » et un indice, jusqu'à ce que vous tombiez dessus. Un Profil enfant en a trois de plus, rien qu'à lui : « L'heure du goûter », « Mercredi, c'est permis » et « Plus fort que les grands », un record de table pris à un grand.
 
 <img src="docs/images/toasts.png" alt="L'annonce d'un Succès" width="440">
 

@@ -50,7 +50,7 @@ When you enter a table's high score board, the place is yours: the pack reads th
 
 <img src="docs/images/achievements.png" alt="The Achievement List" width="380">
 
-There are dozens of Achievements, from Bronze to Platinum: manufacturers and decades completed, hours played, Streaks, Challenges, a full tour of the wheel... Each one is announced by a small toast in a corner, without interrupting your games; a Platinum also brings a shower of confetti across the wheel screen. The Achievement List, opened from **My Achievements** in the main menu, shows how far you are from each missing one, and which of the household's Avatars already have it. A few stay secret, shown as "???" with a hint, until you stumble upon them.
+There are dozens of Achievements, from Bronze to Platinum: manufacturers and decades completed, hours played, Streaks, Challenges, a full tour of the wheel... Each one is announced by a small toast in a corner, without interrupting your games; a Platinum also brings a shower of confetti across the wheel screen. The Achievement List, opened from **My Achievements** in the main menu, shows how far you are from each missing one, and which of the household's Avatars already have it. A few stay secret, shown as "???" with a hint, until you stumble upon them. A Child Profile has three more of its own: Snack Time, Wednesday Off and Beat the Grown-Ups, a Table Record taken from a grown-up.
 
 <img src="docs/images/toasts.png" alt="An Achievement Toast" width="440">
 
