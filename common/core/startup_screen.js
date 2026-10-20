@@ -53,7 +53,7 @@ export function onStartupPickerDone(listener) {
     pickerDoneListeners.push(listener);
 }
 
-export function startupPickerDone() {
+export function notifyStartupPickerDone() {
     for (const listener of pickerDoneListeners) listener();
 }
 

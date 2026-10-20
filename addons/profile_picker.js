@@ -17,7 +17,7 @@ import { getProfileStore } from "../common/profiles/profile_store.js";
 import { displayNameOf } from "../common/profiles/profile_name.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/core/wheel_dialog.js";
-import { getStartupScreen, startupPickerDone, STARTUP_SCREEN } from "../common/core/startup_screen.js";
+import { getStartupScreen, notifyStartupPickerDone, STARTUP_SCREEN } from "../common/core/startup_screen.js";
 import { getStartupVeil } from "../common/drawing/startup_veil.js";
 import { registerChangePlayer } from "../common/profiles/change_player.js";
 import { drawShadowedText } from "../common/drawing/shadowed_text.js";
@@ -579,6 +579,10 @@ export default function init() {
     }
 
     function open() {
+        // Opened from a menu during the startup pause: the pause must not open it again.
+        host.clearTimeout(startupPauseTimer);
+        startupPauseTimer = null;
+        isStartupWaitingForWheel = false;
         stopGreeting();
         // The player is already choosing: greeting them afterwards would
         // come out of nowhere.
@@ -629,10 +633,12 @@ export default function init() {
         }), STARTUP_PAUSE_MS);
     }
 
-    // Its turn in the wheel dialog module: the wheel is free.
+    // Its turn in the wheel dialog module: the wheel is free. A carousel the
+    // player opened from a menu meanwhile becomes the startup one.
     function openAtStartup(closeDialog) {
         closeStartupDialog = closeDialog;
-        startStartupPause();
+        if (profiles) startupVeil.hideLoader();
+        else startStartupPause();
     }
 
     // While the startup carousel waits its turn or its pause: it never
@@ -651,12 +657,12 @@ export default function init() {
     // pick, so it follows once.
     function pick(chosen) {
         if (isWelcomeScreenOn) {
-            if (closeStartupDialog) startupPickerDone();
+            if (isStartupPending) notifyStartupPickerDone();
             close();
             if (chosen.name !== profileStore.getActiveProfile().name) profileStore.switchTo(chosen.name);
             return;
         }
-        const atStartup = closeStartupDialog !== null;
+        const atStartup = isStartupPending;
         // The carousel stays drawn, at rest, until the greeting replaces it.
         stopGlide();
         placeCarousel();
@@ -669,8 +675,8 @@ export default function init() {
     // Exit keeps the active Profile; at startup it is welcomed or greeted
     // all the same.
     function exit() {
-        const atStartup = closeStartupDialog !== null;
-        if (atStartup && isWelcomeScreenOn) startupPickerDone();
+        const atStartup = isStartupPending;
+        if (atStartup && isWelcomeScreenOn) notifyStartupPickerDone();
         close();
         if (atStartup && !isWelcomeScreenOn) greetAfterPause({ atStartup });
     }
