@@ -301,28 +301,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="quiet-wheel-other-screens" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Son des vidéos baissé sur les autres écrans dessinés</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
-          </div>
-          <p>Baisser aussi de moitié le son des vidéos de la table sélectionnée tant que la Profile Stats, la Household Stats, l'Achievement List ou le High Score Board voilent la roue, comme le fera le Profile picker et le Welcome Screen.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> (court : quels écrans) → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/286">spec #286</a> du son baissé sur le Profile picker et le Welcome Screen, dont elle reprend le mécanisme : d'abord <code>/implement</code> <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/287">#287</a>, puis <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/288">#288</a> et <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/289">#289</a> (ou <code>/implement-spec</code>)</div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>Quels écrans : tous ceux qui voilent la roue, ou seulement ceux où l'on reste longtemps ?</li>
-              <li>Passer d'un écran à l'autre (Profile Stats → Achievement List) garde-t-il le son bas sans remonter entre les deux ?</li>
-            </ul>
-            <p class="ctx">Reporté pendant le grilling du son baissé sur le Profile picker et le Welcome Screen, le 20/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -673,6 +651,31 @@
           </details>
         </div>
       </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="quiet-wheel-other-screens" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Son des vidéos baissé sur les autres écrans dessinés</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Baisser aussi de moitié le son des vidéos de la table sélectionnée tant que la Profile Stats, la Household Stats, l'Avatar Frame list, l'Achievement List ou le High Score Board voilent la roue, comme le fera la Quiet Wheel du Profile picker et du Welcome Screen. Grillé le 20/10/2026.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/286">spec #286</a> (tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/287">#287</a>, puis <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/288">#288</a> et <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/289">#289</a>), dont elle reprend le mécanisme</div>
+          <details>
+            <summary>Décisions</summary>
+            <ul>
+              <li>Les cinq écrans dessinés qui voilent la roue : Profile Stats, Household Stats, Avatar Frame list, Achievement List, High Score Board. Pas de tri entre écrans longs et courts : sous le voile, le scintillement de chaque <code>update()</code> se voit peu.</li>
+              <li>Les Drawn Menus ne baissent jamais le son : on les traverse vite, et chaque ouverture ferait scintiller deux fois la roue à travers leur voile. Exit des Profile Stats vers le menu principal fait donc remonter le son.</li>
+              <li>Du voile (avant l'éventuel Loader) à la fermeture, Exit pendant le Loader compris, comme le Welcome Screen dans #286.</li>
+              <li>Une seule baisse et un seul retour pour une navigation entre écrans dessinés (Household Stats, Profile Stats d'un autre Profile, Avatar Frame list, retour instantané) : le parent caché garde le son bas, le délai de passage de #286 couvre les relais.</li>
+              <li>Pas de nouveau terme au glossaire : « Quiet Wheel » reste le nom de la baisse du Profile picker et du Welcome Screen.</li>
+            </ul>
+            <p class="ctx">Reporté pendant le grilling du son baissé sur le Profile picker et le Welcome Screen, le 20/10/2026.</p>
+          </details>
+        </div>
+      </li>
     </ol>
   </section>
 
@@ -682,8 +685,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>20/10 <span class="count">(3)</span></summary>
+          <summary>20/10 <span class="count">(4)</span></summary>
           <ol>
+            <li><strong>Le son baissé sur les autres écrans dessinés grillé, et placé en fin de file</strong>
+              <span>Les cinq écrans dessinés qui voilent la roue baissent le son, jamais les Drawn Menus ; une seule baisse pour une navigation entre écrans. Pas de nouveau terme : « Quiet Wheel » reste celle du Profile picker et du Welcome Screen. Choix de Félix : le dernier de la file, la robustesse passe 1ʳᵉ. Effort petit, impact faible, inchangés.</span></li>
             <li><strong>Nouvel ordre de tête : son baissé ailleurs, robustesse, menu de pause, cadres de fête</strong>
               <span>Choix de Félix. Le son baissé sur les autres écrans dessinés passe 1ᵉʳ et la robustesse 2ᵉ ; le menu de pause, déjà en tickets, descend 3ᵉ et les cadres de fête 4ᵉ. Le reste de la file ne bouge pas.</span></li>
             <li><strong>La robustesse grillée : trois tickets au lieu de quatre, effort petit</strong>
