@@ -261,9 +261,9 @@
           <a class="chip tr-play" href="#shown-layers-reader"><b></b>Lecteur des calques</a>
           <a class="chip tr-share" href="#launch-events-order"><b></b>Ordre des événements</a>
           <a class="chip tr-play" href="#quiet-wheel-other-screens"><b></b>Son baissé ailleurs</a>
+          <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
         </div>
         <div class="cell">
-          <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
           <a class="chip tr-play" href="#household-stats-read"><b></b>Household Stats plus rapides</a>
         </div>
         <div class="cell">
@@ -381,20 +381,19 @@
         <div class="content">
           <div class="item-head">
             <h3>Robustesse : configuration lisible, résumé de démarrage, fichiers d'une version future protégés</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
           </div>
-          <p>Quatre points, un ticket chacun :</p>
+          <p>Trois points, un ticket chacun :</p>
           <ul>
-            <li><code>.env.example</code> découpé en sections commentées (Profils, Progression, Présentation, Menus…), avec une ligne par lien entre Add-ons (« sans <code>ADD_ON_PROFILE_PICKER</code>, les Challenges… »).</li>
-            <li>Dans le code, un seul point d'accès du genre <code>isAddOnOn("challenges")</code> remplace les <code>config.addOns.X !== false</code> éparpillés, pour retrouver chaque lien d'un <code>grep</code>.</li>
-            <li>Un résumé de démarrage dans <code>logfile.log</code> : version de PinballY (<code>systemInfo.version</code>) comparée au minimum Beta 10, langue, Add-ons désactivés, nombre de Profiles et de tables visibles. Log seulement, rien à l'écran.</li>
-            <li>Le Profile Store relit la <code>version</code> qu'il écrit déjà : un fichier d'une version plus récente que le code (retour à un ancien commit) est mis de côté sous un nom daté et journalisé, jamais lu ni réécrit dans l'ancien format.</li>
+            <li><code>.env.example</code>, déjà en sections : sous chaque Add-on dont d'autres dépendent, une ligne <code># false also: …</code> qui dit ce que l'on perd ailleurs (Profile picker → barre et place des Challenges, Table Mastery → Profile Rewards, High Scores → Welcome Screen et Achievements…).</li>
+            <li>Une ligne de résumé au démarrage dans <code>logfile.log</code> : version de PinballY (<code>systemInfo.version</code>), langue, Add-ons désactivés, nombre de Profiles et de tables visibles. Une ligne d'avertissement à part si la version est antérieure à Beta 10 ou plus récente que la dernière testée. Log seulement, rien à l'écran.</li>
+            <li>Le Profile Store relit la <code>version</code> de <code>cabinet.json</code>, <code>profile.json</code> et des <code>play-log-&lt;année&gt;.json</code> : un fichier d'une version plus récente que le code est mis de côté en <code>&lt;nom&gt;.newer-&lt;date&gt;.json</code>, journalisé, et repart de zéro, comme un fichier illisible (<a href="adr/0016-a-saved-file-s-version-changes-only-for-a-breaking-format-change.md">ADR 0016</a>).</li>
           </ul>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par point) puis <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code> et facilite les retours en arrière</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par point, sans spec) puis <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code> et facilite les retours en arrière</div>
           <details>
             <summary>Contexte</summary>
-            <p class="ctx">Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
+            <p class="ctx">Grillé le 20/10/2026. <code>version</code> ne monte que pour un changement cassant : un ajout de champ survit déjà à un ancien code, qui garde ce qu'il ne connaît pas (ADR 0016). Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
           </details>
         </div>
       </li>
@@ -427,7 +426,7 @@
           </div>
           <p>Activer ou désactiver les Add-ons et régler les options du pack depuis le menu opérateur de PinballY, sans éditer <code>.env.local</code>. PinballY ne recharge jamais les scripts : un changement d'Add-on ne prend effet qu'au redémarrage de PinballY, que le menu pourrait proposer.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont le point d'accès unique <code>isAddOnOn(...)</code> et les sections de configuration donnent la liste du menu ; le <a href="#language-menu">choix de la langue (n° <span data-ref="language-menu"></span>)</a> pose les mêmes questions, un seul grill pour les deux est possible</div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont les sections de configuration et les liens entre Add-ons donnent la liste du menu ; le <a href="#language-menu">choix de la langue (n° <span data-ref="language-menu"></span>)</a> pose les mêmes questions, un seul grill pour les deux est possible</div>
           <details>
             <summary>Questions ouvertes (5)</summary>
             <ul>
@@ -681,8 +680,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>20/10 <span class="count">(1)</span></summary>
+          <summary>20/10 <span class="count">(2)</span></summary>
           <ol>
+            <li><strong>La robustesse grillée : trois tickets au lieu de quatre, effort petit</strong>
+              <span>Le point d'accès unique aux Add-ons est abandonné. <code>.env.example</code> a déjà ses sections : il ne reste que les lignes de liens entre Add-ons. Le résumé de démarrage reste tel quel. Un fichier d'une version future est mis de côté et repart de zéro, comme un fichier illisible (ADR 0016). Passe d'effort moyen à petit ; l'impact reste faible.</span></li>
             <li><strong>Le son baissé sur les autres écrans dessinés, 3ᵉ de la file</strong>
               <span>Reporté pendant le grill du son des vidéos baissé sur le Profile picker et le Welcome Screen : la même baisse sur la Profile Stats, la Household Stats, l'Achievement List et le High Score Board. Placé juste après le menu de pause dessiné, car c'est un besoin de la borne et il reprend le mécanisme de cette spec sans rien ajouter. Effort petit, impact faible.</span></li>
           </ol>
