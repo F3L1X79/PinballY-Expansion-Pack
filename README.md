@@ -10,7 +10,7 @@ An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), 
 
 <img src="docs/images/profiles.png" alt="The Change Player carousel and its Avatars with their Player Level" width="400">
 
-With Change Player, each of you picks your own Profile and Avatar, and the Welcome Screen greets you by name so you know whose games will count. Only games of at least a minute count, so a launch by mistake never spoils anything. Your Daily Streak counts the days in a row you have played, on any table. Guest is always there for visitors.
+With Change Player, each of you picks your own Profile and Avatar, and the Welcome Screen greets you by name so you know whose games will count. Only games of at least a minute count, so a launch by mistake never spoils anything. Your Daily Streak counts the days in a row you have played, on any table. Guest is always there for visitors. On a shared cabinet, PinballY can start on Change Player so that everyone picks their Profile before playing, or straight on the wheel (`STARTUP_SCREEN`, below).
 
 ### Profile Stats
 

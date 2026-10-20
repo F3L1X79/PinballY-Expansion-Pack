@@ -23,7 +23,7 @@ Les menus et messages de PinballY enfin en français, mais aussi en allemand, es
 
 <img src="docs/images/profiles.png" alt="Le carrousel « Changer de joueur » et ses Avatars avec leur niveau" width="400">
 
-Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran d'accueil vous salue par votre nom : vous savez pour qui les parties vont compter. Seules les parties d'au moins une minute comptent : un lancement par erreur ne fausse rien. Vos jours d'affilée sur la borne comptent les jours de suite où vous avez joué, sur n'importe quelle table. Le Profil Invité reste toujours là pour les visiteurs.
+Avec « Changer de joueur », chacun prend son Profil et son Avatar, et l'écran d'accueil vous salue par votre nom : vous savez pour qui les parties vont compter. Seules les parties d'au moins une minute comptent : un lancement par erreur ne fausse rien. Vos jours d'affilée sur la borne comptent les jours de suite où vous avez joué, sur n'importe quelle table. Le Profil Invité reste toujours là pour les visiteurs. Sur une borne partagée, PinballY peut démarrer sur « Changer de joueur », pour que chacun choisisse son Profil avant de jouer, ou directement sur la roue (`STARTUP_SCREEN`, plus bas).
 
 ### Mon profil
 
