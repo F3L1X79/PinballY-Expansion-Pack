@@ -15,7 +15,8 @@ test("the Household button opens the Household Stats, Exit goes back to it, attr
     const { fake, lang } = await startHousehold({ profiles: { Alice: {}, Bob: {} } });
     openProfileStats(fake, lang);
     const shownButtons = buttons(fake);
-    assert.deepEqual(shownButtons[shownButtons.length - 1], { label: "Household Stats", count: "2" }, "last, Guest seeing it too, Guest left out of its count");
+    assert.deepEqual(shownButtons.slice(0, 2).map(button => button.label), ["Frame", "Household Stats"], "right after the Frame button");
+    assert.deepEqual(shownButtons[1], { label: "Household Stats", count: "2" }, "Guest seeing it too, Guest left out of its count");
     press(fake, "Exit");
 
     openHouseholdStats(fake, lang);

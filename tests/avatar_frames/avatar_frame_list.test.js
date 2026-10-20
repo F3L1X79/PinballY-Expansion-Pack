@@ -19,10 +19,7 @@ test("the Frame button opens the ten frames then None, the locked ones greyed wi
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
 
-    assert.deepEqual(buttons(fake).slice(0, 2), [
-        { label: "Achievements", count: buttons(fake)[0].count },
-        { label: "Frame", count: "3/10" },
-    ], "the Frame button comes right after the Achievements one, with the frames unlocked");
+    assert.deepEqual(buttons(fake)[0], { label: "Frame", count: "3/10" }, "the Frame button comes first, with the frames unlocked");
 
     choose(fake, "Frame");
 

@@ -43,7 +43,7 @@ test("no Play shows a dash and no selection button; long games show hours", asyn
 
     openProfileStats(fake, lang);
     assert.equal(cardTexts(fake)[0], "Invité");
-    assert.deepEqual(buttons(fake).map(button => button.label), ["Succès", "Stats de la maison"], "nothing played, Tables to Discover off; Alice and Bob make a Household");
+    assert.deepEqual(buttons(fake).map(button => button.label), ["Stats de la maison", "Succès"], "nothing played, Tables to Discover off; Alice and Bob make a Household");
     assert.deepEqual(section(fake, "JEU", TEXT.stats), {
         "Parties jouées": ["0"],
         "Temps total": ["0 h 00"],
@@ -59,7 +59,7 @@ test("no Play shows a dash and no selection button; long games show hours", asyn
 
     getProfileStore().switchTo("Alice");
     openProfileStats(fake, lang);
-    assert.deepEqual(buttons(fake).map(button => button.label), ["Succès", "Tables les plus jouées", "Stats de la maison"]);
+    assert.deepEqual(buttons(fake).map(button => button.label), ["Stats de la maison", "Succès", "Tables les plus jouées"]);
     assert.deepEqual(section(fake, "JEU", TEXT.stats), {
         "Parties jouées": ["1\u00A0500"],
         "Temps total": ["2250 h 00"],

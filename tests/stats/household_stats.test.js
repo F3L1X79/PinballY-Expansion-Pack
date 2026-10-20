@@ -32,7 +32,7 @@ test("the Household side by side, the best of each line in gold", async () => {
         profileStore.switchTo(name);
         fake.advanceTime(ALL_TOASTS_MS);
         openProfileStats(fake, lang);
-        own[name] = { level: playerLevel(fake, lang.profileStats).level, achievements: buttons(fake)[0].count };
+        own[name] = { level: playerLevel(fake, lang.profileStats).level, achievements: buttons(fake).find(button => button.label === lang.profileStats.buttons.achievements).count };
         press(fake, "Exit");
     }
 
