@@ -48,6 +48,11 @@ test("absolute and network paths are kept, an empty one still means no sound", (
     });
 });
 
+test("a relative Profile picker sound is resolved too, though none ships with the pack", () => {
+    const resolved = resolveSoundFiles({ profilePickerSoundFile: "assets\\sounds\\local\\choose-your-character.mp3" }, PACK);
+    assert.deepEqual(resolved, { profilePickerSoundFile: `${PACK}\\assets\\sounds\\local\\choose-your-character.mp3` });
+});
+
 test("the other settings are left untouched", () => {
     const settings = { language: "fr", launchSoundFile: "", adultCategory: "assets\\NSFW", addOns: { clock: true } };
     assert.deepEqual(resolveSoundFiles(settings, PACK), settings);

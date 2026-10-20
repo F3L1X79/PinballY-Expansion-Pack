@@ -22,7 +22,13 @@ export const SHIPPED_SOUNDS = Object.freeze({
     // Played once when the Fireworks start.
     fireworksSoundFile: "assets\\sounds\\fireworks.wav",
 });
-const NO_SOUNDS = Object.fromEntries(Object.keys(SHIPPED_SOUNDS).map(key => [key, ""]));
+// The sounds with nothing shipped: silent until the player sets one.
+const UNSHIPPED_SOUNDS = Object.freeze({
+    // Played once when the Profile picker appears as the Startup Screen.
+    profilePickerSoundFile: "",
+});
+const SOUND_SETTINGS = [...Object.keys(SHIPPED_SOUNDS), ...Object.keys(UNSHIPPED_SOUNDS)];
+const NO_SOUNDS = Object.fromEntries(SOUND_SETTINGS.map(key => [key, ""]));
 
 const DEFAULTS = {
     // --- Set these for your setup ---
@@ -30,10 +36,11 @@ const DEFAULTS = {
     // Interface language: "en", "fr", "de", "es", "it" or "pt".
     language: "en",
     // Sounds: by default the ones shipped in assets\sounds\ (see CREDITS.md
-    // there). A path relative to the pack's folder (such as
+    // there), or none. A path relative to the pack's folder (such as
     // assets\sounds\local\launch.mp3, kept out of git) or an absolute one.
     // Empty = no sound.
     ...SHIPPED_SOUNDS,
+    ...UNSHIPPED_SOUNDS,
     // Manufacturer name you gave fictional/community VPX tables in PinballY.
     // Used by the status line and the "Original Tables" filter.
     communityTablesManufacturer: "VPX Community",
@@ -114,7 +121,7 @@ const ABSOLUTE_PATH_PATTERN = /^([A-Za-z]:|[\\/])/;
 // from the pack's folder: Windows Media Player knows nothing of the pack.
 export function resolveSoundFiles(config, projectFolder) {
     const resolved = { ...config };
-    for (const key of Object.keys(SHIPPED_SOUNDS)) {
+    for (const key of SOUND_SETTINGS) {
         const path = resolved[key];
         if (typeof path !== "string" || path === "" || ABSOLUTE_PATH_PATTERN.test(path)) continue;
         resolved[key] = `${projectFolder}\\${path.replace(/\//g, "\\").replace(/^\.\\/, "")}`;

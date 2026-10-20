@@ -183,6 +183,11 @@ export default function init() {
     const playGreetingSound = safeHandler(SCRIPT_NAME, () => {
         if (config.profileGreetingSoundFile) host.playSound(config.profileGreetingSoundFile);
     });
+    // A sound that cannot play is logged and never stops the carousel. On
+    // its own player: the greeting after a quick pick would cut it on the shared one.
+    const playPickerSound = safeHandler(SCRIPT_NAME, () => {
+        if (config.profilePickerSoundFile) host.createSoundRotation(config.profilePickerSoundFile, 1).play();
+    });
 
     function readProfiles() {
         const listed = profileStore.listProfiles();
@@ -597,6 +602,8 @@ export default function init() {
         navigationSound.load();
         backLayer.alpha = 1;
         placeCarousel();
+        // Only the startup carousel, whether its pause or a menu opened it.
+        if (isStartupPending) playPickerSound();
     }
 
     // Frees the wheel dialog queue held by the startup carousel. Without

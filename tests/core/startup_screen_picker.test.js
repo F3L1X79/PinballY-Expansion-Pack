@@ -36,6 +36,7 @@ test("the startup Profile picker opens on the last active Profile and the Welcom
     assert.equal(highlightedName(fake, names), "Bob", "on the last active Profile");
     assert.deepEqual(readLoader(fake), { shown: false }, "the Loader goes as the carousel shows");
     assert.equal(startupVeil(fake).shown, true, "the veil stays under it");
+    assert.deepEqual(fake.soundsPlayed(), [], "no Profile picker sound by default");
     fake.advanceTime(TOAST_RISE_MS);
     assert.equal(waitingToasts(fake), 0, "the toast waits for the carousel");
     assert.equal(isWelcomeScreenOpen(fake), false);

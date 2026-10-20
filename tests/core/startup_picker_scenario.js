@@ -17,18 +17,21 @@ export const CAROUSEL_PAUSE_MS = 500;
 export const GLIDE_OVER_MS = 500;
 
 // addOns: the Add-ons turned on; profiles: the Household's folders;
-// tables: the wheel's, as the fake host takes them.
+// tables: the wheel's, as the fake host takes them; settings: the other
+// config values; files: the paths present on disk (sounds).
 export async function startOnProfilePicker({
-    addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], activeProfile = "Bob", tables,
+    addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], activeProfile = "Bob", tables, settings = {}, files = [],
 } = {}) {
     const fake = createFakePinballYHost(tables ? { tables } : {});
     for (const name of profiles) fake.addFolder(`${PROFILES_FOLDER}\\${name}`);
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile }));
+    for (const path of files) fake.addFile(path);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = "en";
     config.startupScreen = "profilePicker";
+    Object.assign(config, settings);
 
     const { default: lang } = await import("../../common/core/i18n.js");
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");
@@ -36,6 +39,10 @@ export async function startOnProfilePicker({
     await import("../../main.js");
     return { fake, lang, store: getProfileStore(), toasts: getAchievementToasts(), settle };
 }
+
+// A Profile picker sound present on disk, and what it played so far.
+export const PICKER_SOUND = "C:\\Sounds\\choose-your-character.mp3";
+export const pickerSounds = fake => fake.soundsPlayed().filter(path => path === PICKER_SOUND);
 
 // What the picker's layers show now, the toasts' drawings left out.
 export const pickerTexts = fake => fake.drawingLayers()
