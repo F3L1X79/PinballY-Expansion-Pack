@@ -5,6 +5,7 @@
 // the Welcome Screen: each hides the Loader as it shows, and the last
 // startup screen hides the veil once it is in.
 // - Gives way by itself to a menu, a launching table and attract mode.
+// - Swallows Exit while the Loader turns: no Exit menu over a screen getting ready.
 // - Cleared, not drawn: nothing measures the window, which is not laid out yet.
 // ============================================================
 
@@ -27,6 +28,7 @@ export function createStartupVeil(host) {
     const loader = createLoader(host, { zIndex: LOADER_Z_INDEX });
     // The veil's layer, null while it is not shown.
     let veil = null;
+    let isLoaderShown = false;
 
     function show() {
         if (!veil) {
@@ -34,6 +36,12 @@ export function createStartupVeil(host) {
             veil.clear(DIMMED_WHEEL);
         }
         loader.show();
+        isLoaderShown = true;
+    }
+
+    function hideLoader() {
+        loader.hide();
+        isLoaderShown = false;
     }
 
     function hideVeil() {
@@ -43,7 +51,7 @@ export function createStartupVeil(host) {
     }
 
     function hide() {
-        loader.hide();
+        hideLoader();
         hideVeil();
     }
 
@@ -53,8 +61,14 @@ export function createStartupVeil(host) {
     host.on("menuopen", safeHandler(SCRIPT_NAME, hide));
     host.on("launchoverlayshow", safeHandler(SCRIPT_NAME, hide));
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, hide));
+    // Fires on every mapped button press: while the comet turns, no startup
+    // screen takes the buttons yet, and Exit would open PinballY's Exit menu
+    // over the one getting ready. Other buttons still move the wheel.
+    host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
+        if (isLoaderShown && ev.command === "Exit") ev.preventDefault();
+    }));
 
-    return { show, hideLoader: () => loader.hide(), hideVeil, hide };
+    return { show, hideLoader, hideVeil, hide };
 }
 
 let sharedStartupVeil = null;
