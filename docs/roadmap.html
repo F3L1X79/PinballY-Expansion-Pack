@@ -246,7 +246,6 @@
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
-          <a class="chip tr-share" href="#language-menu"><b></b>Menu des langues</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
           <a class="chip tr-play" href="#drawn-pause-menu"><b></b>Menu de pause dessiné</a>
         </div>
@@ -407,31 +406,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="easter-eggs" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Easter eggs : une rare apparition au lancement, et son succès secret</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Un ou deux easter eggs tirés au hasard : par exemple une petite image qui apparaît au lancement avec une chance sur 1000, et un Secret Achievement de la famille Surprises débloqué par le Profile qui l'a vue.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend le tracker des Surprises (<code>common/achievements/surprises.js</code>, livré) et le style Steamball. Avant la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a>, qui traduira ses textes</div>
-          <details>
-            <summary>Questions ouvertes (5)</summary>
-            <ul>
-              <li>« Au lancement » : au démarrage de PinballY, ou au lancement d'une table (bien plus fréquent, donc vu plus souvent à 1 sur 1000) ?</li>
-              <li>Quelle image, où (roue, backglass, DMD, topper), combien de temps, et avec quel mouvement (une seule fois, pas d'animation sans fin) ?</li>
-              <li>Le second easter egg : une autre image, ou un autre déclencheur (une combinaison de boutons, une date) ?</li>
-              <li>Qui débloque le succès : le Profile actif au moment de l'apparition ; et au démarrage, avant le choix du Profile ?</li>
-              <li>Un réglage pour forcer l'apparition, utile pour la vérifier sur la borne ?</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 20/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -458,17 +432,19 @@
             <h3>Les options du pack dans le menu opérateur</h3>
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
-          <p>Activer ou désactiver les Add-ons et régler les options du pack depuis le menu opérateur de PinballY, sans éditer <code>.env.local</code>. PinballY ne recharge jamais les scripts : un changement d'Add-on ne prend effet qu'au redémarrage de PinballY, que le menu pourrait proposer.</p>
+          <p>Activer ou désactiver les Add-ons et régler les options du pack depuis le menu opérateur de PinballY, sans éditer <code>.env.local</code>, y compris la langue de l'interface (aujourd'hui figée au chargement par <code>common/core/i18n.js</code>, à partir de <code>config.language</code>). PinballY ne recharge jamais les scripts : un changement d'Add-on ne prend effet qu'au redémarrage de PinballY, que le menu pourrait proposer.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont les sections de configuration et les liens entre Add-ons donnent la liste du menu ; le <a href="#language-menu">choix de la langue (n° <span data-ref="language-menu"></span>)</a> pose les mêmes questions, un seul grill pour les deux est possible</div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont les sections de configuration et les liens entre Add-ons donnent la liste du menu</div>
           <details>
-            <summary>Questions ouvertes (5)</summary>
+            <summary>Questions ouvertes (7)</summary>
             <ul>
               <li>Où écrire les choix : <code>optionSettings</code> (sans <code>save()</code>), un fichier du pack, ou <code>.env.local</code> réécrit ? Lequel l'emporte quand <code>.env.local</code> dit autre chose ?</li>
               <li>Tous les réglages de <code>common/core/config.js</code>, ou seulement les Add-ons et quelques options simples (oui/non, listes) ?</li>
               <li>Redémarrer comment : un script peut-il relancer PinballY lui-même, ou le menu dit-il seulement « pris en compte au prochain démarrage » ?</li>
               <li>Le menu opérateur natif reçoit-il une entrée « Expansion Pack » qui ouvre un Drawn Menu, et qui y a droit (l'Admin Profile seulement ?) ?</li>
               <li>Comment montrer les liens entre Add-ons (« sans le Profile picker, les Challenges… ») au moment où on en désactive un ?</li>
+              <li>La langue : un réglage de la borne, appliqué au redémarrage comme les autres, ou une langue par Profile (<code>profile.json</code>) qui change tout de suite, ce qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage ?</li>
+              <li>Le choix de la langue liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
             </ul>
             <p class="ctx">Idée de Félix du 19/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas.</p>
           </details>
@@ -492,29 +468,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="language-menu" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Choix de la langue dans un menu</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Choisir la langue de l'interface depuis un menu du cabinet, sans éditer <code>.env.local</code> ni <code>common/core/config.js</code>. Aujourd'hui, <code>common/i18n.js</code> fige la langue au chargement, à partir de <code>config.language</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
-          <details>
-            <summary>Questions ouvertes (4)</summary>
-            <ul>
-              <li>Où placer l'entrée : menu principal via <code>getMainMenu().add(...)</code>, ou le menu Exit, réservé à l'Admin Profile comme « Réinitialiser un profil » (livré le 01/10) ?</li>
-              <li>Où l'enregistrer : dans <code>optionSettings</code> (sans <code>save()</code>), ou dans <code>profile.json</code>, ce qui donne une langue par Profile ?</li>
-              <li>Changement immédiat, qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage, ou appliqué au prochain lancement de PinballY ?</li>
-              <li>Le menu liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
-            </ul>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -529,6 +482,31 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/images/rank_*.png</code>) des emblèmes de League of Legends.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="easter-eggs" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Easter eggs : une rare apparition au lancement, et son succès secret</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Un ou deux easter eggs tirés au hasard : par exemple une petite image qui apparaît au lancement avec une chance sur 1000, et un Secret Achievement de la famille Surprises débloqué par le Profile qui l'a vue.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend le tracker des Surprises (<code>common/achievements/surprises.js</code>, livré) et le style Steamball. Après la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> : ses textes iront en anglais dans de, es, it et pt, marqués <code>// TODO: translation pass</code></div>
+          <details>
+            <summary>Questions ouvertes (5)</summary>
+            <ul>
+              <li>« Au lancement » : au démarrage de PinballY, ou au lancement d'une table (bien plus fréquent, donc vu plus souvent à 1 sur 1000) ?</li>
+              <li>Quelle image, où (roue, backglass, DMD, topper), combien de temps, et avec quel mouvement (une seule fois, pas d'animation sans fin) ?</li>
+              <li>Le second easter egg : une autre image, ou un autre déclencheur (une combinaison de boutons, une date) ?</li>
+              <li>Qui débloque le succès : le Profile actif au moment de l'apparition ; et au démarrage, avant le choix du Profile ?</li>
+              <li>Un réglage pour forcer l'apparition, utile pour la vérifier sur la borne ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 20/10/2026.</p>
           </details>
         </div>
       </li>
@@ -739,8 +717,12 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>20/10 <span class="count">(6)</span></summary>
+          <summary>20/10 <span class="count">(8)</span></summary>
           <ol>
+            <li><strong>Le choix de la langue fusionné dans les options au menu opérateur</strong>
+              <span>Proposé par Félix : la langue est une option du pack comme une autre, et les deux chantiers posaient les mêmes questions (où enregistrer, effet immédiat ou au redémarrage, qui y a droit). Ses questions propres, une langue par Profile et la liste des six langues, rejoignent celles du menu opérateur. L'item sort de la file et de la matrice ; effort et impact du menu opérateur inchangés.</span></li>
+            <li><strong>Easter eggs 10ᵉ, après la Distribution</strong>
+              <span>Ordre choisi par Félix : les Easter eggs descendent de la 5ᵉ à la 10ᵉ place, après la passe de traduction ; leurs textes iront en anglais dans de, es, it et pt, marqués pour la passe suivante. Le reste de la file ne bouge pas.</span></li>
             <li><strong>Easter eggs 5ᵉ, juste avant la passe de traduction</strong>
               <span>Idée de Félix : une petite image qui apparaît au lancement avec une chance sur 1000, et un Secret Achievement pour qui la voit. Placée après les chantiers déjà en tickets et avant la passe de traduction, pour que ses textes (titre et indice du succès) y soient traduits ; elle reprend la famille Surprises sans brique nouvelle. Effort petit, impact faible.</span></li>
             <li><strong>Cadres de fête seuls, remis 4ᵉ, spec #297</strong>
