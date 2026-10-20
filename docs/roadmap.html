@@ -260,6 +260,7 @@
         <div class="cell">
           <a class="chip tr-play" href="#shown-layers-reader"><b></b>Lecteur des calques</a>
           <a class="chip tr-share" href="#launch-events-order"><b></b>Ordre des événements</a>
+          <a class="chip tr-play" href="#quiet-wheel"><b></b>Quiet Wheel</a>
           <a class="chip tr-play" href="#quiet-wheel-other-screens"><b></b>Son baissé ailleurs</a>
           <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
         </div>
@@ -300,6 +301,30 @@
     </div>
 
     <ol class="queue">
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="quiet-wheel" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Quiet Wheel : son des vidéos baissé sur le Profile picker et le Welcome Screen</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Tant que le Profile picker ou le Welcome Screen voilent la roue (au démarrage ou depuis le menu principal), le son des vidéos de la table sélectionnée baisse d'un coup de moitié, sans remonter entre les deux écrans ; les sons du pack gardent leur volume. Grillé le 20/10/2026 (ADR 0015), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/286">spec #286</a>, tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/287">#287</a> → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/288">#288</a>, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/289">#289</a>.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Flow Matt : <code>/implement</code> (#287, puis #288 et #289) ou <code>/implement-spec</code>. Prototype : branche <code>prototype/quiet-wheel</code>. La même baisse sur les autres écrans dessinés : <a href="#quiet-wheel-other-screens">n° <span data-ref="quiet-wheel-other-screens"></span></a></div>
+          <details>
+            <summary>Décisions</summary>
+            <ul>
+              <li>PinballY n'a pas de volume global : la baisse passe par le volume propre de la table (<code>audioVolume</code>), donc les vidéos du backglass, du DMD et du topper suivent (<a href="adr/0015-the-quiet-wheel-lowers-the-table-s-own-audio-volume-for-a-while.md">ADR 0015</a>).</li>
+              <li>Moitié du volume de la table, arrondie ; une seule baisse et un seul retour, jamais de fondu (chaque <code>update()</code> fait scintiller la roue).</li>
+              <li>Retour sur la table baissée retrouvée par son config ID, même si la sélection a changé ; un lancement, un menu natif ou le mode attract pendant le délai de passage remettent le volume tout de suite.</li>
+              <li>Un fichier en attente remet le volume au démarrage suivant si PinballY a quitté ou planté pendant la baisse.</li>
+              <li>Pas de réglage : part fixe, pas d'interrupteur.</li>
+            </ul>
+          </details>
+        </div>
+      </li>
 
       <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -662,7 +687,7 @@
           </div>
           <p>Baisser aussi de moitié le son des vidéos de la table sélectionnée tant que la Profile Stats, la Household Stats, l'Avatar Frame list, l'Achievement List ou le High Score Board voilent la roue, comme le fera la Quiet Wheel du Profile picker et du Welcome Screen. Grillé le 20/10/2026.</p>
           <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/286">spec #286</a> (tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/287">#287</a>, puis <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/288">#288</a> et <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/289">#289</a>), dont elle reprend le mécanisme</div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#quiet-wheel">Quiet Wheel (n° <span data-ref="quiet-wheel"></span>)</a>, dont elle reprend le mécanisme</div>
           <details>
             <summary>Décisions</summary>
             <ul>
@@ -687,10 +712,10 @@
         <details open>
           <summary>20/10 <span class="count">(4)</span></summary>
           <ol>
-            <li><strong>Le son baissé sur les autres écrans dessinés grillé, et placé en fin de file</strong>
-              <span>Les cinq écrans dessinés qui voilent la roue baissent le son, jamais les Drawn Menus ; une seule baisse pour une navigation entre écrans. Pas de nouveau terme : « Quiet Wheel » reste celle du Profile picker et du Welcome Screen. Choix de Félix : le dernier de la file, la robustesse passe 1ʳᵉ. Effort petit, impact faible, inchangés.</span></li>
-            <li><strong>Nouvel ordre de tête : son baissé ailleurs, robustesse, menu de pause, cadres de fête</strong>
-              <span>Choix de Félix. Le son baissé sur les autres écrans dessinés passe 1ᵉʳ et la robustesse 2ᵉ ; le menu de pause, déjà en tickets, descend 3ᵉ et les cadres de fête 4ᵉ. Le reste de la file ne bouge pas.</span></li>
+            <li><strong>La Quiet Wheel 1ʳᵉ de la file, le son baissé sur les autres écrans dessinés grillé et dernier</strong>
+              <span>Choix de Félix. La 1ʳᵉ place ne couvre que la spec #286 (Profile picker et Welcome Screen, tickets #287 → #289), qui n'avait pas d'item ; effort petit, impact faible. La même baisse sur les autres écrans devient un chantier à part, en fin de file : les cinq écrans dessinés qui voilent la roue, jamais les Drawn Menus, une seule baisse pour une navigation entre écrans ; « Quiet Wheel » reste le nom de la baisse des écrans d'accueil. Effort petit, impact faible, inchangés.</span></li>
+            <li><strong>Nouvel ordre de tête : robustesse 2ᵉ, menu de pause 3ᵉ, cadres de fête 4ᵉ</strong>
+              <span>Choix de Félix. Le menu de pause, déjà en tickets, descend 3ᵉ et les cadres de fête 4ᵉ. Le reste de la file ne bouge pas.</span></li>
             <li><strong>La robustesse grillée : trois tickets au lieu de quatre, effort petit</strong>
               <span>Le point d'accès unique aux Add-ons est abandonné. <code>.env.example</code> a déjà ses sections : il ne reste que les lignes de liens entre Add-ons. Le résumé de démarrage reste tel quel. Un fichier d'une version future est mis de côté et repart de zéro, comme un fichier illisible (ADR 0016). Passe d'effort moyen à petit ; l'impact reste faible.</span></li>
             <li><strong>Le son baissé sur les autres écrans dessinés, 3ᵉ de la file</strong>
