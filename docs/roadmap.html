@@ -406,20 +406,38 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
+      <li draggable="true" tabindex="0" class="item tr-share" id="launch-events-order" data-track="share" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Passe de traduction : allemand, espagnol, italien, portugais</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+            <h3>L'ordre réel des événements d'un lancement, dans le faux host</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">tests</span></div>
           </div>
-          <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket</div>
+          <p>L'aide de PinballY ne dit pas dans quel ordre arrivent <code>launchoverlayshow</code>, <code>launchoverlaymessage</code> (<code>"running"</code>, <code>"terminating"</code>), <code>launchoverlayhide</code>, <code>gamestarted</code> et <code>gameover</code>. Le faux host ne les déclenche donc pas dans son propre lancement : les tests du Loader les envoient à la main. Journaliser cet ordre sur la borne, l'écrire dans <code>docs/pinbally/</code>, puis le reproduire dans le lancement du faux host.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/research</code> (avec une trace des événements prise par Félix sur la borne) → <code>/grill-with-docs</code> → <code>/implement</code></div>
           <details>
             <summary>Contexte</summary>
-            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
+            <p class="ctx">Relevé par la revue Spec du Loader (#237), puis à la rétro, le 17/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="shown-layers-reader" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Tests : un seul lecteur des calques affichés</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">tests</span></div>
+          </div>
+          <p>Le filtre <code>shownLayers</code> (les calques affichés d'un z-index) est recopié dans au moins cinq lecteurs de tests (Profile Stats, Household Stats, Welcome Screen, Drawn Menu, High Score Board). Le ranger dans un module de <code>tests/support/</code>, comme <code>selection_marker_reader.js</code>.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : tâche directe, un ticket puis <code>/implement</code></div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Relevé par la revue Standards du ticket #236, le 17/10/2026.</p>
           </details>
         </div>
       </li>
@@ -447,6 +465,24 @@
               <li>Le choix de la langue liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
             </ul>
             <p class="ctx">Idée de Félix du 19/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Passe de traduction : allemand, espagnol, italien, portugais</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket. Après les <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a>, dont elle traduira les textes</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
           </details>
         </div>
       </li>
@@ -482,6 +518,24 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/images/rank_*.png</code>) des emblèmes de League of Legends.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="household-stats-read" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Household Stats plus rapides à ouvrir</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Sur la borne, la Household Stats met environ 1,1 s à s'ouvrir, dont 544 à 598 ms de lecture : plus que son dessin (265 à 329 ms), et dix fois la lecture des Profile Stats d'un seul Profile (40 ms). Trouver ce qui coûte dans la lecture des stats de chaque Profile, puis la raccourcir.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>diagnostic</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/diagnosing-bugs</code> (lenteur, avec la ligne <code>[HouseholdStats] Opened</code> du log) → correctif → <code>/retro</code>. Le retour instantané (spec #255) évite déjà de la relire au retour d'un autre Profile</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Vu dans les logs de la borne à la rétro du ticket #256 (18/10/2026) ; Félix : pas pressé.</p>
           </details>
         </div>
       </li>
@@ -559,48 +613,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="themes" data-track="share" data-rank="platinum">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Thèmes : d'autres palettes que Steamball, au choix</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">gros</span></div>
-          </div>
-          <p>Le propriétaire choisit le thème de tous les écrans dessinés (Welcome Screen, Achievement List, Profile Stats, toasts, Drawn Menus…) parmi plusieurs, Steamball restant celui par défaut.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (les palettes, à juger sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant l'<a href="#theme-editor">éditeur de palette (n° <span data-ref="theme-editor"></span>)</a></div>
-          <details>
-            <summary>Questions ouvertes (4)</summary>
-            <ul>
-              <li>Quels thèmes, et combien pour commencer ?</li>
-              <li>Ce que couvre un thème : seulement les couleurs et les polices de <code>common/drawing/steamball_palette.js</code>, ou aussi les images peintes d'avance (cadres, panneau et verre des Drawn Menus, blasons), à repeindre une fois par thème par les scripts de <code>maintainer/</code> ?</li>
-              <li>Où le choisir : un réglage dans <code>.env.local</code>, un choix par Profile, ou une entrée de menu ?</li>
-              <li>Les confettis et les feux d'artifice suivent-ils le thème ?</li>
-            </ul>
-            <p class="ctx">Idée du 10/10/2026. Aujourd'hui, les couleurs passent déjà presque toutes par <code>common/drawing/steamball_palette.js</code>, mais les images PNG sont peintes en Steamball.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="household-stats-read" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Household Stats plus rapides à ouvrir</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Sur la borne, la Household Stats met environ 1,1 s à s'ouvrir, dont 544 à 598 ms de lecture : plus que son dessin (265 à 329 ms), et dix fois la lecture des Profile Stats d'un seul Profile (40 ms). Trouver ce qui coûte dans la lecture des stats de chaque Profile, puis la raccourcir.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>diagnostic</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/diagnosing-bugs</code> (lenteur, avec la ligne <code>[HouseholdStats] Opened</code> du log) → correctif → <code>/retro</code>. Le retour instantané (spec #255) évite déjà de la relire au retour d'un autre Profile</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Vu dans les logs de la borne à la rétro du ticket #256 (18/10/2026) ; Félix : pas pressé.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="stats-api" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -625,6 +637,30 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-share" id="themes" data-track="share" data-rank="platinum">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Thèmes : d'autres palettes que Steamball, au choix</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">gros</span></div>
+          </div>
+          <p>Le propriétaire choisit le thème de tous les écrans dessinés (Welcome Screen, Achievement List, Profile Stats, toasts, Drawn Menus…) parmi plusieurs, Steamball restant celui par défaut.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (les palettes, à juger sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant l'<a href="#theme-editor">éditeur de palette (n° <span data-ref="theme-editor"></span>)</a></div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Quels thèmes, et combien pour commencer ?</li>
+              <li>Ce que couvre un thème : seulement les couleurs et les polices de <code>common/drawing/steamball_palette.js</code>, ou aussi les images peintes d'avance (cadres, panneau et verre des Drawn Menus, blasons), à repeindre une fois par thème par les scripts de <code>maintainer/</code> ?</li>
+              <li>Où le choisir : un réglage dans <code>.env.local</code>, un choix par Profile, ou une entrée de menu ?</li>
+              <li>Les confettis et les feux d'artifice suivent-ils le thème ?</li>
+            </ul>
+            <p class="ctx">Idée du 10/10/2026. Aujourd'hui, les couleurs passent déjà presque toutes par <code>common/drawing/steamball_palette.js</code>, mais les images PNG sont peintes en Steamball.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-share" id="theme-editor" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -644,42 +680,6 @@
               <li>Un aperçu en direct des écrans du pack pendant la retouche ?</li>
             </ul>
             <p class="ctx">Idée du 10/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="shown-layers-reader" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Tests : un seul lecteur des calques affichés</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">tests</span></div>
-          </div>
-          <p>Le filtre <code>shownLayers</code> (les calques affichés d'un z-index) est recopié dans au moins cinq lecteurs de tests (Profile Stats, Household Stats, Welcome Screen, Drawn Menu, High Score Board). Le ranger dans un module de <code>tests/support/</code>, comme <code>selection_marker_reader.js</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : tâche directe, un ticket puis <code>/implement</code></div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Relevé par la revue Standards du ticket #236, le 17/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="launch-events-order" data-track="share" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>L'ordre réel des événements d'un lancement, dans le faux host</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">tests</span></div>
-          </div>
-          <p>L'aide de PinballY ne dit pas dans quel ordre arrivent <code>launchoverlayshow</code>, <code>launchoverlaymessage</code> (<code>"running"</code>, <code>"terminating"</code>), <code>launchoverlayhide</code>, <code>gamestarted</code> et <code>gameover</code>. Le faux host ne les déclenche donc pas dans son propre lancement : les tests du Loader les envoient à la main. Journaliser cet ordre sur la borne, l'écrire dans <code>docs/pinbally/</code>, puis le reproduire dans le lancement du faux host.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/research</code> (avec une trace des événements prise par Félix sur la borne) → <code>/grill-with-docs</code> → <code>/implement</code></div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Relevé par la revue Spec du Loader (#237), puis à la rétro, le 17/10/2026.</p>
           </details>
         </div>
       </li>
@@ -717,8 +717,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>20/10 <span class="count">(8)</span></summary>
+          <summary>20/10 <span class="count">(9)</span></summary>
           <ol>
+            <li><strong>Les deux chantiers de tests 5ᵉ et 6ᵉ, le menu opérateur avant la passe de traduction</strong>
+              <span>Ordre choisi par Félix : l'ordre réel des événements d'un lancement et le lecteur unique des calques affichés remontent juste après les cadres de fête. Les options au menu opérateur passent avant la passe de traduction, qui traduira leurs textes. La Household Stats plus rapide descend après la Distribution, et l'API des statistiques passe avant les thèmes.</span></li>
             <li><strong>Le choix de la langue fusionné dans les options au menu opérateur</strong>
               <span>Proposé par Félix : la langue est une option du pack comme une autre, et les deux chantiers posaient les mêmes questions (où enregistrer, effet immédiat ou au redémarrage, qui y a droit). Ses questions propres, une langue par Profile et la liste des six langues, rejoignent celles du menu opérateur. L'item sort de la file et de la matrice ; effort et impact du menu opérateur inchangés.</span></li>
             <li><strong>Easter eggs 10ᵉ, après la Distribution</strong>
