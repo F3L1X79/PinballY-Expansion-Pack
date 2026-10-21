@@ -42,7 +42,7 @@ test("Go equip it opens the frame list on the new frame; Exit goes back to the P
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     assert.equal(isFrameListOpen(fake), false);
     assert.equal(isProfileStatsOpen(fake), true);
-    assert.equal(highlighted(fake), "Frame");
+    assert.equal(highlighted(fake), "Avatar Frames");
     assert.equal(savedData(fake, "guest").avatarFrame, null, "nothing worn");
     assert.deepEqual(errorLines(fake), []);
 });

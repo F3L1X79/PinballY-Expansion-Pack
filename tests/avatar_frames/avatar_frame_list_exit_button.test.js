@@ -3,7 +3,7 @@
 // on the fake PinballY globals: the list still opens on the worn row; Prev
 // from the first row, or Next from the last, selects the button, its tooltip saying Back and the
 // Selection Marker round it; Next from it goes to the first row; Select
-// on it goes back to the Profile Stats on "Frame", the worn frame unchanged.
+// on it goes back to the Profile Stats on "Avatar Frames", the worn frame unchanged.
 // ============================================================
 
 import { test } from "node:test";
@@ -22,7 +22,7 @@ test("the Exit Button comes first in the loop and goes back to the Profile Stats
     fake.advanceTime(DRAWN_AHEAD_MS);
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     untilFrameListShown(fake);
 
     assert.equal(highlightedChoice(fake), "None", "opens on the worn row");
@@ -44,9 +44,9 @@ test("the Exit Button comes first in the loop and goes back to the Profile Stats
     assert.equal(isFrameListOpen(fake), false);
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     assert.equal(isProfileStatsOpen(fake), true);
-    assert.equal(highlighted(fake), "Frame", "back on the Frame button");
+    assert.equal(highlighted(fake), "Avatar Frames", "back on the Frame button");
 
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     untilFrameListShown(fake);
     assert.equal(highlightedChoice(fake), "None", "the worn frame unchanged");
     assertNoErrorLogged(fake);

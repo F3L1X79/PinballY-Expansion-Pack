@@ -37,7 +37,7 @@ test("a new Collection Tier announces its frame but keeps the recorded choice, N
     assert.deepEqual(collectionToasts(fake).map(toast => toast.split(" | ").at(-1)), ["New frame: Steam and Gears"]);
     assert.equal(savedData(fake, "guest").avatarFrame, 1);
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     assert.equal(wornRow(fake), "Enchanted Forest");
     assert.equal(frameRows(fake)[1].frame, "frame_02_192.png", "the new frame is offered unlocked");
     press(fake, "Exit");
@@ -49,7 +49,7 @@ test("a new Collection Tier announces its frame but keeps the recorded choice, N
     fake.advanceTime(2 * ONE_TOAST_MS);
     assert.equal(savedData(fake, "mia").avatarFrame, null, "None stays None");
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     assert.equal(wornRow(fake), "None");
     assert.deepEqual(errorLines(fake), []);
 });

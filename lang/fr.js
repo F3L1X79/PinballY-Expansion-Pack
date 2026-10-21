@@ -492,7 +492,7 @@ export default {
         // The buttons at the card's foot.
         buttons: {
             achievements: "Succès",
-            frame: "Cadre",
+            frame: "Cadres d'Avatar",
             mostPlayedTables: "Tables les plus jouées",
             tablesToDiscover: "Tables à découvrir",
             household: "Stats de la maison",

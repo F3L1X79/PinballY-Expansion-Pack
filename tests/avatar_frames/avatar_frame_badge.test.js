@@ -27,7 +27,7 @@ test("the badge wears the frame the player equips, above the name and under the 
 
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     pickRow(fake, "Steam and Gears");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     press(fake, "Exit");

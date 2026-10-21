@@ -24,7 +24,7 @@ test("a Child Profile's choice stays in its own profile.json, and a Profile Rese
     const { default: lang } = await import("../../common/core/i18n.js");
 
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     pickRow(fake, "Enchanted Forest");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     press(fake, "Exit");
@@ -34,7 +34,7 @@ test("a Child Profile's choice stays in its own profile.json, and a Profile Rese
     getProfileStore().switchTo("guest");
     fake.advanceTime(DRAWN_AHEAD_MS);
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     assert.equal(wornRow(fake), "Steam and Gears");
     press(fake, "Exit");
     press(fake, "Exit");
@@ -43,7 +43,7 @@ test("a Child Profile's choice stays in its own profile.json, and a Profile Rese
     fake.advanceTime(DRAWN_AHEAD_MS);
     assert.equal("avatarFrame" in savedData(fake, "guest"), false);
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     assert.equal(wornRow(fake), "None");
     assert.equal(savedData(fake, "mia").avatarFrame, 1);
     assert.deepEqual(errorLines(fake), []);

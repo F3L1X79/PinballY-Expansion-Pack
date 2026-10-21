@@ -499,7 +499,7 @@ export default {
         // The buttons at the card's foot.
         buttons: {
             achievements: "Achievements",
-            frame: "Frame",
+            frame: "Frame", // TODO: translation pass, now Avatar Frames
             mostPlayedTables: "Most Played Tables",
             tablesToDiscover: "Tables to Discover",
             household: "Household Stats", // TODO: translation pass

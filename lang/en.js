@@ -383,7 +383,7 @@ export default {
         // The buttons at the card's foot.
         buttons: {
             achievements: "Achievements",
-            frame: "Frame",
+            frame: "Avatar Frames",
             mostPlayedTables: "Most Played Tables",
             tablesToDiscover: "Tables to Discover",
             household: "Household Stats",

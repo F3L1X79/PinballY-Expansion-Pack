@@ -21,7 +21,7 @@ test("the Avatar Frame list speaks French: Retour, and the footer's words", asyn
     fake.advanceTime(DRAWN_AHEAD_MS);
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
-    choose(fake, "Cadre");
+    choose(fake, "Cadres d'Avatar");
     untilFrameListShown(fake);
 
     assert.deepEqual(frameListButtonHints(fake), [

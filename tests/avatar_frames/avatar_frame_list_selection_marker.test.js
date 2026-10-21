@@ -23,7 +23,7 @@ test("the Selection Marker surrounds the worn row, follows the moves and is gone
     const intervalsBefore = fake.runningIntervalCount();
     const reopenList = () => {
         openProfileStats(fake, lang);
-        choose(fake, "Frame");
+        choose(fake, "Avatar Frames");
         untilFrameListShown(fake);
         assert.equal(isFrameListOpen(fake), true);
     };

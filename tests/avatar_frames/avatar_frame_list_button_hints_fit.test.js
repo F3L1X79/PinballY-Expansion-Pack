@@ -24,7 +24,7 @@ test("the footer fits under the rows in landscape and portrait", async () => {
         fake.setLayoutSize(size);
         fake.advanceTime(DRAWN_AHEAD_MS);
         openProfileStats(fake, lang);
-        choose(fake, "Frame");
+        choose(fake, "Avatar Frames");
         untilFrameListShown(fake);
         const { footer, rows, exitButton, textsInside } = frameListFooterLayout(fake, size);
         const where = `${size.width}x${size.height}`;

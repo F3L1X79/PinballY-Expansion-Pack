@@ -51,7 +51,7 @@ test("the header wears the frame instead of its gold frame, a new choice include
 
     pressAndGlide(fake, "Exit");
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     pickRow(fake, "Enchanted Forest");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     press(fake, "Exit");

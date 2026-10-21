@@ -18,7 +18,7 @@ test("the footer reads Prev Next Browse, Select Choose, Exit Back", async () => 
     fake.advanceTime(DRAWN_AHEAD_MS);
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     untilFrameListShown(fake);
 
     assert.deepEqual(frameListButtonHints(fake), [

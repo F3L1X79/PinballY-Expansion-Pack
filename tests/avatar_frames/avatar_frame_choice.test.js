@@ -23,7 +23,7 @@ test("Select saves an unlocked frame and goes back on the Frame button; a locked
     fake.advanceTime(DRAWN_AHEAD_MS);
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     untilFrameListShown(fake);
 
     pickRow(fake, "Eternal Frost");
@@ -34,10 +34,10 @@ test("Select saves an unlocked frame and goes back on the Frame button; a locked
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     assert.equal(isFrameListOpen(fake), false);
     assert.equal(isProfileStatsOpen(fake), true);
-    assert.equal(highlighted(fake), "Frame", "back on the Frame button");
+    assert.equal(highlighted(fake), "Avatar Frames", "back on the Frame button");
     assert.equal(savedData(fake, "guest").avatarFrame, 2);
 
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     untilFrameListShown(fake);
     assert.equal(wornRow(fake), "Steam and Gears");
     assert.equal(highlightedRow(fake), "Steam and Gears", "the list opens on the worn row");
@@ -46,15 +46,15 @@ test("Select saves an unlocked frame and goes back on the Frame button; a locked
     press(fake, "Next");
     press(fake, "Exit");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
-    assert.equal(highlighted(fake), "Frame", "Exit goes back on the Frame button too");
+    assert.equal(highlighted(fake), "Avatar Frames", "Exit goes back on the Frame button too");
     assert.equal(savedData(fake, "guest").avatarFrame, 2, "Exit changes nothing");
 
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     untilFrameListShown(fake);
     pickRow(fake, "None");
     assert.equal(savedData(fake, "guest").avatarFrame, null, "None is recorded as null");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     untilFrameListShown(fake);
     assert.equal(wornRow(fake), "None");
     assert.deepEqual(errorLines(fake), []);

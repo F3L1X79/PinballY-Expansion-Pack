@@ -16,7 +16,7 @@ test("a missing frame image is logged and its row shows the plain Avatar", async
     fake.advanceTime(DRAWN_AHEAD_MS);
     const { default: lang } = await import("../../common/core/i18n.js");
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
 
     assert.deepEqual(frameRows(fake)[0], { name: "Enchanted Forest", status: null, frame: null, avatar: DEFAULT_AVATAR });
     assert.ok(fake.logLines().some(line => line.includes("not found") && line.includes(`${AVATAR_FRAMES_FOLDER}\\frame_01_192.png`)));

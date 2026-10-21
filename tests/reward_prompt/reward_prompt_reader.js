@@ -13,4 +13,4 @@ export const rewardPrompts = fake => fake.shownMenus()
     .map(menu => menu.items.filter(item => item.title).map(item => item.title).join(" | "));
 
 export const promptOf = frameName =>
-    `You won the Avatar Frame "${frameName}"! Equip it from "My Profile", then "Frame". | Go equip it | Got it`;
+    `You won the Avatar Frame "${frameName}"! Equip it from "My Profile", then "Avatar Frames". | Go equip it | Got it`;

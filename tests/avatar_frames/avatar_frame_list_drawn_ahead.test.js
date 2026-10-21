@@ -22,7 +22,7 @@ test("the list's rows are drawn ahead, and redrawn ahead after a choice", async 
     assert.equal(rowDrawings(fake).length, 11, "every row drawn once at startup");
 
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     assert.equal(rowDrawings(fake).length, 11, "nothing drawn on opening");
     pickRow(fake, "Steam and Gears");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
@@ -32,7 +32,7 @@ test("the list's rows are drawn ahead, and redrawn ahead after a choice", async 
         "only the newly worn row and the one left are drawn again");
 
     openProfileStats(fake, lang);
-    choose(fake, "Frame");
+    choose(fake, "Avatar Frames");
     assert.equal(rowDrawings(fake).length, 13);
     assert.deepEqual(errorLines(fake), []);
 });
