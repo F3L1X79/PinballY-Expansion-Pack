@@ -5,6 +5,7 @@
 // nothing. Both call the return given to open().
 // Opens directly, not through the wheel dialog module: the player asked for it.
 // - Every layer is drawn ahead from startup and kept between openings.
+// - Rows that do not fit scroll with the selection: those out of view stay hidden.
 // - Swallows every button through "commandbuttondown" while open.
 // - Opens through the shared screen opening when not drawn ahead (docs/adr/0014).
 // ============================================================
@@ -16,7 +17,7 @@ import { createNavigationSound } from "../core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import {
-    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, drawTitle, drawRow,
+    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, rowRectOf, drawTitle, drawRow,
 } from "./avatar_frame_list_painter.js";
 import {
     drawBackdrop, drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsBand, EXIT_BUTTON_LOOK,
@@ -60,9 +61,9 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     // one: every caller gives a return so far.
     let exitLook = EXIT_BUTTON_LOOK.BACK;
     // The open list, null when closed: the selected row's index (or
-    // EXIT_BUTTON), its
-    // Selection Marker (null while getting ready), what Select and Exit
-    // return to and whether it is still getting ready.
+    // EXIT_BUTTON), the index of the top row shown, its Selection Marker
+    // (null while getting ready), what Select and Exit return to and
+    // whether it is still getting ready.
     let shown = null;
     const opening = createScreenOpening(host, SCRIPT_NAME, { zIndex: AVATAR_FRAME_LIST_Z_INDEX.backdrop - 2, drawingAhead });
     const closedListeners = createClosedListeners(SCRIPT_NAME);
@@ -106,9 +107,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
 
     // Every piece: the title, the Exit Button, its tooltip, the Button
     // Hints, then each row, each { key, rect, zIndex, look, draw(dc) } in
-    // its rect's own coordinates.
+    // its rect's own coordinates; a row also tells whether it is in view.
     function pieces() {
         const { rows, geometry } = content;
+        const topIndex = shown ? shown.topIndex : 0;
         const exitWord = exitButtonWordOf(exitLook);
         const hints = buttonHintGroupsOf({ flippers: FLIPPER_HINT.BROWSE, select: true, exitLook });
         return [
@@ -120,10 +122,14 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
                 draw: dc => drawExitTooltip(host, dc, exitWord) },
             { key: "buttonHints", zIndex: AVATAR_FRAME_LIST_Z_INDEX.buttonHints, rect: geometry.buttonHints, look: hints,
                 draw: dc => drawButtonHintsBand(host, dc, hints, { width: geometry.buttonHints.w, height: geometry.buttonHints.h }) },
-            ...rows.map((row, index) => ({
-                key: row.key, zIndex: AVATAR_FRAME_LIST_Z_INDEX.rows, rect: geometry.rows[index], look: row,
-                draw: dc => drawRow(host, dc, row, geometry.rows[index].w, geometry.rows[index].h),
-            })),
+            ...rows.map((row, index) => {
+                const rect = rowRectOf(geometry, index, topIndex);
+                return {
+                    key: row.key, zIndex: AVATAR_FRAME_LIST_Z_INDEX.rows, rect, look: row,
+                    isInView: index >= topIndex && index < topIndex + geometry.rowsShown,
+                    draw: dc => drawRow(host, dc, row, rect.w, rect.h),
+                };
+            }),
         ];
     }
 
@@ -155,6 +161,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         layer.setPos((rect.x + rect.w / 2) / content.referenceWidth - 0.5, 0.5 - (rect.y + rect.h / 2) / REFERENCE_HEIGHT);
     }
 
+    // A row scrolled out of view stays hidden while the list is open.
+    const isShowing = piece => piece.isInView !== false;
+    const placeOrHide = (layer, piece) => (isShowing(piece) ? place(layer, piece.rect) : hide(layer));
+
     // One step of the drawing ahead. What the list shows is read again only
     // while it is closed: the open list keeps what it opened with.
     function drawAheadStep() {
@@ -177,13 +187,26 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         wakeDrawingAhead();
     }
 
-    const selectedRect = () => (shown.selected === EXIT_BUTTON ? content.geometry.exitButton : content.geometry.rows[shown.selected]);
+    const selectedRect = () => (shown.selected === EXIT_BUTTON
+        ? content.geometry.exitButton
+        : rowRectOf(content.geometry, shown.selected, shown.topIndex));
+
+    // Keeps the selected row and its neighbours in view; the rows stay
+    // where they are while the Exit Button is selected.
+    function scrollToSelected() {
+        if (shown.selected === EXIT_BUTTON) return;
+        const { rowsShown } = content.geometry;
+        const before = Math.max(0, shown.selected - 1);
+        const after = Math.min(content.rows.length - 1, shown.selected + 1);
+        const topIndex = Math.max(Math.min(shown.topIndex, before), after - rowsShown + 1);
+        shown.topIndex = Math.max(0, Math.min(content.rows.length - rowsShown, topIndex));
+    }
 
     // Shows the list drawn for it at this opacity, the Selection Marker on
     // the selected choice.
     function show(opacity) {
         backdropLayer.setScale(WINDOW_SCALE);
-        for (const piece of pieces()) place(layerOf(piece), piece.rect);
+        for (const piece of pieces()) placeOrHide(layerOf(piece), piece);
         // Not drawn ahead: it lives only while the list is open, its timer
         // with it.
         shown.marker = createSelectionMarker(host, {
@@ -199,7 +222,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     function setOpacity(opacity) {
         shown.opacity = opacity;
         backdropLayer.alpha = opacity;
-        for (const piece of pieces()) layers.get(piece.key).layer.alpha = opacity;
+        for (const piece of pieces()) if (isShowing(piece)) layers.get(piece.key).layer.alpha = opacity;
         if (shown.selected !== EXIT_BUTTON) layers.get(EXIT_TOOLTIP).layer.alpha = 0;
         shown.marker.setOpacity(opacity);
     }
@@ -222,7 +245,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         // The backdrop measures the window the rows' layout depends on.
         opening.draw(() => readContent(rows));
         const isOpenedOn = row => (selectedTier === null ? row.isWorn : row.tier === selectedTier);
-        shown = { onBack, onClosed, marker: null, opacity: 0, selected: Math.max(0, content.rows.findIndex(isOpenedOn)), isPreparing: false };
+        shown = {
+            onBack, onClosed, marker: null, opacity: 0, selected: Math.max(0, content.rows.findIndex(isOpenedOn)), topIndex: 0, isPreparing: false,
+        };
+        scrollToSelected();
         const nextMissing = () => pieces().find(piece => !isDrawn(piece));
         if (!nextMissing()) {
             show(1);
@@ -276,6 +302,10 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
     function move(direction) {
         navigationSound.play();
         shown.selected = stepThroughExitButton(shown.selected, direction, content.rows.length);
+        const topIndexBefore = shown.topIndex;
+        scrollToSelected();
+        // Every layer is drawn by now, as in setOpacity().
+        if (shown.topIndex !== topIndexBefore) for (const piece of pieces()) placeOrHide(layers.get(piece.key).layer, piece);
         shown.marker.moveTo(selectedRect());
         setOpacity(shown.opacity);
     }
