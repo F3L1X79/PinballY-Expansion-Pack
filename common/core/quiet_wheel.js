@@ -3,7 +3,8 @@
 // picker, the Welcome Screen), the selected table's own audioVolume is brought
 // down to 50 with a single update(); it comes back when the last of them
 // closes, at once if a launch, a menu or attract mode cuts the hand-over
-// (docs/adr/0015).
+// (docs/adr/0015). A pending file keeps the original while it is lowered.
+// - restoreLeftover() runs from main.js before any hold: a crash leaves the file.
 // - One update() each way, never a fade: every update() flashes the wheel.
 // - The return finds the table by config ID: the selection may have moved since.
 // ============================================================
@@ -17,6 +18,8 @@ const QUIET_CEILING = 50;
 // A screen that follows another holds the wheel again within this delay:
 // no rise between them.
 const HANDOVER_MS = 150;
+// In the project folder while a table is lowered, for the startup restore.
+const PENDING_FILE_NAME = "quiet_wheel_pending.json";
 
 // hold() and release() are safe to call again with the same name.
 export function createQuietWheel(host) {
@@ -25,6 +28,7 @@ export function createQuietWheel(host) {
     // { configId, title, original, quiet } while a table is lowered, else null.
     let loweredTable = null;
     let handoverTimer = null;
+    const pendingFile = `${host.getProjectFolder()}\\${PENDING_FILE_NAME}`;
 
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
 
@@ -42,29 +46,54 @@ export function createQuietWheel(host) {
         }
         const original = game.audioVolume;
         const quiet = Math.min(original, QUIET_CEILING);
-        // Kept even when untouched, so later holds don't look at it again.
-        loweredTable = { configId: game.configId, title: game.title, original, quiet };
+        const table = { configId: game.configId, title: game.title, original, quiet };
         if (quiet === original) {
+            // Kept even when untouched, so later holds don't look at it again.
+            loweredTable = table;
             log(`Left "${game.title}" at ${original}, already quiet.`);
             return;
         }
+        // Written before the drop: a write that fails leaves the table untouched.
+        host.files.writeText(pendingFile, JSON.stringify(table));
+        loweredTable = table;
         game.update({ audioVolume: quiet });
         log(`Lowered "${game.title}" from ${original} to ${quiet} (${[...holders].join(", ")}).`);
+    }
+
+    // Writes the original volume back, then deletes the pending file; a
+    // table gone from the game list is only logged.
+    function putBackOriginal({ configId, title, original, quiet }, why) {
+        const game = host.getGameInfo(configId);
+        if (game) {
+            game.update({ audioVolume: original });
+            log(`Restored "${title}" from ${quiet} to ${original} (${why}).`);
+        } else {
+            log(`"${title}" (${configId}) is no longer in the game list, its volume left at ${quiet}.`);
+        }
+        host.files.deleteFile(pendingFile);
     }
 
     function restore(why) {
         clearHandover();
         if (!loweredTable) return;
-        const { configId, title, original, quiet } = loweredTable;
+        const table = loweredTable;
         loweredTable = null;
-        if (quiet === original) return;
-        const game = host.getGameInfo(configId);
-        if (!game) {
-            log(`"${title}" (${configId}) is no longer in the game list, its volume left at ${quiet}.`);
+        if (table.quiet !== table.original) putBackOriginal(table, why);
+    }
+
+    // PinballY quit or crashed while a table was lowered: its pending file is
+    // still there. An unreadable one (cut short by the crash) is deleted.
+    function restoreLeftover() {
+        if (!host.files.fileExists(pendingFile)) return;
+        let table;
+        try {
+            table = JSON.parse(host.files.readText(pendingFile));
+        } catch (error) {
+            log(`ERROR reading ${PENDING_FILE_NAME}, deleted: ${error.message}`);
+            host.files.deleteFile(pendingFile);
             return;
         }
-        game.update({ audioVolume: original });
-        log(`Restored "${title}" from ${quiet} to ${original} (${why}).`);
+        putBackOriginal(table, "left by the last session");
     }
 
     function hold(name) {
@@ -96,6 +125,7 @@ export function createQuietWheel(host) {
     for (const type of ["launchoverlayshow", "menuopen", "attractmodestart"]) host.on(type, endHandover);
 
     return {
+        restoreLeftover: safeHandler(SCRIPT_NAME, restoreLeftover),
         hold: safeHandler(SCRIPT_NAME, hold),
         release: safeHandler(SCRIPT_NAME, release),
     };

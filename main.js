@@ -1,7 +1,8 @@
 ﻿// ============================================================
 // Entry point loaded by PinballY: loads the Profile store, keeps the Adult
 // Tables off a Child Profile's wheel, switches to Guest when the Profile
-// picker is off, resolves the Startup Screen, then initializes every script
+// picker is off, resolves the Startup Screen, puts back a table volume the
+// quiet wheel left lowered, then initializes every script
 // of SCRIPTS in order, skipping those disabled in config.addOns.
 // - A script whose init() throws is logged and skipped, so the others still load.
 // - LOG_STARTUP_TIMING logs each init time.
@@ -11,6 +12,7 @@ import config from "./common/core/config.js";
 import { getProfileStore } from "./common/profiles/profile_store.js";
 import { installChildWheelFilter } from "./common/tables/adult_tables.js";
 import { getStartupScreen } from "./common/core/startup_screen.js";
+import { getQuietWheel } from "./common/core/quiet_wheel.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;
@@ -143,6 +145,14 @@ if (store) {
     } catch (error) {
         logfile.log(`[Startup] ERROR resolving the Startup Screen: ${error.message}`);
     }
+}
+
+// Before any Add-on, and whatever Add-ons are on: a table the last session
+// left lowered gets its volume back before any screen can lower it again.
+try {
+    getQuietWheel().restoreLeftover();
+} catch (error) {
+    logfile.log(`[Startup] ERROR restoring the quiet wheel's table: ${error.message}`);
 }
 
 for (const { key, module } of SCRIPTS) {
