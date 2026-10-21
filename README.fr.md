@@ -46,7 +46,7 @@ Dès que vous êtes deux à avoir un Profil, **Stats de la maison** montre tous 
 
 <img src="docs/images/welcome_screen.png" alt="L'écran d'accueil avec la table du jour et la table de la semaine" width="480">
 
-Chaque jour une table que personne à la maison n'a encore jouée, ou celle délaissée depuis le plus longtemps, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, après chaque « Changer de joueur », et chaque fois que vous choisissez **Écran d'accueil** dans le menu principal, avec ce qu'elles représentent pour vous : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série.
+Chaque jour une table que personne à la maison n'a encore jouée, ou celle délaissée depuis le plus longtemps, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, après chaque « Changer de joueur », et chaque fois que vous choisissez **Écran d'accueil** dans le menu principal, avec ce qu'elles représentent pour vous : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série. Tant que l'écran d'accueil ou « Changer de joueur » sont ouverts, le son des vidéos de la table de la roue est baissé, et revient à leur fermeture.
 
 ### Défis de la semaine
 
