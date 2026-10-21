@@ -72,7 +72,7 @@ PinballY's own menus and messages in French, German, Spanish, Italian or Portugu
 Everything stays in one folder, with no change to PinballY itself.
 
 **And also**:
-- PinballY's menus (main menu, Exit, filters, power off, table setup, Operator Menu) drawn in the pack's Steamball look, same entries, sorted into sections, and same buttons; a shorter main menu gathers every wheel selection and filter group behind one "Change Filter" entry, and names the filter the wheel shows under its list ("Active filter: All Tables");
+- PinballY's menus (main menu, Exit, filters, power off, table setup, Operator Menu, a game's pause) drawn in the pack's Steamball look, same entries, sorted into sections, and same buttons; in the pause, Exit and "Cancel" resume the game; a shorter main menu gathers every wheel selection and filter group behind one "Change Filter" entry, and names the filter the wheel shows under its list ("Active filter: All Tables");
 - a Random Game spun on a wheel of fortune;
 - "Tables to Discover", "Most Played Tables", "My High Scores" (the tables where you hold a place on the board), "Favorite Tables", "Hidden Tables" (while a table is hidden) and "Original Tables" behind "Change Filter";
 - a clock, a gold arc under the wheel (the Wheel Arc) and a richer status line;

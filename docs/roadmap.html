@@ -247,7 +247,6 @@
         <div class="cell">
           <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
-          <a class="chip tr-play" href="#drawn-pause-menu"><b></b>Menu de pause dessiné</a>
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
@@ -320,35 +319,6 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Grillé le 20/10/2026. <code>version</code> ne monte que pour un changement cassant : un ajout de champ survit déjà à un ancien code, qui garde ce qu'il ne connaît pas (ADR 0016). Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="drawn-pause-menu" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Menu de pause en Drawn Menu</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span><span class="tag">UI</span></div>
-          </div>
-          <p>Le menu de pause d'une partie (Reprendre, Arrêter, Informations, Meilleurs scores…) reste natif : il détonne à côté des Drawn Menus. Grill commencé le 19/10/2026 ; le prototype sur la borne (20/10/2026, branche <code>prototype/pause-menu</code>, commit <code>6d07a1f</code>) dit oui : dessiné par-dessus le menu natif gardé ouvert sous un voile noir. Grillé le 20/10/2026 (ADR 0013), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/294">spec #294</a>, tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/295">#295</a> → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/296">#296</a>.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : <code>/implement</code> (#295 puis #296) ou <code>/implement-spec</code>. Prototype : branche <code>prototype/pause-menu</code>, commit <code>6d07a1f</code>, à citer sur le ticket d'implémentation</div>
-          <details>
-            <summary>Décisions</summary>
-            <ul>
-              <li>Même contenu que le menu natif : mêmes entrées, même ordre, même effet (« High Scores » gardé).</li>
-              <li>Le menu natif n'est jamais annulé (sinon VPX reprend le focus) : le Drawn Menu est dessiné par-dessus, sur un voile noir opaque, et se ferme sur le <code>menuclose</code> natif, quelle qu'en soit la cause ; le voile reste jusque-là.</li>
-              <li>Mode générique de <code>draw()</code> (natif gardé ouvert, voile, fermeture sur son <code>menuclose</code>, commande d'Exit), pas un chemin propre à la pause.</li>
-              <li>Exit et l'entrée « Annuler » reprennent la partie (<code>ResumeGame</code>) ; ExitGame venu du même appui est avalé.</li>
-              <li>Double ouverture native : un seul dessin, sans second fondu, curseur gardé.</li>
-              <li>Fondu et glissement comme les autres Drawn Menus ; le panneau seul sur le voile noir.</li>
-              <li>Perte du focus : pas de surveillance, une ligne de log si l'avant-plan change pendant la pause, un ticket si cela revient.</li>
-              <li>Pauses spontanées (clic, Select pendant le chargement) : hors sujet.</li>
-              <li>Repli : dessin en échec, le natif jamais annulé reste ; Add-on Drawn Menus désactivé, natif. Pas de réglage à part.</li>
-            </ul>
-            <p class="ctx">Vu sur une capture de la borne pendant le prototype du Loader, le 17/10/2026. Questions de la reprise : <a href="research/pause-menu-prototype-handoff.md">handoff</a>.</p>
           </details>
         </div>
       </li>

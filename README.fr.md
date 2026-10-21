@@ -95,7 +95,7 @@ Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son ra
 Tout tient dans un seul dossier, sans modifier PinballY.
 
 **Et aussi** :
-- les menus de PinballY (menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur) dessinés dans le style Steamball du pack, mêmes entrées, rangées en sections, et mêmes boutons ; un menu principal plus court range toutes les sélections de la roue et les groupes de filtres derrière une seule entrée « Changer de filtre », et nomme sous sa liste le filtre affiché par la roue (« Filtre actif : Toutes les tables ») ;
+- les menus de PinballY (menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur, pause d'une partie) dessinés dans le style Steamball du pack, mêmes entrées, rangées en sections, et mêmes boutons ; dans la pause, Exit et « Annuler » reprennent la partie ; un menu principal plus court range toutes les sélections de la roue et les groupes de filtres derrière une seule entrée « Changer de filtre », et nomme sous sa liste le filtre affiché par la roue (« Filtre actif : Toutes les tables ») ;
 - une table au hasard sur une roue de la fortune ;
 - « Tables à découvrir », « Tables les plus jouées », « Mes meilleurs scores » (les tables où vous avez une place au tableau), « Tables favorites », « Tables masquées » (tant qu'une table est masquée) et « Tables Originales » derrière « Changer de filtre » ;
 - une horloge, l'arc doré de la roue et une ligne d'état enrichie ;
