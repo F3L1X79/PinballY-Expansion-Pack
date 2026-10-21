@@ -4,7 +4,7 @@
 // for the household. Decides which game is a Play (ADR 0007) and tells its
 // listeners of each switch, update and Play (onPlay, ADR 0008). Handles the
 // Profile Reset. Listens to "gamestarted" / "gameover".
-// - Every write is whole: tmp, backup, rename; a broken file comes back from its backup.
+// - Every write is whole: tmp, backup, rename; a broken or newer file comes back from its backup.
 // - isAdmin and isChild are set by hand: read and kept, never written.
 // - Other cabinet-level files sit next to cabinet.json; no Profile Reset touches them.
 // ============================================================
@@ -16,8 +16,8 @@ const SCRIPT_NAME = "ProfileStore";
 
 // Also the folder name; any letter case is Guest.
 const GUEST_NAME = "guest";
-// Bumped when a shape change needs an older file migrated; a new domain or
-// session stat needs no bump, since a missing one is read as empty.
+// Bumped only for a breaking format change (ADR 0016), never for an added
+// field: a missing one is read as empty. A newer file is set aside.
 const PROFILE_VERSION = 1;
 const CABINET_VERSION = 1;
 const PLAY_LOG_VERSION = 1;
@@ -132,36 +132,53 @@ export function createProfileStore(host) {
     }
 
     // Renames a broken file to "<name>.broken-<date>.json" next to it, for
-    // the player to repair; returns the new file name.
-    function setAside(folder, name) {
-        const asideName = datedFileName(folder, name, "broken");
+    // the player to repair, or a newer one to "<name>.newer-<date>.json";
+    // returns the new file name.
+    function setAside(folder, name, kind = "broken") {
+        const asideName = datedFileName(folder, name, kind);
         files.renameFile(`${folder}\\${name}.json`, `${folder}\\${asideName}`);
         return asideName;
     }
 
-    // The saved data, or null for a file never saved. A missing or broken
-    // file comes back from its readable backup; when the backup is broken
-    // too, both are set aside and the file starts from zero (null). A
-    // broken file is set aside, never deleted: it may hold a hand edit.
-    function loadJson(folder, baseName, label) {
+    // Saved by a newer pack (ADR 0016): read or rewritten here, it would be
+    // misread, so it is set aside like a broken file. Returns the new name,
+    // null when the file is not newer or no code version is given.
+    function setAsideIfNewer(folder, name, data, codeVersion) {
+        if (codeVersion === undefined || !(Number(data.version) > codeVersion)) return null;
+        const asideName = setAside(folder, name, "newer");
+        log(`${folder}\\${name}.json has version ${data.version}, newer than this pack's ${codeVersion};`
+            + ` kept aside as ${asideName}, never read.`);
+        return asideName;
+    }
+
+    // The saved data, or null for a file never saved. A missing, broken or
+    // newer file comes back from its usable backup; when the backup is
+    // broken or newer too, both are set aside and the file starts from zero
+    // (null). A set-aside file is never deleted: it may hold a hand edit.
+    function loadJson(folder, baseName, label, codeVersion) {
         const path = `${folder}\\${baseName}.json`;
         const backupPath = `${folder}\\${baseName}.bak.json`;
         const data = tryReadJson(path);
-        if (data) return data;
-        const hasFile = files.fileExists(path);
+        const newerFile = data ? setAsideIfNewer(folder, baseName, data, codeVersion) : null;
+        if (data && !newerFile) return data;
+        const hasFile = newerFile !== null || files.fileExists(path);
         if (!hasFile && !files.fileExists(backupPath)) return null;
 
-        const brokenFile = hasFile ? setAside(folder, baseName) : null;
+        const asideFile = newerFile || (hasFile ? setAside(folder, baseName) : null);
+        const asideKind = newerFile ? "newer" : "broken";
         const backup = tryReadJson(backupPath);
-        if (backup) {
+        const newerBackup = backup ? setAsideIfNewer(folder, `${baseName}.bak`, backup, codeVersion) : null;
+        if (backup && !newerBackup) {
             saveJson(folder, baseName, backup);
-            log(`${label} is missing or unreadable; restored from its backup`
-                + `${brokenFile ? ` (broken file kept as ${brokenFile})` : ""}.`);
+            log(`${label} is ${newerFile ? "newer" : "missing or unreadable"}; restored from its backup`
+                + `${asideFile ? ` (${asideKind} file kept as ${asideFile})` : ""}.`);
             return backup;
         }
-        const asideFiles = brokenFile ? [brokenFile] : [];
-        if (files.fileExists(backupPath)) asideFiles.push(setAside(folder, `${baseName}.bak`));
-        log(`${label} and its backup are unreadable; kept aside as ${asideFiles.join(" and ")}, starting from zero.`);
+        const asideFiles = asideFile ? [asideFile] : [];
+        if (newerBackup) asideFiles.push(newerBackup);
+        else if (files.fileExists(backupPath)) asideFiles.push(setAside(folder, `${baseName}.bak`));
+        const problem = newerFile || newerBackup ? "cannot be read by this pack" : "are unreadable";
+        log(`${label} and its backup ${problem}; kept aside as ${asideFiles.join(" and ")}, starting from zero.`);
         return null;
     }
 
@@ -184,7 +201,7 @@ export function createProfileStore(host) {
 
     // A file saved before a domain or a session stat existed gets it empty.
     function readProfileData(profile) {
-        const saved = loadJson(profile.folder, "profile", `${profile.name}\\profile.json`) || {};
+        const saved = loadJson(profile.folder, "profile", `${profile.name}\\profile.json`, PROFILE_VERSION) || {};
         return { ...emptyProfileData(), ...saved, sessions: { ...emptySessions(), ...saved.sessions } };
     }
     const saveProfileData = (profile, data) => saveJson(profile.folder, "profile", data);
@@ -195,7 +212,7 @@ export function createProfileStore(host) {
     files.createFolder(profilesFolder);
     files.createFolder(findProfile(GUEST_NAME).folder);
 
-    const savedCabinet = loadJson(profilesFolder, "cabinet", "cabinet.json");
+    const savedCabinet = loadJson(profilesFolder, "cabinet", "cabinet.json", CABINET_VERSION);
     const cabinet = savedCabinet || { version: CABINET_VERSION, activeProfile: GUEST_NAME };
     let activeProfile = typeof cabinet.activeProfile === "string" ? findProfile(cabinet.activeProfile) : null;
     const activeFolderMissing = !activeProfile;
@@ -232,7 +249,7 @@ export function createProfileStore(host) {
     function readPlayLog(profile, year) {
         const baseName = playLogBaseName(year);
         const label = `${profile.name}\\${baseName}.json`;
-        const saved = loadJson(profile.folder, baseName, label);
+        const saved = loadJson(profile.folder, baseName, label, PLAY_LOG_VERSION);
         if (!saved) return [];
         if (Array.isArray(saved.plays)) return saved.plays;
         log(`${label} has no "plays" list; kept aside as ${setAside(profile.folder, baseName)}, starting from zero.`);
@@ -449,7 +466,8 @@ export function createProfileStore(host) {
         isChild,
         getCabinetData: () => cabinet,
         // Another module's cabinet-level file, "<baseName>.json" next to
-        // cabinet.json: its data, or null when it was never saved.
+        // cabinet.json: its data, or null when it was never saved. Its
+        // version is the other module's to check, not the store's.
         readCabinetFile: (baseName) => loadJson(profilesFolder, baseName, `${baseName}.json`),
         saveCabinetFile: (baseName, data) => saveJson(profilesFolder, baseName, data),
         updateCabinetData: (change) => {
