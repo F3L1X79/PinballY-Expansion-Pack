@@ -367,6 +367,9 @@ export function createPinballYHost() {
         getProgramFolder: () => systemInfo.programDir,
         // Where the pack keeps its settings, Profiles and assets.
         getProjectFolder: () => projectFolderOf(systemInfo.programDir),
+        // { display, semantic, build, ... }: read the release status from semantic
+        // (docs/pinbally/pinbally-help.md §2.10).
+        getPinballYVersion: () => systemInfo.version,
         // Read again on each call: a screen can be plugged in or out while
         // PinballY runs.
         countMonitors: () => {

@@ -203,6 +203,9 @@ Text may contain `[substitution]` variables (StatuslineOptions.html).
 
 ### 2.10 Other objects
 - `systemInfo` (SystemInfoObject.html): `platform`, `programDir`, `programExe`, `programName`, `version.{basic, build, buildDate, display, semantic, status}`.
+  - Formats, from the source at tag `1.1.0-Beta10` (`VersionInfoUpdater/VersionInfoUpdater.cpp#L360-L420`, `PinballY/PlayfieldView.cpp#L715-L736`): `display` is `"1.1.0 (Beta 10)"` (`"1.2.3 (RC2)"` for an RC, `"1.2.3 (Release)"` without a sequence number); `semantic` is `"1.1.0-beta.10+<build>.<yyyymmddThhmm>"` (`-alpha`, `-beta`, `-rc`, or `-Dev.<build>` for a dev build; no suffix for a release); `build` is an integer.
+  - **`status` does not hold the release status:** the C++ passes its format arguments one place off, so `status` gets the three-part version string (`"1.1.0"`, like `basic`). Read the release status and its number from `semantic`.
+  - The game list is loaded before Javascript starts (`Application.cpp#L389`, `InitGameList`, then `InitJavascript` at `#L460`): `main.js` already sees every table.
 - `HttpRequest` (HttpRequest.html): `new`, then `open(method, url, true, user?, pw?)`, `setRequestHeader`, then `send(body?) → Promise<string>`. Also `abort()`, `status`, `statusText`, `responseText`, `responseXML`, `readyState`, `getResponseHeader(name)`, `getAllResponseHeaders()`. It needs MSXML. Don't use `MSXML.XMLHTTP` through Automation instead.
 - `createAutomationObject(progId)` (OLEAutomation.html) is the equivalent of VB `CreateObject`. For example, `Scripting.FileSystemObject` gives file access.
   - Indexed properties are read as `obj.Item(k)` and written as `obj.put_Item(k, v)`.

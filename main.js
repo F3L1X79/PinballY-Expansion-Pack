@@ -1,8 +1,8 @@
 ﻿// ============================================================
-// Entry point loaded by PinballY: loads the Profile store, keeps the Adult
-// Tables off a Child Profile's wheel, switches to Guest when the Profile
-// picker is off, resolves the Startup Screen, puts back a table volume the
-// quiet wheel left lowered, then initializes every script
+// Entry point loaded by PinballY: loads the Profile store, logs the startup
+// summary, keeps the Adult Tables off a Child Profile's wheel, switches to
+// Guest when the Profile picker is off, resolves the Startup Screen, puts back
+// a table volume the quiet wheel left lowered, then initializes every script
 // of SCRIPTS in order, skipping those disabled in config.addOns.
 // - A script whose init() throws is logged and skipped, so the others still load.
 // - LOG_STARTUP_TIMING logs each init time.
@@ -13,6 +13,8 @@ import { getProfileStore } from "./common/profiles/profile_store.js";
 import { installChildWheelFilter } from "./common/tables/adult_tables.js";
 import { getStartupScreen } from "./common/core/startup_screen.js";
 import { getQuietWheel } from "./common/core/quiet_wheel.js";
+import { createPinballYHost } from "./common/core/pinbally_host.js";
+import { writeStartupSummary } from "./common/core/startup_summary.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;
@@ -110,6 +112,19 @@ try {
     store = getProfileStore();
 } catch (error) {
     logfile.log(`[Startup] ERROR loading the Profiles: ${error.message}`);
+}
+
+// As early as the Profile count allows, so it is the pack's first line in
+// a pasted logfile.log.
+try {
+    writeStartupSummary(createPinballYHost(), {
+        language: config.language,
+        addOns: ENABLED_SCRIPTS,
+        // Guest included. Names only: listProfiles() would probe every Avatar.
+        profileCount: store ? store.listProfileNames().length : null,
+    });
+} catch (error) {
+    logfile.log(`[Startup] ERROR writing the startup summary: ${error.message}`);
 }
 
 // Whatever Add-ons are on, a Child Profile never sees an Adult Table on the

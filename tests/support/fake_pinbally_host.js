@@ -74,6 +74,11 @@ const TEMPORARY_FOLDER = "C:\\Users\\Cabinet\\AppData\\Local\\Temp";
 // What cmd.exe answers when the program to run does not exist.
 const PROGRAM_NOT_FOUND_EXIT_CODE = 9009;
 const DEFAULT_PROGRAM_MS = 100;
+// PinballY 1.1.0 Beta 10's systemInfo.version (the build number is made up).
+export const BETA_10_VERSION = {
+    basic: "1.1.0", build: 10086, buildDate: new RealDate(Date.UTC(2024, 8, 24)),
+    display: "1.1.0 (Beta 10)", semantic: "1.1.0-beta.10+10086.20240924T1200", status: "1.1.0",
+};
 
 const withoutTrailingSlash = path => path.replace(/\\+$/, "");
 const parentFolder = path => path.slice(0, path.lastIndexOf("\\"));
@@ -146,6 +151,9 @@ export function createFakePinballYHost({
     tables = [],
     layoutSize = { width: 1920, height: 1080 },
     programFolder = "C:\\PinballY\\",
+    // systemInfo.version, in the formats of docs/pinbally/pinbally-help.md §2.10
+    // (status holds the three-part version, not the release status).
+    pinballYVersion = BETA_10_VERSION,
     // The player's own messages, from PinballY's status line options.
     upperStatusLineMessages = [],
     lowerStatusLineMessages = [],
@@ -1068,6 +1076,7 @@ export function createFakePinballYHost({
         },
         getProgramFolder: () => programFolder,
         getProjectFolder: () => projectFolderOf(programFolder),
+        getPinballYVersion: () => pinballYVersion,
         countMonitors: () => monitorCount,
         showBackglass: (visible) => { backglassShowCalls.push(visible); },
         playSound,
@@ -1436,7 +1445,7 @@ export function createFakePinballYHost({
                 clearInterval: removeTimer,
                 StyledText: FakeStyledText,
                 CommandEvent: FakeCommandEvent,
-                systemInfo: { programDir: programFolder },
+                systemInfo: { programDir: programFolder, version: pinballYVersion },
                 backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
                 // Only User32's GetSystemMetrics, for the monitor count
                 // (SM_CMONITORS), and Shell32's ShellExecuteW, for cmd.exe
