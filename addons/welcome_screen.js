@@ -1,14 +1,14 @@
 ﻿// ============================================================
 // Welcome Screen: at startup (alone or after the startup Profile picker),
 // after Change Player and from its main menu entry, a drawn panel greets the
-// active Profile with its Daily Streak, Lost Records and Collection Mastery,
-// then offers a Period Table, a Random Game, or to stay. A drawn dialog of
-// the wheel dialog module at the startup priority (docs/adr/0011).
+// active Profile (Daily Streak, Lost Records, Collection Mastery) and offers
+// a Period Table, a Random Game, or to stay. A drawn dialog of the wheel
+// dialog module at the startup priority (docs/adr/0011).
 // - At startup only, the startup veil dims the wheel until the panel is in.
 // - Swallows every button through "commandbuttondown" while open.
 // - Reading the Period cards picks and locks this Period's tables.
 // - Writes the Lost Records seen marker to high_scores.json.
-// - Holds the quiet wheel while shown, released at once on a launch (docs/adr/0015).
+// - Holds the quiet wheel from its turn, pause included; gives it up at once to a launch, a menu or attract mode (docs/adr/0015).
 // ============================================================
 
 import lang from "../common/core/i18n.js";
@@ -219,6 +219,7 @@ export default function init() {
     // startup (docs/adr/0011).
     function draw() {
         const openedAt = host.now().getTime();
+        // Again: a launch or a menu during the pause may have released it.
         quietWheel.hold(SCRIPT_NAME);
         const profile = store.getActiveProfile();
         const screen = readScreen(profile);
@@ -296,20 +297,25 @@ export default function init() {
             else {
                 isWaitingForWheel = true;
                 startupVeil.hide();
+                quietWheel.release(SCRIPT_NAME, { atOnce: true });
             }
         }), STARTUP_PAUSE_MS);
     }
 
     // Its turn in the wheel dialog module: the wheel is free.
+    // Held from here, not from the drawing: the Profile picker's hand-over
+    // is shorter than the pause.
     function open(close) {
         isSubmitted = false;
         closeDialog = close;
+        quietWheel.hold(SCRIPT_NAME);
         startPause();
     }
 
     // Removes the screen, or drops it before it shows, and frees the queue.
-    // isLaunching: a table is chosen, back at its own volume before the wheel moves.
-    function close({ isLaunching = false } = {}) {
+    // atOnce: nothing follows (a table chosen, attract mode), back at its own
+    // volume before the wheel moves.
+    function close({ atOnce = false } = {}) {
         host.clearTimeout(pauseTimer);
         pauseTimer = null;
         isWaitingForWheel = false;
@@ -320,7 +326,7 @@ export default function init() {
             for (const layer of shown.layers) host.removeDrawingLayer(layer);
             shown = null;
         }
-        quietWheel.release(SCRIPT_NAME, { atOnce: isLaunching });
+        quietWheel.release(SCRIPT_NAME, { atOnce });
         const done = closeDialog;
         closeDialog = null;
         if (done) done();
@@ -337,7 +343,7 @@ export default function init() {
 
     function choose() {
         const choice = shown.choices[shown.selected];
-        close({ isLaunching: choice === CHOICE.RANDOM || choice in periodTables });
+        close({ atOnce: choice === CHOICE.RANDOM || choice in periodTables });
         if (choice === CHOICE.RANDOM) return randomGame.launch();
         if (choice === CHOICE.AVATAR) getChangePlayer()();
         // Locked when the screen was read; a new Period since may have
@@ -406,12 +412,21 @@ export default function init() {
     // Fires when a table starts: one launched during the pause means the
     // player already chose, so the screen must not show after the game.
     host.on("gamestarted", safeHandler(SCRIPT_NAME, () => {
-        if (closeDialog && !shown) close();
+        if (closeDialog && !shown) close({ atOnce: true });
     }));
 
     // Fires when the cabinet sits idle: the screen must not stay over
     // attract mode nor keep the buttons.
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, () => {
-        if (closeDialog) close();
+        if (closeDialog) close({ atOnce: true });
     }));
+
+    // Fire when a table starts launching or a menu opens during the pause:
+    // the table must not stay lowered under them. The screen holds the
+    // wheel again if it still shows afterwards.
+    const giveWayInPause = safeHandler(SCRIPT_NAME, () => {
+        if (closeDialog && !shown) quietWheel.release(SCRIPT_NAME, { atOnce: true });
+    });
+    host.on("launchoverlayshow", giveWayInPause);
+    host.on("menuopen", giveWayInPause);
 }

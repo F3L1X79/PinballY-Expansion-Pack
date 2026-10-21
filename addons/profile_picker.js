@@ -8,6 +8,7 @@
 // - Swallows every button through "commandbuttondown" while open.
 // - Layers are drawn ahead and kept: each draw blocks PinballY 20 to 45 ms on the cabinet.
 // - The startup greeting waits for a wheel free of menus, screens and dialogs.
+// - Holds the quiet wheel while open, until the Welcome Screen that follows takes it (docs/adr/0015).
 // ============================================================
 
 import lang from "../common/core/i18n.js";
@@ -19,6 +20,7 @@ import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../common/core/wheel_dialog.js";
 import { getStartupScreen, notifyStartupPickerDone, STARTUP_SCREEN } from "../common/core/startup_screen.js";
 import { getStartupVeil } from "../common/drawing/startup_veil.js";
+import { getQuietWheel } from "../common/core/quiet_wheel.js";
 import { registerChangePlayer } from "../common/profiles/change_player.js";
 import { drawShadowedText } from "../common/drawing/shadowed_text.js";
 import { getDrawingAhead } from "../common/core/drawing_ahead.js";
@@ -171,6 +173,7 @@ export default function init() {
     const startupScreen = getStartupScreen();
     let startupGreetingPending = startupScreen === STARTUP_SCREEN.WHEEL;
     const startupVeil = getStartupVeil();
+    const quietWheel = getQuietWheel();
     // The startup carousel's close in the wheel dialog module, from its
     // turn until a pick, Exit or a drop; the pause before it shows.
     let closeStartupDialog = null;
@@ -594,6 +597,7 @@ export default function init() {
         startupGreetingPending = false;
         // A native menu left open would stay stuck behind the carousel.
         if (host.getUIMode() === "menu") host.doCommand(host.getBuiltInCommand("MenuReturn"));
+        quietWheel.hold(SCRIPT_NAME);
         profiles = readProfiles();
         const activeName = profileStore.getActiveProfile().name;
         highlighted = Math.max(0, profiles.findIndex(profile => profile.name === activeName));
@@ -617,12 +621,15 @@ export default function init() {
         done();
     }
 
-    function close() {
+    // isFollowed: the Welcome Screen comes next and takes the quiet wheel
+    // over; otherwise the table is back at once.
+    function close({ isFollowed = false } = {}) {
         stopGlide();
         profiles = null;
         stopGreeting();
         markAheadStale();
         releaseStartupDialog();
+        quietWheel.release(SCRIPT_NAME, { atOnce: !isFollowed });
     }
 
     function startStartupPause() {
@@ -664,9 +671,11 @@ export default function init() {
     // pick, so it follows once.
     function pick(chosen) {
         if (isWelcomeScreenOn) {
+            const isSwitch = chosen.name !== profileStore.getActiveProfile().name;
+            const isFollowed = isStartupPending || isSwitch;
             if (isStartupPending) notifyStartupPickerDone();
-            close();
-            if (chosen.name !== profileStore.getActiveProfile().name) profileStore.switchTo(chosen.name);
+            close({ isFollowed });
+            if (isSwitch) profileStore.switchTo(chosen.name);
             return;
         }
         const atStartup = isStartupPending;
@@ -676,6 +685,7 @@ export default function init() {
         profiles = null;
         profileStore.switchTo(chosen.name);
         releaseStartupDialog();
+        quietWheel.release(SCRIPT_NAME, { atOnce: true });
         greetAfterPause({ atStartup });
     }
 
@@ -684,7 +694,7 @@ export default function init() {
     function exit() {
         const atStartup = isStartupPending;
         if (atStartup && isWelcomeScreenOn) notifyStartupPickerDone();
-        close();
+        close({ isFollowed: atStartup && isWelcomeScreenOn });
         if (atStartup && !isWelcomeScreenOn) greetAfterPause({ atStartup });
     }
 

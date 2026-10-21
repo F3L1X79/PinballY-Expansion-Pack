@@ -1,7 +1,9 @@
 // ============================================================
-// Quiet wheel: while a screen dims the wheel (the startup veil, the Welcome
-// Screen), the selected table's own audioVolume is brought down to 50 with a
-// single update(); it comes back when the last of them closes (docs/adr/0015).
+// Quiet wheel: while a screen dims the wheel (the startup veil, the Profile
+// picker, the Welcome Screen), the selected table's own audioVolume is brought
+// down to 50 with a single update(); it comes back when the last of them
+// closes, at once if a launch, a menu or attract mode cuts the hand-over
+// (docs/adr/0015).
 // - One update() each way, never a fade: every update() flashes the wheel.
 // - The return finds the table by config ID: the selection may have moved since.
 // ============================================================
@@ -85,6 +87,13 @@ export function createQuietWheel(host) {
             if (holders.size === 0) restore(`${name} closed`);
         }), HANDOVER_MS);
     }
+
+    // Fire when a table starts launching, a menu opens or the cabinet sits
+    // idle: no screen follows any more, so a hand-over ends at once.
+    const endHandover = safeHandler(SCRIPT_NAME, ev => {
+        if (handoverTimer !== null) restore(`${ev.type} in the hand-over`);
+    });
+    for (const type of ["launchoverlayshow", "menuopen", "attractmodestart"]) host.on(type, endHandover);
 
     return {
         hold: safeHandler(SCRIPT_NAME, hold),
