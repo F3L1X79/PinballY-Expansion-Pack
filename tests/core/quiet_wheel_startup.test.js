@@ -1,7 +1,7 @@
 // ============================================================
 // Quiet wheel at a Welcome Screen startup: the selected table's audioVolume
-// drops to half from the veil's first frame, once only through the Welcome
-// Screen, and comes back when the screen closes.
+// drops to the quiet ceiling from the veil's first frame, once only through
+// the Welcome Screen, and comes back when the screen closes.
 // ============================================================
 
 import { test } from "node:test";
@@ -29,8 +29,8 @@ test("the veil lowers the selected table from its first frame, and the Welcome S
     config.language = "en";
 
     await import("../../main.js");
-    const lowered = [{ configId: TABLES[0].configId, changes: { audioVolume: 41 } }];
-    assert.deepEqual(fake.gameUpdates(), lowered, "halved, rounded, as the veil dims the wheel");
+    const lowered = [{ configId: TABLES[0].configId, changes: { audioVolume: 50 } }];
+    assert.deepEqual(fake.gameUpdates(), lowered, "down to 50 as the veil dims the wheel");
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
@@ -43,6 +43,6 @@ test("the veil lowers the selected table from its first frame, and the Welcome S
     assert.equal(fake.getGameInfo(TABLES[0].configId).audioVolume, 81);
     const quietLines = fake.logLines().filter(line => line.startsWith("[QuietWheel]"));
     assert.equal(quietLines.length, 2, "the drop and the return logged");
-    for (const line of quietLines) assert.ok(line.includes("\"Medieval Madness\" from") && line.includes("81") && line.includes("41"), line);
+    for (const line of quietLines) assert.ok(line.includes("\"Medieval Madness\" from") && line.includes("81") && line.includes("50"), line);
     assertNoErrorLogged(fake);
 });

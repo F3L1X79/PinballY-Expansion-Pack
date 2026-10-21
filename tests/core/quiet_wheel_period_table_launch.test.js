@@ -47,7 +47,7 @@ test("the Table of the Week launched from the Welcome Screen finds the selected 
     assert.deepEqual(fake.launches().map(game => game.configId), [MARS.configId]);
     assert.deepEqual(volumesAtLaunch, [[60, 90]], "both tables at their own volume as the launch starts");
     assert.deepEqual(fake.gameUpdates(), [
-        { configId: MEDIEVAL.configId, changes: { audioVolume: 30 } },
+        { configId: MEDIEVAL.configId, changes: { audioVolume: 50 } },
         { configId: MEDIEVAL.configId, changes: { audioVolume: 60 } },
     ]);
     assertNoErrorLogged(fake);

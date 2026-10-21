@@ -1,7 +1,7 @@
 // ============================================================
 // Quiet wheel on a bare-wheel startup: the Profile Greeting alone changes no
 // volume; the Welcome Screen opened from the main menu lowers the table once
-// and brings it back once on close. A silent table stays silent.
+// and brings it back once on close, and leaves a table already quiet alone.
 // ============================================================
 
 import { test } from "node:test";
@@ -13,8 +13,8 @@ import { press, isWelcomeScreenOpen, openFromMainMenu } from "../welcome_screen/
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
-    { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", audioVolume: 0 },
-    { id: 2, configId: "Attack from Mars (Bally 1995)", title: "Attack from Mars", audioVolume: 100 },
+    { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", audioVolume: 100 },
+    { id: 2, configId: "Attack from Mars (Bally 1995)", title: "Attack from Mars", audioVolume: 40 },
 ];
 const GREETING_OVER_MS = 2500;
 const HANDOVER_OVER_MS = 200;
@@ -37,12 +37,20 @@ test("the bare wheel changes no volume, the Welcome Screen from the main menu lo
 
     await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
     assert.equal(isWelcomeScreenOpen(fake), true);
-    const lowered = [{ configId: TABLES[0].configId, changes: { audioVolume: 0 } }];
-    assert.deepEqual(fake.gameUpdates(), lowered, "one drop on open, 0 stays 0");
-
+    const lowered = [{ configId: TABLES[0].configId, changes: { audioVolume: 50 } }];
+    assert.deepEqual(fake.gameUpdates(), lowered, "one drop on open");
     press(fake, "Exit");
     fake.advanceTime(HANDOVER_OVER_MS);
-    assert.deepEqual(fake.gameUpdates(), [...lowered, { configId: TABLES[0].configId, changes: { audioVolume: 0 } }], "one return on close");
+    const restored = [...lowered, { configId: TABLES[0].configId, changes: { audioVolume: 100 } }];
+    assert.deepEqual(fake.gameUpdates(), restored, "one return on close");
     assert.ok(fake.logLines().some(line => line.startsWith("[QuietWheel] Restored \"Medieval Madness\"")), "the return logged");
+
+    // Attack from Mars, already at 40, plays as it is.
+    fake.setWheelGame(1);
+    await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
+    press(fake, "Exit");
+    fake.advanceTime(HANDOVER_OVER_MS);
+    assert.deepEqual(fake.gameUpdates(), restored, "no update() for a table already quiet");
+    assert.ok(fake.logLines().some(line => line.startsWith("[QuietWheel] Left \"Attack from Mars\" at 40")), "logged as left alone");
     assertNoErrorLogged(fake);
 });

@@ -40,12 +40,12 @@ test("a Random Game launched from the Welcome Screen finds the selected table ba
     await settle();
     fake.advanceTime(GREETING_OVER_MS);
     await openFromMainMenu(fake, lang.welcomeScreen.menuEntry);
-    assert.deepEqual(fake.gameUpdates(), [{ configId: MEDIEVAL.configId, changes: { audioVolume: 38 } }], "75 halved, rounded up");
+    assert.deepEqual(fake.gameUpdates(), [{ configId: MEDIEVAL.configId, changes: { audioVolume: 50 } }]);
 
     choose(fake, lang.welcomeScreen.randomTable);
     await settle();
     assert.equal(fake.launches().length, 1);
     assert.deepEqual(volumesAtLaunch, [75], "back before the launch");
-    assert.deepEqual(fake.gameUpdates().map(update => update.changes.audioVolume), [38, 75]);
+    assert.deepEqual(fake.gameUpdates().map(update => update.changes.audioVolume), [50, 75]);
     assertNoErrorLogged(fake);
 });

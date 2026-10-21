@@ -1,7 +1,7 @@
 // ============================================================
 // Quiet wheel: while a screen dims the wheel (the startup veil, the Welcome
-// Screen), the selected table's own audioVolume is halved with a single
-// update(); it comes back when the last of them closes (docs/adr/0015).
+// Screen), the selected table's own audioVolume is brought down to 50 with a
+// single update(); it comes back when the last of them closes (docs/adr/0015).
 // - One update() each way, never a fade: every update() flashes the wheel.
 // - The return finds the table by config ID: the selection may have moved since.
 // ============================================================
@@ -10,7 +10,8 @@ import { safeHandler } from "./safe_handler.js";
 import { createPinballYHost } from "./pinbally_host.js";
 
 const SCRIPT_NAME = "QuietWheel";
-const QUIET_SHARE = 0.5;
+// Half the recorded level; a table set at or below it is left alone.
+const QUIET_CEILING = 50;
 // A screen that follows another holds the wheel again within this delay:
 // no rise between them.
 const HANDOVER_MS = 150;
@@ -38,8 +39,13 @@ export function createQuietWheel(host) {
             return;
         }
         const original = game.audioVolume;
-        const quiet = Math.round(original * QUIET_SHARE);
+        const quiet = Math.min(original, QUIET_CEILING);
+        // Kept even when untouched, so later holds don't look at it again.
         loweredTable = { configId: game.configId, title: game.title, original, quiet };
+        if (quiet === original) {
+            log(`Left "${game.title}" at ${original}, already quiet.`);
+            return;
+        }
         game.update({ audioVolume: quiet });
         log(`Lowered "${game.title}" from ${original} to ${quiet} (${[...holders].join(", ")}).`);
     }
@@ -49,6 +55,7 @@ export function createQuietWheel(host) {
         if (!loweredTable) return;
         const { configId, title, original, quiet } = loweredTable;
         loweredTable = null;
+        if (quiet === original) return;
         const game = host.getGameInfo(configId);
         if (!game) {
             log(`"${title}" (${configId}) is no longer in the game list, its volume left at ${quiet}.`);

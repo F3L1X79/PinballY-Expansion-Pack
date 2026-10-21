@@ -10,7 +10,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
-const TABLES = [{ id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", audioVolume: 50 }];
+const TABLES = [{ id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", audioVolume: 80 }];
 
 test("a launch under the startup veil brings the volume back as its overlay shows", async () => {
     const fake = createFakePinballYHost({ tables: TABLES });
@@ -20,11 +20,11 @@ test("a launch under the startup veil brings the volume back as its overlay show
     config.language = "en";
     await import("../../main.js");
     await settle();
-    assert.equal(fake.getGameInfo(TABLES[0].configId).audioVolume, 25);
+    assert.equal(fake.getGameInfo(TABLES[0].configId).audioVolume, 50);
 
     const [game] = fake.getAllTables();
     fake.playGame(game);
     fake.fire("launchoverlayshow", { game });
-    assert.deepEqual(fake.gameUpdates().map(update => update.changes.audioVolume), [25, 50], "back as the overlay shows");
+    assert.deepEqual(fake.gameUpdates().map(update => update.changes.audioVolume), [50, 80], "back as the overlay shows");
     assertNoErrorLogged(fake);
 });

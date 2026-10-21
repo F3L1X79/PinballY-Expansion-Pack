@@ -4,7 +4,7 @@ status: accepted
 
 # The quiet wheel lowers the table's own audioVolume for a while
 
-While the Profile picker or the Welcome Screen dims the wheel, the selected table's video sound drops to half. PinballY gives scripts no global volume, so the pack lowers that table's own `audioVolume` with `GameInfo.update()` and puts the original value back when the last screen closes. The value is per table and persisted by PinballY (`GameStats.csv`, at PinballY's own saves, not at `update()`), so the original waits in a pending file of the pack and is put back at the next startup if PinballY quit while it was lowered. The prototype on the cabinet (branch `prototype/quiet-wheel`) showed that `update()` changes the volume of the video already playing at once.
+While the Profile picker or the Welcome Screen dims the wheel, the selected table's video sound drops to half the recorded level: its `audioVolume` is capped at 50, and a table already set at or below 50 is left alone, with no `update()`. PinballY gives scripts no global volume, so the pack lowers that table's own `audioVolume` with `GameInfo.update()` and puts the original value back when the last screen closes. The value is per table and persisted by PinballY (`GameStats.csv`, at PinballY's own saves, not at `update()`), so the original waits in a pending file of the pack and is put back at the next startup if PinballY quit while it was lowered. The prototype on the cabinet (branch `prototype/quiet-wheel`) showed that `update()` changes the volume of the video already playing at once.
 
 ## Considered Options
 
