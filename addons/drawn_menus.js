@@ -4,6 +4,7 @@
 // (see docs/adr/0013). Listens to "menuopen".
 // - Listens last of all the Add-ons, so it sees the final entries.
 // - Cancels the native menu only once drawing succeeded: any error shows the native one.
+// - Never cancels the pause menu: drawn over it kept open, Exit resumes the game.
 // - Any other menu stays native and replaces an open Drawn Menu.
 // ============================================================
 
@@ -17,16 +18,18 @@ const SCRIPT_NAME = "DrawnMenus";
 
 // The PinballY menu ids drawn instead of shown natively: the player's
 // menus, the table's setup and categories menus, opened from the main
-// menu, and the operator menu, from the Exit menu. The capture, media
-// drop and elevation menus and the pause menu stay native.
+// menu, the operator menu, from the Exit menu, and the pause menu of a
+// running game. The capture, media drop and elevation menus stay native.
 const FILTER_MENU_IDS = FILTER_GROUPS.map(group => group.menuId);
-const DRAWN_MENU_IDS = ["main", FILTER_PICKER_MENU_ID, "exit", "power off", "game setup", "game categories", "operator", ...FILTER_MENU_IDS];
+const PAUSE_MENU_ID = "pause game";
+const DRAWN_MENU_IDS = ["main", FILTER_PICKER_MENU_ID, "exit", "power off", "game setup", "game categories", "operator", PAUSE_MENU_ID, ...FILTER_MENU_IDS];
 
 export default function init() {
     const drawnMenus = getDrawnMenus();
     // Created now, for its "menuopen" listener to run before ours.
     const { filterPicker } = getMainMenu();
     const showMainMenu = command.ShowMainMenu;
+    const resumeGame = command.ResumeGame;
     // The last command run, as the one that opened a filter submenu; and
     // the main menu's entry to put the cursor on when going back to it.
     let lastCommand = null;
@@ -66,6 +69,12 @@ export default function init() {
             const labels = lang.customMenuLabels;
             items = items.map(item => (item.cmd === filterPicker.entryCmd ? Object.assign({}, item, { title: labels.changeFilter }) : item));
             drawOptions.footer = { label: labels.activeFilterLabel, name: filterPicker.activeFilterName() };
+        }
+        if (ev.id === PAUSE_MENU_ID) {
+            // Never cancelled, drawn or not: cancelled, PinballY hands the
+            // focus back to the game and the Drawn Menu hears nothing.
+            drawnMenus.draw(ev.id, items, { ...drawOptions, keepNative: { exitCmd: resumeGame } });
+            return;
         }
         if (!drawnMenus.draw(ev.id, items, drawOptions)) return;
         ev.preventDefault();

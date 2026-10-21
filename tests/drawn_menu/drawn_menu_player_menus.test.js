@@ -1,8 +1,8 @@
 // ============================================================
 // The player's other menus as Drawn Menus through main.js: Exit, power off,
-// filter, setup, categories and operator menus are drawn; capture and pause
-// stay native. Submenus open in place and go back to their parent entry;
-// long lists scroll and page.
+// filter, setup, categories and operator menus are drawn; capture stays
+// native (the pause menu: drawn_menu_pause.test.js). Submenus open in
+// place and go back to their parent entry; long lists scroll and page.
 // - A native menu opening replaces a Drawn one.
 // ============================================================
 
@@ -270,13 +270,11 @@ test("the operator menu is drawn", () => {
     assert.ok(!isDrawnMenuShown(fake));
 });
 
-test("the capture menus and the pause menu stay native", () => {
-    for (const id of ["capture", "pause game"]) {
-        fake.openMenu(id, [{ title: "Something", cmd: COMMAND.MenuReturn }]);
-        assert.ok(!isDrawnMenuShown(fake), id);
-        assert.equal(fake.currentMenu().id, id);
-        fake.closeMenu();
-    }
+test("the capture menus stay native", () => {
+    fake.openMenu("capture", [{ title: "Something", cmd: COMMAND.MenuReturn }]);
+    assert.ok(!isDrawnMenuShown(fake));
+    assert.equal(fake.currentMenu().id, "capture");
+    fake.closeMenu();
 });
 
 test("a native menu opening replaces an open Drawn Menu", () => {

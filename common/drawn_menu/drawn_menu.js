@@ -1,11 +1,11 @@
 // ============================================================
 // Drawn Menu: the single place that shows a menu in the Steamball look (see
-// docs/adr/0013) instead of PinballY's native one. show() takes PinballY's
-// own menu items and runs the chosen entry's command as a native menu would;
-// it falls back to the native menu when the Add-on is off or drawing fails.
-// draw() returns false instead. Never changes PinballY's UI mode.
-// - Swallows every button through "commandbuttondown" while open.
+// docs/adr/0013) instead of PinballY's native one. show() runs the chosen
+// entry's command as a native menu would, falling back to the native menu
+// when the Add-on is off or drawing fails; draw() returns false instead.
+// - Swallows every button through "commandbuttondown" while open; never changes the UI mode.
 // - A menu with onBack (a submenu) goes back on Exit and on its MenuReturn entry.
+// - With keepNative (the pause menu), it closes only on the native "menuclose".
 // - Images are drawn ahead, only placed on opening, shrunk to a dot while hidden.
 // - isOpen() and onClosed() let what waits for a free wheel wait for it.
 // ============================================================
@@ -145,11 +145,11 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     const closedListeners = createClosedListeners(SCRIPT_NAME);
 
     // Draws the backdrop on a window-sized canvas, which also measures the window.
-    function measure() {
+    function measure(covering = false) {
         backdrop.clear(TRANSPARENT);
         backdrop.draw(dc => {
             windowSize = dc.getSize();
-            drawBackdrop(dc);
+            drawBackdrop(dc, covering);
         });
     }
 
@@ -314,8 +314,9 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         shown.scroll = Math.max(0, Math.min(Math.max(0, geometry.rowsHeight - geometry.areaHeight), scroll));
     }
 
-    // Returns how long each part took, in ms, for the log.
-    function open(id, model, onClose, { fadeIn }) {
+    // Returns how long each part took, in ms, for the log. covering: an
+    // opaque backdrop, shown at once, over a native menu kept open.
+    function open(id, model, onClose, { fadeIn, covering }) {
         const timings = {};
         let partStartMs = host.now().getTime();
         const lap = name => {
@@ -325,7 +326,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         };
         for (const sound of Object.values(sounds)) sound.load();
         lap("sounds");
-        measure();
+        measure(covering);
         lap("measure");
         // PinballY tells no script of a new window size: only this measure
         // sees it, so the images drawn for the old size are drawn again here.
@@ -344,11 +345,13 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         backdrop.setScale({ xSpan: 1, ySpan: 1 });
         backdrop.setPos(0, 0);
         shown.layers = [
-            backdrop,
             ...placeStack(panel, geometry.panel),
             textsLayer, outline.layer, selectedTextLayer,
             ...placeStack(glass, geometry.panel),
         ];
+        // Fading in, the cover would let the native menu show through.
+        if (covering) backdrop.alpha = 1;
+        else shown.layers.unshift(backdrop);
         if (!fadeIn) {
             setAlpha(1);
             return timings;
@@ -386,9 +389,17 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // onBack: what Exit and a MenuReturn entry run instead of only closing
     // (a submenu going back to its menu); selectedCmd: the entry the cursor
     // opens on, over the one PinballY marks; footer: { label, name } under
-    // the list.
-    function draw(id, items, { dialogStyle = false, onClose = null, onBack = null, selectedCmd = null, footer = null } = {}) {
+    // the list; keepNative: { exitCmd } over a native menu left open (never
+    // cancelled), hidden by an opaque cover: Exit and a MenuReturn entry run
+    // exitCmd, and the menu closes on that native menu's "menuclose".
+    function draw(id, items, { dialogStyle = false, onClose = null, onBack = null, selectedCmd = null, footer = null, keepNative = null } = {}) {
         const startMs = host.now().getTime();
+        // PinballY opening the kept native menu again over itself (the pause
+        // menu opens twice in a row): no redraw, the cursor kept.
+        if (keepNative && shown && shown.keepNative && shown.id === id) {
+            shown.nativeOpenings++;
+            return true;
+        }
         // The same menu shown again over itself (PinballY refreshing it after
         // a stayOpen entry, as when ticking a category): no fade, and the
         // cursor stays on its entry unless PinballY marks one.
@@ -401,8 +412,13 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             if (kept !== undefined && !model.entries.some(index => model.rows[index].selected)) model.selected = kept;
             const chosen = model.entries.find(index => model.rows[index].cmd === selectedCmd);
             if (selectedCmd !== null && chosen !== undefined) model.selected = chosen;
-            const timings = open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})), { fadeIn: refreshedCmd === null });
+            const timings = open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})), { fadeIn: refreshedCmd === null, covering: Boolean(keepNative) });
             shown.onBack = onBack;
+            shown.keepNative = keepNative;
+            // The native menu's openings not closed yet; the panel hidden
+            // once a command ran, the cover left until the last one closes.
+            shown.nativeOpenings = 1;
+            shown.panelHidden = false;
             const parts = Object.entries(timings).map(([name, ms]) => `${name} ${ms}`).join(", ");
             host.log(`[${SCRIPT_NAME}] "${id}" opened in ${host.now().getTime() - startMs} ms (${model.entries.length} entries; ${parts}).`);
             return true;
@@ -485,6 +501,14 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         }
     }
 
+    // Over a native menu kept open: the panel hides at once, but the cover
+    // stays and every press stays swallowed until its "menuclose".
+    function hidePanel() {
+        stopTimers();
+        for (const layer of allLayers) if (layer !== backdrop) hide(layer);
+        shown.panelHidden = true;
+    }
+
     // The close is reported after the command, as PinballY's "menuclose"
     // follows its "command"; even when the command fails, for a wheel
     // dialog's queue not to stay held.
@@ -493,6 +517,12 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         sounds.select.play();
         if (shown.onBack && row.cmd === menuReturnCommand) {
             goBack();
+            return;
+        }
+        if (shown.keepNative && !row.stayOpen) {
+            const cmd = row.cmd === menuReturnCommand ? shown.keepNative.exitCmd : row.cmd;
+            hidePanel();
+            host.runCommand(cmd);
             return;
         }
         const onClose = row.stayOpen ? null : takeDown();
@@ -509,6 +539,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         if (!shown || ev.defaultPrevented) return;
         // Swallowed first, so a failing move still never reaches the wheel.
         ev.preventDefault();
+        if (shown.panelHidden) return;
         if (ev.command === "Next") move(1);
         else if (ev.command === "Prev") move(-1);
         else if (ev.command === "NextPage") movePage(1);
@@ -517,8 +548,33 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         else if (ev.command === "Exit") {
             sounds.deselect.play();
             if (shown.onBack) goBack();
+            else if (shown.keepNative) exitOverNative();
             else close();
         }
+    }));
+
+    // PinballY fires one press event per command mapped to the button (Exit
+    // and ExitGame): run later, the command closing the native menu at once
+    // still leaves the menu open, swallowing the press's other events.
+    function exitOverNative() {
+        const { exitCmd } = shown.keepNative;
+        hidePanel();
+        host.setTimeout(safeHandler(SCRIPT_NAME, () => host.runCommand(exitCmd)), 0);
+    }
+
+    // Fires after any menu closes; the native menu kept open closes ours,
+    // whatever closed it, once each of its openings has closed.
+    host.on("menuclose", safeHandler(SCRIPT_NAME, ev => {
+        if (!shown || !shown.keepNative || ev.id !== shown.id) return;
+        shown.nativeOpenings--;
+        if (shown.nativeOpenings <= 0) close();
+    }));
+
+    // Fires on a press PinballY hears in the background: another window
+    // took the focus from the native menu kept open, and ours hears nothing.
+    host.on("commandbuttonbgdown", safeHandler(SCRIPT_NAME, ev => {
+        if (!shown || !shown.keepNative) return;
+        host.log(`[${SCRIPT_NAME}] "${ev.command}" pressed in the background while the "${shown.id}" menu is open: another window has the focus.`);
     }));
 
     // Fires when the cabinet sits idle: the menu closes without choosing.

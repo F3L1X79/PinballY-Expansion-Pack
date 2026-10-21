@@ -18,6 +18,10 @@ const textsLayer = fake => shownLayers(fake, DRAWN_MENU_Z_INDEX.texts).find(laye
 
 export const isDrawnMenuShown = fake => textsLayer(fake) !== null;
 
+// Any of the Drawn Menu's layers shown, the backdrop or cover included.
+export const isAnythingDrawn = fake => fake.drawingLayers()
+    .some(layer => Object.values(DRAWN_MENU_Z_INDEX).includes(layer.zIndex) && layer.alpha > 0);
+
 // The message above the list (null when none; its wrapped lines joined
 // as drawn, without the spaces between them) and the rows from top to
 // bottom: { kind: "entry", title, mark } (mark: "check", "radio",
@@ -88,6 +92,12 @@ export function openMainMenu(fake) {
 
 export function openExitMenu(fake) {
     fake.openExitMenu();
+    fake.advanceTime(OPEN_OVER_MS);
+}
+
+// Past the first of its two native openings closing.
+export function openPauseMenu(fake) {
+    fake.openPauseMenu();
     fake.advanceTime(OPEN_OVER_MS);
 }
 

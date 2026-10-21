@@ -59,6 +59,8 @@ export const DRAWN_MENU_LOOK = Object.freeze({
         footerLabel: COLORS.description,
         gold: COLORS.gold,
         backdrop: 0xB0080A0E,
+        // Hides a native menu kept open under the Drawn Menu.
+        cover: 0xFF000000,
     }),
 });
 
@@ -274,9 +276,10 @@ export function drawSelectedText(host, dc, geometry, row) {
     drawEntry(host, dc, row, { x: 0, y: 0, width: geometry.listWidth, height, k: geometry.k, color: LOOK.colors.gold, markColor: LOOK.colors.gold });
 }
 
-export function drawBackdrop(dc) {
+// The translucent backdrop, or the opaque cover.
+export function drawBackdrop(dc, covering = false) {
     const { width, height } = dc.getSize();
-    dc.fillRect(0, 0, width, height, LOOK.colors.backdrop);
+    dc.fillRect(0, 0, width, height, covering ? LOOK.colors.cover : LOOK.colors.backdrop);
 }
 
 // The selection's outline image with its glow margin, in window pixels.

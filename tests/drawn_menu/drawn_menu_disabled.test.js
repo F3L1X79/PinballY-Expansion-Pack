@@ -34,6 +34,21 @@ test("turned off, the main menu is native", () => {
     fake.closeMenu();
 });
 
+test("turned off, the pause menu is native and untouched", () => {
+    const openings = [];
+    fake.on("menuopen", ev => {
+        if (ev.id === "pause game") openings.push(ev.defaultPrevented);
+    });
+    fake.openPauseMenu();
+    // Past the first opening's close.
+    fake.advanceTime(300);
+
+    assert.deepEqual(openings, [false, false]);
+    assert.equal(fake.currentMenu().id, "pause game");
+    assert.ok(!fake.drawingLayers().some(isMenuLayer));
+    fake.closeMenu();
+});
+
 test("turned off, the wheel dialogs are native and their queue advances", async () => {
     const { getWheelDialogs, DIALOG_PRIORITY } = await import("../../common/core/wheel_dialog.js");
     // Past the Welcome Screen, which holds the queue at startup.

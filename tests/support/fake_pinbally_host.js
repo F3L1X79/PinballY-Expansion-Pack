@@ -31,7 +31,7 @@ const BUILT_IN_COMMANDS = {
     ShowMainMenu: 8, ShowOperatorMenu: 9, PowerOff: 10, GameInfo: 11, Flyer: 12, HighScores: 13,
     Instructions: 14, AddFavorite: 15, Help: 16, AboutBox: 17,
     FilterByEra: 18, FilterByManufacturer: 19, FilterBySystem: 20, FilterByCategory: 21, FilterByRating: 22,
-    FilterByRecency: 23, FilterByAdded: 24, RemoveFavorite: 25,
+    FilterByRecency: 23, FilterByAdded: 24, RemoveFavorite: 25, ResumeGame: 26, KillGame: 27,
     // Every filter's command is in this range, PinballY's and the scripts' alike.
     FilterFirst: 900, FilterLast: 949,
 };
@@ -56,6 +56,17 @@ const nativeGroupOf = filterId => {
     return found ? found[1] : null;
 };
 const FIRST_CUSTOM_COMMAND = 1000;
+// The pause menu of a running game, as PinballY 1.1.0 Beta 10 opens it
+// (ADR 0013; prototype commit 6d07a1f): its items, Resume Game selected,
+// and when the first of its two openings closes. Its separators are not
+// recorded: left out.
+const PAUSE_MENU_ID = "pause game";
+const PAUSE_MENU_ITEMS = [
+    ["Resume Game", "ResumeGame"], ["End Game", "KillGame"], ["Information", "GameInfo"], ["High Scores", "HighScores"],
+    ["Flyer", "Flyer"], ["Instruction Card", "Instructions"], ["Exit PinballY", "Quit"], ["Shut Down", "PowerOff"],
+    ["Cancel", "MenuReturn"],
+];
+const PAUSE_FIRST_CLOSE_MS = 150;
 
 const TRUE_STRINGS = ["1", "true", "yes", "on"];
 
@@ -859,6 +870,18 @@ export function createFakePinballYHost({
         uiMode = "menu";
     }
 
+    // PinballY's pause menu closing, back to the game.
+    function closePauseMenu() {
+        if (!shownMenu || shownMenu.id !== PAUSE_MENU_ID) return;
+        shownMenu = null;
+        if (uiMode === "menu") uiMode = "running";
+        fire("menuclose", { id: PAUSE_MENU_ID });
+    }
+    // ResumeGame closes the pause menu at once; after KillGame it stays up
+    // until the game has exited (gameOver).
+    nativeCommands.set(BUILT_IN_COMMANDS.ResumeGame, closePauseMenu);
+    nativeCommands.set(BUILT_IN_COMMANDS.KillGame, () => { runMode = "exiting"; });
+
     function getGameInfo(configId) {
         return allTables.find(table => table.configId === configId || table.id === configId) || null;
     }
@@ -1243,6 +1266,16 @@ export function createFakePinballYHost({
             ]);
         },
 
+        // The pause menu as PinballY opens it during a game: twice in a row,
+        // first in the running mode, then in the menu mode, the first
+        // closing 150 ms later while the second stays open.
+        openPauseMenu() {
+            const items = () => PAUSE_MENU_ITEMS.map(([title, name], index) => ({ title, cmd: BUILT_IN_COMMANDS[name], selected: index === 0 }));
+            host.openMenu(PAUSE_MENU_ID, items());
+            host.openMenu(PAUSE_MENU_ID, items());
+            addTimer(() => fire("menuclose", { id: PAUSE_MENU_ID }), PAUSE_FIRST_CLOSE_MS);
+        },
+
         // The main menu as PinballY opens it, with its native items: "Play",
         // the information section, Rate Table / Add to Favorites, the [Top]
         // filters (PinballY's All Tables and Favorites, the scripts' ones
@@ -1288,6 +1321,11 @@ export function createFakePinballYHost({
         // opened another menu in the meantime.
         closeMenu() {
             if (!shownMenu) throw new Error("No menu is open.");
+            // Back to the game still running, not to the wheel.
+            if (shownMenu.id === PAUSE_MENU_ID && runMode) {
+                closePauseMenu();
+                return;
+            }
             const { id } = shownMenu;
             shownMenu = null;
             if (uiMode === "menu") uiMode = "wheel";
@@ -1313,8 +1351,11 @@ export function createFakePinballYHost({
             if (!item) throw new Error(`No menu item titled "${title}" is showing.`);
             const ev = fire("command", { id: item.cmd });
             if (!ev.defaultPrevented && nativeCommands.has(item.cmd)) nativeCommands.get(item.cmd)();
+            // Closed by the command itself (ResumeGame), "menuclose" included.
+            if (shownMenu === null) return;
             if (shownMenu !== menu) fire("menuclose", { id: menu.id });
-            else if (!item.stayOpen) host.closeMenu();
+            // End Game's pause menu stays up until the game has exited (gameOver).
+            else if (!item.stayOpen && item.cmd !== BUILT_IN_COMMANDS.KillGame) host.closeMenu();
         },
 
         // The cabinet enters attract mode after a while on its own: PinballY
@@ -1345,6 +1386,7 @@ export function createFakePinballYHost({
         gameOver(game) {
             runMode = "exiting";
             fire("gameover", { game });
+            closePauseMenu();
             returnToWheel();
         },
         launchError(game) {
