@@ -8,6 +8,7 @@
 // - Swallows every button through "commandbuttondown" while open.
 // - Reading the Period cards picks and locks this Period's tables.
 // - Writes the Lost Records seen marker to high_scores.json.
+// - Holds the quiet wheel while shown, released at once on a launch (docs/adr/0015).
 // ============================================================
 
 import lang from "../common/core/i18n.js";
@@ -34,6 +35,7 @@ import { createNavigationSound } from "../common/core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../common/drawing/steamball_palette.js";
 import { createSelectionMarker } from "../common/drawing/selection_marker.js";
 import { getStartupVeil } from "../common/drawing/startup_veil.js";
+import { getQuietWheel } from "../common/core/quiet_wheel.js";
 import { EXIT_BUTTON_LOOK } from "../common/drawing/steamball_drawing.js";
 import { buttonHintGroupsOf, exitButtonWordOf, FLIPPER_HINT } from "../common/drawing/button_hints.js";
 import {
@@ -90,6 +92,7 @@ export default function init() {
     // Highlighted on opening: Close once the player was just changed or picked.
     let firstChoice = null;
     const startupVeil = getStartupVeil();
+    const quietWheel = getQuietWheel();
 
     // The grey line: played this Period, or else a Streak of at least 2.
     function greyLineOf(periodTable, texts) {
@@ -216,6 +219,7 @@ export default function init() {
     // startup (docs/adr/0011).
     function draw() {
         const openedAt = host.now().getTime();
+        quietWheel.hold(SCRIPT_NAME);
         const profile = store.getActiveProfile();
         const screen = readScreen(profile);
         const layers = [];
@@ -304,7 +308,8 @@ export default function init() {
     }
 
     // Removes the screen, or drops it before it shows, and frees the queue.
-    function close() {
+    // isLaunching: a table is chosen, back at its own volume before the wheel moves.
+    function close({ isLaunching = false } = {}) {
         host.clearTimeout(pauseTimer);
         pauseTimer = null;
         isWaitingForWheel = false;
@@ -315,6 +320,7 @@ export default function init() {
             for (const layer of shown.layers) host.removeDrawingLayer(layer);
             shown = null;
         }
+        quietWheel.release(SCRIPT_NAME, { atOnce: isLaunching });
         const done = closeDialog;
         closeDialog = null;
         if (done) done();
@@ -331,7 +337,7 @@ export default function init() {
 
     function choose() {
         const choice = shown.choices[shown.selected];
-        close();
+        close({ isLaunching: choice === CHOICE.RANDOM || choice in periodTables });
         if (choice === CHOICE.RANDOM) return randomGame.launch();
         if (choice === CHOICE.AVATAR) getChangePlayer()();
         // Locked when the screen was read; a new Period since may have

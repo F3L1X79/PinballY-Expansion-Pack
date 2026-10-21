@@ -7,11 +7,13 @@
 // - Gives way by itself to a menu, a launching table and attract mode.
 // - Swallows Exit while the Loader turns: no Exit menu over a screen getting ready.
 // - Cleared, not drawn: nothing measures the window, which is not laid out yet.
+// - Holds the quiet wheel from before its first frame (docs/adr/0015).
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { createLoader } from "./loader.js";
+import { getQuietWheel } from "../core/quiet_wheel.js";
 import { DIMMED_WHEEL } from "./steamball_drawing.js";
 import { WELCOME_SCREEN_Z_INDEX } from "../welcome_screen/welcome_screen_painter.js";
 
@@ -24,7 +26,7 @@ const VEIL_Z_INDEX = WELCOME_SCREEN_Z_INDEX.backdrop - 2;
 const LOADER_Z_INDEX = WELCOME_SCREEN_Z_INDEX.backdrop - 1;
 
 // show(), hideLoader(), hideVeil() and hide() are safe to call again.
-export function createStartupVeil(host) {
+export function createStartupVeil(host, quietWheel) {
     const loader = createLoader(host, { zIndex: LOADER_Z_INDEX });
     // The veil's layer, null while it is not shown.
     let veil = null;
@@ -32,6 +34,8 @@ export function createStartupVeil(host) {
 
     function show() {
         if (!veil) {
+            // Before the veil paints: the dim and the drop arrive together.
+            quietWheel.hold(SCRIPT_NAME);
             veil = host.createDrawingLayer(VEIL_Z_INDEX);
             veil.clear(DIMMED_WHEEL);
         }
@@ -44,23 +48,26 @@ export function createStartupVeil(host) {
         isLoaderShown = false;
     }
 
-    function hideVeil() {
+    // atOnce: no startup screen follows, the volume comes back without the hand-over.
+    function hideVeil({ atOnce = false } = {}) {
         if (!veil) return;
         host.removeDrawingLayer(veil);
         veil = null;
+        quietWheel.release(SCRIPT_NAME, { atOnce });
     }
 
-    function hide() {
+    function hide(options) {
         hideLoader();
-        hideVeil();
+        hideVeil(options);
     }
 
     // Fire when a menu opens, a table starts launching (whose overlay has
     // its own Loader) or the cabinet sits idle: the veil and the Loader
-    // must not sit over them.
-    host.on("menuopen", safeHandler(SCRIPT_NAME, hide));
-    host.on("launchoverlayshow", safeHandler(SCRIPT_NAME, hide));
-    host.on("attractmodestart", safeHandler(SCRIPT_NAME, hide));
+    // must not sit over them, nor the table stay lowered.
+    const giveWay = () => hide({ atOnce: true });
+    host.on("menuopen", safeHandler(SCRIPT_NAME, giveWay));
+    host.on("launchoverlayshow", safeHandler(SCRIPT_NAME, giveWay));
+    host.on("attractmodestart", safeHandler(SCRIPT_NAME, giveWay));
     // Fires on every mapped button press: while the comet turns, no startup
     // screen takes the buttons yet, and Exit would open PinballY's Exit menu
     // over the one getting ready. Other buttons still move the wheel.
@@ -74,6 +81,6 @@ export function createStartupVeil(host) {
 let sharedStartupVeil = null;
 
 export function getStartupVeil() {
-    if (!sharedStartupVeil) sharedStartupVeil = createStartupVeil(createPinballYHost());
+    if (!sharedStartupVeil) sharedStartupVeil = createStartupVeil(createPinballYHost(), getQuietWheel());
     return sharedStartupVeil;
 }

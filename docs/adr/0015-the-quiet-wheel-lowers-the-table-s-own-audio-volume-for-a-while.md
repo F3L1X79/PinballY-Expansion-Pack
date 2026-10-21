@@ -15,5 +15,6 @@ While the Profile picker or the Welcome Screen dims the wheel, the selected tabl
 
 ## Consequences
 
+- When the last screen closes, the return waits a short hand-over (150 ms), so a screen that follows holds the wheel again with no rise in between. A screen that closes with nothing to follow (a launch from the Welcome Screen, the startup veil giving way to a launch, a menu or attract mode) brings the volume back at once, before the wheel moves or the table launches.
 - The quiet volume is never left behind: the startup restore runs before any screen lowers it again.
 - An operator who changes the table's volume with Adjust Audio Volume cannot do so while the volume is lowered, since the screens hold the wheel; the restore puts back the value read at the drop.
