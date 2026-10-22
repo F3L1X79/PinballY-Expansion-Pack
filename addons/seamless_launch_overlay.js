@@ -91,11 +91,13 @@ export default function init() {
     // runs, so the comet and its words stop once the game plays and come
     // back while it closes, unchanged until the overlay goes; a launch that
     // never plays keeps them until then. A capture is named only while the
-    // comet shows, never over a game being played.
+    // comet shows, never over a game being played. Exit Game sends
+    // "terminating" and skips "gameover"; a table that closes on its own, or
+    // after a capture, sends only "gameover".
     host.on("launchoverlaymessage", safeHandler(SCRIPT_NAME, ev => {
         ev.preventDefault();
         if (ev.id === "running") hide();
-        if (ev.id === "terminating") show(STEP_TEXT.closing);
+        if (ev.id === "terminating" || ev.id === "gameover") show(STEP_TEXT.closing);
         if (ev.id === "capturing" && textLayer) show(STEP_TEXT.capturing);
     }));
 

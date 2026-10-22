@@ -1,7 +1,8 @@
 // ============================================================
 // The launch Loader and its gold text through main.js with the Seamless
-// Launch Overlay: centred under the menus while the table loads and closes,
-// gone with the overlay; PinballY's own message is cancelled; no button taken.
+// Launch Overlay: centred under the menus while the table loads and closes
+// (Exit Game, on its own, after a capture), gone with the overlay;
+// PinballY's own message is cancelled; no button taken.
 // ============================================================
 
 import { test } from "node:test";
@@ -76,15 +77,54 @@ test("the loading words show beneath the comet from the overlay's show until the
     fake.gameStarted(game);
     assertNothingShown();
 
+    // The fake host cannot remove a listener: this one records during this test only.
+    const messagesAfterExit = [];
+    let recordingExit = true;
+    fake.on("launchoverlaymessage", ev => { if (recordingExit) messagesAfterExit.push(ev.id); });
     fake.runCommand(fake.getBuiltInCommand("KillGame"));
     assertCometAndText("Returning to tables…");
     assertButtonsPassThrough();
+    const wordsLayer = () => fake.drawingLayers().find(layer => layer.strokes().some(stroke => "text" in stroke));
+    const layerAtExit = wordsLayer();
+    let checkedAtGameOver = false;
+    fake.one("gameover", () => {
+        assertCometAndText("Returning to tables…");
+        assert.equal(wordsLayer(), layerAtExit, "the same words' layer, never removed");
+        checkedAtGameOver = true;
+    });
     let checkedAfterRunAfter = false;
     fake.one("runafterpost", () => {
         assertCometAndText("Returning to tables…");
         checkedAfterRunAfter = true;
     });
     fake.gameOver(game);
+    assert.ok(checkedAtGameOver, "still there when the game is over");
+    assert.ok(checkedAfterRunAfter, "still there once the Run After step is done");
+    recordingExit = false;
+    assert.ok(!messagesAfterExit.includes("gameover"), "PinballY skips its game-over message after Exit Game");
+    assertNothingShown();
+    assert.equal(fake.wheelShown(), true, "the wheel is back");
+    assert.deepEqual(messagesNotCancelled, [], "every PinballY message is cancelled");
+    assertNoErrorLogged(fake);
+});
+
+test("a table that closes on its own shows the closing words beneath the comet from its game-over message until the overlay goes", () => {
+    fake.playGame(game);
+    fake.gameStarted(game);
+    assertNothingShown();
+    let checkedAtGameOver = false;
+    fake.one("gameover", () => {
+        assertCometAndText("Returning to tables…");
+        assertButtonsPassThrough();
+        checkedAtGameOver = true;
+    });
+    let checkedAfterRunAfter = false;
+    fake.one("runafterpost", () => {
+        assertCometAndText("Returning to tables…");
+        checkedAfterRunAfter = true;
+    });
+    fake.gameOver(game);
+    assert.ok(checkedAtGameOver, "shown once the game is over");
     assert.ok(checkedAfterRunAfter, "still there once the Run After step is done");
     assertNothingShown();
     assert.equal(fake.wheelShown(), true, "the wheel is back");
@@ -112,12 +152,18 @@ test("a launch that never plays keeps the comet and the loading words until the 
     assertNoErrorLogged(fake);
 });
 
-test("a media capture shows the capture words beneath the comet", () => {
+test("a media capture shows the capture words beneath the comet, then the closing ones while PinballY closes the game", () => {
     fake.playGame(game);
     fake.gameStarted(game, { capture: "single" });
     assertCometAndText("Capturing…");
     assertButtonsPassThrough();
+    let checkedAtGameOver = false;
+    fake.one("gameover", () => {
+        assertCometAndText("Returning to tables…");
+        checkedAtGameOver = true;
+    });
     fake.gameOver(game);
+    assert.ok(checkedAtGameOver, "the closing words once the capture's game is over");
     assertNothingShown();
     assert.deepEqual(messagesNotCancelled, [], "every PinballY message is cancelled");
     assertNoErrorLogged(fake);
