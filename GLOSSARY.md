@@ -13,7 +13,7 @@ _Avoid_: plugin, script (a script is just a `.js` file)
 ### Menus
 
 **Drawn Menu**:
-A menu the player sees drawn in the pack's own style instead of PinballY's native one, with the same entries and the same effect when one is chosen: the menus a player meets (main, Exit, filter choices, power off), the table's setup and categories, the Operator Menu, the pause menu of a running game (drawn over the native one, kept open underneath), and those the Add-ons open. The capture, media and elevation menus that look after the cabinet stay native, and so does every menu when the Add-on is turned off or a menu cannot be drawn. Shown simply as "menu".
+A menu the player sees drawn in the pack's own style instead of PinballY's native one, with the same entries and the same effect when one is chosen: the menus a player meets (main, Exit, filter choices, power off), the table's setup and categories, the Operator Menu, the pause menu of a running game (drawn over the native one, kept open underneath; native during a media capture), and those the Add-ons open. The capture, media and elevation menus that look after the cabinet stay native, and so does every menu when the Add-on is turned off or a menu cannot be drawn. Shown simply as "menu".
 _Avoid_: Steamball menu (Steamball is the palette), custom menu, popup (a popup shows information, a menu offers choices)
 
 **Expansion Pack Settings**:

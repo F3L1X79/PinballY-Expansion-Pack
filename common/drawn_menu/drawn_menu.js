@@ -5,7 +5,7 @@
 // when the Add-on is off or drawing fails; draw() returns false instead.
 // - Swallows every button through "commandbuttondown" while open; never changes the UI mode.
 // - A menu with onBack (a submenu) goes back on Exit and on its MenuReturn entry.
-// - With keepNative (the pause menu), it closes only on the native "menuclose".
+// - With keepNative (the pause menu), it closes on the native "menuclose", or at "postlaunch".
 // - Images are drawn ahead, only placed on opening, shrunk to a dot while hidden.
 // - isOpen() and onClosed() let what waits for a free wheel wait for it.
 // ============================================================
@@ -568,6 +568,13 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         if (!shown || !shown.keepNative || ev.id !== shown.id) return;
         shown.nativeOpenings--;
         if (shown.nativeOpenings <= 0) close();
+    }));
+
+    // Fires once a game is over: PinballY may leave the native menu kept
+    // open, with fewer "menuclose" than openings and nothing left to
+    // resume, so ours comes down instead of covering the screen for good.
+    host.on("postlaunch", safeHandler(SCRIPT_NAME, () => {
+        if (shown && shown.keepNative) close();
     }));
 
     // Fires on a press PinballY hears in the background: another window

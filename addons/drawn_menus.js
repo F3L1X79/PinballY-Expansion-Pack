@@ -5,6 +5,7 @@
 // - Listens last of all the Add-ons, so it sees the final entries.
 // - Cancels the native menu only once drawing succeeded: any error shows the native one.
 // - Never cancels the pause menu: drawn over it kept open, Exit resumes the game.
+// - Leaves the pause menu native during a media capture, which opens it on its own.
 // - Any other menu stays native and replaces an open Drawn Menu.
 // ============================================================
 
@@ -39,7 +40,6 @@ export default function init() {
     mainWindow.on("command", safeHandler(SCRIPT_NAME, ev => {
         lastCommand = ev.id;
     }));
-
     // Fires when any menu opens, after every other Add-on edited its entries.
     mainWindow.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
         // As a native menu replaces another, the new menu replaces a Drawn
@@ -71,6 +71,12 @@ export default function init() {
             drawOptions.footer = { label: labels.activeFilterLabel, name: filterPicker.activeFilterName() };
         }
         if (ev.id === PAUSE_MENU_ID) {
+            // A capture opens it on its own (docs/adr/0013): native, so that
+            // no black cover lands in the media or stays after the capture.
+            if (mainWindow.getUIMode().capture) {
+                drawnMenus.close();
+                return;
+            }
             // Never cancelled, drawn or not: cancelled, PinballY hands the
             // focus back to the game and the Drawn Menu hears nothing.
             drawnMenus.draw(ev.id, items, { ...drawOptions, keepNative: { exitCmd: resumeGame } });

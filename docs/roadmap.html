@@ -234,6 +234,7 @@
         <div class="cell sweet">
         </div>
         <div class="cell">
+          <a class="chip tr-share" href="#drawn-upkeep-menus"><b></b>Menus de capture dessinés</a>
           <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
         </div>
         <div class="cell">
@@ -261,7 +262,6 @@
           <a class="chip tr-share" href="#launch-events-order"><b></b>Ordre des événements</a>
           <a class="chip tr-play" href="#quiet-wheel-other-screens"><b></b>Son baissé ailleurs</a>
           <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
-          <a class="chip tr-share" href="#config-sections"><b></b>Robustesse</a>
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#household-stats-read"><b></b>Household Stats plus rapides</a>
@@ -301,25 +301,20 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="config-sections" data-track="share" data-rank="silver">
+      <li draggable="true" tabindex="0" class="item tr-share" id="drawn-upkeep-menus" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Robustesse : configuration lisible, résumé de démarrage, fichiers d'une version future protégés</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
+            <h3>Menus de capture et confirmations en Drawn Menu</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Trois points, un ticket chacun :</p>
-          <ul>
-            <li><code>.env.example</code>, déjà en sections : sous chaque Add-on dont d'autres dépendent, une ligne <code># false also: …</code> qui dit ce que l'on perd ailleurs (Profile picker → barre et place des Challenges, Table Mastery → Profile Rewards, High Scores → Welcome Screen et Achievements…).</li>
-            <li>Une ligne de résumé au démarrage dans <code>logfile.log</code> : version de PinballY (<code>systemInfo.version</code>), langue, Add-ons désactivés, nombre de Profiles et de tables visibles. Une ligne d'avertissement à part si la version est antérieure à Beta 10 ou plus récente que la dernière testée. Log seulement, rien à l'écran.</li>
-            <li>Le Profile Store relit la <code>version</code> de <code>cabinet.json</code>, <code>profile.json</code> et des <code>play-log-&lt;année&gt;.json</code> : un fichier d'une version plus récente que le code est mis de côté en <code>&lt;nom&gt;.newer-&lt;date&gt;.json</code>, journalisé, et repart de zéro, comme un fichier illisible (<a href="adr/0016-a-saved-file-s-version-changes-only-for-a-breaking-format-change.md">ADR 0016</a>).</li>
-          </ul>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/291">#291</a>, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/292">#292</a>, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/293">#293</a>, indépendants : <code>/implement</code> par ticket. Avant la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui écrit les <code>ADD_ON_*</code> et facilite les retours en arrière</div>
+          <p>Les derniers menus natifs que l'on croise depuis le Game Setup ou le menu opérateur détonnent : la préparation de la capture (<code>capture</code>), toutes les étapes de la capture par lot (<code>batch capture …</code>) et les confirmations de suppression (<code>confirm delete gameinfo</code>, <code>confirm delete media</code>). Les dessiner comme les autres Drawn Menus.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code>. Change une décision de l'<a href="adr/0013-the-player-s-menus-are-drawn-menus-replacing-the-native-ones.md">ADR 0013</a> (menus d'entretien laissés natifs) et l'entrée Drawn Menu du glossaire.</div>
           <details>
             <summary>Contexte</summary>
-            <p class="ctx">Grillé le 20/10/2026. <code>version</code> ne monte que pour un changement cassant : un ajout de champ survit déjà à un ancien code, qui garde ce qu'il ne connaît pas (ADR 0016). Nés de critiques du 06/10/2026. Écartés : des groupes <code>features: { profiles, progression, … }</code> avec validation des dépendances, et un <code>requires</code> par Add-on dans <code>SCRIPTS</code>. Les liens actuels sont des dégradations douces (aucun Add-on ne casse si un autre est désactivé) et l'ordre de <code>SCRIPTS</code> ne porte que trois contraintes commentées ; un format imbriqué casserait les clés des <code>.env.local</code> existants. Pas d'écran « Diagnostics » à coches : un module qui plante est déjà isolé et journalisé ; un écran réservé à l'Admin Profile pourra venir plus tard. Pas de fonctions de migration d'avance : elles viendront avec la première v2. Limite du contrôle de version : des scripts <code>System\</code> qui ne correspondent pas à l'exe désactivent tout le JavaScript avant <code>main.js</code>.</p>
+            <p class="ctx">Demandé par Félix le 22/10/2026, en priorité haute : le menu natif de préparation de la capture est « très choquant » au milieu des menus dessinés. Placé en tête de file pour cette raison. À trancher au grilling : les menus encore exclus (<code>media drop …</code>, <code>play pick system</code>, élévation, <code>swf error</code>) et les popups natives (<code>capture delay</code>, <code>batch capture preview</code>, <code>media list</code>…).</p>
           </details>
         </div>
       </li>
@@ -398,7 +393,7 @@
           </div>
           <p>Activer ou désactiver les Add-ons et régler les options du pack depuis le menu opérateur de PinballY, sans éditer <code>.env.local</code>, y compris la langue de l'interface (aujourd'hui figée au chargement par <code>common/core/i18n.js</code>, à partir de <code>config.language</code>). PinballY ne recharge jamais les scripts : un changement d'Add-on ne prend effet qu'au redémarrage de PinballY, que le menu pourrait proposer.</p>
           <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/handoff</code> → <code>/prototype</code> (la relance de PinballY, sur la borne) → <code>/handoff</code> du résultat → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont les liens entre Add-ons écrits dans <code>.env.example</code> donnent les textes des fiches</div>
+          <div class="links">Flow Matt : <code>/handoff</code> → <code>/prototype</code> (la relance de PinballY, sur la borne) → <code>/handoff</code> du résultat → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Les liens entre Add-ons écrits dans <code>.env.example</code> (lignes <code># false also: …</code>) donnent les textes des fiches</div>
           <details>
             <summary>Décisions du grilling</summary>
             <ul>

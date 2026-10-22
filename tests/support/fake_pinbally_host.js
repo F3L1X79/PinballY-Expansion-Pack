@@ -325,6 +325,8 @@ export function createFakePinballYHost({
     let uiMode = "wheel";
     // "starting", "running" or "exiting" while a game is on, as in PinballY.
     let runMode;
+    // "single" or "batch" while the running game is a media capture.
+    let captureMode;
     const launchList = [];
     const logLines = [];
     const executedCommands = [];
@@ -412,6 +414,7 @@ export function createFakePinballYHost({
     function returnToWheel() {
         uiMode = "wheel";
         runMode = undefined;
+        captureMode = undefined;
         fire("wheelmode");
     }
 
@@ -419,6 +422,7 @@ export function createFakePinballYHost({
         const mode = { mode: uiMode };
         if (shownMenu) mode.menuID = shownMenu.id;
         if (runMode) mode.runMode = runMode;
+        if (captureMode) mode.capture = captureMode;
         return mode;
     }
 
@@ -877,9 +881,10 @@ export function createFakePinballYHost({
         if (uiMode === "menu") uiMode = "running";
         fire("menuclose", { id: PAUSE_MENU_ID });
     }
-    // ResumeGame closes the pause menu at once; after KillGame it stays up
-    // until the game has exited (gameOver).
-    nativeCommands.set(BUILT_IN_COMMANDS.ResumeGame, closePauseMenu);
+    // ResumeGame closes the pause menu at once, and does nothing once the
+    // game is over; after KillGame it stays up until the game has exited
+    // (gameOver).
+    nativeCommands.set(BUILT_IN_COMMANDS.ResumeGame, () => { if (runMode) closePauseMenu(); });
     nativeCommands.set(BUILT_IN_COMMANDS.KillGame, () => { runMode = "exiting"; });
 
     function getGameInfo(configId) {
@@ -1378,10 +1383,24 @@ export function createFakePinballYHost({
         },
 
         launches: () => [...launchList],
-        gameStarted(game) {
+        // capture: "single" or "batch" for a media capture's game.
+        gameStarted(game, { capture } = {}) {
             uiMode = "running";
             runMode = "running";
+            captureMode = capture;
             fire("gamestarted", { game });
+        },
+        // The game ending with the pause menu open, as seen on the cabinet
+        // during a capture (docs/adr/0013): "gameover" and "postlaunch"
+        // fire, then one "menuclose", and the pause menu stays open, with no
+        // game left for ResumeGame to resume.
+        gameOverUnderPauseMenu(game) {
+            runMode = "exiting";
+            fire("gameover", { game });
+            runMode = undefined;
+            captureMode = undefined;
+            fire("postlaunch", { game });
+            fire("menuclose", { id: PAUSE_MENU_ID });
         },
         gameOver(game) {
             runMode = "exiting";
