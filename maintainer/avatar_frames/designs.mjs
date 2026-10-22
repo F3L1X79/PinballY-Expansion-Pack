@@ -1688,9 +1688,102 @@ function thanksgiving(cv) {
     scatter(113, 12, 1.3, 0.12, (x, y, random) => mapleLeaf(cv, x, y, 0.055, random() * TAU, AUTUMN[Math.floor(random() * AUTUMN.length)]));
 }
 
+// ============================================================
+// Chinese New Year: a red lacquer band with a faint lattice between gold
+// trims, red lanterns at its corners, gold coins along its sides, a gold
+// dragon on top chasing a flaming pearl.
+// ============================================================
+
+// A red lantern hanging upright at (x, y), size its height: gold caps, a
+// cord above and a tassel below.
+function lantern(cv, x, y, size) {
+    const a = 0.4 * size;
+    const b = 0.34 * size;
+    const cord = stroke([[x, y - 0.62 * size], [x, y - 0.36 * size]], 0.01, 0.01);
+    cv.shape(cord.sdf, metal(cord.sdf, RAMPS.gold, { bevel: 0.01 }), { bbox: cord.bbox });
+    for (const turn of [-16, -6, 6, 16]) {
+        const end = [x + Math.sin(rad(turn)) * 0.36 * size, y + 0.36 * size + Math.cos(rad(turn)) * 0.36 * size];
+        const tassel = stroke([[x, y + 0.38 * size], end], 0.012, 0.004);
+        cv.shape(tassel.sdf, metal(tassel.sdf, LACQUER, { bevel: 0.01, base: 0.6 }), { bbox: tassel.bbox });
+    }
+    const body = (px, py) => sdEllipse(px - x, py - y, a, b);
+    cv.glow(body, "#ff7a2a", 0.35 * size, 0.6, { bbox: around(x, y, 1.1 * size) });
+    cv.shadow(body, { bbox: around(x, y, 0.6 * size), opacity: 0.5 });
+    const lacquer = metal(body, LACQUER, { bevel: 0.35 * size, spec: 0.8, shininess: 26 });
+    cv.shape(body, (px, py, d) => {
+        const u = clamp((px - x) / a, -1, 1);
+        // Ribs bending around its sides, lit from within at its heart.
+        const rib = smoothstep(0.82, 1, Math.cos(Math.asin(u) * 8));
+        const heart = Math.exp(-((u * 1.4) ** 2 + ((py - y) / b * 1.6) ** 2));
+        return mixc(mixc(lacquer(px, py, d), hex("#ffcf6a"), 0.45 * heart), hex("#5a0208"), 0.45 * rib);
+    }, { bbox: around(x, y, a + 0.02) });
+    for (const side of [-1, 1]) {
+        const cap = (px, py) => sdBox(px, py, x, y + side * 0.33 * size, 0.2 * size, 0.06 * size, 0.02 * size);
+        cv.shape(cap, metal(cap, RAMPS.gold, { bevel: 0.03 * size, contrast: 1.6 }), { bbox: around(x, y + side * 0.33 * size, 0.22 * size) });
+    }
+}
+
+// A gold coin with its square hole at (x, y), r its radius.
+function coin(cv, x, y, r) {
+    const sdf = (px, py) => Math.max(sdCircle(px, py, x, y, r), -sdBox(px, py, x, y, 0.3 * r, 0.3 * r));
+    cv.shadow(sdf, { bbox: around(x, y, r + 0.06), opacity: 0.5 });
+    cv.shape(sdf, metal(sdf, RAMPS.gold, { bevel: 0.35 * r, contrast: 1.5, spec: 0.9 }), { bbox: around(x, y, r + 0.01) });
+}
+
+// The dragon along the top, tail on the left, head on the right, then its pearl.
+function dragon(cv) {
+    const path = [];
+    for (let i = 0; i <= 48; i++) {
+        const t = i / 48;
+        path.push([-0.8 + 1.12 * t, -1.22 + 0.09 * Math.sin(t * TAU * 1.5)]);
+    }
+    const halfWidthAt = t => 0.025 + 0.06 * t;
+    // Red spikes along its back, drawn first so the body covers their bases.
+    for (let i = 4; i < 46; i += 3) {
+        const [px, py] = path[i];
+        const [nx, ny] = path[i + 1];
+        const w = halfWidthAt(i / 48);
+        polygon(cv, placed([[-0.035, -w * 0.5], [0.035, -w * 0.5], [-0.02, -w - 0.065]], px, py, Math.atan2(ny - py, nx - px)),
+            sdf => metal(sdf, LACQUER, { bevel: 0.02, base: 0.6, contrast: 1.4 }), { shadow: { opacity: 0.35 } });
+    }
+    // Head points with the snout along +u, scaled to the body's end.
+    const HEAD = 1.5;
+    const headAt = (u, v) => [0.32 + u * HEAD, -1.22 + v * HEAD];
+    const mane = placed([[-0.1, -0.06], [-0.04, -0.12], [0, -0.07], [0.04, -0.13], [0.06, -0.06], [-0.02, 0.07], [-0.1, 0.06], [-0.14, 0.02]]
+        .map(([u, v]) => [u * HEAD, v * HEAD]), 0.32, -1.22);
+    polygon(cv, mane, sdf => metal(sdf, LACQUER, { bevel: 0.03, base: 0.6 }), { shadow: { opacity: 0.4 } });
+    const horn = stroke(bezier(headAt(0.02, -0.06), headAt(-0.02, -0.12), headAt(-0.08, -0.15), headAt(-0.14, -0.15), 12), 0.018, 0.005);
+    cv.shape(horn.sdf, metal(horn.sdf, BONE, { bevel: 0.015 }), { bbox: horn.bbox });
+    const body = stroke(path, 0.025, 0.085);
+    cv.shadow(body.sdf, { bbox: body.bbox, opacity: 0.55 });
+    cv.shape(body.sdf, metal(body.sdf, RAMPS.gold, {
+        bevel: 0.05, spec: 0.85, shininess: 26,
+        texture: (px, py) => -0.18 * smoothstep(0.5, 1, Math.sin(body.at(px, py) * 160)),
+    }), { bbox: body.bbox });
+    const head = [[-0.06, -0.07], [0.03, -0.075], [0.09, -0.05], [0.17, -0.04], [0.19, -0.01], [0.17, 0.015],
+        [0.1, 0.02], [0.13, 0.05], [0.08, 0.065], [0, 0.06], [-0.07, 0.04]].map(([u, v]) => headAt(u, v));
+    polygon(cv, head, sdf => metal(sdf, RAMPS.gold, { bevel: 0.05, contrast: 1.5, spec: 0.9 }), { shadow: { opacity: 0.5 } });
+    dot(cv, ...headAt(0.06, -0.035), 0.02, hex("#fff2a0"), 0.05, 0.7);
+    dot(cv, ...headAt(0.064, -0.035), 0.009, hex("#200400"));
+    for (const [control, end] of [[[0.28, -0.08], [0.24, -0.16]], [[0.26, 0.07], [0.18, 0.12]]]) {
+        const whisker = stroke(bezier(headAt(0.18, 0), headAt(...control), headAt(...control), headAt(...end), 14), 0.008, 0.002);
+        cv.shape(whisker.sdf, metal(whisker.sdf, RAMPS.gold, { bevel: 0.006 }), { bbox: whisker.bbox });
+    }
+    cv.glow(circle(0.78, -1.24, 0.065), "#ff9a3a", 0.14, 0.8, { bbox: around(0.78, -1.24, 0.24) });
+    cv.shape(circle(0.78, -1.24, 0.065), sphere(0.78, -1.24, 0.065, WARM), { bbox: around(0.78, -1.24, 0.08) });
+}
+
+function chineseNewYear(cv) {
+    holidayBand(cv, LACQUER, RAMPS.gold, (x, y) => 0.06 * smoothstep(0.85, 1, Math.max(Math.abs(Math.sin(x * 34)), Math.abs(Math.sin(y * 34)))) - 0.03);
+    ornamentSpots(0.5, 0.11).forEach(({ x, y, size }, index) => (index < 3 ? lantern(cv, x, y, size) : coin(cv, x, y, size)));
+    dragon(cv);
+    twinkles(cv, 120, 12, "#ffe8a0");
+}
+
 // The Holiday Frames, by their id in the Profile Rewards module.
 export const HOLIDAY_FRAMES = [
     { id: "newYear", name: "New Year's Day", draw: newYear },
+    { id: "chineseNewYear", name: "Chinese New Year", draw: chineseNewYear },
     { id: "valentine", name: "Valentine's Day", draw: valentine },
     { id: "mardiGras", name: "Mardi Gras", draw: mardiGras },
     { id: "stPatrick", name: "St. Patrick's Day", draw: stPatrick },

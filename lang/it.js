@@ -671,6 +671,7 @@ export default {
         toastHeader: "Holiday Frame",
         holidays: {
             newYear: { name: "New Year's Day", condition: "A Play on 1 January" },
+            chineseNewYear: { name: "Chinese New Year", condition: "A Play on Chinese New Year, between 21 January and 20 February" },
             valentine: { name: "Valentine's Day", condition: "A Play on 14 February" },
             mardiGras: { name: "Mardi Gras", condition: "A Play on Mardi Gras, 47 days before Easter" },
             stPatrick: { name: "St. Patrick's Day", condition: "A Play on 17 March" },

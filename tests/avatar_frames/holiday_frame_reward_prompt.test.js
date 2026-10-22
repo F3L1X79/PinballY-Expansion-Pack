@@ -35,8 +35,8 @@ test("Christmas as a first frame: the Reward Prompt's Go equip it lands on its r
     assert.equal(highlightedRow(fake), "Christmas");
     const rows = frameRows(fake);
     const christmas = rows.findIndex(row => row.name === "Christmas");
-    // The Collection Tier rows above are scrolled out of view.
-    assert.deepEqual(rows.slice(christmas - 9).map(row => row.name), ["New Year's Day", "Valentine's Day", "Mardi Gras",
+    // The rows above, New Year's Day included, are scrolled out of view.
+    assert.deepEqual(rows.slice(christmas - 9).map(row => row.name), ["Chinese New Year", "Valentine's Day", "Mardi Gras",
         "St. Patrick's Day", "Easter", "Fête de la Musique", "Halloween", "Día de los Muertos", "Thanksgiving", "Christmas", "None"],
         "the Holiday Frames in the year's order, Christmas last, before None");
     assert.deepEqual(rows[christmas].frame, "frame_christmas_192.png");

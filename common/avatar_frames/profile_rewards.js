@@ -14,6 +14,7 @@ import { getProfileStore } from "../profiles/profile_store.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../core/wheel_dialog.js";
 import { TOAST_KIND } from "../achievements/achievement_toast.js";
 import { safeHandler } from "../core/safe_handler.js";
+import { chineseNewYear } from "./chinese_calendar.js";
 import lang from "../core/i18n.js";
 import config from "../core/config.js";
 
@@ -51,6 +52,7 @@ const thanksgiving = year => new Date(year, NOVEMBER, 1 + ((4 - new Date(year, N
 // The Holiday Frames in list order, each with whether a local date is on its holiday.
 const HOLIDAYS = Object.freeze([
     { id: "newYear", isOn: onDays(1, 1) },
+    { id: "chineseNewYear", isOn: onComputedDay(chineseNewYear) },
     { id: "valentine", isOn: onDays(2, 14) },
     { id: "mardiGras", isOn: onComputedDay(mardiGras) },
     { id: "stPatrick", isOn: onDays(3, 17) },

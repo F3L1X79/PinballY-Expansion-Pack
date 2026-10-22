@@ -73,14 +73,14 @@ test("Plays of every year file count, and the Holiday Frames are listed after th
     assert.deepEqual(frames.map(frame => [frame.id, frame.family, frame.isUnlocked]), [
         [1, "collection", true], [2, "collection", true], [3, "collection", false], [4, "collection", false], [5, "collection", false],
         [6, "collection", false], [7, "collection", false], [8, "collection", false], [9, "collection", false], [10, "collection", false],
-        ["newYear", "holiday", false], ["valentine", "holiday", false], ["mardiGras", "holiday", false], ["stPatrick", "holiday", false],
+        ["newYear", "holiday", false], ["chineseNewYear", "holiday", false], ["valentine", "holiday", false], ["mardiGras", "holiday", false], ["stPatrick", "holiday", false],
         ["easter", "holiday", false], ["musicDay", "holiday", false], ["halloween", "holiday", false], ["deadDay", "holiday", false],
         ["thanksgiving", "holiday", false], ["christmas", "holiday", true],
     ]);
-    assert.equal(frames[19].name, "Christmas");
-    assert.equal(frames[19].holiday, "christmas");
-    assert.equal(frames[17].unlockCondition, "A Play on 1 or 2 November", "a locked row tells what wins it");
-    assert.equal(frames[18].unlockCondition, "A Play on Thanksgiving, the fourth Thursday of November");
+    assert.equal(frames[20].name, "Christmas");
+    assert.equal(frames[20].holiday, "christmas");
+    assert.equal(frames[18].unlockCondition, "A Play on 1 or 2 November", "a locked row tells what wins it");
+    assert.equal(frames[19].unlockCondition, "A Play on Thanksgiving, the fourth Thursday of November");
 });
 
 // The published dates of Easter Sunday and of Mardi Gras, 2026 to 2035.
@@ -100,13 +100,29 @@ test("Easter Sunday and Mardi Gras unlock on their published dates, 2026 to 2035
     for (const [easter, mardiGras] of EASTER_AND_MARDI_GRAS) {
         assert.deepEqual(unlockedHolidays(rewardsWith(playOn(easter)).rewards), ["easter"], easter);
         assert.deepEqual(unlockedHolidays(rewardsWith(playOn(dayBefore(easter))).rewards), [], `the Saturday before ${easter}`);
-        assert.deepEqual(unlockedHolidays(rewardsWith(playOn(mardiGras)).rewards), ["mardiGras"], mardiGras);
+        // 17 February 2026 is also Chinese New Year.
+        assert.deepEqual(unlockedHolidays(rewardsWith(playOn(mardiGras)).rewards).filter(id => id !== "chineseNewYear"), ["mardiGras"], mardiGras);
         assert.deepEqual(unlockedHolidays(rewardsWith(playOn(dayBefore(mardiGras))).rewards), [], `the day before ${mardiGras}`);
     }
 });
 
 test("a Play from Holy Saturday 23:50 ending on Easter Sunday unlocks Easter", () => {
     assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2027-03-27", "23:50:00", 20 * 60)).rewards), ["easter"]);
+});
+
+// The published dates of Chinese New Year, 2026 to 2035; 2034 comes after a
+// leap month, a third new moon after the December solstice.
+const CHINESE_NEW_YEAR = [
+    "2026-02-17", "2027-02-06", "2028-01-26", "2029-02-13", "2030-02-03",
+    "2031-01-23", "2032-02-11", "2033-01-31", "2034-02-19", "2035-02-08",
+];
+
+// 17 February 2026 is also Mardi Gras.
+test("Chinese New Year unlocks on its published dates, 2026 to 2035; the day before does not", () => {
+    for (const day of CHINESE_NEW_YEAR) {
+        assert.ok(unlockedHolidays(rewardsWith(playOn(day)).rewards).includes("chineseNewYear"), day);
+        assert.ok(!unlockedHolidays(rewardsWith(playOn(dayBefore(day))).rewards).includes("chineseNewYear"), `the day before ${day}`);
+    }
 });
 
 test("Thanksgiving is the fourth Thursday of November, in a November starting on a Thursday and in one starting on a Friday", () => {

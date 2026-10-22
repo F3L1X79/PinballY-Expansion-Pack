@@ -28,7 +28,8 @@ test("en français : la ligne verrouillée de Noël, puis son toast", async () =
     choose(fake, lang.profileStats.buttons.frame);
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     assert.deepEqual(frameRows(fake).map(row => [row.name, row.status, row.frame]), [
-        ["Jour de l'An", "Une partie le 1er janvier", "frame_newYear_192_locked.png"],
+        // Jour de l'An and the rows above are scrolled out of view.
+        ["Nouvel An chinois", "Une partie le jour du Nouvel An chinois, entre le 21 janvier et le 20 février", "frame_chineseNewYear_192_locked.png"],
         ["Saint-Valentin", "Une partie le 14 février", "frame_valentine_192_locked.png"],
         ["Mardi gras", "Une partie le jour de Mardi gras, 47 jours avant Pâques", "frame_mardiGras_192_locked.png"],
         ["Saint-Patrick", "Une partie le 17 mars", "frame_stPatrick_192_locked.png"],

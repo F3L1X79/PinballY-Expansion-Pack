@@ -659,6 +659,7 @@ export default {
         // status in the frame list and the description of its toast.
         holidays: {
             newYear: { name: "Jour de l'An", condition: "Une partie le 1er janvier" },
+            chineseNewYear: { name: "Nouvel An chinois", condition: "Une partie le jour du Nouvel An chinois, entre le 21 janvier et le 20 février" },
             valentine: { name: "Saint-Valentin", condition: "Une partie le 14 février" },
             mardiGras: { name: "Mardi gras", condition: "Une partie le jour de Mardi gras, 47 jours avant Pâques" },
             stPatrick: { name: "Saint-Patrick", condition: "Une partie le 17 mars" },
