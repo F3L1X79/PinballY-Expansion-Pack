@@ -179,7 +179,7 @@ export default function init() {
     for (const screen of [achievementList, frameList, profileStats, householdStats]) getWheelDialogs().waitFor(screen);
     // "Go equip it" needs the Profile Stats' frame list, so the Reward
     // Prompt exists only with them.
-    profileRewards.enablePrompts(profileStats.openFrameList);
+    profileRewards.enablePrompts(profileStats.openFrameList, achievementToasts);
     mainMenu.add({
         name: PROFILE_STATS_ENTRY,
         label: lang.profileStats.menuEntry,

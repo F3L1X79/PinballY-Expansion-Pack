@@ -67,9 +67,11 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.equal(cardTexts(fake)[0], "Alice");
     assert.deepEqual(cardImages(fake), [getProfileStore().getActiveProfile().avatarPath], "the active Profile's Avatar");
-    assert.deepEqual(buttons(fake).map(button => button.label), [TEXT.buttons.achievements, TEXT.buttons.tablesToDiscover, TEXT.buttons.mostPlayedTables]);
-    assert.deepEqual(buttons(fake).slice(1).map(button => button.count), ["1", "2"]);
-    assert.match(buttons(fake)[0].count, /^\d+\/\d+$/);
+    // The Frame button for the Holiday Frames, even with Table Mastery off.
+    assert.deepEqual(buttons(fake).map(button => button.label),
+        [TEXT.buttons.frame, TEXT.buttons.achievements, TEXT.buttons.tablesToDiscover, TEXT.buttons.mostPlayedTables]);
+    assert.deepEqual(buttons(fake).slice(2).map(button => button.count), ["1", "2"]);
+    assert.match(buttons(fake)[1].count, /^\d+\/\d+$/);
     assert.deepEqual(section(fake, TEXT.sections.game, TEXT.stats), {
         [TEXT.stats.gamesPlayed]: ["1,206"],
         [TEXT.stats.totalTime]: ["96 h 20"],
@@ -77,8 +79,9 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
     });
 
     assert.equal(highlighted(fake), lang.buttonHints.back, "the Exit Button is selected on opening");
-    assert.deepEqual(readChoices(fake), [lang.buttonHints.back, TEXT.buttons.achievements, TEXT.buttons.tablesToDiscover, TEXT.buttons.mostPlayedTables]);
-    assert.deepEqual(fake.soundsPlayed(), Array(4).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
+    assert.deepEqual(readChoices(fake),
+        [lang.buttonHints.back, TEXT.buttons.frame, TEXT.buttons.achievements, TEXT.buttons.tablesToDiscover, TEXT.buttons.mostPlayedTables]);
+    assert.deepEqual(fake.soundsPlayed(), Array(5).fill(NAVIGATION_SOUND), "each move plays the navigation sound");
     press(fake, "Prev");
     assert.equal(highlighted(fake), TEXT.buttons.mostPlayedTables, "Prev loops back to the last choice");
     for (const button of ["Next", "Prev", "Info", "Coin"]) {
@@ -99,9 +102,9 @@ test("the Profile Stats show the Profile, its buttons and its GAME totals, and d
     await settle();
     openProfileStats(fake, lang);
     assert.deepEqual(section(fake, TEXT.sections.game, TEXT.stats)[TEXT.stats.gamesPlayed], ["1,207"]);
-    assert.deepEqual(buttons(fake).map(button => button.label), [TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables],
+    assert.deepEqual(buttons(fake).map(button => button.label), [TEXT.buttons.frame, TEXT.buttons.achievements, TEXT.buttons.mostPlayedTables],
         "no Tables to Discover once every table was played");
-    assert.equal(buttons(fake)[1].count, "3");
+    assert.equal(buttons(fake)[2].count, "3");
     choose(fake, lang.buttonHints.back);
     assert.equal(isProfileStatsOpen(fake), false, "Select on the Exit Button closes them");
     assert.equal(fake.getUIMode(), "wheel");

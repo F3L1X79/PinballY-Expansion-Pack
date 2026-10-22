@@ -72,15 +72,15 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         const { avatarPath } = profileStore.getActiveProfile();
         const worn = profileRewards.wornFrameOf();
         const rows = profileRewards.framesOf().map(frame => {
-            const isWorn = worn !== null && worn.tier === frame.tier;
+            const isWorn = worn !== null && worn.id === frame.id;
             return {
-                key: `frame${frame.tier}`, tier: frame.tier, name: frame.name, isLocked: !frame.isUnlocked, isWorn, avatarPath,
-                status: frame.isUnlocked ? (isWorn ? TEXT.worn : null) : TEXT.unlockCondition(frame.tier),
+                key: `frame${frame.id}`, frameId: frame.id, name: frame.name, isLocked: !frame.isUnlocked, isWorn, avatarPath,
+                status: frame.isUnlocked ? (isWorn ? TEXT.worn : null) : frame.unlockCondition,
                 framePath: profileRewards.imageOf(frame, frame.isUnlocked ? "small" : "locked"),
             };
         });
         rows.push({
-            key: NONE_KEY, tier: null, name: TEXT.none, isLocked: false, isWorn: worn === null, avatarPath,
+            key: NONE_KEY, frameId: null, name: TEXT.none, isLocked: false, isWorn: worn === null, avatarPath,
             status: worn === null ? TEXT.worn : null, framePath: null,
         });
         return rows;
@@ -229,12 +229,12 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
 
     // onBack(isWornChanged): what Select and Exit return to, called once the
     // list is closed, true when the frame worn changed (null: the bare wheel,
-    // the Exit Button then a cross); selectedTier (optional): the frame row
-    // it opens on instead of the worn one; onClosed (optional): called whenever it closes, attract
+    // the Exit Button then a cross); selectedFrameId (optional): the id of
+    // the frame row it opens on instead of the worn one; onClosed (optional): called whenever it closes, attract
     // mode included, before onBack; onFailed (optional): called once an
     // opening that failed is given up. Opens at once when every row is drawn
     // ahead; otherwise the missing ones are drawn under the veil first.
-    function open(onBack = null, { selectedTier = null, onClosed = () => {}, onFailed = () => {} } = {}) {
+    function open(onBack = null, { selectedFrameId = null, onClosed = () => {}, onFailed = () => {} } = {}) {
         if (shown) return;
         // Before anything is drawn: the Exit Button and the footer follow it.
         exitLook = exitButtonLookOf(onBack !== null);
@@ -244,7 +244,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         const rows = opening.read(readRows);
         // The backdrop measures the window the rows' layout depends on.
         opening.draw(() => readContent(rows));
-        const isOpenedOn = row => (selectedTier === null ? row.isWorn : row.tier === selectedTier);
+        const isOpenedOn = row => (selectedFrameId === null ? row.isWorn : row.frameId === selectedFrameId);
         shown = {
             onBack, onClosed, marker: null, opacity: 0, selected: Math.max(0, content.rows.findIndex(isOpenedOn)), topIndex: 0, isPreparing: false,
         };
@@ -277,9 +277,9 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         });
     }
 
-    const wornTier = () => {
+    const wornFrameId = () => {
         const worn = profileRewards.wornFrameOf();
-        return worn ? worn.tier : null;
+        return worn ? worn.id : null;
     };
 
     // Closes the open list or gives up the one getting ready.
@@ -323,9 +323,9 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         const row = content.rows[shown.selected];
         if (row.isLocked) return;
         // The frame already worn changes nothing.
-        const wornBefore = wornTier();
-        profileRewards.choose(row.tier);
-        back(wornTier() !== wornBefore);
+        const wornBefore = wornFrameId();
+        profileRewards.choose(row.frameId);
+        back(wornFrameId() !== wornBefore);
     }
 
     // Fires on every mapped button press; drives the list while it is open.
@@ -360,7 +360,7 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
         isOpen: () => shown !== null,
         onClosed: closedListeners.onClosed,
         // The active Profile's frames unlocked and in all, null when there
-        // are none (Table Mastery off).
+        // are none (Table Mastery and the Profile picker off).
         count() {
             const frames = profileRewards.framesOf();
             return frames.length === 0 ? null : { unlocked: frames.filter(frame => frame.isUnlocked).length, total: frames.length };

@@ -1,28 +1,51 @@
 // ============================================================
-// Profile Rewards: the only module that knows the Avatar Frames, one per
-// Collection Tier, unlocked by the tier kept in profile.json. Writes the
-// active Profile's choice ("avatarFrame"), and submits the Reward Prompt
-// through the wheel dialog module for a first unlocked frame.
+// Profile Rewards: the only module that knows the Avatar Frames, in two
+// families: one per Collection Tier (id 1 to 10, from the tier kept in
+// profile.json), then the Holiday Frames (a text id each, read from the
+// Play Log, never stored). Writes the active Profile's choice ("avatarFrame"),
+// toasts each new Holiday Frame and submits the Reward Prompt for a first frame.
 // - A frame never locks again short of a Profile Reset.
-// - No frames while the Table Mastery Add-on is off.
+// - No Collection frames while Table Mastery is off; no Holiday Frames without the Profile picker.
 // - The prompt sets "avatarFrame" to null when shown, so it never comes back.
 // ============================================================
 
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { getProfileStore } from "../profiles/profile_store.js";
 import { getWheelDialogs, DIALOG_PRIORITY } from "../core/wheel_dialog.js";
+import { TOAST_KIND } from "../achievements/achievement_toast.js";
 import { safeHandler } from "../core/safe_handler.js";
 import lang from "../core/i18n.js";
 import config from "../core/config.js";
 
 const FRAME_COUNT = 10;
+const FRAME_FAMILY = Object.freeze({ COLLECTION: "collection", HOLIDAY: "holiday" });
+// The Holiday Frames in list order, each with whether a local date is on its holiday.
+const HOLIDAYS = Object.freeze([
+    { id: "christmas", isOn: date => date.getMonth() === 11 && (date.getDate() === 24 || date.getDate() === 25) },
+]);
+const LOCAL_ISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/;
 // Frames drawn this wide or less take the 192 px image, wider ones the 384 px one.
 const SMALL_IMAGE_MAX_WIDTH = 192;
 const FRAMES_FOLDER = "assets\\images\\avatar_frames";
 const SCRIPT_NAME = "ProfileRewards";
 const REWARD_PROMPT_ID = "rewardPrompt";
 
-export function createProfileRewards(host, { profileStore, isEnabled = () => true, wheelDialogs = null }) {
+// The holidays a Play from start (a Date) lasting seconds starts or ends on.
+function holidaysOfPlay(start, seconds) {
+    const end = new Date(start.getTime() + seconds * 1000);
+    return HOLIDAYS.filter(holiday => holiday.isOn(start) || holiday.isOn(end)).map(holiday => holiday.id);
+}
+
+// A Play Log start, in local time; null when it is not one.
+function localDateOf(text) {
+    const match = LOCAL_ISO.exec(String(text));
+    if (!match) return null;
+    const [year, month, day, hours, minutes, seconds] = match.slice(1).map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+}
+
+// withProfiles: whether the Profile picker is on, without which there are no Holiday Frames.
+export function createProfileRewards(host, { profileStore, isEnabled = () => true, withProfiles = () => true, wheelDialogs = null }) {
     const projectFolder = host.getProjectFolder();
     // Each image's path, or null when its file is missing: checked once per session.
     const imagePaths = new Map();
@@ -36,38 +59,76 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
         return imagePaths.get(path);
     }
 
-    // tier: from 1 to FRAME_COUNT. The images are drawn by absolute path:
-    // drawImage resolves relative paths from the PinballY folder.
-    function frameOf(tier) {
-        const base = `${projectFolder}\\${FRAMES_FOLDER}\\frame_${String(tier).padStart(2, "0")}`;
+    // id: a tier from 1 to FRAME_COUNT, or a holiday's. The images are drawn
+    // by absolute path: drawImage resolves relative paths from the PinballY folder.
+    function frameOf(id) {
+        const isTier = typeof id === "number";
+        const base = `${projectFolder}\\${FRAMES_FOLDER}\\frame_${isTier ? String(id).padStart(2, "0") : id}`;
         return {
-            tier,
-            name: lang.profileRewards.frameNames[tier - 1],
+            id,
+            family: isTier ? FRAME_FAMILY.COLLECTION : FRAME_FAMILY.HOLIDAY,
+            ...(isTier ? {} : { holiday: id }),
+            name: isTier ? lang.profileRewards.frameNames[id - 1] : lang.profileRewards.holidays[id].name,
+            unlockCondition: isTier ? lang.profileStats.frameList.unlockCondition(id) : lang.profileRewards.holidays[id].condition,
             images: { large: `${base}_384.png`, small: `${base}_192.png`, locked: `${base}_192_locked.png` },
         };
     }
 
     const dataOf = profileName => (profileName === undefined ? profileStore.getProfileData() : profileStore.getProfileDataOf(profileName));
+    const nameOf = profileName => (profileName === undefined ? profileStore.getActiveProfile().name : profileName);
 
-    // Every frame of the Profile (the active one by default) in tier
-    // order, each with whether it is unlocked; none with the Add-on off.
-    function framesOf(profileName) {
-        if (!isEnabled()) return [];
-        const keptTier = dataOf(profileName).collectionTier || 0;
-        return Array.from({ length: FRAME_COUNT }, (_, index) => ({ ...frameOf(index + 1), isUnlocked: keptTier >= index + 1 }));
+    // How many Plays of each holiday the Profile's Play Log holds, by
+    // Profile name in lower case: read again after any change or Play.
+    // Registered here, before the announcing listener of enablePrompts,
+    // which must count the Play just logged.
+    const holidayCounts = new Map();
+    const forgetHolidays = () => holidayCounts.clear();
+    profileStore.onUpdate(safeHandler(SCRIPT_NAME, forgetHolidays));
+    profileStore.onPlay(safeHandler(SCRIPT_NAME, forgetHolidays));
+
+    function holidayCountsOf(profileName) {
+        const name = nameOf(profileName);
+        const profileKey = name.toLowerCase();
+        if (!holidayCounts.has(profileKey)) {
+            const counts = new Map();
+            for (const year of profileStore.getPlayLogYearsOf(name)) {
+                for (const play of profileStore.getPlayLogOf(name, year)) {
+                    const start = localDateOf(play.start);
+                    if (!start) continue;
+                    for (const id of holidaysOfPlay(start, Number(play.seconds) || 0)) counts.set(id, (counts.get(id) || 0) + 1);
+                }
+            }
+            holidayCounts.set(profileKey, counts);
+        }
+        return holidayCounts.get(profileKey);
     }
 
-    const unlockedFrameOf = (tier, profileName) => framesOf(profileName).find(frame => frame.isUnlocked && frame.tier === tier) || null;
+    // Every frame of the Profile (the active one by default) in list
+    // order, each with whether it is unlocked.
+    function framesOf(profileName) {
+        const frames = [];
+        if (isEnabled()) {
+            const keptTier = dataOf(profileName).collectionTier || 0;
+            for (let tier = 1; tier <= FRAME_COUNT; tier++) frames.push({ ...frameOf(tier), isUnlocked: keptTier >= tier });
+        }
+        if (withProfiles()) {
+            const counts = holidayCountsOf(profileName);
+            for (const { id } of HOLIDAYS) frames.push({ ...frameOf(id), isUnlocked: counts.has(id) });
+        }
+        return frames;
+    }
+
+    const unlockedFrameOf = (id, profileName) => framesOf(profileName).find(frame => frame.isUnlocked && frame.id === id) || null;
 
     // The frame the Profile wears, null when none: a choice of a frame
-    // that is not unlocked (a hand edit) wears none.
+    // that is not unlocked or unknown (a hand edit, a newer pack) wears none.
     const wornFrameOf = profileName => unlockedFrameOf(dataOf(profileName).avatarFrame, profileName);
 
-    // Opens the frame list on that tier's row, then calls onClosed once it
+    // Opens the frame list on that frame's row, then calls onClosed once it
     // closes; null until enablePrompts.
     let openFrameList = null;
     // Profile Resets so far, by Profile name in lower case (Profile names
-    // ignore case): a prompt submitted before its Profile's reset is stale.
+    // ignore case): a prompt or toast submitted before its Profile's reset is stale.
     const resetCounts = new Map();
     const resetCountOf = profileKey => resetCounts.get(profileKey) || 0;
 
@@ -76,13 +137,14 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
 
     // The Reward Prompt for the named Profile, dropped when that Profile is
     // reset, no longer active or already prompted at its turn; isBlocked
-    // (optional) also drops it, isReady (optional) holds it.
-    function submitPrompt(profileName, { isBlocked = () => false, isReady } = {}) {
+    // (optional) also drops it, isReady (optional) holds it; frameId
+    // (optional) the frame it names, else the last one unlocked.
+    function submitPrompt(profileName, { isBlocked = () => false, isReady, frameId } = {}) {
         if (!isPromptPending(profileName)) return;
         const profileKey = profileName.toLowerCase();
         const resetCount = resetCountOf(profileKey);
-        // The newest frame: the one just won.
-        const frame = framesOf(profileName).filter(candidate => candidate.isUnlocked).pop();
+        const unlocked = framesOf(profileName).filter(candidate => candidate.isUnlocked);
+        const frame = unlocked.find(candidate => candidate.id === frameId) || unlocked.pop();
         const TEXT = lang.profileRewards.prompt;
         wheelDialogs.submit({
             id: REWARD_PROMPT_ID,
@@ -90,7 +152,7 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
             buttons: [
                 // A drawn dialog of its own once the prompt closed: the queue
                 // waits for the frame list, so no dialog opens over it.
-                { label: TEXT.goEquip, action: () => wheelDialogs.submit({ priority: DIALOG_PRIORITY.REWARD_PROMPT, open: close => openFrameList(frame.tier, close) }) },
+                { label: TEXT.goEquip, action: () => wheelDialogs.submit({ priority: DIALOG_PRIORITY.REWARD_PROMPT, open: close => openFrameList(frame.id, close) }) },
                 // No action: the dialog closing is all it must do.
                 { label: TEXT.gotIt },
             ],
@@ -104,6 +166,37 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
 
     const submitForActive = () => submitPrompt(profileStore.getActiveProfile().name);
 
+    // For the toast of a new frame, isStale being the toast's: submits the
+    // Profile's pending prompt now, so it holds its place ahead of the
+    // rating prompt, and returns the toast's onShown, which lets it show.
+    // A stale toast never shows, so neither does its prompt.
+    function promptAfterToast(profileName, isStale, frameId) {
+        let isToastShown = false;
+        submitPrompt(profileName, { isBlocked: isStale, isReady: () => isToastShown, frameId });
+        return () => {
+            isToastShown = true;
+            wheelDialogs.wake();
+        };
+    }
+
+    // The toast of a Holiday Frame the Profile's Play just unlocked, dropped
+    // when that Profile is reset or no longer active at its turn.
+    function announceHoliday(toasts, profileName, id) {
+        const profileKey = profileName.toLowerCase();
+        const resetCount = resetCountOf(profileKey);
+        const isStale = () => resetCountOf(profileKey) !== resetCount
+            || profileStore.getActiveProfile().name.toLowerCase() !== profileKey;
+        const frame = frameOf(id);
+        toasts.submit({
+            kind: TOAST_KIND.FRAME,
+            imagePath: existingImage(frame.images.small),
+            title: lang.profileRewards.toastLine([frame.name]),
+            description: lang.profileRewards.holidays[id].condition,
+            onShown: promptAfterToast(profileName, isStale, id),
+            isStale,
+        });
+    }
+
     return {
         framesOf,
         wornFrameOf,
@@ -116,11 +209,11 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
         // The image of that size ("large", "small" or "locked") of a frame
         // from framesOf, null when its file is missing.
         imageOf: (frame, size) => existingImage(frame.images[size]),
-        // Makes the active Profile wear the frame of that tier, or none for
+        // Makes the active Profile wear the frame of that id, or none for
         // null; false, changing nothing, when that frame is not unlocked.
-        choose(tier) {
-            if (tier !== null && !unlockedFrameOf(tier)) return false;
-            profileStore.updateProfileData(data => { data.avatarFrame = tier; });
+        choose(id) {
+            if (id !== null && !unlockedFrameOf(id)) return false;
+            profileStore.updateProfileData(data => { data.avatarFrame = id; });
             return true;
         },
         // The frames a Collection Tier raised from keptTier to tier unlocks,
@@ -133,31 +226,29 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
             }
             return frames;
         },
-        // opener(tier, onClosed): opens the frame list on that tier's row,
-        // calling onClosed once the list is closed. Submits the
-        // active Profile's pending prompt now, which waits for the Welcome
-        // Screen, and the new one's on each Profile switch.
-        enablePrompts(opener) {
+        // opener(id, onClosed): opens the frame list on that frame's row,
+        // calling onClosed once the list is closed; toasts: the Achievement
+        // Toast module. Submits the active Profile's pending prompt now,
+        // which waits for the Welcome Screen, and the new one's on each
+        // Profile switch; toasts each Holiday Frame a Play newly unlocks.
+        enablePrompts(opener, toasts) {
             openFrameList = opener;
             profileStore.onUpdate(safeHandler(SCRIPT_NAME, (profileName, { isReset }) => {
                 if (isReset) resetCounts.set(profileName.toLowerCase(), resetCountOf(profileName.toLowerCase()) + 1);
             }));
             profileStore.onSwitch(safeHandler(SCRIPT_NAME, submitForActive));
+            // The Play is in the Play Log already: a holiday it unlocks is
+            // one no other Play of the Profile touches.
+            profileStore.onPlay(safeHandler(SCRIPT_NAME, ({ profileName, start, seconds }) => {
+                if (!withProfiles()) return;
+                const counts = holidayCountsOf(profileName);
+                for (const id of holidaysOfPlay(start, seconds)) if (counts.get(id) === 1) announceHoliday(toasts, profileName, id);
+            }));
             submitForActive();
         },
-        // For the Mastery Toast of a Collection Tier that unlocks frames,
-        // isStale being the toast's: submits the Profile's pending prompt
-        // now, so it holds its place ahead of the rating prompt, and returns
-        // the toast's onShown, which lets it show. A stale toast never shows,
-        // so neither does its prompt.
-        promptAfterToast(profileName, isStale) {
-            let isToastShown = false;
-            submitPrompt(profileName, { isBlocked: isStale, isReady: () => isToastShown });
-            return () => {
-                isToastShown = true;
-                wheelDialogs.wake();
-            };
-        },
+        // For the Mastery Toast of a Collection Tier that unlocks frames, as
+        // for the Holiday Frame toasts.
+        promptAfterToast,
     };
 }
 
@@ -166,7 +257,10 @@ let shared = null;
 export function getProfileRewards() {
     if (!shared) {
         shared = createProfileRewards(createPinballYHost(), {
-            profileStore: getProfileStore(), isEnabled: () => config.addOns.tableMastery !== false, wheelDialogs: getWheelDialogs(),
+            profileStore: getProfileStore(),
+            isEnabled: () => config.addOns.tableMastery !== false,
+            withProfiles: () => config.addOns.profilePicker !== false,
+            wheelDialogs: getWheelDialogs(),
         });
     }
     return shared;

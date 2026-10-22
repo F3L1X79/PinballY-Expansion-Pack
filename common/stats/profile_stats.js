@@ -565,12 +565,12 @@ export function createProfileStats(host, {
         readStats,
         isOpen: () => shown !== null || screenSetAside !== null,
         onClosed: closedListeners.onClosed,
-        // Opens the frame list straight away on that tier's row, onClosed
+        // Opens the frame list straight away on that frame's row, onClosed
         // called once it closes; Select or Exit there shows this screen on the
         // Frame button, as if the list had been opened from it, with nothing
         // to bring back: its Exit leaves the bare wheel.
-        openFrameList(tier, onClosed) {
-            frameList.open(() => open(CHOICE.FRAME), { selectedTier: tier, onClosed });
+        openFrameList(frameId, onClosed) {
+            frameList.open(() => open(CHOICE.FRAME), { selectedFrameId: frameId, onClosed });
         },
     };
 }

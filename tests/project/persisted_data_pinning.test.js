@@ -486,6 +486,18 @@ test("the Avatar Frame choice keeps its key in profile.json", () => {
     assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).avatarFrame, null);
 });
 
+test("a Holiday Frame choice keeps its text id in avatarFrame", () => {
+    const fake = createFakePinballYHost({ now: NOW, tables: TABLES });
+    fake.addFile(GUEST_PROFILE_FILE, JSON.stringify({ version: 1 }));
+    fake.addFile(GUEST_PROFILE_FILE.replace("profile.json", "play-log-2026.json"), JSON.stringify({
+        version: 1, plays: [{ start: "2026-12-24T20:00:00", configId: TABLES[0].configId, seconds: 600 }],
+    }));
+    const profileRewards = createProfileRewards(fake, { profileStore: createProfileStore(fake) });
+
+    profileRewards.choose("christmas");
+    assert.equal(JSON.parse(fake.readFile(GUEST_PROFILE_FILE)).avatarFrame, "christmas");
+});
+
 test("the Table ROM record keeps its file name and keys", () => {
     const vpx = "C:\\Visual Pinball\\Tables\\Attack from Mars (Bally 1995).vpx";
     const vbs = "C:\\Visual Pinball\\Tables\\Attack from Mars (Bally 1995).vbs";

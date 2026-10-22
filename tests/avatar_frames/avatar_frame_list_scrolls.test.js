@@ -28,13 +28,15 @@ const NAMES = [...Array.from({ length: FRAME_COUNT }, (_, index) => `Frame ${ind
 // A Profile Rewards module with FRAME_COUNT frames, the first three
 // unlocked, wearing wornTier (null for none).
 function fakeProfileRewards(wornTier) {
-    const frames = Array.from({ length: FRAME_COUNT }, (_, index) => ({ tier: index + 1, name: `Frame ${index + 1}`, isUnlocked: index < 3 }));
+    const frames = Array.from({ length: FRAME_COUNT }, (_, index) => ({
+        id: index + 1, name: `Frame ${index + 1}`, isUnlocked: index < 3, unlockCondition: `Collection Tier ${index + 1}`,
+    }));
     let worn = wornTier;
     return {
         framesOf: () => frames,
         wornFrameOf: () => (worn === null ? null : frames[worn - 1]),
-        imageOf: (frame, size) => `C:\\frames\\frame_${frame.tier}_${size}.png`,
-        choose: tier => { worn = tier; },
+        imageOf: (frame, size) => `C:\\frames\\frame_${frame.id}_${size}.png`,
+        choose: id => { worn = id; },
     };
 }
 
@@ -114,7 +116,7 @@ test("Prev from the Exit Button goes to the last row, then scrolls back up to th
 
 test("opened on a row further down, the list shows it", () => {
     const { fake, list } = setUp();
-    list.open(() => {}, { selectedTier: 18 });
+    list.open(() => {}, { selectedFrameId: 18 });
 
     assert.equal(highlightedRow(fake), "Frame 18");
     assertRowsFit(fake, "opened on Frame 18");
@@ -132,7 +134,7 @@ test("opened on the worn None, the list shows the last rows", () => {
 
 test("not drawn ahead, it opens through the shared screen opening on the selected row", () => {
     const { fake, list } = setUp({ drawnAhead: false });
-    list.open(() => {}, { selectedTier: 15 });
+    list.open(() => {}, { selectedFrameId: 15 });
     untilFrameListShown(fake);
 
     assert.equal(highlightedRow(fake), "Frame 15");

@@ -653,6 +653,13 @@ export default {
         // The Mastery Toast's extra line, naming the frames its Collection
         // Tier unlocks (more than one when a Play raised it by several tiers).
         toastLine: (names) => `${names.length === 1 ? "Nouveau cadre" : "Nouveaux cadres"} : ${names.join(", ")}`,
+        // The Holiday Frame toast's header; its title is the toast line.
+        toastHeader: "Cadre de fête",
+        // Each Holiday Frame's name, and what unlocks it: the locked row's
+        // status in the frame list and the description of its toast.
+        holidays: {
+            christmas: { name: "Noël", condition: "Une partie le 24 ou le 25 décembre" },
+        },
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {

@@ -1,8 +1,8 @@
 ﻿// ============================================================
 // Achievement Toast: announces each unlocked Achievement with a small card
 // in the bottom-right corner, on a non-blocking drawing layer (see
-// docs/adr/0003). Also shows the Challenge, Mastery, Level and High Score
-// Toasts, which share its queue. Cards stack, at most five on screen.
+// docs/adr/0003). Also shows the Challenge, Mastery, Level, High Score and
+// Frame Toasts, which share its queue. Cards stack, at most five on screen.
 // - Toasts wait during a game and while a drawn dialog is open (docs/adr/0011).
 // - A celebrated toast starts the Confetti Shower, a Level Toast the Fireworks.
 // - A Level Toast waits until a second before the shower ends.
@@ -75,7 +75,7 @@ const COLORS = Object.freeze({
 });
 
 export const TOAST_KIND = Object.freeze({
-    ACHIEVEMENT: "achievement", CHALLENGE: "challenge", MASTERY: "mastery", LEVEL: "level", HIGH_SCORE: "highScore",
+    ACHIEVEMENT: "achievement", CHALLENGE: "challenge", MASTERY: "mastery", LEVEL: "level", HIGH_SCORE: "highScore", FRAME: "frame",
 });
 
 // Icons in the pack's assets folder, drawn by absolute path: drawImage
@@ -106,6 +106,11 @@ const KIND_LOOKS = Object.freeze({
     [TOAST_KIND.HIGH_SCORE]: {
         accent: STEAMBALL_COLORS.highScoreAccent,
         header: () => lang.highScores.toastHeader,
+    },
+    // The frame won fills the tile, from the toast's imagePath.
+    [TOAST_KIND.FRAME]: {
+        accent: STEAMBALL_COLORS.gold,
+        header: () => lang.profileRewards.toastHeader,
     },
 });
 
@@ -144,6 +149,8 @@ function drawTile(host, dc, look, x, y, accent, { iconPath, iconInset, number })
         dc.drawImage(iconPath, x + iconInset, y + iconInset, tileSize - 2 * iconInset, tileSize - 2 * iconInset);
         return;
     }
+    // A Frame Toast whose image is missing: an empty tile.
+    if (number === undefined) return;
     const text = host.createStyledText({
         textAlign: "center",
         textStyle: { font: STEAMBALL_FONTS.display, size: Math.round(tileSize * TILE_NUMBER_SHARE), weight: 700, color: accent },
@@ -181,7 +188,8 @@ function drawCard(host, dc, look, toast, iconOf) {
     fillGradient(dc, x, y, cardWidth, height, COLORS.gradientTop, COLORS.gradientBottom);
     dc.frameRect(x, y, cardWidth, height, look.border, COLORS.border);
     dc.fillRect(x, y, accentBarWidth, height, accent);
-    const icon = kindLook.iconFile ? iconOf(toast, kindLook.iconFile) : null;
+    let icon = kindLook.iconFile ? iconOf(toast, kindLook.iconFile) : null;
+    if (toast.imagePath) icon = { path: toast.imagePath, isEmblem: true };
     drawTile(host, dc, look, x + accentBarWidth + tileGap, y + (height - tileSize) / 2, accent, icon
         ? { iconPath: icon.path, iconInset: icon.isEmblem ? look.emblemInset : look.iconInset }
         : { number: toast.tileNumber });
@@ -387,7 +395,8 @@ export function createAchievementToasts(host, {
     // dropping it unshown when it returns true at its turn, celebrate
     // (optional) starting the Confetti Shower with it; a Mastery Toast
     // gives its accent and the number its tile shows, a Level Toast and a
-    // High Score Toast that number only, header (optional) replaces the
+    // High Score Toast that number only, a Frame Toast the image of its
+    // frame (imagePath, null when missing), header (optional) replaces the
     // kind's, and extraLine (optional) shows under the description, in the
     // accent, growing the card.
     function submit(toast) {

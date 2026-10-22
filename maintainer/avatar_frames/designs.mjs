@@ -1,5 +1,5 @@
 // ============================================================
-// The ten Avatar Frames, one theme each, painted with frame_kit.mjs
+// The Avatar Frames (Collection Tiers, then Holiday Frames), one theme each, painted with frame_kit.mjs
 // around the Avatar's image box [-1, 1]: each keeps the bottom-right corner
 // light, where the Player Level pip sits. A maintainer's tool, run by
 // generate_frames.mjs, never loaded by PinballY.
@@ -1113,6 +1113,95 @@ function celestialLegend(cv) {
         sparkle(cv, x, y, s, hex("#fff3c4"));
     }
 }
+
+// ============================================================
+// Christmas: a pine-green lacquered band between gold trims, holly sprigs
+// with red berries at its corners and sides, a gold star on top and snow
+// twinkling around.
+// ============================================================
+const PINE = ramp([[0, "#021308"], [0.3, "#0b3d1c"], [0.52, "#17663a"], [0.7, "#2f9152"], [0.86, "#8fd3a0"], [1, "#ffffff"]]);
+const HOLLY = ramp([[0, "#03170a"], [0.35, "#0f4a22"], [0.6, "#1f7a3a"], [0.8, "#58b463"], [1, "#d8ffd0"]]);
+const BERRY = ramp([[0, "#2a0004"], [0.35, "#8a0a14"], [0.6, "#d41c26"], [0.82, "#ff6a5c"], [1, "#ffffff"]]);
+
+// A holly leaf along angle from (x, y): its edges zigzag into spikes.
+function hollyLeaf(cv, x, y, angle, length, width) {
+    const steps = 8;
+    const top = [];
+    const bottom = [];
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const w = (width / 2) * Math.sin(Math.PI * t) ** 0.7 * (i % 2 === 1 ? 1 : 0.6);
+        top.push([t * length, -w]);
+        bottom.push([t * length, w]);
+    }
+    const pts = placed([...top, ...bottom.reverse()], x, y, angle);
+    const sdf = (px, py) => sdPolygon(px, py, pts);
+    cv.shadow(sdf, { bbox: bboxOf(pts, 0.06), blur: 0.03, opacity: 0.45 });
+    cv.shape(sdf, (px, py, d) => {
+        const [u, v] = toLocal(px, py, x, y, angle);
+        const side = v < 0 ? 0.66 : 0.48;
+        const vein = smoothstep(0.006, 0, Math.abs(v)) * 0.3 * (1 - u / length);
+        const edge = smoothstep(0.012, 0, -d) * -0.14;
+        return HOLLY(side + vein + edge);
+    }, { bbox: bboxOf(pts, 0.02) });
+}
+
+// Two holly leaves spread from (x, y) along angle, berries over their root.
+function hollySprig(cv, x, y, angle, size) {
+    hollyLeaf(cv, x, y, angle - rad(38), size, size * 0.42);
+    hollyLeaf(cv, x, y, angle + rad(38), size, size * 0.42);
+    const r = size * 0.13;
+    for (const [ox, oy] of [[-0.9, 0.3], [0.9, 0.3], [0, -0.75]]) {
+        const bx = x + ox * r;
+        const by = y + oy * r;
+        const berry = circle(bx, by, r);
+        cv.shadow(berry, { bbox: around(bx, by, r * 3), blur: r, opacity: 0.5 });
+        cv.shape(berry, sphere(bx, by, r, BERRY, { spec: 0.8 }), { bbox: around(bx, by, r * 1.2) });
+    }
+}
+
+function christmas(cv) {
+    const ring = band(1.13, 0.08);
+    cv.shadow(ring, { bbox: B(1.3), opacity: 0.6 });
+    cv.shape(ring, metal(ring, PINE, {
+        bevel: 0.07, spec: 0.7, shininess: 24,
+        // Faint diagonal stripes, like a wrapped present.
+        texture: (x, y) => 0.06 * smoothstep(0.6, 1, Math.sin((x + y) * 26)),
+    }), { bbox: B(1.17) });
+    for (const [h, r, w] of [[1.125, 0.08, 0.013], [0.985, 0.035, 0.015]]) {
+        const trim = tube(h, r, w);
+        cv.shape(trim, metal(trim, RAMPS.gold, { bevel: w, contrast: 1.6 }), { bbox: B(h + 0.03) });
+    }
+
+    // Big sprigs on three corners, small ones mid-side, none on the pip's corner.
+    for (const [s, size] of [[0, 0.34], [0.25, 0.34], [0.75, 0.34], [0.375, 0.24], [0.625, 0.24], [0.875, 0.24]]) {
+        const p = onRoundSquare(s, 1.06, 0.12);
+        if (isPipCorner(p.x, p.y)) continue;
+        hollySprig(cv, p.x, p.y, Math.atan2(p.ny, p.nx), size);
+    }
+
+    // The star on top, glowing.
+    const starSdf = (x, y) => sdPolygon(x, y, starPoints(0, -1.2, 0.22, 0.09, 5));
+    cv.glow(starSdf, "#fff0b0", 0.16, 0.7, { bbox: around(0, -1.2, 0.4) });
+    cv.shadow(starSdf, { bbox: around(0, -1.2, 0.32) });
+    cv.shape(starSdf, metal(starSdf, RAMPS.gold, { bevel: 0.05, contrast: 1.6, spec: 0.9, shininess: 26 }), { bbox: around(0, -1.2, 0.24) });
+    sparkle(cv, -0.05, -1.26, 0.08, WHITE);
+
+    const snow = rng(25);
+    for (let i = 0; i < 16; i++) {
+        const a = snow() * TAU;
+        const r = 1.28 + snow() * 0.14;
+        const x = clamp(Math.cos(a) * r, -1.42, 1.42);
+        const y = clamp(Math.sin(a) * r, -1.42, 1.42);
+        if (isPipCorner(x, y) || (Math.abs(x) < 0.35 && y < -1)) continue;
+        sparkle(cv, x, y, 0.03 + 0.02 * snow(), hex("#f2f8ff"), 0.8);
+    }
+}
+
+// The Holiday Frames, by their id in the Profile Rewards module.
+export const HOLIDAY_FRAMES = [
+    { id: "christmas", name: "Christmas", draw: christmas },
+];
 
 // In Collection Tier order.
 export const FRAMES = [
