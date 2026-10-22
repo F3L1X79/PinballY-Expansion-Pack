@@ -254,6 +254,7 @@
           <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
           <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
           <a class="chip tr-share" href="#themes"><b></b>Thèmes</a>
+          <a class="chip tr-share" href="#drawn-upkeep-popups"><b></b>Popups d'entretien dessinées</a>
         </div>
 
         <div class="ax row">Faible</div>
@@ -407,6 +408,24 @@
               <li>Les écrans font partie du socle du pack, pas d'un Add-on : absents de la liste, jamais désactivables, toujours dessinés, même quand Drawn Menus est désactivé.</li>
             </ul>
             <p class="ctx">Idée de Félix du 19/10/2026, grillée le 21/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas. Une langue par Profile, qui changerait tout de suite, est écartée.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="drawn-upkeep-popups" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Popups d'entretien dessinées</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">gros</span><span class="tag">UI</span></div>
+          </div>
+          <p>Une fois les menus de capture dessinés, les popups natives que l'on croise au même endroit détonnent encore : le choix du délai de capture (<code>capture delay</code>), la liste de la capture par lot (<code>batch capture preview</code>) et la liste des médias de la table (<code>media list</code>). Les dessiner dans le style Steamball, chacune avec son propre contenu.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code>. Le module Drawn Menu ne dessine que des listes d'entrées : chaque popup demande son propre écran dessiné.</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Reporté le 22/10/2026 pendant le grilling des menus de capture dessinés, qui laisse les popups natives. Placé juste après les options au menu opérateur : c'est l'entretien de la borne, vu moins souvent que les menus eux-mêmes.</p>
           </details>
         </div>
       </li>
@@ -682,6 +701,13 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>22/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>Les popups d'entretien dessinées, après les options au menu opérateur</strong>
+              <span>Reportées pendant le grilling des menus de capture dessinés, qui dessine tous les menus sauf ceux du glisser-déposer et laisse les popups natives (délai de capture, liste de la capture par lot, liste des médias). Placées juste après les options au menu opérateur, avec l'entretien de la borne. Effort gros (un écran par popup), impact moyen.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>21/10 <span class="count">(1)</span></summary>
           <ol>
             <li><strong>Un toast d'erreur, en fin de file</strong>
