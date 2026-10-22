@@ -1,12 +1,13 @@
 // ============================================================
-// Drawn Menus (on by default): draws the player's menus in the Steamball
-// look through the Drawn Menu module instead of PinballY's native ones
-// (see docs/adr/0013). Listens to "menuopen".
+// Drawn Menus (on by default): draws every menu, PinballY's or a script's,
+// in the Steamball look through the Drawn Menu module instead of the native
+// one, except the media drop menus and "confirm delete media" (see
+// docs/adr/0013). Listens to "menuopen".
 // - Listens last of all the Add-ons, so it sees the final entries.
 // - Cancels the native menu only once drawing succeeded: any error shows the native one.
 // - Never cancels the pause menu: drawn over it kept open, Exit resumes the game.
-// - Leaves the pause menu native during a media capture, which opens it on its own.
-// - Any other menu stays native and replaces an open Drawn Menu.
+// - Leaves native the pause menu during a media capture and a pack menu the module fell back on.
+// - A menu left native replaces an open Drawn Menu.
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";
@@ -17,13 +18,11 @@ import { FILTER_GROUPS, FILTER_PICKER_MENU_ID } from "../common/menus/filter_pic
 
 const SCRIPT_NAME = "DrawnMenus";
 
-// The PinballY menu ids drawn instead of shown natively: the player's
-// menus, the table's setup and categories menus, opened from the main
-// menu, the operator menu, from the Exit menu, and the pause menu of a
-// running game. The capture, media drop and elevation menus stay native.
+// The menus left native: the media drop menus, made for the mouse on a PC,
+// and the deletion of a media file, asked over the native media list.
+const isNativeMenuId = id => id.startsWith("media drop") || id === "confirm delete media";
 const FILTER_MENU_IDS = FILTER_GROUPS.map(group => group.menuId);
 const PAUSE_MENU_ID = "pause game";
-const DRAWN_MENU_IDS = ["main", FILTER_PICKER_MENU_ID, "exit", "power off", "game setup", "game categories", "operator", PAUSE_MENU_ID, ...FILTER_MENU_IDS];
 
 export default function init() {
     const drawnMenus = getDrawnMenus();
@@ -45,8 +44,9 @@ export default function init() {
     mainWindow.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
         // As a native menu replaces another, the new menu replaces a Drawn
         // one; draw() closes it itself, seeing first whether it is the same
-        // menu shown again.
-        if (!DRAWN_MENU_IDS.includes(ev.id)) {
+        // menu shown again. A pack menu shown natively by the module stays
+        // so: cancelled, its "menuclose", which the module waits for, never comes.
+        if (isNativeMenuId(ev.id) || drawnMenus.isShownNatively(ev.id)) {
             drawnMenus.close();
             return;
         }

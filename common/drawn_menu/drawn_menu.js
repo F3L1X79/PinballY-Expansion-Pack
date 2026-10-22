@@ -78,13 +78,14 @@ export function buildMenuModel(items, { dialogStyle = false, pagingCommands = []
 }
 
 // PinballY's own menus, behind the same show() as the Drawn Menus: each
-// onClose runs on the "menuclose" of its menu's id.
+// onClose runs on the "menuclose" of its menu's id. isShownNatively(id):
+// one of them is shown and not closed yet.
 export function createNativeMenus(host) {
     const waitingCloses = [];
 
     function show(id, items, { dialogStyle = false, onClose = null } = {}) {
         host.showMenu(id, items, dialogStyle ? { dialogStyle: true } : {});
-        if (onClose) waitingCloses.push({ id, onClose });
+        waitingCloses.push({ id, onClose });
     }
 
     // Fires after any menu closes, chosen, dismissed or replaced.
@@ -92,12 +93,12 @@ export function createNativeMenus(host) {
         const index = waitingCloses.findIndex(waiting => waiting.id === ev.id);
         if (index === -1) return;
         const [{ onClose }] = waitingCloses.splice(index, 1);
-        onClose();
+        if (onClose) onClose();
     }));
 
     // A native menu leaves the wheel's UI mode, and "wheelmode" fires on
     // its close: nothing to wait for here.
-    return { show, isOpen: () => false, onClosed() {} };
+    return { show, isShownNatively: id => waitingCloses.some(waiting => waiting.id === id), isOpen: () => false, onClosed() {} };
 }
 
 // drawingAhead: the shared drawing ahead (common/core/drawing_ahead.js);
@@ -583,8 +584,9 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, close));
 
     // onClosed: a Drawn Menu never changes the UI mode, so no "wheelmode"
-    // follows its closing.
-    return { show, draw, close, isOpen: () => shown !== null, onClosed: closedListeners.onClosed };
+    // follows its closing. isShownNatively(id): a menu show() could not draw,
+    // shown natively until its "menuclose", which its onClose waits for.
+    return { show, draw, close, isOpen: () => shown !== null, onClosed: closedListeners.onClosed, isShownNatively: nativeMenus.isShownNatively };
 }
 
 let sharedDrawnMenus = null;

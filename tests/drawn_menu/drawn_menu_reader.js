@@ -112,9 +112,9 @@ export function openPauseMenu(fake) {
     fake.advanceTime(OPEN_OVER_MS);
 }
 
-// Any menu, as PinballY opens it with these native items.
-export function openMenu(fake, id, items) {
-    fake.openMenu(id, items);
+// Any menu, as PinballY opens it with these native items and options.
+export function openMenu(fake, id, items, options = {}) {
+    fake.openMenu(id, items, options);
     fake.advanceTime(OPEN_OVER_MS);
 }
 

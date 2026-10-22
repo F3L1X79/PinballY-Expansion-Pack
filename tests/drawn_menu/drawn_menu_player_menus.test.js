@@ -1,7 +1,7 @@
 // ============================================================
 // The player's other menus as Drawn Menus through main.js: Exit, power off,
-// filter, setup, categories and operator menus are drawn; capture stays
-// native (the pause menu: drawn_menu_pause.test.js). Submenus open in
+// filter, setup, categories, operator and capture menus are drawn (the
+// pause menu: drawn_menu_pause.test.js). Submenus open in
 // place and go back to their parent entry; long lists scroll and page.
 // - A native menu opening replaces a Drawn one.
 // ============================================================
@@ -270,19 +270,19 @@ test("the operator menu is drawn", () => {
     assert.ok(!isDrawnMenuShown(fake));
 });
 
-test("the capture menus stay native", () => {
-    fake.openMenu("capture", [{ title: "Something", cmd: COMMAND.MenuReturn }]);
-    assert.ok(!isDrawnMenuShown(fake));
-    assert.equal(fake.currentMenu().id, "capture");
-    fake.closeMenu();
+test("the capture menu is drawn", () => {
+    openMenu(fake, "capture", [{ title: "Something", cmd: COMMAND.MenuReturn }]);
+    assert.ok(isDrawnMenuShown(fake));
+    assert.equal(fake.currentMenu(), null);
+    press(fake, "Exit");
 });
 
 test("a native menu opening replaces an open Drawn Menu", () => {
     openMainMenu(fake);
-    fake.openMenu("capture", [{ title: "Something", cmd: COMMAND.MenuReturn }]);
+    fake.openMenu("media drop confirm", [{ title: "Something", cmd: COMMAND.MenuReturn }]);
 
     assert.ok(!isDrawnMenuShown(fake));
-    assert.equal(fake.currentMenu().id, "capture");
+    assert.equal(fake.currentMenu().id, "media drop confirm");
     assert.ok(!press(fake, "Next").defaultPrevented, "the buttons are left to the native menu");
     fake.closeMenu();
 });

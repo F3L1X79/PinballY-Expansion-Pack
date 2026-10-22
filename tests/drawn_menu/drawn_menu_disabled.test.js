@@ -1,8 +1,8 @@
 // ============================================================
 // With the Drawn Menus Add-on turned off in addOns, through main.js on the
 // fake PinballY globals, the main menu is PinballY's native one, with the
-// pack's entries, and nothing is drawn; the wheel dialogs are native too,
-// and their queue advances on the native dialog's close.
+// pack's entries, and nothing is drawn; the capture menu and the wheel
+// dialogs are native too, the dialogs' queue advancing on their close.
 // ============================================================
 
 import { test } from "node:test";
@@ -30,6 +30,14 @@ test("turned off, the main menu is native", () => {
 
     assert.equal(fake.currentMenu().id, "main");
     assert.ok(fake.currentMenu().items.some(item => item.title === lang.customMenuLabels.tableSetup));
+    assert.ok(!fake.drawingLayers().some(isMenuLayer));
+    fake.closeMenu();
+});
+
+test("turned off, the capture menu is native", () => {
+    fake.openMenu("capture", [{ title: "Start capture", cmd: 4011 }, { title: "Cancel", cmd: globalThis.command.MenuReturn }], { dialogStyle: true });
+
+    assert.equal(fake.currentMenu().id, "capture");
     assert.ok(!fake.drawingLayers().some(isMenuLayer));
     fake.closeMenu();
 });

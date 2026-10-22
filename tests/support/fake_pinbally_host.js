@@ -1222,11 +1222,13 @@ export function createFakePinballYHost({
 
         // A menu opened by the player (unlike showMenu, which doesn't fire
         // "menuopen"): handlers may add items, or delete them by command id
-        // then tidy the separators, before it is shown.
-        openMenu(id, items) {
+        // then tidy the separators, before it is shown. options: as
+        // showMenu's ({ dialogStyle }), read in ev.options.
+        openMenu(id, items, options = {}) {
             let menuItems = [...items];
             const ev = fire("menuopen", {
                 id,
+                options,
                 get items() { return menuItems; },
                 set items(newItems) { menuItems = newItems; },
                 // Like PinballY: after a command id it does not find, at the end.
@@ -1251,7 +1253,7 @@ export function createFakePinballYHost({
             // even when "menuopen" was cancelled; preventDefault() only
             // stops the unchanged native menu.
             // A listener may show another menu in its place by changing ev.id.
-            if (ev.menuUpdated || !ev.defaultPrevented) showMenu(ev.id, menuItems);
+            if (ev.menuUpdated || !ev.defaultPrevented) showMenu(ev.id, menuItems, ev.options);
         },
 
         // The Exit menu as PinballY opens it on the Exit button, with its
