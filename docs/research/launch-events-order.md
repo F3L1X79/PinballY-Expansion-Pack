@@ -45,7 +45,7 @@ Steps 1 to 7 run as above. Then the process launch fails (APP 3511, 3545, 3613, 
 
 None of `"running"`, `gamestarted`, `"gameover"`, `gameover`, `runafter`, `"after"` and `runafterpost` fires. The external Run After and Run After Post commands still run, through guard objects, but they fire no JS event.
 
-- **[unverified]** `launchoverlayhide` probably fires twice. The thread-exit message follows immediately, while the fade is still running. The overlay popup is therefore still set, and the guard in `EndRunningGameMode` does not stop the second call.
+- **[confirmed on the cabinet]** `launchoverlayhide` fires twice. The thread-exit message follows immediately, while the fade is still running. The overlay popup is therefore still set, and the guard in `EndRunningGameMode` does not stop the second call.
 - If the thread itself cannot be created (APP 2577), only `prelaunch` and PinballY's error message appear. No overlay event and no `launcherror` fire.
 
 ## 4. Media capture
@@ -59,11 +59,21 @@ None of `"running"`, `gamestarted`, `"gameover"`, `gameover`, `runafter`, `"afte
 
 - `ID_KILL_GAME` (PFV ~4703) fires `launchoverlaymessage "terminating"` at once, then calls `Application::KillGame`.
 - When `PFVMsgGameOver` arrives, the UI is already in Exiting mode, so `"gameover"` is skipped. `gameover` and the rest of the sequence still fire.
-- **[unverified]** If the kill comes before `PFVMsgGameLoaded`, `closeCommandIssued` stops that message. Then neither `"running"` nor `gamestarted` fires (APP 3818). Where `closeCommandIssued` is set was not traced.
+- **[confirmed on the cabinet]** If the kill comes before `PFVMsgGameLoaded`, `closeCommandIssued` stops that message. Then neither `"running"` nor `gamestarted` fires (APP 3818). Where `closeCommandIssued` is set was not traced.
 - During a batch capture, the first kill only shows a cancel prompt. Stopping the batch takes a second press.
+
+## Cabinet trace (#310)
+
+Traced on 22/10/2026 with `LOG_LAUNCH_EVENTS=true`, PinballY 1.1.0 (Beta 10), build 10086. The order matched the source in every traced case, with no difference to record:
+
+- A table closed from VPX, Exit Game while playing, a single capture: as in §1, §4 and §5.
+- Exit Game before the table loaded: `"terminating"` came right after `runbefore`, and neither `"running"` nor `gamestarted` fired. The §5 point is confirmed.
+- Launch failure (VPX's executable renamed): `launcherror`, `launchoverlayhide`, `launchoverlayhide` 9 ms later, then `postlaunch`. The §3 double hide is confirmed.
+- A renamed `.vpx` is no launch failure: PinballY starts VPX all the same, and the launch runs as a table that closes on its own.
+- Not traced: the batch capture.
 
 ## Not determined
 
 - Whether a JS handler that runs a nested message loop could let thread messages through during `playGame()`.
 - Launches that need Administrator mode (`PFVMsgPlayElevReqd`) and the Admin Host path.
-- Whether the release on the cabinet matches `master`.
+- The batch capture's order on the cabinet.
