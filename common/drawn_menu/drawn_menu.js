@@ -18,9 +18,8 @@ import { getDrawingAhead } from "../core/drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "../core/navigation_sound.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER } from "./drawn_menu_images.js";
 import {
-    DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, pointsOf, computeGeometry, menuScaleOf, rowHeightIn, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
+    DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, pointsOf, computeGeometry, menuScaleOf, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
 } from "./drawn_menu_painter.js";
-import { STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
 
 const SCRIPT_NAME = "DrawnMenus";
 
@@ -220,13 +219,10 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         return [top.layer, middle.layer, bottom.layer];
     }
 
-    // size: in pixels, as the painter's look gives it.
-    function messageHeightAt(width, size) {
-        const styled = host.createStyledText({
-            textAlign: "center",
-            textStyle: { font: FONTS.body, size: pointsOf(size), weight: DRAWN_MENU_LOOK.message.weight, color: DRAWN_MENU_LOOK.colors.message },
-        });
-        styled.add(shown.model.message);
+    // A text wrapped in width; sizePx: in pixels, as the painter's look gives it.
+    function wrappedHeightAt(str, width, { font, sizePx, weight }) {
+        const styled = host.createStyledText({ textAlign: "center", textStyle: { font, size: pointsOf(sizePx), weight } });
+        styled.add(str);
         return styled.measure(width).height;
     }
 
@@ -250,8 +246,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // The selected entry's middle in window pixels, at the current scroll.
     function selectedCenterY() {
         const { geometry, model } = shown;
-        const row = model.rows[model.selected];
-        return geometry.contentTop + geometry.areaOffset + geometry.rowTops[model.selected] - shown.scroll + rowHeightIn(geometry, row) / 2;
+        return geometry.contentTop + geometry.areaOffset + geometry.rowTops[model.selected] - shown.scroll + geometry.rowHeights[model.selected] / 2;
     }
 
     function drawSelectedTextLayer() {
@@ -308,7 +303,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         const before = Math.max(0, index - 1);
         const after = Math.min(model.rows.length - 1, index + 1);
         let scroll = shown.scroll;
-        const afterBottom = geometry.rowTops[after] + rowHeightIn(geometry, model.rows[after]);
+        const afterBottom = geometry.rowTops[after] + geometry.rowHeights[after];
         if (geometry.rowTops[before] < scroll) scroll = geometry.rowTops[before];
         if (afterBottom > scroll + geometry.areaHeight) scroll = afterBottom - geometry.areaHeight;
         shown.scroll = Math.max(0, Math.min(Math.max(0, geometry.rowsHeight - geometry.areaHeight), scroll));
@@ -333,7 +328,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         for (const record of images) if (record.signature !== windowSignature()) drawImage(record);
         lap("images");
         shown = { id, model, onClose, geometry: null, scroll: 0, layers: [], fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
-        shown.geometry = computeGeometry(windowSize, model, messageHeightAt);
+        shown.geometry = computeGeometry(windowSize, model, wrappedHeightAt);
         const { geometry } = shown;
         scrollToSelected();
         drawTextsLayer();

@@ -71,6 +71,17 @@ export const drawnMenuLines = fake => readDrawnMenu(fake).rows.map(row => {
     return row.kind === "heading" ? `[${row.title}]` : row.title;
 });
 
+// The headings and entries as drawn on the texts' canvas, from top to
+// bottom: { kind, title, top, bottom, size } (size in points).
+export function drawnRowBoxes(fake) {
+    const layer = textsLayer(fake);
+    if (!layer) throw new Error("No Drawn Menu is shown.");
+    const kinds = new Map([[COLORS.heading, "heading"], [COLORS.entry, "entry"]]);
+    return layer.strokes()
+        .filter(stroke => "text" in stroke && kinds.has(stroke.color))
+        .map(stroke => ({ kind: kinds.get(stroke.color), title: stroke.text, top: stroke.rect.y, bottom: stroke.rect.y + stroke.rect.height, size: stroke.size }));
+}
+
 // The title of the highlighted entry, written in gold over the selection.
 export function highlightedEntry(fake) {
     const layer = shownLayers(fake, DRAWN_MENU_Z_INDEX.selectedText).find(candidate => candidate.texts().length > 0);

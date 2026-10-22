@@ -3,6 +3,7 @@
 // drawing of its live parts (texts, selected entry, backdrop, images).
 // Only drawing: no layer, no event.
 // - A line estimated to fit is drawn unmeasured; each style's line height is measured once.
+// - A heading estimated too wide wraps whole, its row taller by its measured extra lines.
 // ============================================================
 
 import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing/steamball_palette.js";
@@ -41,7 +42,7 @@ export const DRAWN_MENU_LOOK = Object.freeze({
         DRAWN_MENU_IMAGES.glass.top.height + DRAWN_MENU_IMAGES.glass.bottom.height),
     rowHeights: Object.freeze({ entry: DRAWN_MENU_ENTRY_HEIGHT, heading: 50, separator: 30 }),
     entry: Object.freeze({ size: 36, minSize: 28, weight: 600 }),
-    heading: Object.freeze({ size: 24, minSize: 20, weight: 600 }),
+    heading: Object.freeze({ size: 24, weight: 600 }),
     message: Object.freeze({ size: 33, weight: 400, gap: 14 }),
     // Under the list, after a separator's height holding its rule: a row
     // as tall as an entry, at the entries' size, then listTop down to the
@@ -73,8 +74,6 @@ const LOOK = DRAWN_MENU_LOOK;
 // (size * 96 / 72): a size given in pixels would show a third bigger.
 export const pointsOf = px => px * 72 / 96;
 
-const heightOf = row => LOOK.rowHeights[row.kind];
-
 // Window pixels per reference pixel in a window ({ width, height }): its
 // height's scale, zoomed out when the panel would take too much of its width.
 export function menuScaleOf({ width, height }) {
@@ -84,19 +83,30 @@ export function menuScaleOf({ width, height }) {
 
 // The menu's layout in the window ({ width, height }), in window pixels
 // unless named "Ref" (reference pixels): k turns the one into the other.
-// messageHeightAt(widthPx, sizePx) measures the message, when there is one.
-export function computeGeometry({ width, height }, model, messageHeightAt) {
+// wrappedHeightAt(str, widthPx, { font, sizePx, weight }) measures a text
+// wrapped in that width: the message, and the headings too wide for one line.
+export function computeGeometry({ width, height }, model, wrappedHeightAt) {
     const k = menuScaleOf({ width, height });
     const zoom = k / (height / LOOK.referenceHeight);
     const listWidth = DRAWN_MENU_LIST_WIDTH * k;
+    // A wrapped heading's row: a one-line heading's, taller by its other
+    // lines, so that one estimated too wide that fits keeps today's height.
+    const rowHeightRefOf = row => {
+        if (row.kind !== ROW_KIND.HEADING || !headingWraps(row, listWidth, k)) return LOOK.rowHeights[row.kind];
+        const style = headingStyleAt(k);
+        const extraLinesHeight = wrappedHeightAt(headingTextOf(row), listWidth, style) - wrappedHeightAt("Ag", UNBOUNDED, style);
+        return LOOK.rowHeights.heading + Math.max(0, extraLinesHeight) / k;
+    };
+    const rowHeightsRef = model.rows.map(rowHeightRefOf);
     let rowTopRef = 0;
-    const rowTopsRef = model.rows.map(row => {
+    const rowTopsRef = rowHeightsRef.map(rowHeightRef => {
         const top = rowTopRef;
-        rowTopRef += heightOf(row);
+        rowTopRef += rowHeightRef;
         return top;
     });
     const rowsHeightRef = rowTopRef;
-    const messageHeightRef = model.message === null ? 0 : messageHeightAt(listWidth, LOOK.message.size * k) / k;
+    const messageStyle = { font: FONTS.body, sizePx: LOOK.message.size * k, weight: LOOK.message.weight };
+    const messageHeightRef = model.message === null ? 0 : wrappedHeightAt(model.message, listWidth, messageStyle) / k;
     const messageBlockRef = model.message === null ? 0 : messageHeightRef + LOOK.message.gap + LOOK.rowHeights.separator;
     const footerBlockRef = model.footer ? LOOK.rowHeights.separator + LOOK.footer.height : 0;
     const listBottomRef = model.footer ? LOOK.listTop : LOOK.listBottom;
@@ -121,11 +131,10 @@ export function computeGeometry({ width, height }, model, messageHeightAt) {
         areaOffset: messageBlockRef * k,
         areaHeight: areaHeightRef * k,
         rowTops: rowTopsRef.map(top => top * k),
+        rowHeights: rowHeightsRef.map(rowHeight => rowHeight * k),
         rowsHeight: rowsHeightRef * k,
     };
 }
-
-export const rowHeightIn = (geometry, row) => heightOf(row) * geometry.k;
 
 // Each character's width in ems, rounded up for Segoe UI, so that a line
 // estimated to fit surely does. Past the Latin letters (CJK, emoji...),
@@ -145,6 +154,11 @@ const emWidthOf = char => {
 };
 // In pixels, at this font size.
 const estimatedWidthPx = (str, size) => [...str].reduce((width, char) => width + emWidthOf(char), 0) * size;
+
+const headingTextOf = row => row.title.toLocaleUpperCase();
+const headingStyleAt = k => ({ font: FONTS.display, sizePx: LOOK.heading.size * k, weight: LOOK.heading.weight });
+// Estimated too wide for one line: wrapped, and measured.
+const headingWraps = (row, width, k) => estimatedWidthPx(headingTextOf(row), headingStyleAt(k).sizePx) > width;
 
 // One line's height for each style, measured once for the session: a
 // single line's height does not depend on its text.
@@ -216,6 +230,18 @@ function drawFooter(host, dc, { label, name }, { x, y, width, k }) {
     styled.draw(dc, { x, y: y + separatorHeight + (height - lineHeight) / 2, width, height: lineHeight });
 }
 
+// A heading in capitals, on one line or wrapped whole in its row, which
+// computeGeometry() made as tall as its lines.
+function drawHeading(host, dc, row, { x, y, width, height, k, color }) {
+    const { font, sizePx, weight } = headingStyleAt(k);
+    const str = headingTextOf(row);
+    if (headingWraps(row, width, k)) {
+        text(host, dc, str, { x, y, width, height, size: pointsOf(sizePx), weight, color, font, align: "center" });
+        return;
+    }
+    line(host, dc, str, { x, y, width, height, size: sizePx, minSize: sizePx, weight, color, font });
+}
+
 const markGlyphOf = row => DRAWN_MENU_MARKS[row.mark] || null;
 
 // An entry's title and mark, in its colour, in the box.
@@ -250,7 +276,7 @@ export function drawTexts(host, dc, geometry, model, scroll) {
     const edge = LOOK.rowHeights.entry * k;
     model.rows.forEach((row, index) => {
         const top = geometry.rowTops[index] - scroll;
-        const height = rowHeightIn(geometry, row);
+        const height = geometry.rowHeights[index];
         if (top < -0.5 || top + height > areaHeight + 0.5) return;
         const faded = (canScrollUp && top < edge) || (canScrollDown && top + height > areaHeight - edge);
         const alpha = faded ? LOOK.edgeAlpha : 0xFF;
@@ -259,10 +285,7 @@ export function drawTexts(host, dc, geometry, model, scroll) {
         if (row.kind === ROW_KIND.SEPARATOR) {
             drawSeparator(dc, box.x, box.y, box.width, box.height, k, alpha);
         } else if (row.kind === ROW_KIND.HEADING) {
-            line(host, dc, row.title.toLocaleUpperCase(), {
-                ...box, size: LOOK.heading.size * k, minSize: LOOK.heading.minSize * k, weight: LOOK.heading.weight,
-                color: shade(LOOK.colors.heading), font: FONTS.display,
-            });
+            drawHeading(host, dc, row, { ...box, k, color: shade(LOOK.colors.heading) });
         } else {
             drawEntry(host, dc, row, { ...box, k, color: shade(LOOK.colors.entry), markColor: shade(LOOK.colors.gold) });
         }
