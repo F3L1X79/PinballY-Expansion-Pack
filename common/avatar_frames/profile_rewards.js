@@ -21,14 +21,44 @@ const FRAME_COUNT = 10;
 const FRAME_FAMILY = Object.freeze({ COLLECTION: "collection", HOLIDAY: "holiday" });
 // Whether a local date is on one of those days of that month (1 to 12).
 const onDays = (month, ...days) => date => date.getMonth() === month - 1 && days.includes(date.getDate());
+// Whether a local date is the day holidayDateIn(year) gives, a Date at local midnight.
+const onComputedDay = holidayDateIn => date => holidayDateIn(date.getFullYear()).getTime() === new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+
+// Easter Sunday by the anonymous Gregorian algorithm (Meeus, Jones, Butcher).
+function easterSunday(year) {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - Math.floor(b / 4) - g + 15) % 30;
+    const l = (32 + 2 * (b % 4) + 2 * Math.floor(c / 4) - h - (c % 4)) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const monthAndDay = h + l - 7 * m + 114;
+    return new Date(year, Math.floor(monthAndDay / 31) - 1, (monthAndDay % 31) + 1);
+}
+
+// Date normalizes the negative day count into February or March.
+const mardiGras = year => {
+    const easter = easterSunday(year);
+    return new Date(year, easter.getMonth(), easter.getDate() - 47);
+};
+
+// The fourth Thursday of November (Thursday is day 4 of getDay).
+const NOVEMBER = 10;
+const thanksgiving = year => new Date(year, NOVEMBER, 1 + ((4 - new Date(year, NOVEMBER, 1).getDay() + 7) % 7) + 21);
+
 // The Holiday Frames in list order, each with whether a local date is on its holiday.
 const HOLIDAYS = Object.freeze([
     { id: "newYear", isOn: onDays(1, 1) },
     { id: "valentine", isOn: onDays(2, 14) },
+    { id: "mardiGras", isOn: onComputedDay(mardiGras) },
     { id: "stPatrick", isOn: onDays(3, 17) },
+    { id: "easter", isOn: onComputedDay(easterSunday) },
     { id: "musicDay", isOn: onDays(6, 21) },
     { id: "halloween", isOn: onDays(10, 31) },
     { id: "deadDay", isOn: onDays(11, 1, 2) },
+    { id: "thanksgiving", isOn: onComputedDay(thanksgiving) },
     { id: "christmas", isOn: onDays(12, 24, 25) },
 ]);
 const LOCAL_ISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/;

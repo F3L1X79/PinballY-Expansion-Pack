@@ -1493,14 +1493,212 @@ function deadDay(cv) {
     scatter(86, 14, 1.28, 0.14, (x, y, random) => dot(cv, x, y, 0.016 + 0.01 * random(), hex(random() < 0.5 ? "#ff9a1a" : "#ffd040"), 0.03, 0.4));
 }
 
+// ============================================================
+// Mardi Gras: a royal-purple band checked like a harlequin between gold
+// trims, fans of purple, green and gold plumes along it, a masquerade
+// mask on top before a fan of plumes, confetti all around.
+// ============================================================
+const ROYAL = ramp([[0, "#0c0218"], [0.3, "#2e0a52"], [0.52, "#5a1a96"], [0.7, "#8a4ad0"], [0.86, "#d4b0ff"], [1, "#ffffff"]]);
+const JADE = ramp([[0, "#011a0e"], [0.3, "#065a30"], [0.52, "#0f9a52"], [0.7, "#3ed48a"], [0.86, "#b0ffd8"], [1, "#ffffff"]]);
+const CARNIVAL = ["#b050ff", "#22c878", "#ffc830"];
+
+// A plume of colorRamp along angle from (x, y), its barbs combed toward the tip.
+function plume(cv, x, y, angle, length, width, colorRamp) {
+    const pts = placed(leafPoints(length, width, { peak: 0.55, tipRound: 0.2 }), x, y, angle);
+    const sdf = (px, py) => sdPolygon(px, py, pts);
+    cv.shadow(sdf, { bbox: bboxOf(pts, 0.06), blur: 0.03, opacity: 0.4 });
+    cv.shape(sdf, (px, py, d) => {
+        const [u, v] = toLocal(px, py, x, y, angle);
+        const barbs = 0.06 * Math.sin((u + Math.abs(v) * 1.5) * 150);
+        const shaft = smoothstep(0.006, 0, Math.abs(v)) * 0.3;
+        const edge = smoothstep(0.012, 0, -d) * -0.15;
+        return colorRamp((v < 0 ? 0.6 : 0.46) + barbs + shaft + edge + 0.15 * (u / length));
+    }, { bbox: bboxOf(pts, 0.02) });
+}
+
+// Plumes fanning out from (x, y) along angle, one per turn (degrees), in turn purple, green and gold.
+function plumeFan(cv, x, y, angle, size, turns) {
+    turns.forEach((turn, index) => plume(cv, x, y, angle + rad(turn), size, size * 0.34, [ROYAL, JADE, RAMPS.gold][index % 3]));
+}
+
+// A gold-rimmed eye mask centred on (x, y), s its half-height: purple on
+// the left, green on the right.
+function masqueradeMask(cv, x, y, s) {
+    const lobe = side => (px, py) => sdEllipse(...toLocal(px, py, x + side * 0.5 * s, y, rad(side * 12)), 0.62 * s, 0.4 * s);
+    const eye = side => (px, py) => sdLens(px, py, x + side * 0.46 * s, y - 0.04 * s, 0.24 * s, 0.11 * s, rad(side * 10));
+    const nose = circle(x, y + 0.42 * s, 0.16 * s);
+    const sdf = (px, py) => Math.max(Math.min(lobe(-1)(px, py), lobe(1)(px, py)), -eye(-1)(px, py), -eye(1)(px, py), -nose(px, py));
+    const rim = (px, py) => sdf(px, py) - 0.05 * s;
+    const box = [x - 1.25 * s, y - 0.65 * s, x + 1.25 * s, y + 0.65 * s];
+    cv.shadow(rim, { bbox: box, opacity: 0.55 });
+    cv.shape(rim, metal(rim, RAMPS.gold, { bevel: 0.05 * s, contrast: 1.6, spec: 0.9 }), { bbox: box });
+    const left = metal(sdf, ROYAL, { bevel: 0.25 * s, spec: 0.8, shininess: 26 });
+    const right = metal(sdf, JADE, { bevel: 0.25 * s, spec: 0.8, shininess: 26 });
+    cv.shape(sdf, (px, py, d) => (px < x ? left : right)(px, py, d), { bbox: box });
+}
+
+function mardiGras(cv) {
+    holidayBand(cv, ROYAL, RAMPS.gold, (x, y) => 0.12 * smoothstep(-0.2, 0.2, Math.sin((x + y) * 14) * Math.sin((x - y) * 14)) - 0.06);
+    for (const { x, y, angle, size } of ornamentSpots(0.34, 0.26)) plumeFan(cv, x, y, angle, size, [-30, 30, 0]);
+    plumeFan(cv, 0, -1.18, -Math.PI / 2, 0.3, [-50, 50, -25, 25, 0]);
+    masqueradeMask(cv, 0, -1.18, 0.25);
+    scatter(97, 26, 1.24, 0.2, (x, y, random) => polygon(cv,
+        placed([[-0.022, -0.011], [0.022, -0.011], [0.022, 0.011], [-0.022, 0.011]], x, y, random() * TAU),
+        flat(CARNIVAL[Math.floor(random() * CARNIVAL.length)])));
+    twinkles(cv, 98, 8, "#fff0c0");
+}
+
+// ============================================================
+// Easter: a spring-green band with a faint dotted print between gold
+// trims, painted eggs at its corners, spring flowers along its sides, a
+// big gold-striped egg on top between two flowers.
+// ============================================================
+const MEADOW = ramp([[0, "#06200a"], [0.3, "#1d5a22"], [0.52, "#3f9a3a"], [0.7, "#7fcf5e"], [0.86, "#d6f5b0"], [1, "#ffffff"]]);
+// Each egg's base and stripe colours, and each flower's petals.
+const EGG_COLORS = [["#ff9ec4", "#fff1a8"], ["#9fd8ff", "#ffffff"], ["#c8a6ff", "#ffe08a"], ["#ffd36a", "#ff7fa8"]];
+const BLOSSOMS = ["#ffb8d8", "#fff4a0", "#b8d8ff", "#e0c0ff"];
+const shaded = color => ramp([[0, mixc(color, "#000000", 0.75)], [0.35, mixc(color, "#000000", 0.3)], [0.62, color], [0.88, mixc(color, WHITE, 0.6)], [1, WHITE]]);
+
+// A painted egg at (x, y), its narrow end along angle: a zigzag, a band
+// and a row of dots of stripe on base.
+function egg(cv, x, y, size, base, stripe, angle) {
+    const sdf = (px, py) => {
+        const [u, v] = toLocal(px, py, x, y, angle);
+        return sdEllipse(u, v, u > 0 ? 0.6 * size : 0.46 * size, 0.42 * size);
+    };
+    const box = around(x, y, 0.65 * size);
+    const baseLit = metal(sdf, shaded(base), { bevel: 0.4 * size, spec: 0.7, shininess: 30 });
+    const stripeLit = metal(sdf, shaded(stripe), { bevel: 0.4 * size, spec: 0.7, shininess: 30 });
+    const dotPitch = 0.2 * size;
+    cv.shadow(sdf, { bbox: box, opacity: 0.5 });
+    cv.shape(sdf, (px, py, d) => {
+        const [u, v] = toLocal(px, py, x, y, angle);
+        const zigzag = Math.abs(u - 0.1 * size - 0.08 * size * Math.abs((((v / (0.16 * size)) % 2) + 2) % 2 - 1)) < 0.05 * size;
+        const stripeBand = Math.abs(u + 0.18 * size) < 0.04 * size;
+        const dots = Math.hypot(u - 0.34 * size, ((v % dotPitch) + dotPitch) % dotPitch - dotPitch / 2) < 0.035 * size;
+        return (zigzag || stripeBand || dots ? stripeLit : baseLit)(px, py, d);
+    }, { bbox: box });
+}
+
+function easter(cv) {
+    holidayBand(cv, MEADOW, RAMPS.gold, (x, y) => 0.06 * smoothstep(0.75, 1, Math.sin(x * 40) * Math.sin(y * 40)));
+    ornamentSpots(0.3, 0.13).forEach(({ x, y, angle, size }, index) => {
+        if (index < 3) {
+            const [base, stripe] = EGG_COLORS[index];
+            egg(cv, x, y, size, base, stripe, angle);
+            return;
+        }
+        for (const turn of [-55, 55]) leaf(cv, x, y, angle + rad(turn), size * 1.5, size * 0.6);
+        flower(cv, x, y, size, BLOSSOMS[index % BLOSSOMS.length], "#f0a020", 5, angle);
+    });
+    for (const side of [-1, 1]) {
+        leaf(cv, side * 0.26, -1.12, -Math.PI / 2 + side * rad(70), 0.2, 0.08);
+        flower(cv, side * 0.32, -1.18, 0.12, BLOSSOMS[side < 0 ? 0 : 2], "#f0a020", 5);
+    }
+    const [base, stripe] = EGG_COLORS[3];
+    egg(cv, 0, -1.22, 0.42, base, stripe, -Math.PI / 2);
+    sparkle(cv, -0.07, -1.34, 0.06, WHITE);
+    twinkles(cv, 104, 10, "#fffbe0");
+}
+
+// ============================================================
+// Thanksgiving: a russet band with a faint grain between copper trims,
+// maple leaves in red, orange and gold at its corners, sheaves of wheat
+// along its sides, a big maple leaf over crossed ears on top, leaves falling.
+// ============================================================
+const HARVEST = ramp([[0, "#160902"], [0.3, "#4a2208"], [0.52, "#7e3e12"], [0.7, "#b66a2a"], [0.86, "#f0c48a"], [1, "#ffffff"]]);
+const AUTUMN = [
+    ramp([[0, "#2a0300"], [0.35, "#8a1406"], [0.6, "#d4361a"], [0.82, "#ff8a50"], [1, "#fff0d0"]]),
+    ramp([[0, "#2a0e00"], [0.35, "#9a3a04"], [0.6, "#e8720e"], [0.82, "#ffb050"], [1, "#fff4d8"]]),
+    ramp([[0, "#2a1a00"], [0.35, "#8a5a04"], [0.6, "#d8a018"], [0.82, "#ffd860"], [1, "#fffbe0"]]),
+];
+
+// A maple leaf at (x, y), its middle lobe along angle: five broad,
+// pointed, serrated lobes, smaller toward the stem, a vein each.
+function mapleLeaf(cv, x, y, size, angle, colorRamp) {
+    const outline = [];
+    for (let i = 0; i < 160; i++) {
+        const a = (i / 160) * TAU;
+        const lobe = 0.25 + 0.75 * (1 - Math.abs(Math.sin(2.5 * a))) ** 0.6 + 0.07 * Math.abs(Math.sin(12.5 * a));
+        const r = size * lobe * (0.78 + 0.22 * Math.cos(a));
+        outline.push([Math.cos(a) * r, Math.sin(a) * r]);
+    }
+    const pts = placed(outline, x, y, angle);
+    const stem = stroke([[x, y], [x - Math.cos(angle) * size * 0.7, y - Math.sin(angle) * size * 0.7]], size * 0.04, size * 0.025);
+    cv.shape(stem.sdf, metal(stem.sdf, HARVEST, { bevel: size * 0.03 }), { bbox: stem.bbox });
+    const sdf = (px, py) => sdPolygon(px, py, pts);
+    cv.shadow(sdf, { bbox: bboxOf(pts, 0.06), blur: 0.03, opacity: 0.45 });
+    cv.shape(sdf, (px, py, d) => {
+        const [u, v] = toLocal(px, py, x, y, angle);
+        const r = Math.hypot(u, v);
+        // Roughly the distance to the nearest lobe's axis.
+        const vein = smoothstep(0.006, 0, (r * Math.abs(Math.sin(2.5 * Math.atan2(v, u)))) / 2.5) * 0.25;
+        const edge = smoothstep(0.012, 0, -d) * -0.15;
+        return colorRamp(0.55 + vein + edge + 0.12 * (r / size));
+    }, { bbox: bboxOf(pts, 0.02) });
+}
+
+// An ear of wheat from (x, y) along angle: a stalk, then pairs of grains
+// up to a grain at its tip, and three awns beyond it.
+function wheatEar(cv, x, y, angle, length) {
+    const at = t => [x + Math.cos(angle) * length * t, y + Math.sin(angle) * length * t];
+    const stalk = stroke([at(0), at(0.95)], length * 0.018, length * 0.012);
+    cv.shadow(stalk.sdf, { bbox: stalk.bbox, opacity: 0.4 });
+    cv.shape(stalk.sdf, metal(stalk.sdf, RAMPS.gold, { bevel: length * 0.015 }), { bbox: stalk.bbox });
+    const grain = (cx, cy, grainLength, grainAngle) => {
+        const sdf = (px, py) => sdLens(px, py, cx, cy, grainLength, grainLength * 0.5, grainAngle);
+        const box = around(cx, cy, grainLength * 1.2);
+        cv.shadow(sdf, { bbox: box, blur: 0.02, opacity: 0.4 });
+        cv.shape(sdf, metal(sdf, RAMPS.gold, { bevel: grainLength * 0.5, base: 0.68, contrast: 1.2, spec: 0.7 }), { bbox: box });
+    };
+    for (let i = 0; i < 6; i++) {
+        const [gx, gy] = at(0.36 + i * 0.1);
+        const grainLength = length * 0.12 * (1 - i * 0.07);
+        for (const side of [-1, 1]) {
+            const grainAngle = angle + side * rad(28);
+            grain(gx + Math.cos(grainAngle) * grainLength, gy + Math.sin(grainAngle) * grainLength, grainLength, grainAngle);
+        }
+    }
+    const [tx, ty] = at(1);
+    grain(tx, ty, length * 0.05, angle);
+    for (const turn of [-12, 0, 12]) {
+        const awnAngle = angle + rad(turn);
+        const awn = stroke([[tx, ty], [tx + Math.cos(awnAngle) * length * 0.22, ty + Math.sin(awnAngle) * length * 0.22]], length * 0.005, length * 0.002);
+        cv.shape(awn.sdf, flat("#f0d080"), { bbox: awn.bbox });
+    }
+}
+
+function thanksgiving(cv) {
+    holidayBand(cv, HARVEST, RAMPS.copper, (x, y) => {
+        const { s, q } = bandCoords(x, y);
+        return 0.16 * (fbm(s * 4, q * 40, 3) - 0.5);
+    });
+    ornamentSpots(0.25, 0.34).forEach(({ x, y, angle, size }, index) => {
+        if (index < 3) {
+            [-38, 38, 0].forEach((turn, k) => {
+                const a = angle + rad(turn);
+                mapleLeaf(cv, x + Math.cos(a) * size * 0.4, y + Math.sin(a) * size * 0.4, size * (k === 2 ? 0.7 : 0.55), a, AUTUMN[(index + k) % 3]);
+            });
+            return;
+        }
+        for (const turn of [-22, 22, 0]) wheatEar(cv, x, y, angle + rad(turn), size);
+    });
+    for (const side of [-1, 1]) wheatEar(cv, side * 0.05, -1.1, -Math.PI / 2 + side * rad(38), 0.38);
+    mapleLeaf(cv, 0, -1.22, 0.2, -Math.PI / 2, AUTUMN[0]);
+    scatter(113, 12, 1.3, 0.12, (x, y, random) => mapleLeaf(cv, x, y, 0.055, random() * TAU, AUTUMN[Math.floor(random() * AUTUMN.length)]));
+}
+
 // The Holiday Frames, by their id in the Profile Rewards module.
 export const HOLIDAY_FRAMES = [
     { id: "newYear", name: "New Year's Day", draw: newYear },
     { id: "valentine", name: "Valentine's Day", draw: valentine },
+    { id: "mardiGras", name: "Mardi Gras", draw: mardiGras },
     { id: "stPatrick", name: "St. Patrick's Day", draw: stPatrick },
+    { id: "easter", name: "Easter", draw: easter },
     { id: "musicDay", name: "Fete de la Musique", draw: musicDay },
     { id: "halloween", name: "Halloween", draw: halloween },
     { id: "deadDay", name: "Dia de los Muertos", draw: deadDay },
+    { id: "thanksgiving", name: "Thanksgiving", draw: thanksgiving },
     { id: "christmas", name: "Christmas", draw: christmas },
 ];
 

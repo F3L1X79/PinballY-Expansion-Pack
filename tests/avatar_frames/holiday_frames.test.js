@@ -73,12 +73,50 @@ test("Plays of every year file count, and the Holiday Frames are listed after th
     assert.deepEqual(frames.map(frame => [frame.id, frame.family, frame.isUnlocked]), [
         [1, "collection", true], [2, "collection", true], [3, "collection", false], [4, "collection", false], [5, "collection", false],
         [6, "collection", false], [7, "collection", false], [8, "collection", false], [9, "collection", false], [10, "collection", false],
-        ["newYear", "holiday", false], ["valentine", "holiday", false], ["stPatrick", "holiday", false], ["musicDay", "holiday", false],
-        ["halloween", "holiday", false], ["deadDay", "holiday", false], ["christmas", "holiday", true],
+        ["newYear", "holiday", false], ["valentine", "holiday", false], ["mardiGras", "holiday", false], ["stPatrick", "holiday", false],
+        ["easter", "holiday", false], ["musicDay", "holiday", false], ["halloween", "holiday", false], ["deadDay", "holiday", false],
+        ["thanksgiving", "holiday", false], ["christmas", "holiday", true],
     ]);
-    assert.equal(frames[16].name, "Christmas");
-    assert.equal(frames[16].holiday, "christmas");
-    assert.equal(frames[15].unlockCondition, "A Play on 1 or 2 November", "a locked row tells what wins it");
+    assert.equal(frames[19].name, "Christmas");
+    assert.equal(frames[19].holiday, "christmas");
+    assert.equal(frames[17].unlockCondition, "A Play on 1 or 2 November", "a locked row tells what wins it");
+    assert.equal(frames[18].unlockCondition, "A Play on Thanksgiving, the fourth Thursday of November");
+});
+
+// The published dates of Easter Sunday and of Mardi Gras, 2026 to 2035.
+const EASTER_AND_MARDI_GRAS = [
+    ["2026-04-05", "2026-02-17"], ["2027-03-28", "2027-02-09"], ["2028-04-16", "2028-02-29"], ["2029-04-01", "2029-02-13"],
+    ["2030-04-21", "2030-03-05"], ["2031-04-13", "2031-02-25"], ["2032-03-28", "2032-02-10"], ["2033-04-17", "2033-03-01"],
+    ["2034-04-09", "2034-02-21"], ["2035-03-25", "2035-02-06"],
+];
+const playOn = (day, time = "12:00:00", seconds = 600) => ({ [day.slice(0, 4)]: [[`${day}T${time}`, seconds]] });
+const dayBefore = day => {
+    const date = new Date(`${day}T12:00:00`);
+    date.setDate(date.getDate() - 1);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
+
+test("Easter Sunday and Mardi Gras unlock on their published dates, 2026 to 2035; the Saturday before Easter does not", () => {
+    for (const [easter, mardiGras] of EASTER_AND_MARDI_GRAS) {
+        assert.deepEqual(unlockedHolidays(rewardsWith(playOn(easter)).rewards), ["easter"], easter);
+        assert.deepEqual(unlockedHolidays(rewardsWith(playOn(dayBefore(easter))).rewards), [], `the Saturday before ${easter}`);
+        assert.deepEqual(unlockedHolidays(rewardsWith(playOn(mardiGras)).rewards), ["mardiGras"], mardiGras);
+        assert.deepEqual(unlockedHolidays(rewardsWith(playOn(dayBefore(mardiGras))).rewards), [], `the day before ${mardiGras}`);
+    }
+});
+
+test("a Play from Holy Saturday 23:50 ending on Easter Sunday unlocks Easter", () => {
+    assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2027-03-27", "23:50:00", 20 * 60)).rewards), ["easter"]);
+});
+
+test("Thanksgiving is the fourth Thursday of November, in a November starting on a Thursday and in one starting on a Friday", () => {
+    // 1 November 2029 is a Thursday, 1 November 2030 a Friday.
+    assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2029-11-22")).rewards), ["thanksgiving"]);
+    assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2029-11-29")).rewards), [], "the fifth Thursday");
+    assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2029-11-15")).rewards), [], "the third Thursday");
+    assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2030-11-28")).rewards), ["thanksgiving"]);
+    assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2030-11-21")).rewards), [], "the third Thursday");
+    assert.deepEqual(unlockedHolidays(rewardsWith(playOn("2026-11-26")).rewards), ["thanksgiving"]);
 });
 
 test("each fixed-date holiday unlocks on its own day, not the day before or after", () => {
@@ -90,9 +128,9 @@ test("each fixed-date holiday unlocks on its own day, not the day before or afte
         ["deadDay", "2026-11-02", null, "2026-11-03"],
     ];
     for (const [id, day, before, after] of cases) {
-        assert.deepEqual(unlockedHolidays(rewardsWith({ [day.slice(0, 4)]: [[`${day}T12:00:00`, 600]] }).rewards), [id], day);
+        assert.deepEqual(unlockedHolidays(rewardsWith(playOn(day)).rewards), [id], day);
         for (const other of [before, after].filter(Boolean)) {
-            assert.deepEqual(unlockedHolidays(rewardsWith({ [other.slice(0, 4)]: [[`${other}T12:00:00`, 600]] }).rewards), [], other);
+            assert.deepEqual(unlockedHolidays(rewardsWith(playOn(other)).rewards), [], other);
         }
     }
 });

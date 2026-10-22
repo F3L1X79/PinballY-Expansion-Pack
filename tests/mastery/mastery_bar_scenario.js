@@ -22,7 +22,7 @@ export const profileFile = name => `${PROFILES_FOLDER}\\${name}\\profile.json`;
 // The Avatar Frame images, three per frame, as the pack ships them.
 export const AVATAR_FRAMES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\assets\\images\\avatar_frames";
 export const AVATAR_FRAME_IMAGES = [...Array.from({ length: 10 }, (_, index) => String(index + 1).padStart(2, "0")),
-    "newYear", "valentine", "stPatrick", "musicDay", "halloween", "deadDay", "christmas"]
+    "newYear", "valentine", "mardiGras", "stPatrick", "easter", "musicDay", "halloween", "deadDay", "thanksgiving", "christmas"]
     .map(id => `${AVATAR_FRAMES_FOLDER}\\frame_${id}`)
     .flatMap(base => [`${base}_384.png`, `${base}_192.png`, `${base}_192_locked.png`]);
 

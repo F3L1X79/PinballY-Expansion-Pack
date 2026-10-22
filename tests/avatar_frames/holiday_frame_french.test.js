@@ -30,10 +30,13 @@ test("en français : la ligne verrouillée de Noël, puis son toast", async () =
     assert.deepEqual(frameRows(fake).map(row => [row.name, row.status, row.frame]), [
         ["Jour de l'An", "Une partie le 1er janvier", "frame_newYear_192_locked.png"],
         ["Saint-Valentin", "Une partie le 14 février", "frame_valentine_192_locked.png"],
+        ["Mardi gras", "Une partie le jour de Mardi gras, 47 jours avant Pâques", "frame_mardiGras_192_locked.png"],
         ["Saint-Patrick", "Une partie le 17 mars", "frame_stPatrick_192_locked.png"],
+        ["Pâques", "Une partie le dimanche de Pâques", "frame_easter_192_locked.png"],
         ["Fête de la Musique", "Une partie le 21 juin", "frame_musicDay_192_locked.png"],
         ["Halloween", "Une partie le 31 octobre", "frame_halloween_192_locked.png"],
         ["Día de los Muertos", "Une partie le 1er ou le 2 novembre", "frame_deadDay_192_locked.png"],
+        ["Thanksgiving", "Une partie le jour de Thanksgiving, le quatrième jeudi de novembre", "frame_thanksgiving_192_locked.png"],
         ["Noël", "Une partie le 24 ou le 25 décembre", "frame_christmas_192_locked.png"],
         ["Aucun", "Porté", null],
     ]);

@@ -1,8 +1,8 @@
 // ============================================================
 // Christmas as a Profile's first Avatar Frame, through main.js on the fake
 // PinballY globals: its toast is followed by the Reward Prompt, whose
-// "Go equip it" opens the frame list on the Christmas row, last of the
-// Holiday Frames after the Collection Tier rows; equipping it saves its text id
+// "Go equip it" opens the frame list scrolled to the Christmas row, last of
+// the Holiday Frames; equipping it saves its text id
 // and the badge wears it.
 // ============================================================
 
@@ -35,11 +35,11 @@ test("Christmas as a first frame: the Reward Prompt's Go equip it lands on its r
     assert.equal(highlightedRow(fake), "Christmas");
     const rows = frameRows(fake);
     const christmas = rows.findIndex(row => row.name === "Christmas");
-    assert.deepEqual(rows.slice(christmas - 7).map(row => row.name), ["Celestial Legend", "New Year's Day", "Valentine's Day",
-        "St. Patrick's Day", "Fête de la Musique", "Halloween", "Día de los Muertos", "Christmas", "None"],
-        "the Holiday Frames after the Collection Tiers, Christmas last, before None");
+    // The Collection Tier rows above are scrolled out of view.
+    assert.deepEqual(rows.slice(christmas - 9).map(row => row.name), ["New Year's Day", "Valentine's Day", "Mardi Gras",
+        "St. Patrick's Day", "Easter", "Fête de la Musique", "Halloween", "Día de los Muertos", "Thanksgiving", "Christmas", "None"],
+        "the Holiday Frames in the year's order, Christmas last, before None");
     assert.deepEqual(rows[christmas].frame, "frame_christmas_192.png");
-    assert.equal(rows[christmas - 7].status, "Collection Tier 10");
 
     press(fake, "Select");
     fake.advanceTime(PROFILE_STATS_OPEN_MS);

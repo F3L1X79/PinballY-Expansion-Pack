@@ -660,10 +660,13 @@ export default {
         holidays: {
             newYear: { name: "Jour de l'An", condition: "Une partie le 1er janvier" },
             valentine: { name: "Saint-Valentin", condition: "Une partie le 14 février" },
+            mardiGras: { name: "Mardi gras", condition: "Une partie le jour de Mardi gras, 47 jours avant Pâques" },
             stPatrick: { name: "Saint-Patrick", condition: "Une partie le 17 mars" },
+            easter: { name: "Pâques", condition: "Une partie le dimanche de Pâques" },
             musicDay: { name: "Fête de la Musique", condition: "Une partie le 21 juin" },
             halloween: { name: "Halloween", condition: "Une partie le 31 octobre" },
             deadDay: { name: "Día de los Muertos", condition: "Une partie le 1er ou le 2 novembre" },
+            thanksgiving: { name: "Thanksgiving", condition: "Une partie le jour de Thanksgiving, le quatrième jeudi de novembre" },
             christmas: { name: "Noël", condition: "Une partie le 24 ou le 25 décembre" },
         },
         // The Reward Prompt, after a Profile's first frame: the frame's name,

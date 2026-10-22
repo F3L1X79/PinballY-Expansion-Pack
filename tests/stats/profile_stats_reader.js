@@ -215,7 +215,7 @@ export function highlightedRow(fake) {
 
 // Moves the highlight with Next to the row of that name, then presses Select.
 export function pickRow(fake, name) {
-    for (let guard = 0; guard < 20 && highlightedRow(fake) !== name; guard++) press(fake, "Next");
+    for (let guard = 0; guard < 40 && highlightedRow(fake) !== name; guard++) press(fake, "Next");
     assert.equal(highlightedRow(fake), name, `the Avatar Frame list offers "${name}"`);
     return press(fake, "Select");
 }

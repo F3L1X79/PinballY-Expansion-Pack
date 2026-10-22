@@ -557,10 +557,13 @@ export default {
         holidays: {
             newYear: { name: "New Year's Day", condition: "A Play on 1 January" },
             valentine: { name: "Valentine's Day", condition: "A Play on 14 February" },
+            mardiGras: { name: "Mardi Gras", condition: "A Play on Mardi Gras, 47 days before Easter" },
             stPatrick: { name: "St. Patrick's Day", condition: "A Play on 17 March" },
+            easter: { name: "Easter", condition: "A Play on Easter Sunday" },
             musicDay: { name: "Fête de la Musique", condition: "A Play on 21 June" },
             halloween: { name: "Halloween", condition: "A Play on 31 October" },
             deadDay: { name: "Día de los Muertos", condition: "A Play on 1 or 2 November" },
+            thanksgiving: { name: "Thanksgiving", condition: "A Play on Thanksgiving, the fourth Thursday of November" },
             christmas: { name: "Christmas", condition: "A Play on 24 or 25 December" },
         },
         // The Reward Prompt, after a Profile's first frame: the frame's name,
