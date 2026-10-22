@@ -334,8 +334,8 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
           </div>
           <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> (un ticket par langue) puis <code>/implement</code> par ticket. Après les <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a>, dont elle traduira les textes</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/320">#320</a> (allemand), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/321">#321</a> (espagnol), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/322">#322</a> (italien), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/323">#323</a> (portugais), indépendants entre eux, chacun bloqué par #317 et #318. Flow Matt : <code>/implement</code> par ticket. Après les <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a>, dont elle traduira les textes</div>
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
@@ -596,8 +596,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>22/10 <span class="count">(1)</span></summary>
+          <summary>22/10 <span class="count">(2)</span></summary>
           <ol>
+            <li><strong>La passe de traduction en quatre tickets, un par langue</strong>
+              <span>Tickets #320 à #323, indépendants entre eux, bloqués par les deux derniers tickets des Expansion Pack Settings qui ajoutent des textes (#317, #318). Chacun retire tous les <code>// TODO: translation pass</code> de sa langue (43 aujourd'hui, plus ceux des réglages). Place, effort et impact inchangés.</span></li>
             <li><strong>Les popups d'entretien dessinées, après les options au menu opérateur</strong>
               <span>Reportées pendant le grilling des menus de capture dessinés, qui dessine tous les menus sauf ceux du glisser-déposer et la confirmation de suppression d'un média, et laisse les popups natives. L'idée ne garde que le délai de capture et la liste de la capture par lot : la liste des médias et le volume audio sont des écrans à part, laissés natifs à la demande de Félix. Placées juste après les options au menu opérateur, avec l'entretien de la borne. Effort moyen, impact faible.</span></li>
           </ol>
