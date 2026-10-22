@@ -19,9 +19,11 @@ if (!Number.isInteger(spec) || spec <= 0) {
 
 const run = (command, args) => execFileSync(command, args, { encoding: "utf8" });
 
+// Every open issue, filtered here: GitHub's search ("#N" in:body) comes
+// back empty at random.
 const openIssues = JSON.parse(run("gh", [
-    "issue", "list", "--repo", REPOSITORY, "--state", "open", "--limit", "200",
-    "--search", `"#${spec}" in:body`, "--json", "number,title,labels,body",
+    "issue", "list", "--repo", REPOSITORY, "--state", "open", "--limit", "1000",
+    "--json", "number,title,labels,body",
 ]));
 const parentPattern = new RegExp(`##\\s*Parent\\s+#${spec}\\b`);
 const tickets = openIssues.filter(issue => issue.number !== spec && parentPattern.test(issue.body));
