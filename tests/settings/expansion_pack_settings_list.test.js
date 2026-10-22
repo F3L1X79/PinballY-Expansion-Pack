@@ -37,20 +37,23 @@ function wholeList() {
     }
 }
 
+// Every Add-on but Drawn Menus runs off here: a saved On shows "on restart".
+const ON = "On (on restart)";
+
 // The list as saved by default, but for what each test changes.
-const listLines = ({ achievements = "On", clock = "On", menuCleanup = "Off", language = "English" } = {}) => [
+const listLines = ({ achievements = ON, clock = ON, menuCleanup = "Off", language = "English" } = {}) => [
     "[PLAYERS AND PROGRESS]",
-    "Profile picker: On", "Welcome Screen: On", `Achievements: ${achievements}`, "Session stats: On",
-    "Challenges: On", "Table Mastery: On", "High Scores: On",
+    `Profile picker: ${ON}`, `Welcome Screen: ${ON}`, `Achievements: ${achievements}`, `Session stats: ${ON}`,
+    `Challenges: ${ON}`, `Table Mastery: ${ON}`, `High Scores: ${ON}`,
     "[WHEEL SCREEN]",
-    "Status line: On", `Clock: ${clock}`, "Wheel Arc: On",
+    `Status line: ${ON}`, `Clock: ${clock}`, `Wheel Arc: ${ON}`,
     "[MENUS AND FILTERS]",
-    "PinballY translation: On", "Drawn Menus: On", "Menu commands: On", "Hall of Fame: On",
-    "Tables to Discover: On", "Hidden Tables: On", "Original Tables: On", `Menu Cleanup: ${menuCleanup}`,
+    `PinballY translation: ${ON}`, "Drawn Menus: On", `Menu commands: ${ON}`, `Hall of Fame: ${ON}`,
+    `Tables to Discover: ${ON}`, `Hidden Tables: ${ON}`, `Original Tables: ${ON}`, `Menu Cleanup: ${menuCleanup}`,
     "[LAUNCHING AND PLAYING A TABLE]",
-    "Backglass: On", "Launch overlay: On", "Launch sound: On", "Rating prompt: On", "Table ROMs: On",
+    `Backglass: ${ON}`, `Launch overlay: ${ON}`, `Launch sound: ${ON}`, `Rating prompt: ${ON}`, `Table ROMs: ${ON}`,
     "[DEBUGGING]",
-    "Launch events trace: On",
+    `Launch events trace: ${ON}`,
     "---",
     `Language: ${language}`,
     "---",
@@ -78,14 +81,14 @@ test("without .env.local, the list shows the defaults, Menu Cleanup off", () => 
 
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.deepEqual(wholeList(), listLines());
-    assert.equal(highlightedEntry(fake), "Profile picker: On", "the cursor skips the heading");
+    assert.equal(highlightedEntry(fake), `Profile picker: ${ON}`, "the cursor skips the heading");
 });
 
-test("choosing a line does nothing yet", () => {
-    chooseEntry(fake, "Clock: On");
+test("choosing the Language line does nothing yet", () => {
+    chooseEntry(fake, "Language: English");
 
     assert.ok(isDrawnMenuShown(fake), "the list stays");
-    assert.equal(highlightedEntry(fake), "Clock: On");
+    assert.equal(highlightedEntry(fake), "Language: English");
 });
 
 test("Exit goes back to the Operator Menu", () => {
@@ -108,7 +111,7 @@ test("the list shows .env.local as saved, read again on each opening", () => {
 
     fake.addFile(ENV_LOCAL, "ADD_ON_CLOCK=false\nADD_ON_MENU_CLEANUP=true\nLANGUAGE=pt\n");
     openList();
-    assert.deepEqual(wholeList(), listLines({ clock: "Off", menuCleanup: "On", language: "Português" }));
+    assert.deepEqual(wholeList(), listLines({ clock: "Off", menuCleanup: ON, language: "Português" }));
 });
 
 test("attract mode closes the list", () => {

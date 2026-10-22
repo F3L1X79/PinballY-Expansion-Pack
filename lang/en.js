@@ -632,32 +632,137 @@ export default {
             launchingAndPlaying: "Launching and playing a table",
             debugging: "Debugging",
         },
-        // Each Add-on by its config.addOns key.
+        // A saved state that differs from the running one.
+        onRestart: (state) => `${state} (on restart)`,
+        // An Add-on's page: what it does, then what else is lost when it is off.
+        pageMessage: (whenOn, whenOff) => `When on: ${whenOn} When off: ${whenOff}`,
+        save: "Save",
+        cancel: "Cancel",
+        notSaved: "Setting not saved",
+        ok: "OK",
+        // Each Add-on by its config.addOns key: its name, what it does, and
+        // what is lost elsewhere when it is off (the "false also" lines of .env.example).
         addOns: {
-            profilePicker: { name: "Profile picker" },
-            startupChoicePrompt: { name: "Welcome Screen" },
-            achievements: { name: "Achievements" },
-            sessionStatsTracker: { name: "Session stats" },
-            challenges: { name: "Challenges" },
-            tableMastery: { name: "Table Mastery" },
-            highScores: { name: "High Scores" },
-            statusLineInfo: { name: "Status line" },
-            clock: { name: "Clock" },
-            wheelArc: { name: "Wheel Arc" },
-            uiTranslation: { name: "PinballY translation" },
-            drawnMenus: { name: "Drawn Menus" },
-            customMenuCommands: { name: "Menu commands" },
-            hallOfFame: { name: "Hall of Fame" },
-            tablesToDiscover: { name: "Tables to Discover" },
-            hiddenTables: { name: "Hidden Tables" },
-            customFilter: { name: "Original Tables" },
-            menuCleanup: { name: "Menu Cleanup" },
-            forceBackglass: { name: "Backglass" },
-            seamlessLaunchOverlay: { name: "Launch overlay" },
-            playLaunchSound: { name: "Launch sound" },
-            ratingPrompt: { name: "Rating prompt" },
-            tableRoms: { name: "Table ROMs" },
-            launchEventsTrace: { name: "Launch events trace" },
+            profilePicker: {
+                name: "Profile picker",
+                whenOn: "Change Player in the main menu: pick whose plays and Achievements count.",
+                whenOff: "Guest's plays count when a Challenge is drawn; the Challenge Card and the Mastery Bar are no longer placed under the Profile badge; the Welcome Screen has no Avatar choice, Avatar Frame or greeting by name.",
+            },
+            startupChoicePrompt: {
+                name: "Welcome Screen",
+                whenOn: "The Welcome Screen at startup and after Change Player: stay on the table on the wheel, change player, or launch the Table of the Day, the Table of the Week or a random table.",
+                whenOff: "The Profile picker gives the Profile Greeting instead of leading to it; with Menu commands off too, no Random Game Achievements.",
+            },
+            achievements: {
+                name: "Achievements",
+                whenOn: "Achievements earned while playing, each announced by a toast.",
+                whenOff: "No Player Level shown anywhere.",
+            },
+            sessionStatsTracker: {
+                name: "Session stats",
+                whenOn: "Records the session stats used by the session Achievements.",
+                whenOff: "No Sessions Achievements.",
+            },
+            challenges: {
+                name: "Challenges",
+                whenOn: "The week's Challenge and your progress, under the Profile badge.",
+                whenOff: "No Challenges Achievements, no completed Challenges in the Profile Stats and Household Stats; the Mastery Bar no longer sits under the Challenge Card.",
+            },
+            tableMastery: {
+                name: "Table Mastery",
+                whenOn: "Each table's Mastery Level for the active Profile, under the Challenge Card.",
+                whenOff: "No Avatar Frames from Collection Tiers, no Collection Mastery line in the Household Stats.",
+            },
+            highScores: {
+                name: "High Scores",
+                whenOn: "Credits each score that enters a ROM table's board to the Profile that played.",
+                whenOff: "No High Scores Achievements, no Lost Records on the Welcome Screen, no Table Records in the Profile Stats and Household Stats; PinballY's own High Scores come back (Menu Cleanup still removes its main menu entry).",
+            },
+            statusLineInfo: {
+                name: "Status line",
+                whenOn: "Table info (position, year, manufacturer, plays, play time) in the status line.",
+                whenOff: "Nothing else.",
+            },
+            clock: {
+                name: "Clock",
+                whenOn: "The time at the top left of the wheel screen.",
+                whenOff: "Nothing else.",
+            },
+            wheelArc: {
+                name: "Wheel Arc",
+                whenOn: "The gold arc under the wheel's icons, unless you have your own underlay.",
+                whenOff: "Nothing else.",
+            },
+            uiTranslation: {
+                name: "PinballY translation",
+                whenOn: "Translates PinballY's own menus and messages into the pack's language.",
+                whenOff: "Nothing else.",
+            },
+            drawnMenus: {
+                name: "Drawn Menus",
+                whenOn: "PinballY's menus (main, Exit, filters, power off, table setup and categories, Operator Menu) drawn in the pack's look instead of the native ones.",
+                whenOff: "The pack's own menus and prompts fall back to PinballY's native menus, but for these settings.",
+            },
+            customMenuCommands: {
+                name: "Menu commands",
+                whenOn: "Table of the Day, Table of the Week, random table and Set Up Table in the main menu.",
+                whenOff: "With the Welcome Screen off too, no Random Game Achievements.",
+            },
+            hallOfFame: {
+                name: "Hall of Fame",
+                whenOn: "The Most Played Tables filter in the main menu: your ten most played tables.",
+                whenOff: "No Most Played Tables button on the Profile Stats.",
+            },
+            tablesToDiscover: {
+                name: "Tables to Discover",
+                whenOn: "The Tables to Discover filter in the main menu: the tables you never played.",
+                whenOff: "No Tables to Discover button on the Profile Stats.",
+            },
+            hiddenTables: {
+                name: "Hidden Tables",
+                whenOn: "The Hidden Tables filter in the main menu, while at least one table is hidden.",
+                whenOff: "Nothing else.",
+            },
+            customFilter: {
+                name: "Original Tables",
+                whenOn: "The Original Tables filter in the Filter by Manufacturer menu.",
+                whenOff: "Nothing else.",
+            },
+            menuCleanup: {
+                name: "Menu Cleanup",
+                whenOn: "Removes Help and About from the Exit and Operator menus, Information, Flyer and Instruction Card from the main menu (and PinballY's own High Scores while High Scores is off), and the filter groups by system, last played and date added from Filter Tables, for every Profile.",
+                whenOff: "Nothing else.",
+            },
+            forceBackglass: {
+                name: "Backglass",
+                whenOn: "Shows the backglass window at startup and hides it while a table runs.",
+                whenOff: "Nothing else.",
+            },
+            seamlessLaunchOverlay: {
+                name: "Launch overlay",
+                whenOn: "Hides the wheel while a table loads, avoiding a black flash.",
+                whenOff: "Nothing else.",
+            },
+            playLaunchSound: {
+                name: "Launch sound",
+                whenOn: "Plays the launch sound when a table launches.",
+                whenOff: "Nothing else.",
+            },
+            ratingPrompt: {
+                name: "Rating prompt",
+                whenOn: "Asks you to rate a table once you have played it long enough.",
+                whenOff: "Nothing else.",
+            },
+            tableRoms: {
+                name: "Table ROMs",
+                whenOn: "Fills each table's empty ROM field from its script (vpxtool in the tools folder).",
+                whenOff: "Nothing else.",
+            },
+            launchEventsTrace: {
+                name: "Launch events trace",
+                whenOn: "Writes the launch events to PinballY.log, while LOG_LAUNCH_EVENTS=true in .env.local.",
+                whenOff: "Nothing else.",
+            },
         },
         // Each language in its own language, the same in every language file.
         languageNames: {

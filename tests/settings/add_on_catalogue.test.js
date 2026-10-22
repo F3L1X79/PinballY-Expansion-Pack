@@ -20,13 +20,16 @@ test("every Add-on of config.addOns has one group, and only they do", () => {
 });
 
 for (const [code, texts] of [["en", en], ["fr", fr]]) {
-    test(`every group and Add-on has its name in ${code}`, () => {
+    test(`every group and Add-on has its texts in ${code}: name, When on, When off`, () => {
         const { groups, addOns } = texts.expansionPackSettings;
         for (const { group } of ADD_ON_GROUPS) {
             assert.equal(typeof groups[group], "string", `the "${group}" heading`);
         }
         for (const key of Object.keys(DEFAULTS.addOns)) {
-            assert.equal(typeof (addOns[key] && addOns[key].name), "string", `the name of "${key}"`);
+            for (const field of ["name", "whenOn", "whenOff"]) {
+                const value = addOns[key] && addOns[key][field];
+                assert.ok(typeof value === "string" && value.trim() !== "", `the ${field} text of "${key}"`);
+            }
         }
     });
 }

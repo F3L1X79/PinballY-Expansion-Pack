@@ -12,4 +12,5 @@
 
 - PinballY is not Node: there is no `process.env`. `config.js` reads `.env.local` synchronously at load time through a Windows COM component, and parses it with project code (keys in `UPPER_SNAKE_CASE`, types taken from the default values, invalid lines logged and ignored).
 - `.env.local` and `.env.example` are saved as UTF-8 with BOM, like the rest of the project, so accented paths and texts read correctly.
+- The pack itself now rewrites single lines of `.env.local`: the Expansion Pack Settings save an Add-on switch by rewriting every active line of that key (or appending one), leaving comments, blank lines, other keys and line endings as they were. The file stays the single source of the settings, and a hand edit made meanwhile is read again on each opening of the screens.
 - Achievement thresholds are no longer configurable. They take part in the Achievement IDs, so changing one used to re-announce Achievements already Notified.

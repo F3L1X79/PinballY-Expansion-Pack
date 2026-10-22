@@ -28,7 +28,7 @@ test("with Drawn Menus off, the list is still drawn and goes back to the native 
 
     assert.equal(fake.currentMenu(), null, "no native menu left");
     assert.ok(isDrawnMenuShown(fake), "the list is drawn");
-    assert.equal(highlightedEntry(fake), "Profile picker: On", "as saved (the defaults), not as running");
+    assert.equal(highlightedEntry(fake), "Profile picker: On (on restart)", "as saved (the defaults), running off");
 
     press(fake, "Exit");
     assert.ok(!isDrawnMenuShown(fake));

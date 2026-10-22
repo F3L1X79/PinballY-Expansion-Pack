@@ -11,17 +11,35 @@ const SECTION_PREFIXES = { addOns: "ADD_ON" };
 
 const toUpperSnake = name => name.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toUpperCase();
 
+// The env key of a configuration key path: "language" gives LANGUAGE,
+// "addOns.achievements" gives ADD_ON_ACHIEVEMENTS.
+export function envKeyOf(keyPath) {
+    const dot = keyPath.indexOf(".");
+    if (dot === -1) return toUpperSnake(keyPath);
+    const section = keyPath.slice(0, dot);
+    return `${SECTION_PREFIXES[section] || toUpperSnake(section)}_${toUpperSnake(keyPath.slice(dot + 1))}`;
+}
+
+// A line split at its first "=", trimmed: null for a blank or comment line,
+// envKey null for a line with no key before an "=".
+export function splitEnvLine(rawLine) {
+    const line = rawLine.trim();
+    if (line === "" || line.startsWith("#")) return null;
+    const separator = line.indexOf("=");
+    if (separator <= 0) return { line, envKey: null, value: null };
+    return { line, envKey: line.slice(0, separator).trim(), value: line.slice(separator + 1).trim() };
+}
+
 // Maps every env key to where it lives in the configuration.
 function buildKeyMap(defaults) {
     const keyMap = new Map();
     for (const [key, value] of Object.entries(defaults)) {
         if (value !== null && typeof value === "object") {
-            const prefix = SECTION_PREFIXES[key] || toUpperSnake(key);
             for (const subKey of Object.keys(value)) {
-                keyMap.set(`${prefix}_${toUpperSnake(subKey)}`, { section: key, key: subKey });
+                keyMap.set(envKeyOf(`${key}.${subKey}`), { section: key, key: subKey });
             }
         } else {
-            keyMap.set(toUpperSnake(key), { section: null, key });
+            keyMap.set(envKeyOf(key), { section: null, key });
         }
     }
     return keyMap;
@@ -66,17 +84,16 @@ export function applyEnvOverrides(defaults, text) {
 
     const lines = String(text || "").replace(/^\uFEFF/, "").split(/\r?\n/);
     lines.forEach((rawLine, index) => {
-        const line = rawLine.trim();
+        const split = splitEnvLine(rawLine);
         const lineLabel = `line ${index + 1}`;
-        if (line === "" || line.startsWith("#")) return;
+        if (split === null) return;
 
-        const separator = line.indexOf("=");
-        if (separator <= 0) {
+        const { line, envKey } = split;
+        if (envKey === null) {
             problems.push(`${lineLabel}: expected KEY=value, got "${line}"`);
             return;
         }
 
-        const envKey = line.slice(0, separator).trim();
         const target = keyMap.get(envKey);
         if (!target) {
             problems.push(`${lineLabel}: unknown key "${envKey}"`);
@@ -84,7 +101,7 @@ export function applyEnvOverrides(defaults, text) {
         }
 
         const owner = target.section ? config[target.section] : config;
-        const rawValue = stripQuotes(line.slice(separator + 1).trim());
+        const rawValue = stripQuotes(split.value);
         const converted = convert(rawValue, owner[target.key]);
         if (!converted.ok) {
             problems.push(`${lineLabel}: invalid value "${rawValue}" for ${envKey} (expected ${converted.expected})`);

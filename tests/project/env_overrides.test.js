@@ -150,6 +150,16 @@ test("a key set twice keeps the last value and is listed once", () => {
     assert.deepEqual(overridden, ["LANGUAGE"]);
 });
 
+test("a file cut in the middle of its last line (a crash while saving): that line reported, the others kept", () => {
+    const { config, problems } = applyEnvOverrides(defaults(), "LANGUAGE=fr\r\nADD_ON_ACHIEVEMENTS=fa");
+
+    assert.equal(config.language, "fr");
+    assert.equal(config.addOns.achievements, true);
+    assert.equal(problems.length, 1);
+    assert.match(problems[0], /line 2/);
+    assert.equal(applyEnvOverrides(defaults(), "LANGUAGE=fr\r\nADD_ON_ACHI").problems.length, 1, "cut before its =");
+});
+
 test(".env.example sets every configuration key, with no problem", () => {
     const exampleText = readFileSync(new URL("../../.env.example", import.meta.url), "utf8");
     const { overridden, problems } = applyEnvOverrides(config, exampleText);
