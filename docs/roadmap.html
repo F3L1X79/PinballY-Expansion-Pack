@@ -254,7 +254,6 @@
           <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
           <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
           <a class="chip tr-share" href="#themes"><b></b>Thèmes</a>
-          <a class="chip tr-share" href="#drawn-upkeep-popups"><b></b>Popups d'entretien dessinées</a>
         </div>
 
         <div class="ax row">Faible</div>
@@ -266,6 +265,7 @@
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#household-stats-read"><b></b>Household Stats plus rapides</a>
+          <a class="chip tr-share" href="#drawn-upkeep-popups"><b></b>Popups de capture dessinées</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
@@ -311,8 +311,8 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
           <p>Les derniers menus natifs que l'on croise depuis le Game Setup ou le menu opérateur détonnent : la préparation de la capture (<code>capture</code>), toutes les étapes de la capture par lot (<code>batch capture …</code>) et les confirmations de suppression (<code>confirm delete gameinfo</code>, <code>confirm delete media</code>). Les dessiner comme les autres Drawn Menus.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code>. Change une décision de l'<a href="adr/0013-the-player-s-menus-are-drawn-menus-replacing-the-native-ones.md">ADR 0013</a> (menus d'entretien laissés natifs) et l'entrée Drawn Menu du glossaire.</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code>. Grillé le 22/10 : tous les menus dessinés sauf les <code>media drop …</code> et <code>confirm delete media</code>, popups natives, vérification sur la borne en ticket humain. Change une décision de l'<a href="adr/0013-the-player-s-menus-are-drawn-menus-replacing-the-native-ones.md">ADR 0013</a> (menus d'entretien laissés natifs) et l'entrée Drawn Menu du glossaire.</div>
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Demandé par Félix le 22/10/2026, en priorité haute : le menu natif de préparation de la capture est « très choquant » au milieu des menus dessinés. Placé en tête de file pour cette raison. À trancher au grilling : les menus encore exclus (<code>media drop …</code>, <code>play pick system</code>, élévation, <code>swf error</code>) et les popups natives (<code>capture delay</code>, <code>batch capture preview</code>, <code>media list</code>…).</p>
@@ -418,9 +418,9 @@
         <div class="content">
           <div class="item-head">
             <h3>Popups d'entretien dessinées</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">gros</span><span class="tag">UI</span></div>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Une fois les menus de capture dessinés, les popups natives que l'on croise au même endroit détonnent encore : le choix du délai de capture (<code>capture delay</code>), la liste de la capture par lot (<code>batch capture preview</code>) et la liste des médias de la table (<code>media list</code>). Les dessiner dans le style Steamball, chacune avec son propre contenu.</p>
+          <p>Une fois les menus de capture dessinés, les deux popups natives de leur parcours détonnent encore : le choix du délai de capture (<code>capture delay</code>) et la liste de la capture par lot (<code>batch capture preview</code>). Les dessiner dans le style Steamball, chacune avec son propre contenu. La liste des médias et le volume audio d'une table sont des écrans à part et restent natifs.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt : <code>/grill-with-docs</code>. Le module Drawn Menu ne dessine que des listes d'entrées : chaque popup demande son propre écran dessiné.</div>
           <details>
@@ -704,7 +704,7 @@
           <summary>22/10 <span class="count">(1)</span></summary>
           <ol>
             <li><strong>Les popups d'entretien dessinées, après les options au menu opérateur</strong>
-              <span>Reportées pendant le grilling des menus de capture dessinés, qui dessine tous les menus sauf ceux du glisser-déposer et laisse les popups natives (délai de capture, liste de la capture par lot, liste des médias). Placées juste après les options au menu opérateur, avec l'entretien de la borne. Effort gros (un écran par popup), impact moyen.</span></li>
+              <span>Reportées pendant le grilling des menus de capture dessinés, qui dessine tous les menus sauf ceux du glisser-déposer et la confirmation de suppression d'un média, et laisse les popups natives. L'idée ne garde que le délai de capture et la liste de la capture par lot : la liste des médias et le volume audio sont des écrans à part, laissés natifs à la demande de Félix. Placées juste après les options au menu opérateur, avec l'entretien de la borne. Effort moyen, impact faible.</span></li>
           </ol>
         </details>
         <details>
