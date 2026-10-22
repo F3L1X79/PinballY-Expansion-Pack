@@ -325,6 +325,54 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="quiet-wheel-other-screens" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Son des vidéos baissé sur les autres écrans dessinés</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+          </div>
+          <p>Baisser aussi le son des vidéos de la table sélectionnée (plafonné à 50) tant que la Profile Stats, la Household Stats, l'Avatar Frame list, l'Achievement List ou le High Score Board voilent la roue, comme le fait la Quiet Wheel du Profile picker et du Welcome Screen. Grillé le 20/10/2026.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. Reprend le mécanisme de la Quiet Wheel (<code>common/core/quiet_wheel.js</code>, spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/286">#286</a>)</div>
+          <details>
+            <summary>Décisions</summary>
+            <ul>
+              <li>Les cinq écrans dessinés qui voilent la roue : Profile Stats, Household Stats, Avatar Frame list, Achievement List, High Score Board. Pas de tri entre écrans longs et courts : sous le voile, le scintillement de chaque <code>update()</code> se voit peu.</li>
+              <li>Les Drawn Menus ne baissent jamais le son : on les traverse vite, et chaque ouverture ferait scintiller deux fois la roue à travers leur voile. Exit des Profile Stats vers le menu principal fait donc remonter le son.</li>
+              <li>Du voile (avant l'éventuel Loader) à la fermeture, Exit pendant le Loader compris, comme le Welcome Screen dans #286.</li>
+              <li>Une seule baisse et un seul retour pour une navigation entre écrans dessinés (Household Stats, Profile Stats d'un autre Profile, Avatar Frame list, retour instantané) : le parent caché garde le son bas, le délai de passage de #286 couvre les relais.</li>
+              <li>Pas de nouveau terme au glossaire : « Quiet Wheel » reste le nom de la baisse du Profile picker et du Welcome Screen.</li>
+            </ul>
+            <p class="ctx">Reporté pendant le grilling du son baissé sur le Profile picker et le Welcome Screen, le 20/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="error-toast" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Un toast d'erreur pour les actions qui échouent</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Quand une action lancée par le joueur ou par le pack échoue (réglage non enregistré, <code>vpxtool</code> introuvable ou en erreur…), un toast dessiné le dit à l'écran, en plus de la ligne dans <code>logfile.log</code>, au lieu d'un échec visible seulement dans le journal.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la forme de l'Achievement Toast (calque non bloquant) ; servira aux <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a>. Avant la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a>, qui traduira ses messages</div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Quelles erreurs méritent un toast : seulement celles d'une action que le joueur vient de demander, ou aussi celles d'un travail de fond (Table ROMs, lecture d'un fichier mis de côté) ?</li>
+              <li>Un module partagé à part, ou une variante de l'Achievement Toast ?</li>
+              <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -339,6 +387,24 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="household-stats-read" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Household Stats plus rapides à ouvrir</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Sur la borne, la Household Stats met environ 1,1 s à s'ouvrir, dont 544 à 598 ms de lecture : plus que son dessin (265 à 329 ms), et dix fois la lecture des Profile Stats d'un seul Profile (40 ms). Trouver ce qui coûte dans la lecture des stats de chaque Profile, puis la raccourcir.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>diagnostic</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/diagnosing-bugs</code> (lenteur, avec la ligne <code>[HouseholdStats] Opened</code> du log) → correctif → <code>/retro</code>. Le retour instantané (spec #255) évite déjà de la relire au retour d'un autre Profile</div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Vu dans les logs de la borne à la rétro du ticket #256 (18/10/2026) ; Félix : pas pressé.</p>
           </details>
         </div>
       </li>
@@ -378,24 +444,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="household-stats-read" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Household Stats plus rapides à ouvrir</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Sur la borne, la Household Stats met environ 1,1 s à s'ouvrir, dont 544 à 598 ms de lecture : plus que son dessin (265 à 329 ms), et dix fois la lecture des Profile Stats d'un seul Profile (40 ms). Trouver ce qui coûte dans la lecture des stats de chaque Profile, puis la raccourcir.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>diagnostic</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/diagnosing-bugs</code> (lenteur, avec la ligne <code>[HouseholdStats] Opened</code> du log) → correctif → <code>/retro</code>. Le retour instantané (spec #255) évite déjà de la relire au retour d'un autre Profile</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Vu dans les logs de la borne à la rétro du ticket #256 (18/10/2026) ; Félix : pas pressé.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-play" id="easter-eggs" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -421,27 +469,26 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="year-in-pinball" data-track="profiles" data-rank="gold">
+      <li draggable="true" tabindex="0" class="item tr-share" id="stats-api" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Year in Pinball : le bilan de l'année</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
+            <h3>Une API des statistiques pour les autres développeurs</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
           </div>
-          <p>Un bilan de l'année par Profile, façon Spotify Wrapped : tables jouées et découvertes, temps de jeu, table et fabricant préférés, plus longue session, Achievements débloqués, plus longue Streak. Proposé tout seul en fin d'année.</p>
+          <p>Offrir aux auteurs d'autres scripts PinballY un accès à toutes nos statistiques et métriques (Profiles, Plays, Player Level, Table Mastery, Achievements, Challenges, Streaks…), pour qu'ils les réutilisent dans leurs propres plugins.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Lit le Play Log (livré) ; sur l'écran des Profile Stats dessinées (livré)</div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui fixe où vit le pack chez les autres</div>
           <details>
-            <summary>Questions ouvertes (5)</summary>
+            <summary>Questions ouvertes (4)</summary>
             <ul>
-              <li>Quand le proposer : premier lancement après le 31/12, ou dès la mi-décembre ? Le garder consultable ensuite depuis les Profile Stats ?</li>
-              <li>Comment le partager : une capture enregistrée dans un dossier, prête pour Discord ?</li>
-              <li>Première année incomplète (journal commencé en cours d'année) : l'annoncer, ou ne rien montrer avant une année pleine ?</li>
-              <li>Un bilan de la maison, tous Profiles confondus, en plus de celui de chaque Profile ?</li>
-              <li>Une carte « ton style de joueur » : taux d'exploration (tables différentes par Play), régularité, et un archétype (Explorer, Completionist…) ? Avec quels seuils, pour que ça ne ressemble pas à un horoscope ?</li>
+              <li>La forme : un module ES à importer (<code>import … from "./ExpansionPack/api.js"</code>, mais la racine n'accepte que <code>main.js</code>), des événements, ou un fichier JSON exporté que n'importe quel outil peut lire ?</li>
+              <li>Lecture seule, ou aussi quelques actions (changer de Profile, lancer la Table of the Day) ?</li>
+              <li>Quelles données : tout ce qu'affichent les Profile Stats, ou aussi le Play Log brut ?</li>
+              <li>Comment garantir la compatibilité d'une version à l'autre (numéro de version de l'API, données figées comme dans <code>tests/project/persisted_data_pinning.test.js</code>) ?</li>
             </ul>
-            <p class="ctx">Idée externe du 30/09/2026, sans doute la plus partageable. En fin de file car elle a besoin d'une année de journal et de la Distribution pour être vue : le Play Log ne date que du 01/10/2026, le premier bilan complet sera celui de 2027.</p>
+            <p class="ctx">Idée du 10/10/2026. Les données existent déjà dans le Profile Store, le Play Log et <code>common/stats/profile_stats.js</code> ; le travail est surtout de choisir une surface stable et de la documenter.</p>
           </details>
         </div>
       </li>
@@ -465,30 +512,6 @@
               <li>Activité de toute la maison, ou des seuls Profiles qui fixent la barre ?</li>
             </ul>
             <p class="ctx">Reporté pendant le grilling du rééquilibrage (01/10/2026) : idée intéressante, mais pas assez de recul. Il faut d'abord analyser un gros Play Log, des mois de parties réelles, pour y voir plus clair.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="stats-api" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Une API des statistiques pour les autres développeurs</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Offrir aux auteurs d'autres scripts PinballY un accès à toutes nos statistiques et métriques (Profiles, Plays, Player Level, Table Mastery, Achievements, Challenges, Streaks…), pour qu'ils les réutilisent dans leurs propres plugins.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui fixe où vit le pack chez les autres</div>
-          <details>
-            <summary>Questions ouvertes (4)</summary>
-            <ul>
-              <li>La forme : un module ES à importer (<code>import … from "./ExpansionPack/api.js"</code>, mais la racine n'accepte que <code>main.js</code>), des événements, ou un fichier JSON exporté que n'importe quel outil peut lire ?</li>
-              <li>Lecture seule, ou aussi quelques actions (changer de Profile, lancer la Table of the Day) ?</li>
-              <li>Quelles données : tout ce qu'affichent les Profile Stats, ou aussi le Play Log brut ?</li>
-              <li>Comment garantir la compatibilité d'une version à l'autre (numéro de version de l'API, données figées comme dans <code>tests/project/persisted_data_pinning.test.js</code>) ?</li>
-            </ul>
-            <p class="ctx">Idée du 10/10/2026. Les données existent déjà dans le Profile Store, le Play Log et <code>common/stats/profile_stats.js</code> ; le travail est surtout de choisir une surface stable et de la documenter.</p>
           </details>
         </div>
       </li>
@@ -540,50 +563,27 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="quiet-wheel-other-screens" data-track="play" data-rank="bronze">
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="year-in-pinball" data-track="profiles" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Son des vidéos baissé sur les autres écrans dessinés</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
+            <h3>Year in Pinball : le bilan de l'année</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
-          <p>Baisser aussi le son des vidéos de la table sélectionnée (plafonné à 50) tant que la Profile Stats, la Household Stats, l'Avatar Frame list, l'Achievement List ou le High Score Board voilent la roue, comme le fait la Quiet Wheel du Profile picker et du Welcome Screen. Grillé le 20/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. Reprend le mécanisme de la Quiet Wheel (<code>common/core/quiet_wheel.js</code>, spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/286">#286</a>)</div>
-          <details>
-            <summary>Décisions</summary>
-            <ul>
-              <li>Les cinq écrans dessinés qui voilent la roue : Profile Stats, Household Stats, Avatar Frame list, Achievement List, High Score Board. Pas de tri entre écrans longs et courts : sous le voile, le scintillement de chaque <code>update()</code> se voit peu.</li>
-              <li>Les Drawn Menus ne baissent jamais le son : on les traverse vite, et chaque ouverture ferait scintiller deux fois la roue à travers leur voile. Exit des Profile Stats vers le menu principal fait donc remonter le son.</li>
-              <li>Du voile (avant l'éventuel Loader) à la fermeture, Exit pendant le Loader compris, comme le Welcome Screen dans #286.</li>
-              <li>Une seule baisse et un seul retour pour une navigation entre écrans dessinés (Household Stats, Profile Stats d'un autre Profile, Avatar Frame list, retour instantané) : le parent caché garde le son bas, le délai de passage de #286 couvre les relais.</li>
-              <li>Pas de nouveau terme au glossaire : « Quiet Wheel » reste le nom de la baisse du Profile picker et du Welcome Screen.</li>
-            </ul>
-            <p class="ctx">Reporté pendant le grilling du son baissé sur le Profile picker et le Welcome Screen, le 20/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="error-toast" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Un toast d'erreur pour les actions qui échouent</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Quand une action lancée par le joueur ou par le pack échoue (réglage non enregistré, <code>vpxtool</code> introuvable ou en erreur…), un toast dessiné le dit à l'écran, en plus de la ligne dans <code>logfile.log</code>, au lieu d'un échec visible seulement dans le journal.</p>
+          <p>Un bilan de l'année par Profile, façon Spotify Wrapped : tables jouées et découvertes, temps de jeu, table et fabricant préférés, plus longue session, Achievements débloqués, plus longue Streak. Proposé tout seul en fin d'année.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la forme de l'Achievement Toast (calque non bloquant) ; servira aux <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a></div>
+          <div class="links">Lit le Play Log (livré) ; sur l'écran des Profile Stats dessinées (livré)</div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Questions ouvertes (5)</summary>
             <ul>
-              <li>Quelles erreurs méritent un toast : seulement celles d'une action que le joueur vient de demander, ou aussi celles d'un travail de fond (Table ROMs, lecture d'un fichier mis de côté) ?</li>
-              <li>Un module partagé à part, ou une variante de l'Achievement Toast ?</li>
-              <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
+              <li>Quand le proposer : premier lancement après le 31/12, ou dès la mi-décembre ? Le garder consultable ensuite depuis les Profile Stats ?</li>
+              <li>Comment le partager : une capture enregistrée dans un dossier, prête pour Discord ?</li>
+              <li>Première année incomplète (journal commencé en cours d'année) : l'annoncer, ou ne rien montrer avant une année pleine ?</li>
+              <li>Un bilan de la maison, tous Profiles confondus, en plus de celui de chaque Profile ?</li>
+              <li>Une carte « ton style de joueur » : taux d'exploration (tables différentes par Play), régularité, et un archétype (Explorer, Completionist…) ? Avec quels seuils, pour que ça ne ressemble pas à un horoscope ?</li>
             </ul>
-            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
+            <p class="ctx">Idée externe du 30/09/2026, sans doute la plus partageable. En fin de file car elle a besoin d'une année de journal et de la Distribution pour être vue : le Play Log ne date que du 01/10/2026, le premier bilan complet sera celui de 2027.</p>
           </details>
         </div>
       </li>
@@ -596,8 +596,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>22/10 <span class="count">(2)</span></summary>
+          <summary>22/10 <span class="count">(3)</span></summary>
           <ol>
+            <li><strong>Nouvel ordre de la file, les options au menu opérateur toujours 1ʳᵉ</strong>
+              <span>Demandé par Félix. Le son baissé sur les autres écrans dessinés remonte 2ᵉ : déjà grillé, petit, besoin de la borne, sans texte à traduire. Le toast d'erreur remonte 3ᵉ, juste avant la passe de traduction (4ᵉ) : il finit le cas d'échec des options au menu opérateur, et la passe traduira ses messages ; il était dernier à la demande de Félix le 21/10. Ensuite la Household Stats plus rapide, les notes et favoris, la Distribution, les Easter eggs (toujours après elle), l'API des statistiques (après elle aussi), les Challenges adaptés (il faut des mois de Play Log), les thèmes et leur éditeur, et Year in Pinball en dernier (premier bilan complet en 2027). Efforts et impacts inchangés.</span></li>
             <li><strong>La passe de traduction en quatre tickets, un par langue</strong>
               <span>Tickets #320 à #323, indépendants entre eux, bloqués par les deux derniers tickets des Expansion Pack Settings qui ajoutent des textes (#317, #318). Chacun retire tous les <code>// TODO: translation pass</code> de sa langue (43 aujourd'hui, plus ceux des réglages). Place, effort et impact inchangés.</span></li>
             <li><strong>Les popups d'entretien dessinées, après les options au menu opérateur</strong>
