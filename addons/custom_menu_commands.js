@@ -7,6 +7,7 @@
 
 import { safeHandler } from "../common/core/safe_handler.js";
 import { getProfileStore } from "../common/profiles/profile_store.js";
+import { seesSetupEntries } from "../common/profiles/setup_entries.js";
 import { getMainMenu, MAIN_MENU_POSITION } from "../common/menus/main_menu.js";
 import { createProfileResetMenu } from "../common/menus/profile_reset_menu.js";
 import { getDrawnMenus } from "../common/drawn_menu/drawn_menu.js";
@@ -18,8 +19,7 @@ const SCRIPT_NAME = "CustomMenuCommands";
 export default function init() {
     const { customMenuLabels: MENU_LABELS } = lang;
     const profileStore = getProfileStore();
-    // Every Profile sees the setup entries until the household marks an Admin Profile.
-    const showsSetupEntries = () => profileStore.isAdmin() || !profileStore.hasAdminProfile();
+    const showsSetupEntries = () => seesSetupEntries(profileStore);
 
     const MENU_COMMANDS = [
         {

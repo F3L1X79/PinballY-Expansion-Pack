@@ -2,7 +2,8 @@
 // Drawn Menu: the single place that shows a menu in the Steamball look (see
 // docs/adr/0013) instead of PinballY's native one. show() runs the chosen
 // entry's command as a native menu would, falling back to the native menu
-// when the Add-on is off or drawing fails; draw() returns false instead.
+// when drawing fails, or with the Add-on off (but for the pack's own screens,
+// getPackMenus); draw() returns false instead.
 // - Swallows every button through "commandbuttondown" while open; never changes the UI mode.
 // - A menu with onBack (a submenu) goes back on Exit and on its MenuReturn entry.
 // - With keepNative (the pause menu), it closes on the native "menuclose", or at "postlaunch".
@@ -601,4 +602,15 @@ export function getDrawnMenus() {
             : createDrawnMenus(host, { drawingAhead: getDrawingAhead() });
     }
     return sharedDrawnMenus;
+}
+
+let sharedPackMenus = null;
+
+// What shows the pack's own screens (the Expansion Pack Settings): drawn
+// even with the Drawn Menus Add-on off, natively only when drawing fails.
+// That drawn instance is created on its first call, nothing drawn ahead before.
+export function getPackMenus() {
+    if (config.addOns.drawnMenus !== false) return getDrawnMenus();
+    if (!sharedPackMenus) sharedPackMenus = createDrawnMenus(createPinballYHost(), { drawingAhead: getDrawingAhead() });
+    return sharedPackMenus;
 }

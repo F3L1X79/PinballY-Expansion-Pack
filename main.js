@@ -1,9 +1,9 @@
 ﻿// ============================================================
 // Entry point loaded by PinballY: loads the Profile store, logs the startup
 // summary, keeps the Adult Tables off a Child Profile's wheel, switches to
-// Guest when the Profile picker is off, resolves the Startup Screen, puts back
-// a table volume the quiet wheel left lowered, then initializes every script
-// of SCRIPTS in order, skipping those disabled in config.addOns.
+// Guest when the Profile picker is off, resolves the Startup Screen, restores
+// the quiet wheel's table volume, then initializes every script of SCRIPTS in
+// order but those off in config.addOns, the Expansion Pack Settings before Drawn Menus.
 // - A script whose init() throws is logged and skipped, so the others still load.
 // - LOG_STARTUP_TIMING logs each init time.
 // ============================================================
@@ -15,6 +15,7 @@ import { getStartupScreen } from "./common/core/startup_screen.js";
 import { getQuietWheel } from "./common/core/quiet_wheel.js";
 import { createPinballYHost } from "./common/core/pinbally_host.js";
 import { writeStartupSummary } from "./common/core/startup_summary.js";
+import { startExpansionPackSettings } from "./common/settings/expansion_pack_settings.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;
@@ -175,7 +176,19 @@ try {
     logfile.log(`[Startup] ERROR restoring the quiet wheel's table: ${error.message}`);
 }
 
+// Right before Drawn Menus, whatever config.addOns says: never an Add-on,
+// their "menuopen" listener must still run before Drawn Menus' draws the
+// Operator Menu, and after the translation's, which knows none of their texts.
+function startSettings() {
+    try {
+        startExpansionPackSettings();
+    } catch (error) {
+        logfile.log(`[Startup] ERROR starting the Expansion Pack Settings: ${error.message}`);
+    }
+}
+
 for (const { key, module } of SCRIPTS) {
+    if (key === "drawnMenus") startSettings();
     if (ENABLED_SCRIPTS[key] === false) {
         if (LOG_STARTUP_TIMING) logfile.log(`[Startup] "${key}" skipped (disabled in config).`);
         continue;

@@ -32,6 +32,7 @@ const BUILT_IN_COMMANDS = {
     Instructions: 14, AddFavorite: 15, Help: 16, AboutBox: 17,
     FilterByEra: 18, FilterByManufacturer: 19, FilterBySystem: 20, FilterByCategory: 21, FilterByRating: 22,
     FilterByRecency: 23, FilterByAdded: 24, RemoveFavorite: 25, ResumeGame: 26, KillGame: 27,
+    Options: 28, BatchCaptureStep1: 29, ClearCredits: 30, EnableVideos: 31, MuteVideos: 32,
     // Every filter's command is in this range, PinballY's and the scripts' alike.
     FilterFirst: 900, FilterLast: 949,
 };
@@ -943,6 +944,8 @@ export function createFakePinballYHost({
         }
         runMode = "exiting";
     });
+    // Displays the Operator Menu (Commands.html).
+    nativeCommands.set(BUILT_IN_COMMANDS.ShowOperatorMenu, () => { host.openOperatorMenu(); });
     // Launches the wheel's current table.
     nativeCommands.set(BUILT_IN_COMMANDS.PlayGame, () => {
         const game = host.getCurrentTable();
@@ -1334,6 +1337,28 @@ export function createFakePinballYHost({
                 { title: "Shut Down", cmd: BUILT_IN_COMMANDS.PowerOff },
                 { title: "", cmd: -1 },
                 { title: "Operator Menu", cmd: BUILT_IN_COMMANDS.ShowOperatorMenu },
+                { title: "", cmd: -1 },
+                { title: "Help", cmd: BUILT_IN_COMMANDS.Help },
+                { title: "About PinballY", cmd: BUILT_IN_COMMANDS.AboutBox },
+                { title: "", cmd: -1 },
+                { title: "Cancel", cmd: BUILT_IN_COMMANDS.MenuReturn },
+            ]);
+        },
+
+        // The Operator Menu as PinballY opens it (from the Exit menu, or the
+        // coin door's service button), with some of the native items
+        // OperatorMenu.html lists, in its order; its separators are not
+        // documented: to be checked on the cabinet.
+        openOperatorMenu() {
+            host.openMenu("operator", [
+                { title: "Game Setup", cmd: BUILT_IN_COMMANDS.ShowGameSetupMenu },
+                { title: "Batch Capture", cmd: BUILT_IN_COMMANDS.BatchCaptureStep1 },
+                { title: "", cmd: -1 },
+                { title: "Reset Coins/Credits", cmd: BUILT_IN_COMMANDS.ClearCredits },
+                { title: "PinballY Options", cmd: BUILT_IN_COMMANDS.Options },
+                { title: "", cmd: -1 },
+                { title: "Enable Videos", cmd: BUILT_IN_COMMANDS.EnableVideos },
+                { title: "Mute Videos", cmd: BUILT_IN_COMMANDS.MuteVideos },
                 { title: "", cmd: -1 },
                 { title: "Help", cmd: BUILT_IN_COMMANDS.Help },
                 { title: "About PinballY", cmd: BUILT_IN_COMMANDS.AboutBox },

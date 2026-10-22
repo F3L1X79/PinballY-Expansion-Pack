@@ -257,15 +257,15 @@ test("ticking a category redraws the categories menu in place, the cursor on it"
     fake.advanceTime(OPEN_OVER_MS);
 });
 
-test("the operator menu is drawn", () => {
-    openMenu(fake, "operator", [
-        { title: "Options", cmd: 3200 },
-        { title: "", cmd: -1 },
-        { title: "Cancel", cmd: COMMAND.MenuReturn },
-    ]);
+test("the operator menu is drawn, with the Expansion Pack Settings", () => {
+    fake.openOperatorMenu();
+    fake.advanceTime(OPEN_OVER_MS);
 
     assert.equal(fake.currentMenu(), null);
-    assert.deepEqual(drawnMenuLines(fake), ["Options", "---", "Cancel"]);
+    assert.deepEqual(drawnMenuLines(fake), [
+        "Game Setup", "Batch Capture", "---", "Reset Coins/Credits", "PinballY Options", lang.expansionPackSettings.menuEntry, "---",
+        "Enable Videos", "Mute Videos", "---", "Help", "About PinballY", "---", "Cancel",
+    ]);
     press(fake, "Exit");
     assert.ok(!isDrawnMenuShown(fake));
 });

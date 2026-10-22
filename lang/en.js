@@ -613,4 +613,60 @@ export default {
             notLearned: "Play a game to bring up this table's high scores",
         },
     },
+
+    // The Expansion Pack Settings, from the Operator Menu (see common/settings/).
+    expansionPackSettings: {
+        menuEntry: "Expansion Pack Settings",
+        on: "On",
+        off: "Off",
+        // An Add-on's line in the list, by its name and state.
+        addOnLine: (name, state) => `${name}: ${state}`,
+        // The language line, by the saved language's own name.
+        languageLine: (languageName) => `Language: ${languageName}`,
+        back: "Back",
+        // The headings of the list, grouped as in .env.example.
+        groups: {
+            playersAndProgress: "Players and progress",
+            wheelScreen: "Wheel screen",
+            menusAndFilters: "Menus and filters",
+            launchingAndPlaying: "Launching and playing a table",
+            debugging: "Debugging",
+        },
+        // Each Add-on by its config.addOns key.
+        addOns: {
+            profilePicker: { name: "Profile picker" },
+            startupChoicePrompt: { name: "Welcome Screen" },
+            achievements: { name: "Achievements" },
+            sessionStatsTracker: { name: "Session stats" },
+            challenges: { name: "Challenges" },
+            tableMastery: { name: "Table Mastery" },
+            highScores: { name: "High Scores" },
+            statusLineInfo: { name: "Status line" },
+            clock: { name: "Clock" },
+            wheelArc: { name: "Wheel Arc" },
+            uiTranslation: { name: "PinballY translation" },
+            drawnMenus: { name: "Drawn Menus" },
+            customMenuCommands: { name: "Menu commands" },
+            hallOfFame: { name: "Hall of Fame" },
+            tablesToDiscover: { name: "Tables to Discover" },
+            hiddenTables: { name: "Hidden Tables" },
+            customFilter: { name: "Original Tables" },
+            menuCleanup: { name: "Menu Cleanup" },
+            forceBackglass: { name: "Backglass" },
+            seamlessLaunchOverlay: { name: "Launch overlay" },
+            playLaunchSound: { name: "Launch sound" },
+            ratingPrompt: { name: "Rating prompt" },
+            tableRoms: { name: "Table ROMs" },
+            launchEventsTrace: { name: "Launch events trace" },
+        },
+        // Each language in its own language, the same in every language file.
+        languageNames: {
+            en: "English",
+            fr: "Français",
+            de: "Deutsch",
+            es: "Español",
+            it: "Italiano",
+            pt: "Português",
+        },
+    },
 };

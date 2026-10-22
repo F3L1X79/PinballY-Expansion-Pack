@@ -30,7 +30,9 @@ const UNSHIPPED_SOUNDS = Object.freeze({
 const SOUND_SETTINGS = [...Object.keys(SHIPPED_SOUNDS), ...Object.keys(UNSHIPPED_SOUNDS)];
 const NO_SOUNDS = Object.fromEntries(SOUND_SETTINGS.map(key => [key, ""]));
 
-const DEFAULTS = {
+// Also what the Expansion Pack Settings parse a fresh read of .env.local
+// against; frozen below, addOns included, so never changed.
+export const DEFAULTS = {
     // --- Set these for your setup ---
 
     // Interface language: "en", "fr", "de", "es", "it" or "pt".
@@ -114,6 +116,9 @@ const DEFAULTS = {
     },
 };
 
+Object.freeze(DEFAULTS.addOns);
+Object.freeze(DEFAULTS);
+
 const LOG_PREFIX = "[Config]";
 const ADODB_TEXT_TYPE = 2;
 const ADODB_READ_ALL = -1;
@@ -153,10 +158,14 @@ function readEnvLocal(path) {
     }
 }
 
+// The running configuration's own copy, addOns included: tests turn
+// Add-ons on and off in it, and DEFAULTS are frozen.
+const copyOfDefaults = () => ({ ...DEFAULTS, addOns: { ...DEFAULTS.addOns } });
+
 function loadConfig() {
     // Under Node (tests) there is no COM and no pack folder: the defaults
     // apply without the shipped sounds, which each test sets as it needs.
-    if (typeof createAutomationObject !== "function") return { ...DEFAULTS, ...NO_SOUNDS };
+    if (typeof createAutomationObject !== "function") return { ...copyOfDefaults(), ...NO_SOUNDS };
 
     const projectFolder = projectFolderOf(systemInfo.programDir);
     const path = `${projectFolder}\\.env.local`;
@@ -165,11 +174,11 @@ function loadConfig() {
         text = readEnvLocal(path);
     } catch (error) {
         logfile.log(`${LOG_PREFIX} ERROR reading ${path}, using defaults: ${error.message}`);
-        return resolveSoundFiles(DEFAULTS, projectFolder);
+        return resolveSoundFiles(copyOfDefaults(), projectFolder);
     }
     if (text === null) {
         logfile.log(`${LOG_PREFIX} No .env.local found at ${path}; using defaults.`);
-        return resolveSoundFiles(DEFAULTS, projectFolder);
+        return resolveSoundFiles(copyOfDefaults(), projectFolder);
     }
 
     const { config, overridden, problems } = applyEnvOverrides(DEFAULTS, text);
