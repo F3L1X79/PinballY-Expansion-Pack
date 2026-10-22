@@ -243,6 +243,7 @@
 
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
+          <a class="chip tr-share" href="#error-toast"><b></b>Toast d'erreur</a>
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#event-frames"><b></b>Cadres de fête</a>
@@ -396,20 +397,21 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
           <p>Activer ou désactiver les Add-ons et régler les options du pack depuis le menu opérateur de PinballY, sans éditer <code>.env.local</code>, y compris la langue de l'interface (aujourd'hui figée au chargement par <code>common/core/i18n.js</code>, à partir de <code>config.language</code>). PinballY ne recharge jamais les scripts : un changement d'Add-on ne prend effet qu'au redémarrage de PinballY, que le menu pourrait proposer.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont les sections de configuration et les liens entre Add-ons donnent la liste du menu</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/handoff</code> → <code>/prototype</code> (la relance de PinballY, sur la borne) → <code>/handoff</code> du résultat → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#config-sections">robustesse (n° <span data-ref="config-sections"></span>)</a>, dont les liens entre Add-ons écrits dans <code>.env.example</code> donnent les textes des fiches</div>
           <details>
-            <summary>Questions ouvertes (7)</summary>
+            <summary>Décisions du grilling</summary>
             <ul>
-              <li>Où écrire les choix : <code>optionSettings</code> (sans <code>save()</code>), un fichier du pack, ou <code>.env.local</code> réécrit ? Lequel l'emporte quand <code>.env.local</code> dit autre chose ?</li>
-              <li>Tous les réglages de <code>common/core/config.js</code>, ou seulement les Add-ons et quelques options simples (oui/non, listes) ?</li>
-              <li>Redémarrer comment : un script peut-il relancer PinballY lui-même, ou le menu dit-il seulement « pris en compte au prochain démarrage » ?</li>
-              <li>Le menu opérateur natif reçoit-il une entrée « Expansion Pack » qui ouvre un Drawn Menu, et qui y a droit (l'Admin Profile seulement ?) ?</li>
-              <li>Comment montrer les liens entre Add-ons (« sans le Profile picker, les Challenges… ») au moment où on en désactive un ?</li>
-              <li>La langue : un réglage de la borne, appliqué au redémarrage comme les autres, ou une langue par Profile (<code>profile.json</code>) qui change tout de suite, ce qui oblige les Add-ons à relire leurs textes au lieu de les capturer au démarrage ?</li>
-              <li>Le choix de la langue liste-t-il les six langues, alors que de, es, it et pt attendent la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> ?</li>
+              <li>Nom : <strong>Expansion Pack Settings</strong> (« Réglages du pack »), une entrée de l'Operator Menu. Pas « Theme Settings » : un thème est une palette.</li>
+              <li>Contenu : les Add-ons et la langue, rien d'autre ; le texte libre (sons, catégorie adulte…) et les autres options restent dans <code>.env.local</code>.</li>
+              <li>Accès : la règle des entrées de réglage, réservées aux Admin Profiles, ou ouvertes à tous, Guest compris, tant qu'aucun Profile n'est marqué.</li>
+              <li>Écrans : une liste, avec l'état de chaque Add-on (Activé / Désactivé, « au redémarrage » s'il vient de changer) et une ligne Langue ; une fiche par Add-on (description, « Si activé : … », « Si désactivé : … » avec ce qu'on perd ailleurs), puis l'interrupteur, Enregistrer (seulement après un changement) et Annuler. La Langue : les six langues, chacune écrite dans sa langue.</li>
+              <li>Enregistrer réécrit tout de suite la seule ligne de la clé dans <code>.env.local</code>, unique source (créé s'il manque, commentaires gardés). Un échec est journalisé, un message dit « Réglage non enregistré » et la fiche garde le choix d'avant.</li>
+              <li>Tout prend effet au redémarrage, langue comprise. En quittant la liste après un changement : « Redémarrer maintenant / Plus tard ». La relance par un processus détaché puis <code>Quit</code> est à vérifier par un prototype ; sinon, seulement « au prochain démarrage ».</li>
+              <li>Pas de désactivation en cascade : les liens entre Add-ons sont des dégradations douces, seulement écrits dans la fiche.</li>
+              <li>Les écrans font partie du socle du pack, pas d'un Add-on : absents de la liste, jamais désactivables, toujours dessinés, même quand Drawn Menus est désactivé.</li>
             </ul>
-            <p class="ctx">Idée de Félix du 19/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas.</p>
+            <p class="ctx">Idée de Félix du 19/10/2026, grillée le 21/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas. Une langue par Profile, qui changerait tout de suite, est écartée.</p>
           </details>
         </div>
       </li>
@@ -653,6 +655,29 @@
           </details>
         </div>
       </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="error-toast" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Un toast d'erreur pour les actions qui échouent</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Quand une action lancée par le joueur ou par le pack échoue (réglage non enregistré, <code>vpxtool</code> introuvable ou en erreur…), un toast dessiné le dit à l'écran, en plus de la ligne dans <code>logfile.log</code>, au lieu d'un échec visible seulement dans le journal.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la forme de l'Achievement Toast (calque non bloquant) ; servira aux <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a></div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Quelles erreurs méritent un toast : seulement celles d'une action que le joueur vient de demander, ou aussi celles d'un travail de fond (Table ROMs, lecture d'un fichier mis de côté) ?</li>
+              <li>Un module partagé à part, ou une variante de l'Achievement Toast ?</li>
+              <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
+          </details>
+        </div>
+      </li>
     </ol>
   </section>
 
@@ -662,6 +687,13 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>21/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>Un toast d'erreur, en fin de file</strong>
+              <span>Idée de Félix pendant le grilling des options au menu opérateur : un toast dessiné quand une action échoue (réglage non enregistré, <code>vpxtool</code>…), en plus du journal. Placé en dernier à sa demande ; les options au menu opérateur affichent d'ici là un simple message. Effort petit, impact moyen.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>20/10 <span class="count">(9)</span></summary>
           <ol>
             <li><strong>Les deux chantiers de tests 5ᵉ et 6ᵉ, le menu opérateur avant la passe de traduction</strong>
