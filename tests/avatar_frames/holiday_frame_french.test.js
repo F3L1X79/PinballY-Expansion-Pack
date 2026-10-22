@@ -1,7 +1,7 @@
 // ============================================================
-// The Christmas Holiday Frame in French, through main.js on the fake
-// PinballY globals: the locked row of the frame list shows its unlock
-// condition, then the toast after a Play on Christmas Eve names it.
+// The Holiday Frames in French, through main.js on the fake PinballY
+// globals: each locked row of the frame list shows its unlock condition,
+// then the toast after a Play on Christmas Eve names Christmas.
 // ============================================================
 
 import { test } from "node:test";
@@ -28,6 +28,12 @@ test("en français : la ligne verrouillée de Noël, puis son toast", async () =
     choose(fake, lang.profileStats.buttons.frame);
     fake.advanceTime(PROFILE_STATS_OPEN_MS);
     assert.deepEqual(frameRows(fake).map(row => [row.name, row.status, row.frame]), [
+        ["Jour de l'An", "Une partie le 1er janvier", "frame_newYear_192_locked.png"],
+        ["Saint-Valentin", "Une partie le 14 février", "frame_valentine_192_locked.png"],
+        ["Saint-Patrick", "Une partie le 17 mars", "frame_stPatrick_192_locked.png"],
+        ["Fête de la Musique", "Une partie le 21 juin", "frame_musicDay_192_locked.png"],
+        ["Halloween", "Une partie le 31 octobre", "frame_halloween_192_locked.png"],
+        ["Día de los Muertos", "Une partie le 1er ou le 2 novembre", "frame_deadDay_192_locked.png"],
         ["Noël", "Une partie le 24 ou le 25 décembre", "frame_christmas_192_locked.png"],
         ["Aucun", "Porté", null],
     ]);

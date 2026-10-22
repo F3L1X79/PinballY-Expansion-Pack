@@ -19,9 +19,17 @@ import config from "../core/config.js";
 
 const FRAME_COUNT = 10;
 const FRAME_FAMILY = Object.freeze({ COLLECTION: "collection", HOLIDAY: "holiday" });
+// Whether a local date is on one of those days of that month (1 to 12).
+const onDays = (month, ...days) => date => date.getMonth() === month - 1 && days.includes(date.getDate());
 // The Holiday Frames in list order, each with whether a local date is on its holiday.
 const HOLIDAYS = Object.freeze([
-    { id: "christmas", isOn: date => date.getMonth() === 11 && (date.getDate() === 24 || date.getDate() === 25) },
+    { id: "newYear", isOn: onDays(1, 1) },
+    { id: "valentine", isOn: onDays(2, 14) },
+    { id: "stPatrick", isOn: onDays(3, 17) },
+    { id: "musicDay", isOn: onDays(6, 21) },
+    { id: "halloween", isOn: onDays(10, 31) },
+    { id: "deadDay", isOn: onDays(11, 1, 2) },
+    { id: "christmas", isOn: onDays(12, 24, 25) },
 ]);
 const LOCAL_ISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/;
 // Frames drawn this wide or less take the 192 px image, wider ones the 384 px one.

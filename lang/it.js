@@ -670,6 +670,12 @@ export default {
         // TODO: translation pass
         toastHeader: "Holiday Frame",
         holidays: {
+            newYear: { name: "New Year's Day", condition: "A Play on 1 January" },
+            valentine: { name: "Valentine's Day", condition: "A Play on 14 February" },
+            stPatrick: { name: "St. Patrick's Day", condition: "A Play on 17 March" },
+            musicDay: { name: "Fête de la Musique", condition: "A Play on 21 June" },
+            halloween: { name: "Halloween", condition: "A Play on 31 October" },
+            deadDay: { name: "Día de los Muertos", condition: "A Play on 1 or 2 November" },
             christmas: { name: "Christmas", condition: "A Play on 24 or 25 December" },
         },
         // The Reward Prompt, after a Profile's first frame: the frame's name,

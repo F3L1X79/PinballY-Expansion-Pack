@@ -1160,25 +1160,51 @@ function hollySprig(cv, x, y, angle, size) {
     }
 }
 
-function christmas(cv) {
+// The Holiday Frames' common base: a lacquered band of colorRamp, texture
+// shifting its shade, between two trims of trimRamp.
+function holidayBand(cv, colorRamp, trimRamp, texture) {
     const ring = band(1.13, 0.08);
     cv.shadow(ring, { bbox: B(1.3), opacity: 0.6 });
-    cv.shape(ring, metal(ring, PINE, {
-        bevel: 0.07, spec: 0.7, shininess: 24,
-        // Faint diagonal stripes, like a wrapped present.
-        texture: (x, y) => 0.06 * smoothstep(0.6, 1, Math.sin((x + y) * 26)),
-    }), { bbox: B(1.17) });
+    cv.shape(ring, metal(ring, colorRamp, { bevel: 0.07, spec: 0.7, shininess: 24, texture }), { bbox: B(1.17) });
     for (const [h, r, w] of [[1.125, 0.08, 0.013], [0.985, 0.035, 0.015]]) {
         const trim = tube(h, r, w);
-        cv.shape(trim, metal(trim, RAMPS.gold, { bevel: w, contrast: 1.6 }), { bbox: B(h + 0.03) });
+        cv.shape(trim, metal(trim, trimRamp, { bevel: w, contrast: 1.6 }), { bbox: B(h + 0.03) });
     }
+}
 
-    // Big sprigs on three corners, small ones mid-side, none on the pip's corner.
-    for (const [s, size] of [[0, 0.34], [0.25, 0.34], [0.75, 0.34], [0.375, 0.24], [0.625, 0.24], [0.875, 0.24]]) {
+// Where the Holiday Frames put their ornaments: three corners and the four
+// mid-sides of the band (none on the pip's corner), each with its outward angle.
+function ornamentSpots(cornerSize, sideSize) {
+    const spots = [];
+    for (const [s, size] of [[0, cornerSize], [0.25, cornerSize], [0.75, cornerSize], [0.375, sideSize], [0.625, sideSize], [0.875, sideSize]]) {
         const p = onRoundSquare(s, 1.06, 0.12);
-        if (isPipCorner(p.x, p.y)) continue;
-        hollySprig(cv, p.x, p.y, Math.atan2(p.ny, p.nx), size);
+        if (!isPipCorner(p.x, p.y)) spots.push({ x: p.x, y: p.y, angle: Math.atan2(p.ny, p.nx), size });
     }
+    return spots;
+}
+
+// count points scattered around the band, r from minRadius to minRadius
+// + radiusSpan, for paint(x, y, random): off the pip's corner and the top ornament.
+function scatter(seed, count, minRadius, radiusSpan, paint) {
+    const random = rng(seed);
+    for (let i = 0; i < count; i++) {
+        const a = random() * TAU;
+        const r = minRadius + random() * radiusSpan;
+        const x = clamp(Math.cos(a) * r, -1.42, 1.42);
+        const y = clamp(Math.sin(a) * r, -1.42, 1.42);
+        if (isPipCorner(x, y) || (Math.abs(x) < 0.35 && y < -1)) continue;
+        paint(x, y, random);
+    }
+}
+
+const twinkles = (cv, seed, count, color) => scatter(seed, count, 1.28, 0.14,
+    (x, y, random) => sparkle(cv, x, y, 0.03 + 0.02 * random(), hex(color), 0.8));
+
+function christmas(cv) {
+    // Faint diagonal stripes, like a wrapped present.
+    holidayBand(cv, PINE, RAMPS.gold, (x, y) => 0.06 * smoothstep(0.6, 1, Math.sin((x + y) * 26)));
+
+    for (const { x, y, angle, size } of ornamentSpots(0.34, 0.24)) hollySprig(cv, x, y, angle, size);
 
     // The star on top, glowing.
     const starSdf = (x, y) => sdPolygon(x, y, starPoints(0, -1.2, 0.22, 0.09, 5));
@@ -1186,20 +1212,295 @@ function christmas(cv) {
     cv.shadow(starSdf, { bbox: around(0, -1.2, 0.32) });
     cv.shape(starSdf, metal(starSdf, RAMPS.gold, { bevel: 0.05, contrast: 1.6, spec: 0.9, shininess: 26 }), { bbox: around(0, -1.2, 0.24) });
     sparkle(cv, -0.05, -1.26, 0.08, WHITE);
+    twinkles(cv, 25, 16, "#f2f8ff");
+}
 
-    const snow = rng(25);
-    for (let i = 0; i < 16; i++) {
-        const a = snow() * TAU;
-        const r = 1.28 + snow() * 0.14;
-        const x = clamp(Math.cos(a) * r, -1.42, 1.42);
-        const y = clamp(Math.sin(a) * r, -1.42, 1.42);
-        if (isPipCorner(x, y) || (Math.abs(x) < 0.35 && y < -1)) continue;
-        sparkle(cv, x, y, 0.03 + 0.02 * snow(), hex("#f2f8ff"), 0.8);
+// ============================================================
+// New Year's Day: a midnight-blue band flecked with gold between gold
+// trims, fireworks bursting all around it.
+// ============================================================
+const MIDNIGHT = ramp([[0, "#02040f"], [0.3, "#0b1638"], [0.52, "#1b2f6b"], [0.7, "#3a56a8"], [0.86, "#9db4ff"], [1, "#ffffff"]]);
+
+// A firework burst at (x, y): rays fading out from its heart, a spark at each tip.
+function burst(cv, x, y, r, color, rays, seed) {
+    const c = hex(color);
+    const random = rng(seed);
+    cv.glow(circle(x, y, r * 0.15), c, r * 0.9, 0.35, { bbox: around(x, y, r * 1.1) });
+    for (let i = 0; i < rays; i++) {
+        const a = (i / rays) * TAU + random() * 0.2;
+        const length = r * (0.75 + 0.25 * random());
+        const tip = [x + Math.cos(a) * length, y + Math.sin(a) * length];
+        const ray = stroke([[x + Math.cos(a) * r * 0.2, y + Math.sin(a) * r * 0.2], tip], 0.004, 0.01);
+        cv.shape(ray.sdf, (px, py) => mixc(c, WHITE, 0.5 * (1 - ray.at(px, py))), { bbox: ray.bbox, mode: "add" });
+        dot(cv, tip[0] + Math.cos(a) * 0.022, tip[1] + Math.sin(a) * 0.022, 0.012, c, 0.035, 0.5);
     }
+    sparkle(cv, x, y, r * 0.3, mixc(c, WHITE, 0.5));
+}
+
+function newYear(cv) {
+    holidayBand(cv, MIDNIGHT, RAMPS.gold, (x, y) => 0.3 * smoothstep(0.97, 1, hash(Math.floor(x * 70), Math.floor(y * 70))));
+    const bursts = [
+        [0, -1.27, 0.22, "#ffd84a", 18], [-1.21, -1.21, 0.2, "#ff4fb8", 14], [1.21, -1.2, 0.19, "#3fe0ff", 14],
+        [-1.2, 1.2, 0.18, "#6dff7a", 12], [-1.3, 0.05, 0.13, "#ffd84a", 10], [1.3, -0.15, 0.13, "#ff8a3a", 10],
+        [0.05, 1.3, 0.13, "#e8ecff", 10],
+    ];
+    bursts.forEach(([x, y, r, color, rays], index) => burst(cv, x, y, r, color, rays, 40 + index));
+    twinkles(cv, 41, 12, "#fff3c0");
+}
+
+// ============================================================
+// Valentine's Day: a crimson band with a quilted sheen between rose-gold
+// trims, glossy hearts along it, a big heart pierced by a gold arrow on top.
+// ============================================================
+const CRIMSON = ramp([[0, "#24000a"], [0.3, "#6b0420"], [0.52, "#b0123a"], [0.7, "#e0405e"], [0.86, "#ffa0b0"], [1, "#ffffff"]]);
+const CANDY = ramp([[0, "#3a0618"], [0.3, "#a01848"], [0.55, "#e84a7e"], [0.75, "#ff8fb2"], [0.9, "#ffd6e2"], [1, "#ffffff"]]);
+
+// A heart's outline centred on (x, y), size its half-width; its point
+// is along +v before turning by angle.
+function heartPoints(x, y, size, angle = 0) {
+    const pts = [];
+    for (let i = 0; i < 48; i++) {
+        const t = (i / 48) * TAU;
+        const v = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16;
+        pts.push([Math.sin(t) ** 3 * size, (v - 0.15) * size]);
+    }
+    return placed(pts, x, y, angle);
+}
+
+function heart(cv, x, y, size, colorRamp, angle = 0) {
+    const pts = heartPoints(x, y, size, angle);
+    const sdf = (px, py) => sdPolygon(px, py, pts);
+    cv.shadow(sdf, { bbox: bboxOf(pts, 0.06), opacity: 0.5 });
+    cv.shape(sdf, metal(sdf, colorRamp, { bevel: size * 0.45, contrast: 1.5, spec: 0.9, shininess: 28 }), { bbox: bboxOf(pts, 0.02) });
+    return sdf;
+}
+
+function valentine(cv) {
+    holidayBand(cv, CRIMSON, RAMPS.copper, (x, y) => 0.05 * smoothstep(0.7, 1, Math.sin((x + y) * 30) * Math.sin((x - y) * 30)));
+    ornamentSpots(0.13, 0.09).forEach(({ x, y, size }, index) => heart(cv, x, y, size, index % 2 ? CANDY : CRIMSON, rad(index % 2 ? 12 : -12)));
+
+    // The arrow's shaft first: the heart drawn over it seems pierced.
+    const shaft = stroke([[-0.44, -1.1], [0.44, -1.34]], 0.012);
+    cv.shadow(shaft.sdf, { bbox: shaft.bbox });
+    cv.shape(shaft.sdf, metal(shaft.sdf, RAMPS.gold, { bevel: 0.012, contrast: 1.6 }), { bbox: shaft.bbox });
+    polygon(cv, placed([[0, -0.04], [0.09, 0], [0, 0.04]], 0.44, -1.34, rad(-15)), sdf => metal(sdf, RAMPS.gold, { bevel: 0.02 }), { shadow: {} });
+    for (const offset of [0, 0.045]) {
+        polygon(cv, placed([[0, 0], [-0.06, -0.035], [-0.03, 0], [-0.06, 0.035]], -0.4 - offset, -1.11 + offset * 0.27, rad(-15)), flat("#fff0f4"));
+    }
+    const top = heart(cv, 0, -1.22, 0.2, CRIMSON);
+    cv.glow(top, "#ff6a8a", 0.12, 0.45, { bbox: around(0, -1.22, 0.36) });
+    sparkle(cv, -0.08, -1.3, 0.06, WHITE);
+    twinkles(cv, 52, 12, "#ffd0dc");
+}
+
+// ============================================================
+// St. Patrick's Day: an emerald band between gold trims, gold-rimmed
+// shamrocks along it, a big one on top, gold coins scattered around.
+// ============================================================
+const EMERALD = ramp([[0, "#01140a"], [0.3, "#064a26"], [0.52, "#0f7a3e"], [0.7, "#2fae5e"], [0.86, "#a6efbf"], [1, "#ffffff"]]);
+const CLOVER = ramp([[0, "#02200c"], [0.35, "#0d5a28"], [0.6, "#22963f"], [0.8, "#6fd77a"], [1, "#e6ffe0"]]);
+
+// A shamrock at (x, y): three heart leaves, one along angle, a stem opposite.
+function shamrock(cv, x, y, size, angle) {
+    const back = angle + Math.PI;
+    const stem = stroke(bezier([x, y], [x + Math.cos(back) * size * 0.5, y + Math.sin(back) * size * 0.5],
+        [x + Math.cos(back + 0.5) * size * 0.8, y + Math.sin(back + 0.5) * size * 0.8],
+        [x + Math.cos(back + 0.4) * size * 1.1, y + Math.sin(back + 0.4) * size * 1.1], 12), size * 0.07, size * 0.04);
+    cv.shape(stem.sdf, metal(stem.sdf, CLOVER, { bevel: size * 0.06 }), { bbox: stem.bbox });
+    for (const turn of [0, rad(120), rad(-120)]) {
+        const d = angle + turn;
+        const pts = heartPoints(x + Math.cos(d) * size * 0.55, y + Math.sin(d) * size * 0.55, size * 0.55, d + Math.PI / 2);
+        const leaf = (px, py) => sdPolygon(px, py, pts);
+        const rim = (px, py) => leaf(px, py) - size * 0.06;
+        cv.shadow(rim, { bbox: bboxOf(pts, 0.08), opacity: 0.45 });
+        cv.shape(rim, metal(rim, RAMPS.gold, { bevel: size * 0.06, contrast: 1.6 }), { bbox: bboxOf(pts, 0.04) });
+        cv.shape(leaf, metal(leaf, CLOVER, { bevel: size * 0.3, spec: 0.6 }), { bbox: bboxOf(pts, 0.02) });
+    }
+}
+
+function stPatrick(cv) {
+    // Faint Celtic weave: two families of diagonal lines.
+    holidayBand(cv, EMERALD, RAMPS.gold, (x, y) => 0.05 * smoothstep(0.85, 1, Math.max(Math.sin((x + y) * 34), Math.sin((x - y) * 34))));
+    for (const { x, y, angle, size } of ornamentSpots(0.11, 0.08)) shamrock(cv, x, y, size, angle);
+    shamrock(cv, 0, -1.24, 0.15, -Math.PI / 2);
+    scatter(63, 9, 1.33, 0, (x, y) => rivet(cv, x, y, 0.03, RAMPS.gold));
+    twinkles(cv, 64, 8, "#fff6c8");
+}
+
+// ============================================================
+// Fête de la Musique: a night-blue band ruled like a stave between brass
+// trims, a brass trumpet on top, gold notes dancing around.
+// ============================================================
+const NIGHT_BLUE = ramp([[0, "#020a14"], [0.3, "#08243f"], [0.52, "#134a73"], [0.7, "#2a77a8"], [0.86, "#9fd2f0"], [1, "#ffffff"]]);
+
+const brassStroke = (cv, pts, w0, w1 = w0) => {
+    const line = stroke(pts, w0, w1);
+    cv.shadow(line.sdf, { bbox: line.bbox, opacity: 0.5 });
+    cv.shape(line.sdf, metal(line.sdf, RAMPS.brass, { bevel: Math.max(w0, w1), contrast: 1.5, spec: 0.8 }), { bbox: line.bbox });
+};
+
+function trumpet(cv) {
+    const y = -1.24;
+    // The lead pipe's loop above the main tube.
+    brassStroke(cv, [...bezier([-0.3, y], [-0.42, y], [-0.42, y - 0.1], [-0.3, y - 0.1], 10), [0.12, y - 0.1],
+        ...bezier([0.12, y - 0.1], [0.24, y - 0.1], [0.24, y], [0.12, y], 10)], 0.016);
+    brassStroke(cv, [[-0.52, y], [0.32, y]], 0.02);
+    for (const x of [-0.1, -0.02, 0.06]) {
+        brassStroke(cv, [[x, y + 0.03], [x, y - 0.14]], 0.018);
+        rivet(cv, x, y - 0.16, 0.022, RAMPS.brass);
+    }
+    const flare = [];
+    for (let i = 0; i <= 16; i++) {
+        const t = i / 16;
+        flare.push([0.3 + t * 0.3, 0.02 + 0.13 * t ** 2.5]);
+    }
+    polygon(cv, [...flare.map(([x, w]) => [x, y - w]), ...flare.reverse().map(([x, w]) => [x, y + w])],
+        sdf => metal(sdf, RAMPS.brass, { bevel: 0.04, contrast: 1.5, spec: 0.9, shininess: 26 }), { shadow: {} });
+    polygon(cv, [[-0.52, y - 0.022], [-0.6, y - 0.04], [-0.6, y + 0.04], [-0.52, y + 0.022]], sdf => metal(sdf, RAMPS.brass, { bevel: 0.02 }));
+    sparkle(cv, 0.58, -1.36, 0.05, WHITE);
+}
+
+// A gold note: its head at (x, y); flags 1 for a quaver, 0 for a crotchet.
+function note(cv, x, y, size, flags) {
+    const headSdf = (px, py) => sdEllipse(...toLocal(px, py, x, y, rad(-22)), size * 0.32, size * 0.22);
+    const box = around(x, y, size * 0.4);
+    cv.shadow(headSdf, { bbox: box, opacity: 0.5 });
+    cv.shape(headSdf, metal(headSdf, RAMPS.gold, { bevel: size * 0.15, contrast: 1.6, spec: 0.8 }), { bbox: box });
+    const stemX = x + size * 0.28;
+    const top = y - size * 1.1;
+    brassStroke(cv, [[stemX, y - size * 0.05], [stemX, top]], size * 0.045);
+    if (flags) brassStroke(cv, bezier([stemX, top], [stemX + size * 0.1, top + size * 0.3], [stemX + size * 0.45, top + size * 0.35], [stemX + size * 0.3, top + size * 0.75], 12), size * 0.07, size * 0.03);
+}
+
+function musicDay(cv) {
+    // Five thin stave lines along the band.
+    holidayBand(cv, NIGHT_BLUE, RAMPS.brass, (x, y) => {
+        const { q } = bandCoords(x, y);
+        return q > 0.03 && q < 0.13 ? 0.22 * smoothstep(0.15, 0, Math.abs(Math.sin(((q - 0.035) * Math.PI) / 0.0225))) : 0;
+    });
+    trumpet(cv);
+    for (const [x, y, size, flags] of [[-1.28, -0.45, 0.17, 1], [-1.3, 0.4, 0.14, 0], [1.26, -0.6, 0.16, 0], [1.25, 0.2, 0.15, 1],
+        [-0.85, 1.3, 0.15, 1], [0.1, 1.31, 0.13, 0], [-1.22, -1.15, 0.15, 1], [1.12, -1.25, 0.13, 1]]) {
+        note(cv, x, y, size, flags);
+    }
+    twinkles(cv, 75, 8, "#fff0c0");
+}
+
+// ============================================================
+// Halloween: a dusk-purple band between copper trims, carved pumpkins
+// glowing from within, the top one before a pale moon, bats around.
+// ============================================================
+const DUSK = ramp([[0, "#08020f"], [0.3, "#24093a"], [0.52, "#4a1670"], [0.7, "#7a33a8"], [0.86, "#d0a0ff"], [1, "#ffffff"]]);
+const PUMPKIN = ramp([[0, "#2a0a00"], [0.3, "#7a2600"], [0.52, "#d45a08"], [0.72, "#ff8c1a"], [0.88, "#ffd08a"], [1, "#ffffff"]]);
+const CANDLE = hex("#ffd23a");
+
+function pumpkin(cv, x, y, r) {
+    const lobes = [[-0.42, 0.5], [0.42, 0.5], [0, 0.6]];
+    const sdf = (px, py) => Math.min(...lobes.map(([ox, a]) => sdEllipse(px - (x + ox * r), py - y, a * r, 0.8 * r)));
+    const box = around(x, y, r * 1.1);
+    cv.shadow(sdf, { bbox: box, opacity: 0.55 });
+    cv.shape(sdf, metal(sdf, PUMPKIN, {
+        bevel: r * 0.5, contrast: 1.4, spec: 0.6,
+        // Darker grooves between the ribs.
+        texture: px => -0.2 * smoothstep(0.1 * r, 0, Math.abs(Math.abs(px - x) - 0.24 * r)),
+    }), { bbox: box });
+    const stem = stroke([[x, y - 0.7 * r], [x + 0.08 * r, y - 0.95 * r], [x + 0.2 * r, y - 1.02 * r]], 0.09 * r, 0.06 * r);
+    cv.shape(stem.sdf, metal(stem.sdf, CLOVER, { bevel: 0.06 * r }), { bbox: stem.bbox });
+    const face = [
+        [[-0.45, -0.05], [-0.15, -0.05], [-0.3, -0.35]],
+        [[0.15, -0.05], [0.45, -0.05], [0.3, -0.35]],
+        [[-0.55, 0.2], [-0.3, 0.3], [-0.18, 0.2], [0, 0.32], [0.18, 0.2], [0.3, 0.3], [0.55, 0.2], [0.3, 0.52], [0, 0.45], [-0.3, 0.52]],
+    ];
+    for (const part of face) {
+        const pts = part.map(([u, v]) => [x + u * r, y + v * r]);
+        const hole = polygon(cv, pts, (px, py) => mixc(CANDLE, WHITE, 0.4 * clamp(1 - Math.hypot(px - x, py - y) / r)));
+        cv.glow(hole, CANDLE, 0.12 * r, 0.6, { bbox: bboxOf(pts, 0.12 * r) });
+    }
+}
+
+// A bat at (x, y), its wings spread across, turned by angle.
+function bat(cv, x, y, size, angle) {
+    const wing = [[0.12, -0.38], [0.2, -0.16], [0.55, -0.42], [1, -0.18], [0.84, 0.06], [0.7, 0], [0.6, 0.16], [0.45, 0.05], [0.3, 0.24], [0.12, 0.12]];
+    const half = wing.map(([u, v]) => [u * size, v * size]);
+    const pts = placed([[0, -0.22 * size], ...half, [0, 0.3 * size], ...half.reverse().map(([u, v]) => [-u, v])], x, y, angle);
+    const sdf = (px, py) => sdPolygon(px, py, pts);
+    cv.glow(sdf, "#b070ff", 0.03, 0.4, { bbox: bboxOf(pts, 0.05) });
+    cv.shape(sdf, flat("#120616"), { bbox: bboxOf(pts, 0.02) });
+}
+
+function halloween(cv) {
+    // Faint cobweb rings around the Avatar.
+    holidayBand(cv, DUSK, RAMPS.copper, (x, y) => 0.06 * smoothstep(0.8, 1, Math.sin(Math.hypot(x, y) * 60)));
+    const moon = circle(0, -1.25, 0.24);
+    cv.glow(moon, "#fff4c8", 0.14, 0.45, { bbox: around(0, -1.25, 0.4) });
+    cv.shape(moon, sphere(0, -1.25, 0.24, ramp([[0, "#8a8468"], [0.6, "#e8e0b8"], [1, "#fffbe8"]]), { spec: 0.2 }), { bbox: around(0, -1.25, 0.26) });
+    pumpkin(cv, 0, -1.2, 0.2);
+    for (const { x, y, size } of ornamentSpots(0.14, 0.09)) pumpkin(cv, x, y, size);
+    for (const [x, y, size, angle] of [[-1.27, -0.5, 0.13, -15], [1.28, -0.6, 0.12, 20], [1.27, 0.35, 0.1, -10], [-1.28, 0.55, 0.11, 10],
+        [-0.55, 1.3, 0.12, -5], [0.38, 1.32, 0.09, 15], [0.55, -1.36, 0.08, 10], [-0.6, -1.36, 0.09, -20]]) {
+        bat(cv, x, y, size, rad(angle));
+    }
+}
+
+// ============================================================
+// Día de los Muertos: a magenta band between gold trims, marigolds along
+// it, a sugar skull on top with flowers for eyes, petals scattered around.
+// ============================================================
+const FUCHSIA = ramp([[0, "#16021a"], [0.3, "#4a0a52"], [0.52, "#8a1a8a"], [0.7, "#c94fc0"], [0.86, "#ffc0f0"], [1, "#ffffff"]]);
+const MARIGOLD = ramp([[0, "#3a0e00"], [0.3, "#a83a00"], [0.55, "#f07a08"], [0.75, "#ffb020"], [0.9, "#ffe27a"], [1, "#ffffff"]]);
+const SUGAR = ramp([[0, "#3a3028"], [0.35, "#9d9284"], [0.65, "#e8e2d6"], [1, "#ffffff"]]);
+
+// A marigold at (x, y): rings of round petals, the outer ones darker.
+function marigold(cv, x, y, r) {
+    cv.shadow(circle(x, y, r), { bbox: around(x, y, r * 1.3), opacity: 0.5 });
+    for (const [ring, count, petal, shade] of [[0.68, 13, 0.34, 0.8], [0.42, 9, 0.3, 0.9], [0.16, 5, 0.26, 1]]) {
+        for (let i = 0; i < count; i++) {
+            const a = (i / count) * TAU + ring * 3;
+            const px = x + Math.cos(a) * r * ring;
+            const py = y + Math.sin(a) * r * ring;
+            cv.shape(circle(px, py, r * petal), sphere(px, py, r * petal, t => MARIGOLD(t * shade), { spec: 0.3 }), { bbox: around(px, py, r * petal * 1.1) });
+        }
+    }
+}
+
+function sugarSkull(cv, x, y, s) {
+    const skull = (px, py) => Math.min(sdCircle(px, py, x, y, s), sdBox(px, py, x, y + 0.7 * s, 0.6 * s, 0.4 * s, 0.25 * s));
+    const box = [x - s * 1.1, y - s * 1.1, x + s * 1.1, y + s * 1.2];
+    cv.shadow(skull, { bbox: box, opacity: 0.55 });
+    cv.shape(skull, metal(skull, SUGAR, { bevel: s * 0.3, contrast: 1.2, spec: 0.5 }), { bbox: box });
+    for (const [side, color] of [[-1, "#2fd6e8"], [1, "#ff4fa8"]]) {
+        const ex = x + side * 0.4 * s;
+        const ey = y + 0.12 * s;
+        cv.shape(circle(ex, ey, 0.3 * s), flat("#1a0a1e"), { bbox: around(ex, ey, 0.32 * s) });
+        flower(cv, ex, ey, 0.26 * s, color, "#e0a020", 6);
+    }
+    polygon(cv, heartPoints(x, y + 0.5 * s, 0.1 * s, Math.PI), flat("#1a0a1e"));
+    const teethY = y + 0.85 * s;
+    const mouth = stroke([[x - 0.4 * s, teethY], [x + 0.4 * s, teethY]], 0.025 * s);
+    cv.shape(mouth.sdf, flat("#1a0a1e"), { bbox: mouth.bbox });
+    for (let i = -3; i <= 3; i++) {
+        const tooth = stroke([[x + i * 0.11 * s, teethY - 0.1 * s], [x + i * 0.11 * s, teethY + 0.1 * s]], 0.018 * s);
+        cv.shape(tooth.sdf, flat("#1a0a1e"), { bbox: tooth.bbox });
+    }
+    marigold(cv, x, y - 0.55 * s, 0.22 * s);
+}
+
+function deadDay(cv) {
+    // Faint papel picado diamonds.
+    holidayBand(cv, FUCHSIA, RAMPS.gold, (x, y) => 0.06 * smoothstep(0.75, 1, Math.abs(Math.sin(x * 28)) * Math.abs(Math.sin(y * 28))));
+    for (const { x, y, size } of ornamentSpots(0.13, 0.09)) marigold(cv, x, y, size);
+    sugarSkull(cv, 0, -1.22, 0.17);
+    scatter(86, 14, 1.28, 0.14, (x, y, random) => dot(cv, x, y, 0.016 + 0.01 * random(), hex(random() < 0.5 ? "#ff9a1a" : "#ffd040"), 0.03, 0.4));
 }
 
 // The Holiday Frames, by their id in the Profile Rewards module.
 export const HOLIDAY_FRAMES = [
+    { id: "newYear", name: "New Year's Day", draw: newYear },
+    { id: "valentine", name: "Valentine's Day", draw: valentine },
+    { id: "stPatrick", name: "St. Patrick's Day", draw: stPatrick },
+    { id: "musicDay", name: "Fete de la Musique", draw: musicDay },
+    { id: "halloween", name: "Halloween", draw: halloween },
+    { id: "deadDay", name: "Dia de los Muertos", draw: deadDay },
     { id: "christmas", name: "Christmas", draw: christmas },
 ];
 
