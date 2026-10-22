@@ -36,7 +36,7 @@ A new Challenge comes every Monday, the same for the whole household: five diffe
 
 <img src="docs/images/table_mastery.png" alt="The Mastery Bar of the selected table: Rookie, Mastery Level 1" width="297">
 
-Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti. Each Collection Tier also unlocks an Avatar Frame, from the Enchanted Forest to the Celestial Legend, to wear around your Avatar: pick it in **My Profile**, under **Frame**.
+Every minute you play a table builds your Table Mastery of it, through ten Mastery Levels from Rookie to Pinball Wizard, each longer to reach than the one before. The Mastery Bar, at the top right of the wheel screen, shows how far you are on the selected table, and a toast announces the level you reach. When ten of your tables reach the next level, your Collection Mastery climbs a tier. Mastery Level 10 on a table and each new Collection Tier bring a shower of confetti. Each Collection Tier also unlocks an Avatar Frame, from the Enchanted Forest to the Celestial Legend, to wear around your Avatar: pick it in **My Profile**, under **Frame**. Play on a holiday (New Year's Day, Chinese New Year, Valentine's Day, Easter, Halloween, Christmas and five more) and that day's Holiday Frame is yours for good, announced by a toast when you come back to the wheel.
 
 ### High Scores
 
@@ -88,7 +88,6 @@ Here is what we are thinking about for the pack's future. Nothing is promised: p
 - **Year in Pinball**: each Profile's year in review, the tables played and discovered, the hours, the favourites, the Achievements and the longest Streak.
 - **Themes**: other looks than Steamball for every drawn screen, with a small editor to make your own.
 - **Ratings and favourites for each Profile**, then the household's average rating of each table.
-- **Holiday and year Avatar Frames**: Christmas, Halloween, "2026"… earned by coming to play at the right time.
 - **Install in 30 seconds and updates**, without git.
 - **The language picked from a menu**, and the latest texts translated into German, Spanish, Italian and Portuguese.
 

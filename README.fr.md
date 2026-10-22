@@ -58,7 +58,7 @@ Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq table
 
 <img src="docs/images/table_mastery.png" alt="La barre de maîtrise de la table sélectionnée : Rookie (Novice), niveau 1" width="297">
 
-Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis. Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Mon profil**, sous **Cadre**.
+Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent. La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint. Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier. Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis. Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Mon profil**, sous **Cadre**. Jouez un jour de fête (Nouvel An, Nouvel An chinois, Saint-Valentin, Pâques, Halloween, Noël et cinq autres) et le cadre de ce jour vous appartient pour de bon, annoncé par un encart à votre retour sur la roue.
 
 ### Meilleurs scores
 
@@ -111,7 +111,6 @@ Voici ce que nous envisageons pour la suite du pack. Rien n'est promis : les pro
 - **Year in Pinball** : le bilan de l'année de chaque Profil, les tables jouées et découvertes, les heures de jeu, les préférées, les succès et la plus longue série.
 - **Thèmes** : d'autres styles que Steamball pour tous les écrans dessinés, avec un petit éditeur pour créer le vôtre.
 - **Notes et favoris propres à chaque Profil**, puis la note moyenne de la maison pour chaque table.
-- **Cadres d'Avatar de fête et d'année** : Noël, Halloween, « 2026 »… gagnés en venant jouer au bon moment.
 - **Installation en 30 secondes et mises à jour**, sans git.
 - **La langue choisie depuis un menu**, et les textes récents traduits en allemand, espagnol, italien et portugais.
 
