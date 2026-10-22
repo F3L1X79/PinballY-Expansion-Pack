@@ -33,6 +33,18 @@ function windowRect(layer, { width, height }) {
     return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 };
 }
 
+// In a window of that size: the scrollbar's rail (its end diamonds
+// included) and thumb, each { left, top, right, bottom }, or null when no
+// scrollbar shows.
+export function frameListScrollbar(fake, size) {
+    const [rail, ...moreRails] = shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.scrollbar);
+    const [thumb, ...moreThumbs] = shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.scrollbarThumb);
+    if (moreRails.length > 0 || moreThumbs.length > 0) throw new Error("more than one scrollbar shows");
+    if (!rail && !thumb) return null;
+    if (!rail || !thumb) throw new Error("the rail and the thumb show together");
+    return { rail: windowRect(rail, size), thumb: windowRect(thumb, size) };
+}
+
 // In a window of that size: the footer's rect, the rows' and the Exit
 // Button's (each { left, top, right, bottom }), and whether every footer
 // text sits inside the footer.

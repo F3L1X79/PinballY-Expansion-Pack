@@ -8,10 +8,13 @@ import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../drawing
 import {
     oneLine, fillGradient, drawAvatar, drawAvatarFrame, avatarFrameSide, buttonHintsFooterRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
+import { layoutScrollbar, thumbTopAt } from "../drawing/scrollbar.js";
 
 // Above the Profile Stats' band, which never shows at the same time, so
 // each reader sees only its own layers.
-export const AVATAR_FRAME_LIST_Z_INDEX = Object.freeze({ backdrop: 6140, title: 6141, rows: 6142, exitButton: 6143, buttonHints: 6144, marker: 6150, tooltip: 6151 });
+export const AVATAR_FRAME_LIST_Z_INDEX = Object.freeze({
+    backdrop: 6140, title: 6141, rows: 6142, exitButton: 6143, buttonHints: 6144, scrollbar: 6145, scrollbarThumb: 6146, marker: 6150, tooltip: 6151,
+});
 
 export const REFERENCE_HEIGHT = 1920;
 
@@ -36,8 +39,9 @@ const PANEL_H_WITHOUT_ROWS = LOOK.pad + LOOK.titleH + LOOK.titleGap + EXIT_AND_H
 const MAX_ROWS_SHOWN = Math.floor((REFERENCE_HEIGHT - 2 * LOOK.minMargin - PANEL_H_WITHOUT_ROWS + LOOK.rowGap) / ROW_STEP);
 
 // The panel, its title, the Exit Button at the title's right end, the
-// first row's place, how many rows show at once (rowCount at most) and the
-// Button Hints' footer under them, in a window referenceWidth wide.
+// first row's place, how many rows show at once (rowCount at most), the
+// Button Hints' footer under them and the shared scrollbar in the panel's
+// right margin (null when every row shows), in a window referenceWidth wide.
 export function layoutFrameList(referenceWidth, rowCount) {
     const rowsShown = Math.min(rowCount, MAX_ROWS_SHOWN);
     const w = Math.min(Math.round(referenceWidth * LOOK.widthShare), LOOK.maxWidth);
@@ -50,12 +54,23 @@ export function layoutFrameList(referenceWidth, rowCount) {
     const exitButton = { x: x + rowW - side, y: title.y + Math.round((title.h - side) / 2), w: side, h: side };
     const firstRow = { x, y: title.y + title.h + LOOK.titleGap, w: rowW, h: LOOK.rowH };
     const buttonHints = buttonHintsFooterRectOf(panel);
-    return { panel, title, exitButton, firstRow, rowsShown, buttonHints };
+    // Drawn at the Button Hints' scale, as the Achievement List's in its
+    // smaller pixels.
+    const scrollbar = layoutScrollbar({
+        centerX: panel.x + w - LOOK.pad / 2, areaTop: firstRow.y, areaHeight: rowsShown * ROW_STEP - LOOK.rowGap,
+        listHeight: rowCount * ROW_STEP - LOOK.rowGap, scale: EXIT_AND_HINTS.hintsScale,
+    });
+    return { panel, title, exitButton, firstRow, rowsShown, buttonHints, scrollbar };
 }
 
 // Where the row at index sits while the list shows from the row at topIndex.
 export function rowRectOf(geometry, index, topIndex) {
     return { ...geometry.firstRow, y: geometry.firstRow.y + (index - topIndex) * ROW_STEP };
+}
+
+// Where the scrollbar's thumb sits while the list shows from the row at topIndex.
+export function thumbRectOf(bar, topIndex) {
+    return { x: bar.centerX - bar.thumbWidth / 2, y: thumbTopAt(bar, topIndex * ROW_STEP), w: bar.thumbWidth, h: bar.thumbHeight };
 }
 
 export function drawTitle(host, dc, title, w, h) {

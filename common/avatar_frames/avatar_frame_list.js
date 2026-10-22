@@ -5,7 +5,7 @@
 // nothing. Both call the return given to open().
 // Opens directly, not through the wheel dialog module: the player asked for it.
 // - Every layer is drawn ahead from startup and kept between openings.
-// - Rows that do not fit scroll with the selection: those out of view stay hidden.
+// - Rows that do not fit scroll with the selection and its scrollbar: those out of view stay hidden.
 // - Swallows every button through "commandbuttondown" while open.
 // - Opens through the shared screen opening when not drawn ahead (docs/adr/0014).
 // ============================================================
@@ -17,8 +17,9 @@ import { createNavigationSound } from "../core/navigation_sound.js";
 import { STEAMBALL_COLORS } from "../drawing/steamball_palette.js";
 import { createSelectionMarker } from "../drawing/selection_marker.js";
 import {
-    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, rowRectOf, drawTitle, drawRow,
+    AVATAR_FRAME_LIST_Z_INDEX, REFERENCE_HEIGHT, layoutFrameList, rowRectOf, thumbRectOf, drawTitle, drawRow,
 } from "./avatar_frame_list_painter.js";
+import { scrollbarRailRectOf, drawScrollbarRail, drawScrollbarThumb } from "../drawing/scrollbar.js";
 import {
     drawBackdrop, drawExitButton, exitTooltipRectOf, drawExitTooltip, drawButtonHintsBand, EXIT_BUTTON_LOOK,
 } from "../drawing/steamball_drawing.js";
@@ -130,6 +131,21 @@ export function createAvatarFrameList(host, { profileStore, profileRewards, draw
                     draw: dc => drawRow(host, dc, row, rect.w, rect.h),
                 };
             }),
+            ...scrollbarPieces(geometry.scrollbar, topIndex),
+        ];
+    }
+
+    // The rail and the thumb, none when every row shows. The thumb's
+    // signature leaves out its place: it is only moved as the rows scroll.
+    function scrollbarPieces(bar, topIndex) {
+        if (!bar) return [];
+        const railRect = scrollbarRailRectOf(bar);
+        const thumbRect = thumbRectOf(bar, topIndex);
+        return [
+            { key: "scrollbar", zIndex: AVATAR_FRAME_LIST_Z_INDEX.scrollbar, rect: railRect, look: null,
+                draw: dc => drawScrollbarRail(dc, bar, { centerX: bar.centerX - railRect.x, top: bar.top - railRect.y }) },
+            { key: "scrollbarThumb", zIndex: AVATAR_FRAME_LIST_Z_INDEX.scrollbarThumb, rect: thumbRect, look: null,
+                draw: dc => drawScrollbarThumb(dc, thumbRect.w, thumbRect.h, bar.scale) },
         ];
     }
 

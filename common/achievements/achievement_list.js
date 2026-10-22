@@ -23,8 +23,9 @@ import { createSelectionMarker } from "../drawing/selection_marker.js";
 import { RANKS_IN_ORDER } from "./achievements.js";
 import {
     LIST_LOOK, AVATAR_FRAME_WIDTH, computeGeometry, drawBackdrop, drawMask, drawSectionHeader, drawRow, layoutOwners, layoutRowEmblem, layoutHeaderEmblems,
-    drawPiece, layoutScrollbar, thumbTopAt, drawScrollbarThumb, SHARED_SCALE, EXIT_BUTTON_CANVAS, EXIT_TOOLTIP_CANVAS,
+    drawPiece, layoutScrollbar, SHARED_SCALE, EXIT_BUTTON_CANVAS, EXIT_TOOLTIP_CANVAS,
 } from "./achievement_list_painter.js";
+import { thumbTopAt, drawScrollbarThumb } from "../drawing/scrollbar.js";
 
 const SCRIPT_NAME = "AchievementList";
 

@@ -10,6 +10,8 @@ import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS, RANK_COLORS } fro
 import {
     drawAvatarFrame, avatarFrameSide, avatarFrameInset, drawButtonHintsBand, exitTooltipRectOf, EXIT_AND_HINTS_METRICS as EXIT_AND_HINTS,
 } from "../drawing/steamball_drawing.js";
+import { SCROLLBAR_LOOK, layoutScrollbar as layoutSharedScrollbar, drawScrollbarRail } from "../drawing/scrollbar.js";
+import { fillDiamond, cornerInset } from "../drawing/pixel_shapes.js";
 
 // The wheel shows dimmed through it.
 const OVERLAY_COLOR = 0xD0080A0E;
@@ -59,15 +61,9 @@ export const LIST_LOOK = Object.freeze({
     ownerGap: 4,
     // Between the Unlock Rate and the row's right edge.
     ownersInset: 12,
-    // The scrollbar, centred in the panel's right margin: a gold thumb in
-    // a soft glow, over a thin rail with a small diamond at each end.
-    scrollbarThumbWidth: 6,
-    scrollbarGlow: 2,
-    scrollbarRailWidth: 2,
-    scrollbarCapRadius: 3,
-    // Between the rail's ends and the header or the footer.
-    scrollbarInset: 10,
-    scrollbarMinThumbHeight: 40,
+    // The shared scrollbar's, centred in the panel's right margin.
+    scrollbarInset: SCROLLBAR_LOOK.inset,
+    scrollbarMinThumbHeight: SCROLLBAR_LOOK.minThumbHeight,
     // The Exit Button at the header's top right, its texts kept exitButtonGap
     // away from it; as far from the panel's top as from its right, nearer
     // than the padding, so that its tooltip stays above the rank counts.
@@ -107,30 +103,7 @@ function fillGradient(dc, x, y, width, height, topColor, bottomColor) {
     }
 }
 
-// A diamond centred on (centerX, centerY), drawn as stacked lines.
-function fillDiamond(dc, centerX, centerY, radius, color) {
-    for (let dy = -radius; dy <= radius; dy++) {
-        const half = radius - Math.abs(dy);
-        dc.fillRect(Math.round(centerX - half), Math.round(centerY + dy), 2 * half + 1, 1, color);
-    }
-}
-
 const withAlpha = (color, alpha) => alpha * 2 ** 24 + (color & 0xFFFFFF);
-
-// How far a rounded corner eats into line i (0 = top line) of a shape.
-function cornerInset(radius, i) {
-    return Math.round(radius - Math.sqrt(radius * radius - (radius - i - 0.5) ** 2));
-}
-
-// A vertical capsule (both ends rounded), drawn line by line.
-function fillCapsule(dc, x, y, width, height, color) {
-    const radius = width / 2;
-    for (let i = 0; i < height; i++) {
-        const fromEnd = Math.min(i, height - 1 - i);
-        const inset = fromEnd < radius ? cornerInset(radius, fromEnd) : 0;
-        dc.fillRect(x + inset, y + i, width - 2 * inset, 1, color);
-    }
-}
 
 // A disc centred on (centerX, centerY), drawn line by line.
 function fillDisc(dc, centerX, centerY, radius, color) {
@@ -349,50 +322,12 @@ export function drawMask(host, dc, g, { header, footer, scrollbar }) {
     if (scrollbar) drawScrollbarRail(dc, scrollbar);
 }
 
-// The scrollbar of a list this tall, or null when it fits in the rows
-// area: the rail's centre and extent in the window, the thumb's layer size
-// and how far the list scrolls.
+// The shared scrollbar of a list this tall, its rail in the panel's right
+// margin, or null when it fits in the rows area.
 export function layoutScrollbar(g, listHeight) {
-    const look = LIST_LOOK;
-    if (listHeight <= g.areaHeight) return null;
-    const top = g.areaTop + look.scrollbarInset;
-    const height = g.areaHeight - 2 * look.scrollbarInset;
-    return {
-        centerX: g.x + g.panelWidth - look.rowsInset / 2,
-        top,
-        height,
-        thumbWidth: look.scrollbarThumbWidth + 2 * look.scrollbarGlow,
-        // Never taller than the rail, even in a tiny window.
-        thumbHeight: Math.min(height, Math.max(look.scrollbarMinThumbHeight, Math.round(height * g.areaHeight / listHeight))),
-        maxScroll: listHeight - g.areaHeight,
-    };
-}
-
-// The thumb's top in the window for this scroll.
-export function thumbTopAt(bar, scroll) {
-    const ratio = Math.min(1, Math.max(0, scroll / bar.maxScroll));
-    return bar.top + (bar.height - bar.thumbHeight) * ratio;
-}
-
-// The rail, on the mask: it never moves.
-function drawScrollbarRail(dc, bar) {
-    const look = LIST_LOOK;
-    const centerX = Math.round(bar.centerX);
-    dc.fillRect(centerX - look.scrollbarRailWidth / 2, bar.top, look.scrollbarRailWidth, bar.height, COLORS.track);
-    for (const capY of [bar.top, bar.top + bar.height]) {
-        fillDiamond(dc, centerX, capY, look.scrollbarCapRadius, COLORS.gold);
-        fillDiamond(dc, centerX, capY, 1, COLORS.title);
-    }
-}
-
-// The thumb on its own layer, at the layer's size: a gold capsule in a
-// soft glow, lit along its left side like the header's gauge.
-export function drawScrollbarThumb(dc, width, height) {
-    const glow = LIST_LOOK.scrollbarGlow;
-    fillCapsule(dc, 0, 0, width, height, withAlpha(COLORS.gold, 0x40));
-    fillCapsule(dc, glow, glow, width - 2 * glow, height - 2 * glow, COLORS.gold);
-    const bodyRadius = (width - 2 * glow) / 2;
-    dc.fillRect(glow + 1, glow + bodyRadius, 1, Math.max(0, height - 2 * glow - 2 * bodyRadius), mixColors(COLORS.gold, COLORS.title, 0.5));
+    return layoutSharedScrollbar({
+        centerX: g.x + g.panelWidth - LIST_LOOK.rowsInset / 2, areaTop: g.areaTop, areaHeight: g.areaHeight, listHeight,
+    });
 }
 
 // Its title in gold, the count beside it, and a rule to the right edge.
