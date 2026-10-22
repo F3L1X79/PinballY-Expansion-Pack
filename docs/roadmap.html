@@ -356,12 +356,22 @@
             <h3>L'ordre réel des événements d'un lancement, dans le faux host</h3>
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">tests</span></div>
           </div>
-          <p>L'aide de PinballY ne dit pas dans quel ordre arrivent <code>launchoverlayshow</code>, <code>launchoverlaymessage</code> (<code>"running"</code>, <code>"terminating"</code>), <code>launchoverlayhide</code>, <code>gamestarted</code> et <code>gameover</code>. Le faux host ne les déclenche donc pas dans son propre lancement : les tests du Loader les envoient à la main. Journaliser cet ordre sur la borne, l'écrire dans <code>docs/pinbally/</code>, puis le reproduire dans le lancement du faux host.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/research</code> (avec une trace des événements prise par Félix sur la borne) → <code>/grill-with-docs</code> → <code>/implement</code></div>
+          <p>L'aide de PinballY ne dit pas dans quel ordre arrivent <code>launchoverlayshow</code>, <code>launchoverlaymessage</code> (<code>"running"</code>, <code>"terminating"</code>), <code>launchoverlayhide</code>, <code>gamestarted</code> et <code>gameover</code>. Le faux host ne les déclenche donc pas dans son propre lancement : les tests du Loader les envoient à la main. Journaliser cet ordre sur la borne, l'écrire dans <code>docs/pinbally/</code>, puis le reproduire dans le lancement du faux host. Grillé le 22/10/2026, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/308">spec #308</a>.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code> (le 3ᵉ ticket attend la trace sur la borne)</div>
+          <details>
+            <summary>Décisions</summary>
+            <ul>
+              <li>L'ordre vient du code source de PinballY (<code>docs/research/launch-events-order.md</code>), confirmé par une trace sur la borne, qui l'emporte en cas de désaccord.</li>
+              <li>Drapeau permanent <code>LOG_LAUNCH_EVENTS</code> dans <code>.env.local</code> : chaque événement de lancement journalisé, à la milliseconde.</li>
+              <li>Cinq cas : la table se ferme seule, Exit Game, Exit Game avant le chargement, échec, capture unique et par lot.</li>
+              <li>Les assistants du faux host (<code>playGame</code>, <code>gameStarted</code>, <code>gameOver</code>, <code>launchError</code>, KillGame) déclenchent tout le cycle eux-mêmes ; les tests du Loader sont réécrits dessus.</li>
+              <li>Le double <code>launchoverlayhide</code> d'un échec et Exit Game avant le chargement ne sont reproduits que si la trace les confirme ; un second <code>hide</code> ne doit rien changer.</li>
+            </ul>
+          </details>
           <details>
             <summary>Contexte</summary>
-            <p class="ctx">Relevé par la revue Spec du Loader (#237), puis à la rétro, le 17/10/2026.</p>
+            <p class="ctx">Relevé par la revue Spec du Loader (#237), puis à la rétro, le 17/10/2026. Le <code>/research</code> prévu a été fait par la lecture du code source pendant le grilling. À vérifier pendant la trace : le Seamless Launch Overlay ne ramène le Loader que sur <code>"terminating"</code>, alors qu'une table qui se ferme seule envoie <code>"gameover"</code>.</p>
           </details>
         </div>
       </li>
