@@ -256,7 +256,6 @@
 
         <div class="ax row">Faible</div>
         <div class="cell">
-          <a class="chip tr-play" href="#quiet-wheel-other-screens"><b></b>Son baissé ailleurs</a>
           <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
         </div>
         <div class="cell">
@@ -321,54 +320,6 @@
               <li>Les écrans font partie du socle du pack, pas d'un Add-on : absents de la liste, jamais désactivables, toujours dessinés, même quand Drawn Menus est désactivé.</li>
             </ul>
             <p class="ctx">Idée de Félix du 19/10/2026, grillée le 21/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas. Une langue par Profile, qui changerait tout de suite, est écartée.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="quiet-wheel-other-screens" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Son des vidéos baissé sur les autres écrans dessinés</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span></div>
-          </div>
-          <p>Baisser aussi le son des vidéos de la table sélectionnée (plafonné à 50) tant que la Profile Stats, la Household Stats, l'Avatar Frame list, l'Achievement List ou le High Score Board voilent la roue, comme le fait la Quiet Wheel du Profile picker et du Welcome Screen. Grillé le 20/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. Reprend le mécanisme de la Quiet Wheel (<code>common/core/quiet_wheel.js</code>, spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/286">#286</a>)</div>
-          <details>
-            <summary>Décisions</summary>
-            <ul>
-              <li>Les cinq écrans dessinés qui voilent la roue : Profile Stats, Household Stats, Avatar Frame list, Achievement List, High Score Board. Pas de tri entre écrans longs et courts : sous le voile, le scintillement de chaque <code>update()</code> se voit peu.</li>
-              <li>Les Drawn Menus ne baissent jamais le son : on les traverse vite, et chaque ouverture ferait scintiller deux fois la roue à travers leur voile. Exit des Profile Stats vers le menu principal fait donc remonter le son.</li>
-              <li>Du voile (avant l'éventuel Loader) à la fermeture, Exit pendant le Loader compris, comme le Welcome Screen dans #286.</li>
-              <li>Une seule baisse et un seul retour pour une navigation entre écrans dessinés (Household Stats, Profile Stats d'un autre Profile, Avatar Frame list, retour instantané) : le parent caché garde le son bas, le délai de passage de #286 couvre les relais.</li>
-              <li>Pas de nouveau terme au glossaire : « Quiet Wheel » reste le nom de la baisse du Profile picker et du Welcome Screen.</li>
-            </ul>
-            <p class="ctx">Reporté pendant le grilling du son baissé sur le Profile picker et le Welcome Screen, le 20/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="error-toast" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Un toast d'erreur pour les actions qui échouent</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Quand une action lancée par le joueur ou par le pack échoue (réglage non enregistré, <code>vpxtool</code> introuvable ou en erreur…), un toast dessiné le dit à l'écran, en plus de la ligne dans <code>logfile.log</code>, au lieu d'un échec visible seulement dans le journal.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la forme de l'Achievement Toast (calque non bloquant) ; servira aux <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a>. Avant la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a>, qui traduira ses messages</div>
-          <details>
-            <summary>Questions ouvertes (3)</summary>
-            <ul>
-              <li>Quelles erreurs méritent un toast : seulement celles d'une action que le joueur vient de demander, ou aussi celles d'un travail de fond (Table ROMs, lecture d'un fichier mis de côté) ?</li>
-              <li>Un module partagé à part, ou une variante de l'Achievement Toast ?</li>
-              <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
           </details>
         </div>
       </li>
@@ -440,6 +391,29 @@
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/images/rank_*.png</code>) des emblèmes de League of Legends.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="error-toast" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Un toast d'erreur pour les actions qui échouent</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Quand une action lancée par le joueur ou par le pack échoue (réglage non enregistré, <code>vpxtool</code> introuvable ou en erreur…), un toast dessiné le dit à l'écran, en plus de la ligne dans <code>logfile.log</code>, au lieu d'un échec visible seulement dans le journal.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la forme de l'Achievement Toast (calque non bloquant) ; servira aux <a href="#operator-menu-options">options au menu opérateur (n° <span data-ref="operator-menu-options"></span>)</a>. Après la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> : ses messages attendront la suivante</div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Quelles erreurs méritent un toast : seulement celles d'une action que le joueur vient de demander, ou aussi celles d'un travail de fond (Table ROMs, lecture d'un fichier mis de côté) ?</li>
+              <li>Un module partagé à part, ou une variante de l'Achievement Toast ?</li>
+              <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
           </details>
         </div>
       </li>
@@ -596,8 +570,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>22/10 <span class="count">(3)</span></summary>
+          <summary>22/10 <span class="count">(4)</span></summary>
           <ol>
+            <li><strong>Le son baissé ailleurs retiré, le toast d'erreur après la Distribution</strong>
+              <span>Demandé par Félix. Le son baissé sur les autres écrans dessinés quitte la file et la matrice. Le toast d'erreur, moins urgent, passe juste après la Distribution : les options au menu opérateur gardent leur simple message, et ses textes attendront une prochaine passe de traduction. Efforts et impacts inchangés.</span></li>
             <li><strong>Nouvel ordre de la file, les options au menu opérateur toujours 1ʳᵉ</strong>
               <span>Demandé par Félix. Le son baissé sur les autres écrans dessinés remonte 2ᵉ : déjà grillé, petit, besoin de la borne, sans texte à traduire. Le toast d'erreur remonte 3ᵉ, juste avant la passe de traduction (4ᵉ) : il finit le cas d'échec des options au menu opérateur, et la passe traduira ses messages ; il était dernier à la demande de Félix le 21/10. Ensuite la Household Stats plus rapide, les notes et favoris, la Distribution, les Easter eggs (toujours après elle), l'API des statistiques (après elle aussi), les Challenges adaptés (il faut des mois de Play Log), les thèmes et leur éditeur, et Year in Pinball en dernier (premier bilan complet en 2027). Efforts et impacts inchangés.</span></li>
             <li><strong>La passe de traduction en quatre tickets, un par langue</strong>
