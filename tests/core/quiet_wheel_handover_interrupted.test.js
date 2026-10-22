@@ -33,7 +33,7 @@ test("a launch, a menu or attract mode during the hand-over brings the table bac
     const drop = { configId: TABLES[0].configId, changes: { audioVolume: 50 } };
     const back = { configId: TABLES[0].configId, changes: { audioVolume: 100 } };
     const interruptions = {
-        launch: () => fake.fire("launchoverlayshow", { game: fake.getGameInfo(TABLES[0].configId) }),
+        launch: () => fake.playGame(fake.getGameInfo(TABLES[0].configId)),
         menu: () => fake.openMainMenu(),
         attract: () => fake.enterAttractMode(),
     };
@@ -50,6 +50,10 @@ test("a launch, a menu or attract mode during the hand-over brings the table bac
         assert.deepEqual(fake.gameUpdates(), expected, `${name}: back at once`);
         fake.advanceTime(HANDOVER_OVER_MS);
         assert.deepEqual(fake.gameUpdates(), expected, `${name}: nothing more after the delay`);
+        if (name === "launch") {
+            fake.gameStarted(fake.getGameInfo(TABLES[0].configId));
+            fake.gameOver(fake.getGameInfo(TABLES[0].configId));
+        }
         if (name === "menu") fake.closeMenu();
         if (name === "attract") fake.exitAttractMode();
         await settle();

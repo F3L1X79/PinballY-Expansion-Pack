@@ -19,8 +19,7 @@ test("after a Profile Reset, the level is announced again once reached again", a
     fake.playGame(FIRST);
     fake.gameStarted(FIRST);
     fake.advanceTime(10 * MINUTE * 1000);
-    fake.fire("gameover", { game: FIRST });
-    getProfileStore().resetProfile("guest");
+    fake.one("gameover", () => getProfileStore().resetProfile("guest"));
     fake.gameOver(FIRST);
     fake.advanceTime(ALL_TOASTS_MS);
     assert.deepEqual(levelToasts(fake), [], "the waiting Level Toast is dropped");

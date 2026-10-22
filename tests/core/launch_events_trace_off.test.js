@@ -1,7 +1,6 @@
 // ============================================================
 // The launch events trace through main.js with LOG_LAUNCH_EVENTS left off
 // (the default): its Add-on is on, yet a launch logs no trace line.
-// - The fake host does not fire the launch events yet (#311): fired by hand here.
 // ============================================================
 
 import { test } from "node:test";
@@ -21,13 +20,11 @@ test("with the flag off, a launch logs no launch event line", async () => {
     await settle();
     const game = fake.getAllTables()[0];
 
-    fake.fire("prelaunch", { game });
-    fake.fire("launchoverlayshow", { game });
-    fake.fire("launchoverlaymessage", { id: "init", message: null, hideWheelImage: false });
-    fake.fire("gamestarted", { game });
-    fake.fire("gameover", { game });
-    fake.fire("launchoverlayhide", { game });
-    fake.fire("postlaunch", { game });
+    fake.playGame(game);
+    fake.gameStarted(game);
+    fake.gameOver(game);
+    fake.playGame(game);
+    fake.launchError(game);
 
     assert.deepEqual(fake.logLines().filter(line => line.startsWith("[LaunchEvents]")), []);
     assertNoErrorLogged(fake);

@@ -80,14 +80,12 @@ export async function startTableRoms({ tables, files = {}, vpxtool, enabled = tr
         // as the game ends.
         play: async (configId, { nvWritten = [], folder = nvramFolder, durationMs = GAME_MS } = {}) => {
             const game = fake.getAllTables().find(candidate => candidate.configId === configId);
-            fake.fire("prelaunch", { game });
             fake.playGame(game);
             await settle();
             fake.gameStarted(game);
             fake.advanceTime(durationMs);
             for (const rom of nvWritten) fake.addFile(`${folder}\\${rom}.nv`, "nvram");
             fake.gameOver(game);
-            fake.fire("postlaunch", { game });
         },
         // The table files vpxtool was asked to read, in order.
         scriptsRead: () => fake.programRuns().map(run => run.args[1]),

@@ -24,7 +24,6 @@ test("a launch under the startup veil brings the volume back as its overlay show
 
     const [game] = fake.getAllTables();
     fake.playGame(game);
-    fake.fire("launchoverlayshow", { game });
     assert.deepEqual(fake.gameUpdates().map(update => update.changes.audioVolume), [50, 80], "back as the overlay shows");
     assertNoErrorLogged(fake);
 });

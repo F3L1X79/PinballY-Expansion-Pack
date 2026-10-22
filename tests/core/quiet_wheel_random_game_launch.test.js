@@ -30,6 +30,10 @@ test("a Random Game launched from the Welcome Screen finds the selected table ba
         volumesAtLaunch.push(fake.getGameInfo(MEDIEVAL.configId).audioVolume);
         playGame(game);
     };
+    const launchEvents = [];
+    for (const type of ["prelaunch", "launchoverlayshow", "launchoverlaymessage"]) {
+        fake.on(type, ev => launchEvents.push(type === "launchoverlaymessage" ? `"${ev.id}"` : type));
+    }
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
     config.language = "en";
     config.startupScreen = "wheel";
@@ -46,6 +50,7 @@ test("a Random Game launched from the Welcome Screen finds the selected table ba
     await settle();
     assert.equal(fake.launches().length, 1);
     assert.deepEqual(volumesAtLaunch, [75], "back before the launch");
+    assert.deepEqual(launchEvents, ["prelaunch", "launchoverlayshow", "\"init\""], "the same opening as playGame");
     assert.deepEqual(fake.gameUpdates().map(update => update.changes.audioVolume), [50, 75]);
     assertNoErrorLogged(fake);
 });

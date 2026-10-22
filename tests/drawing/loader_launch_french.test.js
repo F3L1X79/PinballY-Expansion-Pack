@@ -21,15 +21,12 @@ test("the launch speaks French: Chargement en cours…, then Retour aux tables�
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "seamlessLaunchOverlay";
     await import("../../main.js");
     await settle();
-    const message = id => fake.fire("launchoverlaymessage", { id, message: null, hideWheelImage: false });
 
-    fake.fire("launchoverlayshow", { game });
-    message("init");
-    message("launching");
+    fake.playGame(game);
     assert.equal(readLaunchText(fake).text, "Chargement en cours…");
-    message("running");
-    message("terminating");
+    fake.gameStarted(game);
+    fake.runCommand(fake.getBuiltInCommand("KillGame"));
     assert.equal(readLaunchText(fake).text, "Retour aux tables…");
-    fake.fire("launchoverlayhide", { game });
+    fake.gameOver(game);
     assertNoErrorLogged(fake);
 });

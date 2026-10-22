@@ -18,8 +18,7 @@ test("a Mastery Toast still waiting when its Profile is reset is dropped", async
     fake.gameStarted(TABLE);
     fake.advanceTime(MINUTE * 1000);
     // The Play is announced while the game exits: its toast waits for the wheel.
-    fake.fire("gameover", { game: TABLE });
-    getProfileStore().resetProfile("guest");
+    fake.one("gameover", () => getProfileStore().resetProfile("guest"));
     fake.gameOver(TABLE);
     fake.advanceTime(ONE_TOAST_MS);
 

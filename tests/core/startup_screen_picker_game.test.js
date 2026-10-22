@@ -29,12 +29,9 @@ test("a game started during startup drops the startup Profile picker and the Wel
     fake.closeMenu();
     const [game] = fake.getAllTables();
     fake.playGame(game);
-    fake.fire("launchoverlayshow", { game });
     fake.gameStarted(game);
-    fake.fire("launchoverlaymessage", { id: "running", message: null, hideWheelImage: false });
     fake.advanceTime(SETTLED_MS);
     fake.gameOver(game);
-    fake.fire("launchoverlayhide", { game });
     await settle();
     fake.advanceTime(SETTLED_MS);
     await settle();

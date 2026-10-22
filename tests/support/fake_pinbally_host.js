@@ -67,6 +67,13 @@ const PAUSE_MENU_ITEMS = [
     ["Cancel", "MenuReturn"],
 ];
 const PAUSE_FIRST_CLOSE_MS = 150;
+// The launch overlay's message for each "launchoverlaymessage" id: "init"
+// and "after" carry none (LaunchOverlayEvent.html); the help names only
+// "Loading Game" and "Game Exiting", the other texts are made up.
+const OVERLAY_MESSAGES = {
+    init: null, launching: "Loading Game", capturing: "Capturing", running: "Running",
+    terminating: "Exiting Game", gameover: "Game Exiting", after: null,
+};
 
 const TRUE_STRINGS = ["1", "true", "yes", "on"];
 
@@ -328,6 +335,10 @@ export function createFakePinballYHost({
     // "single" or "batch" while the running game is a media capture.
     let captureMode;
     const launchList = [];
+    // The launch under way: its game, and how far the launch thread got
+    // ("loading" from playGame, "opened" once "runbefore" fired, "started"
+    // from "gamestarted"); and whether Exit Game was chosen during it.
+    let launch = null;
     const logLines = [];
     const executedCommands = [];
     // What PinballY does itself for a command a test describes (opening a
@@ -363,6 +374,15 @@ export function createFakePinballYHost({
         const type = eventName.split(".")[0];
         if (!handlers.has(type)) handlers.set(type, []);
         handlers.get(type).push(handler);
+    }
+    // Like PinballY's one(): the handler runs on the next event only.
+    function one(eventName, handler) {
+        let done = false;
+        on(eventName, (ev) => {
+            if (done) return;
+            done = true;
+            handler(ev);
+        });
     }
 
     // As PinballY does, inserts a temporary entry just after the current one
@@ -416,6 +436,33 @@ export function createFakePinballYHost({
         runMode = undefined;
         captureMode = undefined;
         fire("wheelmode");
+    }
+
+    // The launch events, in the order of docs/pinbally/pinbally-help.md
+    // ("Interleaved launch order"), as confirmed on the cabinet.
+    const launchPropertiesOf = game => ({ game, command: BUILT_IN_COMMANDS.PlayGame });
+    function showOverlayMessage(id) {
+        fire("launchoverlaymessage", { id, message: OVERLAY_MESSAGES[id], hideWheelImage: false });
+    }
+    // The launch thread's first steps, which every later step follows.
+    function openLaunch() {
+        if (!launch || launch.stage !== "loading") return;
+        launch.stage = "opened";
+        fire("runbeforepre", launchPropertiesOf(launch.game));
+        showOverlayMessage("launching");
+        fire("runbefore", launchPropertiesOf(launch.game));
+    }
+    // From the game's exit to the overlay's hide; "postlaunch" is the caller's.
+    function closeLaunch(game) {
+        openLaunch();
+        runMode = "exiting";
+        if (!(launch && launch.exitChosen)) showOverlayMessage("gameover");
+        fire("gameover", launchPropertiesOf(game));
+        fire("runafter", launchPropertiesOf(game));
+        showOverlayMessage("after");
+        fire("runafterpost", launchPropertiesOf(game));
+        fire("launchoverlayhide", { game });
+        launch = null;
     }
 
     function getFullUIMode() {
@@ -885,7 +932,22 @@ export function createFakePinballYHost({
     // game is over; after KillGame it stays up until the game has exited
     // (gameOver).
     nativeCommands.set(BUILT_IN_COMMANDS.ResumeGame, () => { if (runMode) closePauseMenu(); });
-    nativeCommands.set(BUILT_IN_COMMANDS.KillGame, () => { runMode = "exiting"; });
+    // Exit Game says "terminating" at once; before the table has loaded,
+    // that comes after the launch thread's "runbefore", and the table never
+    // starts.
+    nativeCommands.set(BUILT_IN_COMMANDS.KillGame, () => {
+        if (launch) {
+            openLaunch();
+            launch.exitChosen = true;
+            showOverlayMessage("terminating");
+        }
+        runMode = "exiting";
+    });
+    // Launches the wheel's current table.
+    nativeCommands.set(BUILT_IN_COMMANDS.PlayGame, () => {
+        const game = host.getCurrentTable();
+        if (game) host.playGame(game);
+    });
 
     function getGameInfo(configId) {
         return allTables.find(table => table.configId === configId || table.id === configId) || null;
@@ -1068,6 +1130,7 @@ export function createFakePinballYHost({
         getFullUIMode,
         showMenu,
         on,
+        one,
         onGameListEvent: on,
         onSettingsEvent: on,
         createDrawingLayer,
@@ -1095,12 +1158,18 @@ export function createFakePinballYHost({
             for (const handler of [...(handlers.get(ev.type) || [])]) handler(ev);
             return !(ev.cancelable && ev.defaultPrevented);
         },
-        // PinballY leaves the wheel as soon as a launch starts.
+        // PinballY clears the table's cached board (docs/research/high-scores.md),
+        // then fires the first launch events during this call, and leaves
+        // the wheel; a cancelled "prelaunch" launches nothing.
         playGame: (game) => {
-            launchList.push(game);
             highScoreCache.delete(game.configId);
+            if (fire("prelaunch", { ...launchPropertiesOf(game), overrides: {} }).defaultPrevented) return;
+            launchList.push(game);
             uiMode = "running";
             runMode = "starting";
+            launch = { game, stage: "loading", exitChosen: false };
+            fire("launchoverlayshow", { game });
+            showOverlayMessage("init");
         },
         getProgramFolder: () => programFolder,
         getProjectFolder: () => projectFolderOf(programFolder),
@@ -1387,32 +1456,41 @@ export function createFakePinballYHost({
         launches: () => [...launchList],
         // capture: "single" or "batch" for a media capture's game.
         gameStarted(game, { capture } = {}) {
+            openLaunch();
             uiMode = "running";
             runMode = "running";
             captureMode = capture;
-            fire("gamestarted", { game });
+            showOverlayMessage(capture ? "capturing" : "running");
+            if (launch) launch.stage = "started";
+            fire("gamestarted", launchPropertiesOf(game));
         },
         // The game ending with the pause menu open, as seen on the cabinet
-        // during a capture (docs/adr/0013): "gameover" and "postlaunch"
-        // fire, then one "menuclose", and the pause menu stays open, with no
-        // game left for ResumeGame to resume.
+        // during a capture (docs/adr/0013): the closing events up to
+        // "postlaunch" fire, then one "menuclose", and the pause menu stays
+        // open, with no game left for ResumeGame to resume.
         gameOverUnderPauseMenu(game) {
-            runMode = "exiting";
-            fire("gameover", { game });
+            closeLaunch(game);
             runMode = undefined;
             captureMode = undefined;
-            fire("postlaunch", { game });
+            fire("postlaunch", launchPropertiesOf(game));
             fire("menuclose", { id: PAUSE_MENU_ID });
         },
         gameOver(game) {
-            runMode = "exiting";
-            fire("gameover", { game });
+            closeLaunch(game);
+            fire("postlaunch", launchPropertiesOf(game));
             closePauseMenu();
             returnToWheel();
         },
+        // The overlay's hide fires twice, a few milliseconds apart, as seen
+        // on the cabinet.
         launchError(game) {
+            openLaunch();
             runMode = "exiting";
             fire("launcherror", { game });
+            fire("launchoverlayhide", { game });
+            fire("launchoverlayhide", { game });
+            launch = null;
+            fire("postlaunch", launchPropertiesOf(game));
             returnToWheel();
         },
 

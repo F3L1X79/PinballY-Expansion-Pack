@@ -34,7 +34,6 @@ test("a game pauses the script reading, lets the run in progress finish, and the
     assert.deepEqual(scriptsRead(), [vpxFile(AFM)], "the first table is being read");
 
     const played = fake.getAllTables().find(game => game.configId === MEDIEVAL);
-    fake.fire("prelaunch", { game: played });
     fake.playGame(played);
     await settle();
     fake.advanceTime(2 * 1000);
@@ -45,7 +44,6 @@ test("a game pauses the script reading, lets the run in progress finish, and the
     assert.deepEqual(roms(), { [AFM]: "afm_113", [MEDIEVAL]: "", [TMNT]: "" }, "the run in progress at launch is recorded");
 
     fake.gameOver(played);
-    fake.fire("postlaunch", { game: played });
     readScripts();
 
     assert.deepEqual(scriptsRead(), [vpxFile(AFM), vpxFile(MEDIEVAL), vpxFile(TMNT)], "the queue resumes after the game");

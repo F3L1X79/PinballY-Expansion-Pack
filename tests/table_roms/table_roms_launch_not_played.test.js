@@ -28,12 +28,13 @@ test("a cancelled launch and a failed launch do not leave the script reading pau
 
     // Another script cancels the launch: PinballY stays on the wheel.
     fake.advanceTime(STARTUP_DELAY_MS + 200);
-    fake.fire("prelaunch", { game: played });
+    fake.one("prelaunch", ev => ev.preventDefault());
+    fake.playGame(played);
+    assert.equal(fake.launches().length, 0, "nothing launched");
     await settle();
     fake.advanceTime(400);
     assert.deepEqual(scriptsRead(), [vpxFile(AFM), vpxFile(MEDIEVAL)], "the reading goes on after a cancelled launch");
 
-    fake.fire("prelaunch", { game: played });
     fake.playGame(played);
     await settle();
     fake.advanceTime(ONE_READ_MS);

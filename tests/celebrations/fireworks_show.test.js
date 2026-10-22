@@ -43,6 +43,8 @@ test("a start while a show plays does nothing", () => {
 
 test("the show vanishes at once on attract mode, a table launch and a started game", () => {
     const { fake, fireworks } = readyFireworks();
+    // Abnormal order on purpose: each launch event fired alone, outside a
+    // launch, so that each one is seen to stop the show by itself.
     const stops = [
         ["attractmodestart", () => fake.fire("attractmodestart")],
         ["prelaunch", () => fake.fire("prelaunch", { game: null })],

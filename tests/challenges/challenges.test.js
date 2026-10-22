@@ -207,12 +207,14 @@ test("each Profile has its own progress, Guest included", () => {
 test("a game started on Sunday night counts for the week it started in", () => {
     const { fake } = setUp({ now: SUNDAY_NIGHT, randoms: [0, 0, 0.99] });
 
+    fake.playGame(TABLES[0]);
     fake.gameStarted(TABLES[0]);
     fake.advanceTime(5 * MINUTE_MS);
-    // "gameover" alone: the Profile has not shown up on the new week's wheel yet.
-    fake.fire("gameover", { game: TABLES[0] });
+    // Read before the wheel: the Profile has not shown up on the new week's wheel yet.
+    let challenge;
+    fake.on("postlaunch", () => { challenge = profileChallenge(fake, "Alice"); });
+    fake.gameOver(TABLES[0]);
 
-    const challenge = profileChallenge(fake, "Alice");
     assert.equal(challenge.week, WEEK);
     assert.deepEqual(challenge.games.map(game => [game.configId, game.day]), [["Table 1", "2026-09-27"]]);
 });
@@ -221,12 +223,16 @@ test("a game started in a week whose Challenge the Profile doesn't follow doesn'
     const { fake } = setUp({ now: SUNDAY_NIGHT, randoms: [0, 0, 0.99] });
     fake.setNow(NEXT_MONDAY);
 
-    // Still following last week's Challenge: nobody showed up on the wheel since.
+    // Still following last week's Challenge: nobody showed up on the wheel
+    // since, so it is read before the wheel.
+    fake.playGame(TABLES[0]);
     fake.gameStarted(TABLES[0]);
     fake.advanceTime(5 * MINUTE_MS);
-    fake.fire("gameover", { game: TABLES[0] });
-    assert.equal(profileChallenge(fake, "Alice").week, WEEK);
-    assert.deepEqual(profileChallenge(fake, "Alice").games, []);
+    let challenge;
+    fake.on("postlaunch", () => { challenge = profileChallenge(fake, "Alice"); });
+    fake.gameOver(TABLES[0]);
+    assert.equal(challenge.week, WEEK);
+    assert.deepEqual(challenge.games, []);
 });
 
 test("the card hides while a game runs and comes back on the wheel", () => {

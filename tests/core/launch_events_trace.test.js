@@ -2,7 +2,6 @@
 // The launch events trace through main.js with LOG_LAUNCH_EVENTS on: one
 // line per launch event, in the order fired, with a millisecond timestamp,
 // and the message id or the table title; the overlay and its Loader unchanged.
-// - The fake host does not fire the launch events yet (#311): fired by hand here.
 // ============================================================
 
 import { test } from "node:test";
@@ -26,48 +25,47 @@ test("each launch event is logged in the order fired, with its id or the table t
     await import("../../main.js");
     await settle();
     const game = fake.getAllTables()[0];
-    const message = id => fake.fire("launchoverlaymessage", { id, message: null, hideWheelImage: false });
+    const initCancelled = [];
+    fake.on("launchoverlaymessage", ev => { if (ev.id === "init") initCancelled.push(ev.defaultPrevented); });
 
-    fake.fire("prelaunch", { game });
-    fake.fire("launchoverlayshow", { game });
-    assert.equal(message("init").defaultPrevented, true, "the overlay still cancels PinballY's message");
-    fake.advanceTime(5);
-    fake.fire("runbeforepre", { game });
-    message("launching");
-    fake.fire("runbefore", { game });
+    fake.playGame(game);
+    assert.deepEqual(initCancelled, [true], "the overlay still cancels PinballY's message");
     assert.equal(readLoader(fake).shown, true, "the Loader still turns");
-    fake.advanceTime(1234);
-    message("running");
-    fake.fire("gamestarted", { game });
-    message("gameover");
-    fake.fire("gameover", { game });
-    fake.fire("runafter", { game });
-    message("after");
-    fake.fire("runafterpost", { game });
-    fake.fire("launchoverlayhide", { game });
-    fake.fire("postlaunch", { game });
-    // Abnormal order on purpose: PinballY never fires launcherror after a
-    // played game; it closes the list so every traced event is checked.
-    fake.fire("launcherror", { game });
+    fake.advanceTime(1239);
+    fake.gameStarted(game);
+    fake.advanceTime(5);
+    fake.gameOver(game);
+    fake.advanceTime(10);
+    fake.playGame(game);
+    fake.launchError(game);
 
     const traced = fake.logLines().filter(line => line.startsWith("[LaunchEvents]"));
     assert.deepEqual(traced, [
         "[LaunchEvents] 20:00:00.000 prelaunch 100% Pinball %s",
         "[LaunchEvents] 20:00:00.000 launchoverlayshow 100% Pinball %s",
         "[LaunchEvents] 20:00:00.000 launchoverlaymessage init",
-        "[LaunchEvents] 20:00:00.005 runbeforepre 100% Pinball %s",
-        "[LaunchEvents] 20:00:00.005 launchoverlaymessage launching",
-        "[LaunchEvents] 20:00:00.005 runbefore 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.239 runbeforepre 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.239 launchoverlaymessage launching",
+        "[LaunchEvents] 20:00:01.239 runbefore 100% Pinball %s",
         "[LaunchEvents] 20:00:01.239 launchoverlaymessage running",
         "[LaunchEvents] 20:00:01.239 gamestarted 100% Pinball %s",
-        "[LaunchEvents] 20:00:01.239 launchoverlaymessage gameover",
-        "[LaunchEvents] 20:00:01.239 gameover 100% Pinball %s",
-        "[LaunchEvents] 20:00:01.239 runafter 100% Pinball %s",
-        "[LaunchEvents] 20:00:01.239 launchoverlaymessage after",
-        "[LaunchEvents] 20:00:01.239 runafterpost 100% Pinball %s",
-        "[LaunchEvents] 20:00:01.239 launchoverlayhide 100% Pinball %s",
-        "[LaunchEvents] 20:00:01.239 postlaunch 100% Pinball %s",
-        "[LaunchEvents] 20:00:01.239 launcherror 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.244 launchoverlaymessage gameover",
+        "[LaunchEvents] 20:00:01.244 gameover 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.244 runafter 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.244 launchoverlaymessage after",
+        "[LaunchEvents] 20:00:01.244 runafterpost 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.244 launchoverlayhide 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.244 postlaunch 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 prelaunch 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 launchoverlayshow 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 launchoverlaymessage init",
+        "[LaunchEvents] 20:00:01.254 runbeforepre 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 launchoverlaymessage launching",
+        "[LaunchEvents] 20:00:01.254 runbefore 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 launcherror 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 launchoverlayhide 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 launchoverlayhide 100% Pinball %s",
+        "[LaunchEvents] 20:00:01.254 postlaunch 100% Pinball %s",
     ]);
     assert.deepEqual(readLoader(fake), { shown: false }, "the Loader is gone with the overlay");
     assertNoErrorLogged(fake);

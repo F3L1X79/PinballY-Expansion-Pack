@@ -17,10 +17,8 @@ const LIGHT_GOLD = 0xFFFFD678;
 const LOADER_HEIGHT = 0.07;
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 17, 20, 0, 0), tables: [TABLE] });
 const game = fake.getAllTables()[0];
-const message = id => {
-    const ev = fake.fire("launchoverlaymessage", { id, message: null, hideWheelImage: false });
-    assert.equal(ev.defaultPrevented, true, `PinballY's "${id}" message is cancelled`);
-};
+// The overlay messages PinballY was left to write itself.
+const messagesNotCancelled = [];
 
 // A button pressed while the comet turns: none of the pack's listeners takes it.
 function assertButtonsPassThrough() {
@@ -66,50 +64,61 @@ test("the loading words show beneath the comet from the overlay's show until the
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "seamlessLaunchOverlay";
     await import("../../main.js");
     await settle();
+    fake.on("launchoverlaymessage", ev => { if (!ev.defaultPrevented) messagesNotCancelled.push(ev.id); });
     assert.equal(loaderLayerCount(fake), 0, "no Loader layer before a launch");
     layersBeforeLaunch = fake.drawingLayers().length;
 
-    fake.fire("launchoverlayshow", { game });
+    fake.playGame(game);
     assertCometAndText("Loading…");
-    message("init");
-    message("launching");
-    assertCometAndText("Loading…");
+    assert.equal(fake.wheelShown(), false, "the wheel is hidden");
     assertButtonsPassThrough();
 
-    message("running");
+    fake.gameStarted(game);
     assertNothingShown();
 
-    message("terminating");
+    fake.runCommand(fake.getBuiltInCommand("KillGame"));
     assertCometAndText("Returning to tables…");
     assertButtonsPassThrough();
-    message("gameover");
-    message("after");
-    assertCometAndText("Returning to tables…");
-    fake.fire("launchoverlayhide", { game });
+    let checkedAfterRunAfter = false;
+    fake.one("runafterpost", () => {
+        assertCometAndText("Returning to tables…");
+        checkedAfterRunAfter = true;
+    });
+    fake.gameOver(game);
+    assert.ok(checkedAfterRunAfter, "still there once the Run After step is done");
     assertNothingShown();
+    assert.equal(fake.wheelShown(), true, "the wheel is back");
+    assert.deepEqual(messagesNotCancelled, [], "every PinballY message is cancelled");
     assertNoErrorLogged(fake);
 });
 
-test("a launch that never plays keeps the comet and the loading words until the overlay goes", () => {
-    fake.fire("launchoverlayshow", { game });
-    message("init");
-    message("launching");
-    assertCometAndText("Loading…");
-    fake.fire("launcherror", { game });
-    assertCometAndText("Loading…");
-    fake.fire("launchoverlayhide", { game });
+test("a launch that never plays keeps the comet and the loading words until the overlay goes, and its second hide changes nothing", () => {
+    fake.playGame(game);
+    let checkedAtError = false;
+    fake.one("launcherror", () => {
+        assertCometAndText("Loading…");
+        checkedAtError = true;
+    });
+    const afterEachHide = [];
+    fake.on("launchoverlayhide", () => afterEachHide.push({ layers: fake.drawingLayers().length, wheelShown: fake.wheelShown() }));
+    fake.launchError(game);
+    assert.ok(checkedAtError);
     assertNothingShown();
+    assert.deepEqual(afterEachHide, [
+        { layers: layersBeforeLaunch, wheelShown: true },
+        { layers: layersBeforeLaunch, wheelShown: true },
+    ]);
+    assert.deepEqual(messagesNotCancelled, [], "every PinballY message is cancelled");
     assertNoErrorLogged(fake);
 });
 
 test("a media capture shows the capture words beneath the comet", () => {
-    fake.fire("launchoverlayshow", { game });
-    message("init");
-    message("launching");
-    message("capturing");
+    fake.playGame(game);
+    fake.gameStarted(game, { capture: "single" });
     assertCometAndText("Capturing…");
     assertButtonsPassThrough();
-    fake.fire("launchoverlayhide", { game });
+    fake.gameOver(game);
     assertNothingShown();
+    assert.deepEqual(messagesNotCancelled, [], "every PinballY message is cancelled");
     assertNoErrorLogged(fake);
 });

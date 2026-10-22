@@ -22,9 +22,10 @@ test("a Play that reaches a new Mastery Level brings one Mastery Toast for the h
     fake.playGame(NEW_TABLE);
     fake.gameStarted(NEW_TABLE);
     fake.advanceTime(MINUTE * 1000);
-    fake.fire("gameover", { game: NEW_TABLE });
-    assert.deepEqual(masteryToasts(fake), [], "not while the game exits");
+    let toastsWhileExiting;
+    fake.on("postlaunch", () => { toastsWhileExiting = masteryToasts(fake); });
     fake.gameOver(NEW_TABLE);
+    assert.deepEqual(toastsWhileExiting, [], "not while the game exits");
     fake.advanceTime(ONE_TOAST_MS);
     assert.deepEqual(masteryToasts(fake), ["1 | TABLE MASTERY | Rookie (1) | Medieval Madness"], "back on the wheel");
 

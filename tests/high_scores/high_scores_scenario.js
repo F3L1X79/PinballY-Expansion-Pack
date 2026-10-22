@@ -187,7 +187,6 @@ export async function startHighScores({
         play: async (configId, { after, afterRead, afterVpreg, afterUserFiles = {}, durationMs = GAME_MS, backOnWheel = () => {} } = {}) => {
             const game = fake.getGameInfo(configId);
             fake.playGame(game);
-            fake.fire("prelaunch", { game });
             await settle();
             fake.gameStarted(game);
             await finishReads();
@@ -197,7 +196,6 @@ export async function startHighScores({
             if (afterVpreg) fake.addFile(VPREG_PATH, writeCompoundFile(afterVpreg));
             for (const [name, text] of Object.entries(afterUserFiles)) fake.addFile(userFileOf(name), text);
             fake.gameOver(game);
-            fake.fire("postlaunch", { game });
             backOnWheel();
             await finishReads();
         },

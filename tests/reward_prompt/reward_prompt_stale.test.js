@@ -29,8 +29,7 @@ test("a toast gone stale by its turn submits no prompt", async () => {
     fake.gameStarted(FOURTH);
     fake.advanceTime(MINUTE * 1000);
     // The Play is announced while the game exits: its toast waits for the wheel.
-    fake.fire("gameover", { game: FOURTH });
-    getProfileStore().switchTo("alice");
+    fake.one("gameover", () => getProfileStore().switchTo("alice"));
     fake.gameOver(FOURTH);
     await settle();
     fake.advanceTime(ALL_TOASTS_MS);

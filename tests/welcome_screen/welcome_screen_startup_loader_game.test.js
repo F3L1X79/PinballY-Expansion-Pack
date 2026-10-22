@@ -28,16 +28,13 @@ test("a table launched during the startup pause takes the veil and the startup c
 
     const [game] = fake.getAllTables();
     fake.playGame(game);
-    fake.fire("launchoverlayshow", { game });
     assert.deepEqual(startupVeil(fake), { shown: false }, "the veil goes as the launch shows");
     assert.equal(loaderLayerCount(fake), 1, "only the launch's comet");
     assert.equal(readLoader(fake).zIndex, 5999);
 
     fake.gameStarted(game);
-    fake.fire("launchoverlaymessage", { id: "running", message: null, hideWheelImage: false });
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     fake.gameOver(game);
-    fake.fire("launchoverlayhide", { game });
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), false, "the screen was dropped");

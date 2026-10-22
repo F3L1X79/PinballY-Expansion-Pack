@@ -34,6 +34,10 @@ test("the Table of the Week launched from the Welcome Screen finds the selected 
         volumesAtLaunch.push([MEDIEVAL, MARS].map(table => fake.getGameInfo(table.configId).audioVolume));
         playGame(game);
     };
+    const launchEvents = [];
+    for (const type of ["prelaunch", "launchoverlayshow", "launchoverlaymessage"]) {
+        fake.on(type, ev => launchEvents.push(type === "launchoverlaymessage" ? `"${ev.id}"` : type));
+    }
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
     config.language = "en";
 
@@ -46,6 +50,7 @@ test("the Table of the Week launched from the Welcome Screen finds the selected 
 
     assert.deepEqual(fake.launches().map(game => game.configId), [MARS.configId]);
     assert.deepEqual(volumesAtLaunch, [[60, 90]], "both tables at their own volume as the launch starts");
+    assert.deepEqual(launchEvents, ["prelaunch", "launchoverlayshow", "\"init\""], "the same opening as playGame");
     assert.deepEqual(fake.gameUpdates(), [
         { configId: MEDIEVAL.configId, changes: { audioVolume: 50 } },
         { configId: MEDIEVAL.configId, changes: { audioVolume: 60 } },

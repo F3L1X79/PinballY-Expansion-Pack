@@ -234,7 +234,6 @@
         <div class="cell sweet">
         </div>
         <div class="cell">
-          <a class="chip tr-share" href="#drawn-upkeep-menus"><b></b>Menus de capture dessinés</a>
           <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
         </div>
         <div class="cell">
@@ -258,13 +257,11 @@
         <div class="ax row">Faible</div>
         <div class="cell">
           <a class="chip tr-play" href="#shown-layers-reader"><b></b>Lecteur des calques</a>
-          <a class="chip tr-share" href="#launch-events-order"><b></b>Ordre des événements</a>
           <a class="chip tr-play" href="#quiet-wheel-other-screens"><b></b>Son baissé ailleurs</a>
           <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#household-stats-read"><b></b>Household Stats plus rapides</a>
-          <a class="chip tr-share" href="#drawn-upkeep-popups"><b></b>Popups de capture dessinées</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
@@ -300,52 +297,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="drawn-upkeep-menus" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Menus de capture et confirmations en Drawn Menu</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
-          </div>
-          <p>Les derniers menus natifs que l'on croise depuis le Game Setup ou le menu opérateur détonnent : la préparation de la capture (<code>capture</code>), toutes les étapes de la capture par lot (<code>batch capture …</code>) et les confirmations de suppression (<code>confirm delete gameinfo</code>, <code>confirm delete media</code>). Les dessiner comme les autres Drawn Menus.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/304">#304</a> : tickets #305 et #306 livrés ; reste la vérification sur la borne, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/307">#307</a> (ticket humain). Grillé le 22/10 : tous les menus dessinés sauf les <code>media drop …</code> et <code>confirm delete media</code>, popups natives, vérification sur la borne en ticket humain. Change une décision de l'<a href="adr/0013-the-player-s-menus-are-drawn-menus-replacing-the-native-ones.md">ADR 0013</a> (menus d'entretien laissés natifs) et l'entrée Drawn Menu du glossaire.</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Demandé par Félix le 22/10/2026, en priorité haute : le menu natif de préparation de la capture est « très choquant » au milieu des menus dessinés. Placé en tête de file pour cette raison. À trancher au grilling : les menus encore exclus (<code>media drop …</code>, <code>play pick system</code>, élévation, <code>swf error</code>) et les popups natives (<code>capture delay</code>, <code>batch capture preview</code>, <code>media list</code>…).</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="launch-events-order" data-track="share" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>L'ordre réel des événements d'un lancement, dans le faux host</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">tests</span></div>
-          </div>
-          <p>L'aide de PinballY ne dit pas dans quel ordre arrivent <code>launchoverlayshow</code>, <code>launchoverlaymessage</code> (<code>"running"</code>, <code>"terminating"</code>), <code>launchoverlayhide</code>, <code>gamestarted</code> et <code>gameover</code>. Le faux host ne les déclenche donc pas dans son propre lancement : les tests du Loader les envoient à la main. Journaliser cet ordre sur la borne, l'écrire dans <code>docs/pinbally/</code>, puis le reproduire dans le lancement du faux host. Grillé le 22/10/2026, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/308">spec #308</a>, tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/309">#309</a> → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/310">#310</a> (trace sur la borne, Félix) → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/311">#311</a>.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : <code>/implement 309</code> → trace sur la borne (#310) → <code>/implement 311</code></div>
-          <details>
-            <summary>Décisions</summary>
-            <ul>
-              <li>L'ordre vient du code source de PinballY (<code>docs/research/launch-events-order.md</code>), confirmé par une trace sur la borne, qui l'emporte en cas de désaccord.</li>
-              <li>Drapeau permanent <code>LOG_LAUNCH_EVENTS</code> dans <code>.env.local</code> : chaque événement de lancement journalisé, à la milliseconde.</li>
-              <li>Cinq cas : la table se ferme seule, Exit Game, Exit Game avant le chargement, échec, capture unique et par lot.</li>
-              <li>Les assistants du faux host (<code>playGame</code>, <code>gameStarted</code>, <code>gameOver</code>, <code>launchError</code>, KillGame) déclenchent tout le cycle eux-mêmes ; les tests du Loader sont réécrits dessus.</li>
-              <li>Le double <code>launchoverlayhide</code> d'un échec et Exit Game avant le chargement ne sont reproduits que si la trace les confirme ; un second <code>hide</code> ne doit rien changer.</li>
-            </ul>
-          </details>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Relevé par la revue Spec du Loader (#237), puis à la rétro, le 17/10/2026. Le <code>/research</code> prévu a été fait par la lecture du code source pendant le grilling. À vérifier pendant la trace : le Seamless Launch Overlay ne ramène le Loader que sur <code>"terminating"</code>, alors qu'une table qui se ferme seule envoie <code>"gameover"</code>.</p>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-play" id="shown-layers-reader" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -389,24 +340,6 @@
               <li>Les écrans font partie du socle du pack, pas d'un Add-on : absents de la liste, jamais désactivables, toujours dessinés, même quand Drawn Menus est désactivé.</li>
             </ul>
             <p class="ctx">Idée de Félix du 19/10/2026, grillée le 21/10/2026. L'aide de PinballY le dit : les scripts ne sont pas rechargés, un <code>settingsreload</code> ne les relance pas. Une langue par Profile, qui changerait tout de suite, est écartée.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="drawn-upkeep-popups" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Popups d'entretien dessinées</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
-          </div>
-          <p>Une fois les menus de capture dessinés, les deux popups natives de leur parcours détonnent encore : le choix du délai de capture (<code>capture delay</code>) et la liste de la capture par lot (<code>batch capture preview</code>). Les dessiner dans le style Steamball, chacune avec son propre contenu. La liste des médias et le volume audio d'une table sont des écrans à part et restent natifs.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code>. Le module Drawn Menu ne dessine que des listes d'entrées : chaque popup demande son propre écran dessiné.</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Reporté le 22/10/2026 pendant le grilling des menus de capture dessinés, qui laisse les popups natives. Placé juste après les options au menu opérateur : c'est l'entretien de la borne, vu moins souvent que les menus eux-mêmes.</p>
           </details>
         </div>
       </li>

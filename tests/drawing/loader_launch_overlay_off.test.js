@@ -19,19 +19,24 @@ test("no Loader at launch with the Seamless Launch Overlay off, and PinballY's o
     config.addOns.seamlessLaunchOverlay = false;
     await import("../../main.js");
     await settle();
+    // The events as PinballY reads them back once every listener has run.
+    const shown = [];
+    const messages = new Map();
+    fake.on("launchoverlayshow", ev => shown.push(ev));
+    fake.on("launchoverlaymessage", ev => messages.set(ev.id, ev));
 
-    const launch = fake.fire("launchoverlayshow", { game });
-    assert.equal(launch.defaultPrevented, false, "PinballY's own launch background stays");
-    const message = id => fake.fire("launchoverlaymessage", { id, message: null, hideWheelImage: false });
-    message("init");
-    const loading = message("launching");
+    fake.playGame(game);
+    assert.equal(shown[0].defaultPrevented, false, "PinballY's own launch background stays");
+    fake.gameStarted(game);
+    const loading = messages.get("launching");
     assert.equal(loading.defaultPrevented, false, "PinballY's own message stays");
     assert.equal(loading.message, "Loading...", "in the player's language");
     assert.equal(loaderLayerCount(fake), 0, "no Loader while the table loads");
-    const closing = message("terminating");
+    fake.runCommand(fake.getBuiltInCommand("KillGame"));
+    const closing = messages.get("terminating");
     assert.equal(closing.defaultPrevented, false);
     assert.equal(closing.message, "Returning to tables…", "the pack says tables");
     assert.equal(loaderLayerCount(fake), 0, "no Loader while it closes");
-    fake.fire("launchoverlayhide", { game });
+    fake.gameOver(game);
     assertNoErrorLogged(fake);
 });

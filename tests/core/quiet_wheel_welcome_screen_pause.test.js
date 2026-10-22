@@ -42,11 +42,16 @@ test("a launch, a menu or attract mode during the Welcome Screen's pause brings 
 
     await startPause();
     assert.deepEqual(fake.gameUpdates(), [drop], "lowered from the screen's turn");
-    fake.fire("launchoverlayshow", { game: fake.getGameInfo(TABLES[0].configId) });
+    const game = fake.getGameInfo(TABLES[0].configId);
+    fake.playGame(game);
     assert.deepEqual(fake.gameUpdates(), [drop, back], "a launch: back at once");
-    fake.fire("gamestarted", { game: fake.getGameInfo(TABLES[0].configId) });
+    fake.gameStarted(game);
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
-    assert.equal(isWelcomeScreenOpen(fake), false, "the screen does not show after the game");
+    assert.equal(isWelcomeScreenOpen(fake), false, "the screen does not show during the game");
+    fake.gameOver(game);
+    await settle();
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    assert.equal(isWelcomeScreenOpen(fake), false, "nor after it");
 
     await startPause();
     fake.openMainMenu();

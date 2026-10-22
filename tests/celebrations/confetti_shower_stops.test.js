@@ -2,7 +2,8 @@
 // The Confetti Shower vanishes at once, through main.js on the fake
 // PinballY globals: each of the three Platinum toasts of one return to the
 // wheel starts a shower once the previous one was stopped, by attract
-// mode, then a table launch ("prelaunch"), then a started game.
+// mode, then a launch another script cancels ("prelaunch"), then a
+// started game.
 // ============================================================
 
 import { test } from "node:test";
@@ -37,13 +38,19 @@ test("the Confetti Shower vanishes at once on attract mode, a table launch and a
     fake.exitAttractMode();
 
     waitForConfetti(fake, "the launch");
-    fake.fire("prelaunch", { game: TABLES[0] });
+    // Another script cancels this launch: PinballY stays on the wheel.
+    fake.one("prelaunch", ev => ev.preventDefault());
+    fake.playGame(TABLES[0]);
     assertHidden(fake, "prelaunch");
 
     waitForConfetti(fake, "the game");
+    // Abnormal order on purpose: "gamestarted" with no launch before it. In
+    // a real launch "prelaunch" has already stopped the shower, and none
+    // starts during a launch, so this is the only way to see this stop.
+    fake.fire("gamestarted", { game: TABLES[0] });
+    assertHidden(fake, "gamestarted");
     fake.playGame(TABLES[0]);
     fake.gameStarted(TABLES[0]);
-    assertHidden(fake, "gamestarted");
 
     fake.advanceTime(SHOWER_MS);
     assert.equal(visibleConfettiCount(fake), 0, "nothing falls again while the game runs");
