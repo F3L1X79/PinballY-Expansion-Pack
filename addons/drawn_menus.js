@@ -40,6 +40,7 @@ export default function init() {
     mainWindow.on("command", safeHandler(SCRIPT_NAME, ev => {
         lastCommand = ev.id;
     }));
+
     // Fires when any menu opens, after every other Add-on edited its entries.
     mainWindow.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
         // As a native menu replaces another, the new menu replaces a Drawn
