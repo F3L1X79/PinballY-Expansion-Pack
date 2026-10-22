@@ -42,12 +42,15 @@ import * as tableRoms from "./addons/table_roms.js";
 import * as highScores from "./addons/high_scores.js";
 import * as welcomeScreen from "./addons/welcome_screen.js";
 import * as drawnMenus from "./addons/drawn_menus.js";
+import * as launchEventsTrace from "./addons/launch_events_trace.js";
 
 // Scripts are initialized in this order, which is also the order their event
 // listeners are registered in, and listeners for the same event run in that
 // order too:
 // - uiTranslation must come first, so its "menuopen" hook is in place before
 //   any menu opens.
+// - launchEventsTrace comes right after it, so each launch event is logged
+//   before any other Add-on handles it.
 // - sessionStatsTracker is kept before achievements as a safety margin; the
 //   achievement checks after a game are deferred by one tick, so the stats
 //   are recorded first either way (the startup check needs no stats from
@@ -68,9 +71,11 @@ import * as drawnMenus from "./addons/drawn_menus.js";
 // which shows them in a fixed priority order, and Achievements are announced
 // by non-blocking toasts, which wait for the Welcome Screen.
 const SCRIPTS = [
-    // Interface: translations, status line, menu cleanup, menus, filters,
+    // Interface: translations, then the launch events trace (debugging,
+    // LOG_LAUNCH_EVENTS), status line, menu cleanup, menus, filters,
     // Profile picker, clock, Wheel Arc, launch overlay.
     { key: "uiTranslation", module: uiTranslation },
+    { key: "launchEventsTrace", module: launchEventsTrace },
     { key: "statusLineInfo", module: statusLineInfo },
     { key: "menuCleanup", module: menuCleanup },
     { key: "customMenuCommands", module: customMenuCommands },

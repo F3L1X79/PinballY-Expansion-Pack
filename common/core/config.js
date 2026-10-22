@@ -73,6 +73,9 @@ const DEFAULTS = {
     // true = every PinballY menu title shown without a translation is written
     // to the PinballY log (for a new PinballY version or a new language).
     logUntranslatedMenuTitles: false,
+    // true = every launch event is written to the PinballY log with a
+    // millisecond timestamp (to check their order on the cabinet).
+    logLaunchEvents: false,
 
     // --- Add-ons ---
 
@@ -105,6 +108,8 @@ const DEFAULTS = {
         highScores: true,
         // The main menu drawn in the pack's look instead of PinballY's native one.
         drawnMenus: true,
+        // Writes the launch events to the log, only when logLaunchEvents is on.
+        launchEventsTrace: true,
         menuCleanup: false,
     },
 };
