@@ -11,9 +11,10 @@ import { startScenario, errorLines } from "../mastery/mastery_bar_scenario.js";
 import { WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
 import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
 import { shownFrame, isPipOverFrame } from "./avatar_frame_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 const ADD_ONS = ["tableMastery", "achievements", "profilePicker", "startupChoicePrompt"];
-const header = fake => fake.drawingLayers().find(layer => layer.zIndex === WELCOME_SCREEN_Z_INDEX.header && layer.alpha > 0);
+const header = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.header)[0];
 
 test("the Welcome Screen's Avatar wears the active Profile's frame, under the pip and above the greeting", async () => {
     const fake = await startScenario({

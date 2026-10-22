@@ -13,6 +13,7 @@ import { readLoader } from "../support/loader_reader.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import { isWelcomeScreenOpen, startupVeil, greeting, openFromMainMenu, WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const PICKER_Z = 6500;
@@ -20,8 +21,7 @@ const PICKER_Z = 6500;
 const TOAST_RISE_MS = 1000;
 const GREETING_OVER_MS = 2500;
 
-const pickerTexts = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === PICKER_Z && layer.alpha > 0)
+const pickerTexts = fake => shownLayers(fake, PICKER_Z)
     .flatMap(layer => layer.texts());
 
 test("starting on the wheel shows no Welcome Screen, holds no toast and greets the last active Profile", async () => {

@@ -11,6 +11,7 @@ import { RANK_COLORS } from "../../common/drawing/steamball_palette.js";
 import { readVeil } from "../support/opening_reader.js";
 import { readButtonHints, exitButtonTooltipOn } from "../support/button_hints_reader.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { computeGeometry, LIST_LOOK } from "../../common/achievements/achievement_list_painter.js";
 import { EXIT_BUTTON } from "../../common/drawing/exit_button_loop.js";
 
@@ -56,8 +57,7 @@ export function headerRankCounts(fake) {
 }
 
 // The images of the header's emblems, from left to right.
-export const headerEmblemImages = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.headerEmblems && layer.alpha > 0)
+export const headerEmblemImages = fake => shownLayers(fake, ACHIEVEMENT_LIST_Z_INDEX.headerEmblems)
     .sort((a, b) => a.position().x - b.position().x)
     .flatMap(layer => layer.images());
 
@@ -99,13 +99,12 @@ export const highlightedTexts = fake => highlightedLayer(fake).texts();
 // Whether a line of the rows area is lit.
 export const isARowHighlighted = fake => shownItemLayers(fake).some(layer => layer.alpha === 1);
 
-const shownExitButtons = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.exitButton && layer.alpha > 0);
+const shownExitButtons = fake => shownLayers(fake, ACHIEVEMENT_LIST_Z_INDEX.exitButton);
 
 export const isExitButtonShown = fake => shownExitButtons(fake).length === 1;
 
 // Whether the Selection Marker shows, round the Exit Button.
-export const isMarkerOnExitButton = fake => fake.drawingLayers().some(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.marker && layer.alpha > 0)
+export const isMarkerOnExitButton = fake => shownLayers(fake, ACHIEVEMENT_LIST_Z_INDEX.marker).length > 0
     && selectionMarker.layerUnderMarker(fake, ACHIEVEMENT_LIST_Z_INDEX.marker, shownExitButtons(fake)) !== undefined;
 
 // The Exit Button's tooltip ("Back"), null while hidden.
@@ -194,7 +193,7 @@ export function readRows(fake, TEXT) {
 // The scrollbar's thumb as the player sees it, in window pixels: its
 // horizontal centre, its top and its height; null when none shows.
 export function scrollbarThumb(fake, { width, height } = { width: 1920, height: 1080 }) {
-    const shown = fake.drawingLayers().filter(layer => layer.zIndex === ACHIEVEMENT_LIST_Z_INDEX.scrollbarThumb && layer.alpha > 0);
+    const shown = shownLayers(fake, ACHIEVEMENT_LIST_Z_INDEX.scrollbarThumb);
     assert.ok(shown.length <= 1, "at most one thumb shows");
     if (shown.length === 0) return null;
     const [layer] = shown;

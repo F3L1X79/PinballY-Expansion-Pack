@@ -11,6 +11,7 @@ import config from "../../common/core/config.js";
 import { DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, DRAWN_MENU_MARKS } from "../../common/drawn_menu/drawn_menu_painter.js";
 import { DRAWN_MENU_PANEL_WIDTH } from "../../common/drawn_menu/drawn_menu_images.js";
 import { openMainMenu } from "./drawn_menu_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 const WINDOW = { width: 1080, height: 1920 };
 const PX_PER_PT = 4 / 3;
@@ -19,8 +20,7 @@ const K = Math.min(1, DRAWN_MENU_LOOK.maxWidthShare * WINDOW.width / DRAWN_MENU_
 const MARK_GLYPHS = Object.values(DRAWN_MENU_MARKS);
 
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 10, 20, 0, 0), layoutSize: WINDOW });
-const textStrokesOn = zIndex => fake.drawingLayers()
-    .filter(layer => layer.zIndex === zIndex && layer.alpha > 0)
+const textStrokesOn = zIndex => shownLayers(fake, zIndex)
     .flatMap(layer => layer.strokes())
     .filter(stroke => "text" in stroke && !MARK_GLYPHS.includes(stroke.text));
 const pixelsOf = stroke => stroke.size * PX_PER_PT;

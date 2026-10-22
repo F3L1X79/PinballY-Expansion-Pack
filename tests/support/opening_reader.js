@@ -5,6 +5,7 @@
 // ============================================================
 
 import assert from "node:assert/strict";
+import { shownLayers } from "./shown_layers.js";
 
 const FRAME_MS = 16;
 // Far past any opening, even with slow draws.
@@ -20,9 +21,6 @@ export function readVeil(fake) {
     if (veils.length === 0) return { shown: false };
     return { shown: true, zIndex: veils[0].zIndex, color: veils[0].clearColor() };
 }
-
-// The layers with this z-index that show.
-export const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
 // Runs the clock a frame at a time until the screen whose backdrop has
 // this z-index is fully in and its veil gone; fails past any opening.

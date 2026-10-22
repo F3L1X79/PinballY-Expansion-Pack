@@ -11,6 +11,7 @@ import { settle } from "../support/fake_pinbally_host.js";
 import { WELCOME_SCREEN_Z_INDEX } from "../../common/welcome_screen/welcome_screen_painter.js";
 import { shownPip } from "../levels/level_pip_reader.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { buttonHintsOn } from "../support/button_hints_reader.js";
 
 // The startup pause: the screen is drawn then, and starts fading in.
@@ -28,8 +29,6 @@ export async function openFromMainMenu(fake, entryTitle) {
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
 }
-
-const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
 export const isWelcomeScreenOpen = fake => shownLayers(fake, WELCOME_SCREEN_Z_INDEX.backdrop).length > 0;
 

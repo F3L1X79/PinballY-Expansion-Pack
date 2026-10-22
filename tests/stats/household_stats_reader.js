@@ -8,6 +8,7 @@
 import assert from "node:assert/strict";
 import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/stats/household_stats_painter.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { openProfileStats, choose, press, isProfileStatsOpen, PROFILE_STATS_OPEN_MS } from "./profile_stats_reader.js";
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
@@ -15,8 +16,6 @@ import { untilFadedIn } from "../support/opening_reader.js";
 import { buttonHintsOn, windowRect } from "../support/button_hints_reader.js";
 
 export { press };
-
-const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
 export const isHouseholdStatsOpen = fake => shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.backdrop).length > 0;
 

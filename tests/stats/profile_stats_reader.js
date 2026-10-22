@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { untilFadedIn } from "../support/opening_reader.js";
 import { buttonHintsOn, windowRect, textsInsideLayer } from "../support/button_hints_reader.js";
 
@@ -17,8 +18,6 @@ import { buttonHintsOn, windowRect, textsInsideLayer } from "../support/button_h
 export const PROFILE_STATS_OPEN_MS = 300;
 
 export const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { command: buttonCommand, repeat: false });
-
-const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
 export const isProfileStatsOpen = fake => shownLayers(fake, PROFILE_STATS_Z_INDEX.backdrop).length > 0;
 

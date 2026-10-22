@@ -7,7 +7,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { readVeil, shownLayers } from "../support/opening_reader.js";
+import { readVeil } from "../support/opening_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { readLoader } from "../support/loader_reader.js";
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 import { isFrameListOpen, untilFrameListShown, frameRows, highlightedRow } from "../stats/profile_stats_reader.js";

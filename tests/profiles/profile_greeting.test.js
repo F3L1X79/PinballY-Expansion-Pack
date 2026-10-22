@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { errorLines } from "../support/error_log.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const ALICE_AVATAR = `${PROFILES_FOLDER}\\Alice\\avatar.png`;
@@ -22,13 +23,11 @@ const GREETING_OVER_MS = 2500;
 
 // The texts shown on the picker's background layers: the carousel's and
 // the greeting's.
-const visibleTexts = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === PICKER_Z && layer.alpha > 0)
+const visibleTexts = fake => shownLayers(fake, PICKER_Z)
     .flatMap(layer => layer.texts());
 
 // The Avatars shown, each on its own layer above the picker layer.
-const visibleAvatars = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === AVATAR_Z && layer.alpha > 0)
+const visibleAvatars = fake => shownLayers(fake, AVATAR_Z)
     .flatMap(layer => layer.images());
 
 const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { command: buttonCommand, repeat: false });

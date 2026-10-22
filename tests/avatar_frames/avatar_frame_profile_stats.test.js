@@ -11,8 +11,9 @@ import { startScenario, errorLines, DRAWN_AHEAD_MS } from "../mastery/mastery_ba
 import { openProfileStats, choose, pickRow, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
 import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { shownFrame } from "./avatar_frame_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 
-const card = fake => fake.drawingLayers().find(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.card && layer.alpha > 0);
+const card = fake => shownLayers(fake, PROFILE_STATS_Z_INDEX.card)[0];
 const cardFrame = fake => {
     const frame = shownFrame(card(fake));
     return frame && { tier: frame.tier, size: frame.size };

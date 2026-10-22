@@ -11,13 +11,13 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { isDrawnMenuShown, press, openMainMenu } from "../drawn_menu/drawn_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const PICKER_Z = 6500;
 const PAUSE_OVER_MS = 600;
 
-const pickerTexts = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === PICKER_Z && layer.alpha > 0)
+const pickerTexts = fake => shownLayers(fake, PICKER_Z)
     .flatMap(layer => layer.texts());
 
 test("the startup greeting waits for an open Drawn Menu", async () => {

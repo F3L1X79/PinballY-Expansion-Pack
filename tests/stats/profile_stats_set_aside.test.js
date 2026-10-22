@@ -8,6 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startHousehold } from "./household_stats_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { isListOpen } from "../achievements/achievement_list_reader.js";
 import { openProfileStats, isProfileStatsOpen, highlighted, buttonHints, choose, press } from "./profile_stats_reader.js";
@@ -17,9 +18,9 @@ const POINT = { xSpan: 0.001, ySpan: 0.001 };
 
 const profileStatsLayers = fake => fake.drawingLayers().filter(layer => Object.values(PROFILE_STATS_Z_INDEX).includes(layer.zIndex));
 const markerDrawings = fake => fake.drawings().filter(drawing => drawing.zIndex === PROFILE_STATS_Z_INDEX.marker).length;
-const exitButtonLook = fake => profileStatsLayers(fake).filter(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.exitButton && layer.alpha > 0)
+const exitButtonLook = fake => shownLayers(fake, PROFILE_STATS_Z_INDEX.exitButton)
     .map(layer => layer.strokes());
-const shownTooltips = fake => profileStatsLayers(fake).filter(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.tooltips && layer.alpha > 0);
+const shownTooltips = fake => shownLayers(fake, PROFILE_STATS_Z_INDEX.tooltips);
 
 function assertSetAside(fake) {
     assert.equal(isProfileStatsOpen(fake), false);

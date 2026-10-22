@@ -13,6 +13,7 @@ import { openHouseholdStats, columns } from "../stats/household_stats_reader.js"
 import { HOUSEHOLD_STATS_Z_INDEX } from "../../common/stats/household_stats_painter.js";
 import { shownFrame } from "./avatar_frame_reader.js";
 import { pipColor } from "../levels/level_pip_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 const HOUSEHOLD = {
     Alice: { collectionTier: 3, avatarFrame: 2 },
@@ -20,8 +21,7 @@ const HOUSEHOLD = {
     Carol: { collectionTier: 2, avatarFrame: null },
 };
 
-const shownColumnLayers = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === HOUSEHOLD_STATS_Z_INDEX.columns && layer.alpha > 0)
+const shownColumnLayers = fake => shownLayers(fake, HOUSEHOLD_STATS_Z_INDEX.columns)
     .sort((a, b) => a.position().x - b.position().x);
 
 test("each column header wears its Profile's frame around the Avatar, without a pip", async () => {

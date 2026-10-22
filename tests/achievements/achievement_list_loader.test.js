@@ -9,7 +9,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { readVeil, shownLayers } from "../support/opening_reader.js";
+import { readVeil } from "../support/opening_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { readLoader } from "../support/loader_reader.js";
 import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
 import { startPack, startOpeningFromMainMenu, LIST_VEIL } from "./achievement_list_opening_scenario.js";

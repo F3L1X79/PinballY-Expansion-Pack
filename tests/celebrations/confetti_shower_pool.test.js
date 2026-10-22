@@ -8,6 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { createConfettiShower, CONFETTI_Z_INDEX } from "../../common/celebrations/confetti_shower.js";
 
 const SHOWER_MS = 10000;
@@ -26,8 +27,7 @@ function manualDrawingAhead() {
     };
 }
 
-const visibleLayers = fake => fake.drawingLayers()
-    .filter(layer => layer.zIndex === CONFETTI_Z_INDEX && layer.alpha > 0);
+const visibleLayers = fake => shownLayers(fake, CONFETTI_Z_INDEX);
 
 test("a shower with no confetti drawn yet does not start, and says why", () => {
     const fake = createFakePinballYHost();

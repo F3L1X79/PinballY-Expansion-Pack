@@ -13,10 +13,11 @@ import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.
 import { ACHIEVEMENT_LIST_Z_INDEX } from "../../common/achievements/achievement_list.js";
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
 import { shownFrame } from "./avatar_frame_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 // The screen's layer at that z-index, which must be shown.
 function shownLayer(fake, zIndex) {
-    const layer = fake.drawingLayers().find(candidate => candidate.zIndex === zIndex && candidate.alpha > 0);
+    const [layer] = shownLayers(fake, zIndex);
     assert.ok(layer, `layer ${zIndex} shown`);
     return layer;
 }

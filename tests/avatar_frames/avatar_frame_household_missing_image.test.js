@@ -12,6 +12,7 @@ import { openHouseholdStats, columns, chooseColumn, isHouseholdStatsOpen } from 
 import { cardImages, PROFILE_STATS_OPEN_MS } from "../stats/profile_stats_reader.js";
 import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import { AVATAR_FRAMES_FOLDER } from "../mastery/mastery_bar_scenario.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 const HOUSEHOLD = {
     Alice: { collectionTier: 3, avatarFrame: 2 },
@@ -19,7 +20,7 @@ const HOUSEHOLD = {
     Carol: { collectionTier: 2, avatarFrame: null },
 };
 
-const card = fake => fake.drawingLayers().find(layer => layer.zIndex === PROFILE_STATS_Z_INDEX.card && layer.alpha > 0);
+const card = fake => shownLayers(fake, PROFILE_STATS_Z_INDEX.card)[0];
 
 test("a missing frame image is logged and the Household Stats and read-only card still open", async () => {
     const { fake, lang } = await startHousehold({ profiles: HOUSEHOLD, active: "Alice" });

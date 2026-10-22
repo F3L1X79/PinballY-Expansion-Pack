@@ -5,6 +5,7 @@
 // ============================================================
 
 import { DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, DRAWN_MENU_MARKS } from "../../common/drawn_menu/drawn_menu_painter.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 // Past the fade in, and past the glide from one entry to the next.
 export const OPEN_OVER_MS = 300;
@@ -13,7 +14,6 @@ export const GLIDE_OVER_MS = 400;
 const { colors: COLORS } = DRAWN_MENU_LOOK;
 const MARK_NAMES = new Map(Object.entries(DRAWN_MENU_MARKS).map(([name, glyph]) => [glyph, name]));
 
-const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 const textsLayer = fake => shownLayers(fake, DRAWN_MENU_Z_INDEX.texts).find(layer => layer.texts().length > 0) || null;
 
 export const isDrawnMenuShown = fake => textsLayer(fake) !== null;

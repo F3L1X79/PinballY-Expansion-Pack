@@ -5,12 +5,13 @@
 // ============================================================
 
 import assert from "node:assert/strict";
+import { shownLayers } from "./shown_layers.js";
 
 // The marker's layers, shown or not.
 export const markerLayerCount = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex).length;
 
 export function markerLayer(fake, zIndex) {
-    const marked = fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
+    const marked = shownLayers(fake, zIndex);
     assert.equal(marked.length, 1, "the Selection Marker surrounds exactly one choice");
     return marked[0];
 }

@@ -9,13 +9,12 @@ import { HIGH_SCORE_BOARD_Z_INDEX, HIGH_SCORE_BOARD_CROWN_Z_INDEX } from "../../
 import { shownFrame, isFrameImage } from "../avatar_frames/avatar_frame_reader.js";
 import { buttonHintsOn, exitButtonTooltipOn } from "../support/button_hints_reader.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 
 // Past the fade in.
 export const BOARD_OPEN_MS = 300;
 
 export const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { command: buttonCommand, repeat: false });
-
-const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
 export const isBoardOpen = fake => shownLayers(fake, HIGH_SCORE_BOARD_Z_INDEX.backdrop).length > 0;
 

@@ -5,6 +5,7 @@
 // ============================================================
 
 import { STEAMBALL_COLORS } from "../../common/drawing/steamball_palette.js";
+import { shownLayers } from "./shown_layers.js";
 
 const textStrokes = strokes => strokes.filter(stroke => "text" in stroke);
 
@@ -26,7 +27,7 @@ export function readButtonHints(strokes) {
 
 // The groups of the shown footer layer at that z-index, null when none shows.
 export function buttonHintsOn(fake, zIndex) {
-    const [layer] = fake.drawingLayers().filter(candidate => candidate.zIndex === zIndex && candidate.alpha > 0);
+    const [layer] = shownLayers(fake, zIndex);
     return layer ? readButtonHints(layer.strokes()) : null;
 }
 
@@ -46,7 +47,7 @@ export function expectedButtonHints(lang, { flippers = "browse", select = true, 
 // The Exit Button's tooltip shown on the layer at that z-index ("Back" or
 // "Close"), null while hidden.
 export function exitButtonTooltipOn(fake, zIndex) {
-    const [layer] = fake.drawingLayers().filter(candidate => candidate.zIndex === zIndex && candidate.alpha > 0);
+    const [layer] = shownLayers(fake, zIndex);
     return layer ? layer.texts()[0] || null : null;
 }
 

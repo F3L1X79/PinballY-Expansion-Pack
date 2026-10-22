@@ -6,10 +6,9 @@
 
 import { AVATAR_FRAME_LIST_Z_INDEX } from "../../common/avatar_frames/avatar_frame_list_painter.js";
 import * as selectionMarker from "../support/selection_marker_reader.js";
+import { shownLayers } from "../support/shown_layers.js";
 import { buttonHintsOn, exitButtonTooltipOn } from "../support/button_hints_reader.js";
 import { highlightedRow } from "../stats/profile_stats_reader.js";
-
-const shownLayers = (fake, zIndex) => fake.drawingLayers().filter(layer => layer.zIndex === zIndex && layer.alpha > 0);
 
 export const isMarkerOnExitButton = fake =>
     selectionMarker.layerUnderMarker(fake, AVATAR_FRAME_LIST_Z_INDEX.marker, shownLayers(fake, AVATAR_FRAME_LIST_Z_INDEX.exitButton)) !== undefined;
