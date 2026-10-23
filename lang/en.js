@@ -623,6 +623,8 @@ export default {
         addOnLine: (name, state) => `${name}: ${state}`,
         // The language line, by the saved language's own name.
         languageLine: (languageName) => `Language: ${languageName}`,
+        startupScreenLine: (screenName) => `Startup screen: ${screenName}`,
+        startupScreenNames: { welcome: "Welcome Screen", profilePicker: "Profile picker", wheel: "Wheel" },
         back: "Back",
         // The categories of the list, each heading its own page, grouped as in .env.example.
         groups: {

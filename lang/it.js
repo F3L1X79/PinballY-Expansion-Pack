@@ -734,6 +734,8 @@ export default {
         off: "Off",
         addOnLine: (name, state) => `${name}: ${state}`,
         languageLine: (languageName) => `Language: ${languageName}`,
+        startupScreenLine: (screenName) => `Startup screen: ${screenName}`,
+        startupScreenNames: { welcome: "Welcome Screen", profilePicker: "Profile picker", wheel: "Wheel" },
         back: "Back",
         groups: {
             playersAndProgress: "Players and progress",

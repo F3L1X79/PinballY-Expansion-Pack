@@ -715,6 +715,8 @@ export default {
         off: "Désactivé",
         addOnLine: (name, state) => `${name} : ${state}`,
         languageLine: (languageName) => `Langue : ${languageName}`,
+        startupScreenLine: (screenName) => `Écran de démarrage : ${screenName}`,
+        startupScreenNames: { welcome: "Écran d'accueil", profilePicker: "Choix du joueur", wheel: "Roue" },
         back: "Retour",
         groups: {
             playersAndProgress: "Joueurs et progression",
