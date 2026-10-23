@@ -624,7 +624,7 @@ export default {
         // The language line, by the saved language's own name.
         languageLine: (languageName) => `Language: ${languageName}`,
         back: "Back",
-        // The headings of the list, grouped as in .env.example.
+        // The categories of the list, each heading its own page, grouped as in .env.example.
         groups: {
             playersAndProgress: "Players and progress",
             wheelScreen: "Wheel screen",

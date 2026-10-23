@@ -30,9 +30,14 @@ test("the list speaks French", async () => {
     chooseEntry(fake, "Réglages du pack");
     fake.advanceTime(OPEN_OVER_MS);
 
+    assert.deepEqual(drawnMenuLines(fake).slice(0, 2), ["Joueurs et progression", "Écran de la roue"]);
+    chooseEntry(fake, "Joueurs et progression");
+    fake.advanceTime(OPEN_OVER_MS);
     assert.deepEqual(drawnMenuLines(fake).slice(0, 4), [
         "[JOUEURS ET PROGRESSION]", "Choix du joueur : Désactivé", "Écran d'accueil : Activé au redémarrage", "Succès : Activé au redémarrage",
     ]);
+    press(fake, "Exit");
+    fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Langue : Español au redémarrage", "Next");
     assert.equal(highlightedEntry(fake), "Retour", "the language line comes before Retour");
     press(fake, "Select");
@@ -43,6 +48,8 @@ test("the list speaks French", async () => {
     assert.ok(drawnMenuLines(fake).includes("Réglages du pack"), "Plus tard goes back to the Operator Menu");
 
     chooseEntry(fake, "Réglages du pack");
+    fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Joueurs et progression");
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Choix du joueur : Désactivé");
     fake.advanceTime(OPEN_OVER_MS);
@@ -56,6 +63,8 @@ test("the list speaks French", async () => {
     assert.equal(fake.readFile(ENV_LOCAL), "LANGUAGE=es\r\nADD_ON_PROFILE_PICKER=true\r\n");
 
     // The languages in their own names, Annuler in the running language.
+    chooseEntry(fake, "Retour");
+    fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Langue : Español au redémarrage");
     fake.advanceTime(OPEN_OVER_MS);
     assert.deepEqual(drawnMenuLines(fake), ["English", "Français", "Deutsch", "Español", "Italiano", "Português", "---", "Annuler"]);

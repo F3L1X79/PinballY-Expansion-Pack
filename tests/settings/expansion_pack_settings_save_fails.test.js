@@ -32,6 +32,8 @@ test("a Save that cannot write shows \"Setting not saved\", logged, the file unc
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Expansion Pack Settings");
     fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Players and progress");
+    fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "High Scores: On");
     fake.advanceTime(OPEN_OVER_MS);
     press(fake, "Select");
@@ -54,11 +56,13 @@ test("OK goes back to the page, on the choice saved before", () => {
     assert.equal(highlightedEntry(fake), "High Scores: On");
     press(fake, "Exit");
     fake.advanceTime(OPEN_OVER_MS);
-    assert.equal(highlightedEntry(fake), "High Scores: On", "back on the list, nothing saved");
+    assert.equal(highlightedEntry(fake), "High Scores: On", "back on the category, nothing saved");
     assert.equal(errorLines(fake).length, 1, "no other error");
 });
 
 test("a language that cannot be saved shows \"Setting not saved\", then the page on the language saved before", () => {
+    chooseEntry(fake, "Back");
+    fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Language: English");
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Deutsch");

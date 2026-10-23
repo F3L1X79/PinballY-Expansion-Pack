@@ -1,64 +1,61 @@
 // ============================================================
-// The Expansion Pack Settings list through main.js, Drawn Menus on: every
-// Add-on by name under its group's heading, On / Off as saved in .env.local
-// (read again on each opening), the Language line; Exit goes back to the
-// Operator Menu, attract mode closes the list.
+// The Expansion Pack Settings list through main.js, Drawn Menus on: the
+// Add-on categories, as in .env.example, each opening its page of Add-ons
+// On / Off as saved in .env.local (read again on each opening), then the
+// Language line; a category's Back returns to its line, Exit on the list to
+// the Operator Menu; attract mode closes the list.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { isDrawnMenuShown, drawnMenuLines, highlightedEntry, press, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
+import { isDrawnMenuShown, drawnMenuLines, highlightedEntry, markedEntries, press, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const ENV_LOCAL = "C:\\PinballY\\Scripts\\ExpansionPack\\.env.local";
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 22, 20, 0, 0) });
 
-// A row cut by the edge of the scrolling area is drawn fading, a heading
-// then read as an entry: rows compare without their brackets.
-const unbracketed = line => line.replace(/^\[(.*)\]$/, "$1");
+const CATEGORIES = ["Players and progress", "Wheel screen", "Menus and filters", "Launching and playing a table", "Debugging"];
 
-// Every line of the list, which scrolls: the cursor walks down to the last
-// entry, each view taking over the lines read before from where it overlaps
-// them; then back to the first entry.
-function wholeList() {
-    const lines = drawnMenuLines(fake);
-    const first = highlightedEntry(fake);
-    for (let guard = 0; ; guard++) {
-        if (guard > 100) throw new Error("The list never wraps back to its first entry.");
-        press(fake, "Next");
-        if (highlightedEntry(fake) === first) return lines;
-        const view = drawnMenuLines(fake);
-        const offset = lines.findIndex((line, index) => lines.slice(index)
-            .every((read, at) => view[at] !== undefined && unbracketed(read) === unbracketed(view[at])));
-        if (offset === -1) throw new Error("A view of the list does not overlap the lines before.");
-        lines.splice(offset, Infinity, ...view);
-    }
-}
+const listLines = (language = "English") => [...CATEGORIES, "---", `Language: ${language}`, "---", "Back"];
 
 // Every Add-on but Drawn Menus runs off here: a saved On shows "on restart".
 const ON = "On (on restart)";
 
-// The list as saved by default, but for what each test changes.
-const listLines = ({ achievements = ON, clock = ON, menuCleanup = "Off", language = "English" } = {}) => [
-    "[PLAYERS AND PROGRESS]",
-    `Profile picker: ${ON}`, `Welcome Screen: ${ON}`, `Achievements: ${achievements}`, `Session stats: ${ON}`,
-    `Challenges: ${ON}`, `Table Mastery: ${ON}`, `High Scores: ${ON}`,
-    "[WHEEL SCREEN]",
-    `Status line: ${ON}`, `Clock: ${clock}`, `Wheel Arc: ${ON}`,
-    "[MENUS AND FILTERS]",
-    `PinballY translation: ${ON}`, "Drawn Menus: On", `Menu commands: ${ON}`, `Hall of Fame: ${ON}`,
-    `Tables to Discover: ${ON}`, `Hidden Tables: ${ON}`, `Original Tables: ${ON}`, `Menu Cleanup: ${menuCleanup}`,
-    "[LAUNCHING AND PLAYING A TABLE]",
-    `Backglass: ${ON}`, `Launch overlay: ${ON}`, `Launch sound: ${ON}`, `Rating prompt: ${ON}`, `Table ROMs: ${ON}`,
-    "[DEBUGGING]",
-    `Launch events trace: ${ON}`,
-    "---",
-    `Language: ${language}`,
-    "---",
-    "Back",
-];
+// Each category's page as saved by default, but for what each test changes.
+const categoryPages = ({ achievements = ON, clock = ON, menuCleanup = "Off" } = {}) => ({
+    "Players and progress": [
+        "[PLAYERS AND PROGRESS]",
+        `Profile picker: ${ON}`, `Welcome Screen: ${ON}`, `Achievements: ${achievements}`, `Session stats: ${ON}`,
+        `Challenges: ${ON}`, `Table Mastery: ${ON}`, `High Scores: ${ON}`, "---", "Back",
+    ],
+    "Wheel screen": ["[WHEEL SCREEN]", `Status line: ${ON}`, `Clock: ${clock}`, `Wheel Arc: ${ON}`, "---", "Back"],
+    "Menus and filters": [
+        "[MENUS AND FILTERS]",
+        `PinballY translation: ${ON}`, "Drawn Menus: On", `Menu commands: ${ON}`, `Hall of Fame: ${ON}`,
+        `Tables to Discover: ${ON}`, `Hidden Tables: ${ON}`, `Original Tables: ${ON}`, `Menu Cleanup: ${menuCleanup}`, "---", "Back",
+    ],
+    "Launching and playing a table": [
+        "[LAUNCHING AND PLAYING A TABLE]",
+        `Backglass: ${ON}`, `Launch overlay: ${ON}`, `Launch sound: ${ON}`, `Rating prompt: ${ON}`, `Table ROMs: ${ON}`, "---", "Back",
+    ],
+    "Debugging": ["[DEBUGGING]", `Launch events trace: ${ON}`, "---", "Back"],
+});
+
+// Each category's page, opened from the list in turn, left by its Back.
+function readCategoryPages() {
+    const pages = {};
+    for (const category of CATEGORIES) {
+        chooseEntry(fake, category);
+        fake.advanceTime(OPEN_OVER_MS);
+        pages[category] = drawnMenuLines(fake);
+        chooseEntry(fake, "Back");
+        fake.advanceTime(OPEN_OVER_MS);
+        assert.equal(highlightedEntry(fake), category, "Back returns to the category's line");
+    }
+    return pages;
+}
 
 function openList() {
     fake.openOperatorMenu();
@@ -76,12 +73,25 @@ test("setup", async () => {
     await settle();
 });
 
-test("without .env.local, the list shows the defaults, Menu Cleanup off", () => {
+test("the list shows the categories, each opening its Add-ons, as saved by default", () => {
     openList();
 
     assert.equal(fake.currentMenu(), null, "no native menu");
-    assert.deepEqual(wholeList(), listLines());
-    assert.equal(highlightedEntry(fake), `Profile picker: ${ON}`, "the cursor skips the heading");
+    assert.deepEqual(drawnMenuLines(fake), listLines());
+    assert.deepEqual(markedEntries(fake, "submenu"), CATEGORIES);
+    assert.equal(highlightedEntry(fake), "Players and progress");
+    assert.deepEqual(readCategoryPages(), categoryPages());
+});
+
+test("on a category's page, the cursor starts on its first Add-on and Exit returns to the list", () => {
+    chooseEntry(fake, "Wheel screen");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.equal(highlightedEntry(fake), `Status line: ${ON}`, "the cursor skips the heading");
+
+    press(fake, "Exit");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.deepEqual(drawnMenuLines(fake), listLines());
+    assert.equal(highlightedEntry(fake), "Wheel screen");
 });
 
 test("Exit goes back to the Operator Menu, past the restart question", () => {
@@ -99,7 +109,8 @@ test("Exit goes back to the Operator Menu, past the restart question", () => {
 test("the list shows .env.local as saved, read again on each opening", () => {
     fake.addFile(ENV_LOCAL, "\uFEFF# My cabinet\r\nADD_ON_ACHIEVEMENTS=false\r\nLANGUAGE=de\r\n");
     openList();
-    assert.deepEqual(wholeList(), listLines({ achievements: "Off", language: "Deutsch (on restart)" }));
+    assert.deepEqual(drawnMenuLines(fake), listLines("Deutsch (on restart)"));
+    assert.deepEqual(readCategoryPages(), categoryPages({ achievements: "Off" }));
     chooseEntry(fake, "Back");
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Later");
@@ -108,7 +119,8 @@ test("the list shows .env.local as saved, read again on each opening", () => {
 
     fake.addFile(ENV_LOCAL, "ADD_ON_CLOCK=false\nADD_ON_MENU_CLEANUP=true\nLANGUAGE=pt\n");
     openList();
-    assert.deepEqual(wholeList(), listLines({ clock: "Off", menuCleanup: ON, language: "Português (on restart)" }));
+    assert.deepEqual(drawnMenuLines(fake), listLines("Português (on restart)"));
+    assert.deepEqual(readCategoryPages(), categoryPages({ clock: "Off", menuCleanup: ON }));
 });
 
 test("attract mode closes the list", () => {

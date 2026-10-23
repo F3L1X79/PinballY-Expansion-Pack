@@ -2,7 +2,7 @@
 // An Add-on's page in the Expansion Pack Settings, through main.js: its
 // "When on" / "When off" texts, the switch flipping in place, Save shown only
 // while it differs from the saved choice, Save rewriting that one line of
-// .env.local, "on restart" in the list; Cancel, Back and Exit change nothing.
+// .env.local, "on restart" in its category; Cancel, Back and Exit change nothing.
 // ============================================================
 
 import { test } from "node:test";
@@ -22,7 +22,12 @@ function openList() {
     fake.advanceTime(OPEN_OVER_MS);
 }
 
-// From the list, which scrolls: the cursor walks down to the line.
+function openCategory(category) {
+    chooseEntry(fake, category);
+    fake.advanceTime(OPEN_OVER_MS);
+}
+
+// From a category: the cursor walks down to the line.
 function openPage(line) {
     for (let guard = 0; highlightedEntry(fake) !== line; guard++) {
         if (guard > 100) throw new Error(`No "${line}" line in the list.`);
@@ -44,6 +49,7 @@ test("setup", async () => {
 
 test("an Add-on's page says what it does, what else is lost, and offers its switch and Cancel", () => {
     openList();
+    openCategory("Players and progress");
     openPage("Achievements: On");
 
     const { message } = readDrawnMenu(fake);
@@ -63,7 +69,7 @@ test("the switch flips in place, Save shown only while it differs from the saved
 });
 
 // Cancel is the page's MenuReturn entry, its Back.
-test("Cancel and Exit forget the switch and return to the list on that line, nothing written", () => {
+test("Cancel and Exit forget the switch and return to the category on that line, nothing written", () => {
     press(fake, "Select");
     chooseEntry(fake, "Cancel");
     fake.advanceTime(OPEN_OVER_MS);
@@ -84,7 +90,7 @@ test("Cancel and Exit forget the switch and return to the list on that line, not
     assert.deepEqual(fake.fileOperations().filter(operation => operation.path === ENV_LOCAL), []);
 });
 
-test("without .env.local, Save creates it with the one line and the list shows \"on restart\"", () => {
+test("without .env.local, Save creates it with the one line and the category shows \"on restart\"", () => {
     openPage("Achievements: On");
     press(fake, "Select");
     chooseEntry(fake, "Save");
@@ -113,6 +119,9 @@ test("Save changes only that key's line, the rest of the file byte for byte", ()
 
 // The Clock runs off here, but saved on by default: no line in the file.
 test("a key with no active line gets one appended at the end", () => {
+    chooseEntry(fake, "Back");
+    fake.advanceTime(OPEN_OVER_MS);
+    openCategory("Wheel screen");
     openPage("Clock: On (on restart)");
     press(fake, "Select");
     chooseEntry(fake, "Save");

@@ -1,8 +1,8 @@
 // ============================================================
 // Expansion Pack Settings: their entry in the Operator Menu, right after
 // PinballY's Options, for whoever sees the setup entries; it opens the list
-// of every Add-on and the language, as saved in .env.local (read again on
-// each opening), one page per Add-on whose Save rewrites its one line, and
+// of Add-on categories, each listing its Add-ons as saved in .env.local (read
+// again on each opening), one page per Add-on whose Save rewrites its one line, and
 // the Language page, saving at once. Listens to "menuopen", "command" and "commandbuttondown"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
@@ -28,6 +28,7 @@ import { rewriteEnvLine } from "./env_local_rewrite.js";
 const SCRIPT_NAME = "ExpansionPackSettings";
 const OPERATOR_MENU_ID = "operator";
 const LIST_MENU_ID = "expansionPackSettings";
+const CATEGORY_MENU_ID = "expansionPackSettingsCategory";
 const PAGE_MENU_ID = "expansionPackSettingsPage";
 const LANGUAGE_MENU_ID = "expansionPackSettingsLanguage";
 const NOT_SAVED_MENU_ID = "expansionPackSettingsNotSaved";
@@ -46,8 +47,12 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const optionsCommand = host.getBuiltInCommand("Options");
     const operatorMenuCommand = host.getBuiltInCommand("ShowOperatorMenu");
     const menuReturnCommand = host.getBuiltInCommand("MenuReturn");
-    // One command per line of the list, so that each line can be chosen.
-    const addOnCommands = new Map(ADD_ON_GROUPS.flatMap(({ addOns }) => addOns)
+    // One command per category and per Add-on line, so that each line can be chosen.
+    const groupCommands = new Map(ADD_ON_GROUPS
+        .map(({ group }) => [group, host.allocateCommand(`expansionPackSettings_group_${group}`)]));
+    const groupOfCommand = new Map([...groupCommands].map(([group, cmd]) => [cmd, group]));
+    const groupOfAddOn = new Map(ADD_ON_GROUPS.flatMap(({ group, addOns }) => addOns.map(key => [key, group])));
+    const addOnCommands = new Map([...groupOfAddOn.keys()]
         .map(key => [key, host.allocateCommand(`expansionPackSettings_${key}`)]));
     const addOnOfCommand = new Map([...addOnCommands].map(([key, cmd]) => [cmd, key]));
     const languageCommand = host.allocateCommand("expansionPackSettings_language");
@@ -78,27 +83,36 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const addOnDiffers = (saved, key) => saved.addOns[key] !== running.addOns[key];
     const languageDiffers = saved => languageCodeOf(saved.language) !== languageCodeOf(running.language);
 
+    // The categories, each opening its page, then the language.
     function openList(selectedCmd = null) {
         page = null;
         const saved = readSaved();
-        const items = [];
-        for (const { group, addOns } of ADD_ON_GROUPS) {
-            items.push({ title: TEXT.groups[group], cmd: -1 });
-            for (const key of addOns) {
-                const state = stateOf(saved.addOns[key]);
-                const shownState = addOnDiffers(saved, key) ? TEXT.onRestart(state) : state;
-                items.push({ title: TEXT.addOnLine(TEXT.addOns[key].name, shownState), cmd: addOnCommands.get(key) });
-            }
-        }
         const languageName = languageNameOf(saved.language);
         const shownLanguage = languageDiffers(saved) ? TEXT.onRestart(languageName) : languageName;
-        items.push(
+        getMenus().show(LIST_MENU_ID, [
+            ...ADD_ON_GROUPS.map(({ group }) => ({ title: TEXT.groups[group], cmd: groupCommands.get(group), hasSubmenu: true })),
             SEPARATOR,
             { title: TEXT.languageLine(shownLanguage), cmd: languageCommand },
             SEPARATOR,
             { title: TEXT.back, cmd: menuReturnCommand },
-        );
-        getMenus().show(LIST_MENU_ID, items, { selectedCmd, onBack: leaveList });
+        ], { selectedCmd, onBack: leaveList });
+    }
+
+    // A category's Add-ons, each On / Off as saved, under its heading.
+    function openCategory(group, selectedCmd = null) {
+        page = null;
+        const saved = readSaved();
+        const { addOns } = ADD_ON_GROUPS.find(entry => entry.group === group);
+        getMenus().show(CATEGORY_MENU_ID, [
+            { title: TEXT.groups[group], cmd: -1 },
+            ...addOns.map((key) => {
+                const state = stateOf(saved.addOns[key]);
+                const shownState = addOnDiffers(saved, key) ? TEXT.onRestart(state) : state;
+                return { title: TEXT.addOnLine(TEXT.addOns[key].name, shownState), cmd: addOnCommands.get(key) };
+            }),
+            SEPARATOR,
+            { title: TEXT.back, cmd: menuReturnCommand },
+        ], { selectedCmd, onBack: () => openList(groupCommands.get(group)) });
     }
 
     const returnToOperatorMenu = () => host.doCommand(operatorMenuCommand);
@@ -160,8 +174,8 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         }
     }
 
-    // Back, Exit, Cancel and Save all return to the list on the page's line.
-    const backToList = key => openList(addOnCommands.get(key));
+    // Back, Exit, Cancel and Save all return to the category on the page's line.
+    const backToCategory = key => openCategory(groupOfAddOn.get(key), addOnCommands.get(key));
 
     function showPage() {
         const { key, saved, value } = page;
@@ -173,7 +187,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
             { title: TEXT.addOnLine(name, stateOf(value)), cmd: switchCommand, stayOpen: true },
             ...(value !== saved ? [{ title: TEXT.save, cmd: saveCommand }] : []),
             { title: TEXT.cancel, cmd: menuReturnCommand },
-        ], { dialogStyle: true, onBack: () => backToList(key) });
+        ], { dialogStyle: true, onBack: () => backToCategory(key) });
     }
 
     function openPage(key) {
@@ -213,7 +227,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
 
     function saveAddOn() {
         const { key, value } = page;
-        save(`addOns.${key}`, value, { onSaved: () => backToList(key), reopen: () => openPage(key) });
+        save(`addOns.${key}`, value, { onSaved: () => backToCategory(key), reopen: () => openPage(key) });
     }
 
     function saveLanguage(code) {
@@ -241,7 +255,8 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
             openList();
             return;
         }
-        if (addOnOfCommand.has(ev.id)) openPage(addOnOfCommand.get(ev.id));
+        if (groupOfCommand.has(ev.id)) openCategory(groupOfCommand.get(ev.id));
+        else if (addOnOfCommand.has(ev.id)) openPage(addOnOfCommand.get(ev.id));
         else if (ev.id === languageCommand) openLanguagePage();
         else if (languageOfCommand.has(ev.id)) saveLanguage(languageOfCommand.get(ev.id));
         else if (ev.id === switchCommand && page) {

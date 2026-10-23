@@ -30,7 +30,23 @@ function openList() {
     fake.advanceTime(OPEN_OVER_MS);
 }
 
-// Flips the Add-on's switch on its page and saves it, back on the list.
+// Opens the list from the Operator Menu, then the High Scores' category.
+function openPlayersAndProgress() {
+    chooseEntry(fake, "Expansion Pack Settings");
+    fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Players and progress");
+    fake.advanceTime(OPEN_OVER_MS);
+}
+
+// From the category, Back to the list, then Back to leave it.
+function backTwice() {
+    chooseEntry(fake, "Back");
+    fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Back");
+    fake.advanceTime(OPEN_OVER_MS);
+}
+
+// Flips the Add-on's switch on its page and saves it, back on its category.
 function switchAndSave(line) {
     chooseEntry(fake, line);
     fake.advanceTime(OPEN_OVER_MS);
@@ -61,23 +77,19 @@ test("with nothing changed, Exit leaves the list at once", () => {
 });
 
 test("a change undone leaves at once too", () => {
-    chooseEntry(fake, "Expansion Pack Settings");
-    fake.advanceTime(OPEN_OVER_MS);
+    openPlayersAndProgress();
     switchAndSave("High Scores: On");
     switchAndSave("High Scores: Off (on restart)");
-    chooseEntry(fake, "Back");
-    fake.advanceTime(OPEN_OVER_MS);
+    backTwice();
 
     assert.ok(isOnOperatorMenu());
     assert.equal(fake.readFile(ENV_LOCAL), RUNNING_TEXT);
 });
 
 test("with a saved setting that differs, Back asks Restart now or Later", () => {
-    chooseEntry(fake, "Expansion Pack Settings");
-    fake.advanceTime(OPEN_OVER_MS);
+    openPlayersAndProgress();
     switchAndSave("High Scores: On");
-    chooseEntry(fake, "Back");
-    fake.advanceTime(OPEN_OVER_MS);
+    backTwice();
 
     assert.equal(readDrawnMenu(fake).message, "The saved settings apply when PinballY restarts.");
     assert.deepEqual(drawnMenuLines(fake), ["Restart now", "Later"]);
