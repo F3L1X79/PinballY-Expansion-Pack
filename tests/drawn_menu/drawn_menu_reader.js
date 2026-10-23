@@ -71,6 +71,9 @@ export const drawnMenuLines = fake => readDrawnMenu(fake).rows.map(row => {
     return row.kind === "heading" ? `[${row.title}]` : row.title;
 });
 
+// The titles of the entries drawn with this mark ("check", "radio", "submenu").
+export const markedEntries = (fake, mark) => readDrawnMenu(fake).rows.filter(row => row.mark === mark).map(row => row.title);
+
 // The headings and entries as drawn on the texts' canvas, from top to
 // bottom: { kind, title, top, bottom, size } (size in points).
 export function drawnRowBoxes(fake) {

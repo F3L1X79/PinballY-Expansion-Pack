@@ -2,8 +2,8 @@
 // Expansion Pack Settings: their entry in the Operator Menu, right after
 // PinballY's Options, for whoever sees the setup entries; it opens the list
 // of every Add-on and the language, as saved in .env.local (read again on
-// each opening), and one page per Add-on whose Save rewrites its one line.
-// Listens to "menuopen" and "command"; writes .env.local.
+// each opening), one page per Add-on whose Save rewrites its one line, and
+// the Language page, saving at once. Listens to "menuopen" and "command"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
 // - Nothing applies before PinballY restarts: "on restart" compares the saved and running values.
@@ -25,6 +25,7 @@ const SCRIPT_NAME = "ExpansionPackSettings";
 const OPERATOR_MENU_ID = "operator";
 const LIST_MENU_ID = "expansionPackSettings";
 const PAGE_MENU_ID = "expansionPackSettingsPage";
+const LANGUAGE_MENU_ID = "expansionPackSettingsLanguage";
 const NOT_SAVED_MENU_ID = "expansionPackSettingsNotSaved";
 const SEPARATOR = { cmd: -1 };
 
@@ -41,6 +42,10 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         .map(key => [key, host.allocateCommand(`expansionPackSettings_${key}`)]));
     const addOnOfCommand = new Map([...addOnCommands].map(([key, cmd]) => [cmd, key]));
     const languageCommand = host.allocateCommand("expansionPackSettings_language");
+    // One command per language of the Language page, in the order of languageNames.
+    const languageCommands = new Map(Object.keys(TEXT.languageNames)
+        .map(code => [code, host.allocateCommand(`expansionPackSettings_language_${code}`)]));
+    const languageOfCommand = new Map([...languageCommands].map(([code, cmd]) => [cmd, code]));
     const switchCommand = host.allocateCommand("expansionPackSettings_switch");
     const saveCommand = host.allocateCommand("expansionPackSettings_save");
     const envLocalPath = `${host.getProjectFolder()}\\.env.local`;
@@ -52,8 +57,11 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     // The settings as saved now, the defaults for a missing file or key.
     const readSaved = () => applyEnvOverrides(DEFAULTS, readEnvLocal()).config;
 
+    // Whatever its case, as i18n.js reads it.
+    const languageCodeOf = language => String(language).toLowerCase();
+
     // A language the pack does not know shows as written.
-    const languageNameOf = code => TEXT.languageNames[code] || code;
+    const languageNameOf = language => TEXT.languageNames[languageCodeOf(language)] || language;
 
     const stateOf = value => (value ? TEXT.on : TEXT.off);
 
@@ -69,10 +77,11 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
                 items.push({ title: TEXT.addOnLine(TEXT.addOns[key].name, shownState), cmd: addOnCommands.get(key) });
             }
         }
+        const languageName = languageNameOf(saved.language);
+        const shownLanguage = languageCodeOf(saved.language) === languageCodeOf(running.language) ? languageName : TEXT.onRestart(languageName);
         items.push(
             SEPARATOR,
-            // Stays open: choosing it does nothing yet.
-            { title: TEXT.languageLine(languageNameOf(saved.language)), cmd: languageCommand, stayOpen: true },
+            { title: TEXT.languageLine(shownLanguage), cmd: languageCommand },
             SEPARATOR,
             { title: TEXT.back, cmd: menuReturnCommand },
         );
@@ -101,11 +110,20 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         showPage();
     }
 
+    // Each language in its own name, the saved one marked; choosing one saves it.
+    function openLanguagePage() {
+        page = null;
+        const saved = languageCodeOf(readSaved().language);
+        getMenus().show(LANGUAGE_MENU_ID, [
+            ...[...languageCommands].map(([code, cmd]) => ({ title: TEXT.languageNames[code], cmd, radio: code === saved })),
+            SEPARATOR,
+            { title: TEXT.cancel, cmd: menuReturnCommand },
+        ], { selectedCmd: languageCommands.get(saved) ?? null, onBack: () => openList(languageCommand) });
+    }
+
     // A failed read or write is caught here, not by safeHandler, for the
-    // owner to see it; the page then shows the choice saved before.
-    function save() {
-        const { key, value } = page;
-        const keyPath = `addOns.${key}`;
+    // owner to see it; reopen then shows the page on the choice saved before.
+    function save(keyPath, value, { onSaved, reopen }) {
         try {
             host.files.writeText(envLocalPath, rewriteEnvLine(readEnvLocal(), keyPath, value));
         } catch (error) {
@@ -114,11 +132,20 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
                 { title: TEXT.notSaved, cmd: -1 },
                 SEPARATOR,
                 { title: TEXT.ok, cmd: menuReturnCommand },
-            ], { dialogStyle: true, onBack: () => openPage(key) });
+            ], { dialogStyle: true, onBack: reopen });
             return;
         }
         host.log(`[${SCRIPT_NAME}] Saved ${envKeyOf(keyPath)}=${value} in .env.local.`);
-        backToList(key);
+        onSaved();
+    }
+
+    function saveAddOn() {
+        const { key, value } = page;
+        save(`addOns.${key}`, value, { onSaved: () => backToList(key), reopen: () => openPage(key) });
+    }
+
+    function saveLanguage(code) {
+        save("language", code, { onSaved: () => openList(languageCommand), reopen: openLanguagePage });
     }
 
     // Fires when any menu opens, with a fresh item list each time, the
@@ -130,18 +157,20 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     }));
 
     // Fires on every command: the entry opens the list, a line its page, the
-    // switch flips, Save writes.
+    // switch flips, Save or a language writes.
     host.on("command", safeHandler(SCRIPT_NAME, ev => {
         if (ev.id === entryCommand) {
             openList();
             return;
         }
         if (addOnOfCommand.has(ev.id)) openPage(addOnOfCommand.get(ev.id));
+        else if (ev.id === languageCommand) openLanguagePage();
+        else if (languageOfCommand.has(ev.id)) saveLanguage(languageOfCommand.get(ev.id));
         else if (ev.id === switchCommand && page) {
             page.value = !page.value;
             showPage();
         } else if (ev.id === saveCommand && page) {
-            save();
+            saveAddOn();
         }
     }));
 }

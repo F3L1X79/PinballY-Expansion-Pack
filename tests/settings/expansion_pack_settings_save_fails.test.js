@@ -1,14 +1,15 @@
 // ============================================================
 // A failed Save in the Expansion Pack Settings, through main.js: .env.local
 // held by another program, the write error logged, "Setting not saved" with
-// OK, then the page back on the choice saved before, the file unchanged.
+// OK, then the page back on the choice saved before, the file unchanged;
+// on an Add-on's page and on the Language page.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { readDrawnMenu, drawnMenuLines, highlightedEntry, press, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
+import { readDrawnMenu, drawnMenuLines, highlightedEntry, markedEntries, press, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { errorLines } from "../support/error_log.js";
 
 const ENV_LOCAL = "C:\\PinballY\\Scripts\\ExpansionPack\\.env.local";
@@ -55,4 +56,20 @@ test("OK goes back to the page, on the choice saved before", () => {
     fake.advanceTime(OPEN_OVER_MS);
     assert.equal(highlightedEntry(fake), "High Scores: On", "back on the list, nothing saved");
     assert.equal(errorLines(fake).length, 1, "no other error");
+});
+
+test("a language that cannot be saved shows \"Setting not saved\", then the page on the language saved before", () => {
+    chooseEntry(fake, "Language: English");
+    fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Deutsch");
+    fake.advanceTime(OPEN_OVER_MS);
+
+    assert.equal(readDrawnMenu(fake).message, "Setting not saved");
+    assert.equal(errorLines(fake).length, 2);
+    assert.match(errorLines(fake)[1], /^\[ExpansionPackSettings\] .*Permission denied/);
+    chooseEntry(fake, "OK");
+    fake.advanceTime(OPEN_OVER_MS);
+
+    assert.deepEqual(markedEntries(fake, "radio"), ["English"]);
+    assert.equal(fake.readFile(ENV_LOCAL), SAVED_TEXT);
 });

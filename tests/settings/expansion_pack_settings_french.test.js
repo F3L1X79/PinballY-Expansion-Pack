@@ -1,7 +1,8 @@
 // ============================================================
 // The Expansion Pack Settings in French through main.js: "Réglages du pack"
 // in the Operator Menu, the list's headings, Add-ons and states, the
-// language line in the saved language's own name, and an Add-on's page.
+// language line in the saved language's own name, an Add-on's page and the
+// Language page.
 // ============================================================
 
 import { test } from "node:test";
@@ -32,7 +33,7 @@ test("the list speaks French", async () => {
     assert.deepEqual(drawnMenuLines(fake).slice(0, 4), [
         "[JOUEURS ET PROGRESSION]", "Choix du joueur : Désactivé", "Écran d'accueil : Activé au redémarrage", "Succès : Activé au redémarrage",
     ]);
-    chooseEntry(fake, "Langue : Español", "Next");
+    chooseEntry(fake, "Langue : Español au redémarrage", "Next");
     assert.equal(highlightedEntry(fake), "Retour", "the language line comes before Retour");
     press(fake, "Select");
     assert.ok(drawnMenuLines(fake).includes("Réglages du pack"), "Retour goes back to the Operator Menu");
@@ -49,6 +50,15 @@ test("the list speaks French", async () => {
     fake.advanceTime(OPEN_OVER_MS);
     assert.equal(highlightedEntry(fake), "Choix du joueur : Activé au redémarrage");
     assert.equal(fake.readFile(ENV_LOCAL), "LANGUAGE=es\r\nADD_ON_PROFILE_PICKER=true\r\n");
+
+    // The languages in their own names, Annuler in the running language.
+    chooseEntry(fake, "Langue : Español au redémarrage");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.deepEqual(drawnMenuLines(fake), ["English", "Français", "Deutsch", "Español", "Italiano", "Português", "---", "Annuler"]);
+    chooseEntry(fake, "Français");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.equal(highlightedEntry(fake), "Langue : Français");
+    assert.equal(fake.readFile(ENV_LOCAL), "LANGUAGE=fr\r\nADD_ON_PROFILE_PICKER=true\r\n");
 
     assertNoErrorLogged(fake);
 });

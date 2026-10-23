@@ -84,13 +84,6 @@ test("without .env.local, the list shows the defaults, Menu Cleanup off", () => 
     assert.equal(highlightedEntry(fake), `Profile picker: ${ON}`, "the cursor skips the heading");
 });
 
-test("choosing the Language line does nothing yet", () => {
-    chooseEntry(fake, "Language: English");
-
-    assert.ok(isDrawnMenuShown(fake), "the list stays");
-    assert.equal(highlightedEntry(fake), "Language: English");
-});
-
 test("Exit goes back to the Operator Menu", () => {
     press(fake, "Exit");
     fake.advanceTime(OPEN_OVER_MS);
@@ -104,14 +97,14 @@ test("Exit goes back to the Operator Menu", () => {
 test("the list shows .env.local as saved, read again on each opening", () => {
     fake.addFile(ENV_LOCAL, "\uFEFF# My cabinet\r\nADD_ON_ACHIEVEMENTS=false\r\nLANGUAGE=de\r\n");
     openList();
-    assert.deepEqual(wholeList(), listLines({ achievements: "Off", language: "Deutsch" }));
+    assert.deepEqual(wholeList(), listLines({ achievements: "Off", language: "Deutsch (on restart)" }));
     chooseEntry(fake, "Back");
     assert.ok(drawnMenuLines(fake).includes("PinballY Options"), "Back goes back to the Operator Menu too");
     press(fake, "Exit");
 
     fake.addFile(ENV_LOCAL, "ADD_ON_CLOCK=false\nADD_ON_MENU_CLEANUP=true\nLANGUAGE=pt\n");
     openList();
-    assert.deepEqual(wholeList(), listLines({ clock: "Off", menuCleanup: ON, language: "Português" }));
+    assert.deepEqual(wholeList(), listLines({ clock: "Off", menuCleanup: ON, language: "Português (on restart)" }));
 });
 
 test("attract mode closes the list", () => {
