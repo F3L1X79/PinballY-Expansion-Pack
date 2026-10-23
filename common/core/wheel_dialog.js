@@ -19,6 +19,7 @@ export const DIALOG_PRIORITY = Object.freeze({
     STARTUP_PROMPT: 0,
     REWARD_PROMPT: 1,
     RATING_PROMPT: 2,
+    RESTART_FAILED: 3,
 });
 
 // menus: what shows a native-style dialog (common/drawn_menu/drawn_menu.js).

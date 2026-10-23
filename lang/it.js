@@ -748,6 +748,10 @@ export default {
         cancel: "Cancel",
         notSaved: "Setting not saved",
         ok: "OK",
+        restartQuestion: "The saved settings apply when PinballY restarts.",
+        restartNow: "Restart now",
+        later: "Later",
+        restartFailed: "Restart not possible: the settings will apply at the next start",
         addOns: {
             profilePicker: {
                 name: "Profile picker",

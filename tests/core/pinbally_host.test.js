@@ -7,12 +7,15 @@
 
 import { describe, test, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
+import { createFakePinballYHost, FAKE_PINBALLY_PID } from "../support/fake_pinbally_host.js";
 import { createPinballYHost } from "../../common/core/pinbally_host.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
 
 const MEDIEVAL_LOGO = "C:\\PinballY\\Media\\Visual Pinball X\\Wheel Images\\Medieval Madness (Williams 1997).png";
+
+const RESTART_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\restart_pinbally.ps1";
+const TEMPORARY_FOLDER = "C:\\Users\\Cabinet\\AppData\\Local\\Temp\\PinballYExpansionPack";
 
 const TABLES = [
     { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", isHidden: false, wheelImage: MEDIEVAL_LOGO },
@@ -504,6 +507,38 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             assert.notEqual(missing.result().exitCode, 0);
         });
 
+        test("a restart quits PinballY only once the restart helper is ready", () => {
+            fake.addFile(RESTART_HELPER);
+            const calls = [];
+            host.restartPinballY({ onQuitting: () => calls.push("quitting"), onFailed: error => calls.push(error.message) });
+
+            assert.equal(fake.restartsAsked(), 1);
+            fake.advanceTime(1000);
+            assert.deepEqual(calls, [], "the helper is not ready yet");
+            assert.deepEqual(fake.executedCommands(), []);
+            fake.advanceTime(1000);
+            assert.deepEqual(calls, ["quitting"]);
+            assert.deepEqual(fake.executedCommands(), [fake.getBuiltInCommand("Quit")]);
+            fake.advanceTime(60000);
+            assert.equal(calls.length, 1, "asked once");
+        });
+
+        test("a restart helper never ready fails after 15 s, and PinballY stays", () => {
+            fake.addFile(RESTART_HELPER);
+            fake.failNextRestart();
+            const calls = [];
+            host.restartPinballY({ onQuitting: () => calls.push("quitting"), onFailed: error => calls.push(error.message) });
+
+            fake.advanceTime(14999);
+            assert.deepEqual(calls, []);
+            fake.advanceTime(1);
+            assert.equal(calls.length, 1);
+            assert.match(calls[0], /not ready after 15 s/);
+            fake.advanceTime(60000);
+            assert.equal(calls.length, 1, "failed once");
+            assert.deepEqual(fake.executedCommands(), [], "no Quit");
+        });
+
         test("writing into a missing folder fails", () => {
             assert.throws(() => host.files.writeText("C:\\PinballY\\Scripts\\missing\\file.json", "{}"), /not found/);
         });
@@ -544,6 +579,46 @@ describe("production host sound players", () => {
             const players = fake.soundPlayers();
             assert.equal(new Set(players.slice(0, 3)).size, 3, "the second caller goes on with the next player");
             assert.equal(players[3], players[0], "three players in all");
+        } finally {
+            uninstallGlobals();
+        }
+    });
+});
+
+describe("production host restart", () => {
+    test("starts the helper hidden with PinballY's process id, and a ready file left by an earlier try does not count", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            fake.addFile(RESTART_HELPER);
+            fake.addFile(`${TEMPORARY_FOLDER}\\restart-ready`, "1234");
+            const calls = [];
+            createPinballYHost().restartPinballY({ onQuitting: () => calls.push("quitting"), onFailed: error => calls.push(error.message) });
+
+            assert.deepEqual(fake.programRuns(), [{
+                program: "powershell.exe",
+                args: [
+                    "-NoProfile", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", RESTART_HELPER,
+                    "-ParentPid", String(FAKE_PINBALLY_PID),
+                    "-ReadyFile", `${TEMPORARY_FOLDER}\\restart-ready`, "-LogFile", `${TEMPORARY_FOLDER}\\restart.log`,
+                ],
+            }]);
+            fake.advanceTime(400);
+            assert.deepEqual(calls, [], "the stale ready file was deleted first");
+        } finally {
+            uninstallGlobals();
+        }
+    });
+
+    test("a missing helper never gets ready", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            const calls = [];
+            createPinballYHost().restartPinballY({ onQuitting: () => calls.push("quitting"), onFailed: error => calls.push(error.message) });
+            fake.advanceTime(15000);
+            assert.equal(calls.length, 1);
+            assert.match(calls[0], /not ready after 15 s/);
         } finally {
             uninstallGlobals();
         }

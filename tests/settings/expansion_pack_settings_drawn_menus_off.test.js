@@ -1,7 +1,7 @@
 // ============================================================
 // The Expansion Pack Settings through main.js with every Add-on off, Drawn
 // Menus included: the Operator Menu stays native, but the list is drawn,
-// and its Exit opens the native Operator Menu again.
+// and its Exit, past the drawn restart question, opens the native Operator Menu again.
 // ============================================================
 
 import { test } from "node:test";
@@ -30,6 +30,9 @@ test("with Drawn Menus off, the list is still drawn and goes back to the native 
     assert.ok(isDrawnMenuShown(fake), "the list is drawn");
     assert.equal(highlightedEntry(fake), "Profile picker: On (on restart)", "as saved (the defaults), running off");
 
+    press(fake, "Exit");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.equal(highlightedEntry(fake), "Restart now", "the restart question is drawn too");
     press(fake, "Exit");
     assert.ok(!isDrawnMenuShown(fake));
     assert.equal(fake.currentMenu().id, "operator", "back to the native Operator Menu");

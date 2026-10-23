@@ -2,7 +2,7 @@
 // In-memory fake PinballY host for the node tests: the same interface as
 // common/core/pinbally_host.js, plus controls to drive it (clock and timers,
 // tables, wheel, menus, events, attract mode, games, file system, registry,
-// programs, PINemHi boards) and inspect what the code did.
+// programs, restarts, PINemHi boards) and inspect what the code did.
 // Never loaded by PinballY.
 // - Reproduces only behaviours written in docs/pinbally/ or an ADR.
 // - installGlobals() also exposes it as PinballY's globals, for code not yet on the host.
@@ -93,6 +93,12 @@ const TEMPORARY_FOLDER = "C:\\Users\\Cabinet\\AppData\\Local\\Temp";
 // What cmd.exe answers when the program to run does not exist.
 const PROGRAM_NOT_FOUND_EXIT_CODE = 9009;
 const DEFAULT_PROGRAM_MS = 100;
+// PinballY's process id, as Kernel32's GetCurrentProcessId gives it.
+export const FAKE_PINBALLY_PID = 4242;
+// The restart helper writes its ready file 1.3 s after its start, as on
+// the cabinet; PinballY gives up after 15 s (docs/adr/0017).
+const RESTART_HELPER_READY_MS = 1300;
+const RESTART_READY_TIMEOUT_MS = 15000;
 // PinballY 1.1.0 Beta 10's systemInfo.version (the build number is made up).
 export const BETA_10_VERSION = {
     basic: "1.1.0", build: 10086, buildDate: new RealDate(Date.UTC(2024, 8, 24)),
@@ -222,6 +228,9 @@ export function createFakePinballYHost({
     const programRunList = [];
     // Registry values by full path ("HKCU\\Software\\...\\name").
     const registryValues = new Map();
+    // Restarts asked so far, and how many of the next ones never get ready.
+    let restartCount = 0;
+    let failingRestartCount = 0;
     // Pending timers, run in due order by advanceTime(): { id, dueMs, callback, intervalMs }.
     let timers = [];
     let nextTimerId = 1;
@@ -802,6 +811,7 @@ export function createFakePinballYHost({
             openFileHandles.delete(handle);
             return 1;
         },
+        GetCurrentProcessId: () => FAKE_PINBALLY_PID,
     };
 
     // Starts the program as the test described it; onEnd({ exitCode, output })
@@ -836,14 +846,48 @@ export function createFakePinballYHost({
         });
     }
 
-    // Shell32's ShellExecuteW: only "open" on cmd.exe, hidden (SW_HIDE). Like
-    // the native one, it returns a handle whose number is above 32 on success.
+    // Counts a restart asked; false when it was made to fail.
+    function askRestart() {
+        restartCount++;
+        if (failingRestartCount === 0) return true;
+        failingRestartCount--;
+        return false;
+    }
+
+    // The restart helper as the production host starts it, recorded as a
+    // run of powershell.exe with its arguments, never run: it writes its
+    // ready file once ready, unless made to fail or missing.
+    function startRestartHelper(parameters) {
+        const args = [...parameters.matchAll(/"([^"]*)"|(\S+)/g)].map(match => match[1] ?? match[2]);
+        programRunList.push({ program: "powershell.exe", args });
+        const valueOf = name => args[args.indexOf(name) + 1];
+        if (!askRestart() || !files.has(valueOf("-File"))) return;
+        addTimer(() => fileSystem.writeText(valueOf("-ReadyFile"), String(FAKE_PINBALLY_PID + 1)), RESTART_HELPER_READY_MS);
+    }
+
+    // Shell32's ShellExecuteW: only "open" on cmd.exe or powershell.exe,
+    // hidden (SW_HIDE). Like the native one, it returns a handle whose
+    // number is above 32 on success.
     function shellExecute(hwnd, operation, file, parameters, directory, showCommand) {
-        if (operation !== "open" || file !== "cmd.exe" || showCommand !== 0) {
-            throw new Error(`The fake host runs cmd.exe hidden only: ${operation} ${file} ${parameters} (show ${showCommand})`);
+        if (operation !== "open" || !["cmd.exe", "powershell.exe"].includes(file) || showCommand !== 0) {
+            throw new Error(`The fake host runs cmd.exe or powershell.exe hidden only: ${operation} ${file} ${parameters} (show ${showCommand})`);
         }
-        runWrapper(parameters);
+        if (file === "powershell.exe") startRestartHelper(parameters);
+        else runWrapper(parameters);
         return { toNumber: () => 42 };
+    }
+
+    // Like the production host, without a helper: Quit once it would be
+    // ready, or onFailed after 15 s for a restart made to fail.
+    function restartPinballY({ onQuitting, onFailed }) {
+        if (!askRestart()) {
+            addTimer(() => onFailed(new Error("The restart helper was not ready after 15 s.")), RESTART_READY_TIMEOUT_MS);
+            return;
+        }
+        addTimer(() => {
+            onQuitting();
+            host.doCommand(BUILT_IN_COMMANDS.Quit);
+        }, RESTART_HELPER_READY_MS);
     }
 
     // WScript.Shell as PinballY's COM bridge offers it on the cabinet: no
@@ -1182,9 +1226,15 @@ export function createFakePinballYHost({
         playSound,
         createSoundRotation,
         runHiddenProgram,
+        restartPinballY,
         readRegistryValue: (path) => (registryValues.has(path) ? registryValues.get(path) : null),
         files: fileSystem,
         log: (text) => { logLines.push(text); },
+
+        // Every restart asked, through either host.
+        restartsAsked: () => restartCount,
+        // The next restart asked never gets ready.
+        failNextRestart() { failingRestartCount++; },
 
         // Moves the date without running the timers.
         setNow(date) { nowMs = date.getTime(); },
@@ -1615,8 +1665,8 @@ export function createFakePinballYHost({
                 backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
                 // Only User32's GetSystemMetrics, for the monitor count
                 // (SM_CMONITORS), and Shell32's ShellExecuteW, for cmd.exe
-                // run hidden, and Kernel32's file reads over the in-memory
-                // file system; any other DLL throws. create() gives a native
+                // and the restart helper run hidden, and Kernel32's file
+                // reads and process id; any other DLL throws. create() gives a native
                 // variable for an out parameter.
                 dllImport: {
                     bind: (dllName) => {

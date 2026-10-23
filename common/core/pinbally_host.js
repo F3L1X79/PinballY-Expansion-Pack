@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // Production PinballY host: the single seam through which the shared modules
 // reach PinballY (settings, clock, timers, tables, wheel, menus, layers,
-// sounds, files, programs, registry, logfile.log).
+// sounds, files, programs, restart, registry, logfile.log).
 // Every call passes straight through to PinballY's globals; tests use
 // tests/support/fake_pinbally_host.js. No side effects on import.
 // ============================================================
@@ -25,8 +25,13 @@ const GENERIC_READ = 0x80000000;
 const FILE_SHARE_READ_WRITE = 0x1 | 0x2;
 const OPEN_EXISTING = 3;
 const FILE_ATTRIBUTE_NORMAL = 0x80;
-// Under the user's temporary folder: the wrapper script and each run's files.
-const RUN_FOLDER_NAME = "PinballYExpansionPack";
+// Under the user's temporary folder: the wrapper script, each run's files,
+// and the restart's ready file and helper log.
+const PACK_TEMPORARY_FOLDER_NAME = "PinballYExpansionPack";
+// In the pack's tools folder; see its own header for what it does.
+const RESTART_HELPER_NAME = "restart_pinbally.ps1";
+const RESTART_POLL_MS = 200;
+const RESTART_READY_TIMEOUT_MS = 15000;
 // Given "<output file>" "<exit code file>" "<program>" "<args>"..., runs the
 // program with its standard output in the first file and its standard error
 // dropped, then writes its exit code to the second, through a .tmp file
@@ -191,24 +196,44 @@ function createFileSystem() {
 const RUN_SESSION = Date.now();
 let nextRunNumber = 1;
 
-// Runs programs hidden, without waiting: ShellExecuteW returns at once and
-// cmd.exe shows no window with SW_HIDE; the output and exit code go
-// through files that result() reads once the run is over. Not WScript.Shell's
-// Run: PinballY's COM bridge does not offer it ("Object doesn't support
-// property or method 'Run'" on the cabinet).
-function createProgramRunner(files) {
-    let runFolder = null;
-    // Bound on the first run, then kept.
+// The pack's folder under the user's temporary folder, created when missing.
+function preparePackTemporaryFolder(files) {
+    const fso = createAutomationObject("Scripting.FileSystemObject");
+    const folder = `${fso.GetSpecialFolder(TEMPORARY_FOLDER).Path}\\${PACK_TEMPORARY_FOLDER_NAME}`;
+    files.createFolder(folder);
+    return folder;
+}
+
+// Starts a program hidden, without waiting: ShellExecuteW returns at once.
+// Not WScript.Shell's Run: PinballY's COM bridge does not offer it ("Object
+// doesn't support property or method 'Run'" on the cabinet).
+function createHiddenStarter() {
+    // Bound on the first start, then kept.
     let shell32 = null;
+    // what: the program as the error names it.
+    return (program, parameters, what = program) => {
+        if (!shell32) {
+            shell32 = dllImport.bind("Shell32.dll", `
+                HINSTANCE WINAPI ShellExecuteW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile, LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd);
+            `);
+        }
+        const instance = shell32.ShellExecuteW(null, "open", program, parameters, null, SW_HIDE).toNumber();
+        if (instance <= SHELL_EXECUTE_MAX_ERROR) throw new Error(`ShellExecuteW could not start ${what} (error ${instance}).`);
+    };
+}
+
+// Runs programs hidden through cmd.exe, which shows no window with
+// SW_HIDE; the output and exit code go through files that result() reads
+// once the run is over.
+function createProgramRunner(files, startHidden) {
+    let runFolder = null;
 
     function prepareRunFolder() {
         if (runFolder) return runFolder;
-        const fso = createAutomationObject("Scripting.FileSystemObject");
-        const folder = `${fso.GetSpecialFolder(TEMPORARY_FOLDER).Path}\\${RUN_FOLDER_NAME}`;
-        files.createFolder(folder);
+        const folder = preparePackTemporaryFolder(files);
         // In ANSI through FileSystemObject: the UTF-8 byte order mark
         // ADODB.Stream writes would break the script's first line.
-        const wrapper = fso.CreateTextFile(`${folder}\\run.cmd`, true, false);
+        const wrapper = createAutomationObject("Scripting.FileSystemObject").CreateTextFile(`${folder}\\run.cmd`, true, false);
         try {
             wrapper.Write(RUN_WRAPPER);
         } finally {
@@ -225,14 +250,8 @@ function createProgramRunner(files) {
         const outputPath = `${basePath}.out`;
         const codePath = `${basePath}.code`;
         const quoted = [`${folder}\\run.cmd`, outputPath, codePath, programPath, ...args].map(text => `"${text}"`).join(" ");
-        if (!shell32) {
-            shell32 = dllImport.bind("Shell32.dll", `
-                HINSTANCE WINAPI ShellExecuteW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile, LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd);
-            `);
-        }
         // cmd.exe strips the outer quotes and keeps each quoted argument.
-        const instance = shell32.ShellExecuteW(null, "open", "cmd.exe", `/d /c "${quoted}"`, null, SW_HIDE).toNumber();
-        if (instance <= SHELL_EXECUTE_MAX_ERROR) throw new Error(`ShellExecuteW could not start cmd.exe for ${programPath} (error ${instance}).`);
+        startHidden("cmd.exe", `/d /c "${quoted}"`, `cmd.exe for ${programPath}`);
 
         let result = null;
         return {
@@ -249,6 +268,44 @@ function createProgramRunner(files) {
                 return result;
             },
         };
+    };
+}
+
+// Restarts PinballY through tools\restart_pinbally.ps1, started hidden as
+// PinballY's own child, which outlives its Quit (no WMI needed, as tried on
+// the cabinet). The helper reads PinballY's command line while it is alive,
+// so Quit runs only once its ready file exists; onFailed after 15 s without it
+// (docs/adr/0017).
+function createRestarter(files, startHidden) {
+    // Bound on the first restart, then kept.
+    let kernel32 = null;
+    return ({ onQuitting, onFailed }) => {
+        const folder = preparePackTemporaryFolder(files);
+        const readyPath = `${folder}\\restart-ready`;
+        // Left by an earlier restart that never quit.
+        if (files.fileExists(readyPath)) files.deleteFile(readyPath);
+        if (!kernel32) kernel32 = dllImport.bind("Kernel32.dll", "DWORD WINAPI GetCurrentProcessId();");
+        const helperPath = `${projectFolderOf(systemInfo.programDir)}\\tools\\${RESTART_HELPER_NAME}`;
+        startHidden("powershell.exe", `-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "${helperPath}"`
+            + ` -ParentPid ${Number(kernel32.GetCurrentProcessId())} -ReadyFile "${readyPath}" -LogFile "${folder}\\restart.log"`);
+        let waitedMs = 0;
+        const poll = setInterval(() => {
+            waitedMs += RESTART_POLL_MS;
+            try {
+                if (files.fileExists(readyPath)) {
+                    clearInterval(poll);
+                    onQuitting();
+                    mainWindow.doCommand(command.Quit);
+                } else if (waitedMs >= RESTART_READY_TIMEOUT_MS) {
+                    clearInterval(poll);
+                    onFailed(new Error(`The restart helper was not ready after ${RESTART_READY_TIMEOUT_MS / 1000} s.`));
+                }
+            } catch (error) {
+                // A poll that fails would fail again every 200 ms.
+                clearInterval(poll);
+                onFailed(error);
+            }
+        }, RESTART_POLL_MS);
     };
 }
 
@@ -269,6 +326,7 @@ export function createPinballYHost() {
     // Bound on the first monitor count, then kept.
     let user32 = null;
     const files = createFileSystem();
+    const startHidden = createHiddenStarter();
 
     return {
         settings: {
@@ -421,7 +479,11 @@ export function createPinballYHost() {
         // Runs the program hidden, without waiting; returns { result() },
         // null while it runs, then { exitCode, output } (its standard output;
         // its standard error is dropped). At most MAX_PROGRAM_ARGS arguments.
-        runHiddenProgram: createProgramRunner(files),
+        runHiddenProgram: createProgramRunner(files, startHidden),
+        // Quits PinballY for a helper to start it again, as it was started;
+        // onQuitting() runs right before Quit, onFailed(error) instead when
+        // the helper cannot get ready, PinballY then staying open.
+        restartPinballY: createRestarter(files, startHidden),
         // A registry value by its full path ("HKCU\\Software\\...\\name");
         // null when it is missing.
         readRegistryValue: (path) => {

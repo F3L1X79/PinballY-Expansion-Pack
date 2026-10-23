@@ -6,7 +6,8 @@
 // the Language page, saving at once. Listens to "menuopen" and "command"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
-// - Nothing applies before PinballY restarts: "on restart" compares the saved and running values.
+// - Nothing applies before PinballY restarts: "on restart" marks a saved value that differs from the running one.
+// - Leaving the list with such a value asks Restart now (host.restartPinballY) or Later; attract mode never asks.
 // ============================================================
 
 import lang from "../core/i18n.js";
@@ -17,7 +18,7 @@ import { createPinballYHost } from "../core/pinbally_host.js";
 import { getProfileStore } from "../profiles/profile_store.js";
 import { seesSetupEntries } from "../profiles/setup_entries.js";
 import { getDrawnMenus, getPackMenus } from "../drawn_menu/drawn_menu.js";
-import { getWheelDialogs } from "../core/wheel_dialog.js";
+import { DIALOG_PRIORITY, getWheelDialogs } from "../core/wheel_dialog.js";
 import { ADD_ON_GROUPS } from "./add_on_catalogue.js";
 import { rewriteEnvLine } from "./env_local_rewrite.js";
 
@@ -27,6 +28,8 @@ const LIST_MENU_ID = "expansionPackSettings";
 const PAGE_MENU_ID = "expansionPackSettingsPage";
 const LANGUAGE_MENU_ID = "expansionPackSettingsLanguage";
 const NOT_SAVED_MENU_ID = "expansionPackSettingsNotSaved";
+const RESTART_MENU_ID = "expansionPackSettingsRestart";
+const RESTART_FAILED_MENU_ID = "expansionPackSettingsRestartFailed";
 const SEPARATOR = { cmd: -1 };
 
 // getMenus: what shows the screens, asked on each opening
@@ -48,6 +51,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const languageOfCommand = new Map([...languageCommands].map(([code, cmd]) => [cmd, code]));
     const switchCommand = host.allocateCommand("expansionPackSettings_switch");
     const saveCommand = host.allocateCommand("expansionPackSettings_save");
+    const restartCommand = host.allocateCommand("expansionPackSettings_restart");
     const envLocalPath = `${host.getProjectFolder()}\\.env.local`;
     // The page on screen: its Add-on, the choice saved when it opened, and the switch.
     let page = null;
@@ -65,6 +69,9 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
 
     const stateOf = value => (value ? TEXT.on : TEXT.off);
 
+    const addOnDiffers = (saved, key) => saved.addOns[key] !== running.addOns[key];
+    const languageDiffers = saved => languageCodeOf(saved.language) !== languageCodeOf(running.language);
+
     function openList(selectedCmd = null) {
         page = null;
         const saved = readSaved();
@@ -73,19 +80,58 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
             items.push({ title: TEXT.groups[group], cmd: -1 });
             for (const key of addOns) {
                 const state = stateOf(saved.addOns[key]);
-                const shownState = saved.addOns[key] === running.addOns[key] ? state : TEXT.onRestart(state);
+                const shownState = addOnDiffers(saved, key) ? TEXT.onRestart(state) : state;
                 items.push({ title: TEXT.addOnLine(TEXT.addOns[key].name, shownState), cmd: addOnCommands.get(key) });
             }
         }
         const languageName = languageNameOf(saved.language);
-        const shownLanguage = languageCodeOf(saved.language) === languageCodeOf(running.language) ? languageName : TEXT.onRestart(languageName);
+        const shownLanguage = languageDiffers(saved) ? TEXT.onRestart(languageName) : languageName;
         items.push(
             SEPARATOR,
             { title: TEXT.languageLine(shownLanguage), cmd: languageCommand },
             SEPARATOR,
             { title: TEXT.back, cmd: menuReturnCommand },
         );
-        getMenus().show(LIST_MENU_ID, items, { selectedCmd, onBack: () => host.doCommand(operatorMenuCommand) });
+        getMenus().show(LIST_MENU_ID, items, { selectedCmd, onBack: leaveList });
+    }
+
+    const returnToOperatorMenu = () => host.doCommand(operatorMenuCommand);
+
+    // Back or Exit on the list: at once when nothing saved differs from what
+    // runs; otherwise Restart now or Later, Exit leaving as Later does.
+    function leaveList() {
+        const saved = readSaved();
+        if (!languageDiffers(saved) && ![...addOnCommands.keys()].some(key => addOnDiffers(saved, key))) {
+            returnToOperatorMenu();
+            return;
+        }
+        getMenus().show(RESTART_MENU_ID, [
+            { title: TEXT.restartQuestion, cmd: -1 },
+            SEPARATOR,
+            { title: TEXT.restartNow, cmd: restartCommand },
+            { title: TEXT.later, cmd: menuReturnCommand },
+        ], { dialogStyle: true, onBack: returnToOperatorMenu });
+    }
+
+    // Shown once the wheel is free: the failure comes up to 15 s after the
+    // screens closed.
+    const restartFailed = safeHandler(SCRIPT_NAME, error => {
+        host.log(`[${SCRIPT_NAME}] ERROR Restart not possible: ${error.message}`);
+        getWheelDialogs().submit({
+            id: RESTART_FAILED_MENU_ID, message: TEXT.restartFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.RESTART_FAILED,
+        });
+    });
+
+    function restart() {
+        host.log(`[${SCRIPT_NAME}] Restart asked.`);
+        try {
+            host.restartPinballY({
+                onQuitting: safeHandler(SCRIPT_NAME, () => host.log(`[${SCRIPT_NAME}] Restart helper ready, quitting.`)),
+                onFailed: restartFailed,
+            });
+        } catch (error) {
+            restartFailed(error);
+        }
     }
 
     // Back, Exit, Cancel and Save all return to the list on the page's line.
@@ -171,6 +217,8 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
             showPage();
         } else if (ev.id === saveCommand && page) {
             saveAddOn();
+        } else if (ev.id === restartCommand) {
+            restart();
         }
     }));
 }

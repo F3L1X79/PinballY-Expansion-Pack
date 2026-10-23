@@ -640,6 +640,11 @@ export default {
         cancel: "Cancel",
         notSaved: "Setting not saved",
         ok: "OK",
+        // On leaving the list while a saved setting differs from the running one.
+        restartQuestion: "The saved settings apply when PinballY restarts.",
+        restartNow: "Restart now",
+        later: "Later",
+        restartFailed: "Restart not possible: the settings will apply at the next start",
         // Each Add-on by its config.addOns key: its name, what it does, and
         // what is lost elsewhere when it is off (the "false also" lines of .env.example).
         addOns: {

@@ -84,8 +84,10 @@ test("without .env.local, the list shows the defaults, Menu Cleanup off", () => 
     assert.equal(highlightedEntry(fake), `Profile picker: ${ON}`, "the cursor skips the heading");
 });
 
-test("Exit goes back to the Operator Menu", () => {
+test("Exit goes back to the Operator Menu, past the restart question", () => {
     press(fake, "Exit");
+    fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Later");
     fake.advanceTime(OPEN_OVER_MS);
 
     assert.ok(drawnMenuLines(fake).includes("PinballY Options"));
@@ -99,6 +101,8 @@ test("the list shows .env.local as saved, read again on each opening", () => {
     openList();
     assert.deepEqual(wholeList(), listLines({ achievements: "Off", language: "Deutsch (on restart)" }));
     chooseEntry(fake, "Back");
+    fake.advanceTime(OPEN_OVER_MS);
+    chooseEntry(fake, "Later");
     assert.ok(drawnMenuLines(fake).includes("PinballY Options"), "Back goes back to the Operator Menu too");
     press(fake, "Exit");
 

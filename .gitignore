@@ -33,8 +33,9 @@ profiles/guest/*
 # The quiet wheel's original table volume, kept while it is lowered
 quiet_wheel_pending.json
 
-# vpxtool, installed by each owner (see the README)
-tools/
+# vpxtool, installed by each owner (see the README); the pack's own restart helper is shipped
+tools/*
+!tools/restart_pinbally.ps1
 
 # Personal sounds, not published (see .env.example)
 assets/sounds/local/

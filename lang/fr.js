@@ -729,6 +729,10 @@ export default {
         cancel: "Annuler",
         notSaved: "Réglage non enregistré",
         ok: "OK",
+        restartQuestion: "Les réglages enregistrés s'appliquent au redémarrage de PinballY.",
+        restartNow: "Redémarrer maintenant",
+        later: "Plus tard",
+        restartFailed: "Redémarrage impossible : les réglages s'appliqueront au prochain démarrage",
         addOns: {
             profilePicker: {
                 name: "Choix du joueur",

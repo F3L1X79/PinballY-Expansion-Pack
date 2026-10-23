@@ -1,8 +1,8 @@
 // ============================================================
 // The Expansion Pack Settings in French through main.js: "Réglages du pack"
 // in the Operator Menu, the list's headings, Add-ons and states, the
-// language line in the saved language's own name, an Add-on's page and the
-// Language page.
+// language line in the saved language's own name, the restart question on
+// leaving, an Add-on's page and the Language page.
 // ============================================================
 
 import { test } from "node:test";
@@ -36,7 +36,11 @@ test("the list speaks French", async () => {
     chooseEntry(fake, "Langue : Español au redémarrage", "Next");
     assert.equal(highlightedEntry(fake), "Retour", "the language line comes before Retour");
     press(fake, "Select");
-    assert.ok(drawnMenuLines(fake).includes("Réglages du pack"), "Retour goes back to the Operator Menu");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.equal(readDrawnMenu(fake).message, "Les réglages enregistrés s'appliquent au redémarrage de PinballY.");
+    assert.deepEqual(drawnMenuLines(fake), ["Redémarrer maintenant", "Plus tard"]);
+    chooseEntry(fake, "Plus tard");
+    assert.ok(drawnMenuLines(fake).includes("Réglages du pack"), "Plus tard goes back to the Operator Menu");
 
     chooseEntry(fake, "Réglages du pack");
     fake.advanceTime(OPEN_OVER_MS);

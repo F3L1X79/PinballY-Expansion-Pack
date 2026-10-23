@@ -1,7 +1,7 @@
 // ============================================================
 // The Expansion Pack Settings through main.js with every Add-on off, Drawn
 // Menus included: a wheel dialog submitted while the drawn list is open
-// waits for it to close, and for the Operator Menu it goes back to.
+// waits for it to close, the restart question, and the Operator Menu it goes back to.
 // ============================================================
 
 import { test } from "node:test";
@@ -32,6 +32,9 @@ test("a wheel dialog waits for the drawn list, even with Drawn Menus off", async
     assert.equal(fake.currentMenu(), null, "the dialog waits for the list");
     assert.ok(isDrawnMenuShown(fake));
 
+    press(fake, "Exit");
+    await settle();
+    assert.equal(fake.currentMenu(), null, "then for the restart question");
     press(fake, "Exit");
     await settle();
     assert.equal(fake.currentMenu().id, "operator", "then for the Operator Menu");
