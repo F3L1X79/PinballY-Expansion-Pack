@@ -12,6 +12,8 @@ export const OPEN_OVER_MS = 300;
 export const GLIDE_OVER_MS = 400;
 
 const { colors: COLORS } = DRAWN_MENU_LOOK;
+// A semibold weight or more reads as bold.
+const BOLD_WEIGHT = 600;
 const MARK_NAMES = new Map(Object.entries(DRAWN_MENU_MARKS).map(([name, glyph]) => [glyph, name]));
 
 const textsLayer = fake => shownLayers(fake, DRAWN_MENU_Z_INDEX.texts).find(layer => layer.texts().length > 0) || null;
@@ -23,7 +25,7 @@ export const isAnythingDrawn = fake => fake.drawingLayers()
     .some(layer => Object.values(DRAWN_MENU_Z_INDEX).includes(layer.zIndex) && layer.alpha > 0);
 
 // The message above the list (null when none; its wrapped lines joined
-// as drawn, without the spaces between them) and the rows from top to
+// as drawn, without the spaces between them), its parts drawn bold, trimmed, and the rows from top to
 // bottom: { kind: "entry", title, mark } (mark: "check", "radio",
 // "submenu" or null), { kind: "heading", title } or { kind: "separator" };
 // and the footer under the list ({ label, name }, null when none).
@@ -31,6 +33,7 @@ export function readDrawnMenu(fake) {
     const layer = textsLayer(fake);
     if (!layer) throw new Error("No Drawn Menu is shown.");
     let message = null;
+    const messageBold = [];
     let footer = null;
     const rows = [];
     let inSeparator = false;
@@ -54,12 +57,15 @@ export function readDrawnMenu(fake) {
         }
         inSeparator = false;
         if (!("text" in stroke)) continue;
-        if (stroke.color === COLORS.message && rows.length === 0) message = message === null ? stroke.text : `${message}${stroke.text}`;
+        if (stroke.color === COLORS.message && rows.length === 0) {
+            message = message === null ? stroke.text : `${message}${stroke.text}`;
+            if (stroke.weight >= BOLD_WEIGHT) messageBold.push(stroke.text.trim());
+        }
         else if (stroke.color === COLORS.heading) rows.push({ kind: "heading", title: stroke.text });
         else if (stroke.color === COLORS.gold) rows.at(-1).mark = MARK_NAMES.get(stroke.text);
         else rows.push({ kind: "entry", title: stroke.text, mark: null });
     }
-    return { message, rows, footer };
+    return { message, messageBold, rows, footer };
 }
 
 // A message as readDrawnMenu gives it, to compare with its full text.

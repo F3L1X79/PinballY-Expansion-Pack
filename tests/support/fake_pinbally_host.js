@@ -165,8 +165,10 @@ class FakeStyledText {
     draw(dc, rect) {
         const baseColor = this.options.textStyle && this.options.textStyle.color;
         const baseSize = this.options.textStyle && this.options.textStyle.size;
+        const baseWeight = this.options.textStyle && this.options.textStyle.weight;
         for (const run of this.runs) {
-            dc.drawText(run.text.replace(/\n$/, ""), rect, run.color === undefined ? baseColor : run.color, run.size === undefined ? baseSize : run.size);
+            dc.drawText(run.text.replace(/\n$/, ""), rect, run.color === undefined ? baseColor : run.color,
+                run.size === undefined ? baseSize : run.size, run.weight === undefined ? baseWeight : run.weight);
         }
     }
 }
@@ -551,10 +553,10 @@ export function createFakePinballYHost({
                 if (!isImageReadable(path)) throw new Error(`Cannot load image: ${path}`);
                 return { width: 256, height: 256 };
             },
-            // size: the StyledText's, in points as PinballY takes it.
-            drawText: (text, rect, color, size) => {
+            // size: the StyledText's, in points as PinballY takes it; weight: its run's.
+            drawText: (text, rect, color, size, weight) => {
                 texts.push(text);
-                strokes.push({ text, rect: rect && { ...rect }, color, size });
+                strokes.push({ text, rect: rect && { ...rect }, color, size, weight });
             },
         };
         // A draw, a clear or a loaded image starts from an empty layer.

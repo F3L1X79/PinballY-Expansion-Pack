@@ -634,8 +634,9 @@ export default {
         },
         // A saved state that differs from the running one.
         onRestart: (state) => `${state} (on restart)`,
-        // An Add-on's page: what it does, then what else is lost when it is off.
-        pageMessage: (whenOn, whenOff) => `When on: ${whenOn} When off: ${whenOff}`,
+        // An Add-on's page, in bold before what it does, then on its own line before what else is lost when it is off.
+        whenOnLabel: "On:",
+        whenOffLabel: "Off:",
         save: "Save",
         cancel: "Cancel",
         notSaved: "Setting not saved",

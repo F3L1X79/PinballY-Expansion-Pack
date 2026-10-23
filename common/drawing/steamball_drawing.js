@@ -17,9 +17,15 @@ export const UNBOUNDED = 100000;
 export const DIMMED_WHEEL = 0xD0080A0E;
 
 // Wraps within width, centred in height when given.
+// str: a string, or runs (strings and StyledText descriptors such as
+// { text, weight }) whose own style overrides the base one.
+export function addStyledText(styled, str) {
+    for (const run of Array.isArray(str) ? str : [str]) styled.add(run);
+}
+
 export function text(host, dc, str, { x, y, width, height, size, weight = 400, color = COLORS.title, font = FONTS.body, align = "left" }) {
     const styled = host.createStyledText({ textAlign: align, textStyle: { font, size, weight, color } });
-    styled.add(str);
+    addStyledText(styled, str);
     const measured = styled.measure(width).height;
     const top = height === undefined ? y : y + (height - measured) / 2;
     styled.draw(dc, { x, y: top, width, height: measured });

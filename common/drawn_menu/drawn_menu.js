@@ -18,6 +18,7 @@ import config from "../core/config.js";
 import { getDrawingAhead } from "../core/drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "../core/navigation_sound.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER } from "./drawn_menu_images.js";
+import { addStyledText } from "../drawing/steamball_drawing.js";
 import {
     DRAWN_MENU_Z_INDEX, DRAWN_MENU_LOOK, ROW_KIND, pointsOf, computeGeometry, menuScaleOf, drawTexts, drawSelectedText, drawBackdrop, selectionSize,
 } from "./drawn_menu_painter.js";
@@ -45,6 +46,9 @@ const copyItem = item => ({
     radio: Boolean(item.radio),
     hasSubmenu: Boolean(item.hasSubmenu),
     stayOpen: Boolean(item.stayOpen),
+    // The pack's own: a dialog message's styled runs, drawn instead of its
+    // title, which a native menu shows as plain text.
+    runs: Array.isArray(item.runs) ? item.runs.map(run => (typeof run === "string" ? run : { ...run })) : null,
 });
 
 const markNameOf = item => {
@@ -54,7 +58,7 @@ const markNameOf = item => {
 };
 
 // What the menu shows: its message (dialogs only: the first static
-// item), its rows, the cursor on the selected entry, and its footer
+// item, its runs or its title), its rows, the cursor on the selected entry, and its footer
 // ({ label, name } or null); null when it has no entry to choose.
 export function buildMenuModel(items, { dialogStyle = false, pagingCommands = [], footer = null } = {}) {
     let message = null;
@@ -64,7 +68,7 @@ export function buildMenuModel(items, { dialogStyle = false, pagingCommands = []
         if (item.cmd >= 0) {
             rows.push({ kind: ROW_KIND.ENTRY, title: item.title, cmd: item.cmd, mark: markNameOf(item), stayOpen: item.stayOpen, selected: item.selected });
         } else if (item.title !== "" && dialogStyle && message === null && rows.length === 0) {
-            message = item.title;
+            message = item.runs || item.title;
         } else if (item.title !== "") {
             rows.push({ kind: ROW_KIND.HEADING, title: item.title });
         } else if (rows.length > 0 && rows[rows.length - 1].kind !== ROW_KIND.SEPARATOR) {
@@ -221,10 +225,10 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         return [top.layer, middle.layer, bottom.layer];
     }
 
-    // A text wrapped in width; sizePx: in pixels, as the painter's look gives it.
+    // A text (a string or runs) wrapped in width; sizePx: in pixels, as the painter's look gives it.
     function wrappedHeightAt(str, width, { font, sizePx, weight }) {
         const styled = host.createStyledText({ textAlign: "center", textStyle: { font, size: pointsOf(sizePx), weight } });
-        styled.add(str);
+        addStyledText(styled, str);
         return styled.measure(width).height;
     }
 

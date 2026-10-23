@@ -53,8 +53,9 @@ test("the list speaks French", async () => {
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Choix du joueur : Désactivé");
     fake.advanceTime(OPEN_OVER_MS);
-    assert.ok(squeezed(readDrawnMenu(fake).message).startsWith(squeezed("Quand il est activé : « Changer de joueur » dans le menu principal")));
-    assert.ok(squeezed(readDrawnMenu(fake).message).includes(squeezed("Quand il est désactivé : Les parties d'Invité comptent")));
+    assert.ok(squeezed(readDrawnMenu(fake).message).startsWith(squeezed("Activé : « Changer de joueur » dans le menu principal")));
+    assert.ok(readDrawnMenu(fake).message.includes("\nDésactivé : Les parties d'Invité comptent"));
+    assert.deepEqual(readDrawnMenu(fake).messageBold, ["Activé :", "Désactivé :"]);
     press(fake, "Select");
     assert.deepEqual(drawnMenuLines(fake), ["Choix du joueur : Activé", "Enregistrer", "Annuler"]);
     chooseEntry(fake, "Enregistrer");

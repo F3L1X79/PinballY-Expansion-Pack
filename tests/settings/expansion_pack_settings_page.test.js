@@ -52,8 +52,10 @@ test("an Add-on's page says what it does, what else is lost, and offers its swit
     openCategory("Players and progress");
     openPage("Achievements: On");
 
-    const { message } = readDrawnMenu(fake);
-    assert.equal(squeezed(message), squeezed("When on: Achievements earned while playing, each announced by a toast. When off: No Player Level shown anywhere."));
+    const { message, messageBold } = readDrawnMenu(fake);
+    assert.equal(squeezed(message), squeezed("On: Achievements earned while playing, each announced by a toast. Off: No Player Level shown anywhere."));
+    assert.match(message, /toast\.\nOff: /, "Off starts a line of its own");
+    assert.deepEqual(messageBold, ["On:", "Off:"]);
     assert.deepEqual(drawnMenuLines(fake), ["Achievements: On", "Cancel"]);
     assert.equal(highlightedEntry(fake), "Achievements: On");
 });

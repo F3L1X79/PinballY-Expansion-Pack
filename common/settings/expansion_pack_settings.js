@@ -38,6 +38,7 @@ const SEPARATOR = { cmd: -1 };
 // Just under the Drawn Menus, which the failure message may show over them.
 const RESTART_VEIL_Z_INDEX = DRAWN_MENU_Z_INDEX.backdrop - 2;
 const RESTART_LOADER_Z_INDEX = DRAWN_MENU_Z_INDEX.backdrop - 1;
+const BOLD_WEIGHT = 700;
 
 // getMenus: what shows the screens, asked on each opening
 // (common/drawn_menu/drawn_menu.js); running: the configuration loaded at startup.
@@ -177,11 +178,18 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     // Back, Exit, Cancel and Save all return to the category on the page's line.
     const backToCategory = key => openCategory(groupOfAddOn.get(key), addOnCommands.get(key));
 
+    // Drawn with each label in bold, "When off" on a line of its own; the
+    // plain title is what a native menu shows instead.
+    const pageMessageRuns = (whenOn, whenOff) => [
+        { text: `${TEXT.whenOnLabel} `, weight: BOLD_WEIGHT }, whenOn,
+        { text: `\n${TEXT.whenOffLabel} `, weight: BOLD_WEIGHT }, whenOff,
+    ];
+
     function showPage() {
         const { key, saved, value } = page;
         const { name, whenOn, whenOff } = TEXT.addOns[key];
         getMenus().show(PAGE_MENU_ID, [
-            { title: TEXT.pageMessage(whenOn, whenOff), cmd: -1 },
+            { title: `${TEXT.whenOnLabel} ${whenOn} ${TEXT.whenOffLabel} ${whenOff}`, runs: pageMessageRuns(whenOn, whenOff), cmd: -1 },
             SEPARATOR,
             // Stays open: the page is shown again over itself, the cursor kept.
             { title: TEXT.addOnLine(name, stateOf(value)), cmd: switchCommand, stayOpen: true },
