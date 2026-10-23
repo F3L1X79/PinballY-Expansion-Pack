@@ -37,7 +37,8 @@ const panelAlphas = () => layersAt(DRAWN_MENU_Z_INDEX.panel).map(layer => layer.
 const outline = () => layersAt(DRAWN_MENU_Z_INDEX.selection)[0];
 const anythingDrawn = () => isAnythingDrawn(fake);
 const runCount = cmd => fake.executedCommands().filter(id => id === cmd).length;
-const openedLogCount = () => fake.logLines().filter(line => line.startsWith(`[DrawnMenus] "${PAUSE_MENU_ID}" opened in`)).length;
+// Drawn on each opening and each move of the cursor.
+const selectionDrawCount = () => fake.drawings().filter(drawing => drawing.zIndex === DRAWN_MENU_Z_INDEX.selectedText).length;
 
 test("setup", async () => {
     // Never uninstalled: node --test runs each test file in its own process.
@@ -167,14 +168,15 @@ test("a native menuclose from any cause closes the drawn pause menu, cover inclu
 });
 
 test("the double native opening is drawn once and the menu closes with the last native one", () => {
-    const openedBefore = openedLogCount();
+    const drawnBefore = selectionDrawCount();
     openPauseMenu(fake);
 
-    assert.equal(openedLogCount(), openedBefore + 1, "drawn once, its opening time logged");
+    assert.equal(selectionDrawCount(), drawnBefore + 1, "drawn once");
     assert.ok(isDrawnMenuShown(fake), "the first opening's close leaves it open");
     press(fake, "Next");
+    const drawnAfterMove = selectionDrawCount();
     fake.openMenu(PAUSE_MENU_ID, fake.currentMenu().items);
-    assert.equal(openedLogCount(), openedBefore + 1, "not drawn again");
+    assert.equal(selectionDrawCount(), drawnAfterMove, "not drawn again");
     assert.equal(highlightedEntry(fake), "End Game", "the cursor kept");
     assert.ok(panelAlphas().every(alpha => alpha === 1), "no second fade");
 

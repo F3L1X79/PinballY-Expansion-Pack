@@ -315,32 +315,19 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         shown.scroll = Math.max(0, Math.min(Math.max(0, geometry.rowsHeight - geometry.areaHeight), scroll));
     }
 
-    // Returns how long each part took, in ms, for the log. covering: an
-    // opaque backdrop, shown at once, over a native menu kept open.
+    // covering: an opaque backdrop, shown at once, over a native menu kept open.
     function open(id, model, onClose, { fadeIn, covering }) {
-        const timings = {};
-        let partStartMs = host.now().getTime();
-        const lap = name => {
-            const nowMs = host.now().getTime();
-            timings[name] = nowMs - partStartMs;
-            partStartMs = nowMs;
-        };
         for (const sound of Object.values(sounds)) sound.load();
-        lap("sounds");
         measure(covering);
-        lap("measure");
         // PinballY tells no script of a new window size: only this measure
         // sees it, so the images drawn for the old size are drawn again here.
         for (const record of images) if (record.signature !== windowSignature()) drawImage(record);
-        lap("images");
-        shown = { id, model, onClose, geometry: null, scroll: 0, layers: [], fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
+        shown ={ id, model, onClose, geometry: null, scroll: 0, layers: [], fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
         shown.geometry = computeGeometry(windowSize, model, wrappedHeightAt);
         const { geometry } = shown;
         scrollToSelected();
         drawTextsLayer();
-        lap("texts");
         drawSelectedTextLayer();
-        lap("selection");
         placeSelectedText();
         placeOutline(selectedCenterY());
         backdrop.setScale({ xSpan: 1, ySpan: 1 });
@@ -355,12 +342,11 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         else shown.layers.unshift(backdrop);
         if (!fadeIn) {
             setAlpha(1);
-            return timings;
+            return;
         }
         setAlpha(0);
         shown.fadeStartMs = host.now().getTime();
         shown.fadeTimer = host.setInterval(safeHandler(SCRIPT_NAME, fadeStep), FRAME_MS);
-        return timings;
     }
 
     // Hides the menu without reporting its close; returns its onClose.
@@ -394,7 +380,6 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // cancelled), hidden by an opaque cover: Exit and a MenuReturn entry run
     // exitCmd, and the menu closes on that native menu's "menuclose".
     function draw(id, items, { dialogStyle = false, onClose = null, onBack = null, selectedCmd = null, footer = null, keepNative = null } = {}) {
-        const startMs = host.now().getTime();
         // PinballY opening the kept native menu again over itself (the pause
         // menu opens twice in a row): no redraw, the cursor kept.
         if (keepNative && shown && shown.keepNative && shown.id === id) {
@@ -413,15 +398,13 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             if (kept !== undefined && !model.entries.some(index => model.rows[index].selected)) model.selected = kept;
             const chosen = model.entries.find(index => model.rows[index].cmd === selectedCmd);
             if (selectedCmd !== null && chosen !== undefined) model.selected = chosen;
-            const timings = open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})), { fadeIn: refreshedCmd === null, covering: Boolean(keepNative) });
+            open(id, model, safeHandler(SCRIPT_NAME, onClose || (() => {})), { fadeIn: refreshedCmd === null, covering: Boolean(keepNative) });
             shown.onBack = onBack;
             shown.keepNative = keepNative;
             // The native menu's openings not closed yet; the panel hidden
             // once a command ran, the cover left until the last one closes.
             shown.nativeOpenings = 1;
             shown.panelHidden = false;
-            const parts = Object.entries(timings).map(([name, ms]) => `${name} ${ms}`).join(", ");
-            host.log(`[${SCRIPT_NAME}] "${id}" opened in ${host.now().getTime() - startMs} ms (${model.entries.length} entries; ${parts}).`);
             return true;
         } catch (error) {
             takeDown();

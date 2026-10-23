@@ -91,6 +91,7 @@ Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son ra
 - **Profil enfant** : une roue sans tables pour adultes.
 - **Réinitialiser un profil** : repartir de zéro, pour un Profil ou toute la maison d'un coup.
 - **Nettoyage des menus** : des menus PinballY allégés.
+- **Réglages du pack** : depuis le menu opérateur, activer ou désactiver chaque Add-on par catégorie, choisir l'écran de démarrage et la langue, puis redémarrer PinballY d'une pression.
 
 Tout tient dans un seul dossier, sans modifier PinballY.
 
@@ -112,7 +113,7 @@ Voici ce que nous envisageons pour la suite du pack. Rien n'est promis : les pro
 - **Thèmes** : d'autres styles que Steamball pour tous les écrans dessinés, avec un petit éditeur pour créer le vôtre.
 - **Notes et favoris propres à chaque Profil**, puis la note moyenne de la maison pour chaque table.
 - **Installation en 30 secondes et mises à jour**, sans git.
-- **La langue choisie depuis un menu**, et les textes récents traduits en allemand, espagnol, italien et portugais.
+- **Les textes récents traduits** en allemand, espagnol, italien et portugais.
 
 ## Installation
 
@@ -133,7 +134,7 @@ Tout ce que le pack conserve reste dans `Scripts\ExpansionPack` : vos réglages 
 
 ## Réglages
 
-Les réglages se trouvent dans `Scripts\ExpansionPack\.env.local`, un `CLÉ=valeur` par ligne. N'écrivez que ceux que vous changez, par exemple :
+Les réglages se trouvent dans `Scripts\ExpansionPack\.env.local`, un `CLÉ=valeur` par ligne. Les Add-ons, l'écran de démarrage et la langue se règlent aussi sans l'éditer, depuis **Réglages du pack** dans le menu opérateur. N'écrivez que ceux que vous changez, par exemple :
 
 ```
 LANGUAGE=fr

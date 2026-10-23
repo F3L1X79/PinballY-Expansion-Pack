@@ -1,7 +1,7 @@
 // ============================================================
 // How a Drawn Menu is drawn, through main.js: images drawn ahead while idle
 // and only placed on opening, hidden layers shrunk to a dot, texts redrawn
-// only when changed, opening time logged, native fallback on failure.
+// only when changed, native fallback on failure.
 // ============================================================
 
 import { test } from "node:test";
@@ -51,10 +51,6 @@ test("the painted images are drawn ahead while the wheel sits idle, then only pl
     for (const file of IMAGE_FILES.filter(path => !path.endsWith("_middle.png"))) {
         assert.ok(shownImages.includes(file), `${file} shown`);
     }
-});
-
-test("the opening's time is logged", () => {
-    assert.ok(fake.logLines().some(line => /^\[DrawnMenus\] "main" opened in \d+ ms/.test(line)), fake.logLines().join("\n"));
 });
 
 test("closed, every layer is hidden and shrunk to a dot again", () => {

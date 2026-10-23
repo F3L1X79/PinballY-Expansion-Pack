@@ -68,6 +68,7 @@ PinballY's own menus and messages in French, German, Spanish, Italian or Portugu
 - **Child Profile**: a wheel without Adult Tables for the kids.
 - **Profile Reset**: start a Profile over, or the whole household at once.
 - **Menu Cleanup**: leaner PinballY menus.
+- **Expansion Pack Settings**: from the Operator Menu, turn each Add-on on or off by category, pick the startup screen and the language, then restart PinballY in one press.
 
 Everything stays in one folder, with no change to PinballY itself.
 
@@ -89,7 +90,7 @@ Here is what we are thinking about for the pack's future. Nothing is promised: p
 - **Themes**: other looks than Steamball for every drawn screen, with a small editor to make your own.
 - **Ratings and favourites for each Profile**, then the household's average rating of each table.
 - **Install in 30 seconds and updates**, without git.
-- **The language picked from a menu**, and the latest texts translated into German, Spanish, Italian and Portuguese.
+- **The latest texts translated** into German, Spanish, Italian and Portuguese.
 
 ## Install
 
@@ -110,7 +111,7 @@ Everything the pack keeps stays in `Scripts\ExpansionPack`: your settings (`.env
 
 ## Settings
 
-Settings live in `Scripts\ExpansionPack\.env.local`, one `KEY=value` per line. Only write the ones you change, for example:
+Settings live in `Scripts\ExpansionPack\.env.local`, one `KEY=value` per line. The Add-ons, the startup screen and the language can also be set without editing it, from **Expansion Pack Settings** in the Operator Menu. Only write the ones you change, for example:
 
 ```
 LANGUAGE=en
