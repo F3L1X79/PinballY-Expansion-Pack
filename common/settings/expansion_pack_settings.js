@@ -3,7 +3,7 @@
 // PinballY's Options, for whoever sees the setup entries; it opens the list
 // of every Add-on and the language, as saved in .env.local (read again on
 // each opening), one page per Add-on whose Save rewrites its one line, and
-// the Language page, saving at once. Listens to "menuopen" and "command"; writes .env.local.
+// the Language page, saving at once. Listens to "menuopen", "command" and "commandbuttondown"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
 // - Nothing applies before PinballY restarts: "on restart" marks a saved value that differs from the running one.
@@ -18,6 +18,9 @@ import { createPinballYHost } from "../core/pinbally_host.js";
 import { getProfileStore } from "../profiles/profile_store.js";
 import { seesSetupEntries } from "../profiles/setup_entries.js";
 import { getDrawnMenus, getPackMenus } from "../drawn_menu/drawn_menu.js";
+import { DRAWN_MENU_Z_INDEX } from "../drawn_menu/drawn_menu_painter.js";
+import { createLoader } from "../drawing/loader.js";
+import { DIMMED_WHEEL } from "../drawing/steamball_drawing.js";
 import { DIALOG_PRIORITY, getWheelDialogs } from "../core/wheel_dialog.js";
 import { ADD_ON_GROUPS } from "./add_on_catalogue.js";
 import { rewriteEnvLine } from "./env_local_rewrite.js";
@@ -31,6 +34,9 @@ const NOT_SAVED_MENU_ID = "expansionPackSettingsNotSaved";
 const RESTART_MENU_ID = "expansionPackSettingsRestart";
 const RESTART_FAILED_MENU_ID = "expansionPackSettingsRestartFailed";
 const SEPARATOR = { cmd: -1 };
+// Just under the Drawn Menus, which the failure message may show over them.
+const RESTART_VEIL_Z_INDEX = DRAWN_MENU_Z_INDEX.backdrop - 2;
+const RESTART_LOADER_Z_INDEX = DRAWN_MENU_Z_INDEX.backdrop - 1;
 
 // getMenus: what shows the screens, asked on each opening
 // (common/drawn_menu/drawn_menu.js); running: the configuration loaded at startup.
@@ -113,9 +119,28 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         ], { dialogStyle: true, onBack: returnToOperatorMenu });
     }
 
+    // From Restart now until PinballY quits: the wheel dimmed as a drawn
+    // screen's backdrop dims it, with the Loader turning over it.
+    let restartVeil = null;
+    const restartLoader = createLoader(host, { zIndex: RESTART_LOADER_Z_INDEX });
+
+    function showRestartVeil() {
+        restartVeil = host.createDrawingLayer(RESTART_VEIL_Z_INDEX);
+        restartVeil.clear(DIMMED_WHEEL);
+        restartLoader.show();
+    }
+
+    function hideRestartVeil() {
+        restartLoader.hide();
+        if (!restartVeil) return;
+        host.removeDrawingLayer(restartVeil);
+        restartVeil = null;
+    }
+
     // Shown once the wheel is free: the failure comes up to 15 s after the
     // screens closed.
     const restartFailed = safeHandler(SCRIPT_NAME, error => {
+        hideRestartVeil();
         host.log(`[${SCRIPT_NAME}] ERROR Restart not possible: ${error.message}`);
         getWheelDialogs().submit({
             id: RESTART_FAILED_MENU_ID, message: TEXT.restartFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.RESTART_FAILED,
@@ -124,6 +149,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
 
     function restart() {
         host.log(`[${SCRIPT_NAME}] Restart asked.`);
+        showRestartVeil();
         try {
             host.restartPinballY({
                 onQuitting: safeHandler(SCRIPT_NAME, () => host.log(`[${SCRIPT_NAME}] Restart helper ready, quitting.`)),
@@ -200,6 +226,12 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     host.on("menuopen", safeHandler(SCRIPT_NAME, ev => {
         if (ev.id !== OPERATOR_MENU_ID || !seesSetupEntries(profileStore)) return;
         ev.addMenuItem({ after: optionsCommand }, { title: TEXT.menuEntry, cmd: entryCommand });
+    }));
+
+    // Fires on every mapped button press: while PinballY gets ready to quit,
+    // no button moves the wheel or launches a table.
+    host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
+        if (restartVeil) ev.preventDefault();
     }));
 
     // Fires on every command: the entry opens the list, a line its page, the

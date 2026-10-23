@@ -13,6 +13,7 @@ import config from "../../common/core/config.js";
 import { envKeyOf } from "../../common/core/env_overrides.js";
 import { readDrawnMenu, drawnMenuLines, isDrawnMenuShown, press, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { readLoader } from "../support/loader_reader.js";
 
 const ENV_LOCAL = "C:\\PinballY\\Scripts\\ExpansionPack\\.env.local";
 const RESTART_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\restart_pinbally.ps1";
@@ -124,6 +125,8 @@ test("Restart now asks one restart, logged, and PinballY quits once the helper i
     assert.equal(fake.restartsAsked(), 1);
     assert.ok(fake.logLines().includes("[ExpansionPackSettings] Restart asked."));
     assert.equal(isDrawnMenuShown(fake), false);
+    assert.equal(readLoader(fake).shown, true, "the Loader turns over the dimmed wheel until PinballY quits");
+    assert.equal(press(fake, "Select").defaultPrevented, true, "no button reaches the wheel meanwhile");
     fake.advanceTime(2000);
     assert.deepEqual(fake.executedCommands().filter(cmd => cmd === QUIT), [QUIT]);
     assert.ok(fake.logLines().includes("[ExpansionPackSettings] Restart helper ready, quitting."));
