@@ -127,9 +127,9 @@ export function createHouseholdStats(host, {
             .map(profile => ({ profile, isActive: isActive(profile) }));
     }
 
-    // entries: readProfiles()'s; allStats: each one's stats, in the same
-    // order; exitLook: the Exit Button's.
-    function describeScreen(entries, allStats, exitLook) {
+    // entries: readProfiles()'s; allStats and framePaths: each one's stats
+    // and worn frame image, in the same order; exitLook: the Exit Button's.
+    function describeScreen(entries, allStats, framePaths, exitLook) {
         const lines = LINES.filter(line => allStats.every(stats => line.isShown(stats)));
         const goldByLine = lines.map(line => {
             const scores = allStats.map(line.scoreOf);
@@ -147,7 +147,7 @@ export function createHouseholdStats(host, {
                 isActive,
                 name: displayNameOf(profile),
                 avatarPath: avatarOf(profile),
-                framePath: profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
+                framePath: framePaths[column],
                 cells: lines.map((line, index) => ({ ...line.cellOf(allStats[column]), isGold: goldByLine[index][column] })),
             })),
         };
@@ -178,11 +178,18 @@ export function createHouseholdStats(host, {
         // has measured the window.
         const drawPiece = (zIndex, rect, draw, into) => drawn.draw(() => drawn.drawPiece(zIndex, rect(), draw, into));
 
-        // Queued once the Profiles are known: one step per Profile read.
+        // Queued once the Profiles are known: one step per Profile read, its
+        // stats and worn frame sharing one read of its profile.json.
         function queueSteps(entries) {
             const allStats = [];
-            for (const { profile } of entries) drawn.read(() => allStats.push(readStats(profile.name)));
-            drawn.read(() => { screen = describeScreen(entries, allStats, exitButtonLookOf(onBack !== null)); });
+            const framePaths = [];
+            for (const { profile } of entries) {
+                drawn.read(() => profileStore.withCachedReads(() => {
+                    allStats.push(readStats(profile.name));
+                    framePaths.push(profileRewards ? profileRewards.wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null);
+                }));
+            }
+            drawn.read(() => { screen = describeScreen(entries, allStats, framePaths, exitButtonLookOf(onBack !== null)); });
             drawn.draw(() => drawn.drawBackdrop((dc, size, referenceWidth) => {
                 geometry = layoutHouseholdStats(referenceWidth, screen.columns.length, screen.labels.length);
                 drawBackdrop(dc, size, REFERENCE_HEIGHT, geometry.panel);

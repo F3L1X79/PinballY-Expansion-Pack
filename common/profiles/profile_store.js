@@ -7,6 +7,7 @@
 // - Every write is whole: tmp, backup, rename; a broken or newer file comes back from its backup.
 // - isAdmin and isChild are set by hand: read and kept, never written.
 // - Other cabinet-level files sit next to cabinet.json; no Profile Reset touches them.
+// - Another Profile's profile.json is read afresh on each call, but once per withCachedReads run.
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";
@@ -234,14 +235,37 @@ export function createProfileStore(host) {
         return profile;
     }
 
+    // Inside withCachedReads: another Profile's data by lower-case name, read
+    // once for the whole run; null outside, every call then reading afresh.
+    let readCache = null;
+
     // The named Profile and its data: the active one's from memory, another
-    // one's read afresh from its file.
+    // one's read afresh from its file (once per withCachedReads run).
     function profileWithData(profileName) {
         // Checked here too, so the active Profile's data is never re-read.
         if (sameName(profileName, activeProfile.name)) return { profile: activeProfile, data: activeData };
         const profile = profileNamed(profileName);
-        return { profile, data: readProfileData(profile) };
+        if (!readCache) return { profile, data: readProfileData(profile) };
+        const key = profile.name.toLowerCase();
+        if (!readCache.has(key)) readCache.set(key, readProfileData(profile));
+        return { profile, data: readCache.get(key) };
     }
+
+    // Runs run() with another Profile's profile.json read once, whichever
+    // readers ask for it: on the cabinet each read costs a file and a parse,
+    // and one Profile's stats asked for it nine times. Nested runs share the
+    // outer one's reads; a write forgets what was read of that Profile.
+    function withCachedReads(run) {
+        if (readCache) return run();
+        readCache = new Map();
+        try {
+            return run();
+        } finally {
+            readCache = null;
+        }
+    }
+
+    const forgetCachedRead = profileName => { if (readCache) readCache.delete(profileName.toLowerCase()); };
 
     // The Plays of the Profile's year file, an empty list when it has none.
     // A file without a "plays" list is set aside like a broken one, since
@@ -281,6 +305,7 @@ export function createProfileStore(host) {
         const { profile, data } = profileWithData(profileName);
         change(data);
         saveProfileData(profile, data);
+        forgetCachedRead(profile.name);
         tellUpdateListeners(profile.name, { isReset: false });
     }
 
@@ -340,6 +365,7 @@ export function createProfileStore(host) {
             if (markName in data) freshData[markName] = data[markName];
         }
         saveProfileData(profile, freshData);
+        forgetCachedRead(profile.name);
         if (sameName(profile.name, activeProfile.name)) activeData = freshData;
         log(`${profile.name} was reset${keptFiles.length ? `; its former files are kept as ${keptFiles.join(", ")}` : ""}.`);
         tellUpdateListeners(profile.name, { isReset: true });
@@ -440,6 +466,7 @@ export function createProfileStore(host) {
         getProfileData: () => activeData,
         // The named Profile's data, to read only: change it with updateProfileData.
         getProfileDataOf: (profileName) => profileWithData(profileName).data,
+        withCachedReads,
         // The active Profile's play record of a table, all zero when never played.
         getPlay: (configId) => activeData.plays[configId] || NO_PLAY,
         hasPlayed: (configId) => (activeData.plays[configId] || NO_PLAY).count > 0,

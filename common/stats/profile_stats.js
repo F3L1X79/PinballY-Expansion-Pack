@@ -95,14 +95,16 @@ export function createProfileStats(host, {
     // Every value of the Profile Stats that another Profile's can be set
     // beside, for the named Profile (the active one by default): the same
     // readers as the screen's, so a value never differs between screens.
-    // Reads only.
+    // Reads only, another Profile's profile.json once for every reader.
     function readStats(profileName = profileStore.getActiveProfile().name) {
-        const profileData = readProfileData(profileName);
-        return {
-            plays: sumPlays(profileData.data),
-            ...readCardStats(profileName, profileData),
-            ...readProgressionStats(profileName, profileData),
-        };
+        return profileStore.withCachedReads(() => {
+            const profileData = readProfileData(profileName);
+            return {
+                plays: sumPlays(profileData.data),
+                ...readCardStats(profileName, profileData),
+                ...readProgressionStats(profileName, profileData),
+            };
+        });
     }
 
     const hoursAndMinutes = totalMinutes =>
