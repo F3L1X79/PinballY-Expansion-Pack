@@ -253,6 +253,7 @@
           <a class="chip tr-profiles" href="#ratings"><b></b>Notes, favoris, masquées</a>
           <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
           <a class="chip tr-share" href="#themes"><b></b>Thèmes</a>
+          <a class="chip tr-play" href="#mini-game"><b></b>Mini-jeu</a>
         </div>
 
         <div class="ax row">Faible</div>
@@ -473,6 +474,31 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="mini-game" data-track="play" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Un mini-jeu aux boutons de flipper, avec son record par Profile</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
+          </div>
+          <p>Un petit jeu à un ou deux boutons, dans l'esprit de Flappy Bird ou du dinosaure de Chrome, lancé depuis le menu principal : un flipper pour sauter ou battre des ailes, l'autre pour se baisser. Un record par Profile, et des Achievements pour un score atteint.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (fluidité sur la borne) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Les boutons se prennent par <code>keydown</code> annulé, comme dans les Drawn Menus ; les sprites sont des calques déplacés par <code>setPos</code>, sans redessin à chaque image. Entrée ajoutée par <code>getMainMenu().add(...)</code>. Après les <a href="#easter-eggs">Easter eggs (n° <span data-ref="easter-eggs"></span>)</a>, autre touche ludique de la famille Jeu et succès</div>
+          <details>
+            <summary>Questions ouvertes (5)</summary>
+            <ul>
+              <li>Quel jeu : sauter des obstacles (dinosaure, un seul bouton), voler entre des tuyaux (Flappy Bird), ou un jeu propre au flipper (une bille à renvoyer avec les deux flippers) ?</li>
+              <li>PinballY tient-il 30 images par seconde avec <code>setTimeout</code> et des calques déplacés, sur l'écran de jeu en portrait ? À mesurer en <code>/prototype</code> sur la borne.</li>
+              <li>Quel écran : l'écran de jeu, ou le DMD (128 × 32, un dinosaure y serait à sa place) ?</li>
+              <li>Le jeu tourne tant qu'on joue : est-ce une exception à la règle « pas d'animation sans fin », puisqu'il s'arrête à la défaite et que le joueur le relance ?</li>
+              <li>Le record : dans les Profile Stats, et un classement de la maison entre Profiles ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-share" id="stats-api" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -624,8 +650,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>25/10 <span class="count">(5)</span></summary>
+          <summary>25/10 <span class="count">(6)</span></summary>
           <ol>
+            <li><strong>Un mini-jeu aux boutons de flipper, après les Easter eggs</strong>
+              <span>Idée de Félix, dans l'esprit de Flappy Bird ou du dinosaure de Chrome. Faisable sans bibliothèque : <code>keydown</code> annulé pour les boutons, calques déplacés par <code>setPos</code> pour les sprites ; la fluidité reste à mesurer sur la borne en <code>/prototype</code>. Placé juste après les Easter eggs, l'autre touche ludique, et avant l'API des statistiques et Discord, d'impact plus faible pour la maison. Effort moyen-gros, impact moyen.</span></li>
             <li><strong>Une Challenge Table au hasard sur le Welcome Screen, 2ᵉ</strong>
               <span>Idée de Félix. Le Welcome Screen offre déjà un Random Game et les Period Tables, et les Challenge Tables existent comme sélection : il ne reste qu'un choix à ajouter, montré seulement quand le Challenge du Profile a des Challenge Tables. Placée juste après la passe de traduction : petite, vue chaque jour sur la borne. Effort petit, impact moyen.</span></li>
             <li><strong>La Distribution et le toast d'erreur avant les notes et favoris, puis la sortie 1.0</strong>
