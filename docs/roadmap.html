@@ -327,14 +327,14 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>Quand le Challenge du Profile actif a des Challenge Tables, le Welcome Screen offre d'en lancer une tirée au hasard, pour faire avancer le Challenge en un bouton.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend les Challenge Tables (livrées, spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/263">#263</a>) et le Random Game du Welcome Screen (livré)</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend les Challenge Tables (livrées, spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/263">#263</a>) et les cartes de Period Table du Welcome Screen (livrées)</div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Décisions du grilling (25/10/2026)</summary>
             <ul>
-              <li>Un choix de plus sur le Welcome Screen, ou à la place du Random Game quand le Challenge a des Challenge Tables ?</li>
-              <li>Le tirage : au hasard parmi toutes, ou en préférant celles qui feraient le plus avancer le Challenge ?</li>
-              <li>Ce que dit le choix : le nom de la table tirée d'avance, ou seulement « une table du défi » ?</li>
+              <li>Une troisième carte « Une table du défi », sous celle de la semaine, de la forme des cartes de Period Table, avec son bouton « Y aller » ; la ligne grise reprend le texte et la progression de la Challenge Card.</li>
+              <li>La table est nommée d'avance : tirée à chances égales parmi les Challenge Tables à chaque ouverture de l'écran, jamais la Last Played Table sauf si elle est seule. Lancée comme une Period Table, elle ne compte pas comme un Random Game.</li>
+              <li>Jamais la Table du jour ou de la semaine déjà proposée (pas de carte s'il ne reste qu'elles), sauf quand une Play de plus finit le Challenge : la carte dit alors « Plus qu'une partie pour finir le défi ! ».</li>
             </ul>
             <p class="ctx">Idée de Félix du 25/10/2026.</p>
           </details>
@@ -374,8 +374,8 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
           </div>
           <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Réécrit la section Install des README</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="here">research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Réécrit la section Install des README · Research : <code>docs/research/distribution-install-and-updates.md</code></div>
           <details>
             <summary>Contexte</summary>
             <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/images/rank_*.png</code>) des emblèmes de League of Legends.</p>
