@@ -247,6 +247,7 @@
           <a class="chip tr-play" href="#challenge-welcome"><b></b>Défi au Welcome Screen</a>
         </div>
         <div class="cell">
+          <a class="chip tr-profiles" href="#picker-preload"><b></b>Un seul chargement au démarrage</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
         </div>
         <div class="cell">
@@ -336,6 +337,30 @@
               <li>Ce que dit le choix : le nom de la table tirée d'avance, ou seulement « une table du défi » ?</li>
             </ul>
             <p class="ctx">Idée de Félix du 25/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="picker-preload" data-track="profiles" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Un seul chargement au démarrage : le Welcome Screen préparé sous le Profile picker</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Quand le démarrage passe par le Profile picker, le Welcome Screen se prépare pendant que le joueur choisit, au lieu de commencer sa lecture et son dessin (avec son Loader) une fois le Profile choisi. Le Profile picker devient ensuite l'écran de démarrage par défaut, à la place du Welcome Screen seul.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend le Startup Screen (livré, spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/280">#280</a>) et le Drawing ahead (ADR 0014)</div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Le Welcome Screen dépend du Profile choisi : préparer seulement les parties communes (fond, Period Tables), le Profile sous le curseur à chaque déplacement, ou tous les Profiles du foyer ?</li>
+              <li>Le dessin d'avance ne doit pas ralentir le carrousel du picker : en arrière-plan par tranches (<code>getDrawingAhead().add</code>), ou en premier plan dès l'apparition du picker ?</li>
+              <li>Le nouveau défaut <code>startupScreen: "profilePicker"</code> : pour toutes les bornes, ou seulement quand le foyer a plus d'un Profile (le picker est déjà sauté pour un foyer vide) ?</li>
+              <li>Le Loader : jamais après un choix, ou seulement si la préparation n'est pas finie quand le joueur valide ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026. Aujourd'hui, le Welcome Screen n'est soumis qu'au signal de fin du picker (<code>onStartupPickerDone</code>), puis se prépare depuis zéro.</p>
           </details>
         </div>
       </li>
@@ -650,8 +675,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>25/10 <span class="count">(6)</span></summary>
+          <summary>25/10 <span class="count">(7)</span></summary>
           <ol>
+            <li><strong>Le Welcome Screen préparé sous le Profile picker, 3ᵉ</strong>
+              <span>Idée de Félix : quand le démarrage passe par le Profile picker, un seul chargement au lieu de deux, puis le picker comme écran de démarrage par défaut. Placé juste après la Challenge Table au hasard, plus petite : vu à chaque démarrage de la borne, il passe avant la Distribution. Effort moyen (le Welcome Screen dépend du Profile pas encore choisi), impact moyen.</span></li>
             <li><strong>Un mini-jeu aux boutons de flipper, après les Easter eggs</strong>
               <span>Idée de Félix, dans l'esprit de Flappy Bird ou du dinosaure de Chrome. Faisable sans bibliothèque : <code>keydown</code> annulé pour les boutons, calques déplacés par <code>setPos</code> pour les sprites ; la fluidité reste à mesurer sur la borne en <code>/prototype</code>. Placé juste après les Easter eggs, l'autre touche ludique, et avant l'API des statistiques et Discord, d'impact plus faible pour la maison. Effort moyen-gros, impact moyen.</span></li>
             <li><strong>Une Challenge Table au hasard sur le Welcome Screen, 2ᵉ</strong>
