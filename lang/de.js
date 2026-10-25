@@ -153,11 +153,10 @@ export default {
 
     // The step under way, written in gold beneath the Loader while a
     // table launches or closes (Seamless Launch Overlay).
-    // TODO: translation pass
     launchSteps: {
-        loading: "Loading…",
-        closing: "Returning to tables…",
-        capturing: "Capturing…",
+        loading: "Wird geladen…",
+        closing: "Zurück zu den Tischen…",
+        capturing: "Aufnahme…",
     },
 
     // Functions that build translated titles for PinballY's dynamically
@@ -201,56 +200,53 @@ export default {
     // words are shown in capitals.
     buttonHints: {
         // PinballY's button names, as on the cabinet's key caps.
-        keyCaps: { next: "Next", prev: "Prev", select: "Select", exit: "Exit" },
+        keyCaps: { next: "Rechts", prev: "Links", select: "Select", exit: "Exit" },
         browse: "Blättern",
         // The flippers on a High Score Board longer than the window.
-        scroll: "Scroll", // TODO: translation pass
-        choose: "Choose", // TODO: translation pass
+        scroll: "Scrollen",
+        choose: "Wählen",
         // Exit's word and the Exit Button's tooltip: Back where Exit brings
         // back a screen or a menu, Close where it leaves the bare wheel.
         back: "Zurück",
-        close: "Close", // TODO: translation pass
+        close: "Schließen",
     },
 
-    // TODO: translation pass
     welcomeScreen: {
-        greetings: { morning: "Good morning", afternoon: "Good afternoon", evening: "Good evening", night: "Still up" },
+        greetings: { morning: "Guten Morgen", afternoon: "Guten Tag", evening: "Guten Abend", night: "Noch wach" },
         greetingWithName: (greeting, name) => [`${greeting}, `, name, "!"],
         greetingAlone: (greeting) => `${greeting}!`,
-        stayOn: (tableTitle) => `Stay on ${tableTitle}`,
-        stayOnWheel: "Stay on the wheel",
-        randomTable: "Launch a random table",
-        menuEntry: "Welcome Screen",
+        stayOn: (tableTitle) => `Bei ${tableTitle} bleiben`,
+        stayOnWheel: "Auf dem Wheel bleiben",
+        randomTable: "Zufälligen Tisch starten",
+        menuEntry: "Willkommensseite",
         // The active Profile's Daily Streak under the greeting, from 2 days
         // on, its count shown in a square before the text.
-        // TODO: translation pass
         cabinetStreak: {
-            notYetToday: "days in a row on the cabinet: keep it going!",
-            playedToday: "days in a row on the cabinet",
+            notYetToday: "Tage in Folge am Automaten: weiter so!",
+            playedToday: "Tage in Folge am Automaten",
         },
-        lostRecord: (taker, tableTitle) => `${taker} took your record on ${tableTitle}`, // TODO: translation pass
-        // TODO: translation pass
+        lostRecord: (taker, tableTitle) => `${taker} hat Ihnen den Rekord auf ${tableTitle} abgenommen`,
         lostRecords: (records, moreCount) => {
             const named = records.map(record => `${record.tableTitle} (${record.taker})`);
             return moreCount > 0
-                ? `Records lost: ${named.join(", ")} and ${moreCount} more`
-                : `Records lost: ${named.slice(0, -1).join(", ")} and ${named[named.length - 1]}`;
+                ? `Verlorene Rekorde: ${named.join(", ")} und ${moreCount} weitere`
+                : `Verlorene Rekorde: ${named.slice(0, -1).join(", ")} und ${named[named.length - 1]}`;
         },
         // One card per Period Table; its grey line says it was played this
         // Period, or else the Streak of the daily or weekly rendezvous, its
         // count shown in a square before the text.
         periodCards: {
             day: {
-                period: "TABLE OF THE DAY",
-                played: "Played today",
-                streak: "days in a row on the Table of the Day: keep it going!",
+                period: "TISCH DES TAGES",
+                played: "Heute gespielt",
+                streak: "Tage in Folge am Tisch des Tages: weiter so!",
             },
             week: {
-                period: "TABLE OF THE WEEK",
-                played: "Played this week",
-                streak: "weeks in a row on the Table of the Week: keep it going!",
+                period: "TISCH DER WOCHE",
+                played: "Diese Woche gespielt",
+                streak: "Wochen in Folge am Tisch der Woche: weiter so!",
             },
-            go: "Go",
+            go: "Los",
         },
     },
 
@@ -278,17 +274,17 @@ export default {
     customMenuLabels: {
         challengeTables: "Tische für die Herausforderung",
         hallOfFameFilter: "Hall of Fame",
-        myHighScoresFilter: "My High Scores", // TODO: translation pass
-        hiddenTablesFilter: "Hidden Tables", // TODO: translation pass
-        tablesToDiscoverFilter: "Tables to Discover", // TODO: translation pass
+        myHighScoresFilter: "Meine Highscores",
+        hiddenTablesFilter: "Ausgeblendete Tische",
+        tablesToDiscoverFilter: "Unentdeckte Tische",
         originalTablesFilter: "Original-Tische",
         tableSetup: "Tischkonfiguration",
-        tableScores: "Table Scores", // TODO: translation pass
-        filterPickerBack: "Back", // TODO: translation pass
-        activeFilter: (name) => `Active filter: ${name}`, // TODO: translation pass
+        tableScores: "Tisch-Highscores",
+        filterPickerBack: "Zurück",
+        activeFilter: (name) => `Aktiver Filter: ${name}`,
         // The Drawn main menu's "Change Filter" entry, and its footer's label before the Active Filter.
-        changeFilter: "Change Filter", // TODO: translation pass
-        activeFilterLabel: "Active filter:", // TODO: translation pass
+        changeFilter: "Filter wechseln",
+        activeFilterLabel: "Aktiver Filter:",
     },
 
     achievements: {
@@ -353,15 +349,13 @@ export default {
             60: "Marathonläufer",
         },
         marathonDescription: (minutes) => `Eine einzige Session von über ${minutes} Minuten spielen.`,
-        // TODO: translation pass
         cabinetStreakTitles: {
-            3: "Back for More",
-            7: "A Week at the Cabinet",
-            15: "Cabinet Regular",
-            30: "Part of the Furniture",
+            3: "Nachschlag, bitte",
+            7: "Eine Woche am Automaten",
+            15: "Automaten-Stammgast",
+            30: "Gehört zum Inventar",
         },
-        // TODO: translation pass
-        cabinetStreakDescription: (days) => `Play on the cabinet ${days} days in a row, any table.`,
+        cabinetStreakDescription: (days) => `${days} Tage in Folge am Automaten spielen, egal an welchem Tisch.`,
         rageQuitTitle: () => "Wutausstieg?!",
         rageQuitDescription: (minSeconds, maxSeconds) => `Einen Tisch nach nur ${minSeconds} bis ${maxSeconds} Sekunden verlassen...`,
         grandReturnTitle: () => "Die große Rückkehr",
@@ -370,40 +364,38 @@ export default {
         rageQuitHint: () => "An manchen Tagen will ein Tisch einfach nicht...",
         grandReturnHint: () => "Alte Freunde freuen sich immer über ein Wiedersehen...",
         worldTourHint: () => "Manche Reisen gelingen, ohne je Start zu drücken...",
-        // TODO: translation pass
-        nightOwlTitle: () => "Night Owl",
-        nightOwlDescription: (from, to) => `Start a game between ${from} and ${to}.`,
-        nightOwlHint: () => "Pinball never sleeps...",
-        fullMoonNightTitle: () => "Full Moon Night",
-        fullMoonNightDescription: (from, to, percent) => `Start a game between ${from} and ${to} while the moon is at least ${percent}% lit.`,
-        fullMoonNightHint: () => "Some nights, even werewolves play pinball...",
-        fridayThe13thTitle: () => "Friday the 13th",
-        fridayThe13thDescription: () => "Start a game on a Friday the 13th.",
-        fridayThe13thHint: () => "Some days, better not walk under a ladder...",
-        lunchBreakTitle: () => "Lunch Break",
-        lunchBreakDescription: (from, to) => `Start a game between ${from} and ${to}, Monday to Friday.`,
-        lunchBreakHint: () => "A sandwich in one hand, the flipper in the other...",
-        mirrorHourTitle: () => "Mirror Hour",
-        mirrorHourDescription: () => "Start a game at a time whose hours match its minutes, such as 11:11.",
-        mirrorHourHint: () => "Make a wish...",
-        fourSeasonsTitle: () => "Four Seasons",
-        fourSeasonsDescription: (count) => `Play at least once in each of the ${count} seasons.`,
-        fourSeasonsHint: () => "Pinball is all year round...",
-        oneMoreGameTitle: () => "One More Game!",
-        oneMoreGameDescription: (count) => `Play the same table ${count} times in a row.`,
-        oneMoreGameHint: () => "When you love, you don't count...",
-        timeTravelTitle: () => "Time Travel",
-        timeTravelDescription: (count) => `Play ${count} games in a row, each on a table from an older decade than the one before.`,
-        timeTravelHint: () => "What if we went back in time...",
-        // TODO: translation pass
-        snackTimeTitle: () => "Snack Time",
-        snackTimeDescription: () => "Start a game between 4 and 5 pm.",
-        snackTimeHint: () => "Just one game before homework...",
-        wednesdayOffTitle: () => "Wednesday Off",
-        wednesdayOffDescription: () => "Start a game on a Wednesday afternoon.",
-        wednesdayOffHint: () => "No school this afternoon...",
-        grownUpRecordTakenTitle: () => "Beat the Grown-Ups",
-        grownUpRecordTakenDescription: () => "Take a Table Record from a grown-up.",
+        nightOwlTitle: () => "Nachteule",
+        nightOwlDescription: (from, to) => `Ein Spiel zwischen ${from} und ${to} starten.`,
+        nightOwlHint: () => "Flippern schläft nie...",
+        fullMoonNightTitle: () => "Vollmondnacht",
+        fullMoonNightDescription: (from, to, percent) => `Ein Spiel zwischen ${from} und ${to} starten, während der Mond zu mindestens ${percent} % beleuchtet ist.`,
+        fullMoonNightHint: () => "In manchen Nächten flippern sogar Werwölfe...",
+        fridayThe13thTitle: () => "Freitag, der 13.",
+        fridayThe13thDescription: () => "An einem Freitag, dem 13., ein Spiel starten.",
+        fridayThe13thHint: () => "An manchen Tagen geht man besser nicht unter einer Leiter durch...",
+        lunchBreakTitle: () => "Mittagspause",
+        lunchBreakDescription: (from, to) => `Ein Spiel zwischen ${from} und ${to} starten, von Montag bis Freitag.`,
+        lunchBreakHint: () => "Das Brötchen in der einen Hand, den Flipper in der anderen...",
+        mirrorHourTitle: () => "Spiegelzeit",
+        mirrorHourDescription: () => "Ein Spiel zu einer Uhrzeit starten, deren Stunden den Minuten gleichen, etwa 11:11.",
+        mirrorHourHint: () => "Zeit für einen Wunsch...",
+        fourSeasonsTitle: () => "Vier Jahreszeiten",
+        fourSeasonsDescription: (count) => `In jeder der ${count} Jahreszeiten mindestens einmal spielen.`,
+        fourSeasonsHint: () => "Flippern hat das ganze Jahr Saison...",
+        oneMoreGameTitle: () => "Noch ein Spiel!",
+        oneMoreGameDescription: (count) => `Denselben Tisch ${count}-mal hintereinander spielen.`,
+        oneMoreGameHint: () => "Wer liebt, der zählt nicht...",
+        timeTravelTitle: () => "Zeitreise",
+        timeTravelDescription: (count) => `${count} Spiele hintereinander spielen, jedes auf einem Tisch aus einem älteren Jahrzehnt als das vorige.`,
+        timeTravelHint: () => "Und wenn wir in der Zeit zurückreisen...",
+        snackTimeTitle: () => "Snackpause",
+        snackTimeDescription: () => "Ein Spiel zwischen 16 und 17 Uhr starten.",
+        snackTimeHint: () => "Nur ein Spiel vor den Hausaufgaben...",
+        wednesdayOffTitle: () => "Freier Mittwoch",
+        wednesdayOffDescription: () => "An einem Mittwochnachmittag ein Spiel starten.",
+        wednesdayOffHint: () => "Heute Nachmittag ist keine Schule...",
+        grownUpRecordTakenTitle: () => "Besser als die Großen",
+        grownUpRecordTakenDescription: () => "Einem Erwachsenen einen Tischrekord abnehmen.",
         randomGamesTitles: {
             10: "Warum nicht?",
             25: "Kopf oder Zahl",
@@ -420,21 +412,20 @@ export default {
             100: "Legende der Woche",
         },
         challengesCompletedDescription: (count) => (count === 1 ? "Eine Herausforderung schaffen." : `${count} Herausforderungen schaffen.`),
-        // TODO: translation pass, the High Scores family
         highScoreTablesTitles: {
-            1: "Initials in Stone",
-            3: "Three Banners Raised",
-            5: "Lord of the Five Boards",
-            10: "The Kwisatz Hiscorach",
+            1: "In Stein gemeißelt",
+            3: "Drei Banner gehisst",
+            5: "Herr der fünf Tafeln",
+            10: "Der Kwisatz Hiscorach",
         },
-        highScoreTablesDescription: (count) => (count === 1 ? "Win a High Score on a table." : `Win High Scores on ${count} different tables.`),
+        highScoreTablesDescription: (count) => (count === 1 ? "Auf einem Tisch einen Highscore erringen." : `Auf ${count} verschiedenen Tischen Highscores erringen.`),
         tableRecordTablesTitles: {
-            1: "One Score to Rule Them All",
-            3: "Warlord of Three Worlds",
+            1: "Ein Score, sie zu knechten",
+            3: "Kriegsherr dreier Welten",
         },
-        tableRecordTablesDescription: (count) => (count === 1 ? "Set a Table Record." : `Set Table Records on ${count} different tables.`),
-        tableRecordTakenTitle: "The Usurper",
-        tableRecordTakenDescription: "Take a Table Record from another Profile.",
+        tableRecordTablesDescription: (count) => (count === 1 ? "Einen Tischrekord aufstellen." : `Auf ${count} verschiedenen Tischen Tischrekorde aufstellen.`),
+        tableRecordTakenTitle: "Der Usurpator",
+        tableRecordTakenDescription: "Einem anderen Profil einen Tischrekord abnehmen.",
         dayManufacturersTitles: {
             3: "Weltreise im Eiltempo",
             5: "Flipper-Schmetterling",
@@ -447,7 +438,7 @@ export default {
     },
 
     achievementList: {
-        menuEntry: "Erfolgsliste", // TODO: translation pass, now My Achievements
+        menuEntry: "Meine Erfolge",
         // The header's title and the section titles are shown in capitals.
         title: "Erfolgsliste",
         totalLine: (unlockedCount, totalCount, percent) => `${unlockedCount} / ${totalCount} Erfolge freigeschaltet (${percent} %)`,
@@ -495,83 +486,80 @@ export default {
     },
 
     profileStats: {
-        menuEntry: "Statistiken", // TODO: translation pass, now My Profile
-        // TODO: translation pass
+        menuEntry: "Mein Profil",
         // The buttons at the card's foot.
         buttons: {
-            achievements: "Achievements",
-            frame: "Frame", // TODO: translation pass, now Avatar Frames
-            mostPlayedTables: "Most Played Tables",
-            tablesToDiscover: "Tables to Discover",
-            household: "Household Stats", // TODO: translation pass
+            achievements: "Erfolge",
+            frame: "Avatar-Rahmen",
+            mostPlayedTables: "Meistgespielte Tische",
+            tablesToDiscover: "Unentdeckte Tische",
+            household: "Familienstatistik",
         },
-        // TODO: translation pass
         // The Household Stats opened from the Household button: the title and
         // the line labels the stats above do not have.
         household: {
-            title: "Household Stats",
+            title: "Familienstatistik",
             lines: {
-                playerLevel: "Player Level",
-                collectionMastery: "Collection Mastery",
-                achievementsUnlocked: "Achievements unlocked",
-                dailyStreak: "Daily Streak",
+                playerLevel: "Spielerlevel",
+                collectionMastery: "Sammlungsmeisterschaft",
+                achievementsUnlocked: "Erfolge freigeschaltet",
+                dailyStreak: "Tage in Folge",
             },
         },
         // The Avatar Frame list opened from the Frame button: its title, the
         // "no frame" row, the worn row's mark and a locked frame's condition.
         frameList: {
-            title: "Avatar Frames",
-            none: "None",
-            worn: "Worn",
-            unlockCondition: (tier) => `Collection Tier ${tier}`,
+            title: "Avatar-Rahmen",
+            none: "Keiner",
+            worn: "Getragen",
+            unlockCondition: (tier) => `Sammlungsstufe ${tier}`,
         },
         // The card's Player Level: its title over the big digits, then the
         // points so far and those of the next level, thousands separated.
         playerLevel: {
             title: "LEVEL",
-            current: (points, nextLevelPoints) => `Current: ${points} / ${nextLevelPoints}`,
+            current: (points, nextLevelPoints) => `Aktuell: ${points} / ${nextLevelPoints}`,
         },
-        collectionTitle: "COLLECTION MASTERY",
+        collectionTitle: "SAMMLUNGSMEISTERSCHAFT",
         sections: {
-            game: "GAME",
-            progression: "PROGRESSION",
-            tastes: "TASTES",
+            game: "SPIEL",
+            progression: "FORTSCHRITT",
+            tastes: "VORLIEBEN",
         },
         // The stats' labels, over their values.
         stats: {
-            gamesPlayed: "Games played",
-            totalTime: "Total time",
-            averageDuration: "Average game",
-            collection: "Collection",
-            challengesCompleted: "Challenges completed",
-            highScoresHeld: "High Scores held", // TODO: translation pass
-            tableRecordsHeld: "Table Records held", // TODO: translation pass
-            // TODO: translation pass
-            cabinetStreak: "Days in a row on the cabinet",
-            dayStreak: "Table of the Day streak",
-            weekStreak: "Table of the Week streak",
-            favouriteManufacturer: "Favorite manufacturer",
-            favouriteDecade: "Favorite decade",
-            favouriteTable: "Most played table",
-            firstTablePlayed: "First table played",
-            lastTablePlayed: "Last table played",
+            gamesPlayed: "Gespielte Spiele",
+            totalTime: "Gesamtzeit",
+            averageDuration: "Ø Spieldauer",
+            collection: "Sammlung",
+            challengesCompleted: "Herausforderungen",
+            highScoresHeld: "Gehaltene Highscores",
+            tableRecordsHeld: "Gehaltene Tischrekorde",
+            cabinetStreak: "Tage in Folge",
+            dayStreak: "Serie Tisch des Tages",
+            weekStreak: "Serie Tisch der Woche",
+            favouriteManufacturer: "Lieblingshersteller",
+            favouriteDecade: "Lieblingsjahrzehnt",
+            favouriteTable: "Meistgespielter Tisch",
+            firstTablePlayed: "Zuerst gespielt",
+            lastTablePlayed: "Zuletzt gespielt",
         },
-        // Thousands separated: "1,206".
-        number: (count) => String(count).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        // Thousands separated: "1.206".
+        number: (count) => String(count).replace(/\B(?=(\d{3})+(?!\d))/g, "."),
         // Minutes on two digits: "96 h 05".
         hoursAndMinutes: (hours, minutes) => `${hours} h ${String(minutes).padStart(2, "0")}`,
         minutes: (minutes) => `${minutes} min`,
         fraction: (count, total) => `${count}/${total}`,
         // The share of the collection played, in a pill.
-        percent: (percent) => `${percent}%`,
+        percent: (percent) => `${percent} %`,
         // A Streak's longest, in a pill (gold while the current one sets it).
-        record: (longest) => `Record: ${longest}`,
+        record: (longest) => `Rekord: ${longest}`,
         // A favourite's play time, in a pill; its hours and minutes given.
-        playTime: (time) => `${time} played`,
+        playTime: (time) => `${time} gespielt`,
         // The favourite decade, by its start year: 1990 for 1990 to 1999.
-        decade: (decadeStartYear) => `${decadeStartYear}s`,
+        decade: (decadeStartYear) => `${decadeStartYear}er`,
         // The first or last table played's date, day and month on two digits.
-        playedOn: (day, month, year) => `on ${month}/${day}/${year}`,
+        playedOn: (day, month, year) => `am ${day}.${month}.${year}`,
         // A stat without a value, such as the average before any Play.
         none: "—",
     },
@@ -593,14 +581,13 @@ export default {
         yes: "Ja, zurücksetzen",
         no: "Nein",
         cancel: "Abbrechen",
-        // TODO: translation pass
-        done: name => `${name} starts over.`,
-        failed: name => `${name} could not be reset. See the log for details.`,
+        done: name => `${name} fängt von vorne an.`,
+        failed: name => `${name} konnte nicht zurückgesetzt werden. Details stehen im Log.`,
         ok: "OK",
-        everyProfile: "Every profile",
-        confirmEvery: count => `Reset all ${count} profiles? All of their plays, streaks, Challenges and achievements will be erased.`,
-        everyDone: count => `All ${count} profiles start over.`,
-        everyFailed: (count, names) => `Profiles reset: ${count}. ${names.join(", ")} could not be reset. See the log for details.`,
+        everyProfile: "Alle Profile",
+        confirmEvery: count => `Alle ${count} Profile zurücksetzen? Alle ihre Partien, Serien, Herausforderungen und Erfolge werden gelöscht.`,
+        everyDone: count => `Alle ${count} Profile fangen von vorne an.`,
+        everyFailed: (count, names) => `Zurückgesetzte Profile: ${count}. Nicht zurückgesetzt: ${names.join(", ")}. Details stehen im Log.`,
     },
 
     // The clock at the top left of the wheel screen.
@@ -644,238 +631,227 @@ export default {
         // (that many tables at the level of that name), how many tables
         // already reach it, or, at the last tier, that all of them did.
         collection: {
-            goal: (count, levelName) => `Goal: ${count} ${count === 1 ? "table" : "tables"} at ${levelName}`,
-            current: (reached, needed) => `Current: ${reached}/${needed}`,
-            allTables: (levelName) => `All your tables: ${levelName}`,
+            goal: (count, levelName) => `Ziel: ${count} ${count === 1 ? "Tisch" : "Tische"} auf Niveau ${levelName}`,
+            current: (reached, needed) => `Aktuell: ${reached}/${needed}`,
+            allTables: (levelName) => `Alle Ihre Tische: ${levelName}`,
         },
-        // TODO: translation pass
-        levelNames: ["Rookie", "Apprentice", "Regular", "Adept", "Specialist", "Ace", "Virtuoso", "Prodigy", "Legend", "Pinball Wizard"],
-        toDiscover: "To discover",
-        toastHeader: "Table Mastery",
+        levelNames: ["Neuling", "Lehrling", "Stammspieler", "Könner", "Spezialist", "Ass", "Virtuose", "Wunderkind", "Legende", "Flipper-Zauberer"],
+        toDiscover: "Zu entdecken",
+        toastHeader: "Tischmeisterschaft",
         toastTitle: (name, level) => `${name} (${level})`,
-        // TODO: translation pass
-        collectionToastHeader: "Collection Mastery",
-        collectionToastTitle: (tier, name) => `Tier ${tier}: ${name}`,
-        collectionToastDescription: (count, name) => `${count} ${count === 1 ? "table" : "tables"} at ${name} or above`,
+        collectionToastHeader: "Sammlungsmeisterschaft",
+        collectionToastTitle: (tier, name) => `Sammlungsstufe ${tier}: ${name}`,
+        collectionToastDescription: (count, name) => `${count} ${count === 1 ? "Tisch" : "Tische"} auf Niveau ${name} oder höher`,
     },
-    // TODO: translation pass
     profileRewards: {
         // The Avatar Frames' names, from Collection Tier 1 to 10.
         frameNames: [
-            "Enchanted Forest", "Steam and Gears", "Arcade Neon", "Eternal Frost", "Spice of Arrakis",
-            "Arcane Grimoire", "Orbital Station", "Dragon's Breath", "Royal Pinball", "Celestial Legend",
+            "Zauberwald", "Dampf und Zahnräder", "Arcade-Neon", "Ewiger Frost", "Gewürz von Arrakis",
+            "Arkanes Grimoire", "Orbitalstation", "Drachenatem", "Königlicher Flipper", "Himmlische Legende",
         ],
         // The Mastery Toast's extra line, naming the frames its Collection
         // Tier unlocks (more than one when a Play raised it by several tiers).
-        toastLine: (names) => `${names.length === 1 ? "New frame" : "New frames"}: ${names.join(", ")}`,
-        // TODO: translation pass
-        toastHeader: "Holiday Frame",
+        toastLine: (names) => `${names.length === 1 ? "Neuer Rahmen" : "Neue Rahmen"}: ${names.join(", ")}`,
+        toastHeader: "Feiertagsrahmen",
         holidays: {
-            newYear: { name: "New Year's Day", condition: "A Play on 1 January" },
-            chineseNewYear: { name: "Chinese New Year", condition: "A Play on Chinese New Year, between 21 January and 20 February" },
-            valentine: { name: "Valentine's Day", condition: "A Play on 14 February" },
-            mardiGras: { name: "Mardi Gras", condition: "A Play on Mardi Gras, 47 days before Easter" },
-            stPatrick: { name: "St. Patrick's Day", condition: "A Play on 17 March" },
-            easter: { name: "Easter", condition: "A Play on Easter Sunday" },
-            musicDay: { name: "Fête de la Musique", condition: "A Play on 21 June" },
-            halloween: { name: "Halloween", condition: "A Play on 31 October" },
-            deadDay: { name: "Día de los Muertos", condition: "A Play on 1 or 2 November" },
-            thanksgiving: { name: "Thanksgiving", condition: "A Play on Thanksgiving, the fourth Thursday of November" },
-            christmas: { name: "Christmas", condition: "A Play on 24 or 25 December" },
+            newYear: { name: "Neujahr", condition: "Eine Partie am 1. Januar" },
+            chineseNewYear: { name: "Chinesisches Neujahr", condition: "Eine Partie am Chinesischen Neujahr, zwischen dem 21. Januar und dem 20. Februar" },
+            valentine: { name: "Valentinstag", condition: "Eine Partie am 14. Februar" },
+            mardiGras: { name: "Faschingsdienstag", condition: "Eine Partie am Faschingsdienstag, 47 Tage vor Ostern" },
+            stPatrick: { name: "St. Patrick's Day", condition: "Eine Partie am 17. März" },
+            easter: { name: "Ostern", condition: "Eine Partie am Ostersonntag" },
+            musicDay: { name: "Fête de la Musique", condition: "Eine Partie am 21. Juni" },
+            halloween: { name: "Halloween", condition: "Eine Partie am 31. Oktober" },
+            deadDay: { name: "Día de los Muertos", condition: "Eine Partie am 1. oder 2. November" },
+            thanksgiving: { name: "Thanksgiving", condition: "Eine Partie an Thanksgiving, dem vierten Donnerstag im November" },
+            christmas: { name: "Weihnachten", condition: "Eine Partie am 24. oder 25. Dezember" },
         },
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {
-            message: (name, menuEntry, button) => `You won the Avatar Frame "${name}"! Equip it from "${menuEntry}", then "${button}".`,
-            goEquip: "Go equip it",
-            gotIt: "Got it",
+            message: (name, menuEntry, button) => `Sie haben den Avatar-Rahmen "${name}" gewonnen! Legen Sie ihn unter "${menuEntry}" und dann "${button}" an.`,
+            goEquip: "Jetzt anlegen",
+            gotIt: "OK",
         },
     },
-    // TODO: translation pass
     playerLevel: {
-        toastHeader: "Level up",
+        toastHeader: "Level-Up",
         toastTitle: (level) => `Level ${level}`,
-        toastDescription: "Your Achievements took you to a new level.",
+        toastDescription: "Ihre Erfolge haben Sie auf ein neues Level gebracht.",
     },
-    // TODO: translation pass
     highScores: {
-        toastHeader: "High Score",
-        toastTitle: (table, place) => {
-            const teen = place % 100 >= 11 && place % 100 <= 13;
-            const suffix = teen ? "th" : (["th", "st", "nd", "rd"][place % 10] || "th");
-            return `High score on ${table}: ${place}${suffix} place`;
-        },
-        tableRecordTitle: (table) => `Table Record on ${table}!`,
-        toastScore: (score) => `${score} points`,
-        takenFrom: (profile) => `taken from ${profile}`, // TODO: translation pass
-        // TODO: translation pass
+        toastHeader: "Highscore",
+        toastTitle: (table, place) => `Highscore auf ${table}: ${place}. Platz`,
+        tableRecordTitle: (table) => `Tischrekord auf ${table}!`,
+        toastScore: (score) => `${score} Punkte`,
+        takenFrom: (profile) => `${profile} abgenommen`,
         // The High Score Board.
         board: {
-            menuEntry: "High Scores",
-            record: "Record",
+            menuEntry: "Highscores",
+            record: "Rekord",
             // In place of a place's owner when it belongs to no Profile.
-            defaultScore: "Default score",
+            defaultScore: "Standardscore",
             // In place of the initials when none were typed.
             noInitials: "\u2014",
-            noScore: "No score yet",
+            noScore: "Noch kein Score",
             // While PINemHi reads the board, as a message or a note over the last known one.
-            reading: "Reading\u2026", // TODO: translation pass
+            reading: "Wird gelesen\u2026",
             // Over the last known board when the fresh read failed.
-            notRefreshed: "These scores could not be refreshed", // TODO: translation pass
-            notSupported: "This table's high scores are not supported", // TODO: translation pass
+            notRefreshed: "Diese Scores konnten nicht aktualisiert werden",
+            notSupported: "Die Highscores dieses Tisches werden nicht unterstützt",
             // A table without a ROM whose VPReg.stg section or text file is not learned yet.
-            notLearned: "Play a game to bring up this table's high scores", // TODO: translation pass
+            notLearned: "Spielen Sie eine Partie, um die Highscores dieses Tisches anzuzeigen",
         },
     },
 
-    // TODO: translation pass (every text but the language names)
+    // The language names stay each in its own language.
     expansionPackSettings: {
-        menuEntry: "Expansion Pack Settings",
-        on: "On",
-        off: "Off",
+        menuEntry: "Expansion-Pack-Einstellungen",
+        on: "An",
+        off: "Aus",
         addOnLine: (name, state) => `${name}: ${state}`,
-        languageLine: (languageName) => `Language: ${languageName}`,
-        startupScreenLine: (screenName) => `Startup screen: ${screenName}`,
-        startupScreenNames: { welcome: "Welcome Screen", profilePicker: "Profile picker", wheel: "Wheel" },
-        back: "Back",
+        languageLine: (languageName) => `Sprache: ${languageName}`,
+        startupScreenLine: (screenName) => `Startbildschirm: ${screenName}`,
+        startupScreenNames: { welcome: "Willkommensseite", profilePicker: "Profilauswahl", wheel: "Wheel" },
+        back: "Zurück",
         groups: {
-            playersAndProgress: "Players and progress",
-            wheelScreen: "Wheel screen",
-            menusAndFilters: "Menus and filters",
-            launchingAndPlaying: "Launching and playing a table",
-            debugging: "Debugging",
+            playersAndProgress: "Spieler und Fortschritt",
+            wheelScreen: "Wheel-Bildschirm",
+            menusAndFilters: "Menüs und Filter",
+            launchingAndPlaying: "Einen Tisch starten und spielen",
+            debugging: "Fehlersuche",
         },
-        onRestart: (state) => `${state} on restart`,
-        whenOnLabel: "On:",
-        whenOffLabel: "Off:",
-        save: "Save",
-        cancel: "Cancel",
-        notSaved: "Setting not saved",
+        onRestart: (state) => `${state} (nach Neustart)`,
+        whenOnLabel: "An:",
+        whenOffLabel: "Aus:",
+        save: "Speichern",
+        cancel: "Abbrechen",
+        notSaved: "Einstellung nicht gespeichert",
         ok: "OK",
-        restartQuestion: "The saved settings apply when PinballY restarts.",
-        restartNow: "Restart now",
-        later: "Later",
-        restartFailed: "Restart not possible: the settings will apply at the next start",
+        restartQuestion: "Die gespeicherten Einstellungen gelten nach einem Neustart von PinballY.",
+        restartNow: "Neu starten",
+        later: "Später",
+        restartFailed: "Neustart nicht möglich: Die Einstellungen gelten beim nächsten Start",
         addOns: {
             profilePicker: {
-                name: "Profile picker",
-                whenOn: "Change Player in the main menu, to pick who is playing.",
-                whenOff: "Everyone plays as Guest; no Avatar or greeting on the Welcome Screen.",
+                name: "Profilauswahl",
+                whenOn: "Spieler wechseln im Hauptmenü, um zu wählen, wer spielt.",
+                whenOff: "Alle spielen als Gast; kein Avatar und kein Gruß auf der Willkommensseite.",
             },
             startupChoicePrompt: {
-                name: "Welcome Screen",
-                whenOn: "At startup and after Change Player: pick a table to play, or change player.",
-                whenOff: "The Profile picker only greets the player.",
+                name: "Willkommensseite",
+                whenOn: "Beim Start und nach Spieler wechseln: einen Tisch wählen oder den Spieler wechseln.",
+                whenOff: "Die Profilauswahl begrüßt den Spieler nur.",
             },
             achievements: {
-                name: "Achievements",
-                whenOn: "Achievements earned while playing, each announced by a toast.",
-                whenOff: "No Player Level.",
+                name: "Erfolge",
+                whenOn: "Beim Spielen verdiente Erfolge, jeweils mit einer Einblendung angekündigt.",
+                whenOff: "Kein Spielerlevel.",
             },
             sessionStatsTracker: {
-                name: "Session stats",
-                whenOn: "Counts each session, for the session Achievements.",
-                whenOff: "No session Achievements.",
+                name: "Session-Statistik",
+                whenOn: "Zählt jede Session, für die Session-Erfolge.",
+                whenOff: "Keine Session-Erfolge.",
             },
             challenges: {
-                name: "Challenges",
-                whenOn: "A Challenge each week, under the Profile badge.",
-                whenOff: "No Challenge Achievements or Challenge stats.",
+                name: "Herausforderungen",
+                whenOn: "Jede Woche eine Herausforderung, unter dem Profil-Abzeichen.",
+                whenOff: "Keine Herausforderungs-Erfolge und keine Herausforderungsstatistik.",
             },
             tableMastery: {
-                name: "Table Mastery",
-                whenOn: "A Mastery Level on each table, for each player.",
-                whenOff: "No Collection Tiers or their Avatar Frames.",
+                name: "Tischmeisterschaft",
+                whenOn: "Eine Meisterschaftsstufe auf jedem Tisch, für jeden Spieler.",
+                whenOff: "Keine Sammlungsstufen und keine Avatar-Rahmen dazu.",
             },
             highScores: {
-                name: "High Scores",
-                whenOn: "Each new high score credited to the player who made it.",
-                whenOff: "No High Score Achievements or Table Records; PinballY's own High Scores come back.",
+                name: "Highscores",
+                whenOn: "Jeder neue Highscore wird dem Spieler gutgeschrieben, der ihn erzielt hat.",
+                whenOff: "Keine Highscore-Erfolge und keine Tischrekorde; die Highscores von PinballY kehren zurück.",
             },
             statusLineInfo: {
-                name: "Status line",
-                whenOn: "The table's year, maker, plays and play time in the status line.",
-                whenOff: "Nothing else changes.",
+                name: "Statuszeile",
+                whenOn: "Jahr, Hersteller, Partien und Spielzeit des Tisches in der Statuszeile.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             clock: {
-                name: "Clock",
-                whenOn: "The time at the top left of the screen.",
-                whenOff: "Nothing else changes.",
+                name: "Uhr",
+                whenOn: "Die Uhrzeit oben links auf dem Bildschirm.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             wheelArc: {
-                name: "Wheel Arc",
-                whenOn: "A gold arc under the wheel, unless you use your own underlay.",
-                whenOff: "Nothing else changes.",
+                name: "Wheel-Bogen",
+                whenOn: "Ein goldener Bogen unter dem Wheel, außer Sie verwenden ein eigenes Underlay.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             uiTranslation: {
-                name: "PinballY translation",
-                whenOn: "PinballY's own menus and messages in the pack's language.",
-                whenOff: "Nothing else changes.",
+                name: "PinballY-Übersetzung",
+                whenOn: "Die Menüs und Meldungen von PinballY in der Sprache des Packs.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             drawnMenus: {
-                name: "Drawn Menus",
-                whenOn: "PinballY's menus drawn in the pack's style.",
-                whenOff: "PinballY's plain menus come back, but for these settings.",
+                name: "Gezeichnete Menüs",
+                whenOn: "Die Menüs von PinballY im Stil des Packs gezeichnet.",
+                whenOff: "Die schlichten Menüs von PinballY kehren zurück, außer für diese Einstellungen.",
             },
             customMenuCommands: {
-                name: "Menu commands",
-                whenOn: "Table of the Day, Table of the Week, random table and Set Up Table in the main menu.",
-                whenOff: "With the Welcome Screen off too: no Random Game Achievements.",
+                name: "Menübefehle",
+                whenOn: "Tisch des Tages, Tisch der Woche, Zufallstisch und Tischkonfiguration im Hauptmenü.",
+                whenOff: "Ist auch die Willkommensseite aus: keine Zufallsspiel-Erfolge.",
             },
             hallOfFame: {
                 name: "Hall of Fame",
-                whenOn: "A filter of your ten most played tables.",
-                whenOff: "No Most Played Tables button in the Profile Stats.",
+                whenOn: "Ein Filter mit Ihren zehn meistgespielten Tischen.",
+                whenOff: "Keine Schaltfläche Meistgespielte Tische unter Mein Profil.",
             },
             tablesToDiscover: {
-                name: "Tables to Discover",
-                whenOn: "A filter of the tables you never played.",
-                whenOff: "No Tables to Discover button in the Profile Stats.",
+                name: "Unentdeckte Tische",
+                whenOn: "Ein Filter mit den Tischen, die Sie nie gespielt haben.",
+                whenOff: "Keine Schaltfläche Unentdeckte Tische unter Mein Profil.",
             },
             hiddenTables: {
-                name: "Hidden Tables",
-                whenOn: "A filter of the hidden tables.",
-                whenOff: "Nothing else changes.",
+                name: "Ausgeblendete Tische",
+                whenOn: "Ein Filter mit den ausgeblendeten Tischen.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             customFilter: {
-                name: "Original Tables",
-                whenOn: "An Original Tables filter, under Filter by Manufacturer.",
-                whenOff: "Nothing else changes.",
+                name: "Original-Tische",
+                whenOn: "Ein Filter Original-Tische, unter Nach Hersteller filtern.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             menuCleanup: {
-                name: "Menu Cleanup",
-                whenOn: "Shorter menus, without rarely used entries such as Help, About or Flyer.",
-                whenOff: "Nothing else changes.",
+                name: "Menüs aufräumen",
+                whenOn: "Kürzere Menüs, ohne selten genutzte Einträge wie Hilfe, Über oder Flyer.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             forceBackglass: {
                 name: "Backglass",
-                whenOn: "The backglass shown at startup, hidden during a game.",
-                whenOff: "Nothing else changes.",
+                whenOn: "Das Backglass wird beim Start gezeigt und während eines Spiels ausgeblendet.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             seamlessLaunchOverlay: {
-                name: "Launch overlay",
-                whenOn: "No black flash while a table loads.",
-                whenOff: "Nothing else changes.",
+                name: "Start-Overlay",
+                whenOn: "Kein schwarzes Aufblitzen, während ein Tisch lädt.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             playLaunchSound: {
-                name: "Launch sound",
-                whenOn: "A sound when a table launches.",
-                whenOff: "Nothing else changes.",
+                name: "Startton",
+                whenOn: "Ein Ton, wenn ein Tisch startet.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             ratingPrompt: {
-                name: "Rating prompt",
-                whenOn: "Asks you to rate a table after a while on it.",
-                whenOff: "Nothing else changes.",
+                name: "Bewertungsfrage",
+                whenOn: "Bittet Sie nach einer Weile, einen Tisch zu bewerten.",
+                whenOff: "Sonst ändert sich nichts.",
             },
             tableRoms: {
-                name: "Table ROMs",
-                whenOn: "Finds each table's ROM by itself (needs vpxtool).",
-                whenOff: "Nothing else changes.",
+                name: "Tisch-ROMs",
+                whenOn: "Findet die ROM jedes Tisches selbst (benötigt vpxtool).",
+                whenOff: "Sonst ändert sich nichts.",
             },
             launchEventsTrace: {
-                name: "Launch events trace",
-                whenOn: "Logs the launch events, for troubleshooting (with LOG_LAUNCH_EVENTS=true).",
-                whenOff: "Nothing else changes.",
+                name: "Startereignis-Protokoll",
+                whenOn: "Protokolliert die Startereignisse zur Fehlersuche (mit LOG_LAUNCH_EVENTS=true).",
+                whenOff: "Sonst ändert sich nichts.",
             },
         },
         languageNames: {
