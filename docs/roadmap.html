@@ -219,7 +219,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 22.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 25.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -235,6 +235,7 @@
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#translations"><b></b>Traductions</a>
+          <a class="chip tr-share" href="#release-1-0"><b></b>Sortie 1.0</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
@@ -243,12 +244,13 @@
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
           <a class="chip tr-share" href="#error-toast"><b></b>Toast d'erreur</a>
+          <a class="chip tr-play" href="#challenge-welcome"><b></b>Défi au Welcome Screen</a>
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
         </div>
         <div class="cell">
-          <a class="chip tr-profiles" href="#ratings"><b></b>Notes et favoris</a>
+          <a class="chip tr-profiles" href="#ratings"><b></b>Notes, favoris, masquées</a>
           <a class="chip tr-profiles" href="#year-in-pinball"><b></b>Year in Pinball</a>
           <a class="chip tr-share" href="#themes"><b></b>Thèmes</a>
         </div>
@@ -256,12 +258,14 @@
         <div class="ax row">Faible</div>
         <div class="cell">
           <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
+          <a class="chip tr-play" href="#clock"><b></b>Heure à l'écran</a>
         </div>
         <div class="cell">
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
           <a class="chip tr-share" href="#theme-editor"><b></b>Éditeur de palette</a>
+          <a class="chip tr-share" href="#discord"><b></b>Discord</a>
         </div>
       </div>
       <div class="legend">
@@ -312,19 +316,25 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="ratings" data-track="profiles" data-rank="gold">
+      <li draggable="true" tabindex="0" class="item tr-play" id="challenge-welcome" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Notes et favoris par Profile</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen-gros</span></div>
+            <h3>Une Challenge Table au hasard sur le Welcome Screen</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
-          <p>Chaque Profile a ses propres notes et favoris (aujourd'hui communs dans PinballY), avec ensuite une note moyenne de la maison par table.</p>
+          <p>Quand le Challenge du Profile actif a des Challenge Tables, le Welcome Screen offre d'en lancer une tirée au hasard, pour faire avancer le Challenge en un bouton.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend les Challenge Tables (livrées, spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/263">#263</a>) et le Random Game du Welcome Screen (livré)</div>
           <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Les notes et favoris natifs sont des colonnes globales de <code>GameStats.csv</code> : l'invite de notation et les filtres de favoris devront lire les données du Profile.</p>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Un choix de plus sur le Welcome Screen, ou à la place du Random Game quand le Challenge a des Challenge Tables ?</li>
+              <li>Le tirage : au hasard parmi toutes, ou en préférant celles qui feraient le plus avancer le Challenge ?</li>
+              <li>Ce que dit le choix : le nom de la table tirée d'avance, ou seulement « une table du défi » ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026.</p>
           </details>
         </div>
       </li>
@@ -366,6 +376,74 @@
               <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
             </ul>
             <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="release-1-0" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Sortie 1.0, puis des versions qui évoluent</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Jalon après la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a>, la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a>. Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Où vit le numéro de version : une constante du pack, lue par le résumé de démarrage et par la vérification des mises à jour de la Distribution ?</li>
+              <li>Le CHANGELOG : écrit à la main à chaque version, ou tiré des commits <code>Closes #N</code> par un script de <code>maintainer/</code> ?</li>
+              <li>Quand passer en 2.0 : un changement des données enregistrées (Profile Store, Play Log), ou seulement de l'installation ?</li>
+              <li>Quelles captures dans les README, et sur quels Profiles de test ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026. Aujourd'hui <code>common/core/startup_summary.js</code> ne connaît que la version de PinballY. La remise à niveau des README fait partie de ce jalon.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="ratings" data-track="profiles" data-rank="platinum">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Notes, favoris et tables masquées par Profile</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">gros</span></div>
+          </div>
+          <p>Chaque Profile a ses propres notes, favoris et tables masquées (aujourd'hui communs dans PinballY), avec ensuite une note moyenne de la maison par table.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Les Tables masquées par Profile remplacent-elles le flag Hidden de toute la borne, ou s'y ajoutent-elles (une table masquée pour tous, plus celles masquées par chaque Profile) ?</li>
+              <li>Quel besoin, hors enfants (les Adult Tables y suffisent) : une table qu'un Profile n'aime pas ? Une note basse suffirait-elle alors ?</li>
+            </ul>
+            <p class="ctx">Les notes, favoris et le flag Hidden natifs sont des colonnes globales de <code>GameStats.csv</code> : l'invite de notation, les filtres de favoris et les Hidden Tables devront lire les données du Profile. Les Tables masquées par Profile rouvrent le choix de la spec #263, où elles valent pour toute la borne.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="clock" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>L'heure à l'écran</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>L'heure toujours visible sur la borne, où celle de Windows ne l'est jamais : d'abord pensée sur le backglass, dans le style Steamball.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Quel écran : le backglass (mais il couvre l'illustration de la table, et il est caché pendant une partie), le topper, le DMD, ou un coin de l'écran de jeu ?</li>
+              <li>Pendant une partie aussi, ou seulement sur la roue ?</li>
+              <li>Format 24 h ou 12 h selon la langue, et la date avec ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026. Le texte change une fois par minute, sans mouvement : pas d'animation sans fin.</p>
           </details>
         </div>
       </li>
@@ -415,6 +493,30 @@
               <li>Comment garantir la compatibilité d'une version à l'autre (numéro de version de l'API, données figées comme dans <code>tests/project/persisted_data_pinning.test.js</code>) ?</li>
             </ul>
             <p class="ctx">Idée du 10/10/2026. Les données existent déjà dans le Profile Store, le Play Log et <code>common/stats/profile_stats.js</code> ; le travail est surtout de choisir une surface stable et de la documenter.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="discord" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Discord Rich Presence : la table jouée dans le statut Discord</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Quand Discord tourne sur le PC de la borne, le statut montre la table en cours (et peut-être la roue, le Challenge ou la Table of the Day).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/research</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après l'<a href="#stats-api">API des statistiques (n° <span data-ref="stats-api"></span>)</a>, dont il est un consommateur extérieur</div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Discord tourne-t-il sur la borne, ou l'idée sert-elle surtout aux autres utilisateurs ?</li>
+              <li>Faisable sans bibliothèque : le tube nommé <code>\\.\pipe\discord-ipc-0</code> ouvert avec <code>dllImport</code> (kernel32), sans lecture qui bloque PinballY ? À vérifier en <code>/research</code>, avec le piège du <code>CParser.js</code>.</li>
+              <li>Vie privée : jamais le nom d'un Child Profile ; le nom du Profile du tout, ou seulement la table ?</li>
+              <li>Une application Discord (client ID) à créer : la tienne pour tout le monde, ou une par installation ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026.</p>
           </details>
         </div>
       </li>
@@ -522,6 +624,21 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>25/10 <span class="count">(5)</span></summary>
+          <ol>
+            <li><strong>Une Challenge Table au hasard sur le Welcome Screen, 2ᵉ</strong>
+              <span>Idée de Félix. Le Welcome Screen offre déjà un Random Game et les Period Tables, et les Challenge Tables existent comme sélection : il ne reste qu'un choix à ajouter, montré seulement quand le Challenge du Profile a des Challenge Tables. Placée juste après la passe de traduction : petite, vue chaque jour sur la borne. Effort petit, impact moyen.</span></li>
+            <li><strong>La Distribution et le toast d'erreur avant les notes et favoris, puis la sortie 1.0</strong>
+              <span>Idée de Félix : une vraie 1.0, qui évoluera ensuite. Le pack n'a pas encore de numéro de version (seul celui de PinballY est journalisé), ni CHANGELOG, ni release. La 1.0 est le jalon qui suit la passe de traduction, la Distribution et le toast d'erreur, qui remontent pour qu'elle sorte tôt ; elle ajoute le numéro de version, le CHANGELOG, la release GitHub et la remise à niveau des README, qui n'est pas un chantier à part (les README suivent déjà chaque fin de spec). Effort moyen, impact fort.</span></li>
+            <li><strong>Les Tables masquées par Profile rejoignent les notes et favoris</strong>
+              <span>Idée de Félix, qui rouvre le choix de la spec #263 (Tables masquées pour toute la borne, les Adult Tables seules tenant une table loin d'un enfant). Même problème que les notes et favoris : des données par table, globales dans <code>GameStats.csv</code>, à tenir par Profile. Un seul chantier, qui passe de moyen-gros à gros ; impact moyen, inchangé.</span></li>
+            <li><strong>L'heure à l'écran, juste avant les Easter eggs</strong>
+              <span>Idée de Félix : sur la borne, l'heure de Windows n'est jamais visible. D'abord pensée sur le backglass ; l'écran (backglass, topper, DMD ou coin de l'écran de jeu) reste à trancher au grill, le backglass étant l'illustration de la table et caché pendant une partie. Effort petit, impact faible.</span></li>
+            <li><strong>Discord Rich Presence, après l'API des statistiques</strong>
+              <span>Idée de Félix. Faisable sans bibliothèque, par le tube nommé de Discord ouvert avec <code>dllImport</code>, mais à étudier d'abord en <code>/research</code>. Placée après l'API des statistiques, dont elle est un consommateur extérieur. Effort moyen-gros, impact faible.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>22/10 <span class="count">(4)</span></summary>
           <ol>
             <li><strong>Le son baissé ailleurs retiré, le toast d'erreur après la Distribution</strong>
