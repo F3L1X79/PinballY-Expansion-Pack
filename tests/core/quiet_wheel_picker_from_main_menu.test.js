@@ -23,6 +23,7 @@ test("the Profile picker from the main menu lowers the table while open, back at
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "profilePicker";
     config.language = "en";
+    config.startupScreen = "welcome";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");

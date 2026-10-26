@@ -32,25 +32,25 @@ test("the Startup screen line comes before the language, with the saved screen",
     chooseEntry(fake, "Expansion Pack Settings");
     fake.advanceTime(OPEN_OVER_MS);
 
-    assert.deepEqual(drawnMenuLines(fake).slice(5, 8), ["---", "Startup screen: Welcome Screen", "Language: English"]);
+    assert.deepEqual(drawnMenuLines(fake).slice(5, 8), ["---", "Startup screen: Profile picker", "Language: English"]);
 });
 
 test("its page lists the three Startup Screens, the saved one marked, then Cancel", () => {
-    chooseEntry(fake, "Startup screen: Welcome Screen");
+    chooseEntry(fake, "Startup screen: Profile picker");
     fake.advanceTime(OPEN_OVER_MS);
 
     assert.deepEqual(drawnMenuLines(fake), [...SCREENS, "---", "Cancel"]);
-    assert.deepEqual(markedEntries(fake, "radio"), ["Welcome Screen"]);
-    assert.equal(highlightedEntry(fake), "Welcome Screen");
+    assert.deepEqual(markedEntries(fake, "radio"), ["Profile picker"]);
+    assert.equal(highlightedEntry(fake), "Profile picker");
 
     chooseEntry(fake, "Cancel");
     fake.advanceTime(OPEN_OVER_MS);
-    assert.equal(highlightedEntry(fake), "Startup screen: Welcome Screen", "Cancel returns on the line");
+    assert.equal(highlightedEntry(fake), "Startup screen: Profile picker", "Cancel returns on the line");
     assert.equal(fake.readFile(ENV_LOCAL), undefined, "nothing written");
 });
 
 test("choosing a screen saves STARTUP_SCREEN at once, shown on restart", () => {
-    chooseEntry(fake, "Startup screen: Welcome Screen");
+    chooseEntry(fake, "Startup screen: Profile picker");
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Wheel");
     fake.advanceTime(OPEN_OVER_MS);

@@ -75,6 +75,7 @@ export async function startWithChallenge({
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = language;
+    config.startupScreen = "welcome";
     await import("../../main.js");
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);

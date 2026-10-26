@@ -41,6 +41,7 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
     config.language = "en";
+    config.startupScreen = "welcome";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");

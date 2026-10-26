@@ -52,6 +52,7 @@ test("a Child Profile never sees an Adult Table on the wheel, in the Random Game
         config.addOns[key] = addOnsUnderTest.includes(key);
     }
     config.language = "en";
+    config.startupScreen = "welcome";
     config.skipRandomGameAnimation = true;
 
     const { default: lang } = await import("../../common/core/i18n.js");

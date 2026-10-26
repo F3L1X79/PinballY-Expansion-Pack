@@ -30,6 +30,7 @@ test("the wheel is veiled with the comet turning until the Welcome Screen fades 
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "startupChoicePrompt" || key === "profilePicker";
     config.language = "en";
+    config.startupScreen = "welcome";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");

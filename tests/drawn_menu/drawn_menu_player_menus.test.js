@@ -52,6 +52,7 @@ test("setup", async () => {
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "en";
+    config.startupScreen = "welcome";
     ({ default: lang } = await import("../../common/core/i18n.js"));
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");

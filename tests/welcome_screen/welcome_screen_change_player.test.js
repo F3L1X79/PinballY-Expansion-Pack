@@ -34,6 +34,7 @@ test("Change Player from the Welcome Screen or the main menu brings the screen b
         config.addOns[key] = key === "startupChoicePrompt" || key === "profilePicker";
     }
     config.language = "en";
+    config.startupScreen = "welcome";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");

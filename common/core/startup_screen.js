@@ -4,7 +4,7 @@
 // chain Profile picker -> Welcome Screen -> wheel; the first read writes
 // each fallback to the PinballY log, once. Also relays the startup Profile
 // picker's close to the Welcome Screen, which follows it.
-// - An empty Household skips the Profile picker without being logged: it is no misconfiguration.
+// - A Household under two Profiles skips the Profile picker without being logged: it is no misconfiguration.
 // ============================================================
 
 import config from "./config.js";
@@ -24,9 +24,9 @@ const CHAIN = [
     { screen: STARTUP_SCREEN.WELCOME, addOn: "startupChoicePrompt", name: "Welcome Screen" },
 ];
 
-// The screen PinballY starts on. isHouseholdEmpty is only asked when the
-// Profile picker would open.
-export function resolveStartupScreen(host, { setting, addOns, isHouseholdEmpty }) {
+// The screen PinballY starts on. householdHasFewerThanTwoProfiles
+// is only asked when the Profile picker would open.
+export function resolveStartupScreen(host, { setting, addOns, householdHasFewerThanTwoProfiles }) {
     let screen = setting;
     if (!ACCEPTED.includes(screen)) {
         host.log(`[Config] startupScreen "${setting}" is not one of ${ACCEPTED.join(", ")}; starting on the Welcome Screen.`);
@@ -37,7 +37,7 @@ export function resolveStartupScreen(host, { setting, addOns, isHouseholdEmpty }
         const next = CHAIN[index + 1] ? CHAIN[index + 1].screen : STARTUP_SCREEN.WHEEL;
         if (addOns[step.addOn] === false) {
             host.log(`[Startup] The ${step.name} Add-on is off; the Startup Screen falls back to "${next}".`);
-        } else if (step.screen !== STARTUP_SCREEN.PROFILE_PICKER || !isHouseholdEmpty()) {
+        } else if (step.screen !== STARTUP_SCREEN.PROFILE_PICKER || !householdHasFewerThanTwoProfiles()) {
             return step.screen;
         }
         screen = next;
@@ -66,7 +66,7 @@ export function getStartupScreen() {
         sharedStartupScreen = resolveStartupScreen(createPinballYHost(), {
             setting: config.startupScreen,
             addOns: config.addOns,
-            isHouseholdEmpty: () => store.listProfiles().every(profile => profile.isGuest),
+            householdHasFewerThanTwoProfiles: () => store.listProfiles().filter(profile => !profile.isGuest).length < 2,
         });
     }
     return sharedStartupScreen;

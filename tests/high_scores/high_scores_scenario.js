@@ -118,6 +118,7 @@ export async function startHighScores({
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = language;
+    config.startupScreen = "welcome";
 
     // Imported once the language is set: the toast module and the
     // Achievement List read the texts.

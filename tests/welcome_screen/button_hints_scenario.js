@@ -43,6 +43,7 @@ export async function startWelcomeScreen({ size = null } = {}) {
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ["startupChoicePrompt", "profilePicker"].includes(key);
+    config.startupScreen = "welcome";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");

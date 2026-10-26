@@ -10,7 +10,7 @@ An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), 
 
 <img src="docs/images/profiles.png" alt="The Change Player carousel and its Avatars with their Player Level" width="400">
 
-With Change Player, each of you picks your own Profile and Avatar, and the Welcome Screen greets you by name so you know whose games will count. Only games of at least a minute count, so a launch by mistake never spoils anything. Your Daily Streak counts the days in a row you have played, on any table. Guest is always there for visitors. On a shared cabinet, PinballY can start on Change Player so that everyone picks their Profile before playing, or straight on the wheel (`STARTUP_SCREEN`, below).
+With Change Player, each of you picks your own Profile and Avatar, and the Welcome Screen greets you by name so you know whose games will count. Only games of at least a minute count, so a launch by mistake never spoils anything. Your Daily Streak counts the days in a row you have played, on any table. Guest is always there for visitors. Once the cabinet has two Profiles or more besides Guest, PinballY starts on Change Player so that everyone picks their Profile before playing; it can also start on the Welcome Screen or straight on the wheel (`STARTUP_SCREEN`, below).
 
 ### Profile Stats
 
@@ -129,7 +129,7 @@ ADD_ON_CLOCK=false
 | `CONFETTI_SOUND_FILE` | `assets\sounds\confetti.wav` | Sound played once when a shower of confetti starts. |
 | `FIREWORKS_SOUND_FILE` | `assets\sounds\fireworks.wav` | Sound played once when the Fireworks start. |
 | `PROFILE_PICKER_SOUND_FILE` | empty | Sound played once when PinballY starts on the Profile picker (`STARTUP_SCREEN=profilePicker`); none ships with the pack. |
-| `STARTUP_SCREEN` | `welcome` | What PinballY shows first: `welcome` (the Welcome Screen), `profilePicker` (the "Change Player" carousel, then the Welcome Screen; skipped while Guest is the only Profile) or `wheel` (the bare wheel, the last player greeted). A screen whose feature is turned off gives way to the next one, from the carousel to the Welcome Screen to the wheel. |
+| `STARTUP_SCREEN` | `profilePicker` | What PinballY shows first: `profilePicker` (the "Change Player" carousel, then the Welcome Screen; skipped while the cabinet has fewer than two Profiles besides Guest), `welcome` (the Welcome Screen) or `wheel` (the bare wheel, the last player greeted). A screen whose feature is turned off gives way to the next one, from the carousel to the Welcome Screen to the wheel. |
 | `ACHIEVEMENT_TOAST_SECONDS` | `4` | Seconds an Achievement toast stays on screen (up to 60). |
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Size of the toast, from `0.5` to `3`. Raise it on a large screen. |
 | `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge, a Platinum Achievement, Mastery Level 10 on a table or a new Collection Tier, if your PC struggles with it. |

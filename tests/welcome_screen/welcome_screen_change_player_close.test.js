@@ -26,6 +26,7 @@ test("the Welcome Screen highlights Change Player at startup and Close after a c
         config.addOns[key] = key === "startupChoicePrompt" || key === "profilePicker";
     }
     config.language = "en";
+    config.startupScreen = "welcome";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");

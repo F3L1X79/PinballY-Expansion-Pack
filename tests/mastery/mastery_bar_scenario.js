@@ -75,6 +75,7 @@ export async function startScenario({
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = language;
+    config.startupScreen = "welcome";
     Object.assign(config, settings);
 
     await import("../../main.js");

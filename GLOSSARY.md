@@ -16,6 +16,14 @@ _Avoid_: plugin, script (a script is just a `.js` file)
 The version number of the Expansion Pack as a whole, raised with each release the owner publishes, and compared with the latest published release to know whether an update exists. Add-ons have no version of their own.
 _Avoid_: PinballY version (PinballY's own number), build, release (a release is the published package of one Pack Version)
 
+**Pack Update**:
+Replacing the installed Expansion Pack with a newer Pack Version while PinballY is closed, keeping the Household's Profiles and the owner's settings and files; if it fails, the previous Pack Version stays in place. It belongs to the pack itself, not to an Add-on. Only whoever sees the setup entries is offered one.
+_Avoid_: upgrade, patch, install (installing is the first, manual copy)
+
+**Update Prompt**:
+The question shown at startup, before anything else, when a newer Pack Version was found at an earlier start: update now, or later. Asked once per Pack Version; afterwards the update stays available from the Expansion Pack Settings.
+_Avoid_: update notification, update toast
+
 ### Menus
 
 **Drawn Menu**:

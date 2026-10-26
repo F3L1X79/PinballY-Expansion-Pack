@@ -1,6 +1,6 @@
 // ============================================================
-// Starts main.js on the fake host with the Profile picker as the Startup
-// Screen, and reads its carousel as the player sees it. Never loaded by
+// Starts main.js on the fake host with the default Startup Screen, the
+// Profile picker, and reads its carousel as the player sees it. Never loaded by
 // PinballY; one start per test file, as main.js loads once per process.
 // ============================================================
 
@@ -17,20 +17,23 @@ export const CAROUSEL_PAUSE_MS = 500;
 export const GLIDE_OVER_MS = 500;
 
 // addOns: the Add-ons turned on; profiles: the Household's folders;
-// tables: the wheel's, as the fake host takes them; settings: the other
-// config values; files: the paths present on disk (sounds).
+// childProfiles: those of them marked as Child Profiles; tables: the
+// wheel's, as the fake host takes them; settings: the other config values;
+// files: the paths present on disk (sounds).
 export async function startOnProfilePicker({
-    addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], activeProfile = "Bob", tables, settings = {}, files = [],
+    addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], childProfiles = [], activeProfile = "Bob", tables, settings = {}, files = [],
 } = {}) {
     const fake = createFakePinballYHost(tables ? { tables } : {});
     for (const name of profiles) fake.addFolder(`${PROFILES_FOLDER}\\${name}`);
+    for (const name of childProfiles) {
+        fake.addFile(`${PROFILES_FOLDER}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified: [], isChild: true }));
+    }
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile }));
     for (const path of files) fake.addFile(path);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);
     config.language = "en";
-    config.startupScreen = "profilePicker";
     Object.assign(config, settings);
 
     const { default: lang } = await import("../../common/core/i18n.js");

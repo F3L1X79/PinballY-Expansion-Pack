@@ -29,6 +29,7 @@ test("the Welcome Screen plays the greeting sound as it appears, at startup and 
         config.addOns[key] = key === "startupChoicePrompt" || key === "profilePicker";
     }
     config.language = "en";
+    config.startupScreen = "welcome";
     config.profileGreetingSoundFile = GREETING_SOUND;
 
     const { default: lang } = await import("../../common/core/i18n.js");
