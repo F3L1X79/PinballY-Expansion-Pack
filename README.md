@@ -24,7 +24,7 @@ With Change Player, each of you picks your own Profile and Avatar, and the Welco
 
 <img src="docs/images/welcome_screen.png" alt="The Welcome Screen with the Table of the Day and the Table of the Week" width="480">
 
-Every day there is a table nobody in the house has played yet, or the one left alone the longest, and every week a random one. The Welcome Screen greets you with both at startup, again after Change Player, and whenever you pick **Welcome Screen** in the main menu, with what they mean for you: launch one of them, stay on the table on the wheel, change player or spin a Random Game. Play them several days or weeks in a row to build a Streak. While the Welcome Screen or Change Player is open, the video sound of the table on the wheel is turned down, and comes back as they close.
+Every day there is a table nobody in the house has played yet, or the one left alone the longest, and every week a random one. The Welcome Screen greets you with both at startup, again after Change Player, and whenever you pick **Welcome Screen** in the main menu, with what they mean for you, and with one of your Challenge Tables drawn at random while your weekly Challenge has some: launch one of them, stay on the table on the wheel, change player or spin a Random Game. That Challenge Table is never one of the two tables already shown, unless one more game finishes your Challenge. Play them several days or weeks in a row to build a Streak. While the Welcome Screen or Change Player is open, the video sound of the table on the wheel is turned down, and comes back as they close.
 
 ### Weekly Challenges
 
@@ -90,7 +90,6 @@ Here is what we are thinking about for the pack's future. Nothing is promised: p
 - **Themes**: other looks than Steamball for every drawn screen, with a small editor to make your own.
 - **Ratings and favourites for each Profile**, then the household's average rating of each table.
 - **Install in 30 seconds and updates**, without git.
-- **The latest texts translated** into German, Spanish, Italian and Portuguese.
 
 ## Install
 

@@ -46,7 +46,7 @@ Dès que vous êtes deux à avoir un Profil, **Stats de la maison** montre tous 
 
 <img src="docs/images/welcome_screen.png" alt="L'écran d'accueil avec la table du jour et la table de la semaine" width="480">
 
-Chaque jour une table que personne à la maison n'a encore jouée, ou celle délaissée depuis le plus longtemps, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, après chaque « Changer de joueur », et chaque fois que vous choisissez **Écran d'accueil** dans le menu principal, avec ce qu'elles représentent pour vous : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série. Tant que l'écran d'accueil ou « Changer de joueur » sont ouverts, le son des vidéos de la table de la roue est baissé, et revient à leur fermeture.
+Chaque jour une table que personne à la maison n'a encore jouée, ou celle délaissée depuis le plus longtemps, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, après chaque « Changer de joueur », et chaque fois que vous choisissez **Écran d'accueil** dans le menu principal, avec ce qu'elles représentent pour vous, et avec l'une de vos tables du défi tirée au hasard tant que votre défi de la semaine en a : lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard. Cette table du défi n'est jamais l'une des deux tables déjà présentées, sauf quand une partie de plus termine votre défi. Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série. Tant que l'écran d'accueil ou « Changer de joueur » sont ouverts, le son des vidéos de la table de la roue est baissé, et revient à leur fermeture.
 
 ### Défis de la semaine
 
@@ -113,7 +113,6 @@ Voici ce que nous envisageons pour la suite du pack. Rien n'est promis : les pro
 - **Thèmes** : d'autres styles que Steamball pour tous les écrans dessinés, avec un petit éditeur pour créer le vôtre.
 - **Notes et favoris propres à chaque Profil**, puis la note moyenne de la maison pour chaque table.
 - **Installation en 30 secondes et mises à jour**, sans git.
-- **Les textes récents traduits** en allemand, espagnol, italien et portugais.
 
 ## Installation
 
