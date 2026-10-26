@@ -422,7 +422,7 @@ export default {
             5: "Senhor dos cinco placares",
             10: "O Kwisatz Hiscorach",
         },
-        highScoreTablesDescription: (count) => (count === 1 ? "Conquistar uma melhor pontuação numa mesa." : `Conquistar melhores pontuações em ${count} mesas diferentes.`),
+        highScoreTablesDescription: (count) => (count === 1 ? "Obter uma melhor pontuação numa mesa." : `Obter melhores pontuações em ${count} mesas diferentes.`),
         tableRecordTablesTitles: {
             1: "Um recorde para a todos governar",
             3: "Senhor da guerra de três mundos",
@@ -507,7 +507,7 @@ export default {
                 playerLevel: "Nível do jogador",
                 collectionMastery: "Maestria da coleção",
                 achievementsUnlocked: "Conquistas desbloqueadas",
-                dailyStreak: "Dias seguidos",
+                dailyStreak: "Sequência diária",
             },
         },
         // The Avatar Frame list opened from the Frame button: its title, the
@@ -679,7 +679,7 @@ export default {
         },
     },
     playerLevel: {
-        toastHeader: "Subiu de nível",
+        toastHeader: "Novo nível",
         toastTitle: (level) => `Nível ${level}`,
         toastDescription: "Suas conquistas levaram você a um novo nível.",
     },
@@ -694,7 +694,7 @@ export default {
             menuEntry: "Melhores pontuações",
             record: "Recorde",
             // In place of a place's owner when it belongs to no Profile.
-            defaultScore: "Padrão",
+            defaultScore: "Pontuação padrão",
             // In place of the initials when none were typed.
             noInitials: "\u2014",
             noScore: "Nenhuma pontuação",
@@ -805,12 +805,12 @@ export default {
             hallOfFame: {
                 name: "Hall of Fame",
                 whenOn: "Um filtro das suas dez mesas mais jogadas.",
-                whenOff: "Sem o botão Mesas mais jogadas em “Meu perfil”.",
+                whenOff: "Sem o botão Mesas mais jogadas em Meu perfil.",
             },
             tablesToDiscover: {
                 name: "Mesas a descobrir",
                 whenOn: "Um filtro das mesas que você nunca jogou.",
-                whenOff: "Sem o botão Mesas a descobrir em “Meu perfil”.",
+                whenOff: "Sem o botão Mesas a descobrir em Meu perfil.",
             },
             hiddenTables: {
                 name: "Mesas ocultas",
