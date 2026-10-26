@@ -244,6 +244,7 @@
         <div class="cell sweet">
           <a class="chip tr-share" href="#error-toast"><b></b>Toast d'erreur</a>
           <a class="chip tr-profiles" href="#picker-preload"><b></b>Welcome Screen sans pause</a>
+          <a class="chip tr-share" href="#rank-emblems"><b></b>Blasons de rang</a>
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
@@ -329,12 +330,18 @@
             <h3>Distribution : installation et mises à jour</h3>
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
           </div>
-          <p>Installer le projet en 30 secondes sans git : choix des Add-ons, dossier <code>Scripts\ExpansionPack</code> copié, ligne <code>import "./ExpansionPack/main.js";</code> ajoutée à <code>Scripts\main.js</code> si elle manque, <code>profiles\</code> et <code>.env.local</code> préservés dans le dossier, puis un moyen de mettre à jour.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Réécrit la section Install des README · Research : <code>docs/research/distribution-install-and-updates.md</code></div>
+          <p>Une Pack Version et des releases GitHub avec un <code>ExpansionPack.zip</code> déjà bien nommé : on l'installe à la main, sans git (zip extrait dans <code>Scripts\</code>, une ligne d'import). Ensuite PinballY s'occupe des mises à jour : l'Update Prompt, au démarrage avant tout le reste, propose la nouvelle version, et un helper caché la télécharge, la vérifie, permute le dossier en gardant les données du joueur, puis relance PinballY.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/331">#331</a> · ADR 0018 · Réécrit la section Install des README · Research : <code>docs/research/distribution-install-and-updates.md</code></div>
           <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Research : installation chez les utilisateurs de pincab, SmartScreen, GitHub Releases. Piste légère avant un vrai .exe : un zip dans GitHub Releases et un script PowerShell qui installe, écrit les <code>ADD_ON_*</code> cochés dans <code>.env.local</code> et vérifie la dernière version. Un .exe non signé déclenche SmartScreen, et une étape de build demande ton accord. Avant de diffuser, éloigner les blasons de rang (<code>assets/images/rank_*.png</code>) des emblèmes de League of Legends.</p>
+            <summary>Décisions du grilling (26/10/2026)</summary>
+            <ul>
+              <li>Ni <code>.exe</code> (SmartScreen, signature payante) ni script PowerShell à coller : première installation à la main depuis le zip, mises à jour depuis PinballY par un helper caché, comme le redémarrage (ADR 0017).</li>
+              <li>Vérification en arrière-plan à chaque démarrage, Update Prompt au démarrage suivant, avant le picker et le Welcome Screen (ADR 0018). Une fois par version, puis une entrée dans les Expansion Pack Settings ; seul qui voit les entrées de configuration (dernier Profile actif).</li>
+              <li>Vérification coupable dans <code>.env.local</code> et les réglages ; jamais sur une borne git. Pas de choix des Add-ons à l'installation, pas de désinstallation automatique, installeur en anglais seulement.</li>
+              <li>Échec : ancienne version remise, dialogue OK au démarrage suivant en attendant le toast d'erreur (<code>TODO</code>). Réussite : un message « mis à jour en vX.Y.Z », les nouveautés viendront avec la 1.0.</li>
+              <li>Script mainteneur <code>.mjs</code> pour publier la release (étape de build validée), sans CI.</li>
+            </ul>
           </details>
         </div>
       </li>
@@ -358,6 +365,24 @@
               <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
             </ul>
             <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="rank-emblems" data-track="share" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Des blasons de rang qui ne rappellent plus League of Legends</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>Redessiner les blasons de rang (<code>assets/images/rank_*.png</code> : plain, tile, missing, pour Bronze, Silver, Gold et Platinum) pour qu'ils s'éloignent des emblèmes de League of Legends, dans le style Steamball, avant de diffuser le pack au public.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Préalable de la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a></div>
+          <details>
+            <summary>Contexte</summary>
+            <p class="ctx">Sorti de la Distribution au grilling du 26/10/2026. git ne montre que des recadrages (04/10) : le blason Gold garde des ailes dorées et violettes autour d'une gemme, très proche de l'emblème Gold de LoL.</p>
           </details>
         </div>
       </li>
@@ -631,8 +656,12 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>26/10 <span class="count">(1)</span></summary>
+          <summary>26/10 <span class="count">(3)</span></summary>
           <ol>
+            <li><strong>La Distribution sans script à lancer : zip à la main, mises à jour depuis PinballY</strong>
+              <span>Grilling de la Distribution, spec #331 et ADR 0018 : ni <code>.exe</code> ni PowerShell à coller ; l'Update Prompt arrive au démarrage suivant la découverte d'une version, avant tout le reste, et un helper caché fait la mise à jour. Garde sa place ; effort moyen-gros et impact fort inchangés.</span></li>
+            <li><strong>Les blasons de rang à redessiner, juste avant la Sortie 1.0</strong>
+              <span>Sortis de la Distribution : c'est un préalable à la diffusion publique, pas à l'installation. Placés juste avant la 1.0, qu'ils conditionnent. Effort petit, impact moyen.</span></li>
             <li><strong>Le Welcome Screen sans pause, plutôt que préparé sous le Profile picker</strong>
               <span>Grilling de la 3ᵉ place : l'attente après le picker vient de la pause de 500 ms, inutile une fois la fenêtre en page, pas du dessin (~70 ms). La pause ne reste qu'au tout premier écran ; la préparation sous le picker attend une mesure sur la borne (au-delà de 150 ms). Le picker devient le Startup Screen par défaut, sauté sous deux Profiles dans le Household. Garde sa 3ᵉ place ; effort moyen → petit, impact moyen inchangé.</span></li>
           </ol>
