@@ -7,7 +7,7 @@
 
 import { describe, test, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { createFakePinballYHost, FAKE_PINBALLY_PID } from "../support/fake_pinbally_host.js";
+import { createFakePinballYHost, FAKE_PINBALLY_PID, settle } from "../support/fake_pinbally_host.js";
 import { createPinballYHost } from "../../common/core/pinbally_host.js";
 
 const NOW = new Date(2026, 8, 23, 10, 0, 0);
@@ -541,6 +541,36 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
 
         test("writing into a missing folder fails", () => {
             assert.throws(() => host.files.writeText("C:\\PinballY\\Scripts\\missing\\file.json", "{}"), /not found/);
+        });
+
+        test("tells an existing folder from a missing one or a file", () => {
+            fake.addFolder("C:\\PinballY\\Scripts\\ExpansionPack\\.git");
+            fake.addFile("C:\\PinballY\\Scripts\\ExpansionPack\\main.js");
+
+            assert.equal(host.files.folderExists("C:\\PinballY\\Scripts\\ExpansionPack\\.git"), true);
+            assert.equal(host.files.folderExists("C:\\PinballY\\Scripts\\ExpansionPack\\missing"), false);
+            assert.equal(host.files.folderExists("C:\\PinballY\\Scripts\\ExpansionPack\\main.js"), false);
+        });
+
+        test("an HTTP GET sends its headers and gives the reply text on status 200", async () => {
+            fake.replyToHttp({ text: "{\"tag_name\":\"v0.2.0\"}" });
+            const reply = await host.httpGet("https://example.com/latest?t=1", { "User-Agent": "Test" });
+
+            assert.equal(reply, "{\"tag_name\":\"v0.2.0\"}");
+            assert.deepEqual(fake.httpRequests(), [{ method: "GET", url: "https://example.com/latest?t=1", headers: { "User-Agent": "Test" } }]);
+        });
+
+        test("an HTTP GET answered with another status rejects with its status text", async () => {
+            fake.replyToHttp({ status: 403, statusText: "Forbidden" });
+            await assert.rejects(host.httpGet("https://example.com/latest", {}), /Forbidden/);
+        });
+
+        test("an HTTP GET with no reply yet stays pending", async () => {
+            let settled = false;
+            host.httpGet("https://example.com/latest", {}).then(() => { settled = true; }, () => { settled = true; });
+            await settle();
+            assert.equal(settled, false);
+            assert.equal(fake.httpRequests().length, 1);
         });
 
         test("tells a readable image from a missing or unreadable one, leaving no drawing layer behind", () => {

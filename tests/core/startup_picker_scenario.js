@@ -19,9 +19,11 @@ export const GLIDE_OVER_MS = 500;
 // addOns: the Add-ons turned on; profiles: the Household's folders;
 // childProfiles: those of them marked as Child Profiles; tables: the
 // wheel's, as the fake host takes them; settings: the other config values;
-// files: the paths present on disk (sounds).
+// files: the paths present on disk (sounds); seed(fake): anything else to
+// prepare before the start.
 export async function startOnProfilePicker({
     addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], childProfiles = [], activeProfile = "Bob", tables, settings = {}, files = [],
+    seed = () => {},
 } = {}) {
     const fake = createFakePinballYHost(tables ? { tables } : {});
     for (const name of profiles) fake.addFolder(`${PROFILES_FOLDER}\\${name}`);
@@ -30,6 +32,7 @@ export async function startOnProfilePicker({
     }
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile }));
     for (const path of files) fake.addFile(path);
+    seed(fake);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = addOns.includes(key);

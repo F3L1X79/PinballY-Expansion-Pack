@@ -15,6 +15,9 @@ function versionKeyOf(version) {
     return match ? [Number(match[1]), Number(match[2]), Number(match[3])] : null;
 }
 
+// The Pack Version a release tag ("v0.2.0") names: "0.2.0".
+export const packVersionOfTag = tag => tag.replace(/^v/, "");
+
 // True when candidate ("v0.2.0" or "0.2.0") is a later version than
 // reference, the running Pack Version by default.
 export function isNewerPackVersion(candidate, reference = PACK_VERSION) {

@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // Production PinballY host: the single seam through which the shared modules
 // reach PinballY (settings, clock, timers, tables, wheel, menus, layers,
-// sounds, files, programs, restart, registry, logfile.log).
+// sounds, files, programs, restart, HTTP, registry, logfile.log).
 // Every call passes straight through to PinballY's globals; tests use
 // tests/support/fake_pinbally_host.js. No side effects on import.
 // ============================================================
@@ -132,6 +132,7 @@ function createFileSystem() {
             return infos;
         },
         fileExists: (path) => fso().FileExists(path),
+        folderExists: (path) => fso().FolderExists(path),
         // The whole file as a Uint8Array; throws when it is missing or unreadable.
         readBytes: createByteReader(),
         readText: (path) => {
@@ -484,6 +485,15 @@ export function createPinballYHost() {
         // onQuitting() runs right before Quit, onFailed(error) instead when
         // the helper cannot get ready, PinballY then staying open.
         restartPinballY: createRestarter(files, startHidden),
+        // A GET through PinballY's HttpRequest (MSXML), always asynchronous:
+        // a synchronous one freezes PinballY. A Promise of the reply text,
+        // rejected for any status but 200.
+        httpGet: (url, headers = {}) => {
+            const request = new HttpRequest();
+            request.open("GET", url, true);
+            for (const [name, value] of Object.entries(headers)) request.setRequestHeader(name, value);
+            return request.send();
+        },
         // A registry value by its full path ("HKCU\\Software\\...\\name");
         // null when it is missing.
         readRegistryValue: (path) => {

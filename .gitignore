@@ -33,6 +33,9 @@ profiles/guest/*
 # The quiet wheel's original table volume, kept while it is lowered
 quiet_wheel_pending.json
 
+# The Pack Update's state: the newest known release (see docs/adr/0018)
+pack_update.json
+
 # vpxtool, installed by each owner (see the README); the pack's own restart helper is shipped
 tools/*
 !tools/restart_pinbally.ps1

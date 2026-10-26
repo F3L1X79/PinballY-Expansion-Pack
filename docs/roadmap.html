@@ -234,6 +234,7 @@
         <div class="cell sweet">
         </div>
         <div class="cell">
+          <a class="chip tr-share" href="#error-toast"><b></b>Toast d'erreur</a>
           <a class="chip tr-share" href="#release-1-0"><b></b>Sortie 1.0</a>
         </div>
         <div class="cell">
@@ -242,7 +243,6 @@
 
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
-          <a class="chip tr-share" href="#error-toast"><b></b>Toast d'erreur</a>
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
@@ -329,19 +329,20 @@
         <div class="content">
           <div class="item-head">
             <h3>Un toast d'erreur pour les actions qui échouent</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
           </div>
-          <p>Quand une action lancée par le joueur ou par le pack échoue (réglage non enregistré, <code>vpxtool</code> introuvable ou en erreur…), un toast dessiné le dit à l'écran, en plus de la ligne dans <code>logfile.log</code>, au lieu d'un échec visible seulement dans le journal.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la forme de l'Achievement Toast (calque non bloquant) ; servira aux Expansion Pack Settings (« Réglage non enregistré », « Redémarrage impossible »). Après la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> : ses messages attendront la suivante</div>
+          <p>Un Error Toast dit à l'écran ce qu'un échec a coûté, quand le joueur ne le verrait pas autrement : une Play non enregistrée dans le Play Log, <code>vpxtool</code> introuvable, une Pack Update échouée. Et un Error Log, <code>errors.log</code> dans le dossier du pack, garde toutes les erreurs d'une session à l'autre, puisque <code>PinballY.log</code> repart à zéro à chaque lancement.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Une famille de l'Achievement Toast (<code>TOAST_KIND</code>). À livrer avant le ticket #335 de la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a>, qui l'utilisera pour l'échec de la Pack Update, sans dialogue provisoire</div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Décisions du grilling (26/10/2026)</summary>
             <ul>
-              <li>Quelles erreurs méritent un toast : seulement celles d'une action que le joueur vient de demander, ou aussi celles d'un travail de fond (Table ROMs, lecture d'un fichier mis de côté) ?</li>
-              <li>Un module partagé à part, ou une variante de l'Achievement Toast ?</li>
-              <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
+              <li>Toast seulement pour un échec qui coûte quelque chose et ne se répare pas seul au démarrage suivant : Play non enregistrée (au Profile qui a joué, Child et Guest compris), <code>vpxtool</code> introuvable avec Table ROMs activé (à un Admin Profile, à chaque démarrage tant que ça dure), Pack Update échouée (une fois, à un Admin Profile, en attendant qu'il y en ait un d'actif). Pas pour un fichier de high scores illisible, un <code>vpxtool</code> en erreur sur une table ni une erreur inattendue de <code>safeHandler</code>.</li>
+              <li>Les messages qui existent déjà restent : « non enregistré » et « Redémarrage impossible » des Expansion Pack Settings, message du Profile Reset, échec du téléchargement juste après « Update now ». Ils répondent à un choix que le joueur vient de faire. La réussite d'une Pack Update reste un dialogue.</li>
+              <li>Une famille de l'Achievement Toast : couleur propre, signe d'avertissement, même file et mêmes attentes (partie, dialogue dessiné, Welcome Screen), 10 s à l'écran. En-tête « Problème », une phrase traduite par cas (ce qui est perdu, et quoi faire pour l'Admin), traduite dans les six langues ; jamais de renvoi au journal, sauf le journal du helper pour la Pack Update.</li>
+              <li>Error Log : toutes les erreurs du pack (pas les <code>WARNING</code>), par une seule fonction qui écrit aussi dans <code>PinballY.log</code> ; une ligne = date et heure, Pack Version, <code>[Script]</code>, message, la pile en retrait. Ignoré par git, gardé par la Pack Update ; au-delà de 1 Mo au démarrage il devient <code>errors.old.log</code>. S'il ne s'écrit pas : une seule ligne dans <code>PinballY.log</code> par session, jamais de toast.</li>
             </ul>
-            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
+            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur ; l'Error Log ajouté au grilling.</p>
           </details>
         </div>
       </li>
@@ -356,7 +357,7 @@
           </div>
           <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Jalon après la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a>, la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a>. Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <div class="links">Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a>. Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
             <summary>Questions ouvertes (4)</summary>
             <ul>
@@ -446,7 +447,7 @@
           </div>
           <p>Un ou deux easter eggs tirés au hasard : par exemple une petite image qui apparaît au lancement avec une chance sur 1000, et un Secret Achievement de la famille Surprises débloqué par le Profile qui l'a vue.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend le tracker des Surprises (<code>common/achievements/surprises.js</code>, livré) et le style Steamball. Après la <a href="#translations">passe de traduction (n° <span data-ref="translations"></span>)</a> : ses textes iront en anglais dans de, es, it et pt, marqués <code>// TODO: translation pass</code></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend le tracker des Surprises (<code>common/achievements/surprises.js</code>, livré) et le style Steamball. Ses textes sont traduits tout de suite dans les six langues</div>
           <details>
             <summary>Questions ouvertes (5)</summary>
             <ul>
@@ -650,8 +651,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>26/10 <span class="count">(5)</span></summary>
+          <summary>26/10 <span class="count">(6)</span></summary>
           <ol>
+            <li><strong>Le toast d'erreur garde sa 2ᵉ place, avec un Error Log, et passe avant le ticket #335</strong>
+              <span>Grilling de la 2ᵉ place : un Error Toast seulement pour un échec qui coûte quelque chose et que le joueur ne verrait pas (Play non enregistrée, <code>vpxtool</code> introuvable, Pack Update échouée), les messages d'échec actuels restant en place. Un <code>errors.log</code> gardé d'une session à l'autre s'y ajoute. Il garde sa place, mais doit être livré avant le ticket #335 de la Distribution, qui l'utilise directement. Effort petit → moyen (Error Log, nouvelle écriture en ajout du host), impact moyen → fort (premier outil de diagnostic avant la 1.0).</span></li>
             <li><strong>Feld, juste après les Easter eggs</strong>
               <span>Idée de Félix. Même famille, après eux. Effort petit, impact faible.</span></li>
             <li><strong>Le Welcome Screen préparé sous le Profile picker revient, après la Distribution</strong>

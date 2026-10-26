@@ -2,7 +2,7 @@
 // In-memory fake PinballY host for the node tests: the same interface as
 // common/core/pinbally_host.js, plus controls to drive it (clock and timers,
 // tables, wheel, menus, events, attract mode, games, file system, registry,
-// programs, restarts, PINemHi boards) and inspect what the code did.
+// programs, restarts, HTTP replies, PINemHi boards) and inspect what the code did.
 // Never loaded by PinballY.
 // - Reproduces only behaviours written in docs/pinbally/ or an ADR.
 // - installGlobals() also exposes it as PinballY's globals, for code not yet on the host.
@@ -233,6 +233,10 @@ export function createFakePinballYHost({
     // Restarts asked so far, and how many of the next ones never get ready.
     let restartCount = 0;
     let failingRestartCount = 0;
+    // The replies to the next HTTP requests, in order: { status, statusText, text }.
+    const httpReplies = [];
+    // Every HTTP request sent, in order: { method, url, headers }.
+    const httpRequestList = [];
     // Pending timers, run in due order by advanceTime(): { id, dueMs, callback, intervalMs }.
     let timers = [];
     let nextTimerId = 1;
@@ -714,6 +718,7 @@ export function createFakePinballYHost({
             return [...files.keys()].filter(path => parentFolder(path) === parent).map(path => path.slice(parent.length + 1));
         },
         fileExists: (path) => files.has(path),
+        folderExists: (path) => folders.has(withoutTrailingSlash(path)),
         readText(path) {
             requireFile(path);
             fileReadList.push(path);
@@ -890,6 +895,35 @@ export function createFakePinballYHost({
             onQuitting();
             host.doCommand(BUILT_IN_COMMANDS.Quit);
         }, RESTART_HELPER_READY_MS);
+    }
+
+    // Like PinballY's HttpRequest.send() (docs/pinbally/pinbally-help.md:
+    // it rejects every status other than 200): the reply text on status
+    // 200, else a rejection with new Error(statusText). A request with no reply queued never answers,
+    // like a slow network.
+    function sendHttp(method, url, headers) {
+        httpRequestList.push({ method, url, headers: { ...headers } });
+        if (httpReplies.length === 0) return new Promise(() => {});
+        const { status = 200, statusText = "OK", text = "" } = httpReplies.shift();
+        return status === 200 ? Promise.resolve(text) : Promise.reject(new Error(statusText));
+    }
+
+    // SystemClasses.js's HttpRequest, asynchronous only: a synchronous
+    // open() freezes PinballY (HttpRequest.html).
+    class FakeHttpRequest {
+        constructor() {
+            this.target = null;
+            this.headers = {};
+        }
+
+        open(method, url, async) {
+            if (async !== true) throw new Error(`The fake host sends asynchronous requests only: ${method} ${url}`);
+            this.target = { method, url };
+        }
+
+        setRequestHeader(name, value) { this.headers[name] = value; }
+
+        send() { return sendHttp(this.target.method, this.target.url, this.headers); }
     }
 
     // WScript.Shell as PinballY's COM bridge offers it on the cabinet: no
@@ -1229,6 +1263,7 @@ export function createFakePinballYHost({
         createSoundRotation,
         runHiddenProgram,
         restartPinballY,
+        httpGet: (url, headers = {}) => sendHttp("GET", url, headers),
         readRegistryValue: (path) => (registryValues.has(path) ? registryValues.get(path) : null),
         files: fileSystem,
         log: (text) => { logLines.push(text); },
@@ -1237,6 +1272,10 @@ export function createFakePinballYHost({
         restartsAsked: () => restartCount,
         // The next restart asked never gets ready.
         failNextRestart() { failingRestartCount++; },
+        // Queues the reply to the next HTTP request, through either host:
+        // { status (200), statusText, text }.
+        replyToHttp(reply) { httpReplies.push({ ...reply }); },
+        httpRequests: () => httpRequestList.map(request => ({ ...request, headers: { ...request.headers } })),
 
         // Moves the date without running the timers.
         setNow(date) { nowMs = date.getTime(); },
@@ -1592,7 +1631,7 @@ export function createFakePinballYHost({
                 "optionSettings", "gameList", "mainWindow", "command", "logfile", "Date",
                 "StyledText", "CommandEvent", "systemInfo", "createAutomationObject",
                 "setTimeout", "clearTimeout", "setInterval", "clearInterval",
-                "backglassWindow", "dllImport",
+                "backglassWindow", "dllImport", "HttpRequest",
             ];
             const previous = globalNames.map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]);
 
@@ -1663,6 +1702,7 @@ export function createFakePinballYHost({
                 clearInterval: removeTimer,
                 StyledText: FakeStyledText,
                 CommandEvent: FakeCommandEvent,
+                HttpRequest: FakeHttpRequest,
                 systemInfo: { programDir: programFolder, version: pinballYVersion },
                 backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
                 // Only User32's GetSystemMetrics, for the monitor count
