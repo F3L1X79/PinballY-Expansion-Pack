@@ -48,13 +48,14 @@ export function playFor(fake, game, seconds) {
 }
 
 // challenge: the week's, locked; games: what Alice's Challenge counted;
-// plays: Alice's play records; addOns: the enabled Add-ons. Returns the
-// fake once the Welcome Screen is open.
+// plays: Alice's play records; others: more Profiles' names; addOns: the
+// enabled Add-ons. Returns the fake once the Welcome Screen is open.
 export async function startWithChallenge({
-    challenge = STERN_CHALLENGE, games = [], completed = false, plays = {}, tables = TABLES,
+    challenge = STERN_CHALLENGE, games = [], completed = false, plays = {}, tables = TABLES, others = [],
     addOns = ["startupChoicePrompt", "profilePicker", "challenges"], language = "en",
 } = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
+    for (const name of others) fake.addFile(`${PROFILES}\\${name}\\profile.json`, JSON.stringify({ version: 1, notified: [], plays: {} }));
     fake.addFile(ALICE_FILE, JSON.stringify({
         version: 1, notified: [], plays,
         challenge: { firstWeek: WEEK, week: WEEK, games, completed, completedCount: completed ? 1 : 0, judgedWeek: "", history: [] },
