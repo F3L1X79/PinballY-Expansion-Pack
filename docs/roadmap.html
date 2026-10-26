@@ -243,7 +243,6 @@
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
           <a class="chip tr-share" href="#error-toast"><b></b>Toast d'erreur</a>
-          <a class="chip tr-share" href="#rank-emblems"><b></b>Blasons de rang</a>
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
@@ -259,6 +258,7 @@
         <div class="cell">
           <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
           <a class="chip tr-play" href="#clock"><b></b>Heure à l'écran</a>
+          <a class="chip tr-play" href="#feld"><b></b>Feld</a>
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#welcome-under-picker"><b></b>Welcome Screen sous le picker</a>
@@ -461,6 +461,19 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="feld" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Feld</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span></div>
+          </div>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links"><a href="../.scratch/feld.md">.scratch/feld.md</a></div>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-play" id="mini-game" data-track="play" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -637,8 +650,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>26/10 <span class="count">(4)</span></summary>
+          <summary>26/10 <span class="count">(5)</span></summary>
           <ol>
+            <li><strong>Feld, juste après les Easter eggs</strong>
+              <span>Idée de Félix. Même famille, après eux. Effort petit, impact faible.</span></li>
             <li><strong>Le Welcome Screen préparé sous le Profile picker revient, après la Distribution</strong>
               <span>Mesure du ticket #330 sur la borne : <code>Opened, drawn in 289 ms</code> après un choix dans le picker, au-delà du seuil de 150 ms ; l'idée revient comme chantier à part. Placée juste après la Distribution, déjà en tickets : vue à chaque démarrage de la borne, mais le gain n'est plus que ces ~290 ms, la pause de 500 ms étant partie. Effort moyen (le Profile n'est pas encore choisi), impact faible.</span></li>
             <li><strong>La Distribution sans script à lancer : zip à la main, mises à jour depuis PinballY</strong>
