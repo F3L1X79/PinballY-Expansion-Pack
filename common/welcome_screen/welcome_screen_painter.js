@@ -1,7 +1,8 @@
 ﻿// ============================================================
 // Welcome Screen painter: layout and drawing of the Welcome Screen (header,
-// Period Table cards, bottom row, Button Hints, each choice's rect and
-// tooltip), in reference pixels, from the prototype validated on the cabinet.
+// Period Table and Challenge Table cards, bottom row, Button Hints, each
+// choice's rect and tooltip), in reference pixels, from the prototype
+// validated on the cabinet.
 // Only drawing: no layer, no event, no side effect.
 // ============================================================
 
@@ -19,7 +20,7 @@ export const WELCOME_SCREEN_Z_INDEX = Object.freeze({ backdrop: 6100, header: 61
 
 export const REFERENCE_HEIGHT = 1920;
 
-export const CHOICE = Object.freeze({ AVATAR: "avatar", EXIT_BUTTON: "exitButton", DAY: "day", WEEK: "week", STAY: "stay", RANDOM: "random" });
+export const CHOICE = Object.freeze({ AVATAR: "avatar", EXIT_BUTTON: "exitButton", DAY: "day", WEEK: "week", CHALLENGE: "challenge", STAY: "stay", RANDOM: "random" });
 
 
 const LOOK = Object.freeze({
@@ -100,6 +101,11 @@ function drawGreyLine(host, dc, count, lineText, x, y, w) {
     if (count === null) drawCheck(dc, x + 6, top + 5, 15, COLORS.description);
     else text(host, dc, String(count), { x, y: top, width: tile, height: tile, size: count > 99 ? 11 : 14, weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
     oneLine(host, dc, lineText, { x: x + tile + 12, y: top, width: w - tile - 12, height: tile, size: LOOK.lineSize, minSize: LOOK.minLineSize, color: COLORS.description });
+}
+
+// A grey line without its square, on the grey line's height.
+function drawPlainLine(host, dc, lineText, x, y, w) {
+    oneLine(host, dc, lineText, { x, y: y + 2, width: w, height: LOOK.lineTile, size: LOOK.lineSize, minSize: LOOK.minLineSize, color: COLORS.description });
 }
 
 // ---------- Mastery cards ----------
@@ -236,8 +242,7 @@ export function drawBackdrop(dc, size, referenceWidth, screen) {
     drawPanelBackdrop(dc, size, REFERENCE_HEIGHT, geometry(referenceWidth, screen).panel);
 }
 
-// The Period Table cards, top to bottom, each with the highlight of its
-// "Go" button.
+// The table cards, top to bottom, each with the highlight of its "Go" button.
 function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, masteryCardH }, cardsTop, choiceAt) {
     const { button } = LOOK;
     // Centred on the Mastery card's height.
@@ -257,7 +262,8 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
                 text(host, dc, card.period, { x: detailsX, y: LOOK.cardTop, width: detailsW, size: LOOK.periodSize, weight: 700, color: COLORS.gold, font: FONTS.display });
                 oneLine(host, dc, card.title, { x: detailsX, y: LOOK.nameY, width: detailsW, size: LOOK.nameSize, minSize: LOOK.minNameSize });
                 drawTableMasteryCard(host, dc, card.mastery, card.masteryHead, detailsX, LOOK.masteryY, detailsW);
-                if (card.line) drawGreyLine(host, dc, card.line.played ? null : card.line.streak, card.line.text, detailsX, lineY, detailsW);
+                if (card.line && card.line.plain) drawPlainLine(host, dc, card.line.text, detailsX, lineY, detailsW);
+                else if (card.line) drawGreyLine(host, dc, card.line.played ? null : card.line.streak, card.line.text, detailsX, lineY, detailsW);
                 fillGradient(dc, buttonRect.x, buttonRect.y, button.w, button.h, COLORS.rowUnlocked, COLORS.tile);
                 dc.frameRect(buttonRect.x, buttonRect.y, button.w, button.h, 1, COLORS.border);
                 text(host, dc, card.goLabel, { x: buttonRect.x, y: buttonRect.y, width: button.w, height: button.h, size: button.size, weight: 700, font: FONTS.display, align: "center" });
@@ -284,7 +290,8 @@ function layoutCards(host, screen, { inner, cardHs, lineY, logoW, detailsX, mast
 // collection ({ tier, reached, needed, goal, current }), cards
 // (each { choice, period, title, logoPath, mastery, masteryHead ({ text,
 // color }, as the Mastery Bar's), line
-// (null, or { played, streak, text }), goLabel }), choices, labels (by
+// (null, { played, streak, text }, or { plain: true, text } without the
+// square), goLabel }), choices, labels (by
 // choice), exitLook (the Exit Button's EXIT_BUTTON_LOOK), buttonHints
 // (the footer's groups) }. Returns the pieces, each { zIndex, rect, draw(dc) } drawn in
 // its rect's own coordinates, and the highlight of each choice.

@@ -1,9 +1,9 @@
 ﻿// ============================================================
-// Welcome Screen: at startup (alone or after the startup Profile picker),
-// after Change Player and from its main menu entry, a drawn panel greets the
-// active Profile (Daily Streak, Lost Records, Collection Mastery) and offers
-// a Period Table, a Random Game, or to stay. A drawn dialog of the wheel
-// dialog module at the startup priority (docs/adr/0011).
+// Welcome Screen: at startup (alone or after the startup Profile picker), after
+// Change Player and from its main menu entry, a drawn panel greets the active
+// Profile (Daily Streak, Lost Records, Collection Mastery) and offers a Period
+// Table, a Challenge Table drawn at each opening, a Random Game, or to stay.
+// A drawn dialog of the wheel dialog module at the startup priority (docs/adr/0011).
 // - At startup only, the startup veil dims the wheel until the panel is in.
 // - Swallows every button through "commandbuttondown" while open.
 // - Reading the Period cards picks and locks this Period's tables.
@@ -28,6 +28,8 @@ import { getRandomGame } from "../common/tables/random_game.js";
 import { getDailyStreak } from "../common/achievements/daily_streak.js";
 import { getHighScoreStore } from "../common/high_scores/high_score_store.js";
 import { getTableOfTheDay, getTableOfTheWeek } from "../common/tables/period_table.js";
+import { launchShownTable } from "../common/tables/table_launch.js";
+import { getChallenges, challengeTitleOf } from "../common/challenges/challenge.js";
 import { masteryOf, collectionMasteryOfProfile } from "../common/mastery/table_mastery.js";
 import { tablesVisibleTo } from "../common/tables/visible_tables.js";
 import { masteryHeadOf, collectionTextsOf } from "../common/mastery/mastery_bar.js";
@@ -72,6 +74,8 @@ export default function init() {
     // The Lost Records come from the High Scores Add-on's store: none when it is off.
     const highScores = config.addOns.highScores === false ? null : getHighScoreStore();
     const periodTables = { [CHOICE.DAY]: getTableOfTheDay(), [CHOICE.WEEK]: getTableOfTheWeek() };
+    // The Challenge Tables come from the Challenges Add-on: none when it is off.
+    const challenges = config.addOns.challenges === false ? null : getChallenges();
     const navigationSound = createNavigationSound(host, SCRIPT_NAME);
     // The screen greets the Profile in place of the Profile Greeting, so it
     // takes its sound; one that cannot play is logged and never stops the screen.
@@ -140,27 +144,51 @@ export default function init() {
         return { avatarPath: lineAvatarOf(lostRecords[0].taker), text };
     }
 
-    // A card per Period Table offered to the active Profile; reading it
-    // picks and locks this Period's table when nobody did yet.
-    function readCards() {
+    // One of the active Profile's Challenge Tables, each with the same
+    // chance, drawn anew at each opening; never the Last Played Table,
+    // unless it is the only one. Null without any.
+    function drawChallengeTable() {
+        if (!challenges) return null;
+        const tables = challenges.getTablesToPlay();
+        const lastPlayed = randomGame.getLastPlayedTable();
+        const others = tables.filter(game => !lastPlayed || game.configId !== lastPlayed.configId);
+        const candidates = others.length > 0 ? others : tables;
+        return candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)] : null;
+    }
+
+    function cardOf(choice, game, period, line) {
+        const mastery = masteryOf(store.getPlay(game.configId));
+        return {
+            choice,
+            period,
+            title: cleanTitle(game.title),
+            logoPath: host.getWheelImage(game),
+            mastery,
+            masteryHead: masteryHeadOf(mastery ? mastery.level : 0),
+            line,
+            goLabel: TEXT.periodCards.go,
+        };
+    }
+
+    // The Challenge's title, as on the Challenge Card, and the progress.
+    function challengeLineOf() {
+        const { challenge, value } = challenges.getActiveView();
+        return { plain: true, text: TEXT.periodCards.challenge.progress(challengeTitleOf(challenge), value, challenge.target) };
+    }
+
+    // A card per Period Table offered to the active Profile, then the
+    // drawn Challenge Table's, if any; reading them picks and locks this
+    // Period's tables when nobody did yet.
+    function readCards(challengeTable) {
         const cards = [];
         for (const choice of [CHOICE.DAY, CHOICE.WEEK]) {
             const periodTable = periodTables[choice];
             const game = periodTable.getOfferedTable();
             if (!game) continue;
             const texts = TEXT.periodCards[choice];
-            const mastery = masteryOf(store.getPlay(game.configId));
-            cards.push({
-                choice,
-                period: texts.period,
-                title: cleanTitle(game.title),
-                logoPath: host.getWheelImage(game),
-                mastery,
-                masteryHead: masteryHeadOf(mastery ? mastery.level : 0),
-                line: greyLineOf(periodTable, texts),
-                goLabel: TEXT.periodCards.go,
-            });
+            cards.push(cardOf(choice, game, texts.period, greyLineOf(periodTable, texts)));
         }
+        if (challengeTable) cards.push(cardOf(CHOICE.CHALLENGE, challengeTable, TEXT.periodCards.challenge.period, challengeLineOf()));
         return cards;
     }
 
@@ -174,8 +202,10 @@ export default function init() {
         // What the wheel shows behind the screen: staying keeps it.
         const current = host.getCurrentTable();
         const stay = current ? cleanTitle(current.title) : null;
-        const cards = readCards();
+        const challengeTable = drawChallengeTable();
+        const cards = readCards(challengeTable);
         return {
+            challengeTable,
             picker,
             avatarPath: profile.avatarPath,
             framePath: picker ? getProfileRewards().wornImageOf(profile.name, AVATAR_FRAME_WIDTH) : null,
@@ -252,7 +282,7 @@ export default function init() {
         const targets = screen.choices.map(choice => highlights[choice].target);
         const marker = createSelectionMarker(host, { zIndex: WELCOME_SCREEN_Z_INDEX.marker, referenceWidth, referenceHeight: REFERENCE_HEIGHT });
         marker.moveTo(targets[selected]);
-        shown = { layers, tooltipLayers, marker, targets, choices: screen.choices, selected, opacity: 0, fadeTimer: null };
+        shown = { layers, tooltipLayers, marker, targets, choices: screen.choices, challengeTable: screen.challengeTable, selected, opacity: 0, fadeTimer: null };
         // The comet would freeze while the screen is drawn on the UI thread:
         // it goes as the panel fades in, the veil once the panel is fully in.
         startupVeil.hideLoader();
@@ -343,9 +373,13 @@ export default function init() {
 
     function choose() {
         const choice = shown.choices[shown.selected];
-        close({ atOnce: choice === CHOICE.RANDOM || choice in periodTables });
+        const { challengeTable } = shown;
+        close({ atOnce: choice === CHOICE.RANDOM || choice === CHOICE.CHALLENGE || choice in periodTables });
         if (choice === CHOICE.RANDOM) return randomGame.launch();
         if (choice === CHOICE.AVATAR) getChangePlayer()();
+        // Launched as shown, without checking again: only a new week starting
+        // while the screen is open could change the Challenge Tables.
+        if (choice === CHOICE.CHALLENGE) launchShownTable(host, challengeTable);
         // Locked when the screen was read; a new Period since may have
         // picked an Adult Table, never launched for a Child Profile.
         if (choice in periodTables) {

@@ -8,9 +8,10 @@
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";
-import { createPinballYHost, ALL_TABLES_FILTER } from "../core/pinbally_host.js";
+import { createPinballYHost } from "../core/pinbally_host.js";
 import { getProfileStore } from "../profiles/profile_store.js";
 import { isAdultTable, isKeptFromChild } from "./adult_tables.js";
+import { launchShownTable } from "./table_launch.js";
 
 const SCRIPT_NAME = "PeriodTable";
 
@@ -155,24 +156,9 @@ export function createPeriodTable(host, definition, profileStore) {
         return period === lastPeriod;
     }
 
-    // Selected on the wheel first, so the wheel is on it when the game
-    // ends and at the next startup; a filter that leaves it out gives way
-    // to all tables.
-    function selectOnWheel(game) {
-        const offsetOf = () => host.getWheelTables().findIndex(table => table.configId === game.configId);
-        let offset = offsetOf();
-        if (offset < 0) {
-            host.setCurrentFilter(ALL_TABLES_FILTER);
-            offset = offsetOf();
-        }
-        if (offset > 0) host.setWheelGame(offset);
-    }
-
     function launch() {
         const game = getTable();
-        if (!game) return;
-        selectOnWheel(game);
-        host.playGame(game);
+        if (game) launchShownTable(host, game);
     }
 
     // Whether the active Profile already played this Period's table.

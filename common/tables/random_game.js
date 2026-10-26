@@ -118,7 +118,7 @@ export function createRandomGame(host, profileStore, { animateTo, skipAnimation 
         pendingConfigId = null;
     }));
 
-    return { launch, getRandomGamesPlayed, isStartedGameRandom: () => startedGameIsRandom };
+    return { launch, getRandomGamesPlayed, getLastPlayedTable: findLastPlayedTable, isStartedGameRandom: () => startedGameIsRandom };
 }
 
 async function animateWheelThenPause(tables, index) {

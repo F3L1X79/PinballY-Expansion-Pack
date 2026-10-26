@@ -146,7 +146,7 @@ The screen shown over the dimmed wheel when PinballY starts (as the Startup Scre
 _Avoid_: startup prompt, splash screen, dialog (it does more than ask a question)
 
 **Startup Screen**:
-The first screen PinballY shows when it starts, chosen by the cabinet's owner: the Welcome Screen (the usual one), the Profile picker (skipped while the Household is empty), which the Welcome Screen then follows whether a Profile is picked or the last active one kept with Exit, or the bare wheel, where the Profile Greeting greets the last active Profile. While the Welcome Screen or the Profile picker is open as the Startup Screen, toasts and prompts wait for it to close. A Startup Screen that is turned off gives way to the next one, from the Profile picker to the Welcome Screen to the wheel. Shown as "Écran de démarrage" in French.
+The first screen PinballY shows when it starts, chosen by the cabinet's owner: the Profile picker (the usual one, skipped while the Household has fewer than two Profiles), which the Welcome Screen then follows whether a Profile is picked or the last active one kept with Exit, the Welcome Screen alone, or the bare wheel, where the Profile Greeting greets the last active Profile. While the Welcome Screen or the Profile picker is open as the Startup Screen, toasts and prompts wait for it to close. A Startup Screen that is turned off gives way to the next one, from the Profile picker to the Welcome Screen to the wheel. Shown as "Écran de démarrage" in French.
 _Avoid_: splash screen, first screen
 
 **Last Played Table**:

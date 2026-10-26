@@ -1,0 +1,23 @@
+// ============================================================
+// Launches a table the player was shown in advance (a Period Table, the
+// Welcome Screen's Challenge Table): selected on the wheel first, so the
+// wheel is on it when the game ends and at the next startup.
+// - A filter that leaves the table out gives way to All Tables.
+// ============================================================
+
+import { ALL_TABLES_FILTER } from "../core/pinbally_host.js";
+
+function selectOnWheel(host, game) {
+    const offsetOf = () => host.getWheelTables().findIndex(table => table.configId === game.configId);
+    let offset = offsetOf();
+    if (offset < 0) {
+        host.setCurrentFilter(ALL_TABLES_FILTER);
+        offset = offsetOf();
+    }
+    if (offset > 0) host.setWheelGame(offset);
+}
+
+export function launchShownTable(host, game) {
+    selectOnWheel(host, game);
+    host.playGame(game);
+}

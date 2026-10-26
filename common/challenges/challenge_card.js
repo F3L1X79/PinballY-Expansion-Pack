@@ -9,6 +9,7 @@
 import lang from "../core/i18n.js";
 import { safeHandler } from "../core/safe_handler.js";
 import { STEAMBALL_COLORS, STEAMBALL_FONTS } from "../drawing/steamball_palette.js";
+import { challengeTitleOf } from "./challenge.js";
 
 const SCRIPT_NAME = "ChallengeCard";
 
@@ -58,13 +59,12 @@ function drawText(host, dc, text, { y, ...style }) {
     styled.draw(dc, { x: CARD.x + CARD.padding, y: CARD.y + y, width: TEXT_WIDTH, height: styled.measure(TEXT_WIDTH).height });
 }
 
-const titleOf = challenge => lang.challenges.titles[challenge.template](challenge.target, challenge.param);
 
 // How much taller than one line the challenge's title is once wrapped.
 function titleExtraHeight(host, challenge) {
     const style = { size: TITLE.size, weight: 600 };
     const oneLine = styledText(host, "X", style).measure(TEXT_WIDTH).height;
-    return Math.max(0, styledText(host, titleOf(challenge), style).measure(TEXT_WIDTH).height - oneLine);
+    return Math.max(0, styledText(host, challengeTitleOf(challenge), style).measure(TEXT_WIDTH).height - oneLine);
 }
 
 // The card's canvas height for this Challenge, in reference px: the Mastery
@@ -110,7 +110,7 @@ function drawCard(host, dc, face, lit, extra) {
     dc.fillRect(CARD.x, CARD.y, CARD.width, CARD.accentHeight, COLORS.accent);
 
     drawText(host, dc, header.toLocaleUpperCase(), { ...HEADER, weight: 600, color: COLORS.accent });
-    drawText(host, dc, titleOf(challenge), { ...TITLE, weight: 600, color: COLORS.title });
+    drawText(host, dc, challengeTitleOf(challenge), { ...TITLE, weight: 600, color: COLORS.title });
 
     const barX = CARD.x + CARD.padding;
     const barY = CARD.y + BAR.y + extra;

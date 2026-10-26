@@ -247,6 +247,10 @@ export default {
                 played: "Jouée cette semaine",
                 streak: "semaines d'affilée sur la table de la semaine : continue !",
             },
+            challenge: {
+                period: "UNE TABLE DU DÉFI",
+                progress: (title, value, target) => `${title} · ${value}/${target}`,
+            },
             go: "Y aller",
         },
     },

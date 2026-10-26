@@ -188,6 +188,9 @@ const TEMPLATES = Object.freeze({
 });
 export const CHALLENGE_TEMPLATE_IDS = Object.freeze(Object.keys(TEMPLATES));
 
+// The Challenge's title, the same on its Card, its Toast and the Welcome Screen.
+export const challengeTitleOf = challenge => lang.challenges.titles[challenge.template](challenge.target, challenge.param);
+
 const NO_CHALLENGE = Object.freeze({ current: null, previous: null });
 const emptyProfileChallenge = () => ({
     firstWeek: "", week: "", games: [], completed: false, completedCount: 0, judgedWeek: "", history: [],
@@ -406,7 +409,7 @@ export function createChallenges(host, profileStore, { tableOfTheDay, tableOfThe
         log(`${profileName} completed the week ${week} Challenge.`);
         toasts.submit({
             kind: TOAST_KIND.CHALLENGE,
-            title: lang.challenges.titles[challenge.template](challenge.target, challenge.param),
+            title: challengeTitleOf(challenge),
             description: lang.challenges.toastDescription(completedCount),
             celebrate: true,
             onShown() {},

@@ -246,6 +246,11 @@ export default {
                 played: "Diese Woche gespielt",
                 streak: "Wochen in Folge am Tisch der Woche: weiter so!",
             },
+            // TODO: translation pass
+            challenge: {
+                period: "A CHALLENGE TABLE",
+                progress: (title, value, target) => `${title} · ${value}/${target}`,
+            },
             go: "Los",
         },
     },
