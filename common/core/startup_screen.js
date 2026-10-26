@@ -29,8 +29,8 @@ const CHAIN = [
 export function resolveStartupScreen(host, { setting, addOns, householdHasFewerThanTwoProfiles }) {
     let screen = setting;
     if (!ACCEPTED.includes(screen)) {
-        host.log(`[Config] startupScreen "${setting}" is not one of ${ACCEPTED.join(", ")}; starting on the Welcome Screen.`);
-        screen = STARTUP_SCREEN.WELCOME;
+        host.log(`[Config] startupScreen "${setting}" is not one of ${ACCEPTED.join(", ")}; starting on the Profile picker.`);
+        screen = STARTUP_SCREEN.PROFILE_PICKER;
     }
     for (let index = CHAIN.findIndex(step => step.screen === screen); index >= 0 && index < CHAIN.length; index++) {
         const step = CHAIN[index];

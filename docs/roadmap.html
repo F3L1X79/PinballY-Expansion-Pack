@@ -262,6 +262,7 @@
           <a class="chip tr-play" href="#clock"><b></b>Heure à l'écran</a>
         </div>
         <div class="cell">
+          <a class="chip tr-profiles" href="#welcome-under-picker"><b></b>Welcome Screen sous le picker</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
@@ -342,6 +343,28 @@
               <li>Échec : ancienne version remise, dialogue OK au démarrage suivant en attendant le toast d'erreur (<code>TODO</code>). Réussite : un message « mis à jour en vX.Y.Z », les nouveautés viendront avec la 1.0.</li>
               <li>Script mainteneur <code>.mjs</code> pour publier la release (étape de build validée), sans CI.</li>
             </ul>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-profiles" id="welcome-under-picker" data-track="profiles" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Le Welcome Screen préparé sous le Profile picker</h3>
+            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+          </div>
+          <p>Au démarrage par le Profile picker, le Welcome Screen se lit et se dessine pendant que le carrousel est ouvert, pour apparaître d'un coup après le choix ou Exit, au lieu d'être préparé seulement à son tour.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Suit le <a href="#picker-preload">Welcome Screen sans pause (n° <span data-ref="picker-preload"></span>)</a> ; mesure du ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/330">#330</a></div>
+          <details>
+            <summary>Questions ouvertes (2)</summary>
+            <ul>
+              <li>Le Profile n'est pas encore choisi : préparer l'écran du Profile surligné et le refaire s'il change, ou seulement ce qui ne dépend pas du Profile ?</li>
+              <li>Le dessin d'avance passe par <code>getDrawingAhead()</code> : ses tranches ne doivent pas ralentir le défilement du carrousel.</li>
+            </ul>
+            <p class="ctx">Mesure sur la borne le 26/10/2026 (#330) : <code>[WelcomeScreen] Opened, drawn in 289 ms</code> après un choix dans le picker, au-delà du seuil de 150 ms fixé au grilling du 26/10.</p>
           </details>
         </div>
       </li>
@@ -656,8 +679,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>26/10 <span class="count">(3)</span></summary>
+          <summary>26/10 <span class="count">(4)</span></summary>
           <ol>
+            <li><strong>Le Welcome Screen préparé sous le Profile picker revient, après la Distribution</strong>
+              <span>Mesure du ticket #330 sur la borne : <code>Opened, drawn in 289 ms</code> après un choix dans le picker, au-delà du seuil de 150 ms ; l'idée revient comme chantier à part. Placée juste après la Distribution, déjà en tickets : vue à chaque démarrage de la borne, mais le gain n'est plus que ces ~290 ms, la pause de 500 ms étant partie. Effort moyen (le Profile n'est pas encore choisi), impact faible.</span></li>
             <li><strong>La Distribution sans script à lancer : zip à la main, mises à jour depuis PinballY</strong>
               <span>Grilling de la Distribution, spec #331 et ADR 0018 : ni <code>.exe</code> ni PowerShell à coller ; l'Update Prompt arrive au démarrage suivant la découverte d'une version, avant tout le reste, et un helper caché fait la mise à jour. Garde sa place ; effort moyen-gros et impact fort inchangés.</span></li>
             <li><strong>Les blasons de rang à redessiner, juste avant la Sortie 1.0</strong>
