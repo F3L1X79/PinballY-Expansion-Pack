@@ -332,8 +332,8 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
           </div>
           <p>Une Pack Version et des releases GitHub avec un <code>ExpansionPack.zip</code> déjà bien nommé : on l'installe à la main, sans git (zip extrait dans <code>Scripts\</code>, une ligne d'import). Ensuite PinballY s'occupe des mises à jour : l'Update Prompt, au démarrage avant tout le reste, propose la nouvelle version, et un helper caché la télécharge, la vérifie, permute le dossier en gardant les données du joueur, puis relance PinballY.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/331">#331</a> · ADR 0018 · Réécrit la section Install des README · Research : <code>docs/research/distribution-install-and-updates.md</code></div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/331">#331</a>, tickets #332 à #337, borne #338 (humain) ; import dynamique à essayer sur la borne #339 · ADR 0018 · Réécrit la section Install des README · Research : <code>docs/research/distribution-install-and-updates.md</code></div>
           <details>
             <summary>Décisions du grilling (26/10/2026)</summary>
             <ul>
@@ -388,24 +388,6 @@
               <li>Le texte : un message court traduit par cas, ou un message générique qui renvoie au journal ?</li>
             </ul>
             <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur : l'échec d'écriture de <code>.env.local</code> y est d'abord un simple message, et <code>vpxtool</code> en aurait profité.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="rank-emblems" data-track="share" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Des blasons de rang qui ne rappellent plus League of Legends</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Redessiner les blasons de rang (<code>assets/images/rank_*.png</code> : plain, tile, missing, pour Bronze, Silver, Gold et Platinum) pour qu'ils s'éloignent des emblèmes de League of Legends, dans le style Steamball, avant de diffuser le pack au public.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Préalable de la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a></div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Sorti de la Distribution au grilling du 26/10/2026. git ne montre que des recadrages (04/10) : le blason Gold garde des ailes dorées et violettes autour d'une gemme, très proche de l'emblème Gold de LoL.</p>
           </details>
         </div>
       </li>
