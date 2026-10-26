@@ -250,6 +250,7 @@ export default {
             challenge: {
                 period: "UNE TABLE DU DÉFI",
                 progress: (title, value, target) => `${title} · ${value}/${target}`,
+                lastStep: "Plus qu'une partie pour finir le défi !",
             },
             go: "Y aller",
         },

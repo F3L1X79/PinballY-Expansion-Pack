@@ -145,15 +145,27 @@ export default function init() {
     }
 
     // One of the active Profile's Challenge Tables, each with the same
-    // chance, drawn anew at each opening; never the Last Played Table,
-    // unless it is the only one. Null without any.
-    function drawChallengeTable() {
+    // chance, drawn anew at each opening, with its card's line. Never an
+    // offered Period Table, unless one more Play completes the Challenge and
+    // nothing else is left; never the Last Played Table, unless it is the
+    // only one. Null without any.
+    function drawChallengeTable(offeredTables) {
         if (!challenges) return null;
         const tables = challenges.getTablesToPlay();
+        if (tables.length === 0) return null;
+        const { challenge, value } = challenges.getActiveView();
+        const isLastStep = value === challenge.target - 1;
+        const unoffered = tables.filter(game => !offeredTables.some(offered => offered.configId === game.configId));
+        const fresh = unoffered.length > 0 || !isLastStep ? unoffered : tables;
         const lastPlayed = randomGame.getLastPlayedTable();
-        const others = tables.filter(game => !lastPlayed || game.configId !== lastPlayed.configId);
-        const candidates = others.length > 0 ? others : tables;
-        return candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)] : null;
+        const others = fresh.filter(game => !lastPlayed || game.configId !== lastPlayed.configId);
+        const candidates = others.length > 0 ? others : fresh;
+        if (candidates.length === 0) return null;
+        const texts = TEXT.periodCards.challenge;
+        return {
+            game: candidates[Math.floor(Math.random() * candidates.length)],
+            line: { plain: true, text: isLastStep ? texts.lastStep : texts.progress(challengeTitleOf(challenge), value, challenge.target) },
+        };
     }
 
     function cardOf(choice, game, period, line) {
@@ -170,26 +182,23 @@ export default function init() {
         };
     }
 
-    // The Challenge's title, as on the Challenge Card, and the progress.
-    function challengeLineOf() {
-        const { challenge, value } = challenges.getActiveView();
-        return { plain: true, text: TEXT.periodCards.challenge.progress(challengeTitleOf(challenge), value, challenge.target) };
-    }
-
     // A card per Period Table offered to the active Profile, then the
     // drawn Challenge Table's, if any; reading them picks and locks this
     // Period's tables when nobody did yet.
-    function readCards(challengeTable) {
+    function readCards() {
         const cards = [];
+        const offeredTables = [];
         for (const choice of [CHOICE.DAY, CHOICE.WEEK]) {
             const periodTable = periodTables[choice];
             const game = periodTable.getOfferedTable();
             if (!game) continue;
             const texts = TEXT.periodCards[choice];
+            offeredTables.push(game);
             cards.push(cardOf(choice, game, texts.period, greyLineOf(periodTable, texts)));
         }
-        if (challengeTable) cards.push(cardOf(CHOICE.CHALLENGE, challengeTable, TEXT.periodCards.challenge.period, challengeLineOf()));
-        return cards;
+        const drawn = drawChallengeTable(offeredTables);
+        if (drawn) cards.push(cardOf(CHOICE.CHALLENGE, drawn.game, TEXT.periodCards.challenge.period, drawn.line));
+        return { cards, challengeTable: drawn ? drawn.game : null };
     }
 
     // Over the tables the active Profile can see; a tier it reached stays.
@@ -202,8 +211,7 @@ export default function init() {
         // What the wheel shows behind the screen: staying keeps it.
         const current = host.getCurrentTable();
         const stay = current ? cleanTitle(current.title) : null;
-        const challengeTable = drawChallengeTable();
-        const cards = readCards(challengeTable);
+        const { cards, challengeTable } = readCards();
         return {
             challengeTable,
             picker,

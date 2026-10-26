@@ -40,6 +40,9 @@ export const choicesWithoutChallengeCard = lang => [
     lang.welcomeScreen.randomTable, lang.welcomeScreen.stayOn("Medieval Madness"),
 ];
 
+// Alice's play records for tables she played once: no longer never played.
+export const playedOnce = games => Object.fromEntries(games.map(game => [game.configId, { count: 1, seconds: 300, lastPlayed: "2026-09-20T21:00:00" }]));
+
 // Plays the game for the given seconds: a minute or more makes it a Play.
 export function playFor(fake, game, seconds) {
     fake.gameStarted(game);
@@ -48,16 +51,17 @@ export function playFor(fake, game, seconds) {
 }
 
 // challenge: the week's, locked; games: what Alice's Challenge counted;
-// plays: Alice's play records; others: more Profiles' names; addOns: the
-// enabled Add-ons. Returns the fake once the Welcome Screen is open.
+// plays: Alice's play records; profile: what else her profile.json carries;
+// others: more Profiles' names; addOns: the enabled Add-ons. Returns the
+// fake once the Welcome Screen is open.
 export async function startWithChallenge({
-    challenge = STERN_CHALLENGE, games = [], completed = false, plays = {}, tables = TABLES, others = [],
+    challenge = STERN_CHALLENGE, games = [], completed = false, plays = {}, profile = {}, tables = TABLES, others = [],
     addOns = ["startupChoicePrompt", "profilePicker", "challenges"], language = "en",
 } = {}) {
     const fake = createFakePinballYHost({ now: NOW, tables });
     for (const name of others) fake.addFile(`${PROFILES}\\${name}\\profile.json`, JSON.stringify({ version: 1, notified: [], plays: {} }));
     fake.addFile(ALICE_FILE, JSON.stringify({
-        version: 1, notified: [], plays,
+        version: 1, notified: [], plays, ...profile,
         challenge: { firstWeek: WEEK, week: WEEK, games, completed, completedCount: completed ? 1 : 0, judgedWeek: "", history: [] },
     }));
     fake.addFile(`${PROFILES}\\cabinet.json`, JSON.stringify({

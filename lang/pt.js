@@ -249,6 +249,7 @@ export default {
             challenge: {
                 period: "UMA MESA DO DESAFIO",
                 progress: (title, value, target) => `${title} · ${value}/${target}`,
+                lastStep: "One more game to finish the Challenge!", // TODO: translation pass
             },
             go: "Ir",
         },

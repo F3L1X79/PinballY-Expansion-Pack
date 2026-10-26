@@ -300,24 +300,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="translations" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Passe de traduction : allemand, espagnol, italien, portugais</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Les nouveaux textes ne sont écrits qu'en anglais et en français. Une seule passe, à la fin, traduira ceux ajoutés après le 01/10/2026 dans <code>lang/de.js</code>, <code>es.js</code>, <code>it.js</code> et <code>pt.js</code>.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Tickets <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/320">#320</a> (allemand), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/321">#321</a> (espagnol), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/322">#322</a> (italien), <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/323">#323</a> (portugais), indépendants entre eux, débloqués depuis la livraison des Expansion Pack Settings, dont ils traduiront les textes. Flow Matt : <code>/implement</code> par ticket</div>
-          <details>
-            <summary>Contexte</summary>
-            <p class="ctx">Une première passe a été faite le 01/10/2026 : plus aucun <code>// TODO: translation pass</code>, la section de la Profile Reset traduite, et les menus de PinballY restés en anglais traduits dans les six langues (comparés à son code source). En attendant la suivante, <code>tests/project/lang_keys.test.js</code> exige chaque clé dans chaque langue, toutes sections comprises : les nouvelles clés y reçoivent le texte anglais, marqué <code>// TODO: translation pass</code>. Pour un nouveau PinballY : <code>LOG_UNTRANSLATED_MENU_TITLES=true</code> dans <code>.env.local</code> journalise les titres de menus non traduits.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-play" id="challenge-welcome" data-track="play" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
