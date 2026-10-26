@@ -12,7 +12,7 @@ import config from "../../common/core/config.js";
 import { readLoader } from "../support/loader_reader.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import {
-    WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, startupVeil, highlighted, greeting,
+    WELCOME_SCREEN_FADE_IN_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, startupVeil, highlighted, greeting, welcomeScreenLayerCount,
 } from "./welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -42,19 +42,17 @@ test("the main menu's Welcome Screen entry reopens the screen for the active Pro
 
     openMainMenu();
     fake.selectMenuItem(lang.welcomeScreen.menuEntry);
-    await settle();
     assert.equal(fake.currentMenu(), null, "the menu closes");
-    assert.equal(isWelcomeScreenOpen(fake), false, "the screen waits its short pause");
-    assert.deepEqual(startupVeil(fake), { shown: false }, "no startup veil");
-    assert.deepEqual(readLoader(fake), { shown: false }, "no Loader");
-
-    // Picked again while the screen waits.
+    // Picked again while the screen waits its turn.
     openMainMenu();
     fake.selectMenuItem(lang.welcomeScreen.menuEntry);
     await settle();
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS);
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn at its turn, without the startup pause");
+    assert.deepEqual(startupVeil(fake), { shown: false }, "no startup veil");
+    assert.deepEqual(readLoader(fake), { shown: false }, "no Loader");
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS / 2);
     assert.deepEqual(startupVeil(fake), { shown: false }, "no veil as it fades in either");
-    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.ok(greeting(fake).includes("Bob"), "for the active Profile");
     assert.equal(highlighted(fake).tooltip, lang.buttonHints.close, "the cursor on the cross");

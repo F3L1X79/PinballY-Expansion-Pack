@@ -1,9 +1,9 @@
 // ============================================================
 // Several Lost Records on the Welcome Screen, through main.js on the fake
 // PinballY globals: Bob and Claire took three of Alice's Table Records,
-// one table twice; her next Welcome Screen sums them up in one line, the
-// most recent first, each table once with its most recent taker, behind
-// that taker's Avatar.
+// one of them again after she took it back; her next Welcome Screen sums
+// them up in one line, the most recent first, with each taker, behind the
+// most recent taker's Avatar.
 // ============================================================
 
 import { test } from "node:test";
@@ -24,8 +24,8 @@ test("Alice's Welcome Screen names each table she lost once, the most recent fir
     }
 
     await playAs("Bob", ONE, recordBoard("BOB", 70));
-    await playAs("Claire", TWO, recordBoard("CLA", 70));
     await playAs("Alice", ONE, recordBoard("ALI", 80));
+    await playAs("Claire", TWO, recordBoard("CLA", 70));
     await playAs("Bob", THREE, recordBoard("BOB", 70));
     await playAs("Claire", ONE, recordBoard("CLA", 90));
     await arrive("Alice");

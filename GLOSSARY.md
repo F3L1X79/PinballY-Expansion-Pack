@@ -10,6 +10,12 @@ Unofficial add-ons for the PinballY virtual pinball front end, built on its Java
 A self-contained feature that `main.js` starts at launch and that the player can turn off in the configuration.
 _Avoid_: plugin, script (a script is just a `.js` file)
 
+### Distribution
+
+**Pack Version**:
+The version number of the Expansion Pack as a whole, raised with each release the owner publishes, and compared with the latest published release to know whether an update exists. Add-ons have no version of their own.
+_Avoid_: PinballY version (PinballY's own number), build, release (a release is the published package of one Pack Version)
+
 ### Menus
 
 **Drawn Menu**:

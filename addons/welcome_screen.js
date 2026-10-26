@@ -5,8 +5,8 @@
 // Table, a Challenge Table drawn at each opening, a Random Game, or to stay.
 // A drawn dialog of the wheel dialog module at the startup priority (docs/adr/0011).
 // - At startup only, the startup veil dims the wheel until the panel is in.
-// - Swallows every button through "commandbuttondown" while open.
-// - Reading the Period cards picks and locks this Period's tables.
+// - Drawn at its turn, except as the Startup Screen itself: after a pause, the window not laid out yet.
+// - Swallows every button through "commandbuttondown" while open; reading the Period cards locks this Period's tables.
 // - Writes the Lost Records seen marker to high_scores.json.
 // - Holds the quiet wheel from its turn, pause included; gives it up at once to a launch, a menu or attract mode (docs/adr/0015).
 // ============================================================
@@ -46,8 +46,9 @@ import {
 
 const SCRIPT_NAME = "WelcomeScreen";
 
-// At startup the window is not laid out yet, and a window-sized canvas
-// measured then comes out distorted (as for the Profile badge).
+// Before the startup Welcome Screen alone: the window is not laid out yet,
+// and a window-sized canvas measured then comes out distorted (as for the
+// Profile badge).
 const STARTUP_PAUSE_MS = 500;
 const FADE_MS = 220;
 const FRAME_MS = 16;
@@ -88,8 +89,11 @@ export default function init() {
     let isSubmitted = false;
     // The wheel dialog module's close, from its turn until the screen closes.
     let closeDialog = null;
+    // Submitted as the Startup Screen itself: drawn only after the pause.
+    let hasStartupPause = false;
     let pauseTimer = null;
-    // The pause ended away from the wheel: it starts again on the next return.
+    // Its turn came, or its pause ended, away from the wheel: it is drawn
+    // on the next return, after the pause again for the startup one.
     let isWaitingForWheel = false;
     // The screen on show: its layers, choices and selection; null when closed.
     let shown = null;
@@ -326,28 +330,37 @@ export default function init() {
         screen.fadeTimer = null;
     }
 
-    function startPause() {
+    // A menu or a game may have come up during the pause.
+    function drawOnceWheelFree() {
+        if (host.getUIMode() === "wheel") draw();
+        else {
+            isWaitingForWheel = true;
+            startupVeil.hide();
+            quietWheel.release(SCRIPT_NAME, { atOnce: true });
+        }
+    }
+
+    // At its turn or back on the wheel: at once, or after STARTUP_PAUSE_MS
+    // for the startup screen alone, the only one opened before the layout.
+    function drawAtTurn() {
         isWaitingForWheel = false;
-        pauseTimer = host.setTimeout(safeHandler(SCRIPT_NAME, () => {
-            pauseTimer = null;
-            // A menu or a game came up during the pause.
-            if (host.getUIMode() === "wheel") draw();
-            else {
-                isWaitingForWheel = true;
-                startupVeil.hide();
-                quietWheel.release(SCRIPT_NAME, { atOnce: true });
-            }
-        }), STARTUP_PAUSE_MS);
+        if (!hasStartupPause) drawOnceWheelFree();
+        else {
+            pauseTimer = host.setTimeout(safeHandler(SCRIPT_NAME, () => {
+                pauseTimer = null;
+                drawOnceWheelFree();
+            }), STARTUP_PAUSE_MS);
+        }
     }
 
     // Its turn in the wheel dialog module: the wheel is free.
     // Held from here, not from the drawing: the Profile picker's hand-over
-    // is shorter than the pause.
+    // is shorter than the startup pause.
     function open(close) {
         isSubmitted = false;
         closeDialog = close;
         quietWheel.hold(SCRIPT_NAME);
-        startPause();
+        drawAtTurn();
     }
 
     // Removes the screen, or drops it before it shows, and frees the queue.
@@ -398,15 +411,16 @@ export default function init() {
         return undefined;
     }
 
-    function submit(choice) {
+    function submit(choice, { atStartup = false } = {}) {
         isSubmitted = true;
         firstChoice = choice;
+        hasStartupPause = atStartup;
         getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open });
     }
 
     const startupScreen = getStartupScreen();
     if (startupScreen === STARTUP_SCREEN.WELCOME) {
-        submit(null);
+        submit(null, { atStartup: true });
         startupVeil.show();
     }
     // The startup Profile picker hands over on a pick or Exit, before any
@@ -446,12 +460,13 @@ export default function init() {
     }));
 
     // Fires on every return to the wheel, after a menu or a game that came
-    // up during the pause.
+    // up before the screen was drawn.
     host.on("wheelmode", safeHandler(SCRIPT_NAME, () => {
-        if (isWaitingForWheel) startPause();
+        if (isWaitingForWheel) drawAtTurn();
     }));
 
-    // Fires when a table starts: one launched during the pause means the
+    // Fires when a table starts: one launched before the screen shows (in
+    // the startup pause, or from a menu while it waits) means the
     // player already chose, so the screen must not show after the game.
     host.on("gamestarted", safeHandler(SCRIPT_NAME, () => {
         if (closeDialog && !shown) close({ atOnce: true });
@@ -463,7 +478,7 @@ export default function init() {
         if (closeDialog) close({ atOnce: true });
     }));
 
-    // Fire when a table starts launching or a menu opens during the pause:
+    // Fire when a table starts launching or a menu opens during the startup pause:
     // the table must not stay lowered under them. The screen holds the
     // wheel again if it still shows afterwards.
     const giveWayInPause = safeHandler(SCRIPT_NAME, () => {

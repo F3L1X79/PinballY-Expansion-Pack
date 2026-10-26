@@ -8,14 +8,16 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, greeting } from "./welcome_screen_reader.js";
+import {
+    WELCOME_SCREEN_OPEN_MS, WELCOME_SCREEN_FADE_IN_MS, press, isWelcomeScreenOpen, choose, greeting, welcomeScreenLayerCount,
+} from "./welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The carousel's background, its Avatars, then the gold frame and names.
 const PICKER_Z_RANGE = [6500, 6502];
 const GLIDE_OVER_MS = 500;
-// Past the screen's pause and fade, and past a whole Profile Greeting.
+// Past the screen's fade, and past a whole Profile Greeting.
 const SETTLED_MS = 2500;
 
 const pickerTexts = fake => fake.drawingLayers()
@@ -61,7 +63,9 @@ test("Change Player from the Welcome Screen or the main menu brings the screen b
     fake.advanceTime(GLIDE_OVER_MS);
     press(fake, "Select");
     assert.equal(store.getActiveProfile().name, "Alice");
-    await playOut();
+    await settle();
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn at its turn, without the startup pause");
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true, "the screen comes back after the switch");
     assert.ok(greeting(fake).includes("Alice"), "for the new Profile");
     assert.deepEqual(greetings(), [], "instead of the Profile Greeting");

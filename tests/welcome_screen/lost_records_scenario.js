@@ -31,10 +31,12 @@ export async function startLostRecords({ addOns = ["highScores"], ...options } =
             await settle();
             fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
         },
-        // Switches to the named Profile and plays the table at once, so its
-        // Welcome Screen is dropped before it shows; VPinMAME saves after.
+        // Switches to the named Profile, closes its Welcome Screen, drawn at
+        // its turn, and plays the table; VPinMAME saves after.
         playAs: async (name, configId, after) => {
             scenario.switchTo(name);
+            await settle();
+            press(fake, "Exit");
             await settle();
             await scenario.play(configId, { after });
         },

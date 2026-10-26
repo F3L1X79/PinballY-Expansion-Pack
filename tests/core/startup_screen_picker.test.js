@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { readLoader } from "../support/loader_reader.js";
 import { toastDrawings } from "../achievements/achievement_toast_reader.js";
 import {
-    press, isWelcomeScreenOpen, startupVeil, greeting, welcomeScreenLayerCount, WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS,
+    press, isWelcomeScreenOpen, startupVeil, greeting, welcomeScreenLayerCount, WELCOME_SCREEN_FADE_IN_MS,
 } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { startOnProfilePicker, pickerTexts, isCarouselOpen, highlightedName, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
@@ -48,10 +48,12 @@ test("the startup Profile picker opens on the last active Profile and the Welcom
     assert.equal(store.getActiveProfile().name, "Alice", "the pick switches");
     assert.equal(isCarouselOpen(fake, lang), false);
     assert.equal(startupVeil(fake).shown, true, "the wheel stays dimmed until the Welcome Screen");
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS / 2);
-    assert.equal(startupVeil(fake).shown, true);
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "the Welcome Screen drawn at its turn, without the startup pause");
     assert.equal(waitingToasts(fake), 0, "the toast waits for the Welcome Screen");
-    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS / 3);
+    assert.equal(isWelcomeScreenOpen(fake), true, "the panel fading in");
+    assert.equal(startupVeil(fake).shown, true, "the veil stays while the panel fades in");
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true, "the Welcome Screen follows");
     assert.ok(greeting(fake).includes("Alice"), "for the Profile picked");
     assert.deepEqual(startupVeil(fake), { shown: false }, "the veil goes once the panel is in");

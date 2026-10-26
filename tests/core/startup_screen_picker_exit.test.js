@@ -5,7 +5,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { press, isWelcomeScreenOpen, startupVeil, greeting, highlighted, WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
+import { press, isWelcomeScreenOpen, startupVeil, greeting, highlighted, welcomeScreenLayerCount, WELCOME_SCREEN_FADE_IN_MS } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
 
@@ -21,7 +21,8 @@ test("Exit in the startup Profile picker keeps the last active Profile and its W
     assert.equal(isCarouselOpen(fake, lang), false);
     assert.equal(store.getActiveProfile().name, "Bob", "the last active Profile stays");
     assert.equal(startupVeil(fake).shown, true, "the wheel stays dimmed");
-    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn at its turn, without the startup pause");
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true, "the Welcome Screen follows");
     assert.ok(greeting(fake).includes("Bob"));
     assert.equal(highlighted(fake).tooltip, lang.buttonHints.close, "Close, as after a pick");

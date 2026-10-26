@@ -10,7 +10,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { readLoader, loaderLayerCount } from "../support/loader_reader.js";
-import { WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, startupVeil } from "./welcome_screen_reader.js";
+import { WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, startupVeil, welcomeScreenLayerCount } from "./welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The panel's backdrop dims the wheel with this colour, from 6100 up.
@@ -40,7 +40,10 @@ test("the wheel is veiled with the comet turning until the Welcome Screen fades 
     assert.equal(press(fake, "Next").defaultPrevented, false, "a button goes through to the wheel");
     assert.equal(fake.fire("keydown", { key: "Enter", code: "Enter", repeat: false }).defaultPrevented, false, "a key goes through");
 
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS);
+    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS - 1);
+    assert.equal(welcomeScreenLayerCount(fake), 0, "nothing of the panel drawn during the startup pause");
+    assert.deepEqual(readLoader(fake), LOADER, "the comet turning all along");
+    fake.advanceTime(1);
     assert.deepEqual(readLoader(fake), { shown: false }, "the comet goes as the panel starts fading in");
     assert.equal(loaderLayerCount(fake), 0);
     fake.advanceTime(FADING_MS);
