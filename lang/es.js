@@ -247,11 +247,10 @@ export default {
                 played: "Jugada esta semana",
                 streak: "semanas seguidas en la mesa de la semana: ¡sigue así!",
             },
-            // TODO: translation pass
             challenge: {
-                period: "A CHALLENGE TABLE",
+                period: "UNA MESA DEL DESAFÍO",
                 progress: (title, value, target) => `${title} · ${value}/${target}`,
-                lastStep: "One more game to finish the Challenge!",
+                lastStep: "¡Una partida más para superar el desafío!",
             },
             go: "Ir",
         },
