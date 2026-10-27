@@ -44,6 +44,12 @@ function zipAssetOf(reply) {
     return { zipUrl: asset.browser_download_url, sha256: digest[1].toLowerCase() };
 }
 
+// A .git file instead of a folder marks a git worktree.
+export function isGitCheckout(host) {
+    const gitPath = `${host.getProjectFolder()}\\.git`;
+    return host.files.folderExists(gitPath) || host.files.fileExists(gitPath);
+}
+
 // Resolves once the reply is handled, never rejects; stays pending while
 // GitHub doesn't answer.
 export function runUpdateCheck(host, state, { enabled }) {
@@ -52,8 +58,7 @@ export function runUpdateCheck(host, state, { enabled }) {
         log("Off: no request.");
         return Promise.resolve();
     }
-    const gitPath = `${host.getProjectFolder()}\\.git`;
-    if (host.files.folderExists(gitPath) || host.files.fileExists(gitPath)) {
+    if (isGitCheckout(host)) {
         log("Git checkout: no request, git pull updates the pack.");
         return Promise.resolve();
     }

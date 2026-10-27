@@ -26,12 +26,15 @@ const FILE_SHARE_READ_WRITE = 0x1 | 0x2;
 const OPEN_EXISTING = 3;
 const FILE_ATTRIBUTE_NORMAL = 0x80;
 // Under the user's temporary folder: the wrapper script, each run's files,
-// and the restart's ready file and helper log.
+// and the helpers' ready files and logs.
 const PACK_TEMPORARY_FOLDER_NAME = "PinballYExpansionPack";
-// In the pack's tools folder; see its own header for what it does.
+// In the pack's tools folder; see their own header for what they do.
 const RESTART_HELPER_NAME = "restart_pinbally.ps1";
-const RESTART_POLL_MS = 200;
+const PACK_UPDATE_HELPER_NAME = "pack_update.ps1";
+const HELPER_POLL_MS = 200;
 const RESTART_READY_TIMEOUT_MS = 15000;
+// Longer: the Pack Update helper downloads and checks the release first.
+const PACK_UPDATE_READY_TIMEOUT_MS = 120000;
 // Given "<output file>" "<exit code file>" "<program>" "<args>"..., runs the
 // program with its standard output in the first file and its standard error
 // dropped, then writes its exit code to the second, through a .tmp file
@@ -272,41 +275,46 @@ function createProgramRunner(files, startHidden) {
     };
 }
 
-// Restarts PinballY through tools\restart_pinbally.ps1, started hidden as
+// Quits PinballY for a PowerShell helper of tools\, started hidden as
 // PinballY's own child, which outlives its Quit (no WMI needed, as tried on
 // the cabinet). The helper reads PinballY's command line while it is alive,
-// so Quit runs only once its ready file exists; onFailed after 15 s without it
-// (docs/adr/0017).
-function createRestarter(files, startHidden) {
-    // Bound on the first restart, then kept.
+// so Quit runs only once its ready file exists; onFailed after readyTimeoutMs
+// without it (docs/adr/0017).
+function createHelperQuitter(files, startHidden, { helperName, fileBaseName, readyTimeoutMs, errorLabel }) {
+    // Bound on the first start, then kept.
     let kernel32 = null;
-    return ({ onQuitting, onFailed }) => {
+    // helperArgs: the helper's own arguments after the common ones, { name: value }.
+    return ({ onQuitting, onFailed }, helperArgs = {}) => {
         const folder = preparePackTemporaryFolder(files);
-        const readyPath = `${folder}\\restart-ready`;
-        // Left by an earlier restart that never quit.
+        const readyPath = `${folder}\\${fileBaseName}-ready`;
+        // Left by an earlier start that never quit.
         if (files.fileExists(readyPath)) files.deleteFile(readyPath);
         if (!kernel32) kernel32 = dllImport.bind("Kernel32.dll", "DWORD WINAPI GetCurrentProcessId();");
-        const helperPath = `${projectFolderOf(systemInfo.programDir)}\\tools\\${RESTART_HELPER_NAME}`;
+        const helperPath = `${projectFolderOf(systemInfo.programDir)}\\tools\\${helperName}`;
+        // A quote would end the argument early and pass the rest as others.
+        const quoted = Object.entries(helperArgs).find(([, value]) => String(value).includes("\""));
+        if (quoted) throw new Error(`A quote in the ${errorLabel}'s -${quoted[0]} argument.`);
+        const ownArgs = Object.entries(helperArgs).map(([name, value]) => ` -${name} "${value}"`).join("");
         startHidden("powershell.exe", `-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "${helperPath}"`
-            + ` -ParentPid ${Number(kernel32.GetCurrentProcessId())} -ReadyFile "${readyPath}" -LogFile "${folder}\\restart.log"`);
+            + ` -ParentPid ${Number(kernel32.GetCurrentProcessId())} -ReadyFile "${readyPath}" -LogFile "${folder}\\${fileBaseName}.log"${ownArgs}`);
         let waitedMs = 0;
         const poll = setInterval(() => {
-            waitedMs += RESTART_POLL_MS;
+            waitedMs += HELPER_POLL_MS;
             try {
                 if (files.fileExists(readyPath)) {
                     clearInterval(poll);
                     onQuitting();
                     mainWindow.doCommand(command.Quit);
-                } else if (waitedMs >= RESTART_READY_TIMEOUT_MS) {
+                } else if (waitedMs >= readyTimeoutMs) {
                     clearInterval(poll);
-                    onFailed(new Error(`The restart helper was not ready after ${RESTART_READY_TIMEOUT_MS / 1000} s.`));
+                    onFailed(new Error(`The ${errorLabel} was not ready after ${readyTimeoutMs / 1000} s.`));
                 }
             } catch (error) {
                 // A poll that fails would fail again every 200 ms.
                 clearInterval(poll);
                 onFailed(error);
             }
-        }, RESTART_POLL_MS);
+        }, HELPER_POLL_MS);
     };
 }
 
@@ -484,7 +492,20 @@ export function createPinballYHost() {
         // Quits PinballY for a helper to start it again, as it was started;
         // onQuitting() runs right before Quit, onFailed(error) instead when
         // the helper cannot get ready, PinballY then staying open.
-        restartPinballY: createRestarter(files, startHidden),
+        restartPinballY: createHelperQuitter(files, startHidden, {
+            helperName: RESTART_HELPER_NAME, fileBaseName: "restart", readyTimeoutMs: RESTART_READY_TIMEOUT_MS, errorLabel: "restart helper",
+        }),
+        // Quits PinballY, as restartPinballY() does, for the Pack Update
+        // helper to download zipUrl, check its sha256 and install packVersion
+        // over the pack folder, then start PinballY again.
+        startPackUpdate: (() => {
+            const quitForHelper = createHelperQuitter(files, startHidden, {
+                helperName: PACK_UPDATE_HELPER_NAME, fileBaseName: "pack-update", readyTimeoutMs: PACK_UPDATE_READY_TIMEOUT_MS, errorLabel: "Pack Update helper",
+            });
+            return ({ zipUrl, sha256, packVersion, onQuitting, onFailed }) => quitForHelper({ onQuitting, onFailed }, {
+                ZipUrl: zipUrl, Sha256: sha256, PackVersion: packVersion, PackFolder: projectFolderOf(systemInfo.programDir),
+            });
+        })(),
         // A GET through PinballY's HttpRequest (MSXML), always asynchronous:
         // a synchronous one freezes PinballY. A Promise of the reply text,
         // rejected for any status but 200.

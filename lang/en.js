@@ -787,4 +787,14 @@ export default {
             pt: "Português",
         },
     },
+
+    // The Update Prompt at startup, and a Pack Update that cannot start (see common/updates/).
+    packUpdates: {
+        // Names the newer Pack Version the Update Check found.
+        prompt: (version) => `Expansion Pack v${version} is available.`,
+        updateNow: "Update now",
+        later: "Later",
+        updateFailed: "Update not possible: the Expansion Pack stays as it is",
+        ok: "OK",
+    },
 };

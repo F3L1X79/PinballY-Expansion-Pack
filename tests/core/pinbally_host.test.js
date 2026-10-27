@@ -16,6 +16,12 @@ const MEDIEVAL_LOGO = "C:\\PinballY\\Media\\Visual Pinball X\\Wheel Images\\Medi
 
 const RESTART_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\restart_pinbally.ps1";
 const TEMPORARY_FOLDER = "C:\\Users\\Cabinet\\AppData\\Local\\Temp\\PinballYExpansionPack";
+const PACK_UPDATE_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\pack_update.ps1";
+const PACK_UPDATE = {
+    zipUrl: "https://github.com/F3L1X79/PinballY-Expansion-Pack/releases/download/v9.0.0/ExpansionPack.zip",
+    sha256: "c0".repeat(32),
+    packVersion: "9.0.0",
+};
 
 const TABLES = [
     { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", isHidden: false, wheelImage: MEDIEVAL_LOGO },
@@ -539,6 +545,38 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             assert.deepEqual(fake.executedCommands(), [], "no Quit");
         });
 
+        test("a Pack Update quits PinballY only once its helper is ready, and records what it installs", () => {
+            fake.addFile(PACK_UPDATE_HELPER);
+            const calls = [];
+            host.startPackUpdate({
+                ...PACK_UPDATE, onQuitting: () => calls.push("quitting"), onFailed: error => calls.push(error.message),
+            });
+
+            assert.deepEqual(fake.packUpdatesAsked(), [PACK_UPDATE]);
+            fake.advanceTime(4000);
+            assert.deepEqual(calls, [], "the helper is still downloading");
+            assert.deepEqual(fake.executedCommands(), []);
+            fake.advanceTime(1200);
+            assert.deepEqual(calls, ["quitting"]);
+            assert.deepEqual(fake.executedCommands(), [fake.getBuiltInCommand("Quit")]);
+        });
+
+        test("a Pack Update helper never ready fails after 120 s, and PinballY stays", () => {
+            fake.addFile(PACK_UPDATE_HELPER);
+            fake.failNextPackUpdate();
+            const calls = [];
+            host.startPackUpdate({
+                ...PACK_UPDATE, onQuitting: () => calls.push("quitting"), onFailed: error => calls.push(error.message),
+            });
+
+            fake.advanceTime(119999);
+            assert.deepEqual(calls, []);
+            fake.advanceTime(1);
+            assert.equal(calls.length, 1);
+            assert.match(calls[0], /Pack Update helper was not ready after 120 s/);
+            assert.deepEqual(fake.executedCommands(), [], "no Quit");
+        });
+
         test("writing into a missing folder fails", () => {
             assert.throws(() => host.files.writeText("C:\\PinballY\\Scripts\\missing\\file.json", "{}"), /not found/);
         });
@@ -635,6 +673,43 @@ describe("production host restart", () => {
             }]);
             fake.advanceTime(400);
             assert.deepEqual(calls, [], "the stale ready file was deleted first");
+        } finally {
+            uninstallGlobals();
+        }
+    });
+
+    test("starts the Pack Update helper hidden with what it installs and where", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            fake.addFile(PACK_UPDATE_HELPER);
+            createPinballYHost().startPackUpdate({ ...PACK_UPDATE, onQuitting: () => {}, onFailed: () => {} });
+
+            assert.deepEqual(fake.programRuns(), [{
+                program: "powershell.exe",
+                args: [
+                    "-NoProfile", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", PACK_UPDATE_HELPER,
+                    "-ParentPid", String(FAKE_PINBALLY_PID),
+                    "-ReadyFile", `${TEMPORARY_FOLDER}\\pack-update-ready`, "-LogFile", `${TEMPORARY_FOLDER}\\pack-update.log`,
+                    "-ZipUrl", PACK_UPDATE.zipUrl, "-Sha256", PACK_UPDATE.sha256, "-PackVersion", "9.0.0",
+                    "-PackFolder", "C:\\PinballY\\Scripts\\ExpansionPack",
+                ],
+            }]);
+            assert.equal(fake.restartsAsked(), 0, "not a restart");
+        } finally {
+            uninstallGlobals();
+        }
+    });
+
+    test("a quote in a Pack Update argument throws before any helper starts", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            fake.addFile(PACK_UPDATE_HELPER);
+            assert.throws(() => createPinballYHost().startPackUpdate({
+                ...PACK_UPDATE, zipUrl: "https://example.com/a\" -Evil \"b.zip", onQuitting: () => {}, onFailed: () => {},
+            }), /quote in the Pack Update helper's -ZipUrl argument/);
+            assert.deepEqual(fake.programRuns(), []);
         } finally {
             uninstallGlobals();
         }

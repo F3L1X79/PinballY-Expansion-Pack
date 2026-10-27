@@ -99,6 +99,11 @@ export const FAKE_PINBALLY_PID = 4242;
 // the cabinet; PinballY gives up after 15 s (docs/adr/0017).
 const RESTART_HELPER_READY_MS = 1300;
 const RESTART_READY_TIMEOUT_MS = 15000;
+// The Pack Update helper downloads and checks the zip first (made-up 5 s);
+// PinballY gives up after 120 s.
+const PACK_UPDATE_HELPER_READY_MS = 5000;
+const PACK_UPDATE_READY_TIMEOUT_MS = 120000;
+const PACK_UPDATE_HELPER_NAME = "pack_update.ps1";
 // PinballY 1.1.0 Beta 10's systemInfo.version (the build number is made up).
 export const BETA_10_VERSION = {
     basic: "1.1.0", build: 10086, buildDate: new RealDate(Date.UTC(2024, 8, 24)),
@@ -233,6 +238,10 @@ export function createFakePinballYHost({
     // Restarts asked so far, and how many of the next ones never get ready.
     let restartCount = 0;
     let failingRestartCount = 0;
+    // Every Pack Update asked, in order: { zipUrl, sha256, packVersion },
+    // and how many of the next ones never get ready.
+    const packUpdateList = [];
+    let failingPackUpdateCount = 0;
     // The replies to the next HTTP requests, in order: { status, statusText, text }.
     const httpReplies = [];
     // Every HTTP request sent, in order: { method, url, headers }.
@@ -861,15 +870,28 @@ export function createFakePinballYHost({
         return false;
     }
 
-    // The restart helper as the production host starts it, recorded as a
-    // run of powershell.exe with its arguments, never run: it writes its
-    // ready file once ready, unless made to fail or missing.
-    function startRestartHelper(parameters) {
+    // Records a Pack Update asked; false when it was made to fail.
+    function askPackUpdate({ zipUrl, sha256, packVersion }) {
+        packUpdateList.push({ zipUrl, sha256, packVersion });
+        if (failingPackUpdateCount === 0) return true;
+        failingPackUpdateCount--;
+        return false;
+    }
+
+    // The restart or Pack Update helper as the production host starts it,
+    // recorded as a run of powershell.exe with its arguments, never run: it
+    // writes its ready file once ready, unless made to fail or missing.
+    function startHelper(parameters) {
         const args = [...parameters.matchAll(/"([^"]*)"|(\S+)/g)].map(match => match[1] ?? match[2]);
         programRunList.push({ program: "powershell.exe", args });
         const valueOf = name => args[args.indexOf(name) + 1];
-        if (!askRestart() || !files.has(valueOf("-File"))) return;
-        addTimer(() => fileSystem.writeText(valueOf("-ReadyFile"), String(FAKE_PINBALLY_PID + 1)), RESTART_HELPER_READY_MS);
+        const isPackUpdate = valueOf("-File").endsWith(`\\${PACK_UPDATE_HELPER_NAME}`);
+        const isAsked = isPackUpdate
+            ? askPackUpdate({ zipUrl: valueOf("-ZipUrl"), sha256: valueOf("-Sha256"), packVersion: valueOf("-PackVersion") })
+            : askRestart();
+        if (!isAsked || !files.has(valueOf("-File"))) return;
+        addTimer(() => fileSystem.writeText(valueOf("-ReadyFile"), String(FAKE_PINBALLY_PID + 1)),
+            isPackUpdate ? PACK_UPDATE_HELPER_READY_MS : RESTART_HELPER_READY_MS);
     }
 
     // Shell32's ShellExecuteW: only "open" on cmd.exe or powershell.exe,
@@ -879,7 +901,7 @@ export function createFakePinballYHost({
         if (operation !== "open" || !["cmd.exe", "powershell.exe"].includes(file) || showCommand !== 0) {
             throw new Error(`The fake host runs cmd.exe or powershell.exe hidden only: ${operation} ${file} ${parameters} (show ${showCommand})`);
         }
-        if (file === "powershell.exe") startRestartHelper(parameters);
+        if (file === "powershell.exe") startHelper(parameters);
         else runWrapper(parameters);
         return { toNumber: () => 42 };
     }
@@ -895,6 +917,19 @@ export function createFakePinballYHost({
             onQuitting();
             host.doCommand(BUILT_IN_COMMANDS.Quit);
         }, RESTART_HELPER_READY_MS);
+    }
+
+    // Like the production host, without a helper: Quit once it would be
+    // ready, or onFailed after 120 s for a Pack Update made to fail.
+    function startPackUpdate({ zipUrl, sha256, packVersion, onQuitting, onFailed }) {
+        if (!askPackUpdate({ zipUrl, sha256, packVersion })) {
+            addTimer(() => onFailed(new Error("The Pack Update helper was not ready after 120 s.")), PACK_UPDATE_READY_TIMEOUT_MS);
+            return;
+        }
+        addTimer(() => {
+            onQuitting();
+            host.doCommand(BUILT_IN_COMMANDS.Quit);
+        }, PACK_UPDATE_HELPER_READY_MS);
     }
 
     // Like PinballY's HttpRequest.send() (docs/pinbally/pinbally-help.md:
@@ -1263,6 +1298,7 @@ export function createFakePinballYHost({
         createSoundRotation,
         runHiddenProgram,
         restartPinballY,
+        startPackUpdate,
         httpGet: (url, headers = {}) => sendHttp("GET", url, headers),
         readRegistryValue: (path) => (registryValues.has(path) ? registryValues.get(path) : null),
         files: fileSystem,
@@ -1272,6 +1308,10 @@ export function createFakePinballYHost({
         restartsAsked: () => restartCount,
         // The next restart asked never gets ready.
         failNextRestart() { failingRestartCount++; },
+        // Every Pack Update asked, through either host: { zipUrl, sha256, packVersion }.
+        packUpdatesAsked: () => packUpdateList.map(update => ({ ...update })),
+        // The next Pack Update asked never gets ready.
+        failNextPackUpdate() { failingPackUpdateCount++; },
         // Queues the reply to the next HTTP request, through either host:
         // { status (200), statusText, text }.
         replyToHttp(reply) { httpReplies.push({ ...reply }); },

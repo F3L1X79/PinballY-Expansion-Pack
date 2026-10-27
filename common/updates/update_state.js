@@ -1,6 +1,7 @@
 // ============================================================
 // Update state: the small git-ignored JSON file in the pack folder that
-// remembers the newest known release between two starts (docs/adr/0018).
+// remembers the newest known release between two starts, the version last
+// offered and the one an update in progress installs (docs/adr/0018).
 // Read once when created; each change writes the whole file.
 // - An unreadable file (cut by a crash) is logged, deleted, and read as empty.
 // ============================================================
@@ -42,6 +43,17 @@ export function createUpdateState(host) {
         forgetRelease: () => {
             if (!saved || !saved.latestRelease) return;
             const { latestRelease, ...rest } = saved;
+            save(rest);
+        },
+        // The Pack Version the Update Prompt last asked about, or null.
+        offeredVersion: () => (saved && saved.offeredVersion) || null,
+        markOffered: packVersion => save({ ...saved, offeredVersion: packVersion }),
+        // The Pack Version a Pack Update in progress installs, or null.
+        requestedVersion: () => (saved && saved.requestedVersion) || null,
+        requestUpdate: packVersion => save({ ...saved, requestedVersion: packVersion }),
+        forgetRequest: () => {
+            if (!saved || !saved.requestedVersion) return;
+            const { requestedVersion, ...rest } = saved;
             save(rest);
         },
     };
