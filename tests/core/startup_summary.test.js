@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { installVpxtool } from "../support/vpxtool.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const TABLES = [
@@ -21,6 +22,7 @@ test("main.js writes one summary line at startup, and no warning on Beta 10", as
     const fake = createFakePinballYHost({ tables: TABLES });
     fake.addFolder(`${PROFILES}\\Alice`);
     fake.addFolder(`${PROFILES}\\Bob`);
+    installVpxtool(fake);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = !["clock", "menuCleanup"].includes(key);

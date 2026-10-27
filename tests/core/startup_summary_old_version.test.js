@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { installVpxtool } from "../support/vpxtool.js";
 
 const BETA_9_VERSION = {
     basic: "1.1.0", build: 9001, buildDate: new Date(Date.UTC(2023, 0, 1)),
@@ -16,6 +17,7 @@ const BETA_9_VERSION = {
 
 test("main.js warns right after the summary when PinballY is older than Beta 10", async () => {
     const fake = createFakePinballYHost({ pinballYVersion: BETA_9_VERSION });
+    installVpxtool(fake);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = true;

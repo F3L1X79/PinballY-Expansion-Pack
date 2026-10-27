@@ -12,12 +12,13 @@ import { pickAtStartup } from "./vpxtool_missing_scenario.js";
 
 test("vpxtool missing: a Profile without the setup entries picked at startup sees no Error Toast", async () => {
     // The last active Profile, highlighted while the toast arrives, sees the setup entries.
-    const { fake, store, errorCardsWhilePicking, errorCards } = await pickAtStartup({
+    const { fake, store, drawnBeforeClosing, arrivalMs, errorCards } = await pickAtStartup({
         adminProfiles: ["Alice"], activeProfile: "Alice", moves: ["Next"],
     });
 
     assert.equal(store.getActiveProfile().name, "Bob");
-    assert.deepEqual(errorCardsWhilePicking, []);
+    assert.equal(drawnBeforeClosing, false);
+    assert.equal(arrivalMs, null);
     assert.deepEqual(errorCards, [], "no Error Toast for Bob");
     assert.deepEqual(errorLines(fake), [`[TableRoms] ERROR vpxtool not found at ${VPXTOOL}; the table scripts are not read.`]);
 });

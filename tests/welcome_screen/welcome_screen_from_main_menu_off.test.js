@@ -7,9 +7,11 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { installVpxtool } from "../support/vpxtool.js";
 
 test("with the Welcome Screen Add-on off, the main menu has no Welcome Screen entry", async () => {
     const fake = createFakePinballYHost();
+    installVpxtool(fake);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     config.addOns.startupChoicePrompt = false;

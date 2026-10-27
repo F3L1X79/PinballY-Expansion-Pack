@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { installVpxtool } from "../support/vpxtool.js";
 
 const TABLES = [{ configId: "afm", title: "Attack from Mars" }, { configId: "mm", title: "Medieval Madness" }];
 const LAUNCH_EVENTS = [
@@ -31,6 +32,7 @@ function takeRecorded() {
 
 test("a table that closes on its own", async () => {
     // Never uninstalled: node --test runs each test file in its own process.
+    installVpxtool(fake);
     fake.installGlobals();
     // Listening before main.js, so the messages are read before an Add-on translates them.
     for (const type of LAUNCH_EVENTS) {

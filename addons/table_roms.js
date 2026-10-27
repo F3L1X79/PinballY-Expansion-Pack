@@ -25,15 +25,19 @@ export default function init() {
     const host = createPinballYHost();
     const profileStore = getProfileStore();
     const record = createTableRomRecord(host, profileStore);
-    const onVpxtoolMissing = () => getAchievementToasts().submit({
-        kind: TOAST_KIND.ERROR,
-        title: lang.expansionPackSettings.addOns.tableRoms.name,
-        description: lang.errorToast.vpxtoolMissing,
-        onShown() {},
-        // Decided at its turn, once the Startup Screen's pick is made.
-        isStale: () => !seesSetupEntries(profileStore),
-    });
-    const queue = createScriptQueue(host, record, { onVpxtoolMissing });
+    const queue = createScriptQueue(host, record);
     createNvConfirmation(host, record);
+    // Checked at once, unlike the reading: a quick Startup Screen finds the toast ready.
+    if (!queue.findVpxtool()) {
+        getAchievementToasts().submit({
+            kind: TOAST_KIND.ERROR,
+            title: lang.expansionPackSettings.addOns.tableRoms.name,
+            description: lang.errorToast.vpxtoolMissing,
+            onShown() {},
+            // Decided at its turn, once the Startup Screen's pick is made.
+            isStale: () => !seesSetupEntries(profileStore),
+        });
+        return;
+    }
     host.setTimeout(safeHandler(SCRIPT_NAME, queue.start), STARTUP_DELAY_MS);
 }

@@ -219,7 +219,7 @@
         <span class="recap" id="recap" aria-label="Chantiers par effort"></span>
       </div>
       <div class="gauge" aria-hidden="true"><i id="hero-gauge" style="width:0"></i></div>
-      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 26.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
+      <div class="hero-line" style="margin-top:8px"><span class="stamp">MAJ 27.10.2026</span><span class="stamp">Blason = effort : bronze petit · argent moyen · or moyen-gros · platine gros</span></div>
     </div>
   </header>
 
@@ -242,6 +242,7 @@
 
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
+          <a class="chip tr-play" href="#random-table-menu"><b></b>Table au hasard au menu</a>
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
@@ -260,6 +261,7 @@
           <a class="chip tr-play" href="#feld"><b></b>Feld</a>
         </div>
         <div class="cell">
+          <a class="chip tr-share" href="#vpxtool-update"><b></b>vpxtool à jour</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
@@ -342,6 +344,53 @@
               <li>Semver du pack : majeure si une Pack Update ne suffit pas seule ou retire quelque chose (PinballY minimum relevé, Add-on supprimé, données illisibles par l'ancienne version) ; mineure pour des nouveautés, migrations automatiques comprises ; correctif sinon. Une release par spec terminée (ou plusieurs), un correctif seulement pour un bug qui coûte au joueur. Règles et étapes dans une section « Releasing » de <code>CONTRIBUTING.md</code>.</li>
               <li>README (en et fr, même plan) : présentation, captures, fonctionnalités par familles, Install (#337), Configuration, « Coming next » gardé, liens CHANGELOG et CONTRIBUTING ; le contenu pour développeurs part dans <code>CONTRIBUTING.md</code>. 4 à 6 captures sur la borne avec les Profiles de test, dans <code>docs/images/</code>, qui reste dans le zip (ticket humain).</li>
             </ul>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="random-table-menu" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>« Lancer une table au hasard » dans le menu principal</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>L'entrée du Welcome Screen, aussi dans le menu principal, sous « Jouer » : la même animation de roue (ou le saut direct de <code>skipRandomGameAnimation</code>) vers une table tirée au hasard, sans rouvrir le Welcome Screen.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> (court) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend <code>common/tables/random_game.js</code> et le libellé <code>welcomeScreen.randomTable</code> ; entrée ajoutée par <code>getMainMenu().add(...)</code> avec une nouvelle position juste après <code>PlayGame</code></div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Le tirage est-il le même que celui du Welcome Screen (tables du Profile actif, Adult Tables exclues pour un enfant, filtre en cours ignoré), ou suit-il le filtre affiché sur la roue ?</li>
+              <li>Le menu se ferme-t-il avant l'animation, et la table est-elle lancée seule, ou seulement sélectionnée sur la roue comme aujourd'hui ?</li>
+              <li>La Play compte-t-elle pour le Challenge « parties au hasard » (<code>randomGames</code>), comme depuis le Welcome Screen ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 27/10/2026. Le libellé existe déjà dans les six langues ; le Challenge <code>randomGames</code> lit peut-être l'origine du lancement.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="vpxtool-update" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>vpxtool à jour : vérification et toast de mise à jour</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Le pack regarde la dernière release de vpxtool sur GitHub et la compare à <code>tools\vpxtool.exe</code> ; un toast propose la mise à jour, que le helper caché de la Distribution télécharge, vérifie et met en place, l'ancien <code>vpxtool.exe</code> gardé en cas d'échec.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a>, dont il reprend la vérification de version et le helper · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Mise à jour automatique, ou toast avec un bouton ? (Recommandation de Claude : toast, jamais seul.)</li>
+              <li>Dernière release, ou une version maximale testée, écrite dans le pack et relevée à chaque release du pack ?</li>
+              <li>Comment juger la nouvelle version bonne avant de remplacer l'ancienne : <code>vpxtool romname</code> sur une table connue, même réponse qu'avant ?</li>
+              <li>Installer aussi vpxtool quand il manque (l'Error Toast « vpxtool introuvable » proposerait de le faire), ce qui retirerait l'étape 4 des README ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 27/10/2026. Risque : vpxtool est en 0.x, avec 49 releases en 2026 et des changements « breaking » ; le pack n'en utilise que <code>romname</code>, qu'une ancienne version fait déjà bien. vpxtool n'est jamais lancé pendant une partie, donc le remplacer hors partie est sûr ; le zip Windows ne contient que <code>vpxtool.exe</code>.</p>
           </details>
         </div>
       </li>
@@ -604,8 +653,12 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>27/10 <span class="count">(1)</span></summary>
+          <summary>27/10 <span class="count">(3)</span></summary>
           <ol>
+            <li><strong>« Lancer une table au hasard » au menu principal, 3ᵉ place</strong>
+              <span>Idée de Félix. Le tirage et l'animation existent déjà (<code>common/tables/random_game.js</code>, entrée du Welcome Screen) : il reste une entrée sous « Jouer ». Gain rapide pour la borne au quotidien, placé juste après la Sortie 1.0 en cours, pour ne pas l'interrompre. Effort petit, impact moyen.</span></li>
+            <li><strong>vpxtool à jour, 4ᵉ place, juste après</strong>
+              <span>Idée de Félix. Placé tant que la Distribution est fraîche : il en reprend la vérification de version et le helper. Toast avec bouton plutôt qu'une mise à jour seule, vpxtool étant en 0.x avec des changements « breaking » fréquents. Effort moyen, impact faible (seul <code>romname</code> sert, et une ancienne version le fait), qui monterait si le toast installait aussi un vpxtool absent.</span></li>
             <li><strong>Le Welcome Screen préparé sous le Profile picker quitte la roadmap</strong>
               <span>Abandonné par Félix au début de son grill : presque tout l'écran dépend du Profile, que le Profile Store ne lit que pour le Profile actif. Le préparer sous le carrousel compliquerait trop le code pour gagner environ 200 ms au démarrage (289 ms mesurées après le picker). L'idée sort de la file et de la matrice.</span></li>
           </ol>
