@@ -1,9 +1,9 @@
 ﻿// ============================================================
 // Entry point loaded by PinballY: loads the Profile store, logs the startup
 // summary, keeps the Adult Tables off a Child Profile's wheel, switches to Guest
-// without the Profile picker, resolves the Startup Screen, restores the quiet
-// wheel's volume, initializes SCRIPTS in order but those off in config.addOns
-// (the Expansion Pack Settings before Drawn Menus), then the Update Prompt and Check.
+// without the Profile picker, resolves the Startup Screen, restores the quiet wheel's
+// volume, starts the Play Error Toasts, initializes SCRIPTS in order but those off in
+// config.addOns (the Expansion Pack Settings before Drawn Menus), then the Update Prompt and Check.
 // - A script whose init() throws is logged, Error Log included, and skipped, so the others still load.
 // - LOG_STARTUP_TIMING logs each init time.
 // ============================================================
@@ -19,6 +19,7 @@ import { startExpansionPackSettings } from "./common/settings/expansion_pack_set
 import { startUpdateCheck } from "./common/updates/update_check.js";
 import { startUpdatePrompt } from "./common/updates/update_prompt.js";
 import { logError } from "./common/core/error_log.js";
+import { startPlayErrorToasts } from "./common/achievements/play_error_toasts.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;
@@ -179,6 +180,15 @@ try {
     getQuietWheel().restoreLeftover();
 } catch (error) {
     logError(SCRIPT_NAME, `ERROR restoring the quiet wheel's table: ${error.message}`);
+}
+
+// Whatever Add-ons are on: a Play that could not be saved is always told.
+if (store) {
+    try {
+        startPlayErrorToasts();
+    } catch (error) {
+        logError(SCRIPT_NAME, `ERROR starting the Play Error Toasts: ${error.message}`);
+    }
 }
 
 // Right before Drawn Menus, whatever config.addOns says: never an Add-on,

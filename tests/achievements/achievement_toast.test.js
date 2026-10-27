@@ -1,8 +1,8 @@
 ﻿// ============================================================
 // Achievement Toast module on the fake host: stacking (at most five), hold
 // duration, scale and sound settings (out of range values logged), Challenge
-// Toasts in the same queue, Confetti Shower and Fireworks starts, and rank
-// emblems with the trophy fallback.
+// and Error Toasts in the same queue, Confetti Shower and Fireworks starts,
+// and rank emblems with the trophy fallback.
 // ============================================================
 
 import { test } from "node:test";
@@ -151,6 +151,24 @@ test("a celebrated toast starts the Confetti Shower when it starts, never when i
     fake.advanceTime(SETTLE_MS);
     assert.deepEqual(cardsOnScreen(fake), ["plain", "celebrated"]);
     assert.deepEqual(starts, [fake.now().getTime() - SETTLE_MS + ARRIVAL_GAP_MS], "once, when its card arrives");
+});
+
+test("an Error Toast waits behind the other kinds, in its copper red and warning sign, and never celebrates", () => {
+    const fake = createFakePinballYHost();
+    fake.installGlobals();
+    const starts = [];
+    const toasts = createAchievementToasts(fake, { confettiShower: { start: () => starts.push("shower"), endsAtMs: () => null, onStopped() {} } });
+    toasts.submit({ kind: TOAST_KIND.ERROR, title: "error", description: "", celebrate: true, onShown() {} });
+    submitOne(toasts, "achievement");
+    toasts.submit({ kind: TOAST_KIND.CHALLENGE, title: "challenge", description: "", onShown() {} });
+    fake.advanceTime(3 * SETTLE_MS);
+
+    assert.deepEqual(cardsOnScreen(fake), ["achievement", "challenge", "error"], "the bad news comes last");
+    assert.deepEqual(starts, []);
+    const errorCard = fake.drawingLayers().find(layer => layer.texts()[1] === "error");
+    assert.equal(errorCard.texts()[0], lang.errorToast.header.toLocaleUpperCase());
+    assert.deepEqual(errorCard.images(), [`${ASSETS}\\error_warning.png`]);
+    assert.ok(errorCard.fills().includes(STEAMBALL_COLORS.errorAccent), "the accent bar in copper red");
 });
 
 test("a Level Toast starts the Fireworks when it starts, and failing ones never stop it", () => {

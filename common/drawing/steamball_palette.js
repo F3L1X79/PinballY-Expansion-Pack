@@ -32,6 +32,9 @@ export const STEAMBALL_COLORS = Object.freeze({
     highScoreAccent: 0xFFB07CF0,
     // News the player would rather not hear, such as a Lost Record.
     alert: 0xFFE8644A,
+    // The Error Toast's copper red, darker than the alert so a failure never
+    // reads as a Lost Record.
+    errorAccent: 0xFFC4452C,
     // Provisional, the border's colour until the Achievement List's key caps
     // and pills are checked on the cabinet.
     // StyledText ignores a semi-transparent backgroundColor.

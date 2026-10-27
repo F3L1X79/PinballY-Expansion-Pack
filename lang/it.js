@@ -879,4 +879,9 @@ export default {
         updateFailed: "Aggiornamento impossibile: l'Expansion Pack resta com'è",
         ok: "OK",
     },
+    errorToast: {
+        header: "Problema",
+        playNotSaved: "Impossibile salvare questa partita: non conterà nelle tue statistiche.",
+        playNotInPlayLog: "Questa partita è stata contata, ma manca dalla tua cronologia delle partite.",
+    },
 };

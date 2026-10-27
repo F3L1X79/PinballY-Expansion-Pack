@@ -881,4 +881,9 @@ export default {
         updateFailed: "No se puede actualizar: el Expansion Pack se queda como está",
         ok: "OK",
     },
+    errorToast: {
+        header: "Problema",
+        playNotSaved: "No se pudo guardar esta partida: no contará en tus estadísticas.",
+        playNotInPlayLog: "Esta partida se contó, pero falta en tu historial de partidas.",
+    },
 };

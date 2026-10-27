@@ -1,9 +1,9 @@
 ﻿// ============================================================
-// Profile store: the only module that knows the Profiles folder: one
-// sub-folder per Profile (Avatar, profile.json, Play Log), and cabinet.json
-// for the household. Decides which game is a Play (ADR 0007) and tells its
-// listeners of each switch, update and Play (onPlay, ADR 0008). Handles the
-// Profile Reset. Listens to "gamestarted" / "gameover".
+// Profile store: the only module that knows the Profiles folder (one sub-folder
+// per Profile: Avatar, profile.json, Play Log; cabinet.json for the household).
+// Decides which game is a Play (ADR 0007) and tells its listeners of each
+// switch, update and Play (onPlay, ADR 0008). Handles the Profile Reset.
+// Listens to "gamestarted" / "gameover"; tells of a Play it could not save or log (onPlayFailed).
 // - Every write is whole: tmp, backup, rename; a broken or newer file comes back from its backup.
 // - isAdmin and isChild are set by hand: read and kept, never written.
 // - Other cabinet-level files sit next to cabinet.json; no Profile Reset touches them.
@@ -71,6 +71,7 @@ export function createProfileStore(host) {
     const switchListeners = [];
     const updateListeners = [];
     const playListeners = [];
+    const playFailedListeners = [];
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
     // Logged once per session: the picker lists the Profiles on every opening.
     const loggedUnreadableAvatars = new Set();
@@ -300,11 +301,19 @@ export function createProfileStore(host) {
     }
 
     // Changes the data of the named Profile (the active one by default) and
-    // saves it.
+    // saves it. A change that cannot be saved is undone and rethrown: what
+    // the readers see never holds what the file does not.
     function updateProfileData(change, profileName = activeProfile.name) {
         const { profile, data } = profileWithData(profileName);
+        const before = JSON.stringify(data);
         change(data);
-        saveProfileData(profile, data);
+        try {
+            saveProfileData(profile, data);
+        } catch (error) {
+            if (data === activeData) activeData = JSON.parse(before);
+            forgetCachedRead(profile.name);
+            throw error;
+        }
         forgetCachedRead(profile.name);
         tellUpdateListeners(profile.name, { isReset: false });
     }
@@ -439,22 +448,33 @@ export function createProfileStore(host) {
         const { profileName } = running;
         const start = new Date(running.startMs);
 
-        updateProfileData(data => {
-            const play = data.plays[configId] || NO_PLAY;
-            data.plays[configId] = {
-                count: play.count + 1,
-                seconds: play.seconds + seconds,
-                lastPlayed: toLocalIsoString(now),
-            };
-        }, profileName);
+        try {
+            updateProfileData(data => {
+                const play = data.plays[configId] || NO_PLAY;
+                data.plays[configId] = {
+                    count: play.count + 1,
+                    seconds: play.seconds + seconds,
+                    lastPlayed: toLocalIsoString(now),
+                };
+            }, profileName);
+        } catch (error) {
+            // Nothing was saved, so nothing is announced.
+            logHandlerError(SCRIPT_NAME, error);
+            tellListeners(playFailedListeners, { profileName, configId, isCounted: false });
+            return;
+        }
         // The Play is in the totals already: a Play Log that cannot be
         // written must not keep it from being announced.
+        let playLogFailed = false;
         try {
             addToPlayLog(profileName, configId, start, seconds);
         } catch (error) {
             logHandlerError(SCRIPT_NAME, error);
+            playLogFailed = true;
         }
         tellListeners(playListeners, { profileName, configId, start, seconds });
+        // After the Play's listeners, so its Error Toast queues behind the Play's other toasts.
+        if (playLogFailed) tellListeners(playFailedListeners, { profileName, configId, isCounted: true });
     }));
 
     return {
@@ -508,6 +528,10 @@ export function createProfileStore(host) {
         // listener({ profileName, configId, start, seconds }): after a Play is
         // saved; profileName is the Profile active at its start.
         onPlay: (listener) => { playListeners.push(listener); },
+        // listener({ profileName, configId, isCounted }): after a Play that
+        // could not be saved (isCounted false, never announced) or not kept
+        // in the Play Log (isCounted true, announced first).
+        onPlayFailed: (listener) => { playFailedListeners.push(listener); },
     };
 }
 

@@ -800,4 +800,10 @@ export default {
         updateFailed: "Update not possible: the Expansion Pack stays as it is",
         ok: "OK",
     },
+    // The Error Toast: a failure the player would not see otherwise, under the table's name.
+    errorToast: {
+        header: "Problem",
+        playNotSaved: "This game could not be saved: it won't count in your stats.",
+        playNotInPlayLog: "This game was counted, but it is missing from your play history.",
+    },
 };

@@ -356,17 +356,18 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
           </div>
           <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a>. Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>. Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a> ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/to-tickets</code> → <code>/implement</code></div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Décisions du grilling (27/10/2026)</summary>
             <ul>
-              <li>Où vit le numéro de version : une constante du pack, lue par le résumé de démarrage et par la vérification des mises à jour de la Distribution ?</li>
-              <li>Le CHANGELOG : écrit à la main à chaque version, ou tiré des commits <code>Closes #N</code> par un script de <code>maintainer/</code> ?</li>
-              <li>Quand passer en 2.0 : un changement des données enregistrées (Profile Store, Play Log), ou seulement de l'installation ?</li>
-              <li>Quelles captures dans les README, et sur quels Profiles de test ?</li>
+              <li>La Pack Version existe déjà (<code>common/core/pack_version.js</code>) ; le résumé de démarrage l'écrit en tête, avec <code>(git checkout)</code> sur une borne git.</li>
+              <li>Les essais de la borne (#338) se font en 0.x ; la 1.0.0 sort après la Distribution, le toast d'erreur et les README remis à niveau, rien d'autre.</li>
+              <li><code>CHANGELOG.md</code> en anglais, à partir de la 1.0.0 (une section « première version publique » par familles). Un script <code>maintainer/release/draft_changelog.mjs</code> liste les <code>Closes #N</code> depuis le dernier tag ; la section est relue, puis reprise comme notes de release par <code>publish_release.mjs</code> (au lieu de <code>--generate-notes</code>), qui refuse une version sans section.</li>
+              <li>Release Highlights : 1 à 3 phrases pour la maison par version, dans <code>lang/</code> (six langues, jamais supprimées), sous « mis à jour en vX.Y.Z » dans le dialogue de réussite ; versions sautées comprises, 5 points au plus, la plus récente d'abord ; aucune pour un correctif, c'est permis.</li>
+              <li>Semver du pack : majeure si une Pack Update ne suffit pas seule ou retire quelque chose (PinballY minimum relevé, Add-on supprimé, données illisibles par l'ancienne version) ; mineure pour des nouveautés, migrations automatiques comprises ; correctif sinon. Une release par spec terminée (ou plusieurs), un correctif seulement pour un bug qui coûte au joueur. Règles et étapes dans une section « Releasing » de <code>CONTRIBUTING.md</code>.</li>
+              <li>README (en et fr, même plan) : présentation, captures, fonctionnalités par familles, Install (#337), Configuration, liens CHANGELOG et CONTRIBUTING ; le contenu pour développeurs part dans <code>CONTRIBUTING.md</code>. 4 à 6 captures sur la borne avec les Profiles de test, dans <code>docs/images/</code> exclu du zip (ticket humain).</li>
             </ul>
-            <p class="ctx">Idée de Félix du 25/10/2026. Aujourd'hui <code>common/core/startup_summary.js</code> ne connaît que la version de PinballY. La remise à niveau des README fait partie de ce jalon.</p>
           </details>
         </div>
       </li>

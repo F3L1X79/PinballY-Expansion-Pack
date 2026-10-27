@@ -1,11 +1,12 @@
 ﻿// ============================================================
 // Achievement Toast: announces each unlocked Achievement with a small card
 // in the bottom-right corner, on a non-blocking drawing layer (see
-// docs/adr/0003). Also shows the Challenge, Mastery, Level, High Score and
-// Frame Toasts, which share its queue. Cards stack, at most five on screen.
+// docs/adr/0003). Also shows the Challenge, Mastery, Level, High Score,
+// Frame and Error Toasts, which share its queue. Cards stack, at most five on screen.
 // - Toasts wait during a game and while a drawn dialog is open (docs/adr/0011).
 // - A celebrated toast starts the Confetti Shower, a Level Toast the Fireworks.
 // - A Level Toast waits until a second before the shower ends.
+// - An Error Toast comes last, holds at least 10 s, plays no sound, never celebrates.
 // ============================================================
 
 import lang from "../core/i18n.js";
@@ -33,6 +34,8 @@ const MAX_CARDS = 5;
 // A Level Toast and its Fireworks start this long before a falling
 // Confetti Shower's end, so the celebrations follow each other without a gap.
 const LEVEL_TOAST_SHOWER_LEAD_MS = 1000;
+// An Error Toast holds at least this long: a whole sentence to read.
+const ERROR_TOAST_MIN_HOLD_MS = 10000;
 
 // Card look at scale 1, validated with a prototype in PinballY; sizes in
 // pixels, fonts in points. The player's scale multiplies all of them.
@@ -76,6 +79,7 @@ const COLORS = Object.freeze({
 
 export const TOAST_KIND = Object.freeze({
     ACHIEVEMENT: "achievement", CHALLENGE: "challenge", MASTERY: "mastery", LEVEL: "level", HIGH_SCORE: "highScore", FRAME: "frame",
+    ERROR: "error",
 });
 
 // Icons in the pack's assets folder, drawn by absolute path: drawImage
@@ -111,6 +115,12 @@ const KIND_LOOKS = Object.freeze({
     [TOAST_KIND.FRAME]: {
         accent: STEAMBALL_COLORS.gold,
         header: () => lang.profileRewards.toastHeader,
+    },
+    // A failure the player would not see otherwise: a warning sign, never a celebration.
+    [TOAST_KIND.ERROR]: {
+        accent: STEAMBALL_COLORS.errorAccent,
+        iconFile: "assets\\images\\error_warning.png",
+        header: () => lang.errorToast.header,
     },
 });
 
@@ -265,6 +275,9 @@ export function createAchievementToasts(host, {
         return emblem ? { path: emblem, isEmblem: true } : { path: `${projectFolder}\\${iconFile}`, isEmblem: false };
     }
 
+    // Every other card holds as long from its arrival, so the oldest leaves first.
+    const holdMsOf = toast => (toast.kind === TOAST_KIND.ERROR ? Math.max(ERROR_TOAST_MIN_HOLD_MS, holdMs) : holdMs);
+
     function placeLayer(card) {
         card.layer.alpha = card.alpha;
         card.layer.setPos(0, card.lift / card.layoutHeight);
@@ -306,10 +319,14 @@ export function createAchievementToasts(host, {
             }
             placeLayer(card);
         });
-        if (cards.length > 0 && cards[0].leaving && cards[0].alpha === 0) {
-            const gone = cards.shift();
-            gone.layer.clear(COLORS.transparent);
-            freeLayers.push(gone.layer);
+        // Any faded card, not only the oldest: an Error Toast outlasts the cards after it.
+        const gone = cards.filter(card => card.leaving && card.alpha === 0);
+        if (gone.length > 0) {
+            for (const card of gone) {
+                cards.splice(cards.indexOf(card), 1);
+                card.layer.clear(COLORS.transparent);
+                freeLayers.push(card.layer);
+            }
             showNext();
             moving = true;
         }
@@ -361,15 +378,16 @@ export function createAchievementToasts(host, {
         };
         cards.push(card);
         placeLayer(card);
-        // Every card holds as long from its arrival: the oldest leaves first.
-        host.setTimeout(safeHandler(SCRIPT_NAME, () => startLeaving(card)), holdMs);
+        const isError = toast.kind === TOAST_KIND.ERROR;
+        host.setTimeout(safeHandler(SCRIPT_NAME, () => startLeaving(card)), holdMsOf(toast));
         arrivalOpen = false;
         host.setTimeout(safeHandler(SCRIPT_NAME, openArrival), ARRIVAL_GAP_MS);
         // Animated before onShown, so a failing callback never leaves the card stuck on screen.
         startFrames();
-        if (toast.celebrate) celebrate();
+        // A failure never sounds like a success.
+        if (toast.celebrate && !isError) celebrate();
         if (toast.kind === TOAST_KIND.LEVEL) startFireworks();
-        playSound();
+        if (!isError) playSound();
         toast.onShown();
     }
 
@@ -398,9 +416,20 @@ export function createAchievementToasts(host, {
     // High Score Toast that number only, a Frame Toast the image of its
     // frame (imagePath, null when missing), header (optional) replaces the
     // kind's, and extraLine (optional) shows under the description, in the
-    // accent, growing the card.
+    // accent, growing the card. An Error Toast waits behind every other
+    // kind: the bad news comes last.
     function submit(toast) {
-        waiting.push(toast);
+        if (toast.kind === TOAST_KIND.ERROR) {
+            // Joins the queue a moment later: a Play's Achievements are
+            // checked a tick after it, when the wheel may already be back.
+            host.setTimeout(safeHandler(SCRIPT_NAME, () => {
+                waiting.push(toast);
+                showNext();
+            }), ARRIVAL_GAP_MS);
+            return;
+        }
+        const firstError = waiting.findIndex(waitingToast => waitingToast.kind === TOAST_KIND.ERROR);
+        waiting.splice(firstError === -1 ? waiting.length : firstError, 0, toast);
         safeShowNext();
     }
 

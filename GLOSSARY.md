@@ -28,10 +28,14 @@ _Avoid_: update notification, version check
 The question shown at startup, before anything else, when a newer Pack Version was found at an earlier start: update now, or later. Asked once per Pack Version; afterwards the update stays available from the Expansion Pack Settings.
 _Avoid_: update notification, update toast
 
+**Release Highlights**:
+One to three sentences per Pack Version, written for the Household rather than for developers and translated into every language of the pack, that say what the new version brings. They are shown once, at the start after a successful Pack Update, together with those of every Pack Version skipped on the way (five at most, the newest first). A Pack Version may have none, often a fix-only one. Shown as "Nouveautés" in French.
+_Avoid_: changelog (the developers' full, English-only list of changes), release notes, what's new
+
 ### Errors
 
 **Error Toast**:
-A toast like the Achievement Toast, but with its own colour and a warning sign instead of a trophy, that says in one sentence what a failure has cost and, for an Admin Profile, what to do about it; it stays longer than the other toasts. It is shown only for a failure the player would not see otherwise and that does not mend itself at the next start: a Play that could not be kept in the Play Log, shown to the Profile that played it; the table script reader missing, shown to an Admin Profile at each start while it lasts; a Pack Update that failed, shown once to an Admin Profile, waiting for one to be active. A failure that answers a choice the player has just made keeps its own message on that screen. Shown as "Problème" in French.
+A toast like the Achievement Toast, but with its own colour and a warning sign instead of a trophy, that says in one sentence what a failure has cost and, for an Admin Profile, what to do about it; it stays longer than the other toasts. It is shown only for a failure the player would not see otherwise and that does not mend itself at the next start: a Play that could not be saved, or not kept in the Play Log, shown to the Profile that played it after that Play's other toasts; the table script reader missing, shown to an Admin Profile at each start while it lasts; a Pack Update that failed, shown once to an Admin Profile, waiting for one to be active. A failure that answers a choice the player has just made keeps its own message on that screen. Shown as "Problème" in French.
 _Avoid_: error popup, error dialog (a toast never waits for the player), alert
 
 **Error Log**:
