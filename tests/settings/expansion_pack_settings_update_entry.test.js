@@ -9,7 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { drawnMenuLines, isDrawnMenuShown, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
+import { drawnMenuLines, isDrawnMenuShown, press, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { readLoader } from "../support/loader_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -51,6 +51,7 @@ test("choosing it records the version, shows the Loader and starts the Pack Upda
     assert.deepEqual(fake.packUpdatesAsked(), [RELEASE]);
     assert.equal(JSON.parse(fake.readFile(STATE_FILE)).requestedVersion, "9.0.0");
     assert.equal(readLoader(fake).shown, true);
+    assert.equal(press(fake, "Select").defaultPrevented, true, "no button reaches the wheel meanwhile");
 
     fake.advanceTime(5000);
     assert.deepEqual(fake.executedCommands().filter(id => id === fake.getBuiltInCommand("Quit")), [fake.getBuiltInCommand("Quit")]);

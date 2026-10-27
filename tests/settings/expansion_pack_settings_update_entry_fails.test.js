@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { readDrawnMenu, drawnMenuLines, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
+import { readDrawnMenu, drawnMenuLines, press, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { readLoader } from "../support/loader_reader.js";
 import { errorLines } from "../support/error_log.js";
 
@@ -39,7 +39,9 @@ test("a Pack Update that never gets ready says so at once, and PinballY stays", 
     chooseEntry(fake, "Expansion Pack Settings");
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Update to v9.0.0");
-    fake.advanceTime(120000);
+    fake.advanceTime(1000);
+    assert.equal(press(fake, "Next").defaultPrevented, true, "no button reaches the wheel while the helper gets ready");
+    fake.advanceTime(119000);
     await settle();
     fake.advanceTime(OPEN_OVER_MS);
 
@@ -52,9 +54,10 @@ test("a Pack Update that never gets ready says so at once, and PinballY stays", 
     assert.match(errorLines(fake)[0], /^\[PackUpdate\] ERROR Pack Update not possible: /);
 });
 
-test("after OK, the entry is still in the Expansion Pack Settings", () => {
+test("after OK, the buttons work again and the entry is still in the Expansion Pack Settings", () => {
     chooseEntry(fake, "OK");
     fake.advanceTime(OPEN_OVER_MS);
+    assert.notEqual(press(fake, "Next").defaultPrevented, true, "the wheel moves again");
     fake.openOperatorMenu();
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Expansion Pack Settings");

@@ -4,6 +4,7 @@
 // the host to start the Pack Update helper, which quits PinballY once ready.
 // A helper not ready in time shows the failure at once (docs/adr/0018).
 // - Holds the wheel dialog queue while it waits: no Startup Screen opens just before PinballY quits.
+// - Blocks the buttons meanwhile, as Restart now does: no table launched under the Loader.
 // ============================================================
 
 import lang from "../core/i18n.js";
@@ -33,6 +34,12 @@ export function createPackUpdater(host, state, dialogs) {
         isOpen: () => Boolean(veil),
         onClosed: listener => { closedListeners.push(listener); },
     });
+
+    // Fires on every mapped button press: while the helper gets ready, no
+    // button moves the wheel or launches a table that the quit would cut.
+    host.on("commandbuttondown", safeHandler(SCRIPT_NAME, ev => {
+        if (veil) ev.preventDefault();
+    }));
 
     function hideVeil() {
         loader.hide();
