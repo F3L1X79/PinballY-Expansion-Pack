@@ -109,6 +109,26 @@ function createFileSystem() {
         return fileSystemObject;
     };
 
+    const readText = (path) => {
+        const stream = openUtf8Stream();
+        try {
+            stream.LoadFromFile(path);
+            // ADODB.Stream keeps the UTF-8 byte order mark it writes itself.
+            return stream.ReadText(ADODB_READ_ALL).replace(/^\uFEFF/, "");
+        } finally {
+            stream.Close();
+        }
+    };
+    const writeText = (path, text) => {
+        const stream = openUtf8Stream();
+        try {
+            stream.WriteText(text);
+            stream.SaveToFile(path, ADODB_SAVE_OVERWRITE);
+        } finally {
+            stream.Close();
+        }
+    };
+
     return {
         // The names of the folder's sub-folders; none when it doesn't exist.
         listFolders: (folderPath) => {
@@ -138,25 +158,12 @@ function createFileSystem() {
         folderExists: (path) => fso().FolderExists(path),
         // The whole file as a Uint8Array; throws when it is missing or unreadable.
         readBytes: createByteReader(),
-        readText: (path) => {
-            const stream = openUtf8Stream();
-            try {
-                stream.LoadFromFile(path);
-                // ADODB.Stream keeps the UTF-8 byte order mark it writes itself.
-                return stream.ReadText(ADODB_READ_ALL).replace(/^\uFEFF/, "");
-            } finally {
-                stream.Close();
-            }
-        },
-        writeText: (path, text) => {
-            const stream = openUtf8Stream();
-            try {
-                stream.WriteText(text);
-                stream.SaveToFile(path, ADODB_SAVE_OVERWRITE);
-            } finally {
-                stream.Close();
-            }
-        },
+        readText,
+        writeText,
+        // Read whole and saved again, in UTF-8: ADODB.Stream cannot open a
+        // file for appending, and Scripting.FileSystemObject appends in ANSI
+        // only. Creates a missing file.
+        appendText: (path, text) => { writeText(path, (fso().FileExists(path) ? readText(path) : "") + text); },
         // Throws when the target already exists.
         renameFile: (fromPath, toPath) => { fso().MoveFile(fromPath, toPath); },
         deleteFile: (path) => { fso().DeleteFile(path); },

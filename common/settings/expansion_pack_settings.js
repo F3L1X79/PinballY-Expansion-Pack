@@ -14,6 +14,7 @@ import lang from "../core/i18n.js";
 import config, { DEFAULTS } from "../core/config.js";
 import { applyEnvOverrides, envKeyOf } from "../core/env_overrides.js";
 import { logHandlerError, safeHandler } from "../core/safe_handler.js";
+import { logError } from "../core/error_log.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { getProfileStore } from "../profiles/profile_store.js";
 import { seesSetupEntries } from "../profiles/setup_entries.js";
@@ -179,7 +180,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     // screens closed.
     const restartFailed = safeHandler(SCRIPT_NAME, error => {
         hideRestartVeil();
-        host.log(`[${SCRIPT_NAME}] ERROR Restart not possible: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR Restart not possible: ${error.message}`, host);
         getWheelDialogs().submit({
             id: RESTART_FAILED_MENU_ID, message: TEXT.restartFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.RESTART_FAILED,
         });

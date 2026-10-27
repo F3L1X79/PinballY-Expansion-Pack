@@ -9,6 +9,7 @@
 
 import lang from "../core/i18n.js";
 import { safeHandler } from "../core/safe_handler.js";
+import { logError } from "../core/error_log.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { DIALOG_PRIORITY, getWheelDialogs } from "../core/wheel_dialog.js";
 import { DRAWN_MENU_Z_INDEX } from "../drawn_menu/drawn_menu_painter.js";
@@ -51,7 +52,7 @@ export function createPackUpdater(host, state, dialogs) {
 
     // Submitted before the veil goes, so it opens ahead of the Startup Screen.
     const failed = safeHandler(SCRIPT_NAME, error => {
-        host.log(`[${SCRIPT_NAME}] ERROR Pack Update not possible: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR Pack Update not possible: ${error.message}`, host);
         state.forgetRequest();
         dialogs.submit({
             id: FAILED_MENU_ID, message: TEXT.updateFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.UPDATE_RESULT,

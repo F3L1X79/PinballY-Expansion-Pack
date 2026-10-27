@@ -10,6 +10,7 @@
 // ============================================================
 
 import { safeHandler } from "./safe_handler.js";
+import { logError } from "./error_log.js";
 import { createPinballYHost } from "./pinbally_host.js";
 
 const SCRIPT_NAME = "QuietWheel";
@@ -89,7 +90,7 @@ export function createQuietWheel(host) {
         try {
             table = JSON.parse(host.files.readText(pendingFile));
         } catch (error) {
-            log(`ERROR reading ${PENDING_FILE_NAME}, deleted: ${error.message}`);
+            logError(SCRIPT_NAME, `ERROR reading ${PENDING_FILE_NAME}, deleted: ${error.message}`, host);
             host.files.deleteFile(pendingFile);
             return;
         }

@@ -12,6 +12,7 @@
 // ============================================================
 
 import { safeHandler } from "../core/safe_handler.js";
+import { logError } from "../core/error_log.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
 import config from "../core/config.js";
@@ -408,7 +409,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             return true;
         } catch (error) {
             takeDown();
-            host.log(`[${SCRIPT_NAME}] ERROR drawing the "${id}" menu, the native one shows instead: ${error.stack || error.message}`);
+            logError(SCRIPT_NAME, `ERROR drawing the "${id}" menu, the native one shows instead: ${error.stack || error.message}`, host);
             return false;
         }
     }

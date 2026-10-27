@@ -2,9 +2,11 @@
 // Shared error guard for event handlers, timer callbacks and async menu
 // commands. main.js only protects each script's init(), so an uncaught
 // error in a handler would otherwise escape to the engine or become an
-// unhandled promise rejection. Wrapped handlers log the error to
-// logfile.log as "[<ScriptName>] ..." and never rethrow.
+// unhandled promise rejection. Wrapped handlers log the error as
+// "[<ScriptName>] ..." to logfile.log and the Error Log, and never rethrow.
 // ============================================================
+
+import { logError } from "./error_log.js";
 
 export function logHandlerError(scriptName, error) {
     let details;
@@ -22,8 +24,8 @@ export function logHandlerError(scriptName, error) {
     }
 
     try {
-        logfile.log(`[${scriptName}] ERROR in handler: ${details}`);
-    } catch (logError) {
+        logError(scriptName, `ERROR in handler: ${details}`);
+    } catch (loggingError) {
         // Last resort when logfile is unavailable, so the error is never lost.
         console.log(`[${scriptName}] ERROR in handler: ${details}`);
     }

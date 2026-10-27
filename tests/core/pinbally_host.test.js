@@ -433,6 +433,18 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             ]);
         });
 
+        test("appends UTF-8 text to a file, creating it when missing, and throws on a locked one", () => {
+            const path = "C:\\PinballY\\Scripts\\ExpansionPack\\errors.log";
+            host.files.appendText(path, "Chloé\r\n");
+            host.files.appendText(path, "Émile\r\n");
+            assert.equal(host.files.readText(path), "Chloé\r\nÉmile\r\n");
+
+            fake.lockFile(path);
+            assert.throws(() => host.files.appendText(path, "Zoé\r\n"), /Permission denied/);
+            fake.unlockFile(path);
+            assert.equal(host.files.readText(path), "Chloé\r\nÉmile\r\n");
+        });
+
         test("lists the files of a folder, not its sub-folders nor deeper files, and none for a missing folder", () => {
             const alice = "C:\\PinballY\\Scripts\\profiles\\Alice";
             assert.deepEqual(host.files.listFiles(alice), []);

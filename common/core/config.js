@@ -8,6 +8,7 @@
 
 import { applyEnvOverrides } from "./env_overrides.js";
 import { projectFolderOf } from "./pinbally_host.js";
+import { logError } from "./error_log.js";
 
 // The sounds shipped in assets\sounds\, by setting.
 export const SHIPPED_SOUNDS = Object.freeze({
@@ -124,7 +125,8 @@ export const DEFAULTS = {
 Object.freeze(DEFAULTS.addOns);
 Object.freeze(DEFAULTS);
 
-const LOG_PREFIX = "[Config]";
+const SCRIPT_NAME = "Config";
+const LOG_PREFIX = `[${SCRIPT_NAME}]`;
 const ADODB_TEXT_TYPE = 2;
 const ADODB_READ_ALL = -1;
 
@@ -178,7 +180,7 @@ function loadConfig() {
     try {
         text = readEnvLocal(path);
     } catch (error) {
-        logfile.log(`${LOG_PREFIX} ERROR reading ${path}, using defaults: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR reading ${path}, using defaults: ${error.message}`);
         return resolveSoundFiles(copyOfDefaults(), projectFolder);
     }
     if (text === null) {

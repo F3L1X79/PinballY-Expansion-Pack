@@ -36,6 +36,10 @@ quiet_wheel_pending.json
 # The Pack Update's state: the newest known release (see docs/adr/0018)
 pack_update.json
 
+# The Error Log: every error the pack logged, kept across launches
+errors.log
+errors.old.log
+
 # vpxtool, installed by each owner (see the README); the pack's own restart helper is shipped
 tools/*
 !tools/restart_pinbally.ps1

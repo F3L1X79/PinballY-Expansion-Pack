@@ -7,8 +7,9 @@
 // ============================================================
 
 import { createPinballYHost } from "../core/pinbally_host.js";
+import { logError } from "../core/error_log.js";
 
-const LOG_PREFIX = "[UpdateCheck]";
+const SCRIPT_NAME = "UpdateCheck";
 export const UPDATE_STATE_FILE_NAME = "pack_update.json";
 const FORMAT_VERSION = 1;
 
@@ -22,7 +23,7 @@ export function createUpdateState(host) {
             if (!saved || typeof saved !== "object") throw new Error("not a JSON object");
             return saved;
         } catch (error) {
-            host.log(`${LOG_PREFIX} ERROR reading ${UPDATE_STATE_FILE_NAME}, deleted: ${error.message}`);
+            logError(SCRIPT_NAME, `ERROR reading ${UPDATE_STATE_FILE_NAME}, deleted: ${error.message}`, host);
             host.files.deleteFile(path);
             return null;
         }

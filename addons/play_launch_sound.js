@@ -8,6 +8,7 @@
 
 import config from "../common/core/config.js";
 import { safeHandler } from "../common/core/safe_handler.js";
+import { logError } from "../common/core/error_log.js";
 
 // Playback volume, 0-100.
 const VOLUME_PERCENT = 100;
@@ -19,8 +20,9 @@ function initializeMediaPlayer() {
         player.settings.volume = VOLUME_PERCENT;
         return player;
     } catch (error) {
-        logfile.log(
-            "[LaunchSound] ERROR: could not initialize Windows Media Player ("
+        logError(
+            SCRIPT_NAME,
+            "ERROR: could not initialize Windows Media Player ("
             + error.message
             + "). Is the 'Windows Media Player' optional feature enabled?"
         );
@@ -46,7 +48,7 @@ export default function init() {
         try {
             mediaPlayer.URL = filePath;
         } catch (error) {
-            logfile.log("[LaunchSound] ERROR: could not play launch sound (" + error.message + ").");
+            logError(SCRIPT_NAME, "ERROR: could not play launch sound (" + error.message + ").");
         }
     }));
 

@@ -751,6 +751,14 @@ export function createFakePinballYHost({
             modifiedDates.set(path, nowMs);
             fileOperationList.push({ operation: "write", path });
         },
+        // Creates a missing file, as writeText does.
+        appendText(path, text) {
+            requireParentFolder(path);
+            requireUnlocked(path);
+            files.set(path, (files.get(path) ?? "") + text);
+            modifiedDates.set(path, nowMs);
+            fileOperationList.push({ operation: "append", path });
+        },
         renameFile(fromPath, toPath) {
             requireFile(fromPath);
             requireUnlocked(fromPath);

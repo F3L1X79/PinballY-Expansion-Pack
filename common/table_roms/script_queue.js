@@ -7,6 +7,7 @@
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";
+import { logError } from "../core/error_log.js";
 import { SCRIPT_NAME } from "./table_rom_record.js";
 
 export const SCRIPT_READ_TIMEOUT_MS = 60 * 1000;
@@ -44,7 +45,7 @@ export function createScriptQueue(host, record) {
         return tables;
     }
 
-    const logFailure = (table, reason) => log(`ERROR reading the script of "${table.configId}": ${reason}; read again at the next startup.`);
+    const logFailure = (table, reason) => logError(SCRIPT_NAME, `ERROR reading the script of "${table.configId}": ${reason}; read again at the next startup.`, host);
 
     function applyAnswer(table, { exitCode, output }) {
         if (exitCode !== 0) {

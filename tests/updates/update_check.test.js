@@ -142,7 +142,8 @@ test("an unreadable update state file is logged, deleted, and the check goes on"
     const errors = errorLines(fake);
     assert.equal(errors.length, 1, errors.join("\n"));
     assert.ok(errors[0].startsWith("[UpdateCheck]") && errors[0].includes("pack_update.json"), errors[0]);
-    assert.deepEqual(fake.fileOperations().map(operation => operation.operation), ["delete", "write"]);
+    assert.deepEqual(fake.fileOperations().map(({ operation, path }) => `${operation} ${path}`),
+        [`append ${PROJECT}\\errors.log`, `delete ${STATE_FILE}`, `write ${STATE_FILE}`], "the error in the Error Log too");
     assert.equal(savedState(fake).latestRelease.packVersion, "9.0.0");
 });
 

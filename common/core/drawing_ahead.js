@@ -9,6 +9,7 @@
 
 import { createPinballYHost } from "./pinbally_host.js";
 import { safeHandler } from "./safe_handler.js";
+import { logError } from "./error_log.js";
 
 const SCRIPT_NAME = "DrawingAhead";
 
@@ -53,7 +54,7 @@ export function createDrawingAhead(host) {
             if (!work.step()) work.awake = false;
         } catch (error) {
             work.awake = false;
-            host.log(`[${SCRIPT_NAME}] ERROR in a drawing step, paused until new work: ${error.stack || error.message}`);
+            logError(SCRIPT_NAME, `ERROR in a drawing step, paused until new work: ${error.stack || error.message}`, host);
         }
     }
 
@@ -68,7 +69,7 @@ export function createDrawingAhead(host) {
         try {
             hasMore = job.step();
         } catch (error) {
-            host.log(`[${SCRIPT_NAME}] ERROR in a foreground step, its work given up: ${error.stack || error.message}`);
+            logError(SCRIPT_NAME, `ERROR in a foreground step, its work given up: ${error.stack || error.message}`, host);
             finish(job, job.onFailed);
             return;
         }

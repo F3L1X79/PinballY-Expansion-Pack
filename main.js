@@ -4,7 +4,7 @@
 // without the Profile picker, resolves the Startup Screen, restores the quiet
 // wheel's volume, initializes SCRIPTS in order but those off in config.addOns
 // (the Expansion Pack Settings before Drawn Menus), then the Update Prompt and Check.
-// - A script whose init() throws is logged and skipped, so the others still load.
+// - A script whose init() throws is logged, Error Log included, and skipped, so the others still load.
 // - LOG_STARTUP_TIMING logs each init time.
 // ============================================================
 
@@ -18,9 +18,12 @@ import { writeStartupSummary } from "./common/core/startup_summary.js";
 import { startExpansionPackSettings } from "./common/settings/expansion_pack_settings.js";
 import { startUpdateCheck } from "./common/updates/update_check.js";
 import { startUpdatePrompt } from "./common/updates/update_prompt.js";
+import { logError } from "./common/core/error_log.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;
+// The script name of main.js in the Error Log.
+const SCRIPT_NAME = "Startup";
 
 import * as uiTranslation from "./addons/ui_translation.js";
 import * as statusLineInfo from "./addons/status_line_info.js";
@@ -119,7 +122,7 @@ let store = null;
 try {
     store = getProfileStore();
 } catch (error) {
-    logfile.log(`[Startup] ERROR loading the Profiles: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR loading the Profiles: ${error.message}`);
 }
 
 // As early as the Profile count allows, so it is the pack's first line in
@@ -132,7 +135,7 @@ try {
         profileCount: store ? store.listProfileNames().length : null,
     });
 } catch (error) {
-    logfile.log(`[Startup] ERROR writing the startup summary: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR writing the startup summary: ${error.message}`);
 }
 
 // Whatever Add-ons are on, a Child Profile never sees an Adult Table on the
@@ -141,7 +144,7 @@ if (store) {
     try {
         installChildWheelFilter();
     } catch (error) {
-        logfile.log(`[Startup] ERROR installing the Child Profile's wheel filter: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR installing the Child Profile's wheel filter: ${error.message}`);
     }
 }
 
@@ -156,7 +159,7 @@ if (store && ENABLED_SCRIPTS.profilePicker === false) {
             logfile.log(`[Startup] Profile picker disabled: switched from "${previousProfile.name}" to Guest.`);
         }
     } catch (error) {
-        logfile.log(`[Startup] ERROR switching to Guest: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR switching to Guest: ${error.message}`);
     }
 }
 
@@ -166,7 +169,7 @@ if (store) {
     try {
         getStartupScreen();
     } catch (error) {
-        logfile.log(`[Startup] ERROR resolving the Startup Screen: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR resolving the Startup Screen: ${error.message}`);
     }
 }
 
@@ -175,7 +178,7 @@ if (store) {
 try {
     getQuietWheel().restoreLeftover();
 } catch (error) {
-    logfile.log(`[Startup] ERROR restoring the quiet wheel's table: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR restoring the quiet wheel's table: ${error.message}`);
 }
 
 // Right before Drawn Menus, whatever config.addOns says: never an Add-on,
@@ -185,7 +188,7 @@ function startSettings() {
     try {
         startExpansionPackSettings();
     } catch (error) {
-        logfile.log(`[Startup] ERROR starting the Expansion Pack Settings: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR starting the Expansion Pack Settings: ${error.message}`);
     }
 }
 
@@ -200,7 +203,7 @@ for (const { key, module } of SCRIPTS) {
     try {
         module.default();
     } catch (error) {
-        logfile.log(`[Startup] ERROR initializing "${key}": ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR initializing "${key}": ${error.message}`);
         continue;
     }
 
@@ -216,10 +219,10 @@ for (const { key, module } of SCRIPTS) {
 try {
     startUpdatePrompt();
 } catch (error) {
-    logfile.log(`[Startup] ERROR submitting the Update Prompt: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR submitting the Update Prompt: ${error.message}`);
 }
 try {
     startUpdateCheck();
 } catch (error) {
-    logfile.log(`[Startup] ERROR starting the Update Check: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR starting the Update Check: ${error.message}`);
 }
