@@ -888,5 +888,6 @@ export default {
         header: "Problème",
         playNotSaved: "Cette partie n'a pas pu être enregistrée : elle ne comptera pas dans vos statistiques.",
         playNotInPlayLog: "Cette partie a été comptée, mais elle manque à votre historique de parties.",
+        vpxtoolMissing: "vpxtool.exe manque dans le dossier tools de l'Expansion Pack : les ROM des tables ne sont pas renseignées.",
     },
 };

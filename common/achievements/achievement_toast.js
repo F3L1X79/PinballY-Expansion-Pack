@@ -356,8 +356,6 @@ export function createAchievementToasts(host, {
     }
 
     function showNext() {
-        // A toast gone stale while it waited (its Profile was reset) never shows.
-        while (waiting.length > 0 && waiting[0].isStale && waiting[0].isStale()) waiting.shift();
         if (!arrivalOpen || cards.length >= MAX_CARDS || waiting.length === 0) return;
         // PinballY stops redrawing its window while a game starts, runs or
         // exits, and the game covers it.
@@ -365,6 +363,11 @@ export function createAchievementToasts(host, {
         // A drawn dialog is the one exception to "over everything": the
         // toast, and the confetti or Fireworks it may start, would hide what it asks.
         if (wheelDialogs.hasDrawnDialog()) return;
+        // A toast gone stale while it waited (its Profile was reset, the
+        // active Profile no longer the one it is for) never shows. Decided
+        // only now: the Startup Screen's pick may still change the Profile.
+        while (waiting.length > 0 && waiting[0].isStale && waiting[0].isStale()) waiting.shift();
+        if (waiting.length === 0) return;
         if (holdForShower(waiting[0])) return;
 
         const toast = waiting.shift();

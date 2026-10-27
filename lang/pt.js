@@ -884,5 +884,6 @@ export default {
         header: "Problema",
         playNotSaved: "Não foi possível salvar esta partida: ela não contará nas suas estatísticas.",
         playNotInPlayLog: "Esta partida foi contada, mas não está no seu histórico de partidas.",
+        vpxtoolMissing: "Falta o vpxtool.exe na pasta tools do Expansion Pack: as ROMs das mesas não são preenchidas.",
     },
 };

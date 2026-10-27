@@ -261,7 +261,6 @@
           <a class="chip tr-play" href="#feld"><b></b>Feld</a>
         </div>
         <div class="cell">
-          <a class="chip tr-profiles" href="#welcome-under-picker"><b></b>Welcome Screen sous le picker</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
@@ -356,8 +355,8 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
           </div>
           <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>. Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a> ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/to-tickets</code> → <code>/implement</code></div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #350, #351, borne #348 et #352 (humain). Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a> ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
           <details>
             <summary>Décisions du grilling (27/10/2026)</summary>
             <ul>
@@ -366,30 +365,8 @@
               <li><code>CHANGELOG.md</code> en anglais, à partir de la 1.0.0 (une section « première version publique » par familles). Un script <code>maintainer/release/draft_changelog.mjs</code> liste les <code>Closes #N</code> depuis le dernier tag ; la section est relue, puis reprise comme notes de release par <code>publish_release.mjs</code> (au lieu de <code>--generate-notes</code>), qui refuse une version sans section.</li>
               <li>Release Highlights : 1 à 3 phrases pour la maison par version, dans <code>lang/</code> (six langues, jamais supprimées), sous « mis à jour en vX.Y.Z » dans le dialogue de réussite ; versions sautées comprises, 5 points au plus, la plus récente d'abord ; aucune pour un correctif, c'est permis.</li>
               <li>Semver du pack : majeure si une Pack Update ne suffit pas seule ou retire quelque chose (PinballY minimum relevé, Add-on supprimé, données illisibles par l'ancienne version) ; mineure pour des nouveautés, migrations automatiques comprises ; correctif sinon. Une release par spec terminée (ou plusieurs), un correctif seulement pour un bug qui coûte au joueur. Règles et étapes dans une section « Releasing » de <code>CONTRIBUTING.md</code>.</li>
-              <li>README (en et fr, même plan) : présentation, captures, fonctionnalités par familles, Install (#337), Configuration, liens CHANGELOG et CONTRIBUTING ; le contenu pour développeurs part dans <code>CONTRIBUTING.md</code>. 4 à 6 captures sur la borne avec les Profiles de test, dans <code>docs/images/</code> exclu du zip (ticket humain).</li>
+              <li>README (en et fr, même plan) : présentation, captures, fonctionnalités par familles, Install (#337), Configuration, « Coming next » gardé, liens CHANGELOG et CONTRIBUTING ; le contenu pour développeurs part dans <code>CONTRIBUTING.md</code>. 4 à 6 captures sur la borne avec les Profiles de test, dans <code>docs/images/</code>, qui reste dans le zip (ticket humain).</li>
             </ul>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-profiles" id="welcome-under-picker" data-track="profiles" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Le Welcome Screen préparé sous le Profile picker</h3>
-            <div class="tags"><span class="tag track">Profiles</span><span class="tag">moyen</span><span class="tag">UI</span></div>
-          </div>
-          <p>Au démarrage par le Profile picker, le Welcome Screen se lit et se dessine pendant que le carrousel est ouvert, pour apparaître d'un coup après le choix ou Exit, au lieu d'être préparé seulement à son tour.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Suit le Welcome Screen sans pause (spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/327">#327</a>, livrée) ; mesure du ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/330">#330</a></div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>Le Profile n'est pas encore choisi : préparer l'écran du Profile surligné et le refaire s'il change, ou seulement ce qui ne dépend pas du Profile ?</li>
-              <li>Le dessin d'avance passe par <code>getDrawingAhead()</code> : ses tranches ne doivent pas ralentir le défilement du carrousel.</li>
-            </ul>
-            <p class="ctx">Mesure sur la borne le 26/10/2026 (#330) : <code>[WelcomeScreen] Opened, drawn in 289 ms</code> après un choix dans le picker, au-delà du seuil de 150 ms fixé au grilling du 26/10.</p>
           </details>
         </div>
       </li>
@@ -652,6 +629,13 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>27/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>Le Welcome Screen préparé sous le Profile picker quitte la roadmap</strong>
+              <span>Abandonné par Félix au début de son grill : presque tout l'écran dépend du Profile, que le Profile Store ne lit que pour le Profile actif. Le préparer sous le carrousel compliquerait trop le code pour gagner environ 200 ms au démarrage (289 ms mesurées après le picker). L'idée sort de la file et de la matrice.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>26/10 <span class="count">(6)</span></summary>
           <ol>
             <li><strong>Le toast d'erreur garde sa 2ᵉ place, avec un Error Log, et passe avant le ticket #335</strong>

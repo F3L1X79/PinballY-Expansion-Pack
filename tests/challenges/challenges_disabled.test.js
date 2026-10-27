@@ -25,8 +25,9 @@ test("no Challenge, Challenge Card or Challenges Achievements when the Challenge
     fake.addFile(`${PROFILES_FOLDER}\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "Alice" }));
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
-    // Nor the Drawn Menus, so the main menu is read natively.
-    for (const key of Object.keys(config.addOns)) config.addOns[key] = !["challenges", "drawnMenus"].includes(key);
+    // Nor the Drawn Menus, so the main menu is read natively, nor Table ROMs,
+    // whose missing vpxtool is an error.
+    for (const key of Object.keys(config.addOns)) config.addOns[key] = !["challenges", "drawnMenus", "tableRoms"].includes(key);
     config.language = "en";
 
     const { default: lang } = await import("../../common/core/i18n.js");

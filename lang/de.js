@@ -884,5 +884,6 @@ export default {
         header: "Problem",
         playNotSaved: "Dieses Spiel konnte nicht gespeichert werden: Es zählt nicht in Ihrer Statistik.",
         playNotInPlayLog: "Dieses Spiel wurde gezählt, fehlt aber in Ihrem Spielverlauf.",
+        vpxtoolMissing: "vpxtool.exe fehlt im Ordner tools des Expansion Pack: Die ROMs der Tische werden nicht eingetragen.",
     },
 };

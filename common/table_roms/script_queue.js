@@ -25,7 +25,8 @@ export function readRomOutput(output) {
     return ROM_NAME.test(lastLine) ? { rom: lastLine } : { unreadable: lastLine };
 }
 
-export function createScriptQueue(host, record) {
+// onVpxtoolMissing: run at start when vpxtool is not in the tools folder.
+export function createScriptQueue(host, record, { onVpxtoolMissing = () => {} } = {}) {
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
     const vpxtoolPath = `${host.getProjectFolder()}\\tools\\vpxtool.exe`;
     // vpxtool reads the script from the .vbs beside the .vpx when there is one.
@@ -132,7 +133,8 @@ export function createScriptQueue(host, record) {
     return {
         start: () => {
             if (!host.files.fileExists(vpxtoolPath)) {
-                log(`vpxtool not found at ${vpxtoolPath}; the table scripts are not read.`);
+                logError(SCRIPT_NAME, `ERROR vpxtool not found at ${vpxtoolPath}; the table scripts are not read.`, host);
+                onVpxtoolMissing();
                 return;
             }
             readNext(tablesToRead());

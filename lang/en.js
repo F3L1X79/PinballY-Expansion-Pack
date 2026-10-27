@@ -805,5 +805,7 @@ export default {
         header: "Problem",
         playNotSaved: "This game could not be saved: it won't count in your stats.",
         playNotInPlayLog: "This game was counted, but it is missing from your play history.",
+        // Under the Table ROMs Add-on's name.
+        vpxtoolMissing: "vpxtool.exe is missing from the Expansion Pack's tools folder: the tables' ROMs are not filled.",
     },
 };

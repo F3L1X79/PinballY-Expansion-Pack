@@ -883,5 +883,6 @@ export default {
         header: "Problema",
         playNotSaved: "Impossibile salvare questa partita: non conterà nelle tue statistiche.",
         playNotInPlayLog: "Questa partita è stata contata, ma manca dalla tua cronologia delle partite.",
+        vpxtoolMissing: "Manca vpxtool.exe nella cartella tools dell'Expansion Pack: le ROM dei tavoli non vengono compilate.",
     },
 };
