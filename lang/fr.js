@@ -722,6 +722,8 @@ export default {
         languageLine: (languageName) => `Langue : ${languageName}`,
         startupScreenLine: (screenName) => `Écran de démarrage : ${screenName}`,
         startupScreenNames: { welcome: "Écran d'accueil", profilePicker: "Choix du joueur", wheel: "Roue" },
+        updateCheckLine: (state) => `Recherche de mises à jour : ${state}`,
+        updateTo: (version) => `Mettre à jour en v${version}`,
         back: "Retour",
         groups: {
             playersAndProgress: "Joueurs et progression",

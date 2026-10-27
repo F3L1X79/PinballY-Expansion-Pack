@@ -10,12 +10,11 @@
 import lang from "../core/i18n.js";
 import config from "../core/config.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
-import { PACK_VERSION, isNewerPackVersion } from "../core/pack_version.js";
 import { DIALOG_PRIORITY, getWheelDialogs } from "../core/wheel_dialog.js";
 import { getStartupVeil } from "../drawing/startup_veil.js";
 import { getProfileStore } from "../profiles/profile_store.js";
 import { seesSetupEntries } from "../profiles/setup_entries.js";
-import { isGitCheckout } from "./update_check.js";
+import { installableRelease } from "./update_check.js";
 import { getUpdateState } from "./update_state.js";
 import { getPackUpdater } from "./pack_update.js";
 
@@ -25,11 +24,9 @@ const MENU_ID = "updatePrompt";
 // The release to offer at this start, or null: why not is logged.
 function releaseToOffer(host, { state, profileStore, enabled }) {
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
-    const release = state.latestRelease();
-    if (!release || !isNewerPackVersion(release.packVersion, PACK_VERSION)) return null;
-    if (release.packVersion === state.offeredVersion()) return null;
     if (!enabled) return null;
-    if (isGitCheckout(host)) return null;
+    const release = installableRelease(host, state);
+    if (!release || release.packVersion === state.offeredVersion()) return null;
     if (!seesSetupEntries(profileStore)) {
         log(`Pack Version ${release.packVersion} kept for a start whose Profile sees the setup entries.`);
         return null;

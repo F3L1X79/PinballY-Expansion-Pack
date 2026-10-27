@@ -50,6 +50,14 @@ export function isGitCheckout(host) {
     return host.files.folderExists(gitPath) || host.files.fileExists(gitPath);
 }
 
+// The remembered release a Pack Update could install now, or null: a newer
+// Pack Version, outside a git checkout.
+export function installableRelease(host, state) {
+    const release = state.latestRelease();
+    if (!release || !isNewerPackVersion(release.packVersion, PACK_VERSION) || isGitCheckout(host)) return null;
+    return release;
+}
+
 // Resolves once the reply is handled, never rejects; stays pending while
 // GitHub doesn't answer.
 export function runUpdateCheck(host, state, { enabled }) {

@@ -718,6 +718,8 @@ export default {
         languageLine: (languageName) => `Sprache: ${languageName}`,
         startupScreenLine: (screenName) => `Startbildschirm: ${screenName}`,
         startupScreenNames: { welcome: "Willkommensseite", profilePicker: "Profilauswahl", wheel: "Wheel" },
+        updateCheckLine: (state) => `Update-Prüfung: ${state}`,
+        updateTo: (version) => `Auf v${version} aktualisieren`,
         back: "Zurück",
         groups: {
             playersAndProgress: "Spieler und Fortschritt",

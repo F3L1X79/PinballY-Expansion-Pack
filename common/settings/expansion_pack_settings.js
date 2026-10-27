@@ -1,9 +1,9 @@
 // ============================================================
-// Expansion Pack Settings: their entry in the Operator Menu, right after
-// PinballY's Options, for whoever sees the setup entries; it opens the list
-// of Add-on categories, each listing its Add-ons as saved in .env.local (read
-// again on each opening), one page per Add-on whose Save rewrites its one line, and
-// the Startup screen and Language pages, saving at once. Listens to "menuopen", "command" and "commandbuttondown"; writes .env.local.
+// Expansion Pack Settings: their entry in the Operator Menu, after PinballY's Options, for whoever
+// sees the setup entries, opens the list of Add-on categories (their Add-ons as saved in .env.local,
+// read again on each opening, one page per Add-on whose Save rewrites its one line), the Startup screen,
+// Language and Update check pages, saving at once, and "Update to vX.Y.Z" while a newer Pack Version is known.
+// Listens to "menuopen", "command" and "commandbuttondown"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
 // - Nothing applies before PinballY restarts: "on restart" marks a saved value that differs from the running one.
@@ -22,6 +22,9 @@ import { DRAWN_MENU_Z_INDEX } from "../drawn_menu/drawn_menu_painter.js";
 import { createLoader } from "../drawing/loader.js";
 import { DIMMED_WHEEL } from "../drawing/steamball_drawing.js";
 import { DIALOG_PRIORITY, getWheelDialogs } from "../core/wheel_dialog.js";
+import { installableRelease } from "../updates/update_check.js";
+import { getUpdateState } from "../updates/update_state.js";
+import { getPackUpdater } from "../updates/pack_update.js";
 import { ADD_ON_GROUPS } from "./add_on_catalogue.js";
 import { rewriteEnvLine } from "./env_local_rewrite.js";
 
@@ -32,6 +35,7 @@ const CATEGORY_MENU_ID = "expansionPackSettingsCategory";
 const PAGE_MENU_ID = "expansionPackSettingsPage";
 const LANGUAGE_MENU_ID = "expansionPackSettingsLanguage";
 const STARTUP_SCREEN_MENU_ID = "expansionPackSettingsStartupScreen";
+const UPDATE_CHECK_MENU_ID = "expansionPackSettingsUpdateCheck";
 const NOT_SAVED_MENU_ID = "expansionPackSettingsNotSaved";
 const RESTART_MENU_ID = "expansionPackSettingsRestart";
 const RESTART_FAILED_MENU_ID = "expansionPackSettingsRestartFailed";
@@ -64,6 +68,8 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const choiceSettings = [
         { key: "startupScreen", menuId: STARTUP_SCREEN_MENU_ID, names: TEXT.startupScreenNames, line: TEXT.startupScreenLine, normalize: String },
         { key: "language", menuId: LANGUAGE_MENU_ID, names: TEXT.languageNames, line: TEXT.languageLine, normalize: value => String(value).toLowerCase() },
+        // Keyed "true" / "false": String turns the saved boolean into one of them.
+        { key: "updateCheck", menuId: UPDATE_CHECK_MENU_ID, names: { true: TEXT.on, false: TEXT.off }, line: TEXT.updateCheckLine, normalize: String },
     ].map(setting => ({
         ...setting,
         lineCommand: host.allocateCommand(`expansionPackSettings_${setting.key}`),
@@ -77,6 +83,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const switchCommand = host.allocateCommand("expansionPackSettings_switch");
     const saveCommand = host.allocateCommand("expansionPackSettings_save");
     const restartCommand = host.allocateCommand("expansionPackSettings_restart");
+    const updateCommand = host.allocateCommand("expansionPackSettings_update");
     const envLocalPath = `${host.getProjectFolder()}\\.env.local`;
     // The page on screen: its Add-on, the choice saved when it opened, and the switch.
     let page = null;
@@ -97,15 +104,20 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         return { title: setting.line(choiceDiffers(saved, setting) ? TEXT.onRestart(name) : name), cmd: setting.lineCommand };
     };
 
-    // The categories, each opening its page, then the settings picked on a page of choices.
+    const releaseToInstall = () => installableRelease(host, getUpdateState());
+
+    // The categories, each opening its page, then the settings picked on a
+    // page of choices, then the Pack Update while one is possible.
     function openList(selectedCmd = null) {
         page = null;
         const saved = readSaved();
+        const release = releaseToInstall();
         getMenus().show(LIST_MENU_ID, [
             ...ADD_ON_GROUPS.map(({ group }) => ({ title: TEXT.groups[group], cmd: groupCommands.get(group), hasSubmenu: true })),
             SEPARATOR,
             ...choiceSettings.map(setting => choiceLineOf(saved, setting)),
             SEPARATOR,
+            ...(release ? [{ title: TEXT.updateTo(release.packVersion), cmd: updateCommand }, SEPARATOR] : []),
             { title: TEXT.back, cmd: menuReturnCommand },
         ], { selectedCmd, onBack: leaveList });
     }
@@ -286,6 +298,9 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
             saveAddOn();
         } else if (ev.id === restartCommand) {
             restart();
+        } else if (ev.id === updateCommand) {
+            const release = releaseToInstall();
+            if (release) getPackUpdater().start(release);
         }
     }));
 }

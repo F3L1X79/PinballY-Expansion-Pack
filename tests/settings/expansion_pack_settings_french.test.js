@@ -39,7 +39,9 @@ test("the list speaks French", async () => {
     press(fake, "Exit");
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Langue : Español au redémarrage", "Next");
-    assert.equal(highlightedEntry(fake), "Retour", "the language line comes before Retour");
+    assert.equal(highlightedEntry(fake), "Recherche de mises à jour : Activé", "the language line comes before the update check");
+    press(fake, "Next");
+    assert.equal(highlightedEntry(fake), "Retour", "then Retour");
     press(fake, "Select");
     fake.advanceTime(OPEN_OVER_MS);
     assert.equal(readDrawnMenu(fake).message, "Les réglages enregistrés s'appliquent au redémarrage de PinballY.");
