@@ -234,7 +234,6 @@
         <div class="cell sweet">
         </div>
         <div class="cell">
-          <a class="chip tr-share" href="#error-toast"><b></b>Toast d'erreur</a>
           <a class="chip tr-share" href="#release-1-0"><b></b>Sortie 1.0</a>
         </div>
         <div class="cell">
@@ -322,30 +321,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="error-toast" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Un toast d'erreur pour les actions qui échouent</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
-          </div>
-          <p>Un Error Toast dit à l'écran ce qu'un échec a coûté, quand le joueur ne le verrait pas autrement : une Play non enregistrée dans le Play Log, <code>vpxtool</code> introuvable, une Pack Update échouée. Et un Error Log, <code>errors.log</code> dans le dossier du pack, garde toutes les erreurs d'une session à l'autre, puisque <code>PinballY.log</code> repart à zéro à chaque lancement.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/340">#340</a>, tickets #341 (Error Log), #342 (Error Toast, Play non enregistrée), #343 (<code>vpxtool</code> introuvable, bloqué par les deux) ; #335 bloqué par #341 et #342 · Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Une famille de l'Achievement Toast (<code>TOAST_KIND</code>). À livrer avant le ticket #335 de la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a>, qui l'utilisera pour l'échec de la Pack Update, sans dialogue provisoire</div>
-          <details>
-            <summary>Décisions du grilling (26/10/2026)</summary>
-            <ul>
-              <li>Toast seulement pour un échec qui coûte quelque chose et ne se répare pas seul au démarrage suivant : Play non enregistrée (au Profile qui a joué, Child et Guest compris), <code>vpxtool</code> introuvable avec Table ROMs activé (à un Admin Profile, à chaque démarrage tant que ça dure), Pack Update échouée (une fois, à un Admin Profile, en attendant qu'il y en ait un d'actif). Pas pour un fichier de high scores illisible, un <code>vpxtool</code> en erreur sur une table ni une erreur inattendue de <code>safeHandler</code>.</li>
-              <li>Les messages qui existent déjà restent : « non enregistré » et « Redémarrage impossible » des Expansion Pack Settings, message du Profile Reset, échec du téléchargement juste après « Update now ». Ils répondent à un choix que le joueur vient de faire. La réussite d'une Pack Update reste un dialogue.</li>
-              <li>Une famille de l'Achievement Toast : couleur propre, signe d'avertissement, même file et mêmes attentes (partie, dialogue dessiné, Welcome Screen), 10 s à l'écran. En-tête « Problème », une phrase traduite par cas (ce qui est perdu, et quoi faire pour l'Admin), traduite dans les six langues ; jamais de renvoi au journal, sauf le journal du helper pour la Pack Update.</li>
-              <li>Error Log : toutes les erreurs du pack (pas les <code>WARNING</code>), par une seule fonction qui écrit aussi dans <code>PinballY.log</code> ; une ligne = date et heure, Pack Version, <code>[Script]</code>, message, la pile en retrait. Ignoré par git, gardé par la Pack Update ; au-delà de 1 Mo au démarrage il devient <code>errors.old.log</code>. S'il ne s'écrit pas : une seule ligne dans <code>PinballY.log</code> par session, jamais de toast.</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 21/10/2026, pendant le grilling des options au menu opérateur ; l'Error Log ajouté au grilling.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="release-1-0" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -356,7 +331,7 @@
           </div>
           <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
           <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #350, #351, borne #348 et #352 (humain). Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> et le <a href="#error-toast">toast d'erreur (n° <span data-ref="error-toast"></span>)</a> ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #350, #351, borne #348 et #352 (humain). Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
           <details>
             <summary>Décisions du grilling (27/10/2026)</summary>
             <ul>
