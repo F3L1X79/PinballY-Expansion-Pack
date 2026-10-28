@@ -180,7 +180,7 @@ function loadConfig() {
     try {
         text = readEnvLocal(path);
     } catch (error) {
-        logError(SCRIPT_NAME, `ERROR reading ${path}, using defaults: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR reading ${path}, using defaults: ${error.message}`, null, error);
         return resolveSoundFiles(copyOfDefaults(), projectFolder);
     }
     if (text === null) {

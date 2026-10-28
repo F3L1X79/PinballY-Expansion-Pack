@@ -124,7 +124,7 @@ let store = null;
 try {
     store = getProfileStore();
 } catch (error) {
-    logError(SCRIPT_NAME, `ERROR loading the Profiles: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR loading the Profiles: ${error.message}`, null, error);
 }
 
 // As early as the Profile count allows, so it is the pack's first line in
@@ -137,7 +137,7 @@ try {
         profileCount: store ? store.listProfileNames().length : null,
     });
 } catch (error) {
-    logError(SCRIPT_NAME, `ERROR writing the startup summary: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR writing the startup summary: ${error.message}`, null, error);
 }
 
 // Whatever Add-ons are on, a Child Profile never sees an Adult Table on the
@@ -146,7 +146,7 @@ if (store) {
     try {
         installChildWheelFilter();
     } catch (error) {
-        logError(SCRIPT_NAME, `ERROR installing the Child Profile's wheel filter: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR installing the Child Profile's wheel filter: ${error.message}`, null, error);
     }
 }
 
@@ -161,7 +161,7 @@ if (store && ENABLED_SCRIPTS.profilePicker === false) {
             logfile.log(`[Startup] Profile picker disabled: switched from "${previousProfile.name}" to Guest.`);
         }
     } catch (error) {
-        logError(SCRIPT_NAME, `ERROR switching to Guest: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR switching to Guest: ${error.message}`, null, error);
     }
 }
 
@@ -171,7 +171,7 @@ if (store) {
     try {
         getStartupScreen();
     } catch (error) {
-        logError(SCRIPT_NAME, `ERROR resolving the Startup Screen: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR resolving the Startup Screen: ${error.message}`, null, error);
     }
 }
 
@@ -180,7 +180,7 @@ if (store) {
 try {
     getQuietWheel().restoreLeftover();
 } catch (error) {
-    logError(SCRIPT_NAME, `ERROR restoring the quiet wheel's table: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR restoring the quiet wheel's table: ${error.message}`, null, error);
 }
 
 // Whatever Add-ons are on: a Play that could not be saved is always told.
@@ -188,7 +188,7 @@ if (store) {
     try {
         startPlayErrorToasts();
     } catch (error) {
-        logError(SCRIPT_NAME, `ERROR starting the Play Error Toasts: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR starting the Play Error Toasts: ${error.message}`, null, error);
     }
 }
 
@@ -199,7 +199,7 @@ function startSettings() {
     try {
         startExpansionPackSettings();
     } catch (error) {
-        logError(SCRIPT_NAME, `ERROR starting the Expansion Pack Settings: ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR starting the Expansion Pack Settings: ${error.message}`, null, error);
     }
 }
 
@@ -214,7 +214,7 @@ for (const { key, module } of SCRIPTS) {
     try {
         module.default();
     } catch (error) {
-        logError(SCRIPT_NAME, `ERROR initializing "${key}": ${error.message}`);
+        logError(SCRIPT_NAME, `ERROR initializing "${key}": ${error.message}`, null, error);
         continue;
     }
 
@@ -230,15 +230,15 @@ for (const { key, module } of SCRIPTS) {
 try {
     startUpdateResult();
 } catch (error) {
-    logError(SCRIPT_NAME, `ERROR submitting the Update result: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR submitting the Update result: ${error.message}`, null, error);
 }
 try {
     startUpdatePrompt();
 } catch (error) {
-    logError(SCRIPT_NAME, `ERROR submitting the Update Prompt: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR submitting the Update Prompt: ${error.message}`, null, error);
 }
 try {
     startUpdateCheck();
 } catch (error) {
-    logError(SCRIPT_NAME, `ERROR starting the Update Check: ${error.message}`);
+    logError(SCRIPT_NAME, `ERROR starting the Update Check: ${error.message}`, null, error);
 }

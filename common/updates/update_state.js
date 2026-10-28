@@ -23,7 +23,7 @@ export function createUpdateState(host) {
             if (!saved || typeof saved !== "object") throw new Error("not a JSON object");
             return saved;
         } catch (error) {
-            logError(SCRIPT_NAME, `ERROR reading ${UPDATE_STATE_FILE_NAME}, deleted: ${error.message}`, host);
+            logError(SCRIPT_NAME, `ERROR reading ${UPDATE_STATE_FILE_NAME}, deleted: ${error.message}`, host, error);
             host.files.deleteFile(path);
             return null;
         }

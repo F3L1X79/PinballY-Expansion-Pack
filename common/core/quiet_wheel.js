@@ -90,7 +90,7 @@ export function createQuietWheel(host) {
         try {
             table = JSON.parse(host.files.readText(pendingFile));
         } catch (error) {
-            logError(SCRIPT_NAME, `ERROR reading ${PENDING_FILE_NAME}, deleted: ${error.message}`, host);
+            logError(SCRIPT_NAME, `ERROR reading ${PENDING_FILE_NAME}, deleted: ${error.message}`, host, error);
             host.files.deleteFile(pendingFile);
             return;
         }

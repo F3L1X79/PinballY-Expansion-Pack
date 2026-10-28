@@ -52,7 +52,7 @@ export function createPackUpdater(host, state, dialogs) {
 
     // Submitted before the veil goes, so it opens ahead of the Startup Screen.
     const failed = safeHandler(SCRIPT_NAME, error => {
-        logError(SCRIPT_NAME, `ERROR Pack Update not possible: ${error.message}`, host);
+        logError(SCRIPT_NAME, `ERROR Pack Update not possible: ${error.message}`, host, error);
         state.forgetRequest();
         dialogs.submit({
             id: FAILED_MENU_ID, message: TEXT.updateFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.UPDATE_RESULT,

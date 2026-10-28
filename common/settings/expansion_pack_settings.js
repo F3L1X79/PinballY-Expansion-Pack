@@ -180,7 +180,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     // screens closed.
     const restartFailed = safeHandler(SCRIPT_NAME, error => {
         hideRestartVeil();
-        logError(SCRIPT_NAME, `ERROR Restart not possible: ${error.message}`, host);
+        logError(SCRIPT_NAME, `ERROR Restart not possible: ${error.message}`, host, error);
         getWheelDialogs().submit({
             id: RESTART_FAILED_MENU_ID, message: TEXT.restartFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.RESTART_FAILED,
         });

@@ -39,5 +39,6 @@ test("an errors.log over 1 MB becomes errors.old.log, the older one replaced", a
 
     assert.equal(errorLines(fake).length, 1);
     assert.equal(fake.readFile(OLD_ERROR_LOG), FULL_LOG);
-    assert.equal(fake.readFile(ERROR_LOG), `2026-10-27 08:30:00 v${PACK_VERSION} [Startup] ERROR initializing "clock": No layer today\r\n`);
+    assert.equal(fake.readFile(ERROR_LOG).split("\r\n")[0], `2026-10-27 08:30:00 v${PACK_VERSION} [Startup] ERROR initializing "clock": No layer today`,
+        "the new errors.log starts with this start's error");
 });

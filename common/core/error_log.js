@@ -4,6 +4,7 @@
 // recreate at each launch. Once per start, an errors.log over 1 MB becomes
 // errors.old.log before the first line. Warnings and information never come here.
 // - Never throws for errors.log: a failure is one logfile.log line per session.
+// - A passed Error's stack goes to errors.log only: never also put it in the message.
 // ============================================================
 
 import { createPinballYHost } from "./pinbally_host.js";
@@ -24,10 +25,18 @@ const twoDigits = number => String(number).padStart(2, "0");
 const timestampOf = date => `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())} `
     + `${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}:${twoDigits(date.getSeconds())}`;
 
+// The error's stack without its "<Name>: <message>" header, which the
+// message already gives; "" when it has none.
+function stackOf(error) {
+    const stack = error && typeof error.stack === "string" ? error.stack : "";
+    const header = String(error);
+    return stack.startsWith(header) ? stack.slice(header.length) : stack;
+}
+
 // The logfile.log line's first line after the date, time and Pack Version;
-// its other lines (a stack) below it, indented.
-function entryOf(line, now) {
-    const [first, ...others] = line.split(/\r?\n/);
+// its other lines and the error's stack below it, indented.
+function entryOf(line, error, now) {
+    const [first, ...others] = `${line}\n${stackOf(error)}`.split(/\r?\n/);
     const stack = others.map(other => other.trim()).filter(other => other.length > 0).map(other => STACK_INDENT + other);
     return [`${timestampOf(now)} v${PACK_VERSION} ${first}`, ...stack].map(entryLine => `${entryLine}\r\n`).join("");
 }
@@ -42,8 +51,9 @@ function rotateWhenFull(files, folder, path) {
 
 // message: the line's text after "[<scriptName>] ", as logfile.log shows it
 // ("ERROR ..."), with the stack on its next lines when there is one. host:
-// the caller's own, PinballY's globals otherwise.
-export function logError(scriptName, message, host = null) {
+// the caller's own, PinballY's globals otherwise. error: the caught Error,
+// whose stack goes to errors.log only.
+export function logError(scriptName, message, host = null, error = null) {
     if (!host) {
         if (!sharedHost) sharedHost = createPinballYHost();
         host = sharedHost;
@@ -52,10 +62,10 @@ export function logError(scriptName, message, host = null) {
     host.log(line);
 
     let state = null;
-    const reportFailure = (error) => {
+    const reportFailure = (writeError) => {
         if (state && state.failureLogged) return;
         if (state) state.failureLogged = true;
-        host.log(`[${SCRIPT_NAME}] ${ERROR_LOG_NAME} could not be written: ${error.message}`);
+        host.log(`[${SCRIPT_NAME}] ${ERROR_LOG_NAME} could not be written: ${writeError.message}`);
     };
     try {
         const folder = host.getProjectFolder();
@@ -67,12 +77,12 @@ export function logError(scriptName, message, host = null) {
             // A failed rotation still lets this line in, the file staying over 1 MB.
             try {
                 rotateWhenFull(host.files, folder, path);
-            } catch (error) {
-                reportFailure(error);
+            } catch (rotationError) {
+                reportFailure(rotationError);
             }
         }
-        host.files.appendText(path, entryOf(line, host.now()));
-    } catch (error) {
-        reportFailure(error);
+        host.files.appendText(path, entryOf(line, error, host.now()));
+    } catch (writeError) {
+        reportFailure(writeError);
     }
 }

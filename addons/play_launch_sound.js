@@ -24,7 +24,9 @@ function initializeMediaPlayer() {
             SCRIPT_NAME,
             "ERROR: could not initialize Windows Media Player ("
             + error.message
-            + "). Is the 'Windows Media Player' optional feature enabled?"
+            + "). Is the 'Windows Media Player' optional feature enabled?",
+            null,
+            error
         );
         return null;
     }
@@ -48,7 +50,7 @@ export default function init() {
         try {
             mediaPlayer.URL = filePath;
         } catch (error) {
-            logError(SCRIPT_NAME, "ERROR: could not play launch sound (" + error.message + ").");
+            logError(SCRIPT_NAME, "ERROR: could not play launch sound (" + error.message + ").", null, error);
         }
     }));
 
