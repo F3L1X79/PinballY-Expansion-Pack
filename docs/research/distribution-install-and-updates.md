@@ -42,7 +42,11 @@ Date: 2026-10-25. Sources:
 **Inference**
 - With a missing `ExpansionPack\main.js`, the player's `Scripts\main.js` never runs either: in an ES module graph, a module runs only once every dependency is linked (ECMAScript, [InnerModuleEvaluation](https://tc39.es/ecma262/#sec-innermoduleevaluation)). PinballY still shows the wheel, with **no** scripts at all, and the log names the cause only if Javascript logging is on.
 - The same goes for an exception thrown while one of our modules is being evaluated (at import time, not in `init()`): the evaluation stops and the importer's body does not run. `main.js` already isolates each `init()` (`main.js:190-207`) and `config.js` catches its own read errors (`common/core/config.js:172-182`). A throw at module level elsewhere would still take the player's own code down.
-- Writing the line as a dynamic import, `import("./ExpansionPack/main.js").catch(e => logfile.log(…))`, would isolate the player's code from ours, and the 100-pass task loop should still finish loading it before startup events. **Unverified — check on the cabinet**, and it differs from the line the README and ADR 0009 document.
+- Writing the line as a dynamic import, `import("./ExpansionPack/main.js").catch(e => logfile.log(…))`, would isolate the player's code from ours, and the 100-pass task loop should still finish loading it before startup events. Checked on the cabinet (#339), see below.
+
+**Checked on the cabinet (#339, PinballY 1.1.0 Beta 10)**
+- Static line, folder missing: no script runs. `Error opening file … (No such file or directory)` is logged even without the "Javascript" log option; `Error loading <path>` only with it.
+- Dynamic line: the pack loads in time for the Startup Screen, the Profile picker and the Welcome Screen. With the folder missing, the player's code runs, PinballY logs `Error loading`, and the `.catch` logs nothing. With the pack throwing at load time, the player's code runs, PinballY logs nothing, and only the `.catch` logs the error. The README now recommends the dynamic line with its `.catch` (ADR 0019).
 
 ## 2. Where PinballY is installed and how to find it
 
@@ -165,8 +169,8 @@ Extracting over the old folder with `Expand-Archive -Force` would keep the data,
 
 ## Open questions to check on the cabinet
 
-1. With `Scripts\main.js` importing a missing `ExpansionPack\main.js`: does PinballY start with no scripts at all (player's own code included), and what does `PinballY.log` show with and without the "Javascript" log option?
-2. Does the dynamic form `import("./ExpansionPack/main.js")` load the pack in time for startup events (initial game selection, Startup Screen), and does it keep the player's code alive when the pack throws?
+1. ~~With `Scripts\main.js` importing a missing `ExpansionPack\main.js`: does PinballY start with no scripts at all?~~ Yes, answered in §1 (#339).
+2. ~~Does the dynamic form load the pack in time and keep the player's code alive when the pack throws?~~ Yes to both, answered in §1 (#339).
 3. Is `HKCU\SOFTWARE\Pinscape Labs\PinballY\InstallPath` present on the cabinet, and does it point to the folder that holds `PinballY.exe`?
 4. Does `powershell.exe` 5.1 on the cabinet reach `api.github.com` without forcing TLS 1.2?
 5. Does MSXML's `HttpRequest` send a User-Agent that GitHub accepts, and does `setRequestHeader("User-Agent", …)` replace it? Does a second call in the same session return a cached reply?

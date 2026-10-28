@@ -98,9 +98,9 @@ Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows 
 2. **Extract it into `PinballY\Scripts`**. The zip already holds a folder named `ExpansionPack`, the name the pack looks for: you should get `PinballY\Scripts\ExpansionPack\main.js`, not `ExpansionPack\ExpansionPack\main.js`.
 3. **Create `PinballY\Scripts\main.js` with only this line** if the file doesn't exist, or **add this line to it** if it does:
    ```js
-   import "./ExpansionPack/main.js";
+   import("./ExpansionPack/main.js").catch(e => logfile.log("ExpansionPack: " + e.message));
    ```
-   Your own scripts keep running: nothing else in `Scripts` is touched.
+   Your own scripts keep running: nothing else in `Scripts` is touched, and they still run if the pack folder is missing or the pack fails to load (the error goes to `PinballY.log`).
 4. **Optional: create `ExpansionPack\.env.local`**, only if you want to change a setting the Expansion Pack Settings don't cover (see [Settings](#settings)): copy `ExpansionPack\.env.example` and keep the lines you change, one `KEY=value` per line (UTF-8). Without it, the pack runs with its defaults.
 5. **Optional: install vpxtool**, so each table's ROM is filled in by itself (Table ROMs). Download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools` (next to the restart helper already there). Without it, a table's ROM is still found, after its first Play, and a "Problem" toast says at each start that `vpxtool.exe` is missing (to Admin Profiles only, or to everyone if none is marked): install it, or turn the Table ROMs add-on off in the Expansion Pack Settings.
 6. **Optional: update PINemHi to 3.6.8**, so the High Scores read the boards of about 300 more ROMs. Replace the files of `PinballY\PINemHi` with those of PINemHi 3.6.8, then **append the whole `[romfind]` section of its `romfind.ini` to the end of its `pinemhi.ini`** (PinballY reads that section from `pinemhi.ini` only: without it, a table with an empty ROM field gets no board at all), and set `USER=` in `pinemhi.ini` to Visual Pinball X's `User` folder.
