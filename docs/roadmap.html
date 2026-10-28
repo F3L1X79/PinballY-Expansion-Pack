@@ -333,8 +333,8 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>Les Dialogs (Update Prompt, résultats de la mise à jour et du redémarrage, Rating Prompt, invite du premier cadre) sont déjà des Drawn Menus, mais l'Update Prompt est apparu sur la borne avec un panneau cassé en trois (haut et bas plus larges que le milieu) et un message gris, petit, sans titre. Corriger le panneau, puis donner à chaque Dialog un titre doré et un message clair.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/diagnosing-bugs</code> (panneau) → <code>/to-spec</code> (titre et message) → <code>/to-tickets</code> → <code>/implement</code>. Modules : <code>common/drawn_menu/</code> et <code>common/core/wheel_dialog.js</code>, six appelants. À livrer avant la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a></div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/357">#357</a>, tickets #358 (menus qui suivent la fenêtre), #359 (titre et message), #360 (Profile picker et Welcome Screen sans pause, après #358), borne #361 (humain). Cause du panneau cassé trouvée par <code>/diagnosing-bugs</code> : PinballY ne met sa fenêtre en place qu'après l'init des scripts. Flow Matt : <code>/implement</code>. À livrer avant la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a></div>
           <details>
             <summary>Décisions du grilling (28/10/2026)</summary>
             <ul>
