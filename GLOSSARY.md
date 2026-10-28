@@ -48,6 +48,10 @@ _Avoid_: logfile, PinballY.log (PinballY's own log, which keeps only the current
 A menu the player sees drawn in the pack's own style instead of PinballY's native one, with the same entries and the same effect when one is chosen: the menus a player meets (main, Exit, filter choices, power off), the table's setup and categories, the Operator Menu, the pause menu of a running game (drawn over the native one, kept open underneath; native during a media capture), the menus that look after the cabinet (media capture, deleting a table's details, system choice, elevation), and those the Add-ons open: every menu, in short. Only the media drop menus, met when dropping files with the mouse on a PC, and the confirmation of a media file's deletion, part of the table's media list, stay native, and so does every menu when the Add-on is turned off or a menu cannot be drawn. PinballY's popups are not menus and stay native. Shown simply as "menu".
 _Avoid_: Steamball menu (Steamball is the palette), custom menu, popup (a popup shows information, a menu offers choices)
 
+**Dialog**:
+A Drawn Menu that waits for the player's answer about one thing: a gold title, a message, then its answers (the Update Prompt, the Rating Prompt, the first Avatar Frame's prompt, the update and restart results). The pack shows one at a time, only when the wheel is free, the most urgent first.
+_Avoid_: popup (a popup shows information without waiting), alert, message box
+
 **Expansion Pack Settings**:
 The screens, reached from the Operator Menu by whoever sees its setup entries, where the cabinet's owner turns each Add-on on or off and picks the interface language without editing the configuration by hand. Each Add-on has a page saying what it does and what is lost, there and elsewhere, without it. A choice is kept at once but takes effect only when PinballY restarts, which the screens offer on leaving. They belong to the pack itself, not to an Add-on, so they can never be turned off. Shown as "Réglages du pack" in French.
 _Avoid_: Theme Settings (a theme is a palette), options menu, Pack Settings

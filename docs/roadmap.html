@@ -242,10 +242,10 @@
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
           <a class="chip tr-play" href="#random-table-menu"><b></b>Table au hasard au menu</a>
+          <a class="chip tr-share" href="#drawn-dialogs"><b></b>Dialogues lisibles</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#wiki"><b></b>README court et guide</a>
-          <a class="chip tr-share" href="#drawn-dialogs"><b></b>Dialogues dessinés</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
         </div>
         <div class="cell">
@@ -329,21 +329,21 @@
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>Dialogues dessinés : toutes les invites du wheel dialog en style Steamball</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">UI</span></div>
+            <h3>Dialogues lisibles : un titre, un message clair, un panneau entier</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
-          <p>Les dialogues soumis à <code>getWheelDialogs()</code> (Update Prompt, résultat de la mise à jour, Rating Prompt, invites des Profiles et des récompenses…) sont aujourd'hui des menus natifs de PinballY : le message n'est qu'une ligne grisée du menu, les boutons un second bloc plus étroit. Le module les dessine tous dans le style Steamball, comme les menus du joueur (ADR 0013), avec un vrai texte de message, un titre et des boutons accordés au cadre.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Un seul module à changer : <code>common/core/wheel_dialog.js</code> (menu natif, message en <code>{ title, cmd: -1 }</code>) ; reprend les menus dessinés de l'ADR 0013. À livrer avant la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a></div>
+          <p>Les Dialogs (Update Prompt, résultats de la mise à jour et du redémarrage, Rating Prompt, invite du premier cadre) sont déjà des Drawn Menus, mais l'Update Prompt est apparu sur la borne avec un panneau cassé en trois (haut et bas plus larges que le milieu) et un message gris, petit, sans titre. Corriger le panneau, puis donner à chaque Dialog un titre doré et un message clair.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/diagnosing-bugs</code> (panneau) → <code>/to-spec</code> (titre et message) → <code>/to-tickets</code> → <code>/implement</code>. Modules : <code>common/drawn_menu/</code> et <code>common/core/wheel_dialog.js</code>, six appelants. À livrer avant la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a></div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Décisions du grilling (28/10/2026)</summary>
             <ul>
-              <li>Reprendre le dessin des menus du joueur (ADR 0013) tel quel, avec le message en en-tête, ou un cadre de dialogue propre ?</li>
-              <li>Le message peut-il être long (chemin du journal dans l'échec d'une mise à jour) : retour à la ligne, taille maximale ?</li>
-              <li>Le contrat de <code>submit({ message, buttons, priority, onShown })</code> reste-t-il le même, pour que les appelants ne changent pas ?</li>
-              <li>Exit, attract mode et lancement d'une table pendant le dialogue : mêmes règles que les menus dessinés ?</li>
+              <li>Le panneau cassé (vu au démarrage ; les menus ordinaires de la borne sont sains) passe d'abord par <code>/diagnosing-bugs</code>, sans attendre la spec.</li>
+              <li>Titre doré obligatoire, dans le style des en-têtes des menus dessinés, en haut du panneau ; <code>submit</code> gagne <code>title</code>, les six appelants en reçoivent un.</li>
+              <li>Message en texte clair (couleur et graisse des entrées, pas l'or de la sélection), centré, autant d'air au-dessus qu'en dessous, puis le filet et les réponses.</li>
+              <li>Titres : Update available / Mise à jour disponible, Update complete / Mise à jour terminée, Update not possible / Mise à jour impossible, Restart not possible / Redémarrage impossible, Rate this table / Noter cette table, New Avatar Frame / Nouveau cadre. Les messages de la mise à jour et du redémarrage impossibles perdent ce que dit leur titre ; six langues.</li>
+              <li>Nouveau terme du glossaire : Dialog.</li>
             </ul>
-            <p class="ctx">Constat de Félix du 28/10/2026 sur la borne (#338) : l'Update Prompt est « horrible ». Il choisit de dessiner tous les dialogues à la fois plutôt que le seul Update Prompt.</p>
           </details>
         </div>
       </li>
@@ -358,7 +358,7 @@
           </div>
           <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
           <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a>. Jalon après la Distribution (spec #331, livrée), le <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a> et les <a href="#drawn-dialogs">Dialogues dessinés (n° <span data-ref="drawn-dialogs"></span>)</a> : #347, #349 et #351 portent un commentaire qui les fait attendre ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a>. Jalon après la Distribution (spec #331, livrée), le <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a> et les <a href="#drawn-dialogs">Dialogues lisibles (n° <span data-ref="drawn-dialogs"></span>)</a> : #347, #349 et #351 portent un commentaire qui les fait attendre ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
           <details>
             <summary>Décisions du grilling (27/10/2026)</summary>
             <ul>
@@ -678,8 +678,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>28/10 <span class="count">(4)</span></summary>
+          <summary>28/10 <span class="count">(5)</span></summary>
           <ol>
+            <li><strong>Dialogues dessinés → Dialogues lisibles, effort petit</strong>
+              <span>Grilling de la 2ᵉ place : les dialogues sont déjà des Drawn Menus ; ce que Félix a vu sur la borne est un panneau cassé en trois au démarrage et un message gris sans titre. Le chantier devient un correctif (<code>/diagnosing-bugs</code>) puis un titre doré et un message clair. Garde sa 2ᵉ place ; effort moyen → petit, impact moyen inchangé.</span></li>
             <li><strong>La Sortie 1.0 passe 3ᵉ, après le README court et les Dialogues dessinés</strong>
               <span>Question de Félix, recommandation de Claude : le public de la 1.0 lira d'abord le README et verra d'abord l'Update Prompt et le dialogue de réussite, où s'affichent les Release Highlights ; les dessiner après la 1.0, ce serait refaire leur mise en page. « Table au hasard » et vpxtool restent après : la première ferait une bonne 1.1, la vraie première mise à jour publique. Revient sur le « rien d'autre » du grilling du 27/10. Les tickets #347, #349 et #351 portent un commentaire de Félix qui les fait attendre, pour que <code>/implement next</code> suive cet ordre. Efforts et impacts inchangés.</span></li>
             <li><strong>La Distribution quitte la roadmap</strong>
