@@ -1,11 +1,14 @@
 // ============================================================
 // Startup summary: called once by main.js, it writes one log line describing
-// the setup, so a pasted logfile.log tells it at a glance. A WARNING line
-// follows when PinballY is older than the minimum or newer than the last
-// version tested. Log only, nothing on screen.
+// the setup, Pack Version first, so a pasted logfile.log tells it at a glance.
+// A WARNING line follows when PinballY is older than the minimum or newer
+// than the last version tested. Log only, nothing on screen.
 // - version.status is not the release status: compare semantic (pinbally-help.md 2.10).
 // - PinballY loads the game list before main.js: the table count is final.
 // ============================================================
+
+import { PACK_VERSION } from "./pack_version.js";
+import { isGitCheckout } from "../updates/update_check.js";
 
 const LOG_PREFIX = "[ExpansionPack]";
 // The README's minimum, and the last version the pack was tested with.
@@ -43,7 +46,8 @@ export function writeStartupSummary(host, { language, addOns, profileCount }) {
     const version = host.getPinballYVersion();
     const offAddOns = Object.keys(addOns).filter(key => addOns[key] === false);
     const profiles = profileCount === null ? "Profiles unknown" : `${profileCount} Profiles`;
-    host.log(`${LOG_PREFIX} Started: PinballY ${version.display}, build ${version.build}, language ${language}, `
+    const pack = `Expansion Pack v${PACK_VERSION}${isGitCheckout(host) ? " (git checkout)" : ""}`;
+    host.log(`${LOG_PREFIX} Started: ${pack}, PinballY ${version.display}, build ${version.build}, language ${language}, `
         + `Add-ons off: ${offAddOns.length === 0 ? "none" : offAddOns.join(", ")}, `
         + `${profiles}, ${host.getVisibleTables().length} tables`);
 

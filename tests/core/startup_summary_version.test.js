@@ -2,28 +2,33 @@
 // Startup summary's version warning: a WARNING line only for a PinballY
 // older than 1.1.0 Beta 10 or newer than the last version tested (Beta 10),
 // with versions in the formats of docs/pinbally/pinbally-help.md §2.10.
+// The summary line starts with the Pack Version, marked in a git checkout.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, BETA_10_VERSION } from "../support/fake_pinbally_host.js";
 import { writeStartupSummary } from "../../common/core/startup_summary.js";
+import { PACK_VERSION } from "../../common/core/pack_version.js";
 
 const SETUP = { language: "en", addOns: { clock: true, wheelArc: true }, profileCount: 1 };
+const GIT_PATH = "C:\\PinballY\\Scripts\\ExpansionPack\\.git";
 
 const versionOf = (display, semantic, build) => ({
     basic: "1.1.0", build, buildDate: new Date(Date.UTC(2024, 0, 1)), display, semantic, status: "1.1.0",
 });
 
-function packLinesFor(pinballYVersion, setup = SETUP) {
+function packLinesFor(pinballYVersion, setup = SETUP, seed = () => {}) {
     const fake = createFakePinballYHost({ pinballYVersion });
+    seed(fake);
     writeStartupSummary(fake, setup);
     return fake.logLines().filter(line => line.startsWith("[ExpansionPack]"));
 }
 
 test("Beta 9 is warned as older than the minimum", () => {
     assert.deepEqual(packLinesFor(versionOf("1.1.0 (Beta 9)", "1.1.0-beta.9+9001.20230101T1200", 9001)), [
-        "[ExpansionPack] Started: PinballY 1.1.0 (Beta 9), build 9001, language en, Add-ons off: none, 1 Profiles, 0 tables",
+        `[ExpansionPack] Started: Expansion Pack v${PACK_VERSION}, PinballY 1.1.0 (Beta 9), build 9001, language en, `
+            + "Add-ons off: none, 1 Profiles, 0 tables",
         "[ExpansionPack] WARNING: PinballY 1.1.0 (Beta 9) is older than 1.1.0 Beta 10, the minimum this pack needs.",
     ]);
 });
@@ -55,6 +60,14 @@ test("Beta 10 itself, and a version in an unknown format, get no warning", () =>
 test("Add-ons off are listed in config order, and a Profile store that failed reads as unknown", () => {
     const [line] = packLinesFor(BETA_10_VERSION,
         { language: "de", addOns: { clock: false, wheelArc: true, menuCleanup: false }, profileCount: null });
-    assert.equal(line, "[ExpansionPack] Started: PinballY 1.1.0 (Beta 10), build 10086, language de, "
+    assert.equal(line, `[ExpansionPack] Started: Expansion Pack v${PACK_VERSION}, PinballY 1.1.0 (Beta 10), build 10086, language de, `
         + "Add-ons off: clock, menuCleanup, Profiles unknown, 0 tables");
+});
+
+test("a git checkout follows the Pack Version, a .git folder or a worktree's .git file", () => {
+    for (const seed of [f => f.addFolder(GIT_PATH), f => f.addFile(GIT_PATH, "gitdir: C:/repo/.git/worktrees/pack")]) {
+        const [line] = packLinesFor(BETA_10_VERSION, SETUP, seed);
+        assert.equal(line, `[ExpansionPack] Started: Expansion Pack v${PACK_VERSION} (git checkout), PinballY 1.1.0 (Beta 10), `
+            + "build 10086, language en, Add-ons off: none, 1 Profiles, 0 tables");
+    }
 });

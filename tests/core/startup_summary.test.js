@@ -1,13 +1,15 @@
 // ============================================================
 // Startup summary through main.js on the fake PinballY globals, on
-// PinballY 1.1.0 Beta 10: one line with the version, language, Add-ons
-// off, Profile count and visible table count, and no version warning.
+// PinballY 1.1.0 Beta 10: one line with the Pack Version, PinballY version,
+// language, Add-ons off, Profile count and visible table count, and no
+// version warning.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
+import { PACK_VERSION } from "../../common/core/pack_version.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { installVpxtool } from "../support/vpxtool.js";
 
@@ -33,7 +35,7 @@ test("main.js writes one summary line at startup, and no warning on Beta 10", as
 
     const packLines = fake.logLines().filter(line => line.startsWith("[ExpansionPack]"));
     assert.deepEqual(packLines, [
-        "[ExpansionPack] Started: PinballY 1.1.0 (Beta 10), build 10086, language fr, "
+        `[ExpansionPack] Started: Expansion Pack v${PACK_VERSION}, PinballY 1.1.0 (Beta 10), build 10086, language fr, `
             + "Add-ons off: clock, menuCleanup, 3 Profiles, 2 tables",
     ]);
     assertNoErrorLogged(fake);
