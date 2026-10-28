@@ -89,28 +89,41 @@ Here is what we are thinking about for the pack's future. Nothing is promised: p
 - **Year in Pinball**: each Profile's year in review, the tables played and discovered, the hours, the favourites, the Achievements and the longest Streak.
 - **Themes**: other looks than Steamball for every drawn screen, with a small editor to make your own.
 - **Ratings and favourites for each Profile**, then the household's average rating of each table.
-- **Install in 30 seconds and updates**, without git.
 
 ## Install
 
-Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows Media Player* optional feature, for the sounds).
+Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows Media Player* optional feature, for the sounds). No git needed.
 
-1. **Copy the project into `PinballY\Scripts\ExpansionPack`**, under that exact name: the pack looks for its files there. From a downloaded zip, rename the extracted folder (`PinballY-Expansion-Pack-main`) to `ExpansionPack`; with git, run `git clone https://github.com/F3L1X79/PinballY-Expansion-Pack.git ExpansionPack` from `PinballY\Scripts`.
-2. **Add this line to `PinballY\Scripts\main.js`**, or create the file with only this line if you have none:
+1. **Download `ExpansionPack.zip`** from the latest release: https://github.com/F3L1X79/PinballY-Expansion-Pack/releases/latest
+2. **Extract it into `PinballY\Scripts`**. The zip already holds a folder named `ExpansionPack`, the name the pack looks for: you should get `PinballY\Scripts\ExpansionPack\main.js`, not `ExpansionPack\ExpansionPack\main.js`.
+3. **Create `PinballY\Scripts\main.js` with only this line** if the file doesn't exist, or **add this line to it** if it does:
    ```js
    import "./ExpansionPack/main.js";
    ```
    Your own scripts keep running: nothing else in `Scripts` is touched.
-3. **Copy `ExpansionPack\.env.example` to `ExpansionPack\.env.local`** and set what you need, one `KEY=value` per line (UTF-8). Missing settings keep their default; `.env.local` is ignored by git.
-4. **Optional: install vpxtool**, so each table's ROM is filled in by itself (Table ROMs). Download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools` (next to the restart helper already there). Without it, a table's ROM is still found, after its first Play, and a "Problem" toast says at each start that `vpxtool.exe` is missing (to Admin Profiles only, or to everyone if none is marked): install it, or turn the Table ROMs add-on off in the Expansion Pack Settings.
-5. **Optional: update PINemHi to 3.6.8**, so the High Scores read the boards of about 300 more ROMs. Replace the files of `PinballY\PINemHi` with those of PINemHi 3.6.8, then **append the whole `[romfind]` section of its `romfind.ini` to the end of its `pinemhi.ini`** (PinballY reads that section from `pinemhi.ini` only: without it, a table with an empty ROM field gets no board at all), and set `USER=` in `pinemhi.ini` to Visual Pinball X's `User` folder.
-6. **Restart PinballY** and check `PinballY.log`: it lists your overrides, one "initialized" line per add-on, and `ERROR` lines naming the add-on at fault. PinballY starts a new `PinballY.log` at each launch, so the pack also keeps every error in `Scripts\ExpansionPack\errors.log`, across launches: one line per error with its date, time, Pack Version and add-on, and the call stack indented below. Once over 1 MB, it becomes `errors.old.log` at the next start. Attach it when you report a problem.
+4. **Optional: create `ExpansionPack\.env.local`**, only if you want to change a setting the Expansion Pack Settings don't cover (see [Settings](#settings)): copy `ExpansionPack\.env.example` and keep the lines you change, one `KEY=value` per line (UTF-8). Without it, the pack runs with its defaults.
+5. **Optional: install vpxtool**, so each table's ROM is filled in by itself (Table ROMs). Download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools` (next to the restart helper already there). Without it, a table's ROM is still found, after its first Play, and a "Problem" toast says at each start that `vpxtool.exe` is missing (to Admin Profiles only, or to everyone if none is marked): install it, or turn the Table ROMs add-on off in the Expansion Pack Settings.
+6. **Optional: update PINemHi to 3.6.8**, so the High Scores read the boards of about 300 more ROMs. Replace the files of `PinballY\PINemHi` with those of PINemHi 3.6.8, then **append the whole `[romfind]` section of its `romfind.ini` to the end of its `pinemhi.ini`** (PinballY reads that section from `pinemhi.ini` only: without it, a table with an empty ROM field gets no board at all), and set `USER=` in `pinemhi.ini` to Visual Pinball X's `User` folder.
+7. **Restart PinballY** and check `PinballY.log`: it lists your overrides, one "initialized" line per add-on, and `ERROR` lines naming the add-on at fault. PinballY starts a new `PinballY.log` at each launch, so the pack also keeps every error in `Scripts\ExpansionPack\errors.log`, across launches: one line per error with its date, time, Pack Version and add-on, and the call stack indented below. Once over 1 MB, it becomes `errors.old.log` at the next start. Attach it when you report a problem.
+8. **Choose your Add-ons** from **Expansion Pack Settings** in the Operator Menu: turn each one on or off, pick the startup screen and the language, then restart PinballY in one press.
 
 Everything the pack keeps stays in `Scripts\ExpansionPack`: your settings (`.env.local`) and each Profile's progress (`profiles`). **To back up**, copy that folder. **To uninstall**, delete it and remove the import line from `Scripts\main.js`.
 
+**For contributors**: instead of the zip, run `git clone https://github.com/F3L1X79/PinballY-Expansion-Pack.git ExpansionPack` from `PinballY\Scripts`, then follow the steps from step 3.
+
+### Updates
+
+At each start, PinballY asks GitHub in the background whether a newer version of the pack is out, without slowing the start down; offline, it only writes one line in `PinballY.log`. When there is one, the next start opens the Update Prompt before anything else, "Expansion Pack vX.Y.Z is available.", with "Update now" and "Later". It waits for a start where the last player sees the setup entries (an Admin Profile, or anyone while no Profile is marked).
+
+- **"Update now"** downloads and checks the new version, closes PinballY, swaps the pack's folder for the new one, and starts PinballY again. Your settings (`.env.local`), Profiles (`profiles`), the files you put in `tools` (`vpxtool.exe` included), your own sounds and Default Score images, and `errors.log` are kept. The next start says "Expansion Pack updated to vX.Y.Z". If the update failed, the previous version is still in place, and a "Problem" toast tells whoever sees the setup entries where to read why. A download that fails before PinballY closes is told at once ("Update not possible: the Expansion Pack stays as it is").
+- **"Later"** is not asked again for that version: "Update to vX.Y.Z" stays in **Expansion Pack Settings** until you update.
+- **To turn the check off**, set "Update check" to "Off" in **Expansion Pack Settings**, or write `UPDATE_CHECK=false` in `.env.local`: the cabinet then never contacts GitHub.
+- **A pack installed with git** is never checked nor offered updates: run `git pull` in `Scripts\ExpansionPack`.
+- **To go back** to the previous version, close PinballY: it is kept next to the pack as `Scripts\ExpansionPack.old-<date>` (the newest one only). Copy `profiles`, `.env.local` and `pack_update.json` into it from `Scripts\ExpansionPack`, to keep the progress made since the update (and not be told that the update failed), then rename `ExpansionPack` to anything else and that folder to `ExpansionPack`.
+
 ## Settings
 
-Settings live in `Scripts\ExpansionPack\.env.local`, one `KEY=value` per line. The Add-ons, the startup screen and the language can also be set without editing it, from **Expansion Pack Settings** in the Operator Menu. Only write the ones you change, for example:
+Settings live in `Scripts\ExpansionPack\.env.local`, one `KEY=value` per line. The Add-ons, the startup screen, the language and the update check can also be set without editing it, from **Expansion Pack Settings** in the Operator Menu. Only write the ones you change, for example:
 
 ```
 LANGUAGE=en
@@ -134,6 +147,7 @@ ADD_ON_CLOCK=false
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Size of the toast, from `0.5` to `3`. Raise it on a large screen. |
 | `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge, a Platinum Achievement, Mastery Level 10 on a table or a new Collection Tier, if your PC struggles with it. |
 | `FIREWORKS` | `true` | `false` turns off the Fireworks that come with the toast of a new Player Level, if your PC struggles with them. Independent of `CONFETTI`. |
+| `UPDATE_CHECK` | `true` | `false` stops PinballY from asking GitHub for a newer version of the pack at each start, and from offering to update it (see [Updates](#updates)). |
 | `SKIP_RANDOM_GAME_ANIMATION` | `false` | `true` skips the wheel of fortune and launches the Random Game at once. |
 | `ASK_TO_RATE_AFTER_MINUTES_PLAYED` | `60` | Minutes played on a table before you are asked to rate it. |
 | `LOG_UNTRANSLATED_MENU_TITLES` | `false` | `true` writes each untranslated PinballY menu title to `PinballY.log`. |

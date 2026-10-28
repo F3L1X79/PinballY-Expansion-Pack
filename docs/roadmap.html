@@ -245,6 +245,7 @@
           <a class="chip tr-play" href="#random-table-menu"><b></b>Table au hasard au menu</a>
         </div>
         <div class="cell">
+          <a class="chip tr-share" href="#wiki"><b></b>Wiki et README minuscule</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
         </div>
         <div class="cell">
@@ -344,6 +345,31 @@
               <li>Semver du pack : majeure si une Pack Update ne suffit pas seule ou retire quelque chose (PinballY minimum relevé, Add-on supprimé, données illisibles par l'ancienne version) ; mineure pour des nouveautés, migrations automatiques comprises ; correctif sinon. Une release par spec terminée (ou plusieurs), un correctif seulement pour un bug qui coûte au joueur. Règles et étapes dans une section « Releasing » de <code>CONTRIBUTING.md</code>.</li>
               <li>README (en et fr, même plan) : présentation, captures, fonctionnalités par familles, Install (#337), Configuration, « Coming next » gardé, liens CHANGELOG et CONTRIBUTING ; le contenu pour développeurs part dans <code>CONTRIBUTING.md</code>. 4 à 6 captures sur la borne avec les Profiles de test, dans <code>docs/images/</code>, qui reste dans le zip (ticket humain).</li>
             </ul>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="wiki" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>README minuscule, documentation dans un wiki en Markdown</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">docs</span></div>
+          </div>
+          <p>Les README (166 lignes en anglais) deviennent une page d'accueil courte : une phrase de présentation, une capture, trois lignes d'installation et des liens. Tout le reste part dans un wiki en Markdown : installation pas à pas, chaque fonctionnalité par familles, configuration (<code>.env.local</code>, Expansion Pack Settings), mises à jour, FAQ et dépannage (Error Log).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. À griller avant le ticket #350 de la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a>, qui réécrit les README selon un plan décidé le 27/10</div>
+          <details>
+            <summary>Questions ouvertes (5)</summary>
+            <ul>
+              <li>GitLab ou GitHub ? Le dépôt et ses tickets sont sur GitHub, qui a aussi un wiki en Markdown ; un wiki GitLab voudrait dire un second site à tenir.</li>
+              <li>Wiki séparé (dépôt <code>.wiki.git</code> à part, absent du zip, non versionné avec le code), ou pages Markdown dans <code>docs/</code> du dépôt, versionnées et livrées avec chaque release ?</li>
+              <li>Le ticket #350 est-il réécrit pour viser ce README minuscule et le wiki, ou fait tel quel puis remplacé après la 1.0 ?</li>
+              <li>Le wiki en anglais et en français, comme les README, ou en anglais seul ?</li>
+              <li>Que deviennent les captures de <code>docs/images/</code> (#348) et le « Coming next » des README ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 28/10/2026. Défait la décision du grilling de la 1.0 (README en et fr de même plan, avec fonctionnalités par familles, Install et Configuration) ; <code>CONTRIBUTING.md</code> garde le contenu pour développeurs.</p>
           </details>
         </div>
       </li>
@@ -653,6 +679,13 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>28/10 <span class="count">(1)</span></summary>
+          <ol>
+            <li><strong>README minuscule et wiki en Markdown, 3ᵉ place</strong>
+              <span>Idée de Félix : les README sont devenus trop gros. Placé juste après la Sortie 1.0, et à griller avant son ticket #350, qui réécrit les README selon le plan du 27/10 que cette idée défait : mieux vaut décider avant d'écrire deux fois. Effort moyen (tout le contenu à répartir en pages, en deux langues peut-être), impact moyen (nouveaux venus et forums).</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>27/10 <span class="count">(3)</span></summary>
           <ol>
             <li><strong>« Lancer une table au hasard » au menu principal, 3ᵉ place</strong>

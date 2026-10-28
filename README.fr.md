@@ -112,28 +112,41 @@ Voici ce que nous envisageons pour la suite du pack. Rien n'est promis : les pro
 - **Year in Pinball** : le bilan de l'année de chaque Profil, les tables jouées et découvertes, les heures de jeu, les préférées, les succès et la plus longue série.
 - **Thèmes** : d'autres styles que Steamball pour tous les écrans dessinés, avec un petit éditeur pour créer le vôtre.
 - **Notes et favoris propres à chaque Profil**, puis la note moyenne de la maison pour chaque table.
-- **Installation en 30 secondes et mises à jour**, sans git.
 
 ## Installation
 
-Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fonctionnalité facultative *Lecteur Windows Media*, pour les sons).
+Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fonctionnalité facultative *Lecteur Windows Media*, pour les sons). Pas besoin de git.
 
-1. **Copiez le projet dans `PinballY\Scripts\ExpansionPack`**, sous ce nom exact : le pack y cherche ses fichiers. Depuis un zip téléchargé, renommez le dossier extrait (`PinballY-Expansion-Pack-main`) en `ExpansionPack` ; avec git, lancez `git clone https://github.com/F3L1X79/PinballY-Expansion-Pack.git ExpansionPack` depuis `PinballY\Scripts`.
-2. **Ajoutez cette ligne à `PinballY\Scripts\main.js`**, ou créez le fichier avec cette seule ligne si vous n'en avez pas :
+1. **Téléchargez `ExpansionPack.zip`** depuis la dernière version publiée : https://github.com/F3L1X79/PinballY-Expansion-Pack/releases/latest
+2. **Extrayez-le dans `PinballY\Scripts`**. Le zip contient déjà un dossier nommé `ExpansionPack`, le nom où le pack cherche ses fichiers : vous devez obtenir `PinballY\Scripts\ExpansionPack\main.js`, et non `ExpansionPack\ExpansionPack\main.js`.
+3. **Créez `PinballY\Scripts\main.js` avec cette seule ligne** si le fichier n'existe pas, ou **ajoutez-lui cette ligne** s'il existe :
    ```js
    import "./ExpansionPack/main.js";
    ```
    Vos propres scripts continuent de fonctionner : rien d'autre n'est touché dans `Scripts`.
-3. **Copiez `ExpansionPack\.env.example` en `ExpansionPack\.env.local`** et réglez ce qu'il vous faut, un `CLÉ=valeur` par ligne (UTF-8). Les réglages absents gardent leur valeur par défaut ; `.env.local` est ignoré par git.
-4. **Facultatif : installez vpxtool**, pour que la ROM de chaque table soit remplie toute seule (Table ROMs). Téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools` (à côté du programme de redémarrage déjà présent). Sans lui, la ROM d'une table est quand même trouvée, après sa première partie, et un toast « Problème » rappelle à chaque démarrage que `vpxtool.exe` manque (aux seuls Profils admin, ou à tous s'il n'y en a aucun) : installez-le, ou désactivez l'add-on Table ROMs dans **Réglages du pack**.
-5. **Facultatif : passez PINemHi en 3.6.8**, pour que les meilleurs scores soient lus sur les tableaux d'environ 300 ROM de plus. Remplacez les fichiers de `PinballY\PINemHi` par ceux de PINemHi 3.6.8, puis **ajoutez toute la section `[romfind]` de son `romfind.ini` à la fin de son `pinemhi.ini`** (PinballY ne lit cette section que dans `pinemhi.ini` : sans elle, une table au champ ROM vide n'a plus aucun tableau), et réglez `USER=` dans `pinemhi.ini` sur le dossier `User` de Visual Pinball X.
-6. **Redémarrez PinballY** et consultez `PinballY.log` : il liste vos réglages, une ligne « initialized » par add-on, et des lignes `ERROR` qui désignent l'add-on en cause. PinballY recrée `PinballY.log` à chaque lancement : le pack garde donc aussi chaque erreur dans `Scripts\ExpansionPack\errors.log`, d'un lancement à l'autre, une ligne par erreur avec sa date, son heure, la version du pack et l'add-on, et la pile d'appels en retrait en dessous. Au-delà de 1 Mo, il devient `errors.old.log` au démarrage suivant. Joignez-le quand vous signalez un problème.
+4. **Facultatif : créez `ExpansionPack\.env.local`**, seulement pour changer un réglage que **Réglages du pack** ne propose pas (voir [Réglages](#réglages)) : copiez `ExpansionPack\.env.example` et gardez les lignes que vous changez, un `CLÉ=valeur` par ligne (UTF-8). Sans lui, le pack tourne avec ses valeurs par défaut.
+5. **Facultatif : installez vpxtool**, pour que la ROM de chaque table soit remplie toute seule (Table ROMs). Téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools` (à côté du programme de redémarrage déjà présent). Sans lui, la ROM d'une table est quand même trouvée, après sa première partie, et un toast « Problème » rappelle à chaque démarrage que `vpxtool.exe` manque (aux seuls Profils admin, ou à tous s'il n'y en a aucun) : installez-le, ou désactivez l'add-on Table ROMs dans **Réglages du pack**.
+6. **Facultatif : passez PINemHi en 3.6.8**, pour que les meilleurs scores soient lus sur les tableaux d'environ 300 ROM de plus. Remplacez les fichiers de `PinballY\PINemHi` par ceux de PINemHi 3.6.8, puis **ajoutez toute la section `[romfind]` de son `romfind.ini` à la fin de son `pinemhi.ini`** (PinballY ne lit cette section que dans `pinemhi.ini` : sans elle, une table au champ ROM vide n'a plus aucun tableau), et réglez `USER=` dans `pinemhi.ini` sur le dossier `User` de Visual Pinball X.
+7. **Redémarrez PinballY** et consultez `PinballY.log` : il liste vos réglages, une ligne « initialized » par add-on, et des lignes `ERROR` qui désignent l'add-on en cause. PinballY recrée `PinballY.log` à chaque lancement : le pack garde donc aussi chaque erreur dans `Scripts\ExpansionPack\errors.log`, d'un lancement à l'autre, une ligne par erreur avec sa date, son heure, la version du pack et l'add-on, et la pile d'appels en retrait en dessous. Au-delà de 1 Mo, il devient `errors.old.log` au démarrage suivant. Joignez-le quand vous signalez un problème.
+8. **Choisissez vos Add-ons** dans **Réglages du pack**, depuis le menu opérateur : activez ou désactivez chacun, choisissez l'écran de démarrage et la langue, puis redémarrez PinballY d'une seule pression.
 
 Tout ce que le pack conserve reste dans `Scripts\ExpansionPack` : vos réglages (`.env.local`) et la progression de chaque Profil (`profiles`). **Pour sauvegarder**, copiez ce dossier. **Pour désinstaller**, supprimez-le et retirez la ligne d'import de `Scripts\main.js`.
 
+**Pour les contributeurs** : au lieu du zip, lancez `git clone https://github.com/F3L1X79/PinballY-Expansion-Pack.git ExpansionPack` depuis `PinballY\Scripts`, puis suivez les étapes à partir de l'étape 3.
+
+### Mises à jour
+
+À chaque démarrage, PinballY demande à GitHub, en arrière-plan, si une version plus récente du pack est sortie, sans ralentir le démarrage ; hors ligne, il écrit seulement une ligne dans `PinballY.log`. S'il y en a une, le démarrage suivant ouvre l'invite de mise à jour avant tout le reste, « La version vX.Y.Z de l'Expansion Pack est disponible. », avec « Mettre à jour » et « Plus tard ». Elle attend un démarrage où le dernier joueur voit les entrées de configuration (un Profil admin, ou n'importe qui tant qu'aucun Profil n'est marqué).
+
+- **« Mettre à jour »** télécharge et vérifie la nouvelle version, ferme PinballY, remplace le dossier du pack par le nouveau, et relance PinballY. Vos réglages (`.env.local`), vos Profils (`profiles`), les fichiers que vous avez mis dans `tools` (`vpxtool.exe` compris), vos propres sons et images de score par défaut, et `errors.log` sont conservés. Le démarrage suivant annonce « Expansion Pack mis à jour en vX.Y.Z ». Si la mise à jour a échoué, la version précédente reste en place, et un toast « Problème » indique où en lire la raison à qui voit les entrées de configuration. Un téléchargement qui échoue avant la fermeture de PinballY est signalé aussitôt (« Mise à jour impossible : l'Expansion Pack reste tel quel »).
+- **« Plus tard »** n'est plus demandé pour cette version : « Mettre à jour en vX.Y.Z » reste dans **Réglages du pack** jusqu'à la mise à jour.
+- **Pour couper la recherche**, réglez « Recherche de mises à jour » sur « Désactivé » dans **Réglages du pack**, ou écrivez `UPDATE_CHECK=false` dans `.env.local` : la borne ne contacte alors jamais GitHub.
+- **Un pack installé avec git** n'est jamais vérifié ni mis à jour : lancez `git pull` dans `Scripts\ExpansionPack`.
+- **Pour revenir** à la version précédente, fermez PinballY : elle est gardée à côté du pack sous le nom `Scripts\ExpansionPack.old-<date>` (la plus récente seulement). Copiez-y `profiles`, `.env.local` et `pack_update.json` depuis `Scripts\ExpansionPack`, pour garder la progression faite depuis la mise à jour (et ne pas être averti d'un échec), puis renommez `ExpansionPack` en n'importe quel autre nom et ce dossier en `ExpansionPack`.
+
 ## Réglages
 
-Les réglages se trouvent dans `Scripts\ExpansionPack\.env.local`, un `CLÉ=valeur` par ligne. Les Add-ons, l'écran de démarrage et la langue se règlent aussi sans l'éditer, depuis **Réglages du pack** dans le menu opérateur. N'écrivez que ceux que vous changez, par exemple :
+Les réglages se trouvent dans `Scripts\ExpansionPack\.env.local`, un `CLÉ=valeur` par ligne. Les Add-ons, l'écran de démarrage, la langue et la recherche de mises à jour se règlent aussi sans l'éditer, depuis **Réglages du pack** dans le menu opérateur. N'écrivez que ceux que vous changez, par exemple :
 
 ```
 LANGUAGE=fr
@@ -157,6 +170,7 @@ ADD_ON_CLOCK=false
 | `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Taille de l'annonce, de `0.5` à `3` : à augmenter sur un grand écran. |
 | `CONFETTI` | `true` | `false` coupe la pluie de confettis qui accompagne l'annonce d'un Défi réussi, d'un Succès Platine, du niveau 10 de maîtrise sur une table ou d'un nouveau palier de la collection, si votre PC peine. |
 | `FIREWORKS` | `true` | `false` coupe le feu d'artifice qui accompagne l'annonce d'un nouveau niveau, si votre PC peine. Indépendant de `CONFETTI`. |
+| `UPDATE_CHECK` | `true` | `false` empêche PinballY de demander à GitHub, à chaque démarrage, si une version plus récente du pack existe, et de proposer de la mettre à jour (voir [Mises à jour](#mises-à-jour)). |
 | `SKIP_RANDOM_GAME_ANIMATION` | `false` | `true` saute la roue de la fortune et lance la table au hasard aussitôt. |
 | `ASK_TO_RATE_AFTER_MINUTES_PLAYED` | `60` | Minutes jouées sur une table avant qu'on vous demande de la noter. |
 | `LOG_UNTRANSLATED_MENU_TITLES` | `false` | `true` écrit chaque titre de menu PinballY non traduit dans `PinballY.log`. |
