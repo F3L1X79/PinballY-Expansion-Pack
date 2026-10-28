@@ -237,7 +237,6 @@
           <a class="chip tr-share" href="#release-1-0"><b></b>Sortie 1.0</a>
         </div>
         <div class="cell">
-          <a class="chip tr-share" href="#distrib"><b></b>Distribution</a>
         </div>
 
         <div class="ax row">Moyen</div>
@@ -301,30 +300,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="distrib" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Distribution : installation et mises à jour</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Une Pack Version et des releases GitHub avec un <code>ExpansionPack.zip</code> déjà bien nommé : on l'installe à la main, sans git (zip extrait dans <code>Scripts\</code>, une ligne d'import). Ensuite PinballY s'occupe des mises à jour : l'Update Prompt, au démarrage avant tout le reste, propose la nouvelle version, et un helper caché la télécharge, la vérifie, permute le dossier en gardant les données du joueur, puis relance PinballY.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/331">#331</a>, tickets #332 à #337, borne #338 (humain) ; import dynamique à essayer sur la borne #339 · ADR 0018 · Réécrit la section Install des README · Research : <code>docs/research/distribution-install-and-updates.md</code></div>
-          <details>
-            <summary>Décisions du grilling (26/10/2026)</summary>
-            <ul>
-              <li>Ni <code>.exe</code> (SmartScreen, signature payante) ni script PowerShell à coller : première installation à la main depuis le zip, mises à jour depuis PinballY par un helper caché, comme le redémarrage (ADR 0017).</li>
-              <li>Vérification en arrière-plan à chaque démarrage, Update Prompt au démarrage suivant, avant le picker et le Welcome Screen (ADR 0018). Une fois par version, puis une entrée dans les Expansion Pack Settings ; seul qui voit les entrées de configuration (dernier Profile actif).</li>
-              <li>Vérification coupable dans <code>.env.local</code> et les réglages ; jamais sur une borne git. Pas de choix des Add-ons à l'installation, pas de désinstallation automatique, installeur en anglais seulement.</li>
-              <li>Échec : ancienne version remise, dialogue OK au démarrage suivant en attendant le toast d'erreur (<code>TODO</code>). Réussite : un message « mis à jour en vX.Y.Z », les nouveautés viendront avec la 1.0.</li>
-              <li>Script mainteneur <code>.mjs</code> pour publier la release (étape de build validée), sans CI.</li>
-            </ul>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="release-1-0" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -335,7 +310,7 @@
           </div>
           <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
           <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a>. Jalon après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a> ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a>. Jalon après la Distribution (spec #331, livrée) ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
           <details>
             <summary>Décisions du grilling (27/10/2026)</summary>
             <ul>
@@ -431,7 +406,7 @@
           </div>
           <p>Le pack regarde la dernière release de vpxtool sur GitHub et la compare à <code>tools\vpxtool.exe</code> ; un toast propose la mise à jour, que le helper caché de la Distribution télécharge, vérifie et met en place, l'ancien <code>vpxtool.exe</code> gardé en cas d'échec.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#distrib">Distribution (n° <span data-ref="distrib"></span>)</a>, dont il reprend la vérification de version et le helper · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la vérification de version et le helper de la Distribution (spec #331, livrée) · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
           <details>
             <summary>Questions ouvertes (4)</summary>
             <ul>
@@ -562,7 +537,7 @@
           </div>
           <p>Offrir aux auteurs d'autres scripts PinballY un accès à toutes nos statistiques et métriques (Profiles, Plays, Player Level, Table Mastery, Achievements, Challenges, Streaks…), pour qu'ils les réutilisent dans leurs propres plugins.</p>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après la <a href="#distrib">distribution (n° <span data-ref="distrib"></span>)</a>, qui fixe où vit le pack chez les autres</div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. La Distribution (spec #331, livrée) fixe où vit le pack chez les autres</div>
           <details>
             <summary>Questions ouvertes (4)</summary>
             <ul>
@@ -703,8 +678,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>28/10 <span class="count">(2)</span></summary>
+          <summary>28/10 <span class="count">(3)</span></summary>
           <ol>
+            <li><strong>La Distribution quitte la roadmap</strong>
+              <span>Spec #331 close : tickets #332 à #337 livrés, essais de la borne #338 et #339 faits (première release, vraie mise à jour, ligne d'import dynamique de l'ADR 0019). Le chantier sort de la file et de la matrice ; la Sortie 1.0 passe 1ʳᵉ.</span></li>
             <li><strong>Dialogues dessinés, 4ᵉ place</strong>
               <span>Constat de Félix sur la borne (#338) : l'Update Prompt, menu natif de PinballY, est illisible et mal cadré. Il choisit de dessiner tous les dialogues de <code>wheel_dialog.js</code> d'un coup plutôt que le seul Update Prompt. Placé juste après le README court, avant « Table au hasard » : ce sont les premiers dialogues que verra le public de la 1.0, qui attend déjà ces deux chantiers. Effort moyen (un module, mais la navigation des menus dessinés à reprendre), impact moyen (chaque mise à jour, chaque Rating Prompt).</span></li>
             <li><strong>README minuscule et wiki en Markdown, 3ᵉ place</strong>
