@@ -35,6 +35,10 @@ const HELPER_POLL_MS = 200;
 const RESTART_READY_TIMEOUT_MS = 15000;
 // Longer: the Pack Update helper downloads and checks the release first.
 const PACK_UPDATE_READY_TIMEOUT_MS = 120000;
+// The Pack Update helper's ready file and log, in the pack's temporary folder.
+const PACK_UPDATE_FILE_BASE_NAME = "pack-update";
+// The Pack Update helper's log as the owner types it in Explorer's address bar.
+export const PACK_UPDATE_LOG_HINT = `%TEMP%\\${PACK_TEMPORARY_FOLDER_NAME}\\${PACK_UPDATE_FILE_BASE_NAME}.log`;
 // Given "<output file>" "<exit code file>" "<program>" "<args>"..., runs the
 // program with its standard output in the first file and its standard error
 // dropped, then writes its exit code to the second, through a .tmp file
@@ -507,7 +511,7 @@ export function createPinballYHost() {
         // over the pack folder, then start PinballY again.
         startPackUpdate: (() => {
             const quitForHelper = createHelperQuitter(files, startHidden, {
-                helperName: PACK_UPDATE_HELPER_NAME, fileBaseName: "pack-update", readyTimeoutMs: PACK_UPDATE_READY_TIMEOUT_MS, errorLabel: "Pack Update helper",
+                helperName: PACK_UPDATE_HELPER_NAME, fileBaseName: PACK_UPDATE_FILE_BASE_NAME, readyTimeoutMs: PACK_UPDATE_READY_TIMEOUT_MS, errorLabel: "Pack Update helper",
             });
             return ({ zipUrl, sha256, packVersion, onQuitting, onFailed }) => quitForHelper({ onQuitting, onFailed }, {
                 ZipUrl: zipUrl, Sha256: sha256, PackVersion: packVersion, PackFolder: projectFolderOf(systemInfo.programDir),

@@ -40,9 +40,10 @@ pack_update.json
 errors.log
 errors.old.log
 
-# vpxtool, installed by each owner (see the README); the pack's own restart helper is shipped
+# vpxtool, installed by each owner (see the README); the pack's own restart and Pack Update helpers are shipped
 tools/*
 !tools/restart_pinbally.ps1
+!tools/pack_update.ps1
 
 # Personal sounds, not published (see .env.example)
 assets/sounds/local/

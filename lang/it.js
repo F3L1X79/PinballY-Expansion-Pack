@@ -878,11 +878,14 @@ export default {
         later: "Più tardi",
         updateFailed: "Aggiornamento impossibile: l'Expansion Pack resta com'è",
         ok: "OK",
+        updated: (version) => `Expansion Pack aggiornato alla v${version}`,
+        toastTitle: "Expansion Pack",
     },
     errorToast: {
         header: "Problema",
         playNotSaved: "Impossibile salvare questa partita: non conterà nelle tue statistiche.",
         playNotInPlayLog: "Questa partita è stata contata, ma manca dalla tua cronologia delle partite.",
         vpxtoolMissing: "Manca vpxtool.exe nella cartella tools dell'Expansion Pack: le ROM dei tavoli non vengono compilate.",
+        packUpdateFailed: (version, logPath) => `L'aggiornamento alla v${version} non è riuscito: la versione precedente resta al suo posto. Dettagli in ${logPath}`,
     },
 };

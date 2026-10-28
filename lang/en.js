@@ -799,6 +799,10 @@ export default {
         later: "Later",
         updateFailed: "Update not possible: the Expansion Pack stays as it is",
         ok: "OK",
+        // At the first start on the Pack Version an update installed.
+        updated: (version) => `Expansion Pack updated to v${version}`,
+        // The title of the Error Toast of an update that failed.
+        toastTitle: "Expansion Pack",
     },
     // The Error Toast: a failure the player would not see otherwise, under the table's name.
     errorToast: {
@@ -807,5 +811,7 @@ export default {
         playNotInPlayLog: "This game was counted, but it is missing from your play history.",
         // Under the Table ROMs Add-on's name.
         vpxtoolMissing: "vpxtool.exe is missing from the Expansion Pack's tools folder: the tables' ROMs are not filled.",
+        // Under packUpdates.toastTitle; logPath: the Pack Update helper's log.
+        packUpdateFailed: (version, logPath) => `The update to v${version} failed: the previous version is still in place. Details in ${logPath}`,
     },
 };
