@@ -94,7 +94,7 @@ Here is what we are thinking about for the pack's future. Nothing is promised: p
 
 Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows Media Player* optional feature, for the sounds). No git needed.
 
-1. **Download `ExpansionPack.zip`** from the latest release: https://github.com/F3L1X79/PinballY-Expansion-Pack/releases/latest
+1. **Download `ExpansionPack.zip`** from the latest release: https://github.com/F3L1X79/PinballY-Expansion-Pack/releases/latest (not "Source code (zip)", whose folder is named `PinballY-Expansion-Pack-<version>` and isn't found by the pack).
 2. **Extract it into `PinballY\Scripts`**. The zip already holds a folder named `ExpansionPack`, the name the pack looks for: you should get `PinballY\Scripts\ExpansionPack\main.js`, not `ExpansionPack\ExpansionPack\main.js`.
 3. **Create `PinballY\Scripts\main.js` with only this line** if the file doesn't exist, or **add this line to it** if it does:
    ```js
