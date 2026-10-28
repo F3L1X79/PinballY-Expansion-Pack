@@ -300,31 +300,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="release-1-0" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Sortie 1.0, puis des versions qui évoluent</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a>. Jalon après la Distribution (spec #331, livrée) ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
-          <details>
-            <summary>Décisions du grilling (27/10/2026)</summary>
-            <ul>
-              <li>La Pack Version existe déjà (<code>common/core/pack_version.js</code>) ; le résumé de démarrage l'écrit en tête, avec <code>(git checkout)</code> sur une borne git.</li>
-              <li>Les essais de la borne (#338) se font en 0.x ; la 1.0.0 sort après la Distribution, le toast d'erreur et les README remis à niveau, rien d'autre.</li>
-              <li><code>CHANGELOG.md</code> en anglais, à partir de la 1.0.0 (une section « première version publique » par familles). Un script <code>maintainer/release/draft_changelog.mjs</code> liste les <code>Closes #N</code> depuis le dernier tag ; la section est relue, puis reprise comme notes de release par <code>publish_release.mjs</code> (au lieu de <code>--generate-notes</code>), qui refuse une version sans section.</li>
-              <li>Release Highlights : 1 à 3 phrases pour la maison par version, dans <code>lang/</code> (six langues, jamais supprimées), sous « mis à jour en vX.Y.Z » dans le dialogue de réussite ; versions sautées comprises, 5 points au plus, la plus récente d'abord ; aucune pour un correctif, c'est permis.</li>
-              <li>Semver du pack : majeure si une Pack Update ne suffit pas seule ou retire quelque chose (PinballY minimum relevé, Add-on supprimé, données illisibles par l'ancienne version) ; mineure pour des nouveautés, migrations automatiques comprises ; correctif sinon. Une release par spec terminée (ou plusieurs), un correctif seulement pour un bug qui coûte au joueur. Règles et étapes dans une section « Releasing » de <code>CONTRIBUTING.md</code>.</li>
-              <li>README (en et fr, même plan) : présentation, captures, fonctionnalités par familles, Install (#337), Configuration, « Coming next » gardé, liens CHANGELOG et CONTRIBUTING ; le contenu pour développeurs part dans <code>CONTRIBUTING.md</code>. 4 à 6 captures sur la borne avec les Profiles de test, dans <code>docs/images/</code>, qui reste dans le zip (ticket humain).</li>
-            </ul>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="wiki" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -369,6 +344,31 @@
               <li>Exit, attract mode et lancement d'une table pendant le dialogue : mêmes règles que les menus dessinés ?</li>
             </ul>
             <p class="ctx">Constat de Félix du 28/10/2026 sur la borne (#338) : l'Update Prompt est « horrible ». Il choisit de dessiner tous les dialogues à la fois plutôt que le seul Update Prompt.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="release-1-0" data-track="share" data-rank="silver">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Sortie 1.0, puis des versions qui évoluent</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
+          </div>
+          <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a>. Jalon après la Distribution (spec #331, livrée), le <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a> et les <a href="#drawn-dialogs">Dialogues dessinés (n° <span data-ref="drawn-dialogs"></span>)</a> : #347, #349 et #351 portent un commentaire qui les fait attendre ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
+          <details>
+            <summary>Décisions du grilling (27/10/2026)</summary>
+            <ul>
+              <li>La Pack Version existe déjà (<code>common/core/pack_version.js</code>) ; le résumé de démarrage l'écrit en tête, avec <code>(git checkout)</code> sur une borne git.</li>
+              <li>Les essais de la borne (#338) se font en 0.x ; la 1.0.0 sort après la Distribution, le toast d'erreur et les README remis à niveau, rien d'autre (revu le 28/10 : après les Dialogues dessinés aussi).</li>
+              <li><code>CHANGELOG.md</code> en anglais, à partir de la 1.0.0 (une section « première version publique » par familles). Un script <code>maintainer/release/draft_changelog.mjs</code> liste les <code>Closes #N</code> depuis le dernier tag ; la section est relue, puis reprise comme notes de release par <code>publish_release.mjs</code> (au lieu de <code>--generate-notes</code>), qui refuse une version sans section.</li>
+              <li>Release Highlights : 1 à 3 phrases pour la maison par version, dans <code>lang/</code> (six langues, jamais supprimées), sous « mis à jour en vX.Y.Z » dans le dialogue de réussite ; versions sautées comprises, 5 points au plus, la plus récente d'abord ; aucune pour un correctif, c'est permis.</li>
+              <li>Semver du pack : majeure si une Pack Update ne suffit pas seule ou retire quelque chose (PinballY minimum relevé, Add-on supprimé, données illisibles par l'ancienne version) ; mineure pour des nouveautés, migrations automatiques comprises ; correctif sinon. Une release par spec terminée (ou plusieurs), un correctif seulement pour un bug qui coûte au joueur. Règles et étapes dans une section « Releasing » de <code>CONTRIBUTING.md</code>.</li>
+              <li>README (en et fr, même plan) : présentation, captures, fonctionnalités par familles, Install (#337), Configuration, « Coming next » gardé, liens CHANGELOG et CONTRIBUTING ; le contenu pour développeurs part dans <code>CONTRIBUTING.md</code>. 4 à 6 captures sur la borne avec les Profiles de test, dans <code>docs/images/</code>, qui reste dans le zip (ticket humain).</li>
+            </ul>
           </details>
         </div>
       </li>
@@ -678,8 +678,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>28/10 <span class="count">(3)</span></summary>
+          <summary>28/10 <span class="count">(4)</span></summary>
           <ol>
+            <li><strong>La Sortie 1.0 passe 3ᵉ, après le README court et les Dialogues dessinés</strong>
+              <span>Question de Félix, recommandation de Claude : le public de la 1.0 lira d'abord le README et verra d'abord l'Update Prompt et le dialogue de réussite, où s'affichent les Release Highlights ; les dessiner après la 1.0, ce serait refaire leur mise en page. « Table au hasard » et vpxtool restent après : la première ferait une bonne 1.1, la vraie première mise à jour publique. Revient sur le « rien d'autre » du grilling du 27/10. Les tickets #347, #349 et #351 portent un commentaire de Félix qui les fait attendre, pour que <code>/implement next</code> suive cet ordre. Efforts et impacts inchangés.</span></li>
             <li><strong>La Distribution quitte la roadmap</strong>
               <span>Spec #331 close : tickets #332 à #337 livrés, essais de la borne #338 et #339 faits (première release, vraie mise à jour, ligne d'import dynamique de l'ADR 0019). Le chantier sort de la file et de la matrice ; la Sortie 1.0 passe 1ʳᵉ.</span></li>
             <li><strong>Dialogues dessinés, 4ᵉ place</strong>
