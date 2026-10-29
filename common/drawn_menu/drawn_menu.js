@@ -1,9 +1,9 @@
 // ============================================================
 // Drawn Menu: the single place that shows a menu in the Steamball look (see
 // docs/adr/0013) instead of PinballY's native one. show() runs the chosen
-// entry's command as a native menu would, falling back to the native menu
-// when drawing fails, or with the Add-on off (but for the pack's own screens,
-// getPackMenus); draw() returns false instead.
+// entry's command as a native menu would (none for a disabled line), falling
+// back to the native menu when drawing fails, or with the Add-on off (but for
+// the pack's own screens, getPackMenus); draw() returns false instead.
 // - Swallows every button through "commandbuttondown" while open; never changes the UI mode.
 // - A menu with onBack (a submenu) goes back on Exit and on its MenuReturn entry.
 // - With keepNative (the pause menu), it closes on the native "menuclose", or at "postlaunch".
@@ -17,6 +17,7 @@ import { createClosedListeners } from "../core/closed_listeners.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
 import { createWindowWatch, sizeText } from "../core/window_watch.js";
 import config from "../core/config.js";
+import lang from "../core/i18n.js";
 import { getDrawingAhead } from "../core/drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "../core/navigation_sound.js";
 import { DRAWN_MENU_IMAGES, DRAWN_MENU_IMAGES_FOLDER } from "./drawn_menu_images.js";
@@ -48,6 +49,9 @@ const copyItem = item => ({
     radio: Boolean(item.radio),
     hasSubmenu: Boolean(item.hasSubmenu),
     stayOpen: Boolean(item.stayOpen),
+    // The pack's own: a line that cannot be used, with the reason shown under it.
+    disabled: Boolean(item.disabled),
+    reason: item.disabled ? String(item.reason || "") : null,
     // The pack's own: a dialog message's styled runs, drawn instead of its
     // title, which a native menu shows as plain text.
     runs: Array.isArray(item.runs) ? item.runs.map(run => (typeof run === "string" ? run : { ...run })) : null,
@@ -71,7 +75,10 @@ export function buildMenuModel(items, { dialogStyle = false, pagingCommands = []
         if (pagingCommands.includes(item.cmd)) continue;
         const isDialogText = item.title !== "" && dialogStyle && title === null && rows.length === 0;
         if (item.cmd >= 0) {
-            rows.push({ kind: ROW_KIND.ENTRY, title: item.title, cmd: item.cmd, mark: markNameOf(item), stayOpen: item.stayOpen, selected: item.selected });
+            rows.push({
+                kind: ROW_KIND.ENTRY, title: item.title, cmd: item.cmd, mark: markNameOf(item), stayOpen: item.stayOpen, selected: item.selected,
+                disabled: item.disabled, reason: item.reason,
+            });
         } else if (isDialogText && message === null) {
             message = item.runs || item.title;
         } else if (isDialogText) {
@@ -92,19 +99,73 @@ export function buildMenuModel(items, { dialogStyle = false, pagingCommands = []
 
 // PinballY's own menus, behind the same show() as the Drawn Menus: each
 // onClose runs on the "menuclose" of its menu's id. isShownNatively(id):
-// one of them is shown and not closed yet.
+// one of them is shown and not closed yet. A disabled line, which PinballY
+// has no item for, shows as "<label> (<reason>)" with a command of its own
+// that shows the same menu again, the cursor on it.
 export function createNativeMenus(host) {
     const waitingCloses = [];
+    // One command per disabled line, by its place among a menu's disabled
+    // lines, allocated on demand: no menu has them before it is shown.
+    const disabledCommands = [];
+    // The menu last shown, as given, to show again from a disabled line.
+    let lastShown = null;
+
+    function disabledCommandAt(index) {
+        while (disabledCommands.length <= index) {
+            disabledCommands.push(host.allocateCommand(`drawnMenuDisabledLine${disabledCommands.length}`));
+        }
+        return disabledCommands[index];
+    }
+
+    // The items PinballY shows, the n-th disabled line on the n-th disabled
+    // command; selectedIndex: the item the cursor opens on, over the one
+    // the items mark.
+    function nativeItemsOf(items, disabledIndexes, selectedIndex = null) {
+        return items.map((item, index) => {
+            const nativeItem = Object.assign({}, item);
+            delete nativeItem.disabled;
+            delete nativeItem.reason;
+            if (item.disabled) {
+                const { title, reason } = copyItem(item);
+                nativeItem.title = lang.drawnMenu.disabledLine(title, reason);
+                nativeItem.cmd = disabledCommandAt(disabledIndexes.indexOf(index));
+            }
+            if (selectedIndex !== null) nativeItem.selected = index === selectedIndex;
+            return nativeItem;
+        });
+    }
+
+    const nativeOptionsOf = dialogStyle => (dialogStyle ? { dialogStyle: true } : {});
 
     function show(id, items, { dialogStyle = false, onClose = null } = {}) {
-        host.showMenu(id, items, dialogStyle ? { dialogStyle: true } : {});
-        waitingCloses.push({ id, onClose });
+        const disabledIndexes = items.map((item, index) => (item.disabled ? index : -1)).filter(index => index >= 0);
+        host.showMenu(id, nativeItemsOf(items, disabledIndexes), nativeOptionsOf(dialogStyle));
+        // closesToSkip: the menu's showings replaced by showing it again,
+        // whose "menuclose" is not its close.
+        waitingCloses.push({ id, onClose, closesToSkip: 0 });
+        lastShown = { id, items, disabledIndexes, dialogStyle };
     }
+
+    // Fires on every command: a disabled line of the menu on screen shows it
+    // again. Shown from here, it replaces the menu, whose "menuclose" follows.
+    host.on("command", safeHandler(SCRIPT_NAME, ev => {
+        const waiting = lastShown && waitingCloses.find(candidate => candidate.id === lastShown.id);
+        if (!waiting) return;
+        const { id, items, disabledIndexes, dialogStyle } = lastShown;
+        const itemIndex = disabledIndexes[disabledCommands.indexOf(ev.id)];
+        if (itemIndex === undefined) return;
+        waiting.closesToSkip++;
+        host.showMenu(id, nativeItemsOf(items, disabledIndexes, itemIndex), nativeOptionsOf(dialogStyle));
+    }));
 
     // Fires after any menu closes, chosen, dismissed or replaced.
     host.on("menuclose", safeHandler(SCRIPT_NAME, ev => {
         const index = waitingCloses.findIndex(waiting => waiting.id === ev.id);
         if (index === -1) return;
+        if (waitingCloses[index].closesToSkip > 0) {
+            waitingCloses[index].closesToSkip--;
+            return;
+        }
         const [{ onClose }] = waitingCloses.splice(index, 1);
         if (onClose) onClose();
     }));
@@ -249,7 +310,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         const { geometry, model } = shown;
         const width = Math.max(1, Math.round(geometry.listWidth));
         const height = Math.max(1, Math.round(geometry.contentHeight));
-        const rows = model.rows.map(({ kind, title, mark }) => [kind, title, mark]);
+        const rows = model.rows.map(({ kind, title, mark, reason }) => [kind, title, mark, reason]);
         const signature = JSON.stringify([model.title, model.message, rows, model.footer, shown.scroll, width, height, geometry.k]);
         if (signature !== textsSignature) {
             textsLayer.clear(TRANSPARENT);
@@ -268,9 +329,10 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     function drawSelectedTextLayer() {
         const { geometry, model } = shown;
         const width = Math.max(1, Math.round(geometry.listWidth));
-        const height = Math.max(1, Math.round(DRAWN_MENU_LOOK.rowHeights.entry * geometry.k));
+        const rowHeight = geometry.rowHeights[model.selected];
+        const height = Math.max(1, Math.round(rowHeight));
         selectedTextLayer.clear(TRANSPARENT);
-        selectedTextLayer.draw(dc => drawSelectedText(host, dc, geometry, model.rows[model.selected]), width, height);
+        selectedTextLayer.draw(dc => drawSelectedText(host, dc, geometry, model.rows[model.selected], rowHeight), width, height);
         shown.selectedTextSize = { width, height };
     }
 
@@ -539,6 +601,8 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // dialog's queue not to stay held.
     function choose() {
         const row = shown.model.rows[shown.model.selected];
+        // A disabled line: nothing runs and the menu stays, silent.
+        if (row.disabled) return;
         sounds.select.play();
         if (shown.onBack && row.cmd === menuReturnCommand) {
             goBack();

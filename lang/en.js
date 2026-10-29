@@ -474,6 +474,11 @@ export default {
         greeting: name => `Hi ${name}!`,
     },
 
+    // A Drawn Menu shown natively: a line that cannot be used, with its reason.
+    drawnMenu: {
+        disabledLine: (label, reason) => `${label} (${reason})`,
+    },
+
     // The Profile Reset, in PinballY's Exit menu for an Admin Profile.
     profileReset: {
         menuEntry: "Reset profile",

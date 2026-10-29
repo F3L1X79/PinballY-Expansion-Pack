@@ -53,6 +53,10 @@ export const DRAWN_MENU_LOOK = Object.freeze({
     // first entry's.
     footer: Object.freeze({ height: DRAWN_MENU_ENTRY_HEIGHT, size: 36, minSize: 20, weight: 600 }),
     mark: Object.freeze({ size: 30, weight: 600, right: 36, width: 40 }),
+    // A disabled entry's reason, under its label: its row taller by height,
+    // the label's box shorter by lift and the reason's taller by it, so the
+    // two read as one line and its note.
+    reason: Object.freeze({ size: 26, minSize: 20, weight: 600, height: 32, lift: 10 }),
     separatorWidth: 320,
     // The rows fading at an edge the list scrolls past.
     edgeAlpha: 0x60,
@@ -63,6 +67,13 @@ export const DRAWN_MENU_LOOK = Object.freeze({
         message: COLORS.title,
         footerLabel: COLORS.description,
         gold: COLORS.gold,
+        // A disabled entry: its label dimmed, dull gold under the selection,
+        // and its reason; apart from the headings' and the footer's colours,
+        // which the tests' reader tells the rows by. Provisional, to be
+        // checked on the cabinet.
+        disabledEntry: 0xFF808A98,
+        disabledSelected: 0xFF9C8651,
+        reason: 0xFF96A0AD,
         backdrop: 0xB0080A0E,
         // Hides a native menu kept open under the Drawn Menu.
         cover: 0xFF000000,
@@ -107,6 +118,7 @@ export function computeGeometry({ width, height }, model, wrappedHeightAt) {
     // A wrapped heading's row: a one-line heading's, taller by its other
     // lines, so that one estimated too wide that fits keeps today's height.
     const rowHeightRefOf = row => {
+        if (row.kind === ROW_KIND.ENTRY && row.disabled) return LOOK.rowHeights.entry + LOOK.reason.height;
         if (row.kind !== ROW_KIND.HEADING || !headingWraps(row, listWidth, k)) return LOOK.rowHeights[row.kind];
         const style = headingStyleAt(k);
         const extraLinesHeight = wrappedHeightAt(headingTextOf(row), listWidth, style) - wrappedHeightAt("Ag", UNBOUNDED, style);
@@ -273,18 +285,26 @@ function drawHeading(host, dc, row, { x, y, width, height, k, color }) {
 
 const markGlyphOf = row => DRAWN_MENU_MARKS[row.mark] || null;
 
-// An entry's title and mark, in its colour, in the box.
-function drawEntry(host, dc, row, { x, y, width, height, k, color, markColor }) {
+// An entry's title and mark, in its colour, in the box; a disabled one's
+// reason under them, in smaller type, the title and mark in the top part.
+function drawEntry(host, dc, row, { x, y, width, height: rowHeight, k, color, markColor, reasonColor }) {
     const markRoom = (LOOK.mark.right + LOOK.mark.width) * k;
+    const labelHeight = row.disabled ? (LOOK.rowHeights.entry - LOOK.reason.lift) * k : rowHeight;
     line(host, dc, row.title, {
-        x: x + markRoom, y, width: width - 2 * markRoom, height,
+        x: x + markRoom, y, width: width - 2 * markRoom, height: labelHeight,
         size: LOOK.entry.size * k, minSize: LOOK.entry.minSize * k, weight: LOOK.entry.weight, color,
     });
     const mark = markGlyphOf(row);
-    if (!mark) return;
-    line(host, dc, mark, {
-        x: x + width - markRoom, y, width: LOOK.mark.width * k, height,
-        size: LOOK.mark.size * k, minSize: LOOK.mark.size * k, weight: LOOK.mark.weight, color: markColor,
+    if (mark) {
+        line(host, dc, mark, {
+            x: x + width - markRoom, y, width: LOOK.mark.width * k, height: labelHeight,
+            size: LOOK.mark.size * k, minSize: LOOK.mark.size * k, weight: LOOK.mark.weight, color: markColor,
+        });
+    }
+    if (!row.disabled) return;
+    line(host, dc, row.reason, {
+        x: x + markRoom, y: y + labelHeight, width: width - 2 * markRoom, height: rowHeight - labelHeight,
+        size: LOOK.reason.size * k, minSize: LOOK.reason.minSize * k, weight: LOOK.reason.weight, color: reasonColor,
     });
 }
 
@@ -325,6 +345,9 @@ export function drawTexts(host, dc, geometry, model, scroll) {
             drawSeparator(dc, box.x, box.y, box.width, box.height, k, alpha);
         } else if (row.kind === ROW_KIND.HEADING) {
             drawHeading(host, dc, row, { ...box, k, color: shade(LOOK.colors.heading) });
+        } else if (row.disabled) {
+            const color = shade(LOOK.colors.disabledEntry);
+            drawEntry(host, dc, row, { ...box, k, color, markColor: color, reasonColor: shade(LOOK.colors.reason) });
         } else {
             drawEntry(host, dc, row, { ...box, k, color: shade(LOOK.colors.entry), markColor: shade(LOOK.colors.gold) });
         }
@@ -332,10 +355,16 @@ export function drawTexts(host, dc, geometry, model, scroll) {
     if (model.footer) drawFooter(host, dc, model.footer, { x: 0, y: areaOffset + areaHeight, width: listWidth, k });
 }
 
-// The selected entry in gold, on a canvas of one entry's size.
-export function drawSelectedText(host, dc, geometry, row) {
-    const height = LOOK.rowHeights.entry * geometry.k;
-    drawEntry(host, dc, row, { x: 0, y: 0, width: geometry.listWidth, height, k: geometry.k, color: LOOK.colors.gold, markColor: LOOK.colors.gold });
+// The selected entry in gold, on a canvas of its row's size (height); a
+// disabled one in dull gold over its reason.
+export function drawSelectedText(host, dc, geometry, row, height) {
+    const box = { x: 0, y: 0, width: geometry.listWidth, height, k: geometry.k };
+    if (row.disabled) {
+        const color = LOOK.colors.disabledSelected;
+        drawEntry(host, dc, row, { ...box, color, markColor: color, reasonColor: LOOK.colors.reason });
+        return;
+    }
+    drawEntry(host, dc, row, { ...box, color: LOOK.colors.gold, markColor: LOOK.colors.gold });
 }
 
 // The translucent backdrop, or the opaque cover.
