@@ -333,8 +333,8 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>L'horloge de la roue disparaît quand une table tourne. La Backglass Clock prend le relais sur l'écran du backglass, devant celui de VPX : une petite fenêtre noire au cadre doré, en haut à gauche. Grillé le 29/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/handoff</code> → <code>/prototype</code> sur la borne (session neuve) → <code>/handoff</code> du résultat → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code> ; nouvel Add-on <code>addons/backglass_clock.js</code> ; pages Interface et Réglages du guide</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="skip">prototype</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/369">Spec #369</a> (prototype sauté : ses questions sont devenues des points à vérifier sur la borne) ; nouvel Add-on <code>addons/backglass_clock.js</code> ; pages Interface et Réglages du guide</div>
           <details>
             <summary>Décisions</summary>
             <ul>
@@ -659,8 +659,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(14)</span></summary>
+          <summary>29/10 <span class="count">(15)</span></summary>
           <ol>
+            <li><strong>La Backglass Clock a sa spec #369, sans prototype</strong>
+              <span>Félix passe directement à la spec. Les questions du prototype (rester devant le B2S, dessin pendant la partie, première place, focus, minuteurs pendant la partie) deviennent des points à vérifier sur la borne avant de fermer la spec.</span></li>
             <li><strong>L'heure à l'écran grillée : la Backglass Clock, avec un prototype d'abord</strong>
               <span>La roue a déjà son horloge, et ce qui manque, c'est l'heure pendant une partie. Sur la borne, VPX occupe l'écran du backglass (B2S et DMD). On y met donc une petite fenêtre de PinballY, noire au cadre doré, au premier plan devant VPX, en haut à gauche. C'est un Add-on à part, désactivé par défaut. Un prototype sur la borne doit d'abord vérifier qu'elle reste devant le B2S. L'étape prototype entre dans le stepper. Effort et impact inchangés.</span></li>
             <li><strong>Nouvel ordre de Félix : l'heure 2ᵉ, Discord et PINemHi remontent</strong>
