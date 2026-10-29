@@ -86,6 +86,27 @@ To reset by hand, close PinballY first, then:
 - remove a Profile: delete its folder, or rename it with a leading `_` to hide it (the `guest` folder always comes back);
 - make Guest active and draw new Period Tables: delete both `cabinet.json` and `cabinet.bak.json`.
 
+## Releasing
+
+The Pack Version is written once, in `common/core/pack_version.js` ([ADR 0018](docs/adr/0018-a-pack-update-is-offered-at-the-start-after-its-discovery-and-applied-by-a-helper.md)). Each release is a GitHub release tagged `vX.Y.Z`, with `ExpansionPack.zip` and the Pack Version's [CHANGELOG](CHANGELOG.md) section as its notes.
+
+**Which number to raise**
+
+- **Major** when a Pack Update alone is not enough or something is taken away: the PinballY minimum is raised, an Add-on is removed, or the saved data can no longer be read by the previous Pack Version.
+- **Minor** for new features, including those that migrate saved data automatically.
+- **Fix** for everything else.
+
+**When to release**: when a spec is done, or several. A fix release only for a bug that costs the player something (lost progress, a screen that no longer opens), so that Households are not asked to update for every ticket.
+
+**Steps**
+
+1. `node maintainer/release/draft_changelog.mjs` prints the tickets closed since the latest `vX.Y.Z` tag (all history before the first one) as a Markdown list. It writes nothing.
+2. Paste it into a new `## vX.Y.Z (YYYY-MM-DD)` section at the top of `CHANGELOG.md`, and edit it into a list of changes a cabinet owner understands.
+3. Write the Release Highlights of the version, if any: one to three sentences for the players, under the Pack Version's key of the `releaseHighlights` group in each of the six `lang/` files. Keep the older ones: a cabinet that skipped versions shows theirs too.
+4. Raise `PACK_VERSION` in `common/core/pack_version.js`.
+5. Commit all of it as one "Release vX.Y.Z" commit, then `git tag vX.Y.Z` and `git push && git push --tags`.
+6. `node maintainer/release/publish_release.mjs` builds the zip from the tag and creates the release. It refuses a dirty tree, a HEAD without the tag of the Pack Version, and a Pack Version with no CHANGELOG section.
+
 ## Upgrading from an edited `config.js`
 
 Older versions were set up by editing `common/core/config.js`. Move your values into `.env.local` (see [.env.example](.env.example)), then run `git checkout common/core/config.js` before pulling.
