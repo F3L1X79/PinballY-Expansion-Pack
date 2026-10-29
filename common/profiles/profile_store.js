@@ -414,14 +414,29 @@ export function createProfileStore(host) {
     }
     const isAdmin = (profileName = activeProfile.name) => profileHasMark("isAdmin", profileName);
     const isChild = (profileName = activeProfile.name) => profileHasMark("isChild", profileName);
+    // Guest is skipped since it never counts: reading it would only log its mark on every menu opening.
+    const adminProfileNames = () => listProfileNames().filter(name => !isGuestName(name) && isAdmin(name));
+
+    // The named Profile's marks as the mark rules read them (setup_entries.js).
+    function marksOf(profileName) {
+        return withCachedReads(() => {
+            const { profile, data } = profileWithData(profileName);
+            const isAdminProfile = markOf(profile, data, "isAdmin");
+            return {
+                isGuest: profile.isGuest,
+                isAdmin: isAdminProfile,
+                isChild: markOf(profile, data, "isChild"),
+                isLastAdmin: isAdminProfile && adminProfileNames().length === 1,
+            };
+        });
+    }
 
     // Sets the mark (true) or clears it (the key removed, so the file holds
     // true marks only); throws, writing nothing, when the mark rules forbid it.
     function setMark(profileName, markName, isOn) {
         if (!MARK_NAMES.includes(markName)) throw new Error(`"${markName}" is not a Profile mark.`);
-        const { profile, data } = profileWithData(profileName);
-        const marks = { isGuest: profile.isGuest, isAdmin: markOf(profile, data, "isAdmin"), isChild: markOf(profile, data, "isChild") };
-        const refusal = markRefusal(marks, markName);
+        const profile = profileNamed(profileName);
+        const refusal = markRefusal(marksOf(profileName), markName);
         if (refusal) throw new Error(`${profile.isGuest ? "Guest" : profile.name} cannot have its "${markName}" mark changed (${refusal}).`);
         updateProfileData(changed => {
             if (isOn) changed[markName] = true;
@@ -522,10 +537,11 @@ export function createProfileStore(host) {
         // Whether the named Profile (the active one by default) is an Admin Profile.
         isAdmin,
         // Whether any Profile is an Admin Profile; re-read on every call, so a hand edit shows up.
-        // Guest is skipped since it never counts: reading it would only log its mark on every menu opening.
-        hasAdminProfile: () => listProfileNames().filter(name => !isGuestName(name)).some(isAdmin),
+        hasAdminProfile: () => adminProfileNames().length > 0,
         // Whether the named Profile (the active one by default) is a Child Profile.
         isChild,
+        // { isGuest, isAdmin, isChild, isLastAdmin } of the named Profile.
+        getMarksOf: marksOf,
         setMark,
         getCabinetData: () => cabinet,
         // Another module's cabinet-level file, "<baseName>.json" next to

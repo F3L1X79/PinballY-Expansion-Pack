@@ -11,12 +11,17 @@ export const seesSetupEntries = profileStore => profileStore.isAdmin() || !profi
 export const MARK_REFUSAL = Object.freeze({
     GUEST: "guestNeverMarked",
     ADMIN_MARK_FIRST: "removeAdminMarkFirst",
+    CHILD_MARK_FIRST: "removeChildMarkFirst",
+    LAST_ADMIN: "lastAdmin",
 });
 
 // Why this mark of a Profile cannot be set or cleared, null when it can;
-// marks: { isGuest, isAdmin, isChild } as the store reads them.
+// marks: { isGuest, isAdmin, isChild, isLastAdmin } as the store reads them.
 export function markRefusal(marks, markName) {
     if (marks.isGuest) return MARK_REFUSAL.GUEST;
     if (markName === "isChild" && marks.isAdmin) return MARK_REFUSAL.ADMIN_MARK_FIRST;
+    // Only setting it: a Profile marked both by hand can still lose its Admin mark.
+    if (markName === "isAdmin" && marks.isChild && !marks.isAdmin) return MARK_REFUSAL.CHILD_MARK_FIRST;
+    if (markName === "isAdmin" && marks.isLastAdmin) return MARK_REFUSAL.LAST_ADMIN;
     return null;
 }

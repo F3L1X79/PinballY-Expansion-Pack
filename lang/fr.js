@@ -593,6 +593,7 @@ export default {
     profileReset: {
         menuEntry: "Gérer les profils",
         listTitle: "Quel profil ?",
+        adminLine: isAdmin => `Admin : ${isAdmin ? "oui" : "non"}`,
         childLine: isChild => `Enfant : ${isChild ? "oui" : "non"}`,
         reset: "Réinitialiser",
         back: "Retour",
@@ -600,6 +601,8 @@ export default {
         refusals: {
             guestNeverMarked: "Invité n'est jamais marqué",
             removeAdminMarkFirst: "Retirez d'abord la marque admin",
+            removeChildMarkFirst: "Retirez d'abord la marque enfant",
+            lastAdmin: "Dernier admin",
         },
         marksFailed: name => `Impossible de changer les marques de ${name}. Voir le journal pour les détails.`,
         confirm: name => `Réinitialiser ${name} ? Ses parties, séries, défis et succès seront tous effacés.`,

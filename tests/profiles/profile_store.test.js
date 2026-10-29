@@ -400,6 +400,30 @@ test("setMark refuses Guest and the Child mark of an Admin Profile, writing noth
     assert.ok(!("isChild" in readJson(fake, `${PROFILES}\\Alice\\profile.json`)));
 });
 
+test("setMark sets and clears the Admin mark, refusing it on a Child Profile and on the last Admin Profile", () => {
+    const fake = createFake();
+    fake.addFile(`${PROFILES}\\Alice\\profile.json`, JSON.stringify({ version: 1, isAdmin: true }));
+    fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({ version: 1 }));
+    fake.addFile(`${PROFILES}\\Kid\\profile.json`, JSON.stringify({ version: 1, isChild: true }));
+    const store = createProfileStore(fake);
+
+    assert.throws(() => store.setMark("Alice", "isAdmin", false), /Alice/, "the last Admin Profile keeps its mark");
+    assert.throws(() => store.setMark("Kid", "isAdmin", true), /Kid/);
+    assert.throws(() => store.setMark("guest", "isAdmin", true), /Guest/);
+    assert.equal(store.isAdmin("Alice"), true);
+    assert.ok(!("isAdmin" in readJson(fake, `${PROFILES}\\Kid\\profile.json`)));
+
+    store.setMark("Bob", "isAdmin", true);
+    assert.equal(readJson(fake, `${PROFILES}\\Bob\\profile.json`).isAdmin, true);
+    store.setMark("Alice", "isAdmin", false);
+    assert.ok(!("isAdmin" in readJson(fake, `${PROFILES}\\Alice\\profile.json`)), "with another admin left, the mark clears");
+    assert.throws(() => store.setMark("Bob", "isAdmin", false), /Bob/, "Bob is now the last one");
+
+    fake.addFile(`${PROFILES}\\Both\\profile.json`, JSON.stringify({ version: 1, isAdmin: true, isChild: true }));
+    store.setMark("Both", "isAdmin", false);
+    assert.ok(!("isAdmin" in readJson(fake, `${PROFILES}\\Both\\profile.json`)), "both marks by hand: the Admin one can still go");
+});
+
 test("a mark that cannot be saved is rethrown and left unchanged, on the active Profile too", () => {
     const fake = createFake();
     fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({ version: 1 }));

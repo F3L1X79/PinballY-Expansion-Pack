@@ -591,6 +591,7 @@ export default {
     profileReset: {
         menuEntry: "Gerenciar perfis",
         listTitle: "Qual perfil?",
+        adminLine: isAdmin => `Admin: ${isAdmin ? "sim" : "não"}`,
         childLine: isChild => `Criança: ${isChild ? "sim" : "não"}`,
         reset: "Redefinir",
         back: "Voltar",
@@ -598,6 +599,8 @@ export default {
         refusals: {
             guestNeverMarked: "Convidado nunca é marcado",
             removeAdminMarkFirst: "Remova primeiro a marca de admin",
+            removeChildMarkFirst: "Remova primeiro a marca de criança",
+            lastAdmin: "Último admin",
         },
         marksFailed: name => `Não foi possível alterar as marcas de ${name}. Consulte o log para mais detalhes.`,
         confirm: name => `Redefinir ${name}? Todas as suas partidas, sequências, desafios e conquistas serão apagados.`,

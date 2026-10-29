@@ -591,6 +591,7 @@ export default {
     profileReset: {
         menuEntry: "Profile verwalten",
         listTitle: "Welches Profil?",
+        adminLine: isAdmin => `Admin: ${isAdmin ? "ja" : "nein"}`,
         childLine: isChild => `Kind: ${isChild ? "ja" : "nein"}`,
         reset: "Zurücksetzen",
         back: "Zurück",
@@ -598,6 +599,8 @@ export default {
         refusals: {
             guestNeverMarked: "Gast wird nie markiert",
             removeAdminMarkFirst: "Zuerst die Admin-Markierung entfernen",
+            removeChildMarkFirst: "Zuerst die Kind-Markierung entfernen",
+            lastAdmin: "Letzter Admin",
         },
         marksFailed: name => `Die Markierungen von ${name} konnten nicht geändert werden. Details stehen im Log.`,
         confirm: name => `${name} zurücksetzen? Alle Partien, Serien, Herausforderungen und Erfolge werden gelöscht.`,

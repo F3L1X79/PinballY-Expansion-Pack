@@ -7,7 +7,7 @@ Pour le propriétaire de la borne :
 - **Réglages du pack** : depuis le menu opérateur, activer ou désactiver chaque Add-on par catégorie, choisir l'écran de démarrage et la langue, puis redémarrer PinballY d'une pression.
 - **Profil admin** : les entrées de configuration pour vous seul.
 - **Profil enfant** : une roue sans tables pour adultes.
-- **Gérer les profils** : marquer un Profil enfant, ou faire repartir de zéro un Profil ou toute la maison d'un coup.
+- **Gérer les profils** : marquer un Profil admin ou un Profil enfant, ou faire repartir de zéro un Profil ou toute la maison d'un coup.
 - **Nettoyage des menus** : des menus PinballY allégés (voir [Interface](interface.md#nettoyage-des-menus)).
 
 Tout tient dans un seul dossier, sans modifier PinballY.
@@ -54,8 +54,11 @@ La progression de chaque Profil est enregistrée dans `Scripts\ExpansionPack\pro
 
 ## Profil admin
 
-Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": true` au premier niveau du `Scripts\ExpansionPack\profiles\<nom>\profile.json` de votre Profil, PinballY fermé.
+Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": true` au premier niveau du `Scripts\ExpansionPack\profiles\<nom>\profile.json` de votre Profil, PinballY fermé. Ce Profil marque ensuite les autres depuis la borne : ouvrez **Gérer les profils** dans le menu de sortie, choisissez un Profil puis « Admin : non », qui passe aussitôt à « Admin : oui ». Choisissez-le de nouveau pour retirer la marque.
 
+- Vous pouvez retirer votre propre marque de la même façon tant qu'il reste un autre Profil admin : les menus se ferment alors, puisque vous n'y avez plus accès.
+- La ligne Admin du dernier Profil admin est grisée (« Dernier admin ») : seule une modification à la main de son `profile.json` ramène la maison à « tout le monde voit tout ».
+- Un Profil n'est jamais à la fois Profil admin et Profil enfant : la ligne Admin d'un Profil enfant est grisée (« Retirez d'abord la marque enfant »), comme celle d'Invité (« Invité n'est jamais marqué ») ; la choisir ne change rien.
 - Dès qu'au moins un Profil est marqué, les autres Profils (Invité compris) ne voient plus « Configurer la table » dans le menu principal ni « Menu opérateur » dans le menu de sortie ; les Profils admin voient toujours les deux, et le bouton de service de la porte du monnayeur ouvre toujours le Menu opérateur pour tout le monde.
 - Plusieurs Profils peuvent être marqués.
 - Invité n'est jamais un Profil admin, et une marque qui n'est ni `true` ni `false`, ou dont la clé est mal écrite (`"isAdmin "`, `"IsAdmin"`), est ignorée et signalée dans `PinballY.log`.
@@ -63,7 +66,7 @@ Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": tr
 
 ## Réinitialiser un profil
 
-Un Profil admin trouve aussi **Gérer les profils** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils », dès qu'il y en a au moins deux, pour remettre toute la maison à zéro d'un coup. Choisir un Profil ouvre son propre menu : sa marque enfant (voir [Profil enfant](#profil-enfant)) et **Réinitialiser**. Avec les [menus dessinés](interface.md#menus-dessinés), Échap ou « Retour » y ramène à la liste ; sans eux, les deux ferment le menu.
+Un Profil admin trouve aussi **Gérer les profils** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils », dès qu'il y en a au moins deux, pour remettre toute la maison à zéro d'un coup. Choisir un Profil ouvre son propre menu : ses marques admin et enfant (voir [Profil admin](#profil-admin) et [Profil enfant](#profil-enfant)) et **Réinitialiser**. Avec les [menus dessinés](interface.md#menus-dessinés), Échap ou « Retour » y ramène à la liste ; sans eux, les deux ferment le menu.
 
 - Après une confirmation (le curseur part sur « Non »), « Réinitialiser » ou « Tous les profils » fait repartir le Profil de zéro : ses parties, ses séries, ses records de session, ses parties aléatoires, sa progression aux défis, ses succès annoncés, sa maîtrise des tables, son palier de collection et ses cadres d'Avatar sont effacés, tandis que son nom, son avatar, ses marques et les meilleurs scores qu'il a gagnés restent.
 - Un message indique ensuite si l'opération a réussi.

@@ -484,6 +484,7 @@ export default {
     profileReset: {
         menuEntry: "Manage profiles",
         listTitle: "Which profile?",
+        adminLine: isAdmin => `Admin: ${isAdmin ? "yes" : "no"}`,
         childLine: isChild => `Child: ${isChild ? "yes" : "no"}`,
         reset: "Reset",
         back: "Back",
@@ -491,6 +492,8 @@ export default {
         refusals: {
             guestNeverMarked: "Guest is never marked",
             removeAdminMarkFirst: "Remove the admin mark first",
+            removeChildMarkFirst: "Remove the child mark first",
+            lastAdmin: "Last admin",
         },
         marksFailed: name => `${name}'s marks could not be changed. See the log for details.`,
         confirm: name => `Reset ${name}? All of its plays, streaks, Challenges and achievements will be erased.`,

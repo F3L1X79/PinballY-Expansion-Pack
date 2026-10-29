@@ -590,6 +590,7 @@ export default {
     profileReset: {
         menuEntry: "Gestisci i profili",
         listTitle: "Quale profilo?",
+        adminLine: isAdmin => `Admin: ${isAdmin ? "sì" : "no"}`,
         childLine: isChild => `Bambino: ${isChild ? "sì" : "no"}`,
         reset: "Azzera",
         back: "Indietro",
@@ -597,6 +598,8 @@ export default {
         refusals: {
             guestNeverMarked: "Ospite non viene mai contrassegnato",
             removeAdminMarkFirst: "Togli prima il segno di admin",
+            removeChildMarkFirst: "Togli prima il segno di bambino",
+            lastAdmin: "Ultimo admin",
         },
         marksFailed: name => `Impossibile cambiare i segni di ${name}. Consulta il log per i dettagli.`,
         confirm: name => `Azzerare ${name}? Tutte le sue partite, serie, sfide e obiettivi saranno cancellati.`,

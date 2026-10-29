@@ -7,7 +7,7 @@ For the cabinet owner:
 - **Expansion Pack Settings**: from the Operator Menu, turn each Add-on on or off by category, pick the startup screen and the language, then restart PinballY in one press.
 - **Admin Profile**: the setup entries for you alone.
 - **Child Profile**: a wheel without Adult Tables for the kids.
-- **Manage profiles**: mark a Child Profile, or start a Profile over (Profile Reset), alone or the whole household at once.
+- **Manage profiles**: mark an Admin Profile or a Child Profile, or start a Profile over (Profile Reset), alone or the whole household at once.
 - **Menu Cleanup**: leaner PinballY menus (see [Interface](interface.md#menu-cleanup)).
 
 Everything stays in one folder, with no change to PinballY itself.
@@ -54,8 +54,11 @@ Each Profile's progress is saved in `Scripts\ExpansionPack\profiles`. Keep that 
 
 ## Admin Profile
 
-To keep the setup entries for yourself, add `"isAdmin": true` at the top level of your Profile's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed.
+To keep the setup entries for yourself, add `"isAdmin": true` at the top level of your Profile's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed. From then on, that Profile marks the others from the cabinet: open **Manage profiles** in the Exit menu, pick a Profile and choose "Admin: no", which turns to "Admin: yes" at once. Choose it again to clear the mark.
 
+- You can clear your own mark the same way while another Admin Profile remains: the menus then close, since you no longer have access to them.
+- The last Admin Profile's Admin line is greyed out ("Last admin"): only editing its `profile.json` by hand takes the household back to everyone seeing everything.
+- A Profile is never both an Admin Profile and a Child Profile: a Child Profile's Admin line is greyed out ("Remove the child mark first"), and so is Guest's ("Guest is never marked"); choosing it changes nothing.
 - Once at least one Profile is marked, the other Profiles (Guest included) no longer see "Set Up Table" in the main menu nor "Operator Menu" in the Exit menu; the Admin Profiles still see both, and the coin door service button still opens the Operator Menu for anyone.
 - Several Profiles can be marked.
 - Guest is never an Admin Profile, and a mark that is not `true` or `false`, or whose key is misspelt (`"isAdmin "`, `"IsAdmin"`), is ignored and logged in `PinballY.log`.
@@ -63,7 +66,7 @@ To keep the setup entries for yourself, add `"isAdmin": true` at the top level o
 
 ## Profile Reset
 
-An Admin Profile also finds **Manage profiles** in the Exit menu (Escape), right after "Operator Menu". It lists every Profile, Guest and yourself included, plus "Every profile", once there are two or more, to reset the whole household at once. Picking a Profile opens its own menu: its Child mark (see [Child Profile](#child-profile)) and **Reset**. With the [drawn menus](interface.md#drawn-menus) on, Exit or "Back" there brings you back to the list; with them off, both close the menu.
+An Admin Profile also finds **Manage profiles** in the Exit menu (Escape), right after "Operator Menu". It lists every Profile, Guest and yourself included, plus "Every profile", once there are two or more, to reset the whole household at once. Picking a Profile opens its own menu: its Admin and Child marks (see [Admin Profile](#admin-profile) and [Child Profile](#child-profile)) and **Reset**. With the [drawn menus](interface.md#drawn-menus) on, Exit or "Back" there brings you back to the list; with them off, both close the menu.
 
 - After one confirmation (the cursor starts on "No"), "Reset" or "Every profile" starts the Profile over: its plays, Streaks, session records, Random Games, Challenge progress, announced Achievements, Table Mastery, Collection Tier and Avatar Frames are erased, while its name, Avatar, marks and the High Scores it won stay.
 - A message then tells whether it worked.

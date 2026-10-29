@@ -56,17 +56,18 @@ test("Manage profiles opens the list, then the Profile's menu with its name as a
     chooseEntry(fake, "Bob");
 
     assert.equal(fake.currentMenu(), null, "no native menu");
-    assert.deepEqual(drawnMenuLines(fake), ["[BOB]", "---", TEXT.childLine(false), "---", TEXT.reset, TEXT.back]);
-    assert.equal(highlightedEntry(fake), TEXT.childLine(false));
+    assert.deepEqual(drawnMenuLines(fake), ["[BOB]", "---", TEXT.adminLine(false), TEXT.childLine(false), "---", TEXT.reset, TEXT.back]);
+    assert.equal(highlightedEntry(fake), TEXT.adminLine(false));
 });
 
 test("choosing the Child line marks the Profile at once, the cursor staying on it, and again clears it", () => {
+    press(fake, "Next");
     press(fake, "Select");
 
     assert.equal(readProfile("Bob").isChild, true);
     assert.equal(readProfile("Bob").randomGames, 3, "nothing else changes");
     assert.ok(isDrawnMenuShown(fake), "the menu stays");
-    assert.deepEqual(drawnMenuLines(fake), ["[BOB]", "---", TEXT.childLine(true), "---", TEXT.reset, TEXT.back]);
+    assert.deepEqual(drawnMenuLines(fake), ["[BOB]", "---", TEXT.adminLine(false), TEXT.childLine(true), "---", TEXT.reset, TEXT.back]);
     assert.equal(highlightedEntry(fake), TEXT.childLine(true));
 
     press(fake, "Select");
@@ -90,6 +91,7 @@ test("the Child line is greyed on an Admin Profile and on Guest, and Select on i
     openProfileMenu("Alice");
     assert.deepEqual(childRow(), { kind: "entry", title: TEXT.childLine(false), mark: null, reason: TEXT.refusals.removeAdminMarkFirst });
     const aliceBefore = fake.readFile(profileFile("Alice"));
+    press(fake, "Next");
     press(fake, "Select");
     assert.equal(fake.readFile(profileFile("Alice")), aliceBefore);
     assert.equal(highlightedEntry(fake), TEXT.childLine(false), "the menu stays as it was");
@@ -97,6 +99,7 @@ test("the Child line is greyed on an Admin Profile and on Guest, and Select on i
 
     chooseEntry(fake, GUEST);
     assert.deepEqual(childRow(), { kind: "entry", title: TEXT.childLine(false), mark: null, reason: TEXT.refusals.guestNeverMarked });
+    press(fake, "Next");
     press(fake, "Select");
     assert.ok(!("isChild" in readProfile("guest")));
     press(fake, "Exit");
