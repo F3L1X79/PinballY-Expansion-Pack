@@ -164,7 +164,7 @@ export default {
         signOff: "Have fun!",
     },
 
-    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js, hall_of_fame.js and tables_to_discover.js).
+    // Labels for menu items this project adds itself (see custom_menu_commands.js, random_game.js, custom_filter.js, hall_of_fame.js and tables_to_discover.js).
     customMenuLabels: {
         challengeTables: "Challenge Tables",
         hallOfFameFilter: "Most Played Tables",
@@ -173,6 +173,8 @@ export default {
         tablesToDiscoverFilter: "Tables to Discover",
         originalTablesFilter: "Original Tables",
         tableSetup: "Set Up Table",
+        // The Random Game's main menu entry, worded as welcomeScreen.randomTable.
+        randomTable: "Launch a random table",
         // The native High Scores item, in the main menu only: other menus keep nativeMenuLabels.
         tableScores: "Table Scores",
         // The Filter Picker's way back, and its main menu entry naming the Active Filter.
@@ -724,8 +726,13 @@ export default {
             },
             customMenuCommands: {
                 name: "Menu commands",
-                whenOn: "Table of the Day, Table of the Week, random table and Set Up Table in the main menu.",
-                whenOff: "With the Welcome Screen off too: no Random Game Achievements.",
+                whenOn: "Set Up Table in the main menu.",
+                whenOff: "Nothing else changes.",
+            },
+            randomGame: {
+                name: "Random table",
+                whenOn: "Launch a random table from the main menu, under Play.",
+                whenOff: "The random table stays on the Welcome Screen; with that off too, no Random Game Achievements.",
             },
             hallOfFame: {
                 name: "Hall of Fame",

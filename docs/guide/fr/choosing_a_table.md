@@ -51,7 +51,7 @@ Pour lire les tableaux d'environ 300 ROM de plus, mettez PINemHi à jour (voir [
 
 ## Table au hasard et filtres
 
-- Une table au hasard est tirée sur une roue de la fortune (`SKIP_RANDOM_GAME_ANIMATION=true` la lance aussitôt).
+- Une table au hasard est tirée sur une roue de la fortune (`SKIP_RANDOM_GAME_ANIMATION=true` la lance aussitôt). Lancez-la depuis l'écran d'accueil, ou depuis « Lancer une table au hasard » dans le menu principal, sous « Jouer » : elle est tirée parmi les tables de la roue, filtre actif compris.
 - Derrière « Changer de filtre » dans le menu principal : « Tables à découvrir », « Tables les plus jouées », « Mes meilleurs scores » (les tables où vous avez une place au tableau), « Tables favorites », « Tables masquées » (tant qu'une table est masquée), « Tables Originales » (le fabricant réglé par `COMMUNITY_TABLES_MANUFACTURER`) et « Tables du défi ».
 - Un rappel vous propose de noter une table une fois que vous y avez assez joué (`ASK_TO_RATE_AFTER_MINUTES_PLAYED`).
 

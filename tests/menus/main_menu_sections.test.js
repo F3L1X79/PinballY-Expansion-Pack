@@ -13,7 +13,7 @@ import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const ADD_ONS_UNDER_TEST = [
-    "uiTranslation", "customMenuCommands", "profilePicker", "achievements", "highScores", "startupChoicePrompt",
+    "uiTranslation", "customMenuCommands", "randomGame", "profilePicker", "achievements", "highScores", "startupChoicePrompt",
 ];
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 const SEPARATOR = "---";
@@ -49,7 +49,7 @@ test("setup", async () => {
     store.switchTo("Alice");
 });
 
-const startingPoints = () => ["Play", lang.customMenuLabels.tableSetup, lang.profiles.menuEntry, lang.welcomeScreen.menuEntry];
+const startingPoints = () => ["Play", lang.customMenuLabels.randomTable, lang.customMenuLabels.tableSetup, lang.profiles.menuEntry, lang.welcomeScreen.menuEntry];
 // Written out: the menu must read these exact names (#274).
 const player = () => ["My Profile", "My Achievements"];
 const changeFilter = () => lang.customMenuLabels.activeFilter("All Tables");
@@ -68,7 +68,7 @@ test("once the household has an Admin Profile, Table Setup is offered under Play
     fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({ version: 1, isAdmin: true }));
     const firstBlock = titles => titles.slice(0, titles.indexOf(SEPARATOR));
 
-    assert.deepEqual(firstBlock(mainMenuTitles()), ["Play", lang.profiles.menuEntry, lang.welcomeScreen.menuEntry]);
+    assert.deepEqual(firstBlock(mainMenuTitles()), ["Play", lang.customMenuLabels.randomTable, lang.profiles.menuEntry, lang.welcomeScreen.menuEntry]);
     store.switchTo("Bob");
     assert.deepEqual(firstBlock(mainMenuTitles()), startingPoints());
     store.switchTo("Alice");
@@ -114,7 +114,7 @@ test("no section leaves a doubled, leading or trailing separator when PinballY l
         { title: "", cmd: -1 },
     ]));
     assert.deepEqual(titles, [
-        "Play", lang.profiles.menuEntry, lang.welcomeScreen.menuEntry, SEPARATOR,
+        "Play", lang.customMenuLabels.randomTable, lang.profiles.menuEntry, lang.welcomeScreen.menuEntry, SEPARATOR,
         ...player(), SEPARATOR,
         lang.highScores.board.menuEntry,
     ]);

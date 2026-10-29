@@ -14,7 +14,7 @@ export const ADD_ON_GROUPS = Object.freeze([
     { group: "wheelScreen", addOns: ["statusLineInfo", "clock", "wheelArc"] },
     {
         group: "menusAndFilters",
-        addOns: ["uiTranslation", "drawnMenus", "customMenuCommands", "hallOfFame", "tablesToDiscover", "hiddenTables", "customFilter", "menuCleanup"],
+        addOns: ["uiTranslation", "drawnMenus", "customMenuCommands", "randomGame", "hallOfFame", "tablesToDiscover", "hiddenTables", "customFilter", "menuCleanup"],
     },
     { group: "launchingAndPlaying", addOns: ["forceBackglass", "seamlessLaunchOverlay", "playLaunchSound", "ratingPrompt", "tableRoms"] },
     { group: "debugging", addOns: ["launchEventsTrace"] },

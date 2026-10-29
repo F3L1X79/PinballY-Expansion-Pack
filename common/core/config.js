@@ -96,6 +96,8 @@ export const DEFAULTS = {
         startupChoicePrompt: true,
         forceBackglass: true,
         customMenuCommands: true,
+        // "Launch a random table" in the main menu, under Play.
+        randomGame: true,
         customFilter: true,
         hallOfFame: true,
         tablesToDiscover: true,

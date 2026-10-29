@@ -14,7 +14,7 @@ import { pressAndGlide, readRows, untilListShown } from "./achievement_list_read
 export const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // Longer than a toast's whole life (rise, hold, fade).
 const ONE_TOAST_MS = 6000;
-const ADD_ONS_UNDER_TEST = ["customMenuCommands", "achievements", "sessionStatsTracker"];
+const ADD_ONS_UNDER_TEST = ["customMenuCommands", "randomGame", "achievements", "sessionStatsTracker"];
 
 // PinballY's own play stats count for nothing: only the Profiles' plays do.
 export function table(id, title, manufacturer, year, categories = []) {

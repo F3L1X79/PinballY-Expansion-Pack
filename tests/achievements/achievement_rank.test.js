@@ -13,7 +13,7 @@ import { ACHIEVEMENT_RANK } from "../../common/achievements/achievements.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
-const ADD_ONS_UNDER_TEST = ["customMenuCommands", "sessionStatsTracker", "achievements", "challenges", "profilePicker"];
+const ADD_ONS_UNDER_TEST = ["customMenuCommands", "randomGame", "sessionStatsTracker", "achievements", "challenges", "profilePicker"];
 
 // One manufacturer, decade and category per group size.
 const GROUP_SIZES = [

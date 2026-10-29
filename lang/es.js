@@ -277,7 +277,7 @@ export default {
         signOff: "¡Que te diviertas!",
     },
 
-    // Labels for menu items this project adds itself (see custom_menu_commands.js, custom_filter.js, hall_of_fame.js and tables_to_discover.js).
+    // Labels for menu items this project adds itself (see custom_menu_commands.js, random_game.js, custom_filter.js, hall_of_fame.js and tables_to_discover.js).
     customMenuLabels: {
         challengeTables: "Mesas del reto",
         hallOfFameFilter: "Hall of Fame",
@@ -286,6 +286,8 @@ export default {
         tablesToDiscoverFilter: "Mesas por descubrir",
         originalTablesFilter: "Mesas originales",
         tableSetup: "Configuración de la mesa",
+        // The Random Game's main menu entry, worded as welcomeScreen.randomTable.
+        randomTable: "Lanzar una mesa al azar",
         tableScores: "Puntuaciones",
         filterPickerBack: "Volver",
         activeFilter: (name) => `Filtro activo: ${name}`,
@@ -806,8 +808,13 @@ export default {
             },
             customMenuCommands: {
                 name: "Comandos de menú",
-                whenOn: "Mesa del día, mesa de la semana, mesa al azar y Configuración de la mesa en el menú principal.",
-                whenOff: "Con la bienvenida también desactivada: sin logros de partidas al azar.",
+                whenOn: "Configuración de la mesa en el menú principal.",
+                whenOff: "No cambia nada más.",
+            },
+            randomGame: {
+                name: "Mesa al azar",
+                whenOn: "Lanzar una mesa al azar desde el menú principal, bajo Jugar.",
+                whenOff: "La mesa al azar sigue en la bienvenida; con ella también desactivada, sin logros de partidas al azar.",
             },
             hallOfFame: {
                 name: "Hall of Fame",
