@@ -243,7 +243,6 @@
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
           <a class="chip tr-play" href="#random-table-menu"><b></b>Table au hasard au menu</a>
-          <a class="chip tr-share" href="#drawn-dialogs"><b></b>Dialogues lisibles</a>
           <a class="chip tr-profiles" href="#profile-marks-in-game"><b></b>Admin et enfant en jeu</a>
         </div>
         <div class="cell">
@@ -302,30 +301,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="drawn-dialogs" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Dialogues lisibles : un titre, un message clair, un panneau entier</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>Les Dialogs (Update Prompt, résultats de la mise à jour et du redémarrage, Rating Prompt, invite du premier cadre) sont déjà des Drawn Menus, mais l'Update Prompt est apparu sur la borne avec un panneau cassé en trois (haut et bas plus larges que le milieu) et un message gris, petit, sans titre. Corriger le panneau, puis donner à chaque Dialog un titre doré et un message clair.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/357">#357</a>, tickets #358, #359 et #360 commités ; reste la vérification sur la borne, <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/361">#361</a> (humain). Cause du panneau cassé trouvée par <code>/diagnosing-bugs</code> : PinballY ne met sa fenêtre en place qu'après l'init des scripts. Flow Matt : <code>/implement</code>. À livrer avant la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a></div>
-          <details>
-            <summary>Décisions du grilling (28/10/2026)</summary>
-            <ul>
-              <li>Le panneau cassé (vu au démarrage ; les menus ordinaires de la borne sont sains) passe d'abord par <code>/diagnosing-bugs</code>, sans attendre la spec.</li>
-              <li>Titre doré obligatoire, dans le style des en-têtes des menus dessinés, en haut du panneau ; <code>submit</code> gagne <code>title</code>, les six appelants en reçoivent un.</li>
-              <li>Message en texte clair (couleur et graisse des entrées, pas l'or de la sélection), centré, autant d'air au-dessus qu'en dessous, puis le filet et les réponses.</li>
-              <li>Titres : Update available / Mise à jour disponible, Update complete / Mise à jour terminée, Update not possible / Mise à jour impossible, Restart not possible / Redémarrage impossible, Rate this table / Noter cette table, New Avatar Frame / Nouveau cadre. Les messages de la mise à jour et du redémarrage impossibles perdent ce que dit leur titre ; six langues.</li>
-              <li>Nouveau terme du glossaire : Dialog.</li>
-            </ul>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-share" id="third-party-credits" data-track="share" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -753,8 +728,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(5)</span></summary>
+          <summary>29/10 <span class="count">(6)</span></summary>
           <ol>
+            <li><strong>Les Dialogues lisibles quittent la roadmap</strong>
+              <span>Spec #357 close : tickets #358, #359 et #360 livrés, vérification sur la borne #361 faite. Le chantier sort de la file et de la matrice ; les Crédits des outils passent 1ᵉʳˢ, la Sortie 1.0 2ᵉ.</span></li>
             <li><strong>Crédits des outils tiers, 2ᵉ place</strong>
               <span>Idée de Félix (licences de PINemHi et vpxtool). Rien d'obligatoire, puisque le pack ne redistribue ni l'un ni l'autre, mais vpin-studio n'est crédité que dans le code. Placé juste avant la Sortie 1.0, dont le public lira le README. Effort petit, impact faible.</span></li>
             <li><strong>Marquer admin ou enfant depuis la borne, après « Table au hasard »</strong>
