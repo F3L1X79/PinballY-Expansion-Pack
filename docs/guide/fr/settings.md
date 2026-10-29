@@ -63,7 +63,7 @@ Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": tr
 
 ## Réinitialiser un profil
 
-Un Profil admin trouve aussi **Gérer les profils** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils », dès qu'il y en a au moins deux, pour remettre toute la maison à zéro d'un coup. Choisir un Profil ouvre son propre menu : sa marque enfant (voir [Profil enfant](#profil-enfant)) et **Réinitialiser**. Échap ou « Retour » y ramène à la liste.
+Un Profil admin trouve aussi **Gérer les profils** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils », dès qu'il y en a au moins deux, pour remettre toute la maison à zéro d'un coup. Choisir un Profil ouvre son propre menu : sa marque enfant (voir [Profil enfant](#profil-enfant)) et **Réinitialiser**. Avec les [menus dessinés](interface.md#menus-dessinés), Échap ou « Retour » y ramène à la liste ; sans eux, les deux ferment le menu.
 
 - Après une confirmation (le curseur part sur « Non »), « Réinitialiser » ou « Tous les profils » fait repartir le Profil de zéro : ses parties, ses séries, ses records de session, ses parties aléatoires, sa progression aux défis, ses succès annoncés, sa maîtrise des tables, son palier de collection et ses cadres d'Avatar sont effacés, tandis que son nom, son avatar, ses marques et les meilleurs scores qu'il a gagnés restent.
 - Un message indique ensuite si l'opération a réussi.

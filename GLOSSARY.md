@@ -32,6 +32,18 @@ _Avoid_: update notification, update toast
 One to three sentences per Pack Version, written for the Household rather than for developers and translated into every language of the pack, that say what the new version brings. They are shown once, at the start after a successful Pack Update, together with those of every Pack Version skipped on the way (five at most, the newest first). A Pack Version may have none, often a fix-only one. Shown as "Nouveautés" in French.
 _Avoid_: changelog (the developers' full, English-only list of changes), release notes, what's new
 
+**Script Reader**:
+The outside program, vpxtool, that reads a table's script to find its ROM. It is never shipped in the pack: the cabinet downloads it from its author's own releases, and only once the owner has agreed. Shown as "vpxtool" everywhere.
+_Avoid_: ROM reader, table script tool
+
+**Script Reader Version**:
+The version of the Script Reader that each Pack Version names as the one to install, tried on the maintainer's cabinet before it is named. A Script Reader older than it is offered an update; an equal or newer one, the owner's own included, is left alone.
+_Avoid_: latest vpxtool (the pack never follows its author's latest release by itself)
+
+**Script Reader Prompt**:
+The Dialog, shown at startup to whoever sees the setup entries, that offers to install the Script Reader when it is missing, or to update it when it is older than the Script Reader Version, saying what it is for, who wrote it, under which licence and where it comes from. The owner may say no; it is then never asked again, and the install stays available from the Expansion Pack Settings or by hand.
+_Avoid_: vpxtool toast, install popup
+
 ### Errors
 
 **Error Toast**:
