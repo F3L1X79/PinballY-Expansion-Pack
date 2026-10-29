@@ -11,6 +11,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, copyFileSync, exis
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { releaseRefusal, changelogSection } from "../../maintainer/release/publish_release.mjs";
+import { PACK_VERSION } from "../../common/core/pack_version.js";
 
 const SCRIPT = resolve("maintainer/release/publish_release.mjs");
 // Run from a pre-commit hook, git exports GIT_INDEX_FILE and the like:
@@ -77,6 +78,11 @@ test("the notes are the Pack Version's section among several, without the next s
 
 test("a version is not mistaken for a longer one that starts the same", () => {
     assert.equal(changelogSection("## v1.0.10 (2027-01-01)\n\n- Later\n", "1.0.1"), null);
+});
+
+// Raised together in each "Release vX.Y.Z" commit (CONTRIBUTING.md, "Releasing").
+test("the repository's CHANGELOG has the section of its Pack Version", () => {
+    assert.ok(changelogSection(readFileSync("CHANGELOG.md", "utf8"), PACK_VERSION), `CHANGELOG.md has no section for ${PACK_VERSION}`);
 });
 
 // A repository at Pack Version 0.3.0 with the real .gitattributes, and a

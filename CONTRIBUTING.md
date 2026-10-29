@@ -103,7 +103,7 @@ The Pack Version is written once, in `common/core/pack_version.js` ([ADR 0018](d
 1. `node maintainer/release/draft_changelog.mjs` prints the tickets closed since the latest `vX.Y.Z` tag (all history before the first one) as a Markdown list. It writes nothing.
 2. Paste it into a new `## vX.Y.Z (YYYY-MM-DD)` section at the top of `CHANGELOG.md`, and edit it into a list of changes a cabinet owner understands.
 3. Write the Release Highlights of the version, if any: one to three sentences for the players, under the Pack Version's key of the `releaseHighlights` group in each of the six `lang/` files. Keep the older ones: a cabinet that skipped versions shows theirs too.
-4. Raise `PACK_VERSION` in `common/core/pack_version.js`.
+4. Raise `PACK_VERSION` in `common/core/pack_version.js`. The suite fails while the Pack Version has no CHANGELOG section.
 5. Commit all of it as one "Release vX.Y.Z" commit, then `git tag vX.Y.Z` and `git push && git push --tags`.
 6. `node maintainer/release/publish_release.mjs` builds the zip from the tag and creates the release. It refuses a dirty tree, a HEAD without the tag of the Pack Version, and a Pack Version with no CHANGELOG section.
 
