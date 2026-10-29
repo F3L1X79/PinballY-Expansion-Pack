@@ -17,12 +17,14 @@ import { getAchievementToasts, TOAST_KIND } from "../achievements/achievement_to
 import { getProfileStore } from "../profiles/profile_store.js";
 import { seesSetupEntries } from "../profiles/setup_entries.js";
 import { getUpdateState } from "./update_state.js";
+import { getStartupVeil } from "../drawing/startup_veil.js";
 
 const SCRIPT_NAME = "UpdateResult";
 const UPDATED_MENU_ID = "packUpdated";
 
-// dialogs: the wheel dialog queue; toasts: the Achievement Toast queue.
-export function submitUpdateResult(host, { state, profileStore, dialogs, toasts }) {
+// dialogs: the wheel dialog queue; toasts: the Achievement Toast queue;
+// onShown: run as the success message shows.
+export function submitUpdateResult(host, { state, profileStore, dialogs, toasts, onShown = () => {} }) {
     const { packUpdates: TEXT } = lang;
     const requested = state.requestedVersion();
     if (!requested) return;
@@ -34,7 +36,10 @@ export function submitUpdateResult(host, { state, profileStore, dialogs, toasts 
             message: TEXT.updated(requested),
             buttons: [{ label: TEXT.ok }],
             priority: DIALOG_PRIORITY.UPDATE_RESULT,
-            onShown: () => state.forgetRequest(),
+            onShown: () => {
+                state.forgetRequest();
+                onShown();
+            },
         });
         return;
     }
@@ -67,5 +72,7 @@ export function startUpdateResult() {
         profileStore: getProfileStore(),
         dialogs: getWheelDialogs(),
         toasts: getAchievementToasts(),
+        // The Startup Screen's Loader would turn under the message, and swallow its Exit.
+        onShown: () => getStartupVeil().hideLoader(),
     });
 }

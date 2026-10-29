@@ -1,12 +1,15 @@
 // ============================================================
 // The first start on the Pack Version an update installed, through main.js
 // on the fake host, the check off: "Expansion Pack updated to vX.Y.Z" shows
-// before the Profile picker, once; the request is cleared.
+// before the Profile picker, once, over the dimmed wheel without the Loader;
+// the request is cleared.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assertNoErrorLogged } from "../support/error_log.js";
+import { readLoader } from "../support/loader_reader.js";
+import { startupVeil } from "../welcome_screen/welcome_screen_reader.js";
 import { readDrawnMenu, drawnMenuLines, isDrawnMenuShown, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 import { PACK_VERSION } from "../../common/core/pack_version.js";
@@ -25,6 +28,8 @@ test("a Pack Update that worked says so once, before the Profile picker", async 
     assert.deepEqual(drawnMenuLines(fake), ["OK"]);
     assert.equal(isCarouselOpen(fake, lang), false, "the message comes before the picker");
     assert.equal(requestedVersionOf(fake), undefined, "said once");
+    assert.deepEqual(readLoader(fake), { shown: false }, "no Loader turning under the message");
+    assert.equal(startupVeil(fake).shown, true, "the wheel stays dimmed for the picker that follows");
 
     chooseEntry(fake, "OK");
     assert.equal(isDrawnMenuShown(fake), false);
