@@ -87,6 +87,12 @@ _Avoid_: spinner, loading screen, splash screen (it is not a screen, only a ring
 The gold arc drawn under the wheel's icons and following its curve, shown by default unless the player has their own decoration there. Shown as "arc de la roue" in French.
 _Avoid_: underlay (PinballY's name for the image layer that carries it), wheel colour
 
+### Time
+
+**Backglass Clock**:
+The time shown in a small black box with a thin gold frame on the backglass screen while a table runs, in front of the table's own backglass, where neither Windows nor the wheel's clock can be seen. Off unless the owner turns it on. Shown as "horloge du backglass" in French.
+_Avoid_: game clock, overlay clock, the clock (that is the wheel's)
+
 ### Profiles
 
 **Profile**:
