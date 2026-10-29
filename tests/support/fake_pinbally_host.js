@@ -1261,6 +1261,7 @@ export function createFakePinballYHost({
         onSettingsEvent: on,
         createDrawingLayer,
         removeDrawingLayer,
+        getViewSize: () => ({ ...currentLayoutSize }),
         setUnderlay,
         showWheel,
         getLaunchOverlayBackground: () => launchOverlay.bg,
@@ -1334,6 +1335,8 @@ export function createFakePinballYHost({
         runningIntervalCount: () => timers.filter(timer => timer.intervalMs !== undefined).length,
         // Timers and intervals not run or cleared yet.
         pendingTimerCount: () => timers.length,
+        // The window's new size, as PinballY gives it after the scripts' init:
+        // seen by the next draw without a size and by getViewSize(), and told to no script.
         setLayoutSize(size) { currentLayoutSize = { ...size }; },
         drawingLayers: () => [...layers],
         underlay: () => underlayFile,
@@ -1727,6 +1730,13 @@ export function createFakePinballYHost({
                     dispatchEvent: host.dispatchEvent,
                     createDrawingLayer,
                     removeDrawingLayer,
+                    // HWNDObject.html: the client rectangle, relative to its
+                    // own upper left corner; the view is as large as the layers' window.
+                    hwndView: {
+                        getWindowPos: () => ({
+                            clientRect: { left: 0, top: 0, right: currentLayoutSize.width, bottom: currentLayoutSize.height },
+                        }),
+                    },
                     setUnderlay,
                     showWheel,
                     launchOverlay,

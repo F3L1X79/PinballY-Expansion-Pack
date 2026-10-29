@@ -415,6 +415,13 @@ export function createPinballYHost() {
         onGameListEvent: (eventName, handler) => { gameList.on(eventName, handler); },
         createDrawingLayer: (zIndex) => mainWindow.createDrawingLayer(zIndex),
         removeDrawingLayer: (layer) => { mainWindow.removeDrawingLayer(layer); },
+        // The main window's view size, read without drawing anything; only
+        // compared with itself to tell a change (PinballY tells no script):
+        // the layers measure the window through a drawing context.
+        getViewSize: () => {
+            const { clientRect } = mainWindow.hwndView.getWindowPos();
+            return { width: clientRect.right - clientRect.left, height: clientRect.bottom - clientRect.top };
+        },
         // Fires no "underlaychange".
         setUnderlay: (filePath) => { mainWindow.setUnderlay(filePath); },
         // The wheel's icons, hidden or shown again.

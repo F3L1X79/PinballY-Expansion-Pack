@@ -7,7 +7,7 @@
 // - Swallows every button through "commandbuttondown" while open; never changes the UI mode.
 // - A menu with onBack (a submenu) goes back on Exit and on its MenuReturn entry.
 // - With keepNative (the pause menu), it closes on the native "menuclose", or at "postlaunch".
-// - Images are drawn ahead, only placed on opening, shrunk to a dot while hidden.
+// - Images are drawn ahead, shrunk to a dot while hidden; all redrawn in place if the window's size changes while open.
 // - isOpen() and onClosed() let what waits for a free wheel wait for it.
 // ============================================================
 
@@ -15,6 +15,7 @@ import { safeHandler } from "../core/safe_handler.js";
 import { logError } from "../core/error_log.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
+import { createWindowWatch } from "../core/window_watch.js";
 import config from "../core/config.js";
 import { getDrawingAhead } from "../core/drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "../core/navigation_sound.js";
@@ -149,6 +150,8 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     // What the texts' layer was drawn with; null when it holds nothing.
     let textsSignature = null;
     const closedListeners = createClosedListeners(SCRIPT_NAME);
+    // Runs while a menu is open, its panel shown: stopped with the other timers.
+    const windowWatch = createWindowWatch(host, SCRIPT_NAME);
 
     // Draws the backdrop on a window-sized canvas, which also measures the window.
     function measure(covering = false) {
@@ -283,6 +286,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
 
     function stopTimers() {
         if (!shown) return;
+        windowWatch.stop();
         for (const key of ["fadeTimer", "glideTimer"]) {
             if (shown[key] !== null) host.clearInterval(shown[key]);
             shown[key] = null;
@@ -290,6 +294,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
     }
 
     function setAlpha(alpha) {
+        shown.alpha = alpha;
         for (const layer of shown.layers) layer.alpha = alpha;
     }
 
@@ -316,15 +321,17 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         shown.scroll = Math.max(0, Math.min(Math.max(0, geometry.rowsHeight - geometry.areaHeight), scroll));
     }
 
-    // covering: an opaque backdrop, shown at once, over a native menu kept open.
-    function open(id, model, onClose, { fadeIn, covering }) {
-        for (const sound of Object.values(sounds)) sound.load();
+    // The window measured again, and the images drawn for its size if it changed.
+    function measureAndDrawImages(covering) {
         measure(covering);
-        // PinballY tells no script of a new window size: only this measure
-        // sees it, so the images drawn for the old size are drawn again here.
         for (const record of images) if (record.signature !== windowSignature()) drawImage(record);
-        shown ={ id, model, onClose, geometry: null, scroll: 0, layers: [], fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
-        shown.geometry = computeGeometry(windowSize, model, wrappedHeightAt);
+    }
+
+    // The open menu's layout for the window measured: its texts drawn and
+    // every layer placed; shown.layers lists the ones it shows.
+    function layOut() {
+        const { covering } = shown;
+        shown.geometry = computeGeometry(windowSize, shown.model, wrappedHeightAt);
         const { geometry } = shown;
         scrollToSelected();
         drawTextsLayer();
@@ -341,6 +348,34 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         // Fading in, the cover would let the native menu show through.
         if (covering) backdrop.alpha = 1;
         else shown.layers.unshift(backdrop);
+    }
+
+    // The window watch saw the view's size change while the menu is open:
+    // laid out again in place, at its current alpha, the selection kept and
+    // the fade going on. False, nothing redrawn, while the layers' window
+    // keeps its old size, for the watch to tell again.
+    function followWindow(previousView, nextView) {
+        const previousLayers = windowSignature();
+        measureAndDrawImages(shown.covering);
+        if (windowSignature() === previousLayers) return false;
+        if (shown.glideTimer !== null) host.clearInterval(shown.glideTimer);
+        shown.glideTimer = null;
+        layOut();
+        setAlpha(shown.alpha);
+        const sizeText = size => `${size.width}x${size.height}`;
+        host.log(`[${SCRIPT_NAME}] The "${shown.id}" menu is redrawn for the window's new size: view ${sizeText(previousView)} to ${sizeText(nextView)}, layers ${previousLayers} to ${windowSignature()}.`);
+        return true;
+    }
+
+    // covering: an opaque backdrop, shown at once, over a native menu kept open.
+    function open(id, model, onClose, { fadeIn, covering }) {
+        for (const sound of Object.values(sounds)) sound.load();
+        // PinballY tells no script of a new window size: measured on each
+        // opening, the images drawn for the old size are drawn again here.
+        measureAndDrawImages(covering);
+        shown = { id, model, onClose, covering, geometry: null, scroll: 0, layers: [], alpha: 0, fadeTimer: null, glideTimer: null, fadeStartMs: 0, glideLastMs: 0, glideY: 0 };
+        layOut();
+        windowWatch.start(followWindow);
         if (!fadeIn) {
             setAlpha(1);
             return;
