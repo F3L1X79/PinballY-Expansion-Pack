@@ -2,7 +2,8 @@
 * text=auto
 
 # Left out of the downloaded zip (GitHub "Download ZIP" and release archives):
-# the players only need the pack itself. docs/images stays for the README.
+# the players only need the pack itself. docs/guide (the player guide) and
+# docs/images (its screenshots and the README's) stay in the zip.
 maintainer/ export-ignore
 tests/ export-ignore
 docs/adr/ export-ignore

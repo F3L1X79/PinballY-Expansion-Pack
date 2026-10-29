@@ -1,0 +1,38 @@
+# Interface
+
+[← Sommaire du guide](index.md)
+
+## PinballY en 6 langues
+
+<img src="../../images/main_menu.png" alt="Le menu principal dessiné, en français, rangé en sections" width="400">
+
+Les menus et messages de PinballY enfin en français, mais aussi en allemand, espagnol, italien et portugais, en plus de l'anglais. Choisissez la langue dans **Réglages du pack**, ou avec `LANGUAGE` dans `.env.local` (voir [Réglages](settings.md)).
+
+## Menus dessinés
+
+Les menus de PinballY et ceux des autres scripts sont dessinés dans le style Steamball du pack, avec les mêmes entrées, rangées en sections, et les mêmes boutons : menu principal, sortie, filtres, extinction, configuration de la table, menu opérateur, pause d'une partie, capture des médias (y compris par lot) et confirmations.
+
+- Dans la pause, Exit et « Annuler » reprennent la partie.
+- Un menu principal plus court range toutes les sélections de la roue et les groupes de filtres derrière une seule entrée « Changer de filtre », et nomme sous sa liste le filtre affiché par la roue (« Filtre actif : Toutes les tables »).
+
+## Nettoyage des menus
+
+Le nettoyage des menus allège les menus de PinballY pour tous les Profils, Profils admin compris. Il retire :
+
+- Aide et À propos des menus de sortie et opérateur ;
+- Informations, Affiche et Carte d'instructions du menu principal (Noter la table et Ajouter aux favoris restent) ;
+- l'entrée Meilleurs scores de PinballY (nommée **Scores de la table** dans le menu principal) quand les meilleurs scores du pack sont désactivés ;
+- les groupes Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout de « Changer de filtre ».
+
+C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
+
+## Sur l'écran de la roue
+
+- Une horloge, l'arc doré de la roue et une ligne d'état enrichie.
+- Le badge du Profil actif et son niveau, la carte du Défi de la semaine et la barre de maîtrise.
+
+## Lancements, attentes et sons
+
+- Un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente, l'étape en cours écrite en doré dessous quand une table se lance ou se ferme (« Chargement en cours… », « Retour aux tables… ») : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar.
+- Le backglass masqué pendant une partie.
+- Des sons au lancement, aux succès, à l'accueil, aux confettis et au feu d'artifice, ou les vôtres (voir [Réglages](settings.md)).

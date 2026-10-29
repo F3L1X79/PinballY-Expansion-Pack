@@ -1,0 +1,81 @@
+# Settings
+
+[← Guide index](index.md)
+
+For the cabinet owner:
+
+- **Expansion Pack Settings**: from the Operator Menu, turn each Add-on on or off by category, pick the startup screen and the language, then restart PinballY in one press.
+- **Admin Profile**: the setup entries for you alone.
+- **Child Profile**: a wheel without Adult Tables for the kids.
+- **Profile Reset**: start a Profile over, or the whole household at once.
+- **Menu Cleanup**: leaner PinballY menus (see [Interface](interface.md#menu-cleanup)).
+
+Everything stays in one folder, with no change to PinballY itself.
+
+## Expansion Pack Settings
+
+**Expansion Pack Settings**, in the Operator Menu, sets the Add-ons, the startup screen, the language and the update check without editing any file, then restarts PinballY in one press. It also offers "Update to vX.Y.Z" once you answered "Later" to the Update Prompt (see [Updates](updates.md)).
+
+## `.env.local`
+
+Every other setting lives in `Scripts\ExpansionPack\.env.local`, one `KEY=value` per line (UTF-8). Copy `ExpansionPack\.env.example` and only write the ones you change, for example:
+
+```
+LANGUAGE=en
+ACHIEVEMENT_SOUND_FILE=assets\sounds\local\trophy.mp3
+ADD_ON_CLOCK=false
+```
+
+| Setting | Default | What it does |
+|---|---|---|
+| `LANGUAGE` | `en` | Interface language: `en`, `fr`, `de`, `es`, `it` or `pt`. |
+| `ADULT_CATEGORY` | `NSFW` | PinballY category of the Adult Tables, hidden from Child Profiles. |
+| `COMMUNITY_TABLES_MANUFACTURER` | `VPX Community` | Manufacturer you gave to fictional or community tables, for the status line and the "Original Tables" filter. |
+| `LAUNCH_SOUND_FILE` | `assets\sounds\launch.mp3` | Sound played when a table launches: a path from the pack's folder (your own sounds go in `assets\sounds\local\`) or a full path; empty = no sound. |
+| `ACHIEVEMENT_SOUND_FILE` | `assets\sounds\achievement.wav` | Sound played with each Achievement toast. |
+| `PROFILE_GREETING_SOUND_FILE` | `assets\sounds\profile_greeting.mp3` | Sound played when a player is greeted. |
+| `CONFETTI_SOUND_FILE` | `assets\sounds\confetti.wav` | Sound played once when a shower of confetti starts. |
+| `FIREWORKS_SOUND_FILE` | `assets\sounds\fireworks.wav` | Sound played once when the Fireworks start. |
+| `PROFILE_PICKER_SOUND_FILE` | empty | Sound played once when PinballY starts on the Profile picker (`STARTUP_SCREEN=profilePicker`); none ships with the pack. |
+| `STARTUP_SCREEN` | `profilePicker` | What PinballY shows first: `profilePicker` (the "Change Player" carousel, then the Welcome Screen; skipped while the cabinet has fewer than two Profiles besides Guest), `welcome` (the Welcome Screen) or `wheel` (the bare wheel, the last player greeted). A screen whose feature is turned off gives way to the next one, from the carousel to the Welcome Screen to the wheel. |
+| `ACHIEVEMENT_TOAST_SECONDS` | `4` | Seconds an Achievement toast stays on screen (up to 60). |
+| `ACHIEVEMENT_TOAST_SCALE` | `1.0` | Size of the toast, from `0.5` to `3`. Raise it on a large screen. |
+| `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge, a Platinum Achievement, Mastery Level 10 on a table or a new Collection Tier, if your PC struggles with it. |
+| `FIREWORKS` | `true` | `false` turns off the Fireworks that come with the toast of a new Player Level, if your PC struggles with them. Independent of `CONFETTI`. |
+| `UPDATE_CHECK` | `true` | `false` stops PinballY from asking GitHub for a newer version of the pack at each start, and from offering to update it (see [Updates](updates.md)). |
+| `SKIP_RANDOM_GAME_ANIMATION` | `false` | `true` skips the wheel of fortune and launches the Random Game at once. |
+| `ASK_TO_RATE_AFTER_MINUTES_PLAYED` | `60` | Minutes played on a table before you are asked to rate it. |
+| `LOG_UNTRANSLATED_MENU_TITLES` | `false` | `true` writes each untranslated PinballY menu title to `PinballY.log`. |
+| `LOG_LAUNCH_EVENTS` | `false` | `true` writes each launch event to `PinballY.log` with a millisecond timestamp, to check their order on the cabinet. |
+
+Every feature can also be turned off with its `ADD_ON_*` key, for example `ADD_ON_CLOCK=false` or `ADD_ON_CHALLENGES=false`. Only Menu Cleanup is off by default. Each key is described in [.env.example](../../../.env.example).
+
+Each Profile's progress is saved in `Scripts\ExpansionPack\profiles`. Keep that folder when you reinstall or update the pack, and you get your progress back.
+
+## Admin Profile
+
+To keep the setup entries for yourself, add `"isAdmin": true` at the top level of your Profile's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed.
+
+- Once at least one Profile is marked, the other Profiles (Guest included) no longer see "Set Up Table" in the main menu nor "Operator Menu" in the Exit menu; the Admin Profiles still see both, and the coin door service button still opens the Operator Menu for anyone.
+- Several Profiles can be marked.
+- Guest is never an Admin Profile, and a mark that is not `true` or `false`, or whose key is misspelt (`"isAdmin "`, `"IsAdmin"`), is ignored and logged in `PinballY.log`.
+- The Update Prompt and the "Problem" toasts meant for the owner show to Admin Profiles only, or to anyone while no Profile is marked (see [Updates](updates.md) and [Troubleshooting](troubleshooting.md)).
+
+## Profile Reset
+
+An Admin Profile also finds **Reset profile** in the Exit menu (Escape), right after "Operator Menu". It lists every Profile, Guest and yourself included, plus "Every profile", once there are two or more, to reset the whole household at once.
+
+- After one confirmation (the cursor starts on "No"), the chosen Profile starts over: its plays, Streaks, session records, Random Games, Challenge progress, announced Achievements, Table Mastery, Collection Tier and Avatar Frames are erased, while its name, Avatar, marks and the High Scores it won stay.
+- A message then tells whether it worked.
+- Its former files are kept next to them, as `profile.reset-<date>.json` and `play-log-<year>.reset-<date>.json`: to undo a reset, close PinballY and rename each copy back, without its `.reset-<date>` part.
+- Reset profile needs PinballY's Exit menu: if you disabled it in PinballY's options, the entry cannot show.
+
+## Child Profile
+
+To keep the Adult Tables away from a child, tag them in PinballY with the category `NSFW` (or name your own category with `ADULT_CATEGORY` in `Scripts\ExpansionPack\.env.local`, spelt exactly as in PinballY), then add `"isChild": true` at the top level of the child's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed.
+
+- While that Profile is active, those tables are left off the wheel whatever the filter, the Random Game never draws one, and starting up never leaves the wheel on one; switching to another Profile brings them back at once.
+- The Table of the Day and the Table of the Week stay the same for the whole household: while one is an Adult Table, the child does not get its card on the Welcome Screen, and that day or week neither extends nor breaks the child's Streak.
+- Guest is never a Child Profile, so adult visitors see the whole collection.
+- A Child Profile has three Achievements of its own (see [Achievements and Challenges](achievements_and_challenges.md)).
+- This is no parental control: nothing asks for a password.

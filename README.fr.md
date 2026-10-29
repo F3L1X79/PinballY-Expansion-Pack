@@ -2,6 +2,8 @@
 
 Extension non officielle de [PinballY](http://mjrnet.org/pinscape/PinballY.php), écrite avec l'API de scripting JavaScript que PinballY ouvre à tous les développeurs. · *[English version](README.md)*
 
+📖 **[Guide du joueur](docs/guide/fr/index.md)** : installation, mises à jour, chaque fonctionnalité, réglages et dépannage, page par page.
+
 > **Votre pincab, en français, avec de vraies raisons d'y revenir.** Ce qui manquait à PinballY, sans toucher à PinballY :
 > - un Profil avec avatar pour chacun, et vos statistiques ;
 > - un écran d'accueil avec la table du jour ;

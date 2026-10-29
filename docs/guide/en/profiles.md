@@ -1,0 +1,38 @@
+# Profiles
+
+[← Guide index](index.md)
+
+## A Profile for everyone
+
+<img src="../../images/profiles.png" alt="The Change Player carousel and its Avatars with their Player Level" width="400">
+
+With Change Player, each of you picks your own Profile and Avatar, and the Welcome Screen greets you by name so you know whose games will count.
+
+- Only games of at least a minute count, so a launch by mistake never spoils anything.
+- Your Daily Streak counts the days in a row you have played, on any table.
+- Guest is always there for visitors.
+- Once the cabinet has two Profiles or more besides Guest, PinballY starts on Change Player so that everyone picks their Profile before playing; it can also start on the Welcome Screen or straight on the wheel (`STARTUP_SCREEN`, see [Settings](settings.md)).
+- While Change Player is open, the video sound of the table on the wheel is turned down, and comes back as it closes.
+
+Each Profile's progress is saved in `Scripts\ExpansionPack\profiles`. An Admin Profile keeps the setup entries for itself, a Child Profile hides the Adult Tables, and Profile Reset starts a Profile over: see [Settings](settings.md).
+
+## My Profile
+
+<img src="../../images/profile_stats.png" alt="The Profile Stats of a Profile: Player Level, Collection Mastery, games, Streaks, tastes and first, most and last played tables" width="480">
+
+**My Profile**, in the main menu, sums up your pinball life:
+
+- games played and total time, and the average game length;
+- your Player Level and Collection Mastery;
+- your favourite manufacturer, decade and table, and the first table you ever played;
+- how much of the collection you have tried;
+- your Achievements, your Daily Streak and your Table of the Day and Table of the Week Streaks, and the Challenges you completed;
+- the High Scores and Table Records you still hold;
+- the Avatar Frame you wear (pick it under **Frame**, see [Table Mastery](choosing_a_table.md#table-mastery));
+- and the way to your most played tables and to the ones still to discover.
+
+## Household Stats
+
+<img src="../../images/household_stats.png" alt="The Household Stats with three Profiles side by side, the best of each line in gold" width="400">
+
+Once two of you have a Profile, **Household Stats** sets every Profile but Guest side by side, Avatars in their frames, the best of each line in gold, and shows who holds the most Table Records. Pick a column to see that Profile's own stats.

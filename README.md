@@ -2,6 +2,8 @@
 
 An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), written with the JavaScript scripting API that PinballY opens to every developer. · *[Version française](README.fr.md)*
 
+📖 **[Player guide](docs/guide/en/index.md)**: install, updates, every feature, settings and troubleshooting, page by page.
+
 > **Give everyone in the house a real reason to come back to your pincab.** A Profile with an Avatar for each of you, a Welcome Screen with the Table of the Day, weekly Challenges, a Mastery Level on every table, Achievements from Bronze to Platinum (a few of them secret) that raise your Player Level, your own stats, and PinballY itself in French, German, Spanish, Italian or Portuguese: everything PinballY was missing, without touching PinballY. [More is on the way…](#coming-next)
 
 <img src="docs/images/hero.png" alt="The wheel screen with the clock, the active Profile's badge and its Player Level, the week's Challenge Card, the Mastery Bar and the Wheel Arc" width="360">

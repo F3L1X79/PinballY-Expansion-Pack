@@ -1,0 +1,56 @@
+# Choisir une table
+
+[← Sommaire du guide](index.md)
+
+## Écran d'accueil : table du jour, table de la semaine
+
+<img src="../../images/welcome_screen.png" alt="L'écran d'accueil avec la table du jour et la table de la semaine" width="480">
+
+Chaque jour une table que personne à la maison n'a encore jouée, ou celle délaissée depuis le plus longtemps, chaque semaine une table au hasard. L'écran d'accueil vous les présente au démarrage, après chaque « Changer de joueur », et chaque fois que vous choisissez **Écran d'accueil** dans le menu principal, avec ce qu'elles représentent pour vous.
+
+- Tant que votre défi de la semaine a des tables du défi, il montre aussi l'une d'elles, tirée au hasard. Cette table du défi n'est jamais l'une des deux tables déjà présentées, sauf quand une partie de plus termine votre défi.
+- De là, lancez l'une d'elles, restez sur la table de la roue, changez de joueur ou tentez une table au hasard.
+- Jouez-les plusieurs jours ou plusieurs semaines d'affilée pour faire une série.
+- Quand quelqu'un d'autre vous prend un record, Invité compris, votre prochain écran d'accueil vous dit qui, une seule fois, pour que vous sachiez quel record reprendre.
+- Tant que l'écran d'accueil est ouvert, le son des vidéos de la table de la roue est baissé, et revient à sa fermeture.
+
+Pour un Profil enfant, voir [Réglages](settings.md#profil-enfant) : la table du jour et la table de la semaine restent les mêmes pour toute la maison.
+
+## Maîtrise des tables
+
+<img src="../../images/table_mastery.png" alt="La barre de maîtrise de la table sélectionnée : Rookie (Novice), niveau 1" width="297">
+
+Chaque minute passée sur une table fait monter votre maîtrise de celle-ci, sur dix niveaux, de Novice à Mage du flipper, chacun plus long à atteindre que le précédent.
+
+- La barre de maîtrise, en haut à droite de l'écran de la roue, montre où vous en êtes sur la table sélectionnée, et un encart annonce le niveau atteint.
+- Quand dix de vos tables atteignent le niveau suivant, la maîtrise de votre collection passe un palier.
+- Le niveau 10 sur une table et chaque nouveau palier font pleuvoir des confettis.
+- Chaque palier débloque aussi un cadre pour votre Avatar, de la Sylve enchantée à la Légende céleste : choisissez celui que vous portez dans **Mon profil**, sous **Cadre**.
+- Jouez un jour de fête (Nouvel An, Nouvel An chinois, Saint-Valentin, Pâques, Halloween, Noël et cinq autres) et le cadre de ce jour vous appartient pour de bon, annoncé par un encart à votre retour sur la roue.
+
+## Meilleurs scores
+
+<img src="../../images/high_score_board.png" alt="Le tableau des meilleurs scores d'une table : le podium sous ses trois couronnes, puis les autres places, dont une gagnée par un Profil" width="400">
+
+Quand vous entrez au tableau des meilleurs scores d'une table, la place est à vous : le pack relit le tableau avant et après chaque partie et, pour une partie d'au moins une minute, attribue chaque nouveau score au Profil qui jouait, quelles que soient les initiales tapées, les autres joueurs d'une partie à plusieurs compris.
+
+- Un encart annonce votre meilleure place, ou le record et à qui vous l'avez pris.
+- Les scores déjà au tableau au premier relevé, ceux d'usine compris, n'appartiennent à personne, et une remise à zéro de la ROM qui les ramène n'est jamais attribuée.
+- Un meilleur score gagné le reste même chassé du tableau par des scores plus récents, et rapporte ses propres succès.
+- **Mon profil** montre les meilleurs scores et records que vous détenez encore, et **Stats de la maison** qui détient le plus de records.
+- Les tables sans ROM (créations originales) comptent aussi : le pack lit leur tableau dans le dossier `User` de Visual Pinball X (`VPReg.stg`, ou le fichier texte que certaines tables y gardent), apprend où chaque table le range pendant sa première partie, et le passe à PinballY, pour que le DMD et la fiche de la table l'affichent aussi. Leur tableau apparaît dès qu'une telle table a été jouée avec le pack.
+
+**Meilleurs scores** dans le menu principal (ou le bouton `HighScores` de PinballY, s'il est affecté) ouvre le tableau de la table sélectionnée, dessiné dans le style Steamball à la place de la fenêtre de PinballY :
+
+- les trois premières places sur un podium sous une couronne d'or, d'argent et de bronze, les autres en lignes en dessous ;
+- chacune avec son rang, son score, ses initiales et le Profil qui l'a gagnée (nom, Avatar et cadre d'Avatar), ou « Score par défaut » avec un portrait choisi d'après ses initiales, le même sur toutes les tables ;
+- le tableau est relu sur la table à chaque ouverture, il montre donc toujours ce qu'elle contient ;
+- les flippers font défiler un tableau trop long pour l'écran.
+
+Pour lire les tableaux d'environ 300 ROM de plus, mettez PINemHi à jour (voir [Installation](install.md#pinemhi-368)).
+
+## Table au hasard et filtres
+
+- Une table au hasard est tirée sur une roue de la fortune (`SKIP_RANDOM_GAME_ANIMATION=true` la lance aussitôt).
+- Derrière « Changer de filtre » dans le menu principal : « Tables à découvrir », « Tables les plus jouées », « Mes meilleurs scores » (les tables où vous avez une place au tableau), « Tables favorites », « Tables masquées » (tant qu'une table est masquée), « Tables Originales » (le fabricant réglé par `COMMUNITY_TABLES_MANUFACTURER`) et « Tables du défi ».
+- Un rappel vous propose de noter une table une fois que vous y avez assez joué (`ASK_TO_RATE_AFTER_MINUTES_PLAYED`).

@@ -1,0 +1,33 @@
+# Succès et défis
+
+[← Sommaire du guide](index.md)
+
+## Défis de la semaine
+
+<img src="../../images/challenges.png" alt="La carte du Défi de la semaine avec sa progression et les jours restants" width="368">
+
+Chaque lundi arrive un nouveau Défi, le même pour toute la maison : cinq tables Stern différentes, trois tables jamais jouées, une demi-heure sur une même table…
+
+- Sa carte suit votre progression sur l'écran de la roue.
+- **Tables du défi**, juste sous « Toutes les tables » derrière « Changer de filtre » dans le menu principal, ne garde que les tables qui le font avancer, et quitte la liste quand il n'y en a plus.
+- L'écran d'accueil montre aussi l'une de vos tables du défi (voir [Choisir une table](choosing_a_table.md)).
+- Le réussir fait pleuvoir des confettis sur tout l'écran de la roue.
+
+## Succès
+
+<img src="../../images/achievements.png" alt="La liste « Succès personnels »" width="380">
+
+Des dizaines de Succès, du Bronze au Platine : fabricants et décennies complétés, heures de jeu, séries, Défis, meilleurs scores, tour complet de la roue…
+
+<img src="../../images/toasts.png" alt="L'annonce d'un Succès" width="440">
+
+- Chacun est annoncé par un petit encart dans un coin, sans interrompre vos parties ; un Succès Platine fait aussi pleuvoir des confettis sur tout l'écran de la roue.
+- « Succès personnels », ouvert depuis **Mes succès** dans le menu principal, montre où vous en êtes de chaque Succès manquant, et quels avatars de la maison l'ont déjà.
+- Quelques-uns restent secrets : vous ne voyez que « ??? » et un indice, jusqu'à ce que vous tombiez dessus.
+- Un Profil enfant en a trois de plus, rien qu'à lui : « L'heure du goûter », « Mercredi, c'est permis » et « Plus fort que les grands », un record de table pris à un grand.
+
+La durée d'affichage et la taille de l'encart, le son et les confettis se changent dans [Réglages](settings.md).
+
+## Niveau
+
+Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son rang est élevé, sans dernier niveau. Il s'affiche en pastille sur votre Avatar, en bronze, puis en argent, en or et en platine à mesure que vous montez, et chaque nouveau niveau atteint a son encart et son feu d'artifice.
