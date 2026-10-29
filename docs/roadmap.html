@@ -241,7 +241,6 @@
 
         <div class="ax row">Moyen</div>
         <div class="cell sweet">
-          <a class="chip tr-play" href="#random-table-menu"><b></b>Table au hasard au menu</a>
           <a class="chip tr-profiles" href="#profile-marks-in-game"><b></b>Admin et enfant en jeu</a>
         </div>
         <div class="cell">
@@ -299,29 +298,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="random-table-menu" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>« Lancer une table au hasard » dans le menu principal</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>L'entrée du Welcome Screen, aussi dans le menu principal, sous « Jouer » : la même animation de roue (ou le saut direct de <code>skipRandomGameAnimation</code>) vers une table tirée au hasard, sans rouvrir le Welcome Screen.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/362">#362</a>, ticket <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/363">#363</a>. Flow Matt : <code>/implement</code>.</div>
-          <details>
-            <summary>Décisions du grilling (29/10/2026)</summary>
-            <ul>
-              <li>Tirage inchangé : la sélection affichée sur la roue (le filtre en cours compte, comme déjà depuis le Welcome Screen), jamais la Last Played Table sauf si elle est seule.</li>
-              <li>Le menu se ferme, la roue tourne (ou saute), la table se lance seule ; la Play compte pour <code>randomGames</code> et le Challenge, quelle que soit l'origine.</li>
-              <li>Nouvel Add-on « Random Game », désactivable, indépendant du Welcome Screen ; entrée juste sous « Jouer », masquée si la roue n'a aucune table.</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 27/10/2026.</p>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-profiles" id="profile-marks-in-game" data-track="profiles" data-rank="bronze">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -680,8 +656,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(8)</span></summary>
+          <summary>29/10 <span class="count">(9)</span></summary>
           <ol>
+            <li><strong>« Table au hasard » au menu quitte la roadmap</strong>
+              <span>Spec #362 close : ticket #363 livré, nouvel Add-on « Random Game » et son entrée « Lancer une table au hasard » sous « Jouer » ; les Random Game Achievements suivent désormais cet Add-on et le Welcome Screen, plus « Menu commands ». Le chantier sort de la file et de la matrice ; « Admin et enfant en jeu » passe 1ᵉʳ.</span></li>
             <li><strong>La Sortie 1.0 quitte la roadmap : le pack est en 1.0</strong>
               <span>Spec #345 close : tickets #346, #347, #349 et #351 livrés, #350 remplacé par la spec #353, publication et vraie mise à jour sur la borne #352 faites (release v1.0.0, Pack Update 0.x → 1.0.0, Nouveautés affichées). Les Nouveautés du dialogue de réussite passent en liste à tirets alignée à gauche, pour la prochaine release. Le chantier sort de la file et de la matrice ; « Table au hasard » passe 1ʳᵉ.</span></li>
             <li><strong>Les Crédits des outils quittent la roadmap</strong>
