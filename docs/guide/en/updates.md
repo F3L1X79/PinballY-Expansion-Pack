@@ -6,11 +6,11 @@
 
 At each start, PinballY asks GitHub in the background whether a newer version of the pack is out, without slowing the start down; offline, it only writes one line in `PinballY.log`.
 
-When there is one, the next start opens the Update Prompt before anything else, "Expansion Pack vX.Y.Z is available.", with "Update now" and "Later". It waits for a start where the last player sees the setup entries (an [Admin Profile](settings.md#admin-profile), or anyone while no Profile is marked).
+When there is one, the next start opens the Update Prompt before anything else, titled "Update available": "Expansion Pack vX.Y.Z is available.", with "Update now" and "Later". It waits for a start where the last player sees the setup entries (an [Admin Profile](settings.md#admin-profile), or anyone while no Profile is marked).
 
 ## Update now
 
-"Update now" downloads and checks the new version, closes PinballY, swaps the pack's folder for the new one, and starts PinballY again. The next start says "Expansion Pack updated to vX.Y.Z".
+"Update now" downloads and checks the new version, closes PinballY, swaps the pack's folder for the new one, and starts PinballY again. The next start says so under "Update complete": "Expansion Pack updated to vX.Y.Z".
 
 These are kept:
 
@@ -22,7 +22,7 @@ These are kept:
 
 ## When an update fails
 
-- A download that fails before PinballY closes is told at once: "Update not possible: the Expansion Pack stays as it is".
+- A download that fails before PinballY closes is told at once under "Update not possible": "The Expansion Pack stays as it is."
 - If the update failed after PinballY closed, the previous version is still in place, and a "Problem" toast tells whoever sees the setup entries where to read why (see [Troubleshooting](troubleshooting.md)).
 
 ## Later

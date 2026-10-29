@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 import { computeGeometry, DRAWN_MENU_LOOK, ROW_KIND } from "../../common/drawn_menu/drawn_menu_painter.js";
 
 const WINDOW = { width: 1080, height: 1920 };
-const menuOf = count => ({ message: null, rows: Array.from({ length: count }, (_, i) => ({ kind: ROW_KIND.ENTRY, title: `Entry ${i}` })) });
+const menuOf = count => ({ title: null, message: null, rows: Array.from({ length: count }, (_, i) => ({ kind: ROW_KIND.ENTRY, title: `Entry ${i}` })) });
 const noMessage = () => 0;
 
 test("a short menu's middle stands a third of the way down the window", () => {

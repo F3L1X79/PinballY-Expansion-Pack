@@ -70,6 +70,7 @@ export default {
     },
 
     ratingPrompt: {
+        title: "Rate this table",
         message: (tableTitle, minutes) =>
             `You've played "${tableTitle}" for over ${minutes} minutes! Would you like to rate it now?`,
         rateNow: "Rate Now",
@@ -575,6 +576,7 @@ export default {
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {
+            title: "New Avatar Frame",
             message: (name, menuEntry, button) => `You won the Avatar Frame "${name}"! Equip it from "${menuEntry}", then "${button}".`,
             goEquip: "Go equip it",
             gotIt: "Got it",
@@ -655,7 +657,8 @@ export default {
         restartQuestion: "The saved settings apply when PinballY restarts.",
         restartNow: "Restart now",
         later: "Later",
-        restartFailed: "Restart not possible: the settings will apply at the next start",
+        restartFailedTitle: "Restart not possible",
+        restartFailed: "The settings will apply at the next start.",
         // Each Add-on by its config.addOns key: its name, what it does, and
         // what is lost elsewhere when it is off (the "false also" lines of .env.example).
         addOns: {
@@ -793,13 +796,16 @@ export default {
 
     // The Update Prompt at startup, and a Pack Update that cannot start (see common/updates/).
     packUpdates: {
+        promptTitle: "Update available",
         // Names the newer Pack Version the Update Check found.
         prompt: (version) => `Expansion Pack v${version} is available.`,
         updateNow: "Update now",
         later: "Later",
-        updateFailed: "Update not possible: the Expansion Pack stays as it is",
+        updateFailedTitle: "Update not possible",
+        updateFailed: "The Expansion Pack stays as it is.",
         ok: "OK",
         // At the first start on the Pack Version an update installed.
+        updatedTitle: "Update complete",
         updated: (version) => `Expansion Pack updated to v${version}`,
         // The title of the Error Toast of an update that failed.
         toastTitle: "Expansion Pack",

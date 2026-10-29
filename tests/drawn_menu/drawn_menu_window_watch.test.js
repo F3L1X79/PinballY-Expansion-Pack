@@ -65,7 +65,7 @@ function assertSharp(layer, name) {
 async function openDialog() {
     wheelDialogs().submit({
         id: "windowWatchDialog",
-        message: "A message long enough to wrap over a couple of lines in the panel.",
+        title: "Dialog", message: "A message long enough to wrap over a couple of lines in the panel.",
         buttons: BUTTONS.map(label => ({ label })),
         priority: DIALOG_PRIORITY.UPDATE_PROMPT,
     });

@@ -189,6 +189,7 @@ export default {
     },
 
     ratingPrompt: {
+        title: "Avaliar esta mesa",
         message: (tableTitle, minutes) =>
             `Você jogou "${tableTitle}" por mais de ${minutes} minutos! Deseja avaliá-la agora?`,
         rateNow: "Avaliar agora",
@@ -674,6 +675,7 @@ export default {
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {
+            title: "Nova moldura de avatar",
             message: (name, menuEntry, button) => `Você ganhou a moldura de avatar "${name}"! Use-a em "${menuEntry}", depois "${button}".`,
             goEquip: "Usar agora",
             gotIt: "Entendi",
@@ -738,7 +740,8 @@ export default {
         restartQuestion: "As configurações salvas se aplicam quando o PinballY reiniciar.",
         restartNow: "Reiniciar agora",
         later: "Mais tarde",
-        restartFailed: "Não é possível reiniciar: as configurações se aplicarão na próxima inicialização",
+        restartFailedTitle: "Não é possível reiniciar",
+        restartFailed: "As configurações se aplicarão na próxima inicialização.",
         addOns: {
             profilePicker: {
                 name: "Escolha do perfil",
@@ -874,11 +877,14 @@ export default {
     // The Update Prompt at startup, and a Pack Update that cannot start (see common/updates/).
     packUpdates: {
         // Names the newer Pack Version the Update Check found.
+        promptTitle: "Atualização disponível",
         prompt: (version) => `Expansion Pack v${version} está disponível.`,
         updateNow: "Atualizar agora",
         later: "Mais tarde",
-        updateFailed: "Não é possível atualizar: o Expansion Pack fica como está",
+        updateFailedTitle: "Não é possível atualizar",
+        updateFailed: "O Expansion Pack fica como está.",
         ok: "OK",
+        updatedTitle: "Atualização concluída",
         updated: (version) => `Expansion Pack atualizado para v${version}`,
         toastTitle: "Expansion Pack",
     },

@@ -33,7 +33,7 @@ test("setup", async () => {
 });
 
 function submitDialog(label) {
-    wheelDialogs().submit({ id: `${label}Dialog`, message: label, buttons: [{ label: `${label} OK` }], priority: DIALOG_PRIORITY.RATING_PROMPT });
+    wheelDialogs().submit({ id: `${label}Dialog`, title: label, message: label, buttons: [{ label: `${label} OK` }], priority: DIALOG_PRIORITY.RATING_PROMPT });
 }
 
 async function letDialogsOpen() {

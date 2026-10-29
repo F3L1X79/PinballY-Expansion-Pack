@@ -12,11 +12,13 @@ export const OPEN_OVER_MS = 300;
 export const GLIDE_OVER_MS = 400;
 
 const { colors: COLORS } = DRAWN_MENU_LOOK;
-// A semibold weight or more reads as bold.
-const BOLD_WEIGHT = 600;
 const MARK_NAMES = new Map(Object.entries(DRAWN_MENU_MARKS).map(([name, glyph]) => [glyph, name]));
 
 const textsLayer = fake => shownLayers(fake, DRAWN_MENU_Z_INDEX.texts).find(layer => layer.texts().length > 0) || null;
+
+// A dialog's title or message: drawn across the list's whole width, where
+// an entry leaves room for its mark, and not in the headings' colour.
+const isDialogText = stroke => stroke.rect.x < 0.5 && stroke.color !== COLORS.heading;
 
 export const isDrawnMenuShown = fake => textsLayer(fake) !== null;
 
@@ -24,14 +26,16 @@ export const isDrawnMenuShown = fake => textsLayer(fake) !== null;
 export const isAnythingDrawn = fake => fake.drawingLayers()
     .some(layer => Object.values(DRAWN_MENU_Z_INDEX).includes(layer.zIndex) && layer.alpha > 0);
 
-// The message above the list (null when none; its wrapped lines joined
-// as drawn, without the spaces between them), its parts drawn bold, trimmed, and the rows from top to
+// A dialog's gold title and its message above the list (null when none;
+// their wrapped lines joined as drawn, without the spaces between them),
+// the message's parts drawn bolder than it, trimmed, and the rows from top to
 // bottom: { kind: "entry", title, mark } (mark: "check", "radio",
 // "submenu" or null), { kind: "heading", title } or { kind: "separator" };
 // and the footer under the list ({ label, name }, null when none).
 export function readDrawnMenu(fake) {
     const layer = textsLayer(fake);
     if (!layer) throw new Error("No Drawn Menu is shown.");
+    let title = null;
     let message = null;
     const messageBold = [];
     let footer = null;
@@ -50,22 +54,44 @@ export function readDrawnMenu(fake) {
         }
         if ("fill" in stroke) {
             // The gold line under a dialog's message is not a row.
-            if (message !== null && rows.length === 0) continue;
+            if ((title !== null || message !== null) && rows.length === 0) continue;
             if (!inSeparator) rows.push({ kind: "separator" });
             inSeparator = true;
             continue;
         }
         inSeparator = false;
         if (!("text" in stroke)) continue;
-        if (stroke.color === COLORS.message && rows.length === 0) {
+        if (rows.length === 0 && isDialogText(stroke) && stroke.color === COLORS.dialogTitle && message === null) {
+            title = title === null ? stroke.text : `${title}${stroke.text}`;
+        }
+        else if (rows.length === 0 && isDialogText(stroke)) {
             message = message === null ? stroke.text : `${message}${stroke.text}`;
-            if (stroke.weight >= BOLD_WEIGHT) messageBold.push(stroke.text.trim());
+            if (stroke.weight > DRAWN_MENU_LOOK.message.weight) messageBold.push(stroke.text.trim());
         }
         else if (stroke.color === COLORS.heading) rows.push({ kind: "heading", title: stroke.text });
         else if (stroke.color === COLORS.gold) rows.at(-1).mark = MARK_NAMES.get(stroke.text);
         else rows.push({ kind: "entry", title: stroke.text, mark: null });
     }
-    return { message, messageBold, rows, footer };
+    return { title, message, messageBold, rows, footer };
+}
+
+// A dialog's title and message as drawn on the texts' canvas, each
+// { color, size, weight, top, bottom } (size in points, null when not
+// drawn), and the middle of the gold line under them.
+export function dialogTextBoxes(fake) {
+    const layer = textsLayer(fake);
+    if (!layer) throw new Error("No Drawn Menu is shown.");
+    const strokes = layer.strokes();
+    const lineIndex = strokes.findIndex(stroke => "fill" in stroke);
+    const above = strokes.slice(0, lineIndex).filter(stroke => "text" in stroke && isDialogText(stroke));
+    const boxOf = stroke => stroke && ({
+        color: stroke.color, size: stroke.size, weight: stroke.weight, top: stroke.rect.y, bottom: stroke.rect.y + stroke.rect.height,
+    });
+    return {
+        title: boxOf(above.find(stroke => stroke.color === COLORS.dialogTitle)),
+        message: boxOf(above.find(stroke => stroke.color !== COLORS.dialogTitle)),
+        lineY: strokes[lineIndex].rect.y,
+    };
 }
 
 // A message as readDrawnMenu gives it, to compare with its full text.
@@ -81,14 +107,17 @@ export const drawnMenuLines = fake => readDrawnMenu(fake).rows.map(row => {
 export const markedEntries = (fake, mark) => readDrawnMenu(fake).rows.filter(row => row.mark === mark).map(row => row.title);
 
 // The headings and entries as drawn on the texts' canvas, from top to
-// bottom: { kind, title, top, bottom, size } (size in points).
+// bottom: { kind, title, top, bottom, size, color, weight } (size in points).
 export function drawnRowBoxes(fake) {
     const layer = textsLayer(fake);
     if (!layer) throw new Error("No Drawn Menu is shown.");
     const kinds = new Map([[COLORS.heading, "heading"], [COLORS.entry, "entry"]]);
     return layer.strokes()
-        .filter(stroke => "text" in stroke && kinds.has(stroke.color))
-        .map(stroke => ({ kind: kinds.get(stroke.color), title: stroke.text, top: stroke.rect.y, bottom: stroke.rect.y + stroke.rect.height, size: stroke.size }));
+        .filter(stroke => "text" in stroke && kinds.has(stroke.color) && (stroke.color === COLORS.heading || !isDialogText(stroke)))
+        .map(stroke => ({
+            kind: kinds.get(stroke.color), title: stroke.text, top: stroke.rect.y, bottom: stroke.rect.y + stroke.rect.height,
+            size: stroke.size, color: stroke.color, weight: stroke.weight,
+        }));
 }
 
 // The title of the highlighted entry, written in gold over the selection.

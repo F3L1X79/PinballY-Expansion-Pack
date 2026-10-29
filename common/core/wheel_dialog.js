@@ -9,6 +9,7 @@
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";
+import { logError } from "./error_log.js";
 import { createPinballYHost } from "./pinbally_host.js";
 import { createNativeMenus, getDrawnMenus } from "../drawn_menu/drawn_menu.js";
 
@@ -82,6 +83,7 @@ export function createWheelDialogs(host, menus = createNativeMenus(host)) {
         menus.show(
             dialog.id,
             [
+                { title: dialog.title, cmd: -1 },
                 { title: dialog.message, cmd: -1 },
                 { cmd: -1 },
                 ...buttons.map(({ label, cmd }) => ({ title: label, cmd })),
@@ -119,12 +121,16 @@ export function createWheelDialogs(host, menus = createNativeMenus(host)) {
         setTimeout(safeHandler(SCRIPT_NAME, showNext), 0);
     }
 
-    // dialog: either a native one { id, message, buttons, priority, onShown },
-    // or a drawn one { priority, open(close) }, open drawing it and close
+    // dialog: either a native one { id, title, message, buttons, priority,
+    // onShown }, or a drawn one { priority, open(close) }, open drawing it and close
     // to be called once it is gone. Either may add isReady (optional: the
     // queue waits on it while it returns false; wake() once it may be ready)
     // and isStale (optional: dropped unshown when it returns true at its turn).
     function submit(dialog) {
+        if (!dialog.open && !dialog.title) {
+            logError(SCRIPT_NAME, `ERROR the "${dialog.id}" dialog has no title: dropped.`, host);
+            return;
+        }
         const insertAt = queue.findIndex(queued => queued.priority > dialog.priority);
         if (insertAt === -1) queue.push(dialog);
         else queue.splice(insertAt, 0, dialog);

@@ -42,6 +42,7 @@ export function submitUpdatePrompt(host, { state, profileStore, dialogs, updater
     if (!release) return;
     dialogs.submit({
         id: MENU_ID,
+        title: TEXT.promptTitle,
         message: TEXT.prompt(release.packVersion),
         buttons: [
             { label: TEXT.updateNow, action: () => updater.start(release) },

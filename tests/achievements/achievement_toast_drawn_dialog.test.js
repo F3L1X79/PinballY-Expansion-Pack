@@ -89,7 +89,7 @@ test("a Level Toast and its Fireworks wait for a drawn dialog to close, then pla
 
 test("a native dialog does not hold the toasts", async () => {
     const { fake, wheelDialogs, toasts } = setUp();
-    wheelDialogs.submit({ id: "ratingPrompt", message: "Rate", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
+    wheelDialogs.submit({ id: "ratingPrompt", title: "Rate this table", message: "Rate", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
     await nextTick();
     assert.equal(fake.currentMenu().id, "ratingPrompt");
 

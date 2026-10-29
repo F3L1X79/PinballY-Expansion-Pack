@@ -27,7 +27,7 @@ test("a wheel dialog waits for the drawn list, even with Drawn Menus off", async
     fake.advanceTime(OPEN_OVER_MS);
     assert.ok(isDrawnMenuShown(fake));
 
-    getWheelDialogs().submit({ id: "someDialog", message: "Rate this table?", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
+    getWheelDialogs().submit({ id: "someDialog", title: "Rate this table", message: "Rate this table?", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
     await settle();
     assert.equal(fake.currentMenu(), null, "the dialog waits for the list");
     assert.ok(isDrawnMenuShown(fake));

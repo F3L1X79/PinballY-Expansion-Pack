@@ -21,7 +21,7 @@ test("a Pack Update that worked says so once, before the Profile picker", async 
     await settle();
     fake.advanceTime(OPEN_OVER_MS);
 
-    assert.equal(readDrawnMenu(fake).message, `Expansion Pack updated to v${PACK_VERSION}`);
+    assert.deepEqual([readDrawnMenu(fake).title, readDrawnMenu(fake).message], ["Update complete", `Expansion Pack updated to v${PACK_VERSION}`]);
     assert.deepEqual(drawnMenuLines(fake), ["OK"]);
     assert.equal(isCarouselOpen(fake, lang), false, "the message comes before the picker");
     assert.equal(requestedVersionOf(fake), undefined, "said once");

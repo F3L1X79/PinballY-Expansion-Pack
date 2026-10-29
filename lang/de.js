@@ -189,6 +189,7 @@ export default {
     },
 
     ratingPrompt: {
+        title: "Diesen Tisch bewerten",
         message: (tableTitle, minutes) =>
             `Sie haben "${tableTitle}" seit über ${minutes} Minuten gespielt! Möchten Sie ihn jetzt bewerten?`,
         rateNow: "Jetzt bewerten",
@@ -674,6 +675,7 @@ export default {
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {
+            title: "Neuer Avatar-Rahmen",
             message: (name, menuEntry, button) => `Sie haben den Avatar-Rahmen "${name}" gewonnen! Legen Sie ihn unter "${menuEntry}" und dann "${button}" an.`,
             goEquip: "Jetzt anlegen",
             gotIt: "OK",
@@ -738,7 +740,8 @@ export default {
         restartQuestion: "Die gespeicherten Einstellungen gelten nach einem Neustart von PinballY.",
         restartNow: "Neu starten",
         later: "Später",
-        restartFailed: "Neustart nicht möglich: Die Einstellungen gelten beim nächsten Start",
+        restartFailedTitle: "Neustart nicht möglich",
+        restartFailed: "Die Einstellungen gelten beim nächsten Start.",
         addOns: {
             profilePicker: {
                 name: "Profilauswahl",
@@ -874,11 +877,14 @@ export default {
     // The Update Prompt at startup, and a Pack Update that cannot start (see common/updates/).
     packUpdates: {
         // Names the newer Pack Version the Update Check found.
+        promptTitle: "Aktualisierung verfügbar",
         prompt: (version) => `Expansion Pack v${version} ist verfügbar.`,
         updateNow: "Jetzt aktualisieren",
         later: "Später",
-        updateFailed: "Aktualisierung nicht möglich: Das Expansion Pack bleibt unverändert",
+        updateFailedTitle: "Aktualisierung nicht möglich",
+        updateFailed: "Das Expansion Pack bleibt unverändert.",
         ok: "OK",
+        updatedTitle: "Aktualisierung abgeschlossen",
         updated: (version) => `Expansion Pack auf v${version} aktualisiert`,
         toastTitle: "Expansion Pack",
     },

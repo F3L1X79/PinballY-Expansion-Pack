@@ -45,7 +45,7 @@ test("a Pack Update that never gets ready says so at once, and PinballY stays", 
     await settle();
     fake.advanceTime(OPEN_OVER_MS);
 
-    assert.equal(readDrawnMenu(fake).message, "Update not possible: the Expansion Pack stays as it is");
+    assert.deepEqual([readDrawnMenu(fake).title, readDrawnMenu(fake).message], ["Update not possible", "The Expansion Pack stays as it is."]);
     assert.deepEqual(drawnMenuLines(fake), ["OK"]);
     assert.equal(readLoader(fake).shown, false);
     assert.ok(!fake.executedCommands().includes(fake.getBuiltInCommand("Quit")));

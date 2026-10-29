@@ -189,6 +189,7 @@ export default {
     },
 
     ratingPrompt: {
+        title: "Valuta questo tavolo",
         message: (tableTitle, minutes) =>
             `Hai giocato a "${tableTitle}" per più di ${minutes} minuti! Vuoi valutarlo ora?`,
         rateNow: "Valuta ora",
@@ -673,6 +674,7 @@ export default {
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {
+            title: "Nuova cornice avatar",
             message: (name, menuEntry, button) => `Hai vinto la cornice avatar "${name}"! Indossala da "${menuEntry}", poi "${button}".`,
             goEquip: "Indossala",
             gotIt: "Capito",
@@ -737,7 +739,8 @@ export default {
         restartQuestion: "Le impostazioni salvate si applicano al riavvio di PinballY.",
         restartNow: "Riavvia ora",
         later: "Più tardi",
-        restartFailed: "Riavvio impossibile: le impostazioni si applicheranno al prossimo avvio",
+        restartFailedTitle: "Riavvio impossibile",
+        restartFailed: "Le impostazioni si applicheranno al prossimo avvio.",
         addOns: {
             profilePicker: {
                 name: "Scelta del profilo",
@@ -873,11 +876,14 @@ export default {
     // The Update Prompt at startup, and a Pack Update that cannot start (see common/updates/).
     packUpdates: {
         // Names the newer Pack Version the Update Check found.
+        promptTitle: "Aggiornamento disponibile",
         prompt: (version) => `Expansion Pack v${version} è disponibile.`,
         updateNow: "Aggiorna ora",
         later: "Più tardi",
-        updateFailed: "Aggiornamento impossibile: l'Expansion Pack resta com'è",
+        updateFailedTitle: "Aggiornamento impossibile",
+        updateFailed: "L'Expansion Pack resta com'è.",
         ok: "OK",
+        updatedTitle: "Aggiornamento completato",
         updated: (version) => `Expansion Pack aggiornato alla v${version}`,
         toastTitle: "Expansion Pack",
     },

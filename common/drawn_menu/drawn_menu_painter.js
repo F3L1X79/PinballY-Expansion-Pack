@@ -43,7 +43,10 @@ export const DRAWN_MENU_LOOK = Object.freeze({
     rowHeights: Object.freeze({ entry: DRAWN_MENU_ENTRY_HEIGHT, heading: 50, separator: 30 }),
     entry: Object.freeze({ size: 36, minSize: 28, weight: 600 }),
     heading: Object.freeze({ size: 24, weight: 600 }),
-    message: Object.freeze({ size: 33, weight: 400, gap: 14 }),
+    // A dialog's title, at the entries' size and weight, then its message
+    // at their weight; gap: from the message to the separator's box.
+    dialogTitle: Object.freeze({ size: 36, weight: 600 }),
+    message: Object.freeze({ size: 33, weight: 600, gap: 14 }),
     // Under the list, after a separator's height holding its rule: a row
     // as tall as an entry, at the entries' size, then listTop down to the
     // face's gold frame, so its text sits as far from the frame as the
@@ -56,7 +59,8 @@ export const DRAWN_MENU_LOOK = Object.freeze({
     colors: Object.freeze({
         entry: COLORS.title,
         heading: COLORS.dim,
-        message: COLORS.description,
+        dialogTitle: COLORS.gold,
+        message: COLORS.title,
         footerLabel: COLORS.description,
         gold: COLORS.gold,
         backdrop: 0xB0080A0E,
@@ -84,7 +88,8 @@ export function menuScaleOf({ width, height }) {
 // The menu's layout in the window ({ width, height }), in window pixels
 // unless named "Ref" (reference pixels): k turns the one into the other.
 // wrappedHeightAt(str, widthPx, { font, sizePx, weight }) measures a text
-// wrapped in that width: the message, and the headings too wide for one line.
+// wrapped in that width: a dialog's title and message, and the headings
+// too wide for one line.
 export function computeGeometry({ width, height }, model, wrappedHeightAt) {
     const k = menuScaleOf({ width, height });
     const zoom = k / (height / LOOK.referenceHeight);
@@ -105,12 +110,17 @@ export function computeGeometry({ width, height }, model, wrappedHeightAt) {
         return top;
     });
     const rowsHeightRef = rowTopRef;
+    const titleStyle = { font: FONTS.body, sizePx: LOOK.dialogTitle.size * k, weight: LOOK.dialogTitle.weight };
+    const titleHeightRef = model.title === null ? 0 : wrappedHeightAt(model.title, listWidth, titleStyle) / k;
     const messageStyle = { font: FONTS.body, sizePx: LOOK.message.size * k, weight: LOOK.message.weight };
     const messageHeightRef = model.message === null ? 0 : wrappedHeightAt(model.message, listWidth, messageStyle) / k;
-    const messageBlockRef = model.message === null ? 0 : messageHeightRef + LOOK.message.gap + LOOK.rowHeights.separator;
+    // Under a title (never without a message), as much space above the
+    // message as below it, down to the separator's line in the middle of its box.
+    const messageTopRef = model.title === null ? 0 : titleHeightRef + LOOK.message.gap + LOOK.rowHeights.separator / 2;
+    const headerBlockRef = model.message === null ? 0 : messageTopRef + messageHeightRef + LOOK.message.gap + LOOK.rowHeights.separator;
     const footerBlockRef = model.footer ? LOOK.rowHeights.separator + LOOK.footer.height : 0;
     const listBottomRef = model.footer ? LOOK.listTop : LOOK.listBottom;
-    const fixedRef = 2 * DRAWN_MENU_FACE_INSET + LOOK.listTop + listBottomRef + messageBlockRef + footerBlockRef;
+    const fixedRef = 2 * DRAWN_MENU_FACE_INSET + LOOK.listTop + listBottomRef + headerBlockRef + footerBlockRef;
     const maxPanelRef = LOOK.maxHeightShare * LOOK.referenceHeight / zoom;
     const areaHeightRef = Math.max(LOOK.rowHeights.entry, Math.min(rowsHeightRef, maxPanelRef - fixedRef));
     const panelHeightRef = Math.max(LOOK.minPanelHeight, fixedRef + areaHeightRef);
@@ -123,12 +133,16 @@ export function computeGeometry({ width, height }, model, wrappedHeightAt) {
         panel: { x: (width - DRAWN_MENU_PANEL_WIDTH * k) / 2, y: panelTop, width: DRAWN_MENU_PANEL_WIDTH * k, height: panelHeightRef * k },
         listX: (width - listWidth) / 2,
         listWidth,
-        // The texts' layer: from the message down to the footer.
+        // The texts' layer: from the title or message down to the footer.
         contentTop: panelTop + contentTopRef * k,
-        contentHeight: (messageBlockRef + areaHeightRef + footerBlockRef) * k,
+        contentHeight: (headerBlockRef + areaHeightRef + footerBlockRef) * k,
+        titleHeight: titleHeightRef * k,
+        messageTop: messageTopRef * k,
         messageHeight: messageHeightRef * k,
+        // From the content's top to the separator's box under the message.
+        headerHeight: (messageTopRef + messageHeightRef) * k,
         // From the content's top to the list's.
-        areaOffset: messageBlockRef * k,
+        areaOffset: headerBlockRef * k,
         areaHeight: areaHeightRef * k,
         rowTops: rowTopsRef.map(top => top * k),
         rowHeights: rowHeightsRef.map(rowHeight => rowHeight * k),
@@ -259,17 +273,23 @@ function drawEntry(host, dc, row, { x, y, width, height, k, color, markColor }) 
     });
 }
 
-// The texts' layer, on a canvas of the content's size: the message, then
-// the rows shown at this scroll (whole rows only), those at an edge the
-// list scrolls past faded, then the footer.
+// The texts' layer, on a canvas of the content's size: a dialog's title
+// and message, then the rows shown at this scroll (whole rows only), those
+// at an edge the list scrolls past faded, then the footer.
 export function drawTexts(host, dc, geometry, model, scroll) {
     const { k, listWidth, areaOffset, areaHeight } = geometry;
+    if (model.title !== null) {
+        text(host, dc, model.title, {
+            x: 0, y: 0, width: listWidth, height: geometry.titleHeight,
+            size: pointsOf(LOOK.dialogTitle.size * k), weight: LOOK.dialogTitle.weight, color: LOOK.colors.dialogTitle, align: "center",
+        });
+    }
     if (model.message !== null) {
         text(host, dc, model.message, {
-            x: 0, y: 0, width: listWidth, height: geometry.messageHeight,
+            x: 0, y: geometry.messageTop, width: listWidth, height: geometry.messageHeight,
             size: pointsOf(LOOK.message.size * k), weight: LOOK.message.weight, color: LOOK.colors.message, align: "center",
         });
-        drawSeparator(dc, 0, geometry.messageHeight + LOOK.message.gap * k, listWidth, LOOK.rowHeights.separator * k, k, 0xFF);
+        drawSeparator(dc, 0, geometry.headerHeight + LOOK.message.gap * k, listWidth, LOOK.rowHeights.separator * k, k, 0xFF);
     }
     const canScrollUp = scroll > 0.5;
     const canScrollDown = scroll + areaHeight < geometry.rowsHeight - 0.5;

@@ -66,12 +66,13 @@ test("turned off, the wheel dialogs are native and their queue advances", async 
         await settle();
     }
     for (const name of ["First", "Second"]) {
-        getWheelDialogs().submit({ id: `dialog${name}`, message: name, buttons: [{ label: `${name} OK` }], priority: DIALOG_PRIORITY.RATING_PROMPT });
+        getWheelDialogs().submit({ id: `dialog${name}`, title: `${name} title`, message: name, buttons: [{ label: `${name} OK` }], priority: DIALOG_PRIORITY.RATING_PROMPT });
     }
     await settle();
 
     assert.equal(fake.currentMenu().id, "dialogFirst");
     assert.deepEqual(fake.currentMenu().options, { dialogStyle: true });
+    assert.deepEqual(fake.currentMenu().items.slice(0, 2).map(item => item.title), ["First title", "First"], "the title first");
     fake.selectMenuItem("First OK");
     await settle();
     assert.equal(fake.currentMenu().id, "dialogSecond");

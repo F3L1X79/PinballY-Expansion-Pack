@@ -182,7 +182,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         hideRestartVeil();
         logError(SCRIPT_NAME, `ERROR Restart not possible: ${error.message}`, host, error);
         getWheelDialogs().submit({
-            id: RESTART_FAILED_MENU_ID, message: TEXT.restartFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.RESTART_FAILED,
+            id: RESTART_FAILED_MENU_ID, title: TEXT.restartFailedTitle, message: TEXT.restartFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.RESTART_FAILED,
         });
     });
 

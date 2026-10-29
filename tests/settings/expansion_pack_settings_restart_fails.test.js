@@ -47,7 +47,7 @@ test("a restart that never gets ready is logged, shows why, and PinballY stays",
 
     assert.equal(errorLines(fake).length, 1);
     assert.match(errorLines(fake)[0], /^\[ExpansionPackSettings\] ERROR Restart not possible: .*not ready after 15 s/);
-    assert.equal(readDrawnMenu(fake).message, "Restart not possible: the settings will apply at the next start");
+    assert.deepEqual([readDrawnMenu(fake).title, readDrawnMenu(fake).message], ["Restart not possible", "The settings will apply at the next start."]);
     assert.deepEqual(drawnMenuLines(fake), ["OK"]);
     assert.ok(!fake.executedCommands().includes(fake.getBuiltInCommand("Quit")));
     assert.equal(readLoader(fake).shown, false, "the veil and the Loader went before the message");

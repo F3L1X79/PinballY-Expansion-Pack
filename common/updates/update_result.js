@@ -30,6 +30,7 @@ export function submitUpdateResult(host, { state, profileStore, dialogs, toasts 
         host.log(`[${SCRIPT_NAME}] Pack Update to ${requested} done.`);
         dialogs.submit({
             id: UPDATED_MENU_ID,
+            title: TEXT.updatedTitle,
             message: TEXT.updated(requested),
             buttons: [{ label: TEXT.ok }],
             priority: DIALOG_PRIORITY.UPDATE_RESULT,

@@ -189,6 +189,7 @@ export default {
     },
 
     ratingPrompt: {
+        title: "Valorar esta mesa",
         message: (tableTitle, minutes) =>
             `¡Has jugado a "${tableTitle}" durante más de ${minutes} minutos! ¿Quieres valorarla ahora?`,
         rateNow: "Valorar ahora",
@@ -675,6 +676,7 @@ export default {
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {
+            title: "Nuevo marco de avatar",
             message: (name, menuEntry, button) => `¡Has ganado el marco de avatar "${name}"! Póntelo desde "${menuEntry}" y luego "${button}".`,
             goEquip: "Ponérmelo",
             gotIt: "Vale",
@@ -739,7 +741,8 @@ export default {
         restartQuestion: "Los ajustes guardados se aplican al reiniciar PinballY.",
         restartNow: "Reiniciar ya",
         later: "Más tarde",
-        restartFailed: "No se puede reiniciar: los ajustes se aplicarán en el próximo inicio",
+        restartFailedTitle: "No se puede reiniciar",
+        restartFailed: "Los ajustes se aplicarán en el próximo inicio.",
         addOns: {
             profilePicker: {
                 name: "Selector de perfil",
@@ -875,11 +878,14 @@ export default {
     // The Update Prompt at startup, and a Pack Update that cannot start (see common/updates/).
     packUpdates: {
         // Names the newer Pack Version the Update Check found.
+        promptTitle: "Actualización disponible",
         prompt: (version) => `Expansion Pack v${version} está disponible.`,
         updateNow: "Actualizar ya",
         later: "Más tarde",
-        updateFailed: "No se puede actualizar: el Expansion Pack se queda como está",
+        updateFailedTitle: "No se puede actualizar",
+        updateFailed: "El Expansion Pack se queda como está.",
         ok: "OK",
+        updatedTitle: "Actualización completada",
         updated: (version) => `Expansion Pack actualizado a v${version}`,
         toastTitle: "Expansion Pack",
     },

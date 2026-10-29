@@ -11,6 +11,7 @@ import { createFakePinballYHost } from "../support/fake_pinbally_host.js";
 import { createWheelDialogs, DIALOG_PRIORITY } from "../../common/core/wheel_dialog.js";
 
 const GAME = { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness" };
+const DIALOG_TITLE = "Dialog";
 
 function setUp() {
     const fake = createFakePinballYHost({ tables: [GAME] });
@@ -21,7 +22,7 @@ function setUp() {
 function ratingDialog(name, extra = {}) {
     return {
         id: "ratingPrompt",
-        message: `Rate ${name}`,
+        title: DIALOG_TITLE, message: `Rate ${name}`,
         buttons: [{ label: "OK" }],
         priority: DIALOG_PRIORITY.RATING_PROMPT,
         ...extra,
@@ -31,11 +32,12 @@ function ratingDialog(name, extra = {}) {
 // Lets the deferred showing (setTimeout 0) run.
 const settle = () => new Promise(resolve => setTimeout(resolve, 0));
 
+// The messages of the dialogs shown, other menus left out.
 function shownMessages(fake) {
-    return fake.shownMenus().map(menu => menu.items[0].title);
+    return fake.shownMenus().filter(menu => menu.items[0].title === DIALOG_TITLE).map(menu => menu.items[1].title);
 }
 
-test("a dialog submitted on a free wheel is shown on the next tick, message then separator then buttons", async () => {
+test("a dialog submitted on a free wheel is shown on the next tick, title then message then separator then buttons", async () => {
     const { fake, dialogs } = setUp();
 
     dialogs.submit(ratingDialog("A"));
@@ -45,11 +47,30 @@ test("a dialog submitted on a free wheel is shown on the next tick, message then
     const menu = fake.currentMenu();
     assert.equal(menu.id, "ratingPrompt");
     assert.deepEqual(menu.options, { dialogStyle: true });
-    assert.equal(menu.items.length, 3);
-    assert.deepEqual(menu.items[0], { title: "Rate A", cmd: -1 });
-    assert.deepEqual(menu.items[1], { cmd: -1 });
-    assert.equal(menu.items[2].title, "OK");
-    assert.ok(menu.items[2].cmd > 0, "a button needs a real command to be selectable");
+    assert.equal(menu.items.length, 4);
+    assert.deepEqual(menu.items[0], { title: DIALOG_TITLE, cmd: -1 });
+    assert.deepEqual(menu.items[1], { title: "Rate A", cmd: -1 });
+    assert.deepEqual(menu.items[2], { cmd: -1 });
+    assert.equal(menu.items[3].title, "OK");
+    assert.ok(menu.items[3].cmd > 0, "a button needs a real command to be selectable");
+});
+
+test("a dialog submitted without a title is logged and dropped, and the next one shows", async () => {
+    const { fake, dialogs } = setUp();
+    const uninstallGlobals = fake.installGlobals();
+    try {
+        const untitled = ratingDialog("A");
+        delete untitled.title;
+        dialogs.submit(untitled);
+        dialogs.submit(ratingDialog("B"));
+        await settle();
+
+        assert.deepEqual(shownMessages(fake), ["Rate B"]);
+        assert.equal(fake.shownMenus().length, 1);
+        assert.equal(fake.logLines().filter(line => line.includes("[WheelDialog] ERROR") && line.includes("ratingPrompt")).length, 1);
+    } finally {
+        uninstallGlobals();
+    }
 });
 
 test("nothing is shown while a game runs; the dialog appears on the next free wheel", async () => {
@@ -124,19 +145,19 @@ test("a button runs its own dialog's action, and a closed dialog's buttons do no
 
     dialogs.submit({
         id: "first",
-        message: "First",
+        title: DIALOG_TITLE, message: "First",
         buttons: [{ label: "Yes", action: () => actions.push("first:yes") }, { label: "No", action: () => actions.push("first:no") }],
         priority: DIALOG_PRIORITY.RATING_PROMPT,
     });
     dialogs.submit({
         id: "second",
-        message: "Second",
+        title: DIALOG_TITLE, message: "Second",
         buttons: [{ label: "Yes", action: () => actions.push("second:yes") }, { label: "Later" }],
         priority: DIALOG_PRIORITY.RATING_PROMPT,
     });
     await settle();
 
-    const firstYesCommand = fake.currentMenu().items[2].cmd;
+    const firstYesCommand = fake.currentMenu().items[3].cmd;
     fake.selectMenuItem("No");
     await settle();
     fake.selectMenuItem("Yes");
@@ -152,7 +173,7 @@ test("a button that launches a game makes the next dialog wait for the wheel", a
 
     dialogs.submit({
         id: "launcher",
-        message: "Play?",
+        title: DIALOG_TITLE, message: "Play?",
         buttons: [{ label: "Play", action: () => fake.playGame(GAME) }],
         priority: DIALOG_PRIORITY.STARTUP_PROMPT,
     });
@@ -173,7 +194,7 @@ test("waiting dialogs are shown by priority, whatever the submission order", asy
     for (const order of [["rating", "startup"], ["startup", "rating"]]) {
         const { fake, dialogs } = setUp();
         const descriptions = {
-            startup: { id: "startup", message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT },
+            startup: { id: "startup", title: DIALOG_TITLE, message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT },
             rating: ratingDialog("A"),
         };
         fake.playGame(GAME);
@@ -195,7 +216,7 @@ test("a dialog with the same priority waits behind the ones already queued", asy
     fake.gameStarted(GAME);
 
     dialogs.submit(ratingDialog("A"));
-    dialogs.submit({ id: "startup", message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
+    dialogs.submit({ id: "startup", title: DIALOG_TITLE, message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
     dialogs.submit(ratingDialog("B"));
     fake.gameOver(GAME);
     await settle();
@@ -211,7 +232,7 @@ test("dialogs submitted together on a free wheel are shown by priority", async (
     const { fake, dialogs } = setUp();
 
     dialogs.submit(ratingDialog("A"));
-    dialogs.submit({ id: "startup", message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
+    dialogs.submit({ id: "startup", title: DIALOG_TITLE, message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
     await settle();
     assert.deepEqual(shownMessages(fake), ["Startup"]);
 
@@ -225,7 +246,7 @@ test("a dialog on screen is never replaced by a higher-priority one", async () =
 
     dialogs.submit(ratingDialog("A"));
     await settle();
-    dialogs.submit({ id: "startup", message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
+    dialogs.submit({ id: "startup", title: DIALOG_TITLE, message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
     await settle();
     assert.deepEqual(shownMessages(fake), ["Rate A"]);
 
@@ -248,7 +269,7 @@ test("a dialog replaced by another menu lets the next one wait for that menu to 
 
     fake.closeMenu();
     await settle();
-    assert.deepEqual(shownMessages(fake).filter(message => message !== "Play"), ["Rate A", "Rate B"]);
+    assert.deepEqual(shownMessages(fake), ["Rate A", "Rate B"]);
 });
 
 test("another menu closing does not advance the queue", async () => {
@@ -269,7 +290,7 @@ test("a failing button action is logged and the queue still advances", async () 
     try {
         dialogs.submit({
             id: "broken",
-            message: "Broken",
+            title: DIALOG_TITLE, message: "Broken",
             buttons: [{ label: "Go", action: () => { throw new Error("boom"); } }],
             priority: DIALOG_PRIORITY.RATING_PROMPT,
         });
@@ -354,7 +375,7 @@ test("a native dialog submitted while a drawn one is open waits for it", async (
 
     dialogs.submit(drawn);
     await settle();
-    dialogs.submit({ id: "startup", message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
+    dialogs.submit({ id: "startup", title: DIALOG_TITLE, message: "Startup", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.STARTUP_PROMPT });
     await settle();
     assert.equal(fake.currentMenu(), null);
 

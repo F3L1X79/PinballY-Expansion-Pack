@@ -188,6 +188,7 @@ export function createProfileRewards(host, { profileStore, isEnabled = () => tru
         const TEXT = lang.profileRewards.prompt;
         wheelDialogs.submit({
             id: REWARD_PROMPT_ID,
+            title: TEXT.title,
             message: TEXT.message(frame.name, lang.profileStats.menuEntry, lang.profileStats.buttons.frame),
             buttons: [
                 // A drawn dialog of its own once the prompt closed: the queue

@@ -64,7 +64,7 @@ test("the requested version running says so once, ahead of the Update Prompt", (
     assert.equal(dialogs.length, 1);
     assert.equal(dialogs[0].priority, DIALOG_PRIORITY.UPDATE_RESULT);
     assert.ok(dialogs[0].priority < DIALOG_PRIORITY.UPDATE_PROMPT);
-    assert.equal(dialogs[0].message, `Expansion Pack updated to v${PACK_VERSION}`);
+    assert.deepEqual([dialogs[0].title, dialogs[0].message], ["Update complete", `Expansion Pack updated to v${PACK_VERSION}`]);
     assert.deepEqual(dialogs[0].buttons.map(button => button.label), ["OK"]);
     assert.equal(requestedIn(fake), PACK_VERSION, "kept until it shows");
 

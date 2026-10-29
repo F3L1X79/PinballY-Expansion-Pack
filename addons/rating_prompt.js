@@ -50,6 +50,7 @@ export default function init() {
 
         wheelDialogs.submit({
             id: "ratingPrompt",
+            title: RATING_PROMPT_TEXT.title,
             message: RATING_PROMPT_TEXT.message(game.title, THRESHOLD_MINUTES),
             buttons: [
                 { label: RATING_PROMPT_TEXT.rateNow, action: () => mainWindow.doCommand(command.RateGame) },

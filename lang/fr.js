@@ -189,6 +189,7 @@ export default {
     },
 
     ratingPrompt: {
+        title: "Noter cette table",
         message: (tableTitle, minutes) =>
             `Eh beh ! Tu as totalisé plus de ${minutes} minutes de jeu sur la table "${tableTitle}" ! Est-ce que ce serait pas le moment de lui mettre une petite note ?`,
         rateNow: "Allez, go !",
@@ -678,6 +679,7 @@ export default {
         // The Reward Prompt, after a Profile's first frame: the frame's name,
         // then the main menu entry and the Profile Stats button to equip it from.
         prompt: {
+            title: "Nouveau cadre",
             message: (name, menuEntry, button) => `Vous avez gagné le cadre « ${name} » ! Équipez-le depuis « ${menuEntry} », puis « ${button} ».`,
             goEquip: "Aller l'équiper",
             gotIt: "Plus tard...",
@@ -742,7 +744,8 @@ export default {
         restartQuestion: "Les réglages enregistrés s'appliquent au redémarrage de PinballY.",
         restartNow: "Redémarrer maintenant",
         later: "Plus tard",
-        restartFailed: "Redémarrage impossible : les réglages s'appliqueront au prochain démarrage",
+        restartFailedTitle: "Redémarrage impossible",
+        restartFailed: "Les réglages s'appliqueront au prochain démarrage.",
         addOns: {
             profilePicker: {
                 name: "Choix du joueur",
@@ -877,12 +880,15 @@ export default {
 
     // The Update Prompt at startup, and a Pack Update that cannot start (see common/updates/).
     packUpdates: {
+        promptTitle: "Mise à jour disponible",
         // Names the newer Pack Version the Update Check found.
         prompt: (version) => `La version v${version} de l'Expansion Pack est disponible.`,
         updateNow: "Mettre à jour",
         later: "Plus tard",
-        updateFailed: "Mise à jour impossible : l'Expansion Pack reste tel quel",
+        updateFailedTitle: "Mise à jour impossible",
+        updateFailed: "L'Expansion Pack reste tel quel.",
         ok: "OK",
+        updatedTitle: "Mise à jour terminée",
         updated: (version) => `Expansion Pack mis à jour en v${version}`,
         toastTitle: "Expansion Pack",
     },

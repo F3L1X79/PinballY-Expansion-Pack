@@ -59,17 +59,23 @@ const markNameOf = item => {
     return item.hasSubmenu ? "submenu" : null;
 };
 
-// What the menu shows: its message (dialogs only: the first static
-// item, its runs or its title), its rows, the cursor on the selected entry, and its footer
-// ({ label, name } or null); null when it has no entry to choose.
+// What the menu shows: its title and message (dialogs only: two static
+// items before the rows are a title and a message, a single one a message;
+// each its runs or its title), its rows, the cursor on the selected entry,
+// and its footer ({ label, name } or null); null when it has no entry to choose.
 export function buildMenuModel(items, { dialogStyle = false, pagingCommands = [], footer = null } = {}) {
+    let title = null;
     let message = null;
     const rows = [];
     for (const item of items.map(copyItem)) {
         if (pagingCommands.includes(item.cmd)) continue;
+        const isDialogText = item.title !== "" && dialogStyle && title === null && rows.length === 0;
         if (item.cmd >= 0) {
             rows.push({ kind: ROW_KIND.ENTRY, title: item.title, cmd: item.cmd, mark: markNameOf(item), stayOpen: item.stayOpen, selected: item.selected });
-        } else if (item.title !== "" && dialogStyle && message === null && rows.length === 0) {
+        } else if (isDialogText && message === null) {
+            message = item.runs || item.title;
+        } else if (isDialogText) {
+            title = message;
             message = item.runs || item.title;
         } else if (item.title !== "") {
             rows.push({ kind: ROW_KIND.HEADING, title: item.title });
@@ -81,7 +87,7 @@ export function buildMenuModel(items, { dialogStyle = false, pagingCommands = []
     const entries = rows.map((row, index) => index).filter(index => rows[index].kind === ROW_KIND.ENTRY);
     if (entries.length === 0) return null;
     const selected = entries.find(index => rows[index].selected);
-    return { message, rows, entries, selected: selected === undefined ? entries[0] : selected, footer };
+    return { title, message, rows, entries, selected: selected === undefined ? entries[0] : selected, footer };
 }
 
 // PinballY's own menus, behind the same show() as the Drawn Menus: each
@@ -244,7 +250,7 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         const width = Math.max(1, Math.round(geometry.listWidth));
         const height = Math.max(1, Math.round(geometry.contentHeight));
         const rows = model.rows.map(({ kind, title, mark }) => [kind, title, mark]);
-        const signature = JSON.stringify([model.message, rows, model.footer, shown.scroll, width, height, geometry.k]);
+        const signature = JSON.stringify([model.title, model.message, rows, model.footer, shown.scroll, width, height, geometry.k]);
         if (signature !== textsSignature) {
             textsLayer.clear(TRANSPARENT);
             textsLayer.draw(dc => drawTexts(host, dc, geometry, model, shown.scroll), width, height);

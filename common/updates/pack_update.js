@@ -55,7 +55,7 @@ export function createPackUpdater(host, state, dialogs) {
         logError(SCRIPT_NAME, `ERROR Pack Update not possible: ${error.message}`, host, error);
         state.forgetRequest();
         dialogs.submit({
-            id: FAILED_MENU_ID, message: TEXT.updateFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.UPDATE_RESULT,
+            id: FAILED_MENU_ID, title: TEXT.updateFailedTitle, message: TEXT.updateFailed, buttons: [{ label: TEXT.ok }], priority: DIALOG_PRIORITY.UPDATE_RESULT,
         });
         hideVeil();
     });

@@ -8,7 +8,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { isDrawnMenuShown, drawnMenuLines, readDrawnMenu, highlightedEntry, squeezed, press, chooseEntry, OPEN_OVER_MS } from "./drawn_menu_reader.js";
+import { DRAWN_MENU_LOOK } from "../../common/drawn_menu/drawn_menu_painter.js";
+import {
+    isDrawnMenuShown, drawnMenuLines, readDrawnMenu, dialogTextBoxes, drawnRowBoxes, highlightedEntry, squeezed, press, chooseEntry, OPEN_OVER_MS,
+} from "./drawn_menu_reader.js";
 
 const ADD_ONS_UNDER_TEST = ["ratingPrompt", "drawnMenus"];
 const THRESHOLD_MINUTES = 60;
@@ -49,14 +52,30 @@ async function playPastThreshold(table) {
 
 const messageOf = table => TEXT.message(table.title, THRESHOLD_MINUTES);
 
-test("the rating prompt is drawn with its message above its buttons, and Rate Now runs its action", async () => {
+test("the rating prompt is drawn with its title and message above its buttons, and Rate Now runs its action", async () => {
     await playPastThreshold(TABLES[0]);
 
     assert.equal(fake.currentMenu(), null, "no native dialog");
     assert.ok(isDrawnMenuShown(fake));
-    assert.equal(squeezed(readDrawnMenu(fake).message), squeezed(messageOf(TABLES[0])));
+    const { title, message } = readDrawnMenu(fake);
+    assert.equal(title, "Rate this table");
+    assert.equal(squeezed(message), squeezed(messageOf(TABLES[0])));
     assert.deepEqual(drawnMenuLines(fake), [TEXT.rateNow, TEXT.notNow]);
     assert.equal(highlightedEntry(fake), TEXT.rateNow);
+
+    // The title in gold at the entries' size and weight, the message in
+    // their colour and weight, as much space above it as below.
+    const boxes = dialogTextBoxes(fake);
+    const [entry] = drawnRowBoxes(fake);
+    assert.equal(entry.title, TEXT.rateNow);
+    assert.equal(boxes.title.color, DRAWN_MENU_LOOK.colors.gold);
+    assert.equal(boxes.title.size, entry.size);
+    assert.equal(boxes.title.weight, entry.weight);
+    assert.equal(boxes.message.color, entry.color);
+    assert.equal(boxes.message.weight, entry.weight);
+    assert.ok(boxes.title.bottom <= boxes.message.top, "the title above the message");
+    assert.ok(Math.abs((boxes.message.top - boxes.title.bottom) - (boxes.lineY - boxes.message.bottom)) <= 1,
+        `space above ${boxes.message.top - boxes.title.bottom}, below ${boxes.lineY - boxes.message.bottom}`);
 
     chooseEntry(fake, TEXT.rateNow);
     await settle();
@@ -85,11 +104,11 @@ test("Exit dismisses the rating prompt, and the next queued dialog follows in pr
     fake.gameOver(game);
     // In the same tick as the rating prompt: one dialog after it, one before.
     wheelDialogs().submit({
-        id: "laterDialog", message: "Shown last", buttons: [{ label: "Later OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT + 1,
+        id: "laterDialog", title: "Later", message: "Shown last", buttons: [{ label: "Later OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT + 1,
         onShown: () => shownOrder.push("later"),
     });
     wheelDialogs().submit({
-        id: "firstDialog", message: "Shown first", buttons: [{ label: "First OK" }], priority: DIALOG_PRIORITY.REWARD_PROMPT,
+        id: "firstDialog", title: "First", message: "Shown first", buttons: [{ label: "First OK" }], priority: DIALOG_PRIORITY.REWARD_PROMPT,
         onShown: () => shownOrder.push("first"),
     });
     await settle();
@@ -115,14 +134,34 @@ test("Exit dismisses the rating prompt, and the next queued dialog follows in pr
     assert.deepEqual(shownOrder, ["first", "later"]);
 });
 
-test("a dialog that fails to draw logs the error and shows natively, the queue advancing on its close", async () => {
+test("a long title wraps within the list's width, whole", async () => {
+    const LONG_TITLE = "A title far too long to stand on a single line of the dialog's panel";
+    wheelDialogs().submit({ id: "shortTitle", title: "Short", message: "Message", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
+    await settle();
+    fake.advanceTime(OPEN_OVER_MS);
+    const { title: oneLine } = dialogTextBoxes(fake);
+    press(fake, "Exit");
+
+    wheelDialogs().submit({ id: "longTitle", title: LONG_TITLE, message: "Message", buttons: [{ label: "OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
+    await settle();
+    fake.advanceTime(OPEN_OVER_MS);
+
+    assert.equal(squeezed(readDrawnMenu(fake).title), squeezed(LONG_TITLE));
+    const { title, message } = dialogTextBoxes(fake);
+    assert.ok(title.bottom - title.top >= 2 * (oneLine.bottom - oneLine.top), "two lines or more");
+    assert.ok(title.bottom <= message.top);
+    assert.equal(highlightedEntry(fake), "OK");
+    press(fake, "Exit");
+});
+
+test("a dialog that fails to draw logs the error and shows natively, title first, the queue advancing on its close", async () => {
     const RealStyledText = globalThis.StyledText;
     globalThis.StyledText = class {
         constructor() { throw new Error("DirectWrite is gone"); }
     };
     try {
         await playPastThreshold(TABLES[3]);
-        wheelDialogs().submit({ id: "nextDialog", message: "Next", buttons: [{ label: "Next OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
+        wheelDialogs().submit({ id: "nextDialog", title: "Next", message: "Next", buttons: [{ label: "Next OK" }], priority: DIALOG_PRIORITY.RATING_PROMPT });
         await settle();
     } finally {
         globalThis.StyledText = RealStyledText;
@@ -130,7 +169,8 @@ test("a dialog that fails to draw logs the error and shows natively, the queue a
 
     assert.ok(!isDrawnMenuShown(fake));
     assert.equal(fake.currentMenu().id, "ratingPrompt", "the native dialog shows");
-    assert.equal(fake.currentMenu().items[0].title, messageOf(TABLES[3]));
+    assert.equal(fake.currentMenu().items[0].title, "Rate this table");
+    assert.equal(fake.currentMenu().items[1].title, messageOf(TABLES[3]));
     assert.ok(fake.logLines().some(line => line.startsWith("[DrawnMenus] ERROR") && line.includes("DirectWrite is gone")));
 
     fake.selectMenuItem(TEXT.rateNow);
