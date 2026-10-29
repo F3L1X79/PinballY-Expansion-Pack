@@ -324,6 +324,29 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-play" id="clock" data-track="play" data-rank="bronze">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>L'heure à l'écran</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+          </div>
+          <p>L'heure toujours visible sur la borne, où celle de Windows ne l'est jamais : d'abord pensée sur le backglass, dans le style Steamball.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Quel écran : le backglass (mais il couvre l'illustration de la table, et il est caché pendant une partie), le topper, le DMD, ou un coin de l'écran de jeu ?</li>
+              <li>Pendant une partie aussi, ou seulement sur la roue ?</li>
+              <li>Format 24 h ou 12 h selon la langue, et la date avec ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026. Le texte change une fois par minute, sans mouvement : pas d'animation sans fin.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-share" id="vpxtool-update" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -349,6 +372,30 @@
         </div>
       </li>
 
+      <li draggable="true" tabindex="0" class="item tr-share" id="discord" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Discord Rich Presence : la table jouée dans le statut Discord</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Quand Discord tourne sur le PC de la borne, le statut montre la table en cours (et peut-être la roue, le Challenge ou la Table of the Day).</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/research</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant l'<a href="#stats-api">API des statistiques (n° <span data-ref="stats-api"></span>)</a> : il lit les données du pack de l'intérieur, sans l'attendre</div>
+          <details>
+            <summary>Questions ouvertes (4)</summary>
+            <ul>
+              <li>Discord tourne-t-il sur la borne, ou l'idée sert-elle surtout aux autres utilisateurs ?</li>
+              <li>Faisable sans bibliothèque : le tube nommé <code>\\.\pipe\discord-ipc-0</code> ouvert avec <code>dllImport</code> (kernel32), sans lecture qui bloque PinballY ? À vérifier en <code>/research</code>, avec le piège du <code>CParser.js</code>.</li>
+              <li>Vie privée : jamais le nom d'un Child Profile ; le nom du Profile du tout, ou seulement la table ?</li>
+              <li>Une application Discord (client ID) à créer : la tienne pour tout le monde, ou une par installation ?</li>
+            </ul>
+            <p class="ctx">Idée de Félix du 25/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
       <li draggable="true" tabindex="0" class="item tr-profiles" id="ratings" data-track="profiles" data-rank="platinum">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -370,25 +417,26 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-play" id="clock" data-track="play" data-rank="bronze">
+      <li draggable="true" tabindex="0" class="item tr-share" id="pinemhi-online" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>L'heure à l'écran</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
+            <h3>Scores en ligne PINemHi sur le High Score Board</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
           </div>
-          <p>L'heure toujours visible sur la borne, où celle de Windows ne l'est jamais : d'abord pensée sur le backglass, dans le style Steamball.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></div>
+          <p>Un onglet « Scores en ligne » à côté des scores locaux du High Score Board : le n° 1 mondial du LeaderBoard de PINemHi, puis le meilleur score de la maison (un autre Profile, ou à défaut un Default Score), sans « ami en ligne ».</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/research</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur le High Score Board (livré) · Research : <code>docs/research/high-scores-tools.md</code></div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Questions ouvertes (4)</summary>
             <ul>
-              <li>Quel écran : le backglass (mais il couvre l'illustration de la table, et il est caché pendant une partie), le topper, le DMD, ou un coin de l'écran de jeu ?</li>
-              <li>Pendant une partie aussi, ou seulement sur la roue ?</li>
-              <li>Format 24 h ou 12 h selon la langue, et la date avec ?</li>
+              <li>pinemhi.com expose-t-il une API, ou faudrait-il lire ses pages (fragile, et ses conditions d'utilisation) ? À établir en <code>/research</code>.</li>
+              <li>Accord de l'auteur de PINemHi : sans licence publiée, se brancher sur son service se demande, comme PinballY l'a fait pour l'embarquer.</li>
+              <li>Le LeaderBoard ne retient que le joueur 1 de la dernière partie, avec un compte pinemhi.com, et surtout les tables à ROM : combien des tables de la borne y ont un classement ?</li>
+              <li>Borne hors ligne, réponse lente : l'onglet attend-il, ou montre-t-il la dernière réponse gardée ? Un record mondial démesuré décourage-t-il les enfants ?</li>
             </ul>
-            <p class="ctx">Idée de Félix du 25/10/2026. Le texte change une fois par minute, sans mouvement : pas d'animation sans fin.</p>
+            <p class="ctx">Idée de Félix du 29/10/2026, d'après une maquette externe. La maison a déjà ses records attribués sur le High Score Board : la seule nouveauté est le score mondial, d'où l'impact faible.</p>
           </details>
         </div>
       </li>
@@ -428,6 +476,32 @@
           </div>
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links"><a href="../.scratch/feld.md">.scratch/feld.md</a></div>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-play" id="household-mission" data-track="play" data-rank="platinum">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>La Mission du foyer : un objectif de la semaine pour toute la maison</h3>
+            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">gros</span><span class="tag">UI</span></div>
+          </div>
+          <p>Chaque semaine, tous les Profiles du Household contribuent à un même objectif (découvrir N tables différentes, revisiter des tables délaissées…). Pas de classement : la maison réussit ou non ensemble. Règle d'or : même le joueur le moins fort aide la maison à gagner.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (l'écran de la mission) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Semaine de la Table of the Week (<code>common/tables/period_table.js</code>), Play Log, confettis. Avant les <a href="#challenge-adaptive">Challenges adaptés (n° <span data-ref="challenge-adaptive"></span>)</a> : elle pose la première le calibrage sur le Play Log, qu'ils reprendront</div>
+          <details>
+            <summary>Questions ouvertes (6)</summary>
+            <ul>
+              <li>Calibrage : l'objectif calculé sur les semaines passées du Play Log, jamais un chiffre en dur, pour qu'une mission ne soit ni triviale ni toujours ratée. Que se passe-t-il après un échec (rien, objectif abaissé) ?</li>
+              <li>Quels objectifs respectent la règle d'or : ceux qui comptent des Plays (découvrir, revisiter). « Des records sur plusieurs machines » avantage le plus fort, « faire jouer tous les Profiles » punit la maison pour un absent : les écarter ?</li>
+              <li>Les contributions : « Ont aidé : toi, maman… », sans chiffres ni ordre, pour ne pas refaire un classement ?</li>
+              <li>La récompense : le glossaire ne connaît pas de récompense qui expire. Plutôt une famille d'Achievements « Foyer » (N missions réussies) et un cadre permanent ?</li>
+              <li>Invité contribue-t-il (un visiteur qui aide), et les Profiles qui n'ont pas joué depuis des semaines comptent-ils ?</li>
+              <li>Masquée tant que le Household a moins de deux Profiles actifs ? Où la voir : le Welcome Screen, un toast de progrès ? Qu'est-ce qui la distingue du Challenge de la semaine ?</li>
+            </ul>
+            <p class="ctx">Idée externe du 29/10/2026. Le Play Log ne date que du 01/10/2026 : comme les Challenges adaptés, elle attend des mois de parties réelles pour être calibrée.</p>
+          </details>
         </div>
       </li>
 
@@ -480,54 +554,6 @@
         </div>
       </li>
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="discord" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Discord Rich Presence : la table jouée dans le statut Discord</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
-          </div>
-          <p>Quand Discord tourne sur le PC de la borne, le statut montre la table en cours (et peut-être la roue, le Challenge ou la Table of the Day).</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/research</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après l'<a href="#stats-api">API des statistiques (n° <span data-ref="stats-api"></span>)</a>, dont il est un consommateur extérieur</div>
-          <details>
-            <summary>Questions ouvertes (4)</summary>
-            <ul>
-              <li>Discord tourne-t-il sur la borne, ou l'idée sert-elle surtout aux autres utilisateurs ?</li>
-              <li>Faisable sans bibliothèque : le tube nommé <code>\\.\pipe\discord-ipc-0</code> ouvert avec <code>dllImport</code> (kernel32), sans lecture qui bloque PinballY ? À vérifier en <code>/research</code>, avec le piège du <code>CParser.js</code>.</li>
-              <li>Vie privée : jamais le nom d'un Child Profile ; le nom du Profile du tout, ou seulement la table ?</li>
-              <li>Une application Discord (client ID) à créer : la tienne pour tout le monde, ou une par installation ?</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 25/10/2026.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="pinemhi-online" data-track="share" data-rank="gold">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Scores en ligne PINemHi sur le High Score Board</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span><span class="tag">UI</span></div>
-          </div>
-          <p>Un onglet « Scores en ligne » à côté des scores locaux du High Score Board : le n° 1 mondial du LeaderBoard de PINemHi, puis le meilleur score de la maison (un autre Profile, ou à défaut un Default Score), sans « ami en ligne ».</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/research</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Sur le High Score Board (livré) · Research : <code>docs/research/high-scores-tools.md</code></div>
-          <details>
-            <summary>Questions ouvertes (4)</summary>
-            <ul>
-              <li>pinemhi.com expose-t-il une API, ou faudrait-il lire ses pages (fragile, et ses conditions d'utilisation) ? À établir en <code>/research</code>.</li>
-              <li>Accord de l'auteur de PINemHi : sans licence publiée, se brancher sur son service se demande, comme PinballY l'a fait pour l'embarquer.</li>
-              <li>Le LeaderBoard ne retient que le joueur 1 de la dernière partie, avec un compte pinemhi.com, et surtout les tables à ROM : combien des tables de la borne y ont un classement ?</li>
-              <li>Borne hors ligne, réponse lente : l'onglet attend-il, ou montre-t-il la dernière réponse gardée ? Un record mondial démesuré décourage-t-il les enfants ?</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 29/10/2026, d'après une maquette externe. La maison a déjà ses records attribués sur le High Score Board : la seule nouveauté est le score mondial, d'où l'impact faible.</p>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-play" id="challenge-adaptive" data-track="play" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -547,32 +573,6 @@
               <li>Activité de toute la maison, ou des seuls Profiles qui fixent la barre ?</li>
             </ul>
             <p class="ctx">Reporté pendant le grilling du rééquilibrage (01/10/2026) : idée intéressante, mais pas assez de recul. Il faut d'abord analyser un gros Play Log, des mois de parties réelles, pour y voir plus clair.</p>
-          </details>
-        </div>
-      </li>
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="household-mission" data-track="play" data-rank="platinum">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>La Mission du foyer : un objectif de la semaine pour toute la maison</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">gros</span><span class="tag">UI</span></div>
-          </div>
-          <p>Chaque semaine, tous les Profiles du Household contribuent à un même objectif (découvrir N tables différentes, revisiter des tables délaissées…). Pas de classement : la maison réussit ou non ensemble. Règle d'or : même le joueur le moins fort aide la maison à gagner.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>prototype</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/prototype</code> (l'écran de la mission) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Semaine de la Table of the Week (<code>common/tables/period_table.js</code>), Play Log, confettis. Après les <a href="#challenge-adaptive">Challenges adaptés (n° <span data-ref="challenge-adaptive"></span>)</a>, dont elle reprend le calibrage sur le Play Log</div>
-          <details>
-            <summary>Questions ouvertes (6)</summary>
-            <ul>
-              <li>Calibrage : l'objectif calculé sur les semaines passées du Play Log, jamais un chiffre en dur, pour qu'une mission ne soit ni triviale ni toujours ratée. Que se passe-t-il après un échec (rien, objectif abaissé) ?</li>
-              <li>Quels objectifs respectent la règle d'or : ceux qui comptent des Plays (découvrir, revisiter). « Des records sur plusieurs machines » avantage le plus fort, « faire jouer tous les Profiles » punit la maison pour un absent : les écarter ?</li>
-              <li>Les contributions : « Ont aidé : toi, maman… », sans chiffres ni ordre, pour ne pas refaire un classement ?</li>
-              <li>La récompense : le glossaire ne connaît pas de récompense qui expire. Plutôt une famille d'Achievements « Foyer » (N missions réussies) et un cadre permanent ?</li>
-              <li>Invité contribue-t-il (un visiteur qui aide), et les Profiles qui n'ont pas joué depuis des semaines comptent-ils ?</li>
-              <li>Masquée tant que le Household a moins de deux Profiles actifs ? Où la voir : le Welcome Screen, un toast de progrès ? Qu'est-ce qui la distingue du Challenge de la semaine ?</li>
-            </ul>
-            <p class="ctx">Idée externe du 29/10/2026. Le Play Log ne date que du 01/10/2026 : comme les Challenges adaptés, elle attend des mois de parties réelles pour être calibrée.</p>
           </details>
         </div>
       </li>
@@ -657,8 +657,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(12)</span></summary>
+          <summary>29/10 <span class="count">(13)</span></summary>
           <ol>
+            <li><strong>Nouvel ordre de Félix : l'heure 2ᵉ, Discord et PINemHi remontent</strong>
+              <span>L'heure à l'écran passe 2ᵉ, devant vpxtool ; Discord passe 4ᵉ, devant les notes et favoris et désormais avant l'API des statistiques, puisqu'il lit les données du pack de l'intérieur ; PINemHi suit les notes et favoris ; la Mission du foyer passe devant le mini-jeu et devant les Challenges adaptés, à qui elle laisse son calibrage sur le Play Log. Efforts et impacts inchangés.</span></li>
             <li><strong>« Admin et enfant en jeu » a ses tickets #365 à #368</strong>
               <span>Une chaîne : la ligne grisée du Drawn Menu (#365), la marque enfant dans « Gérer les profils » (#366), la marque admin (#367), puis le premier admin qui se désigne lui-même (#368).</span></li>
             <li><strong>« Admin et enfant en jeu » a sa spec #364</strong>
