@@ -1,6 +1,7 @@
 // ============================================================
-// Profile Reset from the Exit menu through main.js: shown to an active Admin
-// only, lists every Profile, asks once on "No". "Yes" keeps a dated copy,
+// Profile Reset from Manage profiles in the Exit menu through main.js: shown
+// to an active Admin only, lists every Profile, then "Reset" in a Profile's
+// menu asks once on "No". "Yes" keeps a dated copy,
 // saves empty data with the marks kept, renames its Play Log year files;
 // the other Profiles' Play Logs are untouched.
 // ============================================================
@@ -92,6 +93,7 @@ test("an Admin Profile resets another Profile from the Exit menu, after one conf
         fake.openExitMenu();
         fake.selectMenuItem(TEXT.menuEntry);
         fake.selectMenuItem(shownName);
+        fake.selectMenuItem(TEXT.reset);
         return fake.currentMenu();
     };
 

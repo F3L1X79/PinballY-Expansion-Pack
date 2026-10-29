@@ -45,6 +45,7 @@ test("a Profile Reset brings the Daily Streak back to 0", async () => {
     fake.openExitMenu();
     fake.selectMenuItem(TEXT.menuEntry);
     fake.selectMenuItem("Alice");
+    fake.selectMenuItem(TEXT.reset);
     fake.selectMenuItem(TEXT.yes);
     fake.selectMenuItem(TEXT.ok);
     fake.fire("wheelmode");

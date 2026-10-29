@@ -40,7 +40,7 @@ PinballY's own log, in the PinballY folder, covers the current session only. At 
 
 **A table with an empty ROM field has no board at all.** If you updated PINemHi, the `[romfind]` section of `romfind.ini` must be appended to `pinemhi.ini` (see [Install](install.md#pinemhi-368)).
 
-**"Reset profile" is missing from the Exit menu.** It shows to Admin Profiles only, and needs PinballY's Exit menu: if you disabled it in PinballY's options, the entry cannot show.
+**"Manage profiles" is missing from the Exit menu.** It shows to Admin Profiles only, and needs PinballY's Exit menu: if you disabled it in PinballY's options, the entry cannot show.
 
 **A Profile mark (`isAdmin`, `isChild`) has no effect.** It must be `true` or `false`, at the top level of `profile.json`, with its key spelt exactly; a wrong mark is ignored and logged in `PinballY.log`. Edit `profile.json` with PinballY closed.
 

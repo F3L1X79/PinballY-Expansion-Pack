@@ -31,8 +31,9 @@ export const PERIOD_TABLE = table(2, "Period Table");
 
 // now: the clock at startup; files: { path: content } kept from an
 // earlier run, written over the default Profiles; tables: the cabinet's
-// tables, TABLE and PERIOD_TABLE by default.
-export async function startSurprisesScenario({ now, files = {}, tables = [TABLE, PERIOD_TABLE] }) {
+// tables, TABLE and PERIOD_TABLE by default; addOns: the Add-ons on
+// besides session stats and Achievements.
+export async function startSurprisesScenario({ now, files = {}, tables = [TABLE, PERIOD_TABLE], addOns = [] }) {
     const fake = createFakePinballYHost({ now, tables });
     const defaultFiles = {
         [`${PROFILES}\\cabinet.json`]: JSON.stringify({ version: 1, activeProfile: "guest" }),
@@ -43,7 +44,7 @@ export async function startSurprisesScenario({ now, files = {}, tables = [TABLE,
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) {
-        config.addOns[key] = ["sessionStatsTracker", "achievements"].includes(key);
+        config.addOns[key] = ["sessionStatsTracker", "achievements", ...addOns].includes(key);
     }
     config.language = "en";
 

@@ -39,6 +39,7 @@ test("after Yes, a message with OK tells whether the Profile Reset worked", asyn
         fake.openExitMenu();
         fake.selectMenuItem(TEXT.menuEntry);
         fake.selectMenuItem(name);
+        fake.selectMenuItem(TEXT.reset);
     };
     const shownMessage = () => {
         const menu = fake.currentMenu();

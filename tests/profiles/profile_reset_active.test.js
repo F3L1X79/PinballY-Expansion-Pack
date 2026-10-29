@@ -77,6 +77,7 @@ test("an Admin Profile resetting itself starts over at once, without replaying a
     fake.openExitMenu();
     fake.selectMenuItem(TEXT.menuEntry);
     fake.selectMenuItem("Alice");
+    fake.selectMenuItem(TEXT.reset);
     fake.selectMenuItem(TEXT.yes);
     // PinballY is back on the wheel once the menu closes.
     fake.fire("wheelmode");

@@ -7,7 +7,7 @@ For the cabinet owner:
 - **Expansion Pack Settings**: from the Operator Menu, turn each Add-on on or off by category, pick the startup screen and the language, then restart PinballY in one press.
 - **Admin Profile**: the setup entries for you alone.
 - **Child Profile**: a wheel without Adult Tables for the kids.
-- **Profile Reset**: start a Profile over, or the whole household at once.
+- **Manage profiles**: mark a Child Profile, or start a Profile over (Profile Reset), alone or the whole household at once.
 - **Menu Cleanup**: leaner PinballY menus (see [Interface](interface.md#menu-cleanup)).
 
 Everything stays in one folder, with no change to PinballY itself.
@@ -63,17 +63,20 @@ To keep the setup entries for yourself, add `"isAdmin": true` at the top level o
 
 ## Profile Reset
 
-An Admin Profile also finds **Reset profile** in the Exit menu (Escape), right after "Operator Menu". It lists every Profile, Guest and yourself included, plus "Every profile", once there are two or more, to reset the whole household at once.
+An Admin Profile also finds **Manage profiles** in the Exit menu (Escape), right after "Operator Menu". It lists every Profile, Guest and yourself included, plus "Every profile", once there are two or more, to reset the whole household at once. Picking a Profile opens its own menu: its Child mark (see [Child Profile](#child-profile)) and **Reset**. Exit or "Back" there brings you back to the list.
 
-- After one confirmation (the cursor starts on "No"), the chosen Profile starts over: its plays, Streaks, session records, Random Games, Challenge progress, announced Achievements, Table Mastery, Collection Tier and Avatar Frames are erased, while its name, Avatar, marks and the High Scores it won stay.
+- After one confirmation (the cursor starts on "No"), "Reset" or "Every profile" starts the Profile over: its plays, Streaks, session records, Random Games, Challenge progress, announced Achievements, Table Mastery, Collection Tier and Avatar Frames are erased, while its name, Avatar, marks and the High Scores it won stay.
 - A message then tells whether it worked.
 - Its former files are kept next to them, as `profile.reset-<date>.json` and `play-log-<year>.reset-<date>.json`: to undo a reset, close PinballY and rename each copy back, without its `.reset-<date>` part.
-- Reset profile needs PinballY's Exit menu: if you disabled it in PinballY's options, the entry cannot show.
+- Manage profiles needs PinballY's Exit menu: if you disabled it in PinballY's options, the entry cannot show.
 
 ## Child Profile
 
-To keep the Adult Tables away from a child, tag them in PinballY with the category `NSFW` (or name your own category with `ADULT_CATEGORY` in `Scripts\ExpansionPack\.env.local`, spelt exactly as in PinballY), then add `"isChild": true` at the top level of the child's `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed.
+To keep the Adult Tables away from a child, tag them in PinballY with the category `NSFW` (or name your own category with `ADULT_CATEGORY` in `Scripts\ExpansionPack\.env.local`, spelt exactly as in PinballY), then mark the child's Profile: from an Admin Profile, open **Manage profiles** in the Exit menu, pick the child's Profile and choose "Child: no", which turns to "Child: yes" at once. Choose it again to clear the mark.
 
+- An Admin Profile's Child line is greyed out ("Remove the admin mark first"), and so is Guest's ("Guest is never marked"): choosing it changes nothing.
+- You can still mark a Profile by hand: add `"isChild": true` at the top level of its `Scripts\ExpansionPack\profiles\<name>\profile.json`, PinballY closed.
+- A Profile marked again finds its own Achievements as it left them, with no new announcement.
 - While that Profile is active, those tables are left off the wheel whatever the filter, the Random Game never draws one, and starting up never leaves the wheel on one; switching to another Profile brings them back at once.
 - The Table of the Day and the Table of the Week stay the same for the whole household: while one is an Adult Table, the child does not get its card on the Welcome Screen, and that day or week neither extends nor breaks the child's Streak.
 - Guest is never a Child Profile, so adult visitors see the whole collection.

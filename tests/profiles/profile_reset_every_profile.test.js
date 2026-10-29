@@ -45,11 +45,11 @@ test("Every Profile resets them all, and a failing one does not stop the others"
         };
     };
 
-    // The Exit menu offers the Profile Reset only once an Admin Profile
+    // The Exit menu offers Manage profiles only once an Admin Profile
     // exists, so never with Guest alone: its list is opened directly.
     const { createPinballYHost } = await import("../../common/core/pinbally_host.js");
-    const { createProfileResetMenu } = await import("../../common/menus/profile_reset_menu.js");
-    createProfileResetMenu(createPinballYHost(), getProfileStore()).open();
+    const { createManageProfilesMenu } = await import("../../common/menus/manage_profiles_menu.js");
+    createManageProfilesMenu(createPinballYHost(), getProfileStore()).open();
     assert.deepEqual(fake.currentMenu().items.map(item => item.title ?? ""),
         [TEXT.listTitle, "", GUEST, "", TEXT.cancel], "with Guest alone, no Every Profile line");
     fake.selectMenuItem(TEXT.cancel);

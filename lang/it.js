@@ -585,10 +585,20 @@ export default {
         disabledLine: (label, reason) => `${label} (${reason})`,
     },
 
-    // The Profile Reset, in PinballY's Exit menu for an Admin Profile.
+    // Manage profiles, in PinballY's Exit menu for an Admin Profile: the
+    // marks and the Profile Reset.
     profileReset: {
-        menuEntry: "Azzera un profilo",
-        listTitle: "Quale profilo riparte da zero?",
+        menuEntry: "Gestisci i profili",
+        listTitle: "Quale profilo?",
+        childLine: isChild => `Bambino: ${isChild ? "sì" : "no"}`,
+        reset: "Azzera",
+        back: "Indietro",
+        // Why a mark line is greyed out, by the mark rules' refusal.
+        refusals: {
+            guestNeverMarked: "Ospite non viene mai contrassegnato",
+            removeAdminMarkFirst: "Togli prima il segno di admin",
+        },
+        marksFailed: name => `Impossibile cambiare i segni di ${name}. Consulta il log per i dettagli.`,
         confirm: name => `Azzerare ${name}? Tutte le sue partite, serie, sfide e obiettivi saranno cancellati.`,
         yes: "Sì, azzera",
         no: "No",

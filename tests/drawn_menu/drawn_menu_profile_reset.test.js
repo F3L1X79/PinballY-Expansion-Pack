@@ -1,7 +1,7 @@
 // ============================================================
 // The Profile Reset menus as Drawn Menus, through main.js on the fake
 // PinballY globals: the list, its title as a heading, opened from the
-// drawn Exit menu; the confirmation, its question above "Yes" and "No",
+// drawn Exit menu; from a Profile's "Reset", the confirmation, its question above "Yes" and "No",
 // the cursor on "No"; the outcome with "OK". The Profile is reset as
 // before, and "No", "Cancel" and "OK" close the menus.
 // ============================================================
@@ -59,6 +59,7 @@ test("the list is drawn from the Exit menu, its title as a heading", () => {
 test("the confirmation asks above Yes and No, the cursor on No, and No closes it", () => {
     openList();
     chooseEntry(fake, "Bob");
+    chooseEntry(fake, TEXT.reset);
 
     assert.equal(fake.currentMenu(), null);
     assert.equal(squeezed(readDrawnMenu(fake).message), squeezed(TEXT.confirm("Bob")));
@@ -74,6 +75,7 @@ test("the confirmation asks above Yes and No, the cursor on No, and No closes it
 test("Yes resets the Profile and the outcome shows with OK", () => {
     openList();
     chooseEntry(fake, "Bob");
+    chooseEntry(fake, TEXT.reset);
     chooseEntry(fake, TEXT.yes);
 
     assert.equal(JSON.parse(fake.readFile(profileFile("Bob"))).randomGames, 0);

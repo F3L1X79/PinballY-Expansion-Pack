@@ -1,7 +1,7 @@
 // ============================================================
-// Profile Reset menus, opened from the Exit menu: the list of Profiles (and
-// "Every Profile"), one confirmation on "No", then a one-line outcome.
-// Opens directly through the Drawn Menu module. Listens to "command".
+// Profile Reset menus, opened from Manage profiles: one confirmation on
+// "No", then a one-line outcome. Opens directly through the Drawn Menu
+// module. Listens to "command".
 // - A failure does not stop the other resets; causes go to the log only.
 // ============================================================
 
@@ -11,7 +11,6 @@ import { logHandlerError, safeHandler } from "../core/safe_handler.js";
 import { createNativeMenus } from "../drawn_menu/drawn_menu.js";
 
 const SCRIPT_NAME = "ProfileReset";
-const LIST_MENU_ID = "profileResetList";
 const CONFIRM_MENU_ID = "profileResetConfirm";
 const OUTCOME_MENU_ID = "profileResetOutcome";
 
@@ -19,37 +18,9 @@ const OUTCOME_MENU_ID = "profileResetOutcome";
 export function createProfileResetMenu(host, profileStore, menus = createNativeMenus(host)) {
     const { profileReset: TEXT } = lang;
     const yesCommand = host.allocateCommand("profileResetYes");
-    const everyProfileCommand = host.allocateCommand("profileResetEveryProfile");
     const cancelCommand = host.getBuiltInCommand("MenuReturn");
-    // One command per line of the list, by position, allocated on demand:
-    // the household can grow while PinballY runs.
-    const profileCommands = [];
-    // The Profiles of the list on screen, then those the confirmation names.
-    let listedProfiles = [];
+    // The Profiles the confirmation names.
     let profilesToReset = null;
-
-    function getProfileCommand(index) {
-        while (profileCommands.length <= index) {
-            profileCommands.push(host.allocateCommand(`profileResetProfile${profileCommands.length}`));
-        }
-        return profileCommands[index];
-    }
-
-    // With Guest alone, "Every Profile" would only repeat its line.
-    const offersEveryProfile = () => listedProfiles.length >= 2;
-
-    function open() {
-        listedProfiles = profileStore.listProfiles();
-        menus.show(LIST_MENU_ID, [
-            { title: TEXT.listTitle, cmd: -1 },
-            { cmd: -1 },
-            ...listedProfiles.map((profile, index) => ({ title: displayNameOf(profile), cmd: getProfileCommand(index) })),
-            { cmd: -1 },
-            // Its own separator before Cancel; without it, the one above already sets Cancel apart.
-            ...(offersEveryProfile() ? [{ title: TEXT.everyProfile, cmd: everyProfileCommand }, { cmd: -1 }] : []),
-            { title: TEXT.cancel, cmd: cancelCommand },
-        ]);
-    }
 
     function confirm(profiles) {
         profilesToReset = profiles;
@@ -89,20 +60,15 @@ export function createProfileResetMenu(host, profileStore, menus = createNativeM
         ], { dialogStyle: true });
     }
 
-    // Fires on every command: a Profile of the list, or "Every Profile", asks
-    // for confirmation, "Yes" resets them and shows the outcome.
+    // Fires on every command: "Yes" resets the Profiles and shows the outcome.
     host.on("command", safeHandler(SCRIPT_NAME, ev => {
-        const index = profileCommands.indexOf(ev.id);
-        if (index >= 0 && index < listedProfiles.length) {
-            confirm([listedProfiles[index]]);
-        } else if (ev.id === everyProfileCommand && offersEveryProfile()) {
-            confirm(listedProfiles);
-        } else if (ev.id === yesCommand && profilesToReset) {
+        if (ev.id === yesCommand && profilesToReset) {
             const profiles = profilesToReset;
             profilesToReset = null;
             resetAndReport(profiles);
         }
     }));
 
-    return { open };
+    // confirm(profiles): asks before resetting these Profiles ({ name, isGuest }).
+    return { confirm };
 }

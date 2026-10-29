@@ -7,7 +7,7 @@ Pour le propriétaire de la borne :
 - **Réglages du pack** : depuis le menu opérateur, activer ou désactiver chaque Add-on par catégorie, choisir l'écran de démarrage et la langue, puis redémarrer PinballY d'une pression.
 - **Profil admin** : les entrées de configuration pour vous seul.
 - **Profil enfant** : une roue sans tables pour adultes.
-- **Réinitialiser un profil** : repartir de zéro, pour un Profil ou toute la maison d'un coup.
+- **Gérer les profils** : marquer un Profil enfant, ou faire repartir de zéro un Profil ou toute la maison d'un coup.
 - **Nettoyage des menus** : des menus PinballY allégés (voir [Interface](interface.md#nettoyage-des-menus)).
 
 Tout tient dans un seul dossier, sans modifier PinballY.
@@ -63,17 +63,20 @@ Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": tr
 
 ## Réinitialiser un profil
 
-Un Profil admin trouve aussi **Réinitialiser un profil** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils », dès qu'il y en a au moins deux, pour remettre toute la maison à zéro d'un coup.
+Un Profil admin trouve aussi **Gérer les profils** dans le menu de sortie (Échap), juste après « Menu opérateur ». Il liste tous les Profils, Invité et vous-même compris, plus « Tous les profils », dès qu'il y en a au moins deux, pour remettre toute la maison à zéro d'un coup. Choisir un Profil ouvre son propre menu : sa marque enfant (voir [Profil enfant](#profil-enfant)) et **Réinitialiser**. Échap ou « Retour » y ramène à la liste.
 
-- Après une confirmation (le curseur part sur « Non »), le Profil choisi repart de zéro : ses parties, ses séries, ses records de session, ses parties aléatoires, sa progression aux défis, ses succès annoncés, sa maîtrise des tables, son palier de collection et ses cadres d'Avatar sont effacés, tandis que son nom, son avatar, ses marques et les meilleurs scores qu'il a gagnés restent.
+- Après une confirmation (le curseur part sur « Non »), « Réinitialiser » ou « Tous les profils » fait repartir le Profil de zéro : ses parties, ses séries, ses records de session, ses parties aléatoires, sa progression aux défis, ses succès annoncés, sa maîtrise des tables, son palier de collection et ses cadres d'Avatar sont effacés, tandis que son nom, son avatar, ses marques et les meilleurs scores qu'il a gagnés restent.
 - Un message indique ensuite si l'opération a réussi.
 - Ses anciens fichiers sont gardés à côté, sous les noms `profile.reset-<date>.json` et `play-log-<année>.reset-<date>.json` : pour annuler une réinitialisation, fermez PinballY et renommez chaque copie sans sa partie `.reset-<date>`.
 - Cette entrée a besoin du menu de sortie de PinballY : si vous l'avez désactivé dans les options de PinballY, elle ne peut pas apparaître.
 
 ## Profil enfant
 
-Pour tenir les tables pour adultes à l'écart d'un enfant, donnez-leur dans PinballY la catégorie `NSFW` (ou nommez votre propre catégorie avec `ADULT_CATEGORY` dans `Scripts\ExpansionPack\.env.local`, écrite exactement comme dans PinballY), puis ajoutez `"isChild": true` au premier niveau du `Scripts\ExpansionPack\profiles\<nom>\profile.json` de l'enfant, PinballY fermé.
+Pour tenir les tables pour adultes à l'écart d'un enfant, donnez-leur dans PinballY la catégorie `NSFW` (ou nommez votre propre catégorie avec `ADULT_CATEGORY` dans `Scripts\ExpansionPack\.env.local`, écrite exactement comme dans PinballY), puis marquez le Profil de l'enfant : depuis un Profil admin, ouvrez **Gérer les profils** dans le menu de sortie, choisissez le Profil de l'enfant puis « Enfant : non », qui passe aussitôt à « Enfant : oui ». Choisissez-la de nouveau pour retirer la marque.
 
+- La ligne Enfant d'un Profil admin est grisée (« Retirez d'abord la marque admin »), comme celle d'Invité (« Invité n'est jamais marqué ») : la choisir ne change rien.
+- Vous pouvez toujours marquer un Profil à la main : ajoutez `"isChild": true` au premier niveau de son `Scripts\ExpansionPack\profiles\<nom>\profile.json`, PinballY fermé.
+- Un Profil marqué de nouveau retrouve ses succès à lui comme il les avait laissés, sans nouvelle annonce.
 - Tant que ce Profil est actif, ces tables n'apparaissent sur la roue sous aucun filtre, la partie aléatoire n'en tire jamais et le démarrage ne laisse jamais la roue sur l'une d'elles ; passer à un autre Profil les fait revenir aussitôt.
 - La table du jour et la table de la semaine restent les mêmes pour toute la maison : tant que l'une d'elles est une table pour adultes, l'enfant n'a pas sa carte sur l'écran d'accueil, et ce jour ou cette semaine ne prolonge ni ne casse sa série.
 - Invité n'est jamais un Profil enfant : les adultes de passage voient toute la collection.
