@@ -85,6 +85,16 @@ export function menuScaleOf({ width, height }) {
     return windowScale * Math.min(1, LOOK.maxWidthShare * (width / windowScale) / DRAWN_MENU_PANEL_WIDTH);
 }
 
+// A dialog message's dash list (its lines from the first one starting with
+// "- "), drawn left-aligned under its first lines, centred, and a blank line:
+// { head, list }, list null without one (styled runs never have one).
+function splitMessage(message) {
+    const lines = typeof message === "string" ? message.split("\n") : [];
+    const first = lines.findIndex(messageLine => messageLine.startsWith("- "));
+    if (first <= 0) return { head: message, list: null };
+    return { head: lines.slice(0, first).join("\n").trimEnd(), list: lines.slice(first).join("\n") };
+}
+
 // The menu's layout in the window ({ width, height }), in window pixels
 // unless named "Ref" (reference pixels): k turns the one into the other.
 // wrappedHeightAt(str, widthPx, { font, sizePx, weight }) measures a text
@@ -113,7 +123,11 @@ export function computeGeometry({ width, height }, model, wrappedHeightAt) {
     const titleStyle = { font: FONTS.body, sizePx: LOOK.dialogTitle.size * k, weight: LOOK.dialogTitle.weight };
     const titleHeightRef = model.title === null ? 0 : wrappedHeightAt(model.title, listWidth, titleStyle) / k;
     const messageStyle = { font: FONTS.body, sizePx: LOOK.message.size * k, weight: LOOK.message.weight };
-    const messageHeightRef = model.message === null ? 0 : wrappedHeightAt(model.message, listWidth, messageStyle) / k;
+    const { head, list } = splitMessage(model.message);
+    const headHeightRef = head === null ? 0 : wrappedHeightAt(head, listWidth, messageStyle) / k;
+    // The list's top: under the first lines and a blank line.
+    const messageListOffsetRef = list === null ? 0 : headHeightRef + wrappedHeightAt("Ag", UNBOUNDED, messageStyle) / k;
+    const messageHeightRef = messageListOffsetRef + (list === null ? headHeightRef : wrappedHeightAt(list, listWidth, messageStyle) / k);
     // Under a title (never without a message), as much space above the
     // message as below it, down to the separator's line in the middle of its box.
     const messageTopRef = model.title === null ? 0 : titleHeightRef + LOOK.message.gap + LOOK.rowHeights.separator / 2;
@@ -139,6 +153,7 @@ export function computeGeometry({ width, height }, model, wrappedHeightAt) {
         titleHeight: titleHeightRef * k,
         messageTop: messageTopRef * k,
         messageHeight: messageHeightRef * k,
+        messageListOffset: messageListOffsetRef * k,
         // From the content's top to the separator's box under the message.
         headerHeight: (messageTopRef + messageHeightRef) * k,
         // From the content's top to the list's.
@@ -285,10 +300,14 @@ export function drawTexts(host, dc, geometry, model, scroll) {
         });
     }
     if (model.message !== null) {
-        text(host, dc, model.message, {
-            x: 0, y: geometry.messageTop, width: listWidth, height: geometry.messageHeight,
-            size: pointsOf(LOOK.message.size * k), weight: LOOK.message.weight, color: LOOK.colors.message, align: "center",
-        });
+        const { head, list } = splitMessage(model.message);
+        const style = { x: 0, width: listWidth, size: pointsOf(LOOK.message.size * k), weight: LOOK.message.weight, color: LOOK.colors.message };
+        if (list === null) {
+            text(host, dc, head, { ...style, y: geometry.messageTop, height: geometry.messageHeight, align: "center" });
+        } else {
+            text(host, dc, head, { ...style, y: geometry.messageTop, align: "center" });
+            text(host, dc, list, { ...style, y: geometry.messageTop + geometry.messageListOffset, align: "left" });
+        }
         drawSeparator(dc, 0, geometry.headerHeight + LOOK.message.gap * k, listWidth, LOOK.rowHeights.separator * k, k, 0xFF);
     }
     const canScrollUp = scroll > 0.5;

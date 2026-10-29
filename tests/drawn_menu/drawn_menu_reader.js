@@ -37,6 +37,7 @@ export function readDrawnMenu(fake) {
     if (!layer) throw new Error("No Drawn Menu is shown.");
     let title = null;
     let message = null;
+    let messageTop = null;
     const messageBold = [];
     let footer = null;
     const rows = [];
@@ -65,7 +66,10 @@ export function readDrawnMenu(fake) {
             title = title === null ? stroke.text : `${title}${stroke.text}`;
         }
         else if (rows.length === 0 && isDialogText(stroke)) {
-            message = message === null ? stroke.text : `${message}${stroke.text}`;
+            // A message's dash list is a second block, a blank line below its first lines.
+            const joint = messageTop === null || stroke.rect.y === messageTop ? "" : "\n\n";
+            message = message === null ? stroke.text : `${message}${joint}${stroke.text}`;
+            messageTop = stroke.rect.y;
             if (stroke.weight > DRAWN_MENU_LOOK.message.weight) messageBold.push(stroke.text.trim());
         }
         else if (stroke.color === COLORS.heading) rows.push({ kind: "heading", title: stroke.text });
@@ -92,6 +96,22 @@ export function dialogTextBoxes(fake) {
         message: boxOf(above.find(stroke => stroke.color !== COLORS.dialogTitle)),
         lineY: strokes[lineIndex].rect.y,
     };
+}
+
+// A dialog message's blocks as drawn, top to bottom: { text, align, top, bottom }.
+export function dialogMessageBlocks(fake) {
+    const layer = textsLayer(fake);
+    if (!layer) throw new Error("No Drawn Menu is shown.");
+    const strokes = layer.strokes();
+    const lineIndex = strokes.findIndex(stroke => "fill" in stroke);
+    const blocks = [];
+    for (const stroke of strokes.slice(0, lineIndex)) {
+        if (!("text" in stroke) || !isDialogText(stroke) || stroke.color === COLORS.dialogTitle) continue;
+        const last = blocks.at(-1);
+        if (last && last.top === stroke.rect.y) last.text += stroke.text;
+        else blocks.push({ text: stroke.text, align: stroke.align, top: stroke.rect.y, bottom: stroke.rect.y + stroke.rect.height });
+    }
+    return blocks;
 }
 
 // A message as readDrawnMenu gives it, to compare with its full text.

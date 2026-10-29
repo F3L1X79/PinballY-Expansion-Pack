@@ -75,7 +75,7 @@ test("the requested version running says so once, ahead of the Update Prompt", (
     assertNoErrorLogged(fake);
 });
 
-test("the Release Highlights of the versions on the way follow the line, one per line, and are forgotten with the request", () => {
+test("the Release Highlights of the versions on the way follow the line as a dash list, and are forgotten with the request", () => {
     const { fake, dialogs } = submitAt({
         saved: { requestedVersion: PACK_VERSION, previousVersion: "0.0.1" },
         releaseHighlights: { "0.0.1": ["Already there."], "0.0.2": ["Older news."], [PACK_VERSION]: ["Fresh news.", "More news."] },
