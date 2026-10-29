@@ -8,7 +8,7 @@
 #    renames the pack folder to ExpansionPack.old-<date> and the new one in
 #    its place (renaming back on failure), keeps only that one old copy.
 # 3. Starts PinballY again the way it was started, whether the update worked or not.
-# Logs each step to LogFile. Windows PowerShell 5.1, ASCII only.
+# Logs each step to LogFile (%TEMP%\PinballYExpansionPack\pack-update.log). Windows PowerShell 5.1, ASCII only.
 # ============================================================
 
 param([int]$ParentPid, [string]$ReadyFile, [string]$LogFile, [string]$ZipUrl, [string]$Sha256, [string]$PackVersion, [string]$PackFolder)

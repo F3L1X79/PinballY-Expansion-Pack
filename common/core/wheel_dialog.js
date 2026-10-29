@@ -7,6 +7,7 @@
 // - A dialog not ready yet holds its place and every dialog after it; a stale one is dropped.
 // - A screen drawn over the wheel keeps it busy once handed to waitFor().
 // - Nothing shows before PinballY lays its window out (common/core/window_layout.js).
+// - A message is measured and drawn by drawn_menu_painter.js (computeGeometry, drawTexts).
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";

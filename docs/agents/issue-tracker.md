@@ -15,6 +15,8 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
+Remote state (a pushed tag, a branch) goes through `gh api`, e.g. `gh api repos/F3L1X79/PinballY-Expansion-Pack/git/refs/tags/v1.0.0` (404: not pushed): git itself has no network in the sandbox.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_
