@@ -37,7 +37,9 @@ export function submitUpdateResult(host, { state, profileStore, dialogs, toasts,
         dialogs.submit({
             id: UPDATED_MENU_ID,
             title: TEXT.updatedTitle,
-            message: [TEXT.updated(requested), ...highlights].join("\n"),
+            message: highlights.length
+                ? `${TEXT.updated(requested)}\n\n${highlights.map(sentence => `- ${sentence}`).join("\n")}`
+                : TEXT.updated(requested),
             buttons: [{ label: TEXT.ok }],
             priority: DIALOG_PRIORITY.UPDATE_RESULT,
             onShown: () => {

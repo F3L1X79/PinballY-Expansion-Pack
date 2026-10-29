@@ -19,7 +19,7 @@ test("the success dialog lists the new version's Release Highlights", async () =
     });
 
     assert.equal(readDrawnMenu(fake).title, "Update complete");
-    assert.equal(readDrawnMenu(fake).message, `Expansion Pack updated to v${PACK_VERSION}\nChallenges now last a whole week.\nThe wheel spins faster.`);
+    assert.equal(readDrawnMenu(fake).message, `Expansion Pack updated to v${PACK_VERSION}\n\n- Challenges now last a whole week.\n- The wheel spins faster.`);
     assert.deepEqual(drawnMenuLines(fake), ["OK"]);
     assert.deepEqual(JSON.parse(fake.readFile(STATE_FILE)), { version: 1, offeredVersion: PACK_VERSION }, "shown once");
 

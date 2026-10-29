@@ -81,7 +81,7 @@ test("the Release Highlights of the versions on the way follow the line, one per
         releaseHighlights: { "0.0.1": ["Already there."], "0.0.2": ["Older news."], [PACK_VERSION]: ["Fresh news.", "More news."] },
     });
 
-    assert.equal(dialogs[0].message, `Expansion Pack updated to v${PACK_VERSION}\nFresh news.\nMore news.\nOlder news.`);
+    assert.equal(dialogs[0].message, `Expansion Pack updated to v${PACK_VERSION}\n\n- Fresh news.\n- More news.\n- Older news.`);
     dialogs[0].onShown();
     assert.deepEqual(JSON.parse(fake.readFile(STATE_FILE)), { version: 1 });
     assertNoErrorLogged(fake);
