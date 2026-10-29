@@ -245,6 +245,7 @@
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
+          <a class="chip tr-share" href="#vpxtool-update"><b></b>vpxtool installé et à jour</a>
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#ratings"><b></b>Notes, favoris, masquées</a>
@@ -260,7 +261,6 @@
           <a class="chip tr-play" href="#feld"><b></b>Feld</a>
         </div>
         <div class="cell">
-          <a class="chip tr-share" href="#vpxtool-update"><b></b>vpxtool à jour</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#pinemhi-online"><b></b>Scores en ligne PINemHi</a>
@@ -354,20 +354,21 @@
         <div class="emblem"></div>
         <div class="content">
           <div class="item-head">
-            <h3>vpxtool à jour : vérification et toast de mise à jour</h3>
+            <h3>vpxtool installé et à jour : le Script Reader Prompt</h3>
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
           </div>
-          <p>Le pack regarde la dernière release de vpxtool sur GitHub et la compare à <code>tools\vpxtool.exe</code> ; un toast propose la mise à jour, que le helper caché de la Distribution télécharge, vérifie et met en place, l'ancien <code>vpxtool.exe</code> gardé en cas d'échec.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la vérification de version et le helper de la Distribution (spec #331, livrée) · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
+          <p>Chaque Pack Version fige une Script Reader Version (v0.38.0 au départ). Quand vpxtool manque ou est plus ancien, un dialogue au démarrage propose de l'installer depuis les releases de son auteur, en disant qui l'a fait, sa licence et son site ; l'owner peut refuser. Un nouveau groupe « Mode hors ligne » des Réglages du pack peut couper cette proposition et la recherche de mises à jour. Grillé le 29/10/2026.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. ADR 0021 ; reprend le helper et le Loader de la Pack Update (spec #331, livrée) · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
           <details>
-            <summary>Questions ouvertes (5)</summary>
+            <summary>Décisions du grilling (6)</summary>
             <ul>
-              <li>Si le pack télécharge vpxtool lui-même, revoir sa ligne dans « Licence et crédits » des README (« Non fourni avec le pack » → téléchargé depuis ses releases, Apache-2.0).</li>
-              <li>Mise à jour automatique, ou toast avec un bouton ? (Recommandation de Claude : toast, jamais seul.)</li>
-              <li>Dernière release, ou une version maximale testée, écrite dans le pack et relevée à chaque release du pack ?</li>
-              <li>Comment juger la nouvelle version bonne avant de remplacer l'ancienne : <code>vpxtool romname</code> sur une table connue, même réponse qu'avant ?</li>
-              <li>Installer aussi vpxtool quand il manque (l'Error Toast « vpxtool introuvable » proposerait de le faire), ce qui retirerait l'étape 4 des README ?</li>
+              <li>vpxtool n'est jamais livré dans le zip, pas sans la bénédiction de son auteur : la borne le télécharge depuis ses releases, à la version figée, vérifiée par SHA-256 (ADR 0021). Jamais la dernière release toute seule.</li>
+              <li>Le Script Reader Prompt remplace l'Error Toast « vpxtool introuvable », pour qui voit les setup entries, après l'Update Prompt. Il s'ouvre si vpxtool manque ou si <code>vpxtool --version</code> donne une version plus ancienne ; jamais pour une version égale ou plus récente. Il dit qu'on peut l'installer plus tard depuis les Réglages ou à la main.</li>
+              <li>Un refus est définitif : ni question ni Error Toast ensuite.</li>
+              <li>« Installer » : la comète sur la roue assombrie avec « Téléchargement en cours… », boutons bloqués ; un helper caché télécharge, vérifie et remplace, l'ancien remis en cas d'échec, sans redémarrage. Puis un Dialog de résultat ; en cas de succès, la lecture des scripts démarre aussitôt. La Pack Update reçoit le même texte sous sa comète.</li>
+              <li>Réglages du pack : « Installer vpxtool v0.38.0 » ou « Mettre à jour vpxtool (vA → vB) » à la racine, à côté de « Mettre à jour en v… », grisée « à jour » sinon, absente si « ROM des tables » est éteint. Groupe « Mode hors ligne » : « Recherche de mises à jour du pack » (clé <code>updateCheck</code>) et « Proposer vpxtool », indépendants de git.</li>
+              <li>README (étape 4, crédits « téléchargé depuis ses releases »), pages Installation, Mises à jour, Réglages et Dépannage du guide, dans les deux langues.</li>
             </ul>
             <p class="ctx">Idée de Félix du 27/10/2026. Risque : vpxtool est en 0.x, avec 49 releases en 2026 et des changements « breaking » ; le pack n'en utilise que <code>romname</code>, qu'une ancienne version fait déjà bien. vpxtool n'est jamais lancé pendant une partie, donc le remplacer hors partie est sûr ; le zip Windows ne contient que <code>vpxtool.exe</code>.</p>
           </details>
@@ -384,14 +385,14 @@
           </div>
           <p>Quand Discord tourne sur le PC de la borne, le statut montre la table en cours (et peut-être la roue, le Challenge ou la Table of the Day).</p>
           <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Recherche : <code>docs/research/discord-rich-presence.md</code> (faisable sans bibliothèque ; client ID dans un dépôt public à vérifier dans les Developer Terms §2(d)). Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant l'<a href="#stats-api">API des statistiques (n° <span data-ref="stats-api"></span>)</a> : il lit les données du pack de l'intérieur, sans l'attendre</div>
+          <div class="links">Recherche : <code>docs/research/discord-rich-presence.md</code> (faisable sans bibliothèque ; les Developer Terms §2(d) interdisent un client ID dans un projet open source : chaque propriétaire crée son application Discord). Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant l'<a href="#stats-api">API des statistiques (n° <span data-ref="stats-api"></span>)</a> : il lit les données du pack de l'intérieur, sans l'attendre</div>
           <details>
             <summary>Questions ouvertes (4)</summary>
             <ul>
               <li>Discord tourne-t-il sur la borne, ou l'idée sert-elle surtout aux autres utilisateurs ?</li>
               <li>Faisable sans bibliothèque : le tube nommé <code>\\.\pipe\discord-ipc-0</code> ouvert avec <code>dllImport</code> (kernel32), sans lecture qui bloque PinballY ? À vérifier en <code>/research</code>, avec le piège du <code>CParser.js</code>.</li>
               <li>Vie privée : jamais le nom d'un Child Profile ; le nom du Profile du tout, ou seulement la table ?</li>
-              <li>Une application Discord (client ID) à créer : la tienne pour tout le monde, ou une par installation ?</li>
+              <li>Décidé le 29/10/2026 : une seule application Discord, celle de Félix, dont l'ID est dans le dépôt, comme le fait Dolphin. Les Developer Terms §2(d) l'interdisent, mais le risque est accepté pour un projet open source peu utilisé. Reste à décider au grill s'il faut un réglage pour remplacer l'ID, au cas où Discord désactiverait l'application.</li>
             </ul>
             <p class="ctx">Idée de Félix du 25/10/2026.</p>
           </details>
@@ -659,8 +660,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(17)</span></summary>
+          <summary>29/10 <span class="count">(18)</span></summary>
           <ol>
+            <li><strong>vpxtool grillé : le Script Reader Prompt, à une version figée, après accord de l'owner</strong>
+              <span>Félix refuse de livrer vpxtool dans le zip sans la bénédiction de son auteur : la borne le télécharge depuis ses releases, à la Script Reader Version figée (v0.38.0, essayée sur la borne), jamais la dernière toute seule (ADR 0021). Le dialogue installe aussi un vpxtool absent et remplace son Error Toast ; un groupe « Mode hors ligne » des Réglages coupe la proposition et la Recherche de mises à jour. Impact faible → moyen (plus d'étape 4 dans les README), effort moyen inchangé. Place inchangée.</span></li>
             <li><strong>La Backglass Clock a ses tickets #370 et #371, et un bug des Drawn Menus a le sien (#372)</strong>
               <span>#370 affiche l'heure devant le backglass de VPX pendant une partie. #371, bloqué par #370, la place la première fois sur l'écran du backglass. #372, hors spec, vient du prototype : une ligne de log par appui sur un flipper pendant toute une partie, parce que les Drawn Menus croient le menu « pause game » ouvert. Il faut d'abord diagnostiquer pourquoi.</span></li>
             <li><strong>Le prototype de la Backglass Clock tient sur la borne</strong>

@@ -21,8 +21,12 @@ Replacing the installed Expansion Pack with a newer Pack Version while PinballY 
 _Avoid_: upgrade, patch, install (installing is the first, manual copy)
 
 **Update Check**:
-The question the pack asks GitHub in the background at each start: is there a newer Pack Version? A newer one is remembered for the next start, where the Update Prompt offers it; nothing shows at the start that found it. It can be turned off, and a pack installed with git is never checked.
+The question the pack asks GitHub in the background at each start: is there a newer Pack Version? A newer one is remembered for the next start, where the Update Prompt offers it; nothing shows at the start that found it. It can be turned off in the Offline Mode, and a pack installed with git is never checked.
 _Avoid_: update notification, version check
+
+**Offline Mode**:
+The group of the Expansion Pack Settings where the owner turns off, one by one, what the pack would fetch from the internet or offer to fetch: the Update Check, and the Script Reader Prompt. Turning one off never removes the matching install or update line from the Expansion Pack Settings. Shown as "Mode hors ligne" in French.
+_Avoid_: network settings, airplane mode
 
 **Update Prompt**:
 The question shown at startup, before anything else, when a newer Pack Version was found at an earlier start: update now, or later. Asked once per Pack Version; afterwards the update stays available from the Expansion Pack Settings.
@@ -47,7 +51,7 @@ _Avoid_: vpxtool toast, install popup
 ### Errors
 
 **Error Toast**:
-A toast like the Achievement Toast, but with its own colour and a warning sign instead of a trophy, that says in one sentence what a failure has cost and, for an Admin Profile, what to do about it; it stays longer than the other toasts. It is shown only for a failure the player would not see otherwise and that does not mend itself at the next start: a Play that could not be saved, or not kept in the Play Log, shown to the Profile that played it after that Play's other toasts; the table script reader missing, shown to an Admin Profile at each start while it lasts; a Pack Update that failed, shown once to an Admin Profile, waiting for one to be active. A failure that answers a choice the player has just made keeps its own message on that screen. Shown as "Problème" in French.
+A toast like the Achievement Toast, but with its own colour and a warning sign instead of a trophy, that says in one sentence what a failure has cost and, for an Admin Profile, what to do about it; it stays longer than the other toasts. It is shown only for a failure the player would not see otherwise and that does not mend itself at the next start: a Play that could not be saved, or not kept in the Play Log, shown to the Profile that played it after that Play's other toasts; a Pack Update that failed, shown once to an Admin Profile, waiting for one to be active. A failure that answers a choice the player has just made keeps its own message on that screen. Shown as "Problème" in French.
 _Avoid_: error popup, error dialog (a toast never waits for the player), alert
 
 **Error Log**:
