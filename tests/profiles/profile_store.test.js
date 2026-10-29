@@ -369,6 +369,56 @@ test("a mark that is not a boolean, or a mark on Guest, is logged once and read 
     assert.ok(markLines.some(line => line.includes("Alice\\profile.json")));
 });
 
+test("setMark writes a true mark, clearing removes the key, and the update listeners hear of each", () => {
+    const fake = createFake();
+    fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({ version: 1, isChild: "yes", randomGames: 2 }));
+    const store = createProfileStore(fake);
+    const updates = [];
+    store.onUpdate((profileName, change) => updates.push([profileName, change]));
+
+    store.setMark("Bob", "isChild", true);
+    assert.equal(readJson(fake, `${PROFILES}\\Bob\\profile.json`).isChild, true, "a wrong hand-written value is replaced");
+    assert.equal(store.isChild("Bob"), true);
+    assert.equal(readJson(fake, `${PROFILES}\\Bob\\profile.json`).randomGames, 2, "the rest of the file is kept");
+
+    store.setMark("Bob", "isChild", false);
+    assert.ok(!("isChild" in readJson(fake, `${PROFILES}\\Bob\\profile.json`)), "a cleared mark leaves no key");
+    assert.equal(store.isChild("Bob"), false);
+    assert.deepEqual(updates, [["Bob", { isReset: false }], ["Bob", { isReset: false }]]);
+});
+
+test("setMark refuses Guest and the Child mark of an Admin Profile, writing nothing", () => {
+    const fake = createFake();
+    fake.addFile(`${PROFILES}\\Alice\\profile.json`, JSON.stringify({ version: 1, isAdmin: true }));
+    const store = createProfileStore(fake);
+    const guestBefore = fake.readFile(GUEST_FILE);
+
+    assert.throws(() => store.setMark("guest", "isChild", true), /Guest/);
+    assert.throws(() => store.setMark("Alice", "isChild", true), /Alice/);
+    assert.throws(() => store.setMark("Alice", "isOld", true), /isOld/);
+    assert.equal(fake.readFile(GUEST_FILE), guestBefore);
+    assert.ok(!("isChild" in readJson(fake, `${PROFILES}\\Alice\\profile.json`)));
+});
+
+test("a mark that cannot be saved is rethrown and left unchanged, on the active Profile too", () => {
+    const fake = createFake();
+    fake.addFile(`${PROFILES}\\Bob\\profile.json`, JSON.stringify({ version: 1 }));
+    fake.addFile(`${PROFILES}\\Carol\\profile.json`, JSON.stringify({ version: 1 }));
+    const store = createProfileStore(fake);
+    store.switchTo("Carol");
+    const updates = [];
+    store.onUpdate(profileName => updates.push(profileName));
+
+    fake.lockFile(`${PROFILES}\\Bob\\profile.json`);
+    fake.lockFile(`${PROFILES}\\Carol\\profile.json`);
+    assert.throws(() => store.setMark("Bob", "isChild", true));
+    assert.throws(() => store.setMark("Carol", "isChild", true));
+
+    assert.equal(store.isChild("Bob"), false);
+    assert.equal(store.isChild(), false, "the active Profile's data in memory is undone");
+    assert.deepEqual(updates, []);
+});
+
 test("a key that is a mark but for its letter case or spaces is logged once and ignored", () => {
     const fake = createFake();
     fake.addFile(`${PROFILES}\\Alice\\profile.json`, JSON.stringify({ version: 1, "isAdmin ": true }));

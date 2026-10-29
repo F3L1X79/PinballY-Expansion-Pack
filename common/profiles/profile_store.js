@@ -5,13 +5,14 @@
 // switch, update and Play (onPlay, ADR 0008). Handles the Profile Reset.
 // Listens to "gamestarted" / "gameover"; tells of a Play it could not save or log (onPlayFailed).
 // - Every write is whole: tmp, backup, rename; a broken or newer file comes back from its backup.
-// - isAdmin and isChild are set by hand: read and kept, never written.
+// - isAdmin and isChild: by hand or setMark, which writes true or removes the key (ADR 0020).
 // - Other cabinet-level files sit next to cabinet.json; no Profile Reset touches them.
 // - Another Profile's profile.json is read afresh on each call, but once per withCachedReads run.
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
+import { markRefusal } from "./setup_entries.js";
 
 const SCRIPT_NAME = "ProfileStore";
 
@@ -53,7 +54,7 @@ const emptySessions = () => ({
 const emptyProfileData = () => ({
     version: PROFILE_VERSION, plays: {}, streaks: {}, randomGames: 0, sessions: emptySessions(), notified: [],
 });
-// Set by hand (ADR 0006), never by the add-ons: kept through a Profile Reset.
+// Set by hand or from Manage profiles (ADR 0020): kept through a Profile Reset.
 const MARK_NAMES = ["isAdmin", "isChild"];
 const NO_PLAY = Object.freeze({ count: 0, seconds: 0, lastPlayed: "" });
 
@@ -414,6 +415,20 @@ export function createProfileStore(host) {
     const isAdmin = (profileName = activeProfile.name) => profileHasMark("isAdmin", profileName);
     const isChild = (profileName = activeProfile.name) => profileHasMark("isChild", profileName);
 
+    // Sets the mark (true) or clears it (the key removed, so the file holds
+    // true marks only); throws, writing nothing, when the mark rules forbid it.
+    function setMark(profileName, markName, isOn) {
+        if (!MARK_NAMES.includes(markName)) throw new Error(`"${markName}" is not a Profile mark.`);
+        const { profile, data } = profileWithData(profileName);
+        const marks = { isGuest: profile.isGuest, isAdmin: markOf(profile, data, "isAdmin"), isChild: markOf(profile, data, "isChild") };
+        const refusal = markRefusal(marks, markName);
+        if (refusal) throw new Error(`${profile.isGuest ? "Guest" : profile.name} cannot have its "${markName}" mark changed (${refusal}).`);
+        updateProfileData(changed => {
+            if (isOn) changed[markName] = true;
+            else delete changed[markName];
+        }, profile.name);
+    }
+
     function switchTo(name) {
         const profile = findProfile(name);
         if (!profile) throw new Error(`No Profile named "${name}".`);
@@ -511,6 +526,7 @@ export function createProfileStore(host) {
         hasAdminProfile: () => listProfileNames().filter(name => !isGuestName(name)).some(isAdmin),
         // Whether the named Profile (the active one by default) is a Child Profile.
         isChild,
+        setMark,
         getCabinetData: () => cabinet,
         // Another module's cabinet-level file, "<baseName>.json" next to
         // cabinet.json: its data, or null when it was never saved. Its

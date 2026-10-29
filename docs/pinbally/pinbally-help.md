@@ -71,6 +71,12 @@ The backglass, DMD, topper and instruction-card windows add nothing else (Backgl
 - Create with `mainWindow.createMediaWindow({title, configVarPrefix, parent, backgroundImageMediaType, backgroundVideoMediaType, defaultBackgroundImage, defaultBackgroundVideo, startupVideo, isMediaCapturable, showMediaWhenRunningKey})`. Never use `new CustomWindow()`.
 - Position and size are restored from settings under `configVarPrefix`.
 - `showMediaWhenRunningFlag`: true, false or undefined (undefined means use the key).
+- Seen on the cabinet (not in the help, Backglass Clock prototype, branch `prototype/backglass-clock`, 2026-10-29, VPX with a B2S on the backglass screen):
+  - A new custom window opens on the playfield screen, cascaded (26,26, then 52,52 for the next one), 810x1375, with a Windows title bar: set `borderlessMode = true` and place it on the backglass screen yourself, from `backglassWindow.hwndFrame.getWindowPos().windowRect` read on `prelaunch` (Force Backglass hides the backglass on `gamestarted`).
+  - PinballY saves a place the owner moved it to, under `configVarPrefix`, and restores it at the next start. `fullScreenMode` stayed false throughout.
+  - With `showMediaWhenRunningFlag = true`, its drawing layer is drawn and redrawn during a game.
+  - Raised with `setWindowPos(HWND.TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE)` at `gamestarted`, then 2, 5, 10, 20 and 40 s later and each minute, it stayed in front of the B2S for a whole game, whether owned by the playfield (the default `parent`) or top-level (`parent: null`). The flippers kept reaching VPX. The B2S had `FormToFront` = 0, the setting this cabinet needs to show the DMD over the backglass; not checked with `FormToFront` = 1, nor whether one raise alone would do.
+  - Sizes don't add up: asked 320x110, `getWindowPos()` then reports 480x300 (x1.5, like a 150 % Windows scaling), while the screenshot shows about 320x200. A drawing sized from `clientRect` came out clipped at the bottom. To check before sizing text from the window.
 
 ### 2.2 mainWindow (MainWindowObject.html)
 - `doCommand(id)` runs a menu-level command (§4.3). It does **not** fire the `command` event (`JsDoCommand` calls `OnCommandImpl`, past `FireCommandEvent`): a command allocated by a script does nothing through it. To run a command as a menu entry would, call `mainWindow.dispatchEvent(new CommandEvent(id))` first, then `doCommand(id)` if it returned true.

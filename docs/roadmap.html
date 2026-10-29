@@ -333,8 +333,8 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>L'horloge de la roue disparaît quand une table tourne. La Backglass Clock prend le relais sur l'écran du backglass, devant celui de VPX : une petite fenêtre noire au cadre doré, en haut à gauche. Grillé le 29/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="skip">prototype</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/369">Spec #369</a> (prototype sauté : ses questions sont devenues des points à vérifier sur la borne) ; nouvel Add-on <code>addons/backglass_clock.js</code> ; pages Interface et Réglages du guide</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">prototype</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/369">Spec #369</a>, complétée par ses commentaires sur le prototype (branche <code>prototype/backglass-clock</code>, jamais fusionnée) ; nouvel Add-on <code>addons/backglass_clock.js</code> ; pages Interface et Réglages du guide</div>
           <details>
             <summary>Décisions</summary>
             <ul>
@@ -659,8 +659,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(15)</span></summary>
+          <summary>29/10 <span class="count">(16)</span></summary>
           <ol>
+            <li><strong>Le prototype de la Backglass Clock tient sur la borne</strong>
+              <span>La fenêtre reste devant le B2S (<code>FormToFront</code> à 0, le réglage de la borne pour afficher le DMD par-dessus le backglass). Elle est mise au premier plan à <code>gamestarted</code>, puis à 2, 5, 10, 20 et 40 s, puis chaque minute, sans prendre le focus. Elle est redessinée pendant la partie. Sa première place est corrigée vers l'écran du backglass, puis c'est le propriétaire qui la place. Elle s'ouvre sans barre de titre. La taille du texte ne s'appuie que sur les proportions de la fenêtre. La spec #369 reçoit ces décisions en commentaire, et le digest de PinballY les observations faites sur la borne.</span></li>
             <li><strong>La Backglass Clock a sa spec #369, sans prototype</strong>
               <span>Félix passe directement à la spec. Les questions du prototype (rester devant le B2S, dessin pendant la partie, première place, focus, minuteurs pendant la partie) deviennent des points à vérifier sur la borne avant de fermer la spec.</span></li>
             <li><strong>L'heure à l'écran grillée : la Backglass Clock, avec un prototype d'abord</strong>
