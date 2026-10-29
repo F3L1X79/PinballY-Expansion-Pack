@@ -3,11 +3,13 @@
 
 # Left out of the downloaded zip (GitHub "Download ZIP" and release archives):
 # the players only need the pack itself. docs/guide (the player guide) and
-# docs/images (its screenshots and the README's) stay in the zip.
+# docs/images (its screenshots and the README's) stay in the zip, except the
+# forum post images.
 maintainer/ export-ignore
 tests/ export-ignore
 docs/adr/ export-ignore
 docs/agents/ export-ignore
+docs/images/forum/ export-ignore
 docs/pinbally/ export-ignore
 docs/research/ export-ignore
 docs/roadmap/ export-ignore
