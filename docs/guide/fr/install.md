@@ -33,7 +33,7 @@ Sans lui, la ROM d'une table est quand même trouvée, après sa première parti
 
 Avec PINemHi 3.6.8, les meilleurs scores sont lus sur les tableaux d'environ 300 ROM de plus.
 
-1. Remplacez les fichiers de `PinballY\PINemHi` par ceux de PINemHi 3.6.8.
+1. Remplacez les fichiers de `PinballY\PINemHi` par ceux de [PINemHi 3.6.8](https://www.pinemhi.com/).
 2. **Ajoutez toute la section `[romfind]` de son `romfind.ini` à la fin de son `pinemhi.ini`**. PinballY ne lit cette section que dans `pinemhi.ini` : sans elle, une table au champ ROM vide n'a plus aucun tableau.
 3. Réglez `USER=` dans `pinemhi.ini` sur le dossier `User` de Visual Pinball X.
 

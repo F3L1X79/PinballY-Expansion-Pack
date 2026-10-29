@@ -33,7 +33,7 @@ Without it, a table's ROM is still found, after its first Play, and a "Problem" 
 
 With PINemHi 3.6.8, the High Scores read the boards of about 300 more ROMs.
 
-1. Replace the files of `PinballY\PINemHi` with those of PINemHi 3.6.8.
+1. Replace the files of `PinballY\PINemHi` with those of [PINemHi 3.6.8](https://www.pinemhi.com/).
 2. **Append the whole `[romfind]` section of its `romfind.ini` to the end of its `pinemhi.ini`**. PinballY reads that section from `pinemhi.ini` only: without it, a table with an empty ROM field gets no board at all.
 3. Set `USER=` in `pinemhi.ini` to Visual Pinball X's `User` folder.
 
