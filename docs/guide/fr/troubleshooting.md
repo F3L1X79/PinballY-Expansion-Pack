@@ -45,3 +45,7 @@ Le journal de PinballY lui-même, dans le dossier de PinballY, ne couvre que la 
 **Une marque de Profil (`isAdmin`, `isChild`) reste sans effet.** Elle doit valoir `true` ou `false`, au premier niveau de `profile.json`, avec sa clé écrite exactement ; une marque fautive est ignorée et signalée dans `PinballY.log`. Modifiez `profile.json` PinballY fermé.
 
 **Les confettis ou le feu d'artifice ralentissent la borne.** Coupez-les avec `CONFETTI=false` ou `FIREWORKS=false`.
+
+---
+
+[← Sommaire du guide](index.md)

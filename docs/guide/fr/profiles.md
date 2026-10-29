@@ -36,3 +36,7 @@ La progression de chaque Profil est enregistrée dans `Scripts\ExpansionPack\pro
 <img src="../../images/household_stats.png" alt="Stats de la maison : trois Profils côte à côte, le meilleur de chaque ligne en doré" width="400">
 
 Dès que vous êtes deux à avoir un Profil, **Stats de la maison** montre tous les Profils côte à côte, sauf Invité, chaque Avatar dans son cadre, le meilleur de chaque ligne en doré, et qui détient le plus de records. Choisissez une colonne pour voir les statistiques de ce Profil.
+
+---
+
+[← Sommaire du guide](index.md)

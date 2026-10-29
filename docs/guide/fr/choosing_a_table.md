@@ -54,3 +54,7 @@ Pour lire les tableaux d'environ 300 ROM de plus, mettez PINemHi à jour (voir [
 - Une table au hasard est tirée sur une roue de la fortune (`SKIP_RANDOM_GAME_ANIMATION=true` la lance aussitôt).
 - Derrière « Changer de filtre » dans le menu principal : « Tables à découvrir », « Tables les plus jouées », « Mes meilleurs scores » (les tables où vous avez une place au tableau), « Tables favorites », « Tables masquées » (tant qu'une table est masquée), « Tables Originales » (le fabricant réglé par `COMMUNITY_TABLES_MANUFACTURER`) et « Tables du défi ».
 - Un rappel vous propose de noter une table une fois que vous y avez assez joué (`ASK_TO_RATE_AFTER_MINUTES_PLAYED`).
+
+---
+
+[← Sommaire du guide](index.md)

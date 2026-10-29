@@ -31,3 +31,7 @@ The toast's time on screen and size, the sound, and the confetti can be changed 
 ## Player Level
 
 Each Achievement earns points toward your **Player Level**, the more the higher its Rank, with no last level. It shows as a small pip on your Avatar, in bronze, then silver, gold and platinum as you climb, and reaching a new level brings its own toast and fireworks.
+
+---
+
+[← Guide index](index.md)

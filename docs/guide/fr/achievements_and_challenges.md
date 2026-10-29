@@ -31,3 +31,7 @@ La durée d'affichage et la taille de l'encart, le son et les confettis se chang
 ## Niveau
 
 Chaque Succès rapporte des points à votre **niveau**, d'autant plus que son rang est élevé, sans dernier niveau. Il s'affiche en pastille sur votre Avatar, en bronze, puis en argent, en or et en platine à mesure que vous montez, et chaque nouveau niveau atteint a son encart et son feu d'artifice.
+
+---
+
+[← Sommaire du guide](index.md)

@@ -1,6 +1,6 @@
 # PinballY Expansion Pack guide
 
-*[Version française](../fr/index.md)* · [Back to the README](../../../README.md)
+*[🇫🇷 Version française](../fr/index.md)* · [Back to the README](../../../README.md)
 
 An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php), written with the JavaScript scripting API that PinballY opens to every developer. It gives everyone in the house a real reason to come back to your pincab: a Profile with an Avatar for each of you, a Welcome Screen with the Table of the Day, weekly Challenges, a Mastery Level on every table, Achievements from Bronze to Platinum (a few of them secret) that raise your Player Level, your own stats, and PinballY itself in French, German, Spanish, Italian or Portuguese: everything PinballY was missing, without touching PinballY.
 
@@ -21,3 +21,7 @@ This guide describes the version it ships with. For an older version, read the g
 9. [Coming next](coming_next.md): where the pack is heading.
 
 Module layout, conventions, tests and adding a language are in the [contributor guide](https://github.com/F3L1X79/PinballY-Expansion-Pack/blob/main/CONTRIBUTING.md), on GitHub only (it is not in the release zip).
+
+---
+
+*[🇫🇷 Version française](../fr/index.md)* · [Back to the README](../../../README.md)

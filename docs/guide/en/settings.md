@@ -79,3 +79,7 @@ To keep the Adult Tables away from a child, tag them in PinballY with the catego
 - Guest is never a Child Profile, so adult visitors see the whole collection.
 - A Child Profile has three Achievements of its own (see [Achievements and Challenges](achievements_and_challenges.md)).
 - This is no parental control: nothing asks for a password.
+
+---
+
+[← Guide index](index.md)

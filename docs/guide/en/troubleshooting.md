@@ -45,3 +45,7 @@ PinballY's own log, in the PinballY folder, covers the current session only. At 
 **A Profile mark (`isAdmin`, `isChild`) has no effect.** It must be `true` or `false`, at the top level of `profile.json`, with its key spelt exactly; a wrong mark is ignored and logged in `PinballY.log`. Edit `profile.json` with PinballY closed.
 
 **The confetti or fireworks slow the cabinet down.** Turn them off with `CONFETTI=false` or `FIREWORKS=false`.
+
+---
+
+[← Guide index](index.md)

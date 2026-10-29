@@ -79,3 +79,7 @@ Pour tenir les tables pour adultes à l'écart d'un enfant, donnez-leur dans Pin
 - Invité n'est jamais un Profil enfant : les adultes de passage voient toute la collection.
 - Un Profil enfant a trois succès rien qu'à lui (voir [Succès et défis](achievements_and_challenges.md)).
 - Ce n'est pas un contrôle parental : rien ne demande de mot de passe.
+
+---
+
+[← Sommaire du guide](index.md)

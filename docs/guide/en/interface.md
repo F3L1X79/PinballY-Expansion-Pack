@@ -36,3 +36,7 @@ It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=
 - Launches without a black flash, with a gold comet turning while you wait, the step under way written in gold beneath it while a table launches or closes ("Loading…", "Returning to tables…"): during a launch, at startup, while a high score board is read and while the Profile Stats, the Household Stats, the Achievement List or the Avatar Frame list get ready.
 - The backglass hidden during a game.
 - Sounds for launches, Achievements, greetings, confetti and fireworks, or your own (see [Settings](settings.md)).
+
+---
+
+[← Guide index](index.md)

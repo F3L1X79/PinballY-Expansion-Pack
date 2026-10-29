@@ -7,3 +7,7 @@ Voici ce que nous envisageons pour la suite du pack. Rien n'est promis : les pro
 - **Year in Pinball** : le bilan de l'année de chaque Profil, les tables jouées et découvertes, les heures de jeu, les préférées, les succès et la plus longue série.
 - **Thèmes** : d'autres styles que Steamball pour tous les écrans dessinés, avec un petit éditeur pour créer le vôtre.
 - **Notes et favoris propres à chaque Profil**, puis la note moyenne de la maison pour chaque table.
+
+---
+
+[← Sommaire du guide](index.md)

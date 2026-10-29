@@ -36,3 +36,7 @@ Each Profile's progress is saved in `Scripts\ExpansionPack\profiles`. An Admin P
 <img src="../../images/household_stats.png" alt="The Household Stats with three Profiles side by side, the best of each line in gold" width="400">
 
 Once two of you have a Profile, **Household Stats** sets every Profile but Guest side by side, Avatars in their frames, the best of each line in gold, and shows who holds the most Table Records. Pick a column to see that Profile's own stats.
+
+---
+
+[← Guide index](index.md)

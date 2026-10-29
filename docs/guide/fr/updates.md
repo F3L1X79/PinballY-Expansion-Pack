@@ -42,3 +42,7 @@ Fermez PinballY : la version précédente est gardée à côté du pack sous le 
 1. Copiez-y `profiles`, `.env.local` et `pack_update.json` depuis `Scripts\ExpansionPack`, pour garder la progression faite depuis la mise à jour (et ne pas être averti d'un échec).
 2. Renommez `ExpansionPack` en n'importe quel autre nom.
 3. Renommez ce dossier en `ExpansionPack`.
+
+---
+
+[← Sommaire du guide](index.md)

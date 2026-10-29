@@ -56,3 +56,7 @@ Tout ce que le pack conserve reste dans `Scripts\ExpansionPack` : vos réglages 
 ## Installer avec git
 
 Pour les contributeurs : au lieu du zip, lancez `git clone https://github.com/F3L1X79/PinballY-Expansion-Pack.git ExpansionPack` depuis `PinballY\Scripts`, puis suivez les étapes à partir de l'étape 3. Un pack installé avec git ne se voit jamais proposer de [mise à jour](updates.md) : lancez `git pull` à la place.
+
+---
+
+[← Sommaire du guide](index.md)

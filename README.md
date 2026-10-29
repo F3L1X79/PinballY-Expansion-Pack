@@ -1,6 +1,6 @@
 # PinballY Expansion Pack
 
-*[Version française](README.fr.md)*
+*[🇫🇷 Version française](README.fr.md)*
 
 An unofficial extension of [PinballY](http://mjrnet.org/pinscape/PinballY.php) that gives everyone in the house a Profile, weekly Challenges, Achievements and a real reason to come back to your pincab, without touching PinballY.
 
