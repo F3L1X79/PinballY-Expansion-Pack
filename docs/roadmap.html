@@ -260,7 +260,6 @@
           <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
           <a class="chip tr-play" href="#clock"><b></b>Heure à l'écran</a>
           <a class="chip tr-play" href="#feld"><b></b>Feld</a>
-          <a class="chip tr-share" href="#third-party-credits"><b></b>Crédits des outils</a>
         </div>
         <div class="cell">
           <a class="chip tr-share" href="#vpxtool-update"><b></b>vpxtool à jour</a>
@@ -301,28 +300,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="third-party-credits" data-track="share" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Crédits des outils tiers dans les README</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">petit</span></div>
-          </div>
-          <p>Une courte section « Crédits » dans les README (en et fr) : vpin-studio (MIT, règles de lecture des scores reprises dans <code>board_reader.js</code> et <code>romless_board_reader.js</code>), vpxtool (Apache-2.0, déposé par le propriétaire, jamais redistribué) et PINemHi (fourni par PinballY avec la permission de son auteur, sans licence publiée, jamais redistribué par le pack).</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : assez petit pour un commit direct, sans grilling ni spec. À faire avant la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a>, dont le public lira le README · Research : <code>docs/research/high-scores-tools.md</code>, <code>docs/research/high-scores-tools/vpxtool.md</code></div>
-          <details>
-            <summary>Questions ouvertes (2)</summary>
-            <ul>
-              <li>La notice MIT de vpin-studio : le pack réécrit ses règles sans copier son code ; un crédit suffit-il, ou faut-il sa notice complète dans un fichier à part ?</li>
-              <li>Licence de vpxtool : le dépôt fournit Apache-2.0 mais <code>Cargo.toml</code> dit MIT ; citer celle du fichier <code>LICENSE</code>.</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 29/10/2026. Aujourd'hui, vpin-studio n'est crédité que dans les commentaires du code.</p>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-share" id="release-1-0" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -408,8 +385,9 @@
           <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
           <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend la vérification de version et le helper de la Distribution (spec #331, livrée) · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Questions ouvertes (5)</summary>
             <ul>
+              <li>Si le pack télécharge vpxtool lui-même, revoir sa ligne dans « Licence et crédits » des README (« Non fourni avec le pack » → téléchargé depuis ses releases, Apache-2.0).</li>
               <li>Mise à jour automatique, ou toast avec un bouton ? (Recommandation de Claude : toast, jamais seul.)</li>
               <li>Dernière release, ou une version maximale testée, écrite dans le pack et relevée à chaque release du pack ?</li>
               <li>Comment juger la nouvelle version bonne avant de remplacer l'ancienne : <code>vpxtool romname</code> sur une table connue, même réponse qu'avant ?</li>
@@ -728,8 +706,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(6)</span></summary>
+          <summary>29/10 <span class="count">(7)</span></summary>
           <ol>
+            <li><strong>Les Crédits des outils quittent la roadmap</strong>
+              <span>Grillé puis commité directement, avant le tag de la 1.0 : section « Licence et crédits » des README pour PinballY (ajouté par Félix), vpin-studio, vpxtool et PINemHi. Un crédit suffit pour vpin-studio, dont seules les règles sont reprises ; le pack reste en MIT. La Sortie 1.0 repasse 1ʳᵉ.</span></li>
             <li><strong>Les Dialogues lisibles quittent la roadmap</strong>
               <span>Spec #357 close : tickets #358, #359 et #360 livrés, vérification sur la borne #361 faite. Le chantier sort de la file et de la matrice ; les Crédits des outils passent 1ᵉʳˢ, la Sortie 1.0 2ᵉ.</span></li>
             <li><strong>Crédits des outils tiers, 2ᵉ place</strong>

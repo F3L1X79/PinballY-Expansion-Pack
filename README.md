@@ -52,6 +52,11 @@ Everything the pack keeps (settings and Profiles) stays in `Scripts\ExpansionPac
 - **[CHANGELOG](CHANGELOG.md)**: what changed in each version.
 - **[Contributor guide](https://github.com/F3L1X79/PinballY-Expansion-Pack/blob/main/CONTRIBUTING.md)**: module layout, conventions, tests and adding a language.
 
-## License
+## License and credits
 
 MIT. See [LICENSE](LICENSE).
+
+- **[PinballY](http://mjrnet.org/pinscape/PinballY.php)** by Michael J Roberts (GPL v3 or later): the frontend the whole pack runs on, through its JavaScript API. Without it, none of this crazy project would be possible.
+- **[vpin-studio](https://github.com/syd711/vpin-studio)** by Matthias Faust / syd711 (MIT): the High Score reading rules are ported from its score parsers.
+- **[vpxtool](https://github.com/francisdb/vpxtool)** by Francis De Brabandere (Apache-2.0): fills in each table's ROM. Not included in the pack.
+- **PINemHi** by Dna Disturber: supplied with PinballY by permission of its author. Not included in the pack.
