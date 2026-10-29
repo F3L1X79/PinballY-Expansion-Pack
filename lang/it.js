@@ -894,4 +894,11 @@ export default {
         vpxtoolMissing: "Manca vpxtool.exe nella cartella tools dell'Expansion Pack: le ROM dei tavoli non vengono compilate.",
         packUpdateFailed: (version, logPath) => `L'aggiornamento alla v${version} non è riuscito: la versione precedente resta al suo posto. Dettagli in ${logPath}`,
     },
+    releaseHighlights: {
+        "1.0.0": [
+            "Versione 1.0: la prima versione pubblica dell'Expansion Pack.",
+            "Menu e messaggi sono più leggibili e stanno nello schermo fin dal primo secondo.",
+            "Dopo ogni aggiornamento, questo messaggio ora mostra le novità.",
+        ],
+    },
 };

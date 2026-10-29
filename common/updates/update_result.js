@@ -1,7 +1,8 @@
 // ============================================================
 // Update result: at init, a Pack Update an earlier start asked for says how
 // it went. The requested Pack Version running shows "Expansion Pack updated
-// to vX.Y.Z" once, ahead of the Update Prompt; any other version brings an
+// to vX.Y.Z" once, ahead of the Update Prompt, with the Release Highlights
+// of the versions on the way below it; any other version brings an
 // Error Toast pointing to the helper's log (docs/adr/0018).
 // - Shown whatever the check setting: a failed update is never silent.
 // - The failure is for whoever sees the setup entries: kept until its toast starts, submitted again at each Profile switch.
@@ -17,23 +18,26 @@ import { getAchievementToasts, TOAST_KIND } from "../achievements/achievement_to
 import { getProfileStore } from "../profiles/profile_store.js";
 import { seesSetupEntries } from "../profiles/setup_entries.js";
 import { getUpdateState } from "./update_state.js";
+import { selectReleaseHighlights } from "./release_highlights.js";
 import { getStartupVeil } from "../drawing/startup_veil.js";
 
 const SCRIPT_NAME = "UpdateResult";
 const UPDATED_MENU_ID = "packUpdated";
 
 // dialogs: the wheel dialog queue; toasts: the Achievement Toast queue;
-// onShown: run as the success message shows.
-export function submitUpdateResult(host, { state, profileStore, dialogs, toasts, onShown = () => {} }) {
+// onShown: run as the success message shows; releaseHighlights: the
+// translated group, keyed by Pack Version.
+export function submitUpdateResult(host, { state, profileStore, dialogs, toasts, onShown = () => {}, releaseHighlights = lang.releaseHighlights }) {
     const { packUpdates: TEXT } = lang;
     const requested = state.requestedVersion();
     if (!requested) return;
     if (requested === PACK_VERSION) {
         host.log(`[${SCRIPT_NAME}] Pack Update to ${requested} done.`);
+        const highlights = selectReleaseHighlights({ previousVersion: state.previousVersion(), runningVersion: PACK_VERSION, releaseHighlights });
         dialogs.submit({
             id: UPDATED_MENU_ID,
             title: TEXT.updatedTitle,
-            message: TEXT.updated(requested),
+            message: [TEXT.updated(requested), ...highlights].join("\n"),
             buttons: [{ label: TEXT.ok }],
             priority: DIALOG_PRIORITY.UPDATE_RESULT,
             onShown: () => {

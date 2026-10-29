@@ -1,5 +1,5 @@
 // ============================================================
-// "Update now" on the Update Prompt: the requested version is recorded, the
+// "Update now" on the Update Prompt: the requested and running versions are recorded, the
 // Loader turns over the dimmed wheel, the Pack Update starts with the
 // remembered URL, digest and version, and PinballY quits once the helper is
 // ready, the Profile picker never opening in the meantime.
@@ -11,6 +11,7 @@ import { assertNoErrorLogged } from "../support/error_log.js";
 import { chooseEntry, isDrawnMenuShown, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { readLoader } from "../support/loader_reader.js";
 import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
+import { PACK_VERSION } from "../../common/core/pack_version.js";
 
 const STATE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\pack_update.json";
 const PACK_UPDATE_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\pack_update.ps1";
@@ -35,7 +36,9 @@ test("Update now records the version, shows the Loader, and starts the Pack Upda
     await settle();
     assert.equal(isDrawnMenuShown(fake), false);
     assert.deepEqual(fake.packUpdatesAsked(), [RELEASE]);
-    assert.equal(JSON.parse(fake.readFile(STATE_FILE)).requestedVersion, "9.0.0");
+    const saved = JSON.parse(fake.readFile(STATE_FILE));
+    assert.equal(saved.requestedVersion, "9.0.0");
+    assert.equal(saved.previousVersion, PACK_VERSION, "for the Release Highlights of the versions on the way");
     assert.equal(readLoader(fake).shown, true);
 
     fake.advanceTime(CAROUSEL_OPEN_MS + OPEN_OVER_MS);

@@ -42,6 +42,17 @@ test("the update state file keeps its offered and requested versions' keys", () 
     assert.equal(readBack.requestedVersion(), "9.0.0");
 });
 
+test("the update state file keeps its previous version's key", () => {
+    const fake = createFakePinballYHost();
+    createUpdateState(fake).requestUpdate("9.0.0", "8.0.0");
+
+    assert.deepEqual(JSON.parse(fake.readFile(STATE_FILE)), { version: 1, requestedVersion: "9.0.0", previousVersion: "8.0.0" });
+
+    const saved = createFakePinballYHost();
+    saved.addFile(STATE_FILE, JSON.stringify({ version: 1, requestedVersion: "9.0.0", previousVersion: "8.0.0" }));
+    assert.equal(createUpdateState(saved).previousVersion(), "8.0.0", "read back from an owner's file");
+});
+
 test("the update state file stays out of git", () => {
     const lines = readFileSync(new URL("../../.gitignore", import.meta.url), "utf8").split(/\r?\n/);
     assert.ok(lines.includes("pack_update.json"));

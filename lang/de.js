@@ -895,4 +895,11 @@ export default {
         vpxtoolMissing: "vpxtool.exe fehlt im Ordner tools des Expansion Pack: Die ROMs der Tische werden nicht eingetragen.",
         packUpdateFailed: (version, logPath) => `Die Aktualisierung auf v${version} ist fehlgeschlagen: Die vorherige Version bleibt erhalten. Details in ${logPath}`,
     },
+    releaseHighlights: {
+        "1.0.0": [
+            "Version 1.0: die erste öffentliche Version des Expansion Pack.",
+            "Menüs und Meldungen sind besser lesbar und passen von der ersten Sekunde an auf den Bildschirm.",
+            "Nach jeder Aktualisierung zeigt diese Meldung jetzt die Neuigkeiten.",
+        ],
+    },
 };

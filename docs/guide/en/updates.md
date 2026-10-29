@@ -10,7 +10,7 @@ When there is one, the next start opens the Update Prompt before anything else, 
 
 ## Update now
 
-"Update now" downloads and checks the new version, closes PinballY, swaps the pack's folder for the new one, and starts PinballY again. The next start says so under "Update complete": "Expansion Pack updated to vX.Y.Z".
+"Update now" downloads and checks the new version, closes PinballY, swaps the pack's folder for the new one, and starts PinballY again. The next start says so under "Update complete": "Expansion Pack updated to vX.Y.Z", followed by what's new, one sentence per line, in the cabinet's language. After a jump over several versions, the news of each version on the way is listed too, newest first, five sentences at most. A fix release with nothing new for the players shows the first line alone.
 
 These are kept:
 

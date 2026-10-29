@@ -1,8 +1,8 @@
 // ============================================================
 // The first start on the Pack Version an update installed, through main.js
-// on the fake host, the check off: "Expansion Pack updated to vX.Y.Z" shows
-// before the Profile picker, once, over the dimmed wheel without the Loader;
-// the request is cleared.
+// on the fake host, the check off, no Release Highlights on the way:
+// "Expansion Pack updated to vX.Y.Z" alone shows before the Profile picker,
+// once, over the dimmed wheel without the Loader; the request is cleared.
 // ============================================================
 
 import { test } from "node:test";
@@ -11,18 +11,13 @@ import { assertNoErrorLogged } from "../support/error_log.js";
 import { readLoader } from "../support/loader_reader.js";
 import { startupVeil } from "../welcome_screen/welcome_screen_reader.js";
 import { readDrawnMenu, drawnMenuLines, isDrawnMenuShown, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
-import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
+import { isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 import { PACK_VERSION } from "../../common/core/pack_version.js";
-import { STATE_FILE, requestedVersionOf } from "./update_failed_scenario.js";
+import { requestedVersionOf } from "./update_failed_scenario.js";
+import { startAfterUpdate } from "./update_result_success_scenario.js";
 
 test("a Pack Update that worked says so once, before the Profile picker", async () => {
-    const { fake, lang, settle } = await startOnProfilePicker({
-        addOns: ["startupChoicePrompt", "profilePicker", "drawnMenus"],
-        settings: { updateCheck: false },
-        seed: f => f.addFile(STATE_FILE, JSON.stringify({ version: 1, requestedVersion: PACK_VERSION, offeredVersion: PACK_VERSION })),
-    });
-    await settle();
-    fake.advanceTime(OPEN_OVER_MS);
+    const { fake, lang, settle } = await startAfterUpdate({ previousVersion: "0.0.1", releaseHighlights: { "0.0.1": ["Already there."] } });
 
     assert.deepEqual([readDrawnMenu(fake).title, readDrawnMenu(fake).message], ["Update complete", `Expansion Pack updated to v${PACK_VERSION}`]);
     assert.deepEqual(drawnMenuLines(fake), ["OK"]);

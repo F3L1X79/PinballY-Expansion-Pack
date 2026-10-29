@@ -1,6 +1,7 @@
 // ============================================================
 // The Update result at init: the requested Pack Version running shows the
-// success once, ahead of the Update Prompt; another one brings an Error
+// success once, ahead of the Update Prompt, with the Release Highlights of
+// the versions on the way; another one brings an Error
 // Toast for whoever sees the setup entries, kept recorded until it starts
 // and submitted again at a Profile switch, never twice at once.
 // ============================================================
@@ -34,7 +35,7 @@ function fakeProfileStore(sees) {
     return store;
 }
 
-function submitAt({ saved, sees = true } = {}) {
+function submitAt({ saved, sees = true, releaseHighlights = {} } = {}) {
     const fake = createFakePinballYHost();
     if (saved) fake.addFile(STATE_FILE, JSON.stringify({ version: 1, ...saved }));
     const dialogs = [];
@@ -45,6 +46,7 @@ function submitAt({ saved, sees = true } = {}) {
         profileStore,
         dialogs: { submit: dialog => dialogs.push(dialog) },
         toasts: { submit: toast => toasts.push(toast) },
+        releaseHighlights,
     });
     return { fake, dialogs, toasts, profileStore };
 }
@@ -70,6 +72,18 @@ test("the requested version running says so once, ahead of the Update Prompt", (
 
     dialogs[0].onShown();
     assert.equal(requestedIn(fake), undefined);
+    assertNoErrorLogged(fake);
+});
+
+test("the Release Highlights of the versions on the way follow the line, one per line, and are forgotten with the request", () => {
+    const { fake, dialogs } = submitAt({
+        saved: { requestedVersion: PACK_VERSION, previousVersion: "0.0.1" },
+        releaseHighlights: { "0.0.1": ["Already there."], "0.0.2": ["Older news."], [PACK_VERSION]: ["Fresh news.", "More news."] },
+    });
+
+    assert.equal(dialogs[0].message, `Expansion Pack updated to v${PACK_VERSION}\nFresh news.\nMore news.\nOlder news.`);
+    dialogs[0].onShown();
+    assert.deepEqual(JSON.parse(fake.readFile(STATE_FILE)), { version: 1 });
     assertNoErrorLogged(fake);
 });
 

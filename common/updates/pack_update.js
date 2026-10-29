@@ -1,6 +1,6 @@
 // ============================================================
 // Pack Update start, from the Update Prompt's "Update now": records the
-// requested Pack Version, shows the Loader over the dimmed wheel and asks
+// requested Pack Version and the running one, shows the Loader over the dimmed wheel and asks
 // the host to start the Pack Update helper, which quits PinballY once ready.
 // A helper not ready in time shows the failure at once (docs/adr/0018).
 // - Holds the wheel dialog queue while it waits: no Startup Screen opens just before PinballY quits.
@@ -11,6 +11,7 @@ import lang from "../core/i18n.js";
 import { safeHandler } from "../core/safe_handler.js";
 import { logError } from "../core/error_log.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
+import { PACK_VERSION } from "../core/pack_version.js";
 import { DIALOG_PRIORITY, getWheelDialogs } from "../core/wheel_dialog.js";
 import { DRAWN_MENU_Z_INDEX } from "../drawn_menu/drawn_menu_painter.js";
 import { createLoader } from "../drawing/loader.js";
@@ -64,7 +65,7 @@ export function createPackUpdater(host, state, dialogs) {
     function start({ packVersion, zipUrl, sha256 }) {
         if (veil) return;
         host.log(`[${SCRIPT_NAME}] Pack Update to ${packVersion} asked.`);
-        state.requestUpdate(packVersion);
+        state.requestUpdate(packVersion, PACK_VERSION);
         veil = host.createDrawingLayer(VEIL_Z_INDEX);
         veil.clear(DIMMED_WHEEL);
         loader.show();

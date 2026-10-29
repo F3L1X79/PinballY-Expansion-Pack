@@ -896,4 +896,11 @@ export default {
         vpxtoolMissing: "Falta vpxtool.exe en la carpeta tools del Expansion Pack: las ROM de las mesas no se rellenan.",
         packUpdateFailed: (version, logPath) => `La actualización a v${version} ha fallado: la versión anterior sigue en su sitio. Detalles en ${logPath}`,
     },
+    releaseHighlights: {
+        "1.0.0": [
+            "Versión 1.0: la primera versión pública del Expansion Pack.",
+            "Los menús y los mensajes se leen mejor y caben en la pantalla desde el primer segundo.",
+            "Tras cada actualización, este mensaje te muestra ahora las novedades.",
+        ],
+    },
 };

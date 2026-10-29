@@ -820,4 +820,13 @@ export default {
         // Under packUpdates.toastTitle; logPath: the Pack Update helper's log.
         packUpdateFailed: (version, logPath) => `The update to v${version} failed: the previous version is still in place. Details in ${logPath}`,
     },
+    // The Release Highlights: one to three sentences for the Household per
+    // Pack Version, under the success dialog of a Pack Update. Never pruned.
+    releaseHighlights: {
+        "1.0.0": [
+            "Version 1.0: the Expansion Pack's first public release.",
+            "Menus and messages are easier to read, and fit the screen from the very first second.",
+            "After each update, this message now tells you what's new.",
+        ],
+    },
 };

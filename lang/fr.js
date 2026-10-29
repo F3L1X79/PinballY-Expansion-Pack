@@ -899,4 +899,11 @@ export default {
         vpxtoolMissing: "vpxtool.exe manque dans le dossier tools de l'Expansion Pack : les ROM des tables ne sont pas renseignées.",
         packUpdateFailed: (version, logPath) => `La mise à jour en v${version} a échoué : la version précédente reste en place. Détails dans ${logPath}`,
     },
+    releaseHighlights: {
+        "1.0.0": [
+            "Version 1.0 : la première version publique de l'Expansion Pack.",
+            "Menus et messages sont plus lisibles, et tiennent dans l'écran dès la première seconde.",
+            "Après chaque mise à jour, ce message présente désormais les nouveautés.",
+        ],
+    },
 };
