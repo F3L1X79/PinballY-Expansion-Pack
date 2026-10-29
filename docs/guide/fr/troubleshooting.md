@@ -10,7 +10,7 @@ Quand quelque chose échoue que vous ne verriez pas autrement, et qui ne se rép
 |---|---|---|
 | « Cette partie n'a pas pu être enregistrée : elle ne comptera pas dans vos statistiques. » | Le Profil qui a joué, après les autres toasts de cette partie. | Chercher la cause dans le journal des erreurs. |
 | « Cette partie a été comptée, mais elle manque à votre historique de parties. » | Le Profil qui a joué, après les autres toasts de cette partie. | Chercher la cause dans le journal des erreurs. |
-| « vpxtool.exe manque dans le dossier tools de l'Expansion Pack : les ROM des tables ne sont pas renseignées. » | Un Profil admin (ou tout le monde tant qu'aucun Profil n'est marqué), à chaque démarrage tant que ça dure. | Installer vpxtool (voir [Installation](install.md#vpxtool)), ou désactiver l'add-on Table ROMs dans **Réglages du pack**. |
+| « vpxtool.exe manque dans le dossier tools de l'Expansion Pack : les ROM des tables ne sont pas renseignées. » | Un Profil admin (ou tout le monde tant qu'aucun Profil n'est marqué), à chaque démarrage tant que ça dure. | Installer vpxtool (voir [Installation](install.md#vpxtool)), ou désactiver l'Add-on « ROM des tables » dans **Réglages du pack**. |
 | « La mise à jour en vX.Y.Z a échoué : la version précédente reste en place. Détails dans … » | Un Profil admin (ou tout le monde tant qu'aucun Profil n'est marqué), une seule fois, en attendant qu'il soit actif. | Lire le journal du programme de mise à jour qu'il nomme, `%TEMP%\PinballYExpansionPack\pack-update.log` (voir [Mises à jour](updates.md)). |
 
 Un échec qui répond à un choix que vous venez de faire (une réinitialisation de profil, le téléchargement d'une mise à jour) garde son propre message sur cet écran, au lieu d'un toast.
