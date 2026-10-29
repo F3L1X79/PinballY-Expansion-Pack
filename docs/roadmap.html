@@ -309,16 +309,16 @@
             <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>L'entrée du Welcome Screen, aussi dans le menu principal, sous « Jouer » : la même animation de roue (ou le saut direct de <code>skipRandomGameAnimation</code>) vers une table tirée au hasard, sans rouvrir le Welcome Screen.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> (court) → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend <code>common/tables/random_game.js</code> et le libellé <code>welcomeScreen.randomTable</code> ; entrée ajoutée par <code>getMainMenu().add(...)</code> avec une nouvelle position juste après <code>PlayGame</code></div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/362">#362</a>. Flow Matt : <code>/to-tickets</code> → <code>/implement</code>.</div>
           <details>
-            <summary>Questions ouvertes (3)</summary>
+            <summary>Décisions du grilling (29/10/2026)</summary>
             <ul>
-              <li>Le tirage est-il le même que celui du Welcome Screen (tables du Profile actif, Adult Tables exclues pour un enfant, filtre en cours ignoré), ou suit-il le filtre affiché sur la roue ?</li>
-              <li>Le menu se ferme-t-il avant l'animation, et la table est-elle lancée seule, ou seulement sélectionnée sur la roue comme aujourd'hui ?</li>
-              <li>La Play compte-t-elle pour le Challenge « parties au hasard » (<code>randomGames</code>), comme depuis le Welcome Screen ?</li>
+              <li>Tirage inchangé : la sélection affichée sur la roue (le filtre en cours compte, comme déjà depuis le Welcome Screen), jamais la Last Played Table sauf si elle est seule.</li>
+              <li>Le menu se ferme, la roue tourne (ou saute), la table se lance seule ; la Play compte pour <code>randomGames</code> et le Challenge, quelle que soit l'origine.</li>
+              <li>Nouvel Add-on « Random Game », désactivable, indépendant du Welcome Screen ; entrée juste sous « Jouer », masquée si la roue n'a aucune table.</li>
             </ul>
-            <p class="ctx">Idée de Félix du 27/10/2026. Le libellé existe déjà dans les six langues ; le Challenge <code>randomGames</code> lit peut-être l'origine du lancement.</p>
+            <p class="ctx">Idée de Félix du 27/10/2026.</p>
           </details>
         </div>
       </li>
