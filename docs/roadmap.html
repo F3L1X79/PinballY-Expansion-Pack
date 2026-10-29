@@ -308,8 +308,8 @@
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
           <p>Aujourd'hui, <code>"isAdmin": true</code> et <code>"isChild": true</code> s'écrivent à la main dans le <code>profile.json</code>, PinballY fermé. « Réinitialiser un profil » du menu Exit devient « Gérer les profils », où un Profile admin coche les deux marques de chaque Profile. Grillé le 29/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/364">Spec #364</a> ; ADR 0020 (remplace l'ADR 0006) ; reprend <code>common/profiles/setup_entries.js</code> et <code>common/menus/profile_reset_menu.js</code> ; pages Réglages et Profils du guide</div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
+          <div class="links">Flow Matt : <code>/implement-spec</code> (une chaîne, un seul implémenteur) ou <code>/implement</code> dans l'ordre <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/365">#365</a> → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/366">#366</a> → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/367">#367</a> → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/368">#368</a>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/364">Spec #364</a> ; ADR 0020 (remplace l'ADR 0006) ; reprend <code>common/profiles/setup_entries.js</code> et <code>common/menus/profile_reset_menu.js</code> ; pages Réglages et Profils du guide</div>
           <details>
             <summary>Décisions</summary>
             <ul>
@@ -657,8 +657,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(11)</span></summary>
+          <summary>29/10 <span class="count">(12)</span></summary>
           <ol>
+            <li><strong>« Admin et enfant en jeu » a ses tickets #365 à #368</strong>
+              <span>Une chaîne : la ligne grisée du Drawn Menu (#365), la marque enfant dans « Gérer les profils » (#366), la marque admin (#367), puis le premier admin qui se désigne lui-même (#368).</span></li>
             <li><strong>« Admin et enfant en jeu » a sa spec #364</strong>
               <span>Guest reste dans la liste de « Gérer les profils », car on peut le réinitialiser (le grilling l'en retirait à tort) ; ses lignes de marque sont grisées, « Invité n'est jamais marqué ». Prochaine étape : les tickets.</span></li>
             <li><strong>« Admin et enfant en jeu » grillé, reste 1ᵉʳ</strong>
