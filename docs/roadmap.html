@@ -358,8 +358,8 @@
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
           </div>
           <p>Chaque Pack Version fige une Script Reader Version (v0.38.0 au départ). Quand vpxtool manque ou est plus ancien, un dialogue au démarrage propose de l'installer depuis les releases de son auteur, en disant qui l'a fait, sa licence et son site ; l'owner peut refuser. Un nouveau groupe « Mode hors ligne » des Réglages du pack peut couper cette proposition et la recherche de mises à jour. Grillé le 29/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. ADR 0021 ; reprend le helper et le Loader de la Pack Update (spec #331, livrée) · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/373">Spec #373</a> ; ADR 0021 ; reprend le helper et le Loader de la Pack Update (spec #331, livrée) · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
           <details>
             <summary>Décisions du grilling (6)</summary>
             <ul>
@@ -660,8 +660,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(18)</span></summary>
+          <summary>29/10 <span class="count">(19)</span></summary>
           <ol>
+            <li><strong>vpxtool a sa spec #373</strong>
+              <span>La version installée se lit par <code>vpxtool --version</code> (« git:v0.38.0 ») et se retient pour le démarrage suivant, comme l'Update Check : le démarrage n'attend jamais. « Non merci » écrit <code>OFFER_VPXTOOL=false</code>, que la ligne « Proposer vpxtool » du Mode hors ligne affiche ; Exit repose la question au démarrage suivant. La branche <code>prototype/backglass-clock</code> reste : la spec #369 renvoie à son code.</span></li>
             <li><strong>vpxtool grillé : le Script Reader Prompt, à une version figée, après accord de l'owner</strong>
               <span>Félix refuse de livrer vpxtool dans le zip sans la bénédiction de son auteur : la borne le télécharge depuis ses releases, à la Script Reader Version figée (v0.38.0, essayée sur la borne), jamais la dernière toute seule (ADR 0021). Le dialogue installe aussi un vpxtool absent et remplace son Error Toast ; un groupe « Mode hors ligne » des Réglages coupe la proposition et la Recherche de mises à jour. Impact faible → moyen (plus d'étape 4 dans les README), effort moyen inchangé. Place inchangée.</span></li>
             <li><strong>La Backglass Clock a ses tickets #370 et #371, et un bug des Drawn Menus a le sien (#372)</strong>
