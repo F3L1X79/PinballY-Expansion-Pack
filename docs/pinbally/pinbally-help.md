@@ -52,7 +52,7 @@ Globals documented by the help (SystemObjects.html, SystemClasses.html, SystemFu
 Applies to every window object:
 - `borderlessMode` (get/set bool) and `fullScreenMode` (get/set bool).
 - `createDrawingLayer(zIndex) → DrawingLayer` and `removeDrawingLayer(layer)`.
-- `hwndFrame` and `hwndView`: read-only HWND values. Don't move or resize the window through Win32 calls, because PinballY isn't notified. `hwnd.getWindowPos()` (HWNDObject.html) returns `{ clientRect, windowRect, isMaximized, isMinimized }`; `clientRect` is `{ left, top, right, bottom }` relative to the window itself (left and top always 0), so its size is `right - left` by `bottom - top`. The pack reads `mainWindow.hwndView`'s to notice the window's size changing (PinballY fires no event for it).
+- `hwndFrame` and `hwndView`: read-only HWND values. Don't move or resize the window through Win32 calls, because PinballY isn't notified. `hwnd.getWindowPos()` (HWNDObject.html) returns `{ clientRect, windowRect, isMaximized, isMinimized }`; `clientRect` is `{ left, top, right, bottom }` relative to the window itself (left and top always 0), so its size is `right - left` by `bottom - top`. The pack reads `mainWindow.hwndView`'s to notice the window's size changing (PinballY fires no event for it). Seen on the cabinet (not in the help, spec #357 and its log of 2026-10-29): PinballY gives the window its final size only after the scripts' init, the view and the layers' window still 845x461 at the first tick, then 2560x1600 together, at once.
 - `name`: "playfield", "backglass", "dmd", "instCard" or "topper". Compare against the objects themselves, not this string.
 - `setWindowState("min"|"max"|"restore")`.
 - `setWindowPos(afterHwnd, x, y, w, h, flags)`:

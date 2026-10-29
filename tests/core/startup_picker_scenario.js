@@ -21,12 +21,15 @@ export const GLIDE_OVER_MS = 500;
 // childProfiles: those of them marked as Child Profiles; tables: the
 // wheel's, as the fake host takes them; settings: the other config values;
 // files: the paths present on disk (sounds); layoutSize: the window's at
-// the start; seed(fake): anything else to prepare before the start.
+// the start, viewSizeAtInit: the view's during the scripts' init (both as
+// the fake host takes them); seed(fake): anything else to prepare before the start.
 export async function startOnProfilePicker({
     addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], childProfiles = [], activeProfile = "Bob", tables, settings = {}, files = [],
-    layoutSize, seed = () => {},
+    layoutSize, viewSizeAtInit, seed = () => {},
 } = {}) {
-    const fake = createFakePinballYHost({ ...(tables ? { tables } : {}), ...(layoutSize ? { layoutSize } : {}) });
+    const fake = createFakePinballYHost({
+        ...(tables ? { tables } : {}), ...(layoutSize ? { layoutSize } : {}), ...(viewSizeAtInit ? { viewSizeAtInit } : {}),
+    });
     for (const name of profiles) fake.addFolder(`${PROFILES_FOLDER}\\${name}`);
     for (const name of childProfiles) {
         fake.addFile(`${PROFILES_FOLDER}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified: [], isChild: true }));

@@ -1,5 +1,5 @@
 ﻿// ============================================================
-// Entry point loaded by PinballY: loads the Profile store, logs the startup
+// Entry point loaded by PinballY: reads the window's size at init, loads the Profile store, logs the startup
 // summary, keeps the Adult Tables off a Child Profile's wheel, switches to Guest
 // without the Profile picker, resolves the Startup Screen, restores the quiet wheel's
 // volume, starts the Play Error Toasts, initializes SCRIPTS in order but those off in
@@ -21,6 +21,7 @@ import { startUpdatePrompt } from "./common/updates/update_prompt.js";
 import { startUpdateResult } from "./common/updates/update_result.js";
 import { logError } from "./common/core/error_log.js";
 import { startPlayErrorToasts } from "./common/achievements/play_error_toasts.js";
+import { getWindowLayout } from "./common/core/window_layout.js";
 
 // Logs each script's init duration (ms), to help find a slow-starting script.
 const LOG_STARTUP_TIMING = true;
@@ -117,6 +118,14 @@ const SCRIPTS = [
 ];
 
 const ENABLED_SCRIPTS = config.addOns;
+
+// First, during the scripts' init: the view's size is read while PinballY
+// has not laid its window out yet, so the startup dialogs wait for the change.
+try {
+    getWindowLayout();
+} catch (error) {
+    logError(SCRIPT_NAME, `ERROR reading the window's size at startup: ${error.message}`, null, error);
+}
 
 // Before any Add-on, and whatever Add-ons are on: the store records every
 // play, and its "gameover" listener must run before the Add-ons' own.

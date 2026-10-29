@@ -1,9 +1,8 @@
 // ============================================================
-// Startup Screen "welcome" in a window PinballY lays out after the
-// scripts' init: the Welcome Screen opens on its turn, without a pause,
-// and is redrawn in place for the window's new size, the same choice
-// selected, without fading in again; nothing is redrawn while the size
-// stays the same.
+// Startup Screen "welcome" in a window whose size changes while it is
+// open: the Welcome Screen opens on its turn, without a pause, and is
+// redrawn in place for the window's new size, the same choice selected,
+// without fading in again; nothing is redrawn while the size stays the same.
 // ============================================================
 
 import { test } from "node:test";

@@ -6,12 +6,14 @@
 // Listens to "command" and "wheelmode".
 // - A dialog not ready yet holds its place and every dialog after it; a stale one is dropped.
 // - A screen drawn over the wheel keeps it busy once handed to waitFor().
+// - Nothing shows before PinballY lays its window out (common/core/window_layout.js).
 // ============================================================
 
 import { safeHandler, logHandlerError } from "./safe_handler.js";
 import { logError } from "./error_log.js";
 import { createPinballYHost } from "./pinbally_host.js";
 import { createNativeMenus, getDrawnMenus } from "../drawn_menu/drawn_menu.js";
+import { getWindowLayout, ALWAYS_LAID_OUT } from "./window_layout.js";
 
 const SCRIPT_NAME = "WheelDialog";
 
@@ -27,8 +29,9 @@ export const DIALOG_PRIORITY = Object.freeze({
     RESTART_FAILED: 5,
 });
 
-// menus: what shows a native-style dialog (common/drawn_menu/drawn_menu.js).
-export function createWheelDialogs(host, menus = createNativeMenus(host)) {
+// menus: what shows a native-style dialog (common/drawn_menu/drawn_menu.js);
+// windowLayout: tells when PinballY's window has its final size.
+export function createWheelDialogs(host, menus = createNativeMenus(host), windowLayout = ALWAYS_LAID_OUT) {
     // Waiting dialogs, sorted by priority, then submission order.
     const queue = [];
     // Dialog on screen, with the command of each of its buttons.
@@ -61,6 +64,12 @@ export function createWheelDialogs(host, menus = createNativeMenus(host)) {
         // overlay, and one opened over another menu would replace it.
         if (host.getUIMode() !== "wheel") return;
         if (isOverlayOpen()) return;
+        // Drawn before PinballY lays its window out, a dialog or a startup
+        // screen would show stretched until its next redraw.
+        if (!windowLayout.isLaidOut()) {
+            windowLayout.whenLaidOut(scheduleShowNext);
+            return;
+        }
         // Whatever it waits for must not wait for this queue in turn: a
         // drawn dialog queued behind it would hold the toasts it waits on.
         if (queue[0].isReady && !queue[0].isReady()) return;
@@ -193,6 +202,6 @@ let sharedWheelDialogs = null;
 
 // One queue for every add-on, so their dialogs never replace each other.
 export function getWheelDialogs() {
-    if (!sharedWheelDialogs) sharedWheelDialogs = createWheelDialogs(createPinballYHost(), getDrawnMenus());
+    if (!sharedWheelDialogs) sharedWheelDialogs = createWheelDialogs(createPinballYHost(), getDrawnMenus(), getWindowLayout());
     return sharedWheelDialogs;
 }

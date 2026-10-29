@@ -182,6 +182,10 @@ export function createFakePinballYHost({
     now = new RealDate(),
     tables = [],
     layoutSize = { width: 1920, height: 1080 },
+    // The view's size during the scripts' init: PinballY gives its window its
+    // final size only afterwards (845x461 then 2560x1600 on the cabinet, spec
+    // #357). From the first tick, getViewSize() reports the layout size.
+    viewSizeAtInit = { width: 0, height: 0 },
     programFolder = "C:\\PinballY\\",
     // systemInfo.version, in the formats of docs/pinbally/pinbally-help.md §2.10
     // (status holds the three-part version, not the release status).
@@ -198,6 +202,10 @@ export function createFakePinballYHost({
     let nowMs = now.getTime();
     let currentDrawMs = drawMs;
     let currentLayoutSize = { ...layoutSize };
+    // Set by the first timer that runs, zero-delay or not: the scripts' init is over.
+    let isPastInit = false;
+    // The view is as large as the layers' window once laid out.
+    const viewSize = () => ({ ...(isPastInit ? currentLayoutSize : viewSizeAtInit) });
     const layers = [];
     // Every layer draw, in order: { zIndex, texts, images }.
     const drawingList = [];
@@ -517,6 +525,7 @@ export function createFakePinballYHost({
     // callback that takes time (a slow draw) moves the clock on itself, and
     // the timers due meanwhile then run late, as in PinballY.
     function advanceTime(ms) {
+        isPastInit = true;
         const targetMs = nowMs + ms;
         for (;;) {
             const due = timers
@@ -1261,7 +1270,7 @@ export function createFakePinballYHost({
         onSettingsEvent: on,
         createDrawingLayer,
         removeDrawingLayer,
-        getViewSize: () => ({ ...currentLayoutSize }),
+        getViewSize: viewSize,
         setUnderlay,
         showWheel,
         getLaunchOverlayBackground: () => launchOverlay.bg,
@@ -1733,9 +1742,10 @@ export function createFakePinballYHost({
                     // HWNDObject.html: the client rectangle, relative to its
                     // own upper left corner; the view is as large as the layers' window.
                     hwndView: {
-                        getWindowPos: () => ({
-                            clientRect: { left: 0, top: 0, right: currentLayoutSize.width, bottom: currentLayoutSize.height },
-                        }),
+                        getWindowPos: () => {
+                            const { width, height } = viewSize();
+                            return { clientRect: { left: 0, top: 0, right: width, bottom: height } };
+                        },
                     },
                     setUnderlay,
                     showWheel,
@@ -1751,7 +1761,10 @@ export function createFakePinballYHost({
                 // Zero-delay timeouts stay on the real event loop, so the
                 // add-ons' "next tick" deferrals still run on settle(); every
                 // other timer waits for advanceTime().
-                setTimeout: (callback, ms = 0) => (ms > 0 ? addTimer(callback, ms) : realSetTimeout(callback, 0)),
+                setTimeout: (callback, ms = 0) => (ms > 0 ? addTimer(callback, ms) : realSetTimeout(() => {
+                    isPastInit = true;
+                    callback();
+                }, 0)),
                 clearTimeout: (id) => {
                     if (typeof id === "number") removeTimer(id);
                     else realClearTimeout(id);
