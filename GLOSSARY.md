@@ -102,7 +102,7 @@ Every Profile of the cabinet except Guest, Child Profiles included, whether or n
 _Avoid_: family, all players, users
 
 **Admin Profile**:
-A Profile marked as one of those who look after the cabinet: only Admin Profiles see the setup entries of the menus, and only they find the Profile Reset in the Exit menu. While no Profile is marked, every Profile sees everything. Guest is never one.
+A Profile marked as one of those who look after the cabinet: only Admin Profiles see the setup entries of the menus, and only they mark Profiles as Admin or Child Profiles and reset them, from the Exit menu. While no Profile is marked, every Profile sees everything, and the active Profile can make itself the first Admin Profile. The last Admin Profile cannot lose its mark from the cabinet. Guest is never one, nor is a Child Profile.
 _Avoid_: administrator, operator (the operator is whoever holds the coin door key)
 
 **Child Profile**:

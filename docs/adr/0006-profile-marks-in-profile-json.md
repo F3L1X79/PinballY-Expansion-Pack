@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by ADR-0020
 ---
 
 # Admin and Child marks live in each Profile's profile.json

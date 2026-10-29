@@ -307,16 +307,17 @@
             <h3>Marquer un Profile admin ou enfant depuis la borne</h3>
             <div class="tags"><span class="tag track">Profiles</span><span class="tag">petit</span><span class="tag">UI</span></div>
           </div>
-          <p>Aujourd'hui, <code>"isAdmin": true</code> et <code>"isChild": true</code> s'écrivent à la main dans le <code>profile.json</code>, PinballY fermé. Une entrée permettrait de les cocher depuis la borne.</p>
-          <div class="stepper"><span class="here">idée</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Reprend <code>common/profiles/setup_entries.js</code> et les marques de l'ADR 0006 ; pages Réglages et Profils du guide</div>
+          <p>Aujourd'hui, <code>"isAdmin": true</code> et <code>"isChild": true</code> s'écrivent à la main dans le <code>profile.json</code>, PinballY fermé. « Réinitialiser un profil » du menu Exit devient « Gérer les profils », où un Profile admin coche les deux marques de chaque Profile. Grillé le 29/10/2026.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="here">spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. ADR 0020 (remplace l'ADR 0006) ; reprend <code>common/profiles/setup_entries.js</code> et <code>common/menus/profile_reset_menu.js</code> ; pages Réglages et Profils du guide</div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Décisions</summary>
             <ul>
-              <li>Qui coche : un Profile admin seulement. Un enfant ne doit jamais pouvoir retirer sa propre marque.</li>
-              <li>Le premier admin : tant qu'aucun n'existe, tout le monde voit les entrées de configuration, donc le premier venu (un enfant compris) pourrait prendre la borne. Le premier admin reste-t-il dans le JSON, ou passe-t-il par le bouton de service du monnayeur (accès physique) ?</li>
-              <li>Où : dans « Réinitialiser un profil » devenu un menu de gestion des Profiles, ou dans les Réglages du pack ?</li>
-              <li>Un Profile qui perd sa marque d'enfant perd ses Young Players : faut-il un Dialog de confirmation ?</li>
+              <li>Seul un Profile admin coche, depuis la borne ; le <code>profile.json</code> reste lisible et modifiable à la main. ADR 0020, qui remplace l'ADR 0006.</li>
+              <li>Le premier admin : tant qu'aucun n'existe, le Profile actif devient admin lui-même (une seule ligne « Devenir admin »), sauf Guest et un Child Profile. Pas de bouton de service du monnayeur.</li>
+              <li>Admin et enfant s'excluent : un Child Profile ne devient jamais admin sans perdre d'abord sa marque. Le dernier admin ne perd sa marque que par le JSON.</li>
+              <li>« Gérer les profils » remplace « Réinitialiser un profil » dans le menu Exit : la liste des Profiles (sans Guest) et « Tous les profils » pour la réinitialisation ; un Profile ouvre « Admin : oui/non », « Enfant : oui/non », « Réinitialiser ». Une marque change d'un coup, sans confirmation : les Young Players reviennent avec la marque d'enfant.</li>
+              <li>Une ligne interdite reste visible, grisée avec sa raison : nouveauté du Drawn Menu ; dans le menu natif de secours, la raison entre parenthèses et la ligne rouvre le menu.</li>
             </ul>
             <p class="ctx">Idée de Félix du 29/10/2026.</p>
           </details>
@@ -656,8 +657,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>29/10 <span class="count">(9)</span></summary>
+          <summary>29/10 <span class="count">(10)</span></summary>
           <ol>
+            <li><strong>« Admin et enfant en jeu » grillé, reste 1ᵉʳ</strong>
+              <span>Un Profile admin coche les marques admin et enfant depuis « Gérer les profils » (menu Exit), qui remplace « Réinitialiser un profil » ; le premier admin se désigne lui-même, jamais un enfant ; marques exclusives ; lignes interdites grisées, nouveauté du Drawn Menu. ADR 0020 remplace l'ADR 0006. Effort et impact inchangés.</span></li>
             <li><strong>« Table au hasard » au menu quitte la roadmap</strong>
               <span>Spec #362 close : ticket #363 livré, nouvel Add-on « Random Game » et son entrée « Lancer une table au hasard » sous « Jouer » ; les Random Game Achievements suivent désormais cet Add-on et le Welcome Screen, plus « Menu commands ». Le chantier sort de la file et de la matrice ; « Admin et enfant en jeu » passe 1ᵉʳ.</span></li>
             <li><strong>La Sortie 1.0 quitte la roadmap : le pack est en 1.0</strong>
