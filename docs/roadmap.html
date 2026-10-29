@@ -245,7 +245,6 @@
           <a class="chip tr-share" href="#drawn-dialogs"><b></b>Dialogues lisibles</a>
         </div>
         <div class="cell">
-          <a class="chip tr-share" href="#wiki"><b></b>README court et guide</a>
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
         </div>
         <div class="cell">
@@ -300,30 +299,6 @@
 
     <ol class="queue">
 
-      <li draggable="true" tabindex="0" class="item tr-share" id="wiki" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>README court et guide du pack en Markdown</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span><span class="tag">docs</span></div>
-          </div>
-          <p>Les README deviennent une page d'accueil courte : une phrase de présentation, la capture du Welcome Screen, quelques lignes par famille, une installation en étapes courtes et des liens. Tout le reste part dans un guide en Markdown dans le dépôt : installation pas à pas, mises à jour, une page par famille de fonctionnalités, réglages, dépannage (Error Log) et « Coming next ».</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/353">#353</a>, tickets #354, #355 (après les captures #348), #356 (orchestrateur) ; remplace le ticket #350 de la <a href="#release-1-0">Sortie 1.0 (n° <span data-ref="release-1-0"></span>)</a>, qui l'attend. Flow Matt : <code>/implement</code></div>
-          <details>
-            <summary>Décisions du grilling (28/10/2026)</summary>
-            <ul>
-              <li>Pas de wiki GitHub (dépôt à part, hors des commits et du zip) : pages Markdown dans <code>docs/guide/en/</code> et <code>docs/guide/fr/</code>, mêmes 10 pages, versionnées avec le code et livrées dans le zip. Le wiki GitHub est désactivé.</li>
-              <li>Pages : <code>index</code>, <code>install</code>, <code>updates</code>, une par famille (<code>profiles</code>, <code>achievements_and_challenges</code>, <code>choosing_a_table</code>, <code>interface</code>), <code>settings</code>, <code>troubleshooting</code>, <code>coming_next</code>.</li>
-              <li>README (en et fr, même plan) : une phrase, la capture du Welcome Screen, 3 à 5 lignes par famille, installation complète en étapes courtes (suffisante hors ligne depuis le zip), liens vers le guide, le CHANGELOG et CONTRIBUTING. « Coming next » devient une page du guide.</li>
-              <li>Captures de #348 inchangées, partagées par le README et les deux langues du guide. Aucun lien vers le guide dans le pack (pas de navigateur sur la borne).</li>
-              <li>Une règle de <code>conventions.md</code> : un changement visible du joueur ou du propriétaire met à jour sa page du guide en et fr dans le même commit ; <code>/to-spec</code> en fait un critère, <code>fin-de-spec.md</code> vise <code>coming_next</code>. Test de projet : mêmes pages en et fr, liens relatifs valides, chaque image utilisée.</li>
-            </ul>
-          </details>
-        </div>
-      </li>
-
       <li draggable="true" tabindex="0" class="item tr-share" id="drawn-dialogs" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
         <div class="emblem"></div>
@@ -358,7 +333,7 @@
           </div>
           <p>Une vraie 1.0 publiée : un numéro de version du pack (semver) écrit au démarrage dans le journal, un CHANGELOG, une release GitHub, et des README remis à niveau pour un public nouveau (présentation, captures, installation). Les versions suivantes en découlent. L'annonce « Expansion Pack mis à jour en vX.Y.Z » de la Distribution montre alors les nouveautés tirées du CHANGELOG.</p>
           <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a>. Jalon après la Distribution (spec #331, livrée), le <a href="#wiki">README court (n° <span data-ref="wiki"></span>)</a> et les <a href="#drawn-dialogs">Dialogues lisibles (n° <span data-ref="drawn-dialogs"></span>)</a> : #347, #349 et #351 portent un commentaire qui les fait attendre ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
+          <div class="links">Spec <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/345">#345</a>, tickets #346, #347, #349, #351, borne #348 et #352 (humain) ; #350 remplacé par la spec #353 du README court et du guide (livrée). Jalon après la Distribution (spec #331, livrée), le README court (spec #353, livrée) et les <a href="#drawn-dialogs">Dialogues lisibles (n° <span data-ref="drawn-dialogs"></span>)</a> : #347, #349 et #351 portent un commentaire qui les fait attendre ; les Release Highlights s'ajoutent au dialogue de réussite de #335. Flow Matt : <code>/implement</code></div>
           <details>
             <summary>Décisions du grilling (27/10/2026)</summary>
             <ul>
