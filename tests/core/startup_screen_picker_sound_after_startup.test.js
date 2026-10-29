@@ -8,14 +8,14 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { press, openFromMainMenu, isWelcomeScreenOpen, WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { startOnProfilePicker, isCarouselOpen, PICKER_SOUND, pickerSounds, CAROUSEL_PAUSE_MS } from "./startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, PICKER_SOUND, pickerSounds, CAROUSEL_OPEN_MS } from "./startup_picker_scenario.js";
 
 const SETTLED_MS = 3000;
 
 test("a carousel opened from the main menu after startup plays no Profile picker sound", async () => {
     const { fake, lang, settle } = await startOnProfilePicker({ settings: { profilePickerSoundFile: PICKER_SOUND }, files: [PICKER_SOUND] });
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
     press(fake, "Exit");
     await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);

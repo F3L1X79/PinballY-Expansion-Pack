@@ -47,7 +47,7 @@ test("the main menu's Welcome Screen entry reopens the screen for the active Pro
     openMainMenu();
     fake.selectMenuItem(lang.welcomeScreen.menuEntry);
     await settle();
-    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn at its turn, without the startup pause");
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn at its turn");
     assert.deepEqual(startupVeil(fake), { shown: false }, "no startup veil");
     assert.deepEqual(readLoader(fake), { shown: false }, "no Loader");
     fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS / 2);

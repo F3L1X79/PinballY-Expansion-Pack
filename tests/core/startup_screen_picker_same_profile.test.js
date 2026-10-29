@@ -7,15 +7,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readLoader } from "../support/loader_reader.js";
-import { press, isWelcomeScreenOpen, startupVeil, greeting, choose, WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
+import { press, isWelcomeScreenOpen, startupVeil, greeting, choose, WELCOME_SCREEN_FADE_IN_MS, WELCOME_SCREEN_OPEN_MS } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { startOnProfilePicker, isCarouselOpen, highlightedName, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, highlightedName, CAROUSEL_OPEN_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
 
 test("keeping the last active Profile in the startup Profile picker brings its Welcome Screen", async () => {
     const { fake, lang, store, settle } = await startOnProfilePicker();
     const names = [lang.profiles.guestName, "Alice", "Bob"];
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
     assert.equal(highlightedName(fake, names), "Bob");
 
     press(fake, "Select");
@@ -34,7 +34,7 @@ test("keeping the last active Profile in the startup Profile picker brings its W
     fake.advanceTime(GLIDE_OVER_MS);
     press(fake, "Select");
     await settle();
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS / 2);
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS / 2);
     assert.deepEqual(startupVeil(fake), { shown: false }, "no veil after Change Player");
     assert.deepEqual(readLoader(fake), { shown: false });
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);

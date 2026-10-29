@@ -5,10 +5,10 @@
 // Table, a Challenge Table drawn at each opening, a Random Game, or to stay.
 // A drawn dialog of the wheel dialog module at the startup priority (docs/adr/0011).
 // - At startup only, the startup veil dims the wheel until the panel is in.
-// - Drawn at its turn, except as the Startup Screen itself: after a pause, the window not laid out yet.
+// - Drawn at its turn, then redrawn in place when PinballY lays the window out while it is open.
 // - Swallows every button through "commandbuttondown" while open; reading the Period cards locks this Period's tables.
 // - Writes the Lost Records seen marker to high_scores.json.
-// - Holds the quiet wheel from its turn, pause included; gives it up at once to a launch, a menu or attract mode (docs/adr/0015).
+// - Holds the quiet wheel while open; gives it up at once to a launch or attract mode (docs/adr/0015).
 // ============================================================
 
 import lang from "../common/core/i18n.js";
@@ -34,6 +34,7 @@ import { masteryOf, collectionMasteryOfProfile } from "../common/mastery/table_m
 import { tablesVisibleTo } from "../common/tables/visible_tables.js";
 import { masteryHeadOf, collectionTextsOf } from "../common/mastery/mastery_bar.js";
 import { createNavigationSound } from "../common/core/navigation_sound.js";
+import { createWindowWatch, sameSize, sizeText } from "../common/core/window_watch.js";
 import { STEAMBALL_COLORS } from "../common/drawing/steamball_palette.js";
 import { createSelectionMarker } from "../common/drawing/selection_marker.js";
 import { getStartupVeil } from "../common/drawing/startup_veil.js";
@@ -46,10 +47,6 @@ import {
 
 const SCRIPT_NAME = "WelcomeScreen";
 
-// Before the startup Welcome Screen alone: the window is not laid out yet,
-// and a window-sized canvas measured then comes out distorted (as for the
-// Profile badge).
-const STARTUP_PAUSE_MS = 500;
 const FADE_MS = 220;
 const FRAME_MS = 16;
 // The Lost Records line names this many tables at most, then counts the others.
@@ -85,18 +82,16 @@ export default function init() {
     });
     const log = message => host.log(`[${SCRIPT_NAME}] ${message}`);
 
-    // Queued, waiting its turn in the wheel dialog module.
-    let isSubmitted = false;
+    // Queued, waiting its turn in the wheel dialog module; null otherwise.
+    // Marked dropped, the module leaves it out at its turn.
+    let waiting = null;
     // The wheel dialog module's close, from its turn until the screen closes.
     let closeDialog = null;
-    // Submitted as the Startup Screen itself: drawn only after the pause.
-    let hasStartupPause = false;
-    let pauseTimer = null;
-    // Its turn came, or its pause ended, away from the wheel: it is drawn
-    // on the next return, after the pause again for the startup one.
-    let isWaitingForWheel = false;
-    // The screen on show: its layers, choices and selection; null when closed.
+    // The screen on show: what was read for it, its layers, choices and
+    // selection; null when closed.
     let shown = null;
+    // Runs while the screen is open.
+    const windowWatch = createWindowWatch(host, SCRIPT_NAME);
     // Highlighted on opening: Close once the player was just changed or picked.
     let firstChoice = null;
     const startupVeil = getStartupVeil();
@@ -256,25 +251,21 @@ export default function init() {
         return layer;
     }
 
-    // Draws every layer at once, hidden, then fades them in together:
-    // drawn piece by piece through the drawing ahead, it stayed empty at
-    // startup (docs/adr/0011).
-    function draw() {
-        const openedAt = host.now().getTime();
-        // Again: a launch or a menu during the pause may have released it.
-        quietWheel.hold(SCRIPT_NAME);
-        const profile = store.getActiveProfile();
-        const screen = readScreen(profile);
-        const layers = [];
-        // The backdrop first: it measures the window and dims the wheel.
-        const backdrop = hiddenLayer(WELCOME_SCREEN_Z_INDEX.backdrop);
-        let referenceWidth = 0;
-        backdrop.draw(dc => {
-            const size = dc.getSize();
-            referenceWidth = REFERENCE_HEIGHT * size.width / size.height;
-            drawBackdrop(dc, size, referenceWidth, screen);
+    // The backdrop, hidden: it measures the window and dims the wheel.
+    function drawBackdropLayer(screen) {
+        const layer = hiddenLayer(WELCOME_SCREEN_Z_INDEX.backdrop);
+        let size = null;
+        layer.draw(dc => {
+            size = dc.getSize();
+            drawBackdrop(dc, size, REFERENCE_HEIGHT * size.width / size.height, screen);
         });
-        layers.push(backdrop);
+        return { layer, size };
+    }
+
+    // Every other layer and the marker, hidden, for the window the backdrop measured.
+    function drawPieces(screen, backdrop) {
+        const referenceWidth = REFERENCE_HEIGHT * backdrop.size.width / backdrop.size.height;
+        const layers = [backdrop.layer];
         const drawPiece = piece => {
             const layer = hiddenLayer(piece.zIndex);
             place(layer, piece.rect, referenceWidth);
@@ -286,21 +277,57 @@ export default function init() {
         pieces.forEach(drawPiece);
         // Only the Avatar and the Exit Button have a tooltip: null for the others.
         const tooltipLayers = screen.choices.map(choice => (highlights[choice].tooltip ? drawPiece(highlights[choice].tooltip) : null));
+        const targets = screen.choices.map(choice => highlights[choice].target);
+        const marker = createSelectionMarker(host, { zIndex: WELCOME_SCREEN_Z_INDEX.marker, referenceWidth, referenceHeight: REFERENCE_HEIGHT });
+        return { size: backdrop.size, layers, tooltipLayers, targets, marker };
+    }
+
+    function removeLayers({ layers, marker }) {
+        marker.remove();
+        for (const layer of layers) host.removeDrawingLayer(layer);
+    }
+
+    // Draws every layer at once, hidden, then fades them in together:
+    // drawn piece by piece through the drawing ahead, it stayed empty at
+    // startup (docs/adr/0011).
+    function draw() {
+        const openedAt = host.now().getTime();
+        const profile = store.getActiveProfile();
+        const screen = readScreen(profile);
+        const drawn = drawPieces(screen, drawBackdropLayer(screen));
         // Seen once drawn, even if the screen closes at once.
         if (highScores) highScores.markLostRecordsSeen(profile.name);
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         const selected = Math.max(0, screen.choices.indexOf(firstChoice));
-        const targets = screen.choices.map(choice => highlights[choice].target);
-        const marker = createSelectionMarker(host, { zIndex: WELCOME_SCREEN_Z_INDEX.marker, referenceWidth, referenceHeight: REFERENCE_HEIGHT });
-        marker.moveTo(targets[selected]);
-        shown = { layers, tooltipLayers, marker, targets, choices: screen.choices, challengeTable: screen.challengeTable, selected, opacity: 0, fadeTimer: null };
+        drawn.marker.moveTo(drawn.targets[selected]);
+        shown = { ...drawn, screen, selected, opacity: 0, fadeTimer: null };
+        windowWatch.start(followWindow);
         // The comet would freeze while the screen is drawn on the UI thread:
         // it goes as the panel fades in, the veil once the panel is fully in.
         startupVeil.hideLoader();
         fadeIn(shown);
         playGreetingSound();
         log(`Opened, drawn in ${host.now().getTime() - openedAt} ms.`);
+    }
+
+    // The window watch saw the view's size change while the screen is open:
+    // drawn again in place from what was read on opening (the same Challenge
+    // Table), the selection kept and the fade going on. False, nothing
+    // kept, while the layers' window keeps its old size.
+    function followWindow(previousView, nextView) {
+        const backdrop = drawBackdropLayer(shown.screen);
+        const previousSize = shown.size;
+        if (sameSize(backdrop.size, previousSize)) {
+            host.removeDrawingLayer(backdrop.layer);
+            return false;
+        }
+        removeLayers(shown);
+        Object.assign(shown, drawPieces(shown.screen, backdrop));
+        shown.marker.moveTo(shown.targets[shown.selected]);
+        setOpacity(shown, shown.opacity);
+        log(`The screen is redrawn for the window's new size: view ${sizeText(previousView)} to ${sizeText(nextView)}, layers ${sizeText(previousSize)} to ${sizeText(backdrop.size)}.`);
+        return true;
     }
 
     // The marker and every layer to the same opacity, except the unselected
@@ -330,51 +357,23 @@ export default function init() {
         screen.fadeTimer = null;
     }
 
-    // A menu or a game may have come up during the pause.
-    function drawOnceWheelFree() {
-        if (host.getUIMode() === "wheel") draw();
-        else {
-            isWaitingForWheel = true;
-            startupVeil.hide();
-            quietWheel.release(SCRIPT_NAME, { atOnce: true });
-        }
-    }
-
-    // At its turn or back on the wheel: at once, or after STARTUP_PAUSE_MS
-    // for the startup screen alone, the only one opened before the layout.
-    function drawAtTurn() {
-        isWaitingForWheel = false;
-        if (!hasStartupPause) drawOnceWheelFree();
-        else {
-            pauseTimer = host.setTimeout(safeHandler(SCRIPT_NAME, () => {
-                pauseTimer = null;
-                drawOnceWheelFree();
-            }), STARTUP_PAUSE_MS);
-        }
-    }
-
-    // Its turn in the wheel dialog module: the wheel is free.
-    // Held from here, not from the drawing: the Profile picker's hand-over
-    // is shorter than the startup pause.
+    // Its turn in the wheel dialog module: the wheel is free. Drawn at once,
+    // even at startup: the window watch follows PinballY laying the window out.
     function open(close) {
-        isSubmitted = false;
+        waiting = null;
         closeDialog = close;
         quietWheel.hold(SCRIPT_NAME);
-        drawAtTurn();
+        draw();
     }
 
-    // Removes the screen, or drops it before it shows, and frees the queue.
-    // atOnce: nothing follows (a table chosen, attract mode), back at its own
-    // volume before the wheel moves.
+    // Removes the screen and frees the queue. atOnce: nothing follows (a
+    // table chosen, attract mode), back at its own volume before the wheel moves.
     function close({ atOnce = false } = {}) {
-        host.clearTimeout(pauseTimer);
-        pauseTimer = null;
-        isWaitingForWheel = false;
+        windowWatch.stop();
         startupVeil.hide();
         if (shown) {
             stopFade(shown);
-            shown.marker.remove();
-            for (const layer of shown.layers) host.removeDrawingLayer(layer);
+            removeLayers(shown);
             shown = null;
         }
         quietWheel.release(SCRIPT_NAME, { atOnce });
@@ -386,15 +385,15 @@ export default function init() {
     // direction: 1 for Next, -1 for Prev.
     function move(direction) {
         navigationSound.play();
-        const count = shown.choices.length;
+        const count = shown.screen.choices.length;
         shown.selected = (shown.selected + direction + count) % count;
         setOpacity(shown, shown.opacity);
         shown.marker.moveTo(shown.targets[shown.selected]);
     }
 
     function choose() {
-        const choice = shown.choices[shown.selected];
-        const { challengeTable } = shown;
+        const choice = shown.screen.choices[shown.selected];
+        const { challengeTable } = shown.screen;
         close({ atOnce: choice === CHOICE.RANDOM || choice === CHOICE.CHALLENGE || choice in periodTables });
         if (choice === CHOICE.RANDOM) return randomGame.launch();
         if (choice === CHOICE.AVATAR) getChangePlayer()();
@@ -411,16 +410,16 @@ export default function init() {
         return undefined;
     }
 
-    function submit(choice, { atStartup = false } = {}) {
-        isSubmitted = true;
+    function submit(choice) {
+        const submission = { isDropped: false };
+        waiting = submission;
         firstChoice = choice;
-        hasStartupPause = atStartup;
-        getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open });
+        getWheelDialogs().submit({ priority: DIALOG_PRIORITY.STARTUP_PROMPT, open, isStale: () => submission.isDropped });
     }
 
     const startupScreen = getStartupScreen();
     if (startupScreen === STARTUP_SCREEN.WELCOME) {
-        submit(null, { atStartup: true });
+        submit(null);
         startupVeil.show();
     }
     // The startup Profile picker hands over on a pick or Exit, before any
@@ -428,14 +427,14 @@ export default function init() {
     // just chosen: the cursor on the cross, as after Change Player.
     if (startupScreen === STARTUP_SCREEN.PROFILE_PICKER) {
         onStartupPickerDone(safeHandler(SCRIPT_NAME, () => {
-            if (!isSubmitted && !closeDialog) submit(CHOICE.EXIT_BUTTON);
+            if (!waiting && !closeDialog) submit(CHOICE.EXIT_BUTTON);
         }));
     }
 
     // Read again when the screen opens, the cursor on the cross; nothing
     // more while the screen is still waiting or open.
     function reopenWelcomeScreen() {
-        if (!isSubmitted && !closeDialog) submit(CHOICE.EXIT_BUTTON);
+        if (!waiting && !closeDialog) submit(CHOICE.EXIT_BUTTON);
     }
 
     // Through the wheel dialog module rather than opened directly, so that
@@ -459,17 +458,13 @@ export default function init() {
         else if (ev.command === "Exit") close();
     }));
 
-    // Fires on every return to the wheel, after a menu or a game that came
-    // up before the screen was drawn.
-    host.on("wheelmode", safeHandler(SCRIPT_NAME, () => {
-        if (isWaitingForWheel) drawAtTurn();
-    }));
-
-    // Fires when a table starts: one launched before the screen shows (in
-    // the startup pause, or from a menu while it waits) means the
-    // player already chose, so the screen must not show after the game.
+    // Fires when a table starts: one launched while the screen waits its
+    // turn (from a menu opened at startup) means the player already chose,
+    // so the screen must not show after the game.
     host.on("gamestarted", safeHandler(SCRIPT_NAME, () => {
-        if (closeDialog && !shown) close({ atOnce: true });
+        if (!waiting) return;
+        waiting.isDropped = true;
+        waiting = null;
     }));
 
     // Fires when the cabinet sits idle: the screen must not stay over
@@ -477,13 +472,4 @@ export default function init() {
     host.on("attractmodestart", safeHandler(SCRIPT_NAME, () => {
         if (closeDialog) close({ atOnce: true });
     }));
-
-    // Fire when a table starts launching or a menu opens during the startup pause:
-    // the table must not stay lowered under them. The screen holds the
-    // wheel again if it still shows afterwards.
-    const giveWayInPause = safeHandler(SCRIPT_NAME, () => {
-        if (closeDialog && !shown) quietWheel.release(SCRIPT_NAME, { atOnce: true });
-    });
-    host.on("launchoverlayshow", giveWayInPause);
-    host.on("menuopen", giveWayInPause);
 }

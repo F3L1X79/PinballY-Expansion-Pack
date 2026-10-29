@@ -23,7 +23,7 @@ import { createScriptQueue } from "../../common/table_roms/script_queue.js";
 import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js";
 import { createHighScoreStore } from "../../common/high_scores/high_score_store.js";
 import { buildHighScoreAchievements } from "../../achievements/high_scores.js";
-import { WELCOME_SCREEN_PAUSE_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
+import { WELCOME_SCREEN_FADE_IN_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 // Wednesday 23 September 2026, 10:00 local time: its week starts Monday 21.
@@ -201,7 +201,7 @@ test("persisted files and Achievement IDs stay byte-identical", async () => {
     // Welcome Screen, once faded in (the pinned times keep their second):
     // launch the Table of the Day from its card, play a long session, and
     // close every dialog (the rating prompt).
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS + 300);
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS + 300);
     choose(fake, lang.welcomeScreen.periodCards.day.period);
     await settle();
     const dayTable = await playLastLaunch(fake, 61 * 60);

@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // Welcome Screen in French, through main.js on the fake PinballY globals,
-// at 19 h: a menu opened before the startup pause ends keeps it closed
-// until the menu closes and another pause ends; it greets the Profile by
+// at 19 h: a menu opened before its turn at startup keeps it closed until
+// the menu closes; it greets the Profile by
 // its name with the evening greeting, offers to stay on the wheel when
 // no table is selected, shows the Avatar's tooltip in French, and Exit closes it.
 // ============================================================
@@ -26,14 +26,13 @@ test("the Welcome Screen waits for a menu to close, greets in the evening and cl
 
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
-    await settle();
 
     fake.openMenu("main", [{ title: "Play", cmd: fake.getBuiltInCommand("PlayGame") }]);
+    await settle();
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), false, "not over a menu");
     fake.closeMenu();
     await settle();
-    assert.equal(isWelcomeScreenOpen(fake), false, "a new pause first");
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
 

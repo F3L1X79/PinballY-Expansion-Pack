@@ -14,12 +14,9 @@ import * as selectionMarker from "../support/selection_marker_reader.js";
 import { shownLayers } from "../support/shown_layers.js";
 import { buttonHintsOn } from "../support/button_hints_reader.js";
 
-// The startup pause: the screen is drawn then, and starts fading in.
-export const WELCOME_SCREEN_PAUSE_MS = 500;
-// Past the startup pause and the fade.
+// Past the screen's turn and its fade, with time to spare.
 export const WELCOME_SCREEN_OPEN_MS = 1000;
-// Past the fade alone, short of the startup pause: enough for a screen
-// drawn at its turn.
+// Past the fade alone: enough for a screen drawn at its turn.
 export const WELCOME_SCREEN_FADE_IN_MS = 300;
 
 export const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { command: buttonCommand, repeat: false });

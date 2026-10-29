@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startLostRecords } from "./lost_records_scenario.js";
 import { settle } from "../support/fake_pinbally_host.js";
-import { readChoices, press, WELCOME_SCREEN_PAUSE_MS } from "./welcome_screen_reader.js";
+import { readChoices, press, WELCOME_SCREEN_FADE_IN_MS } from "./welcome_screen_reader.js";
 import { board, avatarFiles, avatarOf, MEDIEVAL, AFM, FACTORY } from "../high_scores/high_scores_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
@@ -50,7 +50,7 @@ test("Alice's Welcome Screen tells her once that Bob took her Table Record", asy
     // Closed as soon as it is drawn, before its fade ends.
     scenario.switchTo("Alice");
     await settle();
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS);
+    fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS);
     press(fake, "Exit");
     await settle();
     await arrive("Bob");

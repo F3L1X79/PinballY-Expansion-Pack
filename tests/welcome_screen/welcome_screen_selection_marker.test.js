@@ -12,7 +12,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import {
-    WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, highlighted, markerLayer, markedImage, welcomeScreenLayerCount,
+    WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, highlighted, markerLayer, markedImage, welcomeScreenLayerCount,
 } from "./welcome_screen_reader.js";
 
 const PROFILES = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -32,11 +32,9 @@ test("the Selection Marker surrounds the Avatar, jumps on Next, flows round in 6
     const { default: lang } = await import("../../common/core/i18n.js");
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     await import("../../main.js");
-    await settle();
-
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS - 100);
     const intervalsBefore = fake.runningIntervalCount();
-    fake.advanceTime(WELCOME_SCREEN_OPEN_MS - WELCOME_SCREEN_PAUSE_MS + 100);
+    await settle();
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.equal(markedImage(fake), getProfileStore().getActiveProfile().avatarPath, "the marker surrounds the Avatar on opening");
     assert.deepEqual(highlighted(fake), { label: null, tooltip: lang.profiles.menuEntry }, "with the Avatar's tooltip");

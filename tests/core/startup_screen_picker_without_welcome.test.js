@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { readLoader } from "../support/loader_reader.js";
 import { press, startupVeil } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { startOnProfilePicker, pickerTexts, isCarouselOpen, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
+import { startOnProfilePicker, pickerTexts, isCarouselOpen, CAROUSEL_OPEN_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
 
 const PAUSE_OVER_MS = 600;
 const GREETING_OVER_MS = 2500;
@@ -19,7 +19,7 @@ test("without the Welcome Screen, the startup Profile picker is followed by the 
     const greetings = () => pickerTexts(fake).filter(text => text === lang.profiles.greeting("Alice") || text === lang.profiles.greeting("Bob"));
     assert.equal(startupVeil(fake).shown, true, "the wheel dimmed from the first frame");
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
     assert.equal(isCarouselOpen(fake, lang), true, "the carousel at startup");
     assert.deepEqual(readLoader(fake), { shown: false });
     assert.deepEqual(greetings(), [], "no greeting before the pick");

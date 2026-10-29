@@ -1,5 +1,5 @@
 ﻿// ============================================================
-// Welcome Screen through main.js at 5 h: opens after the startup pause,
+// Welcome Screen through main.js at 5 h: opens on its turn at startup,
 // greets by the hour, loops through its choices with the navigation sound,
 // names the table on the wheel, swallows every button, and closes on Stay
 // leaving no layer nor timer.
@@ -23,7 +23,7 @@ const MEDIEVAL = table(1, "Medieval Madness (Williams 1997)", "Medieval Madness 
 // A lost "™" read as Windows-1252, then a parenthetical suffix.
 const MARS = table(2, "Attack from Mars\u00EF\u00BF\u00BD  Special (Bally 1995)", "Attack from Mars (Bally 1995)");
 
-test("the Welcome Screen opens after the startup pause, greets the Profile and loops through its choices", async () => {
+test("the Welcome Screen opens on its turn at startup, greets the Profile and loops through its choices", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 8, 23, 5, 0, 0), tables: [MEDIEVAL, MARS] });
     fake.addFolder(`${PROFILES}\\Bob`);
     fake.addFile(`${PROFILES}\\Alice\\profile.json`, JSON.stringify({
@@ -47,12 +47,10 @@ test("the Welcome Screen opens after the startup pause, greets the Profile and l
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");
     const TEXT = lang.welcomeScreen;
     await import("../../main.js");
-    await settle();
-
-    fake.advanceTime(400);
-    assert.equal(isWelcomeScreenOpen(fake), false, "not before the startup pause");
     const intervalsBefore = fake.runningIntervalCount();
-    fake.advanceTime(WELCOME_SCREEN_OPEN_MS - 400);
+    await settle();
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn on its turn, without a pause");
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.equal(fake.currentMenu(), null, "no native menu");
 

@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { readDrawnMenu, drawnMenuLines, isDrawnMenuShown, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
-import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS } from "../core/startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 import { PACK_VERSION } from "../../common/core/pack_version.js";
 import { STATE_FILE, requestedVersionOf } from "./update_failed_scenario.js";
 
@@ -29,7 +29,7 @@ test("a Pack Update that worked says so once, before the Profile picker", async 
     chooseEntry(fake, "OK");
     assert.equal(isDrawnMenuShown(fake), false);
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS + OPEN_OVER_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS + OPEN_OVER_MS);
     assert.equal(isCarouselOpen(fake, lang), true, "the picker opens once the message closed");
     assertNoErrorLogged(fake);
 });

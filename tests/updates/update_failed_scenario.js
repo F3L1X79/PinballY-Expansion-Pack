@@ -6,7 +6,7 @@
 // Never loaded by PinballY.
 // ============================================================
 
-import { startOnProfilePicker, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "../core/startup_picker_scenario.js";
+import { startOnProfilePicker, CAROUSEL_OPEN_MS, GLIDE_OVER_MS } from "../core/startup_picker_scenario.js";
 import { press, WELCOME_SCREEN_FADE_IN_MS } from "../welcome_screen/welcome_screen_reader.js";
 import { watchCards } from "../achievements/error_toast_scenario.js";
 
@@ -35,7 +35,7 @@ export async function pickAfterFailedUpdate({ adminProfiles = [], activeProfile 
         },
     });
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS + HURRIED_PICK_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS + HURRIED_PICK_MS);
     await settle();
     for (const button of moves) {
         press(fake, button);

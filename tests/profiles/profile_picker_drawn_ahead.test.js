@@ -30,6 +30,8 @@ test("once drawn ahead, the carousel opens and moves without drawing", async () 
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "profilePicker";
     config.language = "en";
+    // A startup carousel, open from the first tick, would hold the drawing ahead.
+    config.startupScreen = "wheel";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");

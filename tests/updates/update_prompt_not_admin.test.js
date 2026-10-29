@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { isDrawnMenuShown } from "../drawn_menu/drawn_menu_reader.js";
-import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS } from "../core/startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 
 const STATE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\pack_update.json";
 const ADMIN_PROFILE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles\\Alice\\profile.json";
@@ -28,7 +28,7 @@ test("a last active Profile without the setup entries sees no Update Prompt, and
         },
     });
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
 
     assert.equal(isCarouselOpen(fake, lang), true, "the picker opens as usual");
     assert.equal(isDrawnMenuShown(fake), false);

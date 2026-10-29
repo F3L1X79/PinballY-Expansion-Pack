@@ -28,6 +28,7 @@ import { getShownPlayerLevel } from "../common/levels/shown_player_level.js";
 import { drawLevelPip, levelPipOn, drawAvatarFrame, avatarFrameSide, AVATAR_FRAME_MARGIN } from "../common/drawing/steamball_drawing.js";
 import { getProfileRewards } from "../common/avatar_frames/profile_rewards.js";
 import { createNavigationSound } from "../common/core/navigation_sound.js";
+import { createWindowWatch, readViewSize, sameSize, sizeText } from "../common/core/window_watch.js";
 import config from "../common/core/config.js";
 
 const SCRIPT_NAME = "ProfilePicker";
@@ -91,8 +92,9 @@ const HINT = Object.freeze({ size: 12, weight: 400, top: 180 });
 // in the carousel, below the highlighted Avatar's frame.
 const FRAMED_TEXT_SHIFT = 45;
 // The badge has its own canvas, pinned to the window's top right corner:
-// PinballY stretches a canvas to the window, and at startup the window is
-// not laid out yet, so a window-sized canvas drawn then ends up distorted.
+// PinballY stretches a canvas to the window, and gives the window its
+// final size only after the scripts' init, so a window-sized canvas drawn
+// at startup ends up distorted.
 // The name is centred under the Avatar, across the canvas width, which also
 // leaves the Avatar ~30 px from the right edge.
 // The level pip straddles the Avatar's bottom-right corner; the name sits
@@ -110,9 +112,6 @@ const BADGE_NAME = Object.freeze({ size: 14, weight: 600 });
 const GREETING = Object.freeze({ delayMs: 500, grownSize: 260, growMs: 250, holdMs: 700, fadeMs: 550 });
 const GREETING_TEXT = Object.freeze({ size: 28, weight: 700, gap: 24 });
 const FRAME_MS = 16;
-// At startup the window is not laid out yet, and the carousel's background
-// measures it: it waits as long as the Welcome Screen does.
-const STARTUP_PAUSE_MS = 500;
 
 export default function init() {
     const { profiles: TEXT } = lang;
@@ -145,6 +144,11 @@ export default function init() {
     // The window's layout size, taken from the background layer, which
     // spans the whole window: the other layers are placed in its pixels.
     let layout = null;
+    // The view's size when the background measured the window: drawn ahead,
+    // it may have been measured before PinballY laid the window out.
+    let layoutView = null;
+    // Runs while the carousel is open.
+    const windowWatch = createWindowWatch(host, SCRIPT_NAME);
     // By Profile name, the image of the Avatar Frame it wears (null for
     // none), read with the Profiles: the carousel places its layers on
     // every frame of a glide, and other Profiles' data is read from file.
@@ -175,11 +179,8 @@ export default function init() {
     const startupVeil = getStartupVeil();
     const quietWheel = getQuietWheel();
     // The startup carousel's close in the wheel dialog module, from its
-    // turn until a pick, Exit or a drop; the pause before it shows.
+    // turn until a pick, Exit or a drop.
     let closeStartupDialog = null;
-    let startupPauseTimer = null;
-    // The pause ended away from the wheel: it starts again on the next return.
-    let isStartupWaitingForWheel = false;
     // From startup until the startup carousel is left or dropped.
     let isStartupPending = startupScreen === STARTUP_SCREEN.PROFILE_PICKER;
     // A sound that cannot play is logged and never stops the greeting.
@@ -393,6 +394,7 @@ export default function init() {
     // for the Profiles read last.
     function measure() {
         isMeasuredFramed = isFramed();
+        layoutView = readViewSize(host, SCRIPT_NAME);
         backLayer.clear(COLORS.transparent);
         backLayer.draw(dc => {
             layout = dc.getSize();
@@ -586,11 +588,22 @@ export default function init() {
         placeCarousel();
     }
 
+    // The window watch saw the view's size change while the carousel is
+    // open: drawn again in place, the same Profile highlighted. False,
+    // nothing placed, while the layers' window keeps its old size.
+    function followWindow(previousView, nextView) {
+        const previousLayout = layout;
+        measure();
+        if (sameSize(layout, previousLayout)) return false;
+        placeCarousel();
+        host.log(`[${SCRIPT_NAME}] The carousel is redrawn for the window's new size: view ${sizeText(previousView)} to ${sizeText(nextView)}, layers ${sizeText(previousLayout)} to ${sizeText(layout)}.`);
+        return true;
+    }
+
+    // Never measured, measured for other worn frames, or for another window.
+    const isLayoutStale = () => !layout || isMeasuredFramed !== isFramed() || !sameSize(readViewSize(host, SCRIPT_NAME), layoutView);
+
     function open() {
-        // Opened from a menu during the startup pause: the pause must not open it again.
-        host.clearTimeout(startupPauseTimer);
-        startupPauseTimer = null;
-        isStartupWaitingForWheel = false;
         stopGreeting();
         // The player is already choosing: greeting them afterwards would
         // come out of nowhere.
@@ -601,12 +614,13 @@ export default function init() {
         profiles = readProfiles();
         const activeName = profileStore.getActiveProfile().name;
         highlighted = Math.max(0, profiles.findIndex(profile => profile.name === activeName));
-        if (!layout || isMeasuredFramed !== isFramed()) measure();
+        if (isLayoutStale()) measure();
         // Here rather than on the first move, which it would slow down.
         navigationSound.load();
         backLayer.alpha = 1;
         placeCarousel();
-        // Only the startup carousel, whether its pause or a menu opened it.
+        windowWatch.start(followWindow);
+        // Only the startup carousel, whether its turn or a menu opened it.
         if (isStartupPending) playPickerSound();
     }
 
@@ -625,6 +639,7 @@ export default function init() {
     // over; otherwise the table is back at once.
     function close({ isFollowed = false } = {}) {
         stopGlide();
+        windowWatch.stop();
         profiles = null;
         stopGreeting();
         markAheadStale();
@@ -632,35 +647,18 @@ export default function init() {
         quietWheel.release(SCRIPT_NAME, { atOnce: !isFollowed });
     }
 
-    function startStartupPause() {
-        isStartupWaitingForWheel = false;
-        startupPauseTimer = host.setTimeout(safeHandler(SCRIPT_NAME, () => {
-            startupPauseTimer = null;
-            // A menu or a game came up during the pause.
-            if (host.getUIMode() !== "wheel") {
-                isStartupWaitingForWheel = true;
-                startupVeil.hide();
-                return;
-            }
-            open();
-            startupVeil.hideLoader();
-        }), STARTUP_PAUSE_MS);
-    }
-
     // Its turn in the wheel dialog module: the wheel is free. A carousel the
-    // player opened from a menu meanwhile becomes the startup one.
+    // player opened from a menu meanwhile becomes the startup one. Opened
+    // at once: the window watch follows PinballY laying the window out.
     function openAtStartup(closeDialog) {
         closeStartupDialog = closeDialog;
-        if (profiles) startupVeil.hideLoader();
-        else startStartupPause();
+        if (!profiles) open();
+        startupVeil.hideLoader();
     }
 
-    // While the startup carousel waits its turn or its pause: it never
-    // shows, and nothing follows it. The active Profile stays.
+    // While the startup carousel waits its turn: it never shows, and
+    // nothing follows it. The active Profile stays.
     function dropStartup() {
-        host.clearTimeout(startupPauseTimer);
-        startupPauseTimer = null;
-        isStartupWaitingForWheel = false;
         startupVeil.hide();
         releaseStartupDialog();
     }
@@ -682,6 +680,7 @@ export default function init() {
         // The carousel stays drawn, at rest, until the greeting replaces it.
         stopGlide();
         placeCarousel();
+        windowWatch.stop();
         profiles = null;
         profileStore.switchTo(chosen.name);
         releaseStartupDialog();
@@ -761,7 +760,6 @@ export default function init() {
     // Fires back on the wheel, after a game, a menu or a dialog.
     host.on("wheelmode", safeHandler(SCRIPT_NAME, () => {
         badgeLayer.alpha = 1;
-        if (isStartupWaitingForWheel) startStartupPause();
         greetAtStartupIfFree();
     }));
     // No "wheelmode" follows the close of a Drawn Menu or a drawn screen.

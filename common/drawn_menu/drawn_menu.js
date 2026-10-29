@@ -15,7 +15,7 @@ import { safeHandler } from "../core/safe_handler.js";
 import { logError } from "../core/error_log.js";
 import { createClosedListeners } from "../core/closed_listeners.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
-import { createWindowWatch } from "../core/window_watch.js";
+import { createWindowWatch, sizeText } from "../core/window_watch.js";
 import config from "../core/config.js";
 import { getDrawingAhead } from "../core/drawing_ahead.js";
 import { createButtonSound, createNavigationSound } from "../core/navigation_sound.js";
@@ -368,7 +368,6 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         shown.glideTimer = null;
         layOut();
         setAlpha(shown.alpha);
-        const sizeText = size => `${size.width}x${size.height}`;
         host.log(`[${SCRIPT_NAME}] The "${shown.id}" menu is redrawn for the window's new size: view ${sizeText(previousView)} to ${sizeText(nextView)}, layers ${previousLayers} to ${windowSignature()}.`);
         return true;
     }

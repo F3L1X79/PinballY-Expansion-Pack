@@ -9,14 +9,14 @@ import assert from "node:assert/strict";
 import { readLoader } from "../support/loader_reader.js";
 import { press, isWelcomeScreenOpen, startupVeil } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
 
 const SETTLED_MS = 3000;
 
 test("attract mode closes the startup Profile picker for good", async () => {
     const { fake, lang, store, settle } = await startOnProfilePicker();
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
     press(fake, "Prev");
     fake.advanceTime(GLIDE_OVER_MS);
     assert.equal(isCarouselOpen(fake, lang), true);

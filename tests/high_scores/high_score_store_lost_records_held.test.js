@@ -2,8 +2,8 @@
 // The High Score store's lostRecordsOf() on a seeded high_scores.json: a
 // Table Record taken from the Profile since it last saw its Lost Records
 // is one, once per table, unless the Profile holds it again. The Welcome
-// Screen draws at once after a switch: outside its startup pause, no
-// player flow reaches these last two cases.
+// Screen draws at once on its turn: no player flow reaches these last two
+// cases.
 // ============================================================
 
 import { test } from "node:test";

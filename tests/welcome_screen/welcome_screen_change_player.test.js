@@ -65,7 +65,7 @@ test("Change Player from the Welcome Screen or the main menu brings the screen b
     press(fake, "Select");
     assert.equal(store.getActiveProfile().name, "Alice");
     await settle();
-    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn at its turn, without the startup pause");
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "drawn at its turn");
     fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true, "the screen comes back after the switch");
     assert.ok(greeting(fake).includes("Alice"), "for the new Profile");

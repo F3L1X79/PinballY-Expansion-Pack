@@ -2,14 +2,14 @@
 // Welcome Screen greeting sound, through main.js on the fake PinballY
 // globals: the screen greets the Profile in place of the Profile Greeting,
 // so it plays the greeting sound as it appears, at startup and again after
-// Change Player picked another Profile; never during the pause before it.
+// Change Player picked another Profile; never before it.
 // ============================================================
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen } from "./welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen } from "./welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
@@ -34,11 +34,10 @@ test("the Welcome Screen plays the greeting sound as it appears, at startup and 
 
     const { default: lang } = await import("../../common/core/i18n.js");
     await import("../../main.js");
-    await settle();
     const greetingSounds = () => fake.soundsPlayed().filter(path => path === GREETING_SOUND).length;
+    assert.equal(greetingSounds(), 0, "not before its turn");
+    await settle();
 
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS - 100);
-    assert.equal(greetingSounds(), 0, "not during the pause");
     fake.advanceTime(WELCOME_SCREEN_OPEN_MS);
     assert.equal(isWelcomeScreenOpen(fake), true);
     assert.equal(greetingSounds(), 1, "once, as the screen appears");

@@ -13,7 +13,7 @@ import { assertNoErrorLogged } from "../support/error_log.js";
 import { readLoader, loaderLayerCount } from "../support/loader_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
-// Past the Profile picker's startup pause.
+// Past the startup Profile picker's opening, with time to spare.
 const PICKER_OPEN_MS = 2000;
 
 const press = (fake, buttonCommand) => fake.fire("commandbuttondown", { command: buttonCommand, repeat: false });
@@ -28,7 +28,6 @@ test("Exit is swallowed while the startup comet turns", async () => {
     config.language = "en";
 
     await import("../../main.js");
-    await settle();
     assert.equal(readLoader(fake).shown, true);
 
     assert.equal(press(fake, "Exit").defaultPrevented, true, "no Exit menu over the comet");

@@ -7,14 +7,14 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { press, startupVeil } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { startOnProfilePicker, pickerTexts, isCarouselOpen, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
+import { startOnProfilePicker, pickerTexts, isCarouselOpen, CAROUSEL_OPEN_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
 
 const PAUSE_OVER_MS = 600;
 
 test("without the Welcome Screen, Exit in the startup Profile picker greets the last active Profile", async () => {
     const { fake, lang, store, settle } = await startOnProfilePicker({ addOns: ["profilePicker"] });
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
     press(fake, "Prev");
     fake.advanceTime(GLIDE_OVER_MS);
 

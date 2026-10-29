@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { chooseEntry, isDrawnMenuShown, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { readLoader } from "../support/loader_reader.js";
-import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS } from "../core/startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 
 const STATE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\pack_update.json";
 const PACK_UPDATE_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\pack_update.ps1";
@@ -38,7 +38,7 @@ test("Update now records the version, shows the Loader, and starts the Pack Upda
     assert.equal(JSON.parse(fake.readFile(STATE_FILE)).requestedVersion, "9.0.0");
     assert.equal(readLoader(fake).shown, true);
 
-    fake.advanceTime(CAROUSEL_PAUSE_MS + OPEN_OVER_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS + OPEN_OVER_MS);
     await settle();
     assert.equal(isCarouselOpen(fake, lang), false, "no picker while the helper gets ready");
 

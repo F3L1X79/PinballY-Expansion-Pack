@@ -8,6 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
+import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { installVpxtool } from "../support/vpxtool.js";
 
@@ -34,6 +35,8 @@ test("a table that closes on its own", async () => {
     // Never uninstalled: node --test runs each test file in its own process.
     installVpxtool(fake);
     fake.installGlobals();
+    // No Startup Screen over the wheel from the first tick: only the launches show.
+    config.startupScreen = "wheel";
     // Listening before main.js, so the messages are read before an Add-on translates them.
     for (const type of LAUNCH_EVENTS) {
         fake.on(type, ev => {

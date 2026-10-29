@@ -14,6 +14,8 @@ test("UPDATE_CHECK=false in .env.local: no request at the start", async () => {
     const fake = createFakePinballYHost();
     fake.addFile(`${PROJECT}\\.env.local`, "UPDATE_CHECK=false\r\n");
     fake.addFile(`${PROJECT}\\profiles\\cabinet.json`, JSON.stringify({ version: 1, activeProfile: "guest" }));
+    // Shipped with the pack: the Welcome Screen greets with it from the first tick.
+    fake.addFile(`${PROJECT}\\assets\\sounds\\profile_greeting.mp3`);
     installVpxtool(fake);
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();

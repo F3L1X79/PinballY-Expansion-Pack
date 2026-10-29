@@ -13,7 +13,7 @@ import {
     press, isWelcomeScreenOpen, startupVeil, greeting, welcomeScreenLayerCount, WELCOME_SCREEN_FADE_IN_MS,
 } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { startOnProfilePicker, pickerTexts, isCarouselOpen, highlightedName, CAROUSEL_PAUSE_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
+import { startOnProfilePicker, pickerTexts, isCarouselOpen, highlightedName, CAROUSEL_OPEN_MS, GLIDE_OVER_MS } from "./startup_picker_scenario.js";
 
 // Enough for a toast to start.
 const TOAST_RISE_MS = 1000;
@@ -30,7 +30,7 @@ test("the startup Profile picker opens on the last active Profile and the Welcom
     await settle();
     toasts.submit({ title: "Waiting", description: "", onShown() {} });
 
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
     assert.equal(isCarouselOpen(fake, lang), true, "the carousel shows");
     assert.ok(pickerTexts(fake).includes(lang.profiles.pickerHint), "with its usual hint");
     assert.equal(highlightedName(fake, names), "Bob", "on the last active Profile");
@@ -48,7 +48,7 @@ test("the startup Profile picker opens on the last active Profile and the Welcom
     assert.equal(store.getActiveProfile().name, "Alice", "the pick switches");
     assert.equal(isCarouselOpen(fake, lang), false);
     assert.equal(startupVeil(fake).shown, true, "the wheel stays dimmed until the Welcome Screen");
-    assert.ok(welcomeScreenLayerCount(fake) > 0, "the Welcome Screen drawn at its turn, without the startup pause");
+    assert.ok(welcomeScreenLayerCount(fake) > 0, "the Welcome Screen drawn at its turn");
     assert.equal(waitingToasts(fake), 0, "the toast waits for the Welcome Screen");
     fake.advanceTime(WELCOME_SCREEN_FADE_IN_MS / 3);
     assert.equal(isWelcomeScreenOpen(fake), true, "the panel fading in");

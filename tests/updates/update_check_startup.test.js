@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { readLoader } from "../support/loader_reader.js";
 import { startupVeil } from "../welcome_screen/welcome_screen_reader.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS } from "../core/startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 import { LATEST_RELEASE_URL } from "../../common/updates/update_check.js";
 
 const STATE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\pack_update.json";
@@ -33,7 +33,7 @@ test("a start asks for the latest release once, opens the Profile picker as usua
     assert.deepEqual(JSON.parse(fake.readFile(STATE_FILE)),
         { version: 1, latestRelease: { packVersion: "9.0.0", zipUrl: ZIP_URL, sha256: SHA256 } });
 
-    fake.advanceTime(CAROUSEL_PAUSE_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS);
     assert.equal(isCarouselOpen(fake, lang), true, "the carousel shows after its usual pause");
     assert.deepEqual(fake.shownMenus(), [], "nothing about the update at this start");
     assertNoErrorLogged(fake);

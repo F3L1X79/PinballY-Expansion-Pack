@@ -13,7 +13,19 @@ import { logError } from "./error_log.js";
 export const WINDOW_WATCH_MS = 100;
 const MAX_RETRIES = 10;
 
-const sameSize = (a, b) => a.width === b.width && a.height === b.height;
+// Sizes as { width, height }: a view's, or a layer's measured window; null never matches.
+export const sameSize = (a, b) => a !== null && b !== null && a.width === b.width && a.height === b.height;
+export const sizeText = size => `${size.width}x${size.height}`;
+
+// The view's size as { width, height }; null, logged, when it cannot be read.
+export function readViewSize(host, scriptName) {
+    try {
+        return host.getViewSize();
+    } catch (error) {
+        logError(scriptName, `ERROR reading the window's size, the screen won't follow it: ${error.stack || error.message}`, host);
+        return null;
+    }
+}
 
 export function createWindowWatch(host, scriptName) {
     let timer = null;
@@ -30,12 +42,8 @@ export function createWindowWatch(host, scriptName) {
     // with the view): the watch tells it again on the next ticks.
     function start(onChange) {
         stop();
-        try {
-            followedSize = host.getViewSize();
-        } catch (error) {
-            logError(scriptName, `ERROR reading the window's size, the screen won't follow it: ${error.stack || error.message}`, host);
-            return;
-        }
+        followedSize = readViewSize(host, scriptName);
+        if (followedSize === null) return;
         let retries = 0;
         timer = host.setInterval(safeHandler(scriptName, () => {
             const next = host.getViewSize();

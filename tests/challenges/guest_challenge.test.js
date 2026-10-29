@@ -47,6 +47,8 @@ test("Guest follows the week's Challenge, completes it and earns its record, apa
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = ADD_ONS_UNDER_TEST.includes(key);
     config.language = "en";
+    // No startup carousel holding the buttons from the first tick.
+    config.startupScreen = "wheel";
 
     const { default: lang } = await import("../../common/core/i18n.js");
     const { getProfileStore } = await import("../../common/profiles/profile_store.js");

@@ -10,7 +10,7 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { readLoader, loaderLayerCount } from "../support/loader_reader.js";
-import { WELCOME_SCREEN_PAUSE_MS, WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, startupVeil, welcomeScreenLayerCount } from "./welcome_screen_reader.js";
+import { WELCOME_SCREEN_OPEN_MS, press, isWelcomeScreenOpen, choose, startupVeil, welcomeScreenLayerCount } from "./welcome_screen_reader.js";
 
 const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The panel's backdrop dims the wheel with this colour, from 6100 up.
@@ -36,21 +36,17 @@ test("the wheel is veiled with the comet turning until the Welcome Screen fades 
     await import("../../main.js");
     assert.deepEqual(startupVeil(fake), VEIL, "the wheel dimmed from the first frame");
     assert.deepEqual(readLoader(fake), LOADER, "the comet turning just under the panel");
-    await settle();
-
     assert.equal(press(fake, "Next").defaultPrevented, false, "a button goes through to the wheel");
     assert.equal(fake.fire("keydown", { key: "Enter", code: "Enter", repeat: false }).defaultPrevented, false, "a key goes through");
+    assert.equal(welcomeScreenLayerCount(fake), 0, "nothing of the panel drawn before its turn");
 
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS - 1);
-    assert.equal(welcomeScreenLayerCount(fake), 0, "nothing of the panel drawn during the startup pause");
-    assert.deepEqual(readLoader(fake), LOADER, "the comet turning all along");
-    fake.advanceTime(1);
+    await settle();
     assert.deepEqual(readLoader(fake), { shown: false }, "the comet goes as the panel starts fading in");
     assert.equal(loaderLayerCount(fake), 0);
     fake.advanceTime(FADING_MS);
     assert.equal(isWelcomeScreenOpen(fake), true, "the panel fading in");
     assert.deepEqual(startupVeil(fake), VEIL, "the veil stays while the panel fades in");
-    fake.advanceTime(WELCOME_SCREEN_OPEN_MS - WELCOME_SCREEN_PAUSE_MS - FADING_MS);
+    fake.advanceTime(WELCOME_SCREEN_OPEN_MS - FADING_MS);
     assert.deepEqual(startupVeil(fake), { shown: false }, "the veil goes once the panel is fully in");
 
     // Change Player from the screen: the screen comes back for Alice.
@@ -60,7 +56,7 @@ test("the wheel is veiled with the comet turning until the Welcome Screen fades 
     fake.advanceTime(GLIDE_OVER_MS);
     press(fake, "Select");
     await settle();
-    fake.advanceTime(WELCOME_SCREEN_PAUSE_MS / 2);
+    fake.advanceTime(FADING_MS);
     assert.deepEqual(startupVeil(fake), { shown: false }, "no veil before the new player's screen");
     assert.deepEqual(readLoader(fake), { shown: false }, "no comet before the new player's screen");
     fake.advanceTime(SETTLED_MS);

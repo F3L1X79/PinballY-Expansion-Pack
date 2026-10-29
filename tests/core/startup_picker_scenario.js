@@ -12,20 +12,21 @@ const PROFILES_FOLDER = "C:\\PinballY\\Scripts\\ExpansionPack\\profiles";
 // The carousel's background, its Avatars, then the gold frame and names.
 const PICKER_Z_RANGE = [6500, 6502];
 
-// The startup pause before the carousel shows, and the glide between two Avatars.
-export const CAROUSEL_PAUSE_MS = 500;
+// Past the carousel's opening, on its turn a tick after the start, and the
+// glide between two Avatars.
+export const CAROUSEL_OPEN_MS = 100;
 export const GLIDE_OVER_MS = 500;
 
 // addOns: the Add-ons turned on; profiles: the Household's folders;
 // childProfiles: those of them marked as Child Profiles; tables: the
 // wheel's, as the fake host takes them; settings: the other config values;
-// files: the paths present on disk (sounds); seed(fake): anything else to
-// prepare before the start.
+// files: the paths present on disk (sounds); layoutSize: the window's at
+// the start; seed(fake): anything else to prepare before the start.
 export async function startOnProfilePicker({
     addOns = ["startupChoicePrompt", "profilePicker"], profiles = ["Alice", "Bob"], childProfiles = [], activeProfile = "Bob", tables, settings = {}, files = [],
-    seed = () => {},
+    layoutSize, seed = () => {},
 } = {}) {
-    const fake = createFakePinballYHost(tables ? { tables } : {});
+    const fake = createFakePinballYHost({ ...(tables ? { tables } : {}), ...(layoutSize ? { layoutSize } : {}) });
     for (const name of profiles) fake.addFolder(`${PROFILES_FOLDER}\\${name}`);
     for (const name of childProfiles) {
         fake.addFile(`${PROFILES_FOLDER}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified: [], isChild: true }));

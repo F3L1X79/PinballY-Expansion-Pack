@@ -11,7 +11,7 @@ import { readDrawnMenu, drawnMenuLines, isDrawnMenuShown, chooseEntry, OPEN_OVER
 import { readLoader } from "../support/loader_reader.js";
 import { DIMMED_WHEEL } from "../../common/drawing/steamball_drawing.js";
 import { DRAWN_MENU_Z_INDEX } from "../../common/drawn_menu/drawn_menu_painter.js";
-import { startOnProfilePicker, isCarouselOpen, CAROUSEL_PAUSE_MS } from "../core/startup_picker_scenario.js";
+import { startOnProfilePicker, isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 
 const STATE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\pack_update.json";
 const PACK_UPDATE_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\pack_update.ps1";
@@ -54,7 +54,7 @@ test("a Pack Update that never gets ready says so at once, and PinballY stays", 
     chooseEntry(fake, "OK");
     assert.equal(isDrawnMenuShown(fake), false);
     await settle();
-    fake.advanceTime(CAROUSEL_PAUSE_MS + OPEN_OVER_MS);
+    fake.advanceTime(CAROUSEL_OPEN_MS + OPEN_OVER_MS);
     assert.equal(isCarouselOpen(fake, lang), true, "the picker opens once the message closed");
     assert.equal(fake.drawingLayers().filter(layer => layer.clearColor() === DIMMED_WHEEL && layer.zIndex === DRAWN_MENU_Z_INDEX.backdrop - 2).length, 0, "no update veil left");
     assert.equal(errorLines(fake).length, 1, "no other error");
