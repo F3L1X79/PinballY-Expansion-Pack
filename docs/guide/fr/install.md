@@ -5,7 +5,7 @@
 ## Ce qu'il faut
 
 - **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent.
-- La fonctionnalité facultative *Lecteur Windows Media* de Windows, pour les sons.
+- La fonctionnalité facultative *Lecteur Windows Media* de Windows, pour les sons. Windows 10 et 11 l'installent par défaut : il n'y a rien de plus à installer. Seules les éditions « N » vendues en Europe en sont privées, et le *Media Feature Pack* gratuit de Microsoft l'ajoute.
 - Pas besoin de git : le zip de la version suffit.
 
 ## Pas à pas

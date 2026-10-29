@@ -32,7 +32,7 @@ Les menus et messages de PinballY en français, anglais, allemand, espagnol, ita
 
 ## Installation
 
-Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fonctionnalité facultative *Lecteur Windows Media*, pour les sons). Pas besoin de git.
+Nécessite **Windows** et **PinballY 1.1.0 Beta 10** ou plus récent (plus la fonctionnalité facultative *Lecteur Windows Media* pour les sons, déjà présente sur Windows 10 et 11). Pas besoin de git.
 
 1. **Téléchargez `ExpansionPack.zip`** depuis la dernière version publiée : https://github.com/F3L1X79/PinballY-Expansion-Pack/releases/latest (et non « Source code (zip) », dont le dossier n'est pas trouvé par le pack).
 2. **Extrayez-le dans `PinballY\Scripts`** : vous devez obtenir `PinballY\Scripts\ExpansionPack\main.js`, et non `ExpansionPack\ExpansionPack\main.js`.

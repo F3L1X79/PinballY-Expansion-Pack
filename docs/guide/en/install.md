@@ -5,7 +5,7 @@
 ## What you need
 
 - **Windows** and **PinballY 1.1.0 Beta 10** or later.
-- The *Windows Media Player* optional feature of Windows, for the sounds.
+- The *Windows Media Player* optional feature of Windows, for the sounds. Windows 10 and 11 install it by default, so there is nothing more to install; only the "N" editions sold in Europe lack it, and Microsoft's free *Media Feature Pack* adds it.
 - No git: the release zip is all you need.
 
 ## Step by step

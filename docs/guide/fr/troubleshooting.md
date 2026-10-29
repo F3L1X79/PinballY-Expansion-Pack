@@ -34,7 +34,7 @@ Le journal de PinballY lui-même, dans le dossier de PinballY, ne couvre que la 
 
 **Le pack ne démarre pas du tout.** Vérifiez que vous avez `PinballY\Scripts\ExpansionPack\main.js`, et non `ExpansionPack\ExpansionPack\main.js` ni un dossier nommé `PinballY-Expansion-Pack-<version>` (celui-là vient de « Source code (zip) », pas d'`ExpansionPack.zip`), et que `Scripts\main.js` contient la ligne d'import (voir [Installation](install.md)). Un pack qui échoue au chargement écrit son erreur dans `PinballY.log`, après « ExpansionPack: ».
 
-**Il n'y a aucun son.** Les sons ont besoin de la fonctionnalité facultative *Lecteur Windows Media* de Windows. Vérifiez aussi les réglages `*_SOUND_FILE` : une valeur vide veut dire aucun son.
+**Il n'y a aucun son.** Les sons ont besoin de la fonctionnalité facultative *Lecteur Windows Media* de Windows, présente par défaut sur Windows 10 et 11 : si elle a été retirée, rajoutez *Lecteur Windows Media hérité* dans *Paramètres › Applications › Fonctionnalités facultatives* (sur une édition « N », installez le *Media Feature Pack*). Vérifiez aussi les réglages `*_SOUND_FILE` : une valeur vide veut dire aucun son.
 
 **Une table originale n'a pas de tableau des scores.** Son tableau apparaît dès que la table a été jouée avec le pack, qui apprend pendant sa première partie où la table le range.
 

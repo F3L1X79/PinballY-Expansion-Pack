@@ -34,7 +34,7 @@ PinballY's own log, in the PinballY folder, covers the current session only. At 
 
 **The pack does not start at all.** Check that you have `PinballY\Scripts\ExpansionPack\main.js`, not `ExpansionPack\ExpansionPack\main.js` nor a folder named `PinballY-Expansion-Pack-<version>` (that one comes from "Source code (zip)", not `ExpansionPack.zip`), and that `Scripts\main.js` holds the import line (see [Install](install.md)). A pack that fails to load writes its error to `PinballY.log`, under "ExpansionPack:".
 
-**There is no sound.** The sounds need the *Windows Media Player* optional feature of Windows. Check also the `*_SOUND_FILE` settings: an empty value means no sound.
+**There is no sound.** The sounds need the *Windows Media Player* optional feature of Windows, there by default on Windows 10 and 11: if it was removed, add *Windows Media Player Legacy* back in *Settings › Apps › Optional features* (on an "N" edition, install the *Media Feature Pack*). Check also the `*_SOUND_FILE` settings: an empty value means no sound.
 
 **An original table has no high score board.** Its board appears once the table has been played with the pack, which learns where the table keeps it during its first game.
 
