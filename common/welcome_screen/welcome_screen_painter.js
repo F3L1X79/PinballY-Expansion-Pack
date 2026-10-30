@@ -28,8 +28,8 @@ const LOOK = Object.freeze({
     avatar: 120,
     greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
     // The Daily Streak line, when there is one, between the greeting and
-    // Collection Mastery.
-    dailyStreakGap: 4,
+    // Collection Mastery, a size above the cards' grey lines.
+    dailyStreakGap: 14, dailyStreakH: 40, dailyStreakTile: 34, dailyStreakSize: 22,
     // The Lost Records line, when there is one, under the greeting and the
     // Daily Streak line.
     lostRecordsGap: 4, lostRecordsSize: 20, minLostRecordsSize: 15,
@@ -92,15 +92,16 @@ function drawLostRecordsLine(host, dc, { avatarPath, text: lineText }, w) {
 }
 
 // A grey line: a small square like the go-back arrow's, with the check
-// mark when count is null, else the count, then its text.
-function drawGreyLine(host, dc, count, lineText, x, y, w) {
-    const tile = LOOK.lineTile;
+// mark when count is null, else the count, then its text. The square and
+// its marks scale with tile.
+function drawGreyLine(host, dc, count, lineText, x, y, w, { tile = LOOK.lineTile, size = LOOK.lineSize } = {}) {
+    const k = tile / LOOK.lineTile;
     const top = y + 2;
     fillGradient(dc, x, top, tile, tile, COLORS.rowUnlocked, COLORS.tile);
     dc.frameRect(x, top, tile, tile, 2, COLORS.border);
-    if (count === null) drawCheck(dc, x + 6, top + 5, 15, COLORS.description);
-    else text(host, dc, String(count), { x, y: top, width: tile, height: tile, size: count > 99 ? 11 : 14, weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
-    oneLine(host, dc, lineText, { x: x + tile + 12, y: top, width: w - tile - 12, height: tile, size: LOOK.lineSize, minSize: LOOK.minLineSize, color: COLORS.description });
+    if (count === null) drawCheck(dc, x + Math.round(6 * k), top + Math.round(5 * k), Math.round(15 * k), COLORS.description);
+    else text(host, dc, String(count), { x, y: top, width: tile, height: tile, size: Math.round((count > 99 ? 11 : 14) * k), weight: 700, color: COLORS.description, font: FONTS.display, align: "center" });
+    oneLine(host, dc, lineText, { x: x + tile + 12, y: top, width: w - tile - 12, height: tile, size, minSize: LOOK.minLineSize, color: COLORS.description });
 }
 
 // A grey line without its square, on the grey line's height.
@@ -217,7 +218,7 @@ function geometry(referenceWidth, screen) {
     const greetingY = screen.picker ? avatarRoomOf(screen) + LOOK.greetingGap : 0;
     const greetingEndY = greetingY + Math.round(LOOK.greetingSize * 1.4);
     const dailyStreakY = greetingEndY + LOOK.dailyStreakGap;
-    const dailyStreakH = screen.dailyStreak ? LOOK.dailyStreakGap + LOOK.lineH : 0;
+    const dailyStreakH = screen.dailyStreak ? LOOK.dailyStreakGap + LOOK.dailyStreakH : 0;
     const lostRecordsY = greetingEndY + dailyStreakH + LOOK.lostRecordsGap;
     const lostRecordsH = screen.lostRecords ? LOOK.lostRecordsGap + LOOK.lineH : 0;
     const collectionY = greetingEndY + dailyStreakH + lostRecordsH + LOOK.greetingBottom;
@@ -328,8 +329,8 @@ export function layoutWelcomeScreen(host, screen, referenceWidth) {
     if (screen.dailyStreak) {
         pieces.push({
             zIndex: WELCOME_SCREEN_Z_INDEX.dailyStreak,
-            rect: { x: inner.x, y: top + dailyStreakY, w: greetingW, h: LOOK.lineH },
-            draw: dc => drawGreyLine(host, dc, screen.dailyStreak.count, screen.dailyStreak.text, 0, 0, greetingW),
+            rect: { x: inner.x, y: top + dailyStreakY, w: greetingW, h: LOOK.dailyStreakH },
+            draw: dc => drawGreyLine(host, dc, screen.dailyStreak.count, screen.dailyStreak.text, 0, 0, greetingW, { tile: LOOK.dailyStreakTile, size: LOOK.dailyStreakSize }),
         });
     }
     // Under the greeting and the Daily Streak line, on a layer of its own.
