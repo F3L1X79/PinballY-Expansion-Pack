@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // Production PinballY host: the single seam through which the shared modules
 // reach PinballY (settings, clock, timers, tables, wheel, menus, layers,
-// sounds, files, programs, restart, HTTP, registry, logfile.log).
+// custom windows, sounds, files, programs, restart, HTTP, registry, logfile.log).
 // Every call passes straight through to PinballY's globals; tests use
 // tests/support/fake_pinbally_host.js. No side effects on import.
 // ============================================================
@@ -50,6 +50,38 @@ const RUN_WRAPPER = "@echo off\r\n%3 %4 %5 %6 %7 %8 %9 > %1 2> nul\r\n"
 const MAX_PROGRAM_ARGS = 6;
 // The pack's fixed folder under Scripts (ADR 0009): never detected at run time.
 const PROJECT_FOLDER_NAME = "ExpansionPack";
+
+// setWindowPos flags (WindowObjects.html): the window keeps its place and
+// size, and never takes the focus from the running game.
+export const SWP_NOSIZE = 0x1;
+export const SWP_NOMOVE = 0x2;
+const SWP_NOACTIVATE = 0x10;
+
+// A custom window (CustomWindow.html) as the pack acts on it; hwnd: the
+// HWND class, whose TOPMOST and NOTOPMOST place it in the z-order.
+// Shared with the fake host, which passes its own raw window and HWND.
+export function mediaWindowOf(window, hwnd) {
+    return {
+        setBorderless: (borderless) => { window.borderlessMode = borderless; },
+        // true keeps it shown while a game runs, when PinballY blanks its other windows.
+        setShowMediaWhenRunning: (show) => { window.showMediaWhenRunningFlag = show; },
+        showWindow: (visible) => { window.showWindow(visible); },
+        // In front of every window that isn't topmost itself, or back among them.
+        setTopmost: (topmost) => {
+            window.setWindowPos(topmost ? hwnd.TOPMOST : hwnd.NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        },
+        // The frame's place on the desktop, { left, top, right, bottom }.
+        getWindowRect: () => ({ ...window.hwndFrame.getWindowPos().windowRect }),
+        // Not in the visible window's units (pinbally-help.md §2.1, "Seen on
+        // the cabinet"): only its aspect ratio can be trusted.
+        getClientSize: () => {
+            const { clientRect } = window.hwndView.getWindowPos();
+            return { width: clientRect.right - clientRect.left, height: clientRect.bottom - clientRect.top };
+        },
+        // Its canvas is stretched over the whole window by default.
+        createDrawingLayer: (zIndex) => window.createDrawingLayer(zIndex),
+    };
+}
 
 // The id of PinballY's own "All Tables" filter.
 export const ALL_TABLES_FILTER = "All";
@@ -462,6 +494,8 @@ export function createPinballYHost() {
             return user32.GetSystemMetrics(SM_CMONITORS);
         },
         showBackglass: (visible) => { backglassWindow.showWindow(visible); },
+        // desc: createMediaWindow's (MainWindowObject.html); see mediaWindowOf().
+        createMediaWindow: (desc) => mediaWindowOf(mainWindow.createMediaWindow(desc), HWND),
         // Through the Windows Media Player COM component, like the launch
         // sound; throws when it is unavailable or the file is missing
         // (Windows Media Player itself fails silently on a missing file).

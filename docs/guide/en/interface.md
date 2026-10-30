@@ -24,7 +24,7 @@ Menu Cleanup lightens PinballY's menus for every Profile, Admin Profiles include
 - PinballY's own High Scores entry (named **Table Scores** in the main menu) when the pack's High Scores are turned off;
 - the Filter by System, Filter by Last Played and Filter by Date Added groups from "Change Filter".
 
-It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
+It is **off by default**, like the Backglass Clock: turn it on with `ADD_ON_MENU_CLEANUP=true`. PinballY's dedicated buttons for these screens, if you mapped them, still work.
 
 ## On the wheel screen
 
@@ -36,6 +36,12 @@ It is the only feature **off by default**: turn it on with `ADD_ON_MENU_CLEANUP=
 - Launches without a black flash, with a gold comet turning while you wait, the step under way written in gold beneath it while a table launches or closes ("Loading…", "Returning to tables…"): during a launch, at startup, while a high score board is read and while the Profile Stats, the Household Stats, the Achievement List or the Avatar Frame list get ready.
 - The backglass hidden during a game.
 - Sounds for launches, Achievements, greetings, confetti and fireworks, or your own (see [Settings](settings.md)).
+
+## Backglass Clock
+
+While a table runs, the Backglass Clock shows the time in a small black box with a thin gold frame, in front of VPX's backglass, in the same format as the wheel's clock. It appears when the game starts, changes when the minute does, and goes when the game ends. It never shows on a single-screen cabinet or while PinballY captures a table's media.
+
+It is **off by default**: turn it on in the Expansion Pack Settings or with `ADD_ON_BACKGLASS_CLOCK=true`. Move and resize the box like PinballY's other windows; PinballY remembers where you put it, and the time grows with the box. A backglass set to stay in front (B2S "FormToFront" on) may hide it.
 
 ---
 

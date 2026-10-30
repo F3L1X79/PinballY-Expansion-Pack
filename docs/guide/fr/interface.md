@@ -24,7 +24,7 @@ Le nettoyage des menus allège les menus de PinballY pour tous les Profils, Prof
 - l'entrée Meilleurs scores de PinballY (nommée **Scores de la table** dans le menu principal) quand les meilleurs scores du pack sont désactivés ;
 - les groupes Filtrer par système, Filtrer par dernière partie et Filtrer par date d'ajout de « Changer de filtre ».
 
-C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
+Elle est **désactivée par défaut**, comme l'horloge du backglass : activez-la avec `ADD_ON_MENU_CLEANUP=true`. Les boutons dédiés de PinballY pour ces écrans, si vous les avez affectés, fonctionnent toujours.
 
 ## Sur l'écran de la roue
 
@@ -36,6 +36,12 @@ C'est la seule fonctionnalité **désactivée par défaut** : activez-la avec `A
 - Un lancement sans flash noir, avec une comète dorée qui tourne pendant l'attente, l'étape en cours écrite en doré dessous quand une table se lance ou se ferme (« Chargement en cours… », « Retour aux tables… ») : au lancement, au démarrage, pendant la lecture d'un tableau des scores et pendant la préparation des statistiques, de la liste des succès et de la liste des cadres d'Avatar.
 - Le backglass masqué pendant une partie.
 - Des sons au lancement, aux succès, à l'accueil, aux confettis et au feu d'artifice, ou les vôtres (voir [Réglages](settings.md)).
+
+## Horloge du backglass
+
+Pendant une partie, l'horloge du backglass affiche l'heure dans un petit cadre noir bordé d'un filet doré, devant le backglass de VPX, au même format que l'horloge de la roue. Elle apparaît au début de la partie, change avec la minute et disparaît à la fin. Elle ne s'affiche jamais sur une borne à un seul écran, ni pendant que PinballY capture les médias d'une table.
+
+Elle est **désactivée par défaut** : activez-la dans les Réglages du pack ou avec `ADD_ON_BACKGLASS_CLOCK=true`. Déplacez et redimensionnez le cadre comme les autres fenêtres de PinballY ; PinballY retient où vous l'avez mis, et l'heure grandit avec le cadre. Un backglass réglé pour rester au premier plan (« FormToFront » de B2S activé) peut la cacher.
 
 ---
 

@@ -865,6 +865,11 @@ export default {
                 whenOn: "El backglass se muestra al iniciar y se oculta durante la partida.",
                 whenOff: "No cambia nada más.",
             },
+            backglassClock: {
+                name: "Reloj del backglass",
+                whenOn: "La hora en un pequeño recuadro en la pantalla del backglass durante la partida.",
+                whenOff: "No cambia nada más.",
+            },
             seamlessLaunchOverlay: {
                 name: "Pantalla de carga",
                 whenOn: "Sin destello negro mientras carga una mesa.",

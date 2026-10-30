@@ -868,6 +868,11 @@ export default {
                 whenOn: "Le backglass affiché au démarrage, caché pendant une partie.",
                 whenOff: "Rien d'autre ne change.",
             },
+            backglassClock: {
+                name: "Horloge du backglass",
+                whenOn: "L'heure dans un petit cadre sur l'écran du backglass pendant une partie.",
+                whenOff: "Rien d'autre ne change.",
+            },
             seamlessLaunchOverlay: {
                 name: "Écran de lancement",
                 whenOn: "Pas d'écran noir pendant le chargement d'une table.",

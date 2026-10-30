@@ -87,14 +87,17 @@ export const DEFAULTS = {
 
     // --- Add-ons ---
 
-    // Set any Add-on to false to keep it from starting. Menu Cleanup is the
-    // only one off by default: it removes PinballY entries others may want.
+    // Set any Add-on to false to keep it from starting. Menu Cleanup is off
+    // by default, as it removes PinballY entries others may want, and so is
+    // the Backglass Clock, as it covers a corner of every table's backglass.
     addOns: {
         uiTranslation: true,
         statusLineInfo: true,
         // The Welcome Screen, under the startup prompt's former key.
         startupChoicePrompt: true,
         forceBackglass: true,
+        // The time in front of VPX's backglass while a table runs, on two screens or more.
+        backglassClock: false,
         customMenuCommands: true,
         // "Launch a random table" in the main menu, under Play.
         randomGame: true,

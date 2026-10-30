@@ -9,7 +9,16 @@
 // - settle() waits on a real timer for deferred work to run.
 // ============================================================
 
-import { projectFolderOf } from "../../common/core/pinbally_host.js";
+import { projectFolderOf, mediaWindowOf, SWP_NOSIZE, SWP_NOMOVE } from "../../common/core/pinbally_host.js";
+
+// PinballY's HWND z-order constants (WindowObjects.html), as names a test reads.
+const FAKE_HWND = Object.freeze({ TOP: "TOP", BOTTOM: "BOTTOM", TOPMOST: "TOPMOST", NOTOPMOST: "NOTOPMOST" });
+// Where a new custom window opens, as seen on the cabinet (pinbally-help.md
+// §2.1): on the playfield screen, at 26,26, 810x1375.
+const NEW_MEDIA_WINDOW_RECT = Object.freeze({ left: 26, top: 26, right: 836, bottom: 1401 });
+// A custom window's clientRect against its frame, as seen on the cabinet
+// (§2.1, asked 320 wide, reported 480): another unit, the same ratio.
+const MEDIA_WINDOW_CLIENT_SCALE = 1.5;
 
 const RealDate = Date;
 // The fake whose globals are installed and not yet uninstalled, if any.
@@ -379,6 +388,8 @@ export function createFakePinballYHost({
     const nativeCommands = new Map();
     // Every showWindow() call on the backglass window, in order.
     const backglassShowCalls = [];
+    // Every custom window created, in order, as mediaWindows() shows them.
+    const mediaWindowList = [];
 
     function readSetting(key, defaultValue, convert) {
         return storedSettings.has(key) ? convert(storedSettings.get(key)) : defaultValue;
@@ -632,6 +643,58 @@ export function createFakePinballYHost({
         const layer = createLayerObject(zIndex);
         layers.push(layer);
         return layer;
+    }
+
+    // A custom window as mainWindow.createMediaWindow() returns it: opened
+    // where the cabinet showed it, visible, with a title bar until
+    // borderlessMode is set. setWindowPos moves and sizes it unless its
+    // flags say not to; its client size is the frame's, in other units.
+    // Each showWindow and setWindowPos call is recorded in order.
+    function createRawMediaWindow(desc) {
+        let rect = { ...NEW_MEDIA_WINDOW_RECT };
+        let visible = true;
+        const calls = [];
+        const ownLayers = [];
+        const rawWindow = {
+            borderlessMode: false,
+            showMediaWhenRunningFlag: undefined,
+            showWindow: (shown) => {
+                calls.push({ call: "showWindow", visible: shown });
+                visible = shown;
+            },
+            setWindowPos: (after, x, y, width, height, flags) => {
+                calls.push({ call: "setWindowPos", after, x, y, width, height, flags });
+                const size = (flags & SWP_NOSIZE) ? { width: rect.right - rect.left, height: rect.bottom - rect.top } : { width, height };
+                const origin = (flags & SWP_NOMOVE) ? { left: rect.left, top: rect.top } : { left: x, top: y };
+                rect = { ...origin, right: origin.left + size.width, bottom: origin.top + size.height };
+            },
+            hwndFrame: { getWindowPos: () => ({ windowRect: { ...rect } }) },
+            hwndView: {
+                getWindowPos: () => ({
+                    clientRect: {
+                        left: 0, top: 0,
+                        right: (rect.right - rect.left) * MEDIA_WINDOW_CLIENT_SCALE, bottom: (rect.bottom - rect.top) * MEDIA_WINDOW_CLIENT_SCALE,
+                    },
+                }),
+            },
+            createDrawingLayer: (zIndex) => {
+                const layer = createLayerObject(zIndex);
+                ownLayers.push(layer);
+                return layer;
+            },
+        };
+        mediaWindowList.push({
+            desc: { ...desc },
+            borderlessMode: () => rawWindow.borderlessMode,
+            showMediaWhenRunningFlag: () => rawWindow.showMediaWhenRunningFlag,
+            isVisible: () => visible,
+            calls: () => calls.map(entry => ({ ...entry })),
+            windowRect: () => ({ ...rect }),
+            layers: () => [...ownLayers],
+            // The owner resizing it by hand: PinballY tells no script.
+            resize({ width, height }) { rect = { ...rect, right: rect.left + width, bottom: rect.top + height }; },
+        });
+        return rawWindow;
     }
 
     // PinballY's launch overlay: its background and foreground layers,
@@ -1313,6 +1376,7 @@ export function createFakePinballYHost({
         getPinballYVersion: () => pinballYVersion,
         countMonitors: () => monitorCount,
         showBackglass: (visible) => { backglassShowCalls.push(visible); },
+        createMediaWindow: (desc) => mediaWindowOf(createRawMediaWindow(desc), FAKE_HWND),
         playSound,
         createSoundRotation,
         runHiddenProgram,
@@ -1674,6 +1738,9 @@ export function createFakePinballYHost({
         logLines: () => [...logLines],
         executedCommands: () => [...executedCommands],
         backglassShowCalls: () => [...backglassShowCalls],
+        // Every custom window created, in order: { desc, borderlessMode(),
+        // showMediaWhenRunningFlag(), isVisible(), calls(), windowRect(), layers(), resize() }.
+        mediaWindows: () => [...mediaWindowList],
 
         // Exposes this fake as PinballY's globals; returns the function that
         // restores the previous globals.
@@ -1692,7 +1759,7 @@ export function createFakePinballYHost({
                 "optionSettings", "gameList", "mainWindow", "command", "logfile", "Date",
                 "StyledText", "CommandEvent", "systemInfo", "createAutomationObject",
                 "setTimeout", "clearTimeout", "setInterval", "clearInterval",
-                "backglassWindow", "dllImport", "HttpRequest",
+                "backglassWindow", "dllImport", "HttpRequest", "HWND",
             ];
             const previous = globalNames.map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]);
 
@@ -1740,6 +1807,7 @@ export function createFakePinballYHost({
                     dispatchEvent: host.dispatchEvent,
                     createDrawingLayer,
                     removeDrawingLayer,
+                    createMediaWindow: createRawMediaWindow,
                     // HWNDObject.html: the client rectangle, relative to its
                     // own upper left corner; the view is as large as the layers' window.
                     hwndView: {
@@ -1775,6 +1843,7 @@ export function createFakePinballYHost({
                 StyledText: FakeStyledText,
                 CommandEvent: FakeCommandEvent,
                 HttpRequest: FakeHttpRequest,
+                HWND: FAKE_HWND,
                 systemInfo: { programDir: programFolder, version: pinballYVersion },
                 backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
                 // Only User32's GetSystemMetrics, for the monitor count

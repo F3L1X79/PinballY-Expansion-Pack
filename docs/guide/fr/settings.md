@@ -48,7 +48,7 @@ ADD_ON_CLOCK=false
 | `LOG_UNTRANSLATED_MENU_TITLES` | `false` | `true` écrit chaque titre de menu PinballY non traduit dans `PinballY.log`. |
 | `LOG_LAUNCH_EVENTS` | `false` | `true` écrit chaque événement de lancement dans `PinballY.log`, horodaté à la milliseconde, pour vérifier leur ordre sur la borne. |
 
-Chaque fonctionnalité se désactive aussi avec sa clé `ADD_ON_*`, par exemple `ADD_ON_CLOCK=false` ou `ADD_ON_CHALLENGES=false`. Seul le nettoyage des menus est désactivé par défaut. Chaque clé est décrite dans [.env.example](../../../.env.example).
+Chaque fonctionnalité se désactive aussi avec sa clé `ADD_ON_*`, par exemple `ADD_ON_CLOCK=false` ou `ADD_ON_CHALLENGES=false`. Seuls le nettoyage des menus et l'horloge du backglass (`ADD_ON_BACKGLASS_CLOCK`, l'heure sur l'écran du backglass pendant une partie, voir [Interface](interface.md#horloge-du-backglass)) sont désactivés par défaut. Chaque clé est décrite dans [.env.example](../../../.env.example).
 
 La progression de chaque Profil est enregistrée dans `Scripts\ExpansionPack\profiles`. Gardez ce dossier quand vous réinstallez ou mettez à jour le pack, et vous retrouvez votre progression.
 

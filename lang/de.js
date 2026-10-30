@@ -864,6 +864,11 @@ export default {
                 whenOn: "Das Backglass wird beim Start gezeigt und während eines Spiels ausgeblendet.",
                 whenOff: "Sonst ändert sich nichts.",
             },
+            backglassClock: {
+                name: "Backglass-Uhr",
+                whenOn: "Die Uhrzeit in einem kleinen Kasten auf dem Backglass-Bildschirm während eines Spiels.",
+                whenOff: "Sonst ändert sich nichts.",
+            },
             seamlessLaunchOverlay: {
                 name: "Start-Overlay",
                 whenOn: "Kein schwarzes Aufblitzen, während ein Tisch lädt.",

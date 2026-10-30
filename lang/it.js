@@ -863,6 +863,11 @@ export default {
                 whenOn: "Il backglass mostrato all'avvio, nascosto durante la partita.",
                 whenOff: "Nient'altro cambia.",
             },
+            backglassClock: {
+                name: "Orologio del backglass",
+                whenOn: "L'ora in un piccolo riquadro sullo schermo del backglass durante la partita.",
+                whenOff: "Nient'altro cambia.",
+            },
             seamlessLaunchOverlay: {
                 name: "Overlay di avvio",
                 whenOn: "Niente lampo nero mentre un tavolo si carica.",

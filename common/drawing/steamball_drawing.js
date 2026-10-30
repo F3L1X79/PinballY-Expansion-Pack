@@ -32,8 +32,8 @@ export function text(host, dc, str, { x, y, width, height, size, weight = 400, c
 }
 
 // One line of text in width: the size goes down to minSize, then the end
-// gives way to "…". Returns the width drawn.
-export function oneLine(host, dc, str, { x, y, width, height, size, minSize = size, weight = 600, color = COLORS.title, font = FONTS.body, align = "left" }) {
+// gives way to "…" unless cut is false (a time is never cut). Returns the width drawn.
+export function oneLine(host, dc, str, { x, y, width, height, size, minSize = size, weight = 600, color = COLORS.title, font = FONTS.body, align = "left", cut = true }) {
     const styledAt = (candidate, fontSize) => {
         const styled = host.createStyledText({ textAlign: "left", textStyle: { font, size: fontSize, weight, color } });
         styled.add(candidate);
@@ -43,7 +43,7 @@ export function oneLine(host, dc, str, { x, y, width, height, size, minSize = si
     let fontSize = size;
     let styled = styledAt(str, fontSize);
     while (!fits(styled) && fontSize > minSize) styled = styledAt(str, --fontSize);
-    for (let cut = str.length - 1; !fits(styled) && cut > 1; cut--) styled = styledAt(`${str.slice(0, cut).trimEnd()}…`, fontSize);
+    for (let end = str.length - 1; cut && !fits(styled) && end > 1; end--) styled = styledAt(`${str.slice(0, end).trimEnd()}…`, fontSize);
     const measured = styled.measure(UNBOUNDED);
     const top = height === undefined ? y : y + (height - measured.height) / 2;
     // A little wider than measured, so the line never wraps on rounding.

@@ -784,6 +784,11 @@ export default {
                 whenOn: "The backglass shown at startup, hidden during a game.",
                 whenOff: "Nothing else changes.",
             },
+            backglassClock: {
+                name: "Backglass Clock",
+                whenOn: "The time in a small box on the backglass screen during a game.",
+                whenOff: "Nothing else changes.",
+            },
             seamlessLaunchOverlay: {
                 name: "Launch overlay",
                 whenOn: "No black flash while a table loads.",
