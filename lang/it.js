@@ -610,7 +610,7 @@ export default {
         done: name => `${name} riparte da zero.`,
         failed: name => `Impossibile azzerare ${name}. Consulta il log per i dettagli.`,
         ok: "OK",
-        everyProfile: "Tutti i profili",
+        everyProfile: "Azzera tutti i profili",
         confirmEvery: count => `Azzerare tutti i ${count} profili? Tutte le loro partite, serie, sfide e obiettivi saranno cancellati.`,
         everyDone: count => `Tutti i ${count} profili ripartono da zero.`,
         everyFailed: (count, names) => `Profili azzerati: ${count}. Impossibile azzerare: ${names.join(", ")}. Consulta il log per i dettagli.`,

@@ -1,8 +1,8 @@
 // ============================================================
 // A disabled line in a Drawn Menu, through main.js on the fake PinballY
 // globals: dimmed, its reason in smaller type under its label, the menu
-// taller by its reason; the cursor rests on it, and Select on it runs no
-// command and leaves the menu open.
+// taller by its reason; the cursor rests on it, its outline as tall as the
+// line, and Select on it runs no command and leaves the menu open.
 // ============================================================
 
 import { test } from "node:test";
@@ -10,7 +10,8 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { computeGeometry, DRAWN_MENU_LOOK, ROW_KIND } from "../../common/drawn_menu/drawn_menu_painter.js";
+import { computeGeometry, DRAWN_MENU_LOOK, DRAWN_MENU_Z_INDEX, ROW_KIND } from "../../common/drawn_menu/drawn_menu_painter.js";
+import { DRAWN_MENU_IMAGES } from "../../common/drawn_menu/drawn_menu_images.js";
 import { readDrawnMenu, drawnRowBoxes, highlightedEntry, isDrawnMenuShown, press } from "./drawn_menu_reader.js";
 
 const MENU_ID = "expansionPack.disabledLine";
@@ -85,6 +86,23 @@ test("the cursor moves onto the disabled line and past it", () => {
     assert.equal(highlightedEntry(fake), "After");
     press(fake, "Prev");
     assert.equal(highlightedEntry(fake), "Locked");
+});
+
+test("on the disabled line, the outline is as tall as the label and its reason", () => {
+    const outlineHeight = () => {
+        // Past the glide, the outline on its entry.
+        fake.advanceTime(500);
+        return fake.drawingLayers().find(layer => layer.zIndex === DRAWN_MENU_Z_INDEX.selection).scale().ySpan;
+    };
+    const lockedHeight = outlineHeight();
+    press(fake, "Next");
+    const afterHeight = outlineHeight();
+    press(fake, "Prev");
+    assert.equal(outlineHeight(), lockedHeight);
+
+    const { selection } = DRAWN_MENU_IMAGES;
+    const expectedRatio = (selection.height + DRAWN_MENU_LOOK.reason.height) / selection.height;
+    assert.ok(Math.abs(lockedHeight / afterHeight - expectedRatio) < 1e-6, `${lockedHeight / afterHeight} vs ${expectedRatio}`);
 });
 
 test("Select on the disabled line runs no command and leaves the menu open", () => {

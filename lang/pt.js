@@ -611,7 +611,7 @@ export default {
         done: name => `${name} recomeça do zero.`,
         failed: name => `Não foi possível redefinir ${name}. Consulte o log para mais detalhes.`,
         ok: "OK",
-        everyProfile: "Todos os perfis",
+        everyProfile: "Redefinir todos os perfis",
         confirmEvery: count => `Redefinir todos os ${count} perfis? Todas as suas partidas, sequências, desafios e conquistas serão apagados.`,
         everyDone: count => `Todos os ${count} perfis recomeçam do zero.`,
         everyFailed: (count, names) => `Perfis redefinidos: ${count}. Não foi possível redefinir: ${names.join(", ")}. Consulte o log para mais detalhes.`,

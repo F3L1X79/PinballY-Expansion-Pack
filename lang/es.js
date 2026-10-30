@@ -612,7 +612,7 @@ export default {
         done: name => `${name} empieza de cero.`,
         failed: name => `No se pudo reiniciar ${name}. Consulta el registro para más detalles.`,
         ok: "OK",
-        everyProfile: "Todos los perfiles",
+        everyProfile: "Reiniciar todos los perfiles",
         confirmEvery: count => `¿Reiniciar los ${count} perfiles? Se borrarán todas sus partidas, rachas, retos y logros.`,
         everyDone: count => `Los ${count} perfiles empiezan de cero.`,
         everyFailed: (count, names) => `Perfiles reiniciados: ${count}. No se pudo reiniciar: ${names.join(", ")}. Consulta el registro para más detalles.`,

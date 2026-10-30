@@ -336,12 +336,12 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
         shown.selectedTextSize = { width, height };
     }
 
-    // The outline and the gold text, centred on this height.
-    // The outline, centred on this height while it glides.
+    // The outline, centred on this height while it glides, as tall as the
+    // selected entry: stretched over a disabled one's reason.
     function placeOutline(centerY) {
-        const { geometry } = shown;
-        const size = selectionSize(geometry);
-        place(outline.layer, { x: geometry.listX - size.margin, y: centerY - size.height / 2, width: size.width, height: size.height }, false);
+        const { geometry, model } = shown;
+        const size = selectionSize(geometry, geometry.rowHeights[model.selected]);
+        place(outline.layer, { x: geometry.listX - size.margin, y: centerY - size.height / 2, width: size.width, height: size.height }, true);
         shown.glideY = centerY;
     }
 

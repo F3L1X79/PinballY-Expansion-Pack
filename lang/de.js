@@ -611,7 +611,7 @@ export default {
         done: name => `${name} fängt von vorne an.`,
         failed: name => `${name} konnte nicht zurückgesetzt werden. Details stehen im Log.`,
         ok: "OK",
-        everyProfile: "Alle Profile",
+        everyProfile: "Alle Profile zurücksetzen",
         confirmEvery: count => `Alle ${count} Profile zurücksetzen? Alle ihre Partien, Serien, Herausforderungen und Erfolge werden gelöscht.`,
         everyDone: count => `Alle ${count} Profile fangen von vorne an.`,
         everyFailed: (count, names) => `Zurückgesetzte Profile: ${count}. Nicht zurückgesetzt: ${names.join(", ")}. Details stehen im Log.`,

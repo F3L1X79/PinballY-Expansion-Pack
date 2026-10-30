@@ -505,7 +505,7 @@ export default {
         done: name => `${name} starts over.`,
         failed: name => `${name} could not be reset. See the log for details.`,
         ok: "OK",
-        everyProfile: "Every profile",
+        everyProfile: "Reset every profile",
         confirmEvery: count => `Reset all ${count} profiles? All of their plays, streaks, Challenges and achievements will be erased.`,
         everyDone: count => `All ${count} profiles start over.`,
         everyFailed: (count, names) => `Profiles reset: ${count}. ${names.join(", ")} could not be reset. See the log for details.`,

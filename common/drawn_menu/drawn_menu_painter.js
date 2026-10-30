@@ -373,8 +373,11 @@ export function drawBackdrop(dc, covering = false) {
     dc.fillRect(0, 0, width, height, covering ? LOOK.colors.cover : LOOK.colors.backdrop);
 }
 
-// The selection's outline image with its glow margin, in window pixels.
-export function selectionSize(geometry) {
+// The selection's outline image with its glow margin, in window pixels,
+// taller than drawn by what the selected row adds to an entry's height (a
+// disabled entry's reason).
+export function selectionSize(geometry, rowHeight) {
     const { selection } = DRAWN_MENU_IMAGES;
-    return { width: selection.width * geometry.k, height: selection.height * geometry.k, margin: DRAWN_MENU_SELECTION_MARGIN * geometry.k };
+    const height = selection.height * geometry.k + rowHeight - LOOK.rowHeights.entry * geometry.k;
+    return { width: selection.width * geometry.k, height, margin: DRAWN_MENU_SELECTION_MARGIN * geometry.k };
 }
