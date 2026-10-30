@@ -1,6 +1,6 @@
 // ============================================================
 // Pack Update start, from the Update Prompt's "Update now": records the
-// requested Pack Version and the running one, shows the Loader over the dimmed wheel and asks
+// requested Pack Version and the running one, shows the captioned Loader over the dimmed wheel and asks
 // the host to start the Pack Update helper, which quits PinballY once ready.
 // A helper not ready in time shows the failure at once (docs/adr/0018).
 // - Holds the wheel dialog queue while it waits: no Startup Screen opens just before PinballY quits.
@@ -27,7 +27,7 @@ const LOADER_Z_INDEX = DRAWN_MENU_Z_INDEX.backdrop - 1;
 // dialogs: the wheel dialog queue (common/core/wheel_dialog.js).
 export function createPackUpdater(host, state, dialogs) {
     const { packUpdates: TEXT } = lang;
-    const loader = createLoader(host, { zIndex: LOADER_Z_INDEX });
+    const loader = createLoader(host, { zIndex: LOADER_Z_INDEX, caption: TEXT.downloadingUpdate });
     let veil = null;
     const closedListeners = [];
 

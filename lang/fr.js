@@ -920,6 +920,8 @@ export default {
         later: "Plus tard",
         updateFailedTitle: "Mise à jour impossible",
         updateFailed: "L'Expansion Pack reste tel quel.",
+        // Under the Loader while the Pack Update helper gets ready.
+        downloadingUpdate: "Téléchargement de la mise à jour…",
         ok: "OK",
         updatedTitle: "Mise à jour terminée",
         updated: (version) => `Expansion Pack mis à jour en v${version}`,

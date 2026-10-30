@@ -57,5 +57,6 @@ test("a Pack Update that never gets ready says so at once, and PinballY stays", 
     fake.advanceTime(CAROUSEL_OPEN_MS + OPEN_OVER_MS);
     assert.equal(isCarouselOpen(fake, lang), true, "the picker opens once the message closed");
     assert.equal(fake.drawingLayers().filter(layer => layer.clearColor() === DIMMED_WHEEL && layer.zIndex === DRAWN_MENU_Z_INDEX.backdrop - 2).length, 0, "no update veil left");
+    assert.equal(fake.drawingLayers().filter(layer => layer.zIndex === DRAWN_MENU_Z_INDEX.backdrop - 1).length, 0, "no comet nor caption layer left");
     assert.equal(errorLines(fake).length, 1, "no other error");
 });

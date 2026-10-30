@@ -1,15 +1,13 @@
 ﻿// ============================================================
 // Hides the wheel while a table launches and closes, showing the Loader and
-// the current step in gold instead of PinballY's launch message, to avoid a
-// black flash before the table's own loading screen. Listens to
+// the current step beneath it instead of PinballY's launch message, to avoid
+// a black flash before the table's own loading screen. Listens to
 // "launchoverlayshow", "launchoverlaymessage" and "launchoverlayhide".
 // ============================================================
 
 import { safeHandler } from "../common/core/safe_handler.js";
 import { createPinballYHost } from "../common/core/pinbally_host.js";
-import { createLoader, LOADER_HEIGHT } from "../common/drawing/loader.js";
-import { oneLine } from "../common/drawing/steamball_drawing.js";
-import { STEAMBALL_COLORS as COLORS, STEAMBALL_FONTS as FONTS } from "../common/drawing/steamball_palette.js";
+import { createLoader } from "../common/drawing/loader.js";
 import lang from "../common/core/i18n.js";
 
 const SCRIPT_NAME = "SeamlessLaunchOverlay";
@@ -17,64 +15,14 @@ const SCRIPT_NAME = "SeamlessLaunchOverlay";
 // PinballY draws the launch overlay above every layer and its own layers
 // cannot be resized, so the Loader is a layer just under it, seen through
 // its nearly clear background; below the menus (6000 and up), such as a
-// game's pause menu. The text sits just under the comet's layer.
+// game's pause menu.
 const LOADER_Z_INDEX = 5999;
-const TEXT_Z_INDEX = 5998;
-
-// The text's canvas, drawn at twice a 1080-pixel-high window's pixels so
-// that its one-pixel outline shows half as thick, and scaled by height
-// only, so the layer never covers the whole window. Gabriola draws small
-// for its size and has a tall line, hence a size above body text that
-// still looks a little under it, and a canvas kept just above its line's
-// height, its empty top already a gap under the comet.
-const CANVAS_SCALE = 2;
-const TEXT_LOOK = Object.freeze({ width: 1200, height: 100, size: 48, weight: 400, outline: 1 });
-const TEXT_HEIGHT = TEXT_LOOK.height / (1080 * CANVAS_SCALE);
-const TEXT_GAP = 0;
-// The comet and the text centred together as one block (PinballY's y axis
-// points up, in window heights).
-const LOADER_Y = (TEXT_GAP + TEXT_HEIGHT) / 2;
-const TEXT_Y = -(LOADER_HEIGHT + TEXT_GAP) / 2;
-const OUTLINE_COLOR = 0xFF000000;
-const OUTLINE_DIRECTIONS = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
 
 const STEP_TEXT = lang.launchSteps;
 
-// The step's words on one line, in light gold calligraphy, repeated first in black
-// round them: PinballY's styled text has no stroke.
-function drawStepText(host, dc, words) {
-    const { width, height, size, weight, outline } = TEXT_LOOK;
-    const line = (dx, dy, color) => oneLine(host, dc, words, {
-        x: outline + dx, y: dy, width: width - 2 * outline, height, size, weight, color, font: FONTS.script, align: "center",
-    });
-    for (const [dx, dy] of OUTLINE_DIRECTIONS) line(dx * outline, dy * outline, OUTLINE_COLOR);
-    line(0, 0, COLORS.lightGold);
-}
-
 export default function init() {
     const host = createPinballYHost();
-    const loader = createLoader(host, { zIndex: LOADER_Z_INDEX, placement: LOADER_Y });
-    let textLayer = null;
-
-    // Shows the comet with the step's words beneath it, or only redraws the words.
-    function show(words) {
-        loader.show();
-        if (!textLayer) {
-            textLayer = host.createDrawingLayer(TEXT_Z_INDEX);
-            textLayer.setScale({ ySpan: TEXT_HEIGHT });
-            textLayer.setPos(0, TEXT_Y);
-        }
-        textLayer.draw(dc => drawStepText(host, dc, words), TEXT_LOOK.width, TEXT_LOOK.height);
-    }
-
-    // Removes the words' layer rather than hiding it, so an idle launch
-    // costs nothing per frame.
-    function hide() {
-        loader.hide();
-        if (!textLayer) return;
-        host.removeDrawingLayer(textLayer);
-        textLayer = null;
-    }
+    const loader = createLoader(host, { zIndex: LOADER_Z_INDEX, caption: STEP_TEXT.loading });
 
     // Fires when the launch overlay appears: hides the wheel and replaces the
     // default overlay background (preventDefault suppresses PinballY's own).
@@ -83,7 +31,7 @@ export default function init() {
         host.setUnderlay("");
         host.getLaunchOverlayBackground().clear(0x20FF00FF);
         ev.preventDefault();
-        show(STEP_TEXT.loading);
+        loader.show();
     }));
 
     // Fires at each step of a launch; preventDefault suppresses PinballY's
@@ -96,13 +44,13 @@ export default function init() {
     // after a capture, sends only "gameover".
     host.on("launchoverlaymessage", safeHandler(SCRIPT_NAME, ev => {
         ev.preventDefault();
-        if (ev.id === "running") hide();
-        if (ev.id === "terminating" || ev.id === "gameover") show(STEP_TEXT.closing);
-        if (ev.id === "capturing" && textLayer) show(STEP_TEXT.capturing);
+        if (ev.id === "running") loader.hide();
+        if (ev.id === "terminating" || ev.id === "gameover") loader.show(STEP_TEXT.closing);
+        if (ev.id === "capturing" && loader.isShown()) loader.show(STEP_TEXT.capturing);
     }));
 
     host.on("launchoverlayhide", safeHandler(SCRIPT_NAME, () => {
         host.showWheel(true);
-        hide();
+        loader.hide();
     }));
 }

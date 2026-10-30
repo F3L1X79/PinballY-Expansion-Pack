@@ -838,6 +838,8 @@ export default {
         later: "Later",
         updateFailedTitle: "Update not possible",
         updateFailed: "The Expansion Pack stays as it is.",
+        // Under the Loader while the Pack Update helper gets ready.
+        downloadingUpdate: "Downloading the update…",
         ok: "OK",
         // At the first start on the Pack Version an update installed.
         updatedTitle: "Update complete",

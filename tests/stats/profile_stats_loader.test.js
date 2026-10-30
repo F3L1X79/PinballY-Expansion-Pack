@@ -10,7 +10,7 @@ import { startHousehold } from "./household_stats_scenario.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { readVeil } from "../support/opening_reader.js";
 import { shownLayers } from "../support/shown_layers.js";
-import { readLoader } from "../support/loader_reader.js";
+import { readLoader, readLoaderCaption } from "../support/loader_reader.js";
 import { DIMMED_WHEEL } from "../../common/drawing/steamball_drawing.js";
 import { PROFILE_STATS_Z_INDEX } from "../../common/stats/profile_stats_painter.js";
 import {
@@ -51,6 +51,7 @@ function expectOpening(fake) {
     assert.equal(loader.shown, true, "the Loader after 150 ms");
     assert.equal(loader.zIndex, PROFILE_STATS_Z_INDEX.backdrop - 1, "over the veil, under the screen");
     assert.deepEqual(loader.position, { x: 0, y: 0 }, "in the middle of the playfield screen");
+    assert.equal(readLoaderCaption(fake), null, "the comet alone, without a caption");
     assert.deepEqual(readVeil(fake), VEIL);
 
     untilFadeStarts(fake);

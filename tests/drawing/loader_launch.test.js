@@ -10,11 +10,9 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { readLoader, loaderLayerCount } from "../support/loader_reader.js";
-import { readLaunchText, EIGHT_DIRECTIONS } from "../support/launch_text_reader.js";
+import { readLoader, loaderLayerCount, readLoaderCaption, assertGoldCaption, assertCaptionBeneathComet } from "../support/loader_reader.js";
 
 const TABLE = { configId: "afm", title: "Attack from Mars" };
-const LIGHT_GOLD = 0xFFFFD678;
 const LOADER_HEIGHT = 0.07;
 const fake = createFakePinballYHost({ now: new Date(2026, 9, 17, 20, 0, 0), tables: [TABLE] });
 const game = fake.getAllTables()[0];
@@ -33,27 +31,19 @@ function assertCometAndText(words) {
     assert.equal(loader.shown, true, "the comet turns");
     assert.equal(loader.zIndex, 5999, "the comet is just under the menus");
     assert.deepEqual(loader.scale, { ySpan: LOADER_HEIGHT }, "7 % high");
-    const launchText = readLaunchText(fake);
-    assert.ok(launchText, "the words show");
-    assert.equal(launchText.text, words);
-    assert.equal(launchText.color, LIGHT_GOLD, "in light gold");
-    assert.deepEqual(launchText.outline, EIGHT_DIRECTIONS, "outlined in black in eight directions");
-    assert.equal(launchText.lines, 1, "on one line");
+    const launchText = readLoaderCaption(fake);
+    assertGoldCaption(launchText, words);
     assert.ok(launchText.zIndex < 6000, "under the menus");
-    assert.equal(launchText.position.x, 0, "centred across");
-    assert.equal(loader.position.x, 0);
+    assertCaptionBeneathComet(loader, launchText);
     const cometTop = loader.position.y + LOADER_HEIGHT / 2;
-    const cometBottom = loader.position.y - LOADER_HEIGHT / 2;
-    const textTop = launchText.position.y + launchText.scale.ySpan / 2;
     const textBottom = launchText.position.y - launchText.scale.ySpan / 2;
-    assert.ok(textTop <= cometBottom && cometBottom - textTop < 0.03, "just beneath the comet");
     assert.ok(Math.abs(cometTop + textBottom) < 1e-9, "comet and words centred together");
 }
 
 function assertNothingShown() {
     assert.deepEqual(readLoader(fake), { shown: false }, "no comet");
     assert.equal(loaderLayerCount(fake), 0, "no Loader layer left");
-    assert.equal(readLaunchText(fake), null, "no words");
+    assert.equal(readLoaderCaption(fake), null, "no words");
     assert.equal(fake.drawingLayers().length, layersBeforeLaunch, "no launch layer left");
 }
 

@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
-import { readLaunchText } from "../support/launch_text_reader.js";
+import { readLoaderCaption } from "../support/loader_reader.js";
 
 test("the launch speaks French: Chargement en cours…, then Retour aux tables…", async () => {
     const fake = createFakePinballYHost({ now: new Date(2026, 9, 17, 20, 0, 0), tables: [{ configId: "afm", title: "Attack from Mars" }] });
@@ -23,10 +23,10 @@ test("the launch speaks French: Chargement en cours…, then Retour aux tables�
     await settle();
 
     fake.playGame(game);
-    assert.equal(readLaunchText(fake).text, "Chargement en cours…");
+    assert.equal(readLoaderCaption(fake).text, "Chargement en cours…");
     fake.gameStarted(game);
     fake.runCommand(fake.getBuiltInCommand("KillGame"));
-    assert.equal(readLaunchText(fake).text, "Retour aux tables…");
+    assert.equal(readLoaderCaption(fake).text, "Retour aux tables…");
     fake.gameOver(game);
     assertNoErrorLogged(fake);
 });
