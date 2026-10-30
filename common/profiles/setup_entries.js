@@ -2,10 +2,18 @@
 // Who sees the setup entries (Table Setup, the Operator Menu, the Expansion
 // Pack Settings): an Admin Profile, or every Profile, Guest included, while
 // the household marks none. Pure: asks the Profile store each time.
-// Also the mark rules (ADR 0020), shared by the Manage profiles menu and the store.
+// Also who sees "Manage profiles" and the mark rules (ADR 0020), shared by
+// the Exit menu, the Manage profiles menu and the store.
 // ============================================================
 
 export const seesSetupEntries = profileStore => profileStore.isAdmin() || !profileStore.hasAdminProfile();
+
+// Who sees "Manage profiles": an Admin Profile, or, while the household marks
+// none, the active Profile if the mark rules let it become the first one
+// (not Guest, not a Child Profile).
+export const seesManageProfiles = profileStore => profileStore.isAdmin()
+    || (!profileStore.hasAdminProfile()
+        && markRefusal(profileStore.getMarksOf(profileStore.getActiveProfile().name), "isAdmin") === null);
 
 // Why a mark line cannot be changed, as the menu explains it.
 export const MARK_REFUSAL = Object.freeze({

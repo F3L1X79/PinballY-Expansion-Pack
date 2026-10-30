@@ -1,8 +1,9 @@
 // ============================================================
 // Manage profiles, opened from the Exit menu: the list of Profiles (and
 // "Every profile"), then a Profile's own menu, where a mark line flips the
-// mark at once and "Reset" leads to the Profile Reset. Opens directly
-// through the Drawn Menu module. Listens to "command".
+// mark at once and "Reset" leads to the Profile Reset; while no Profile is
+// marked, only "Become admin". Opens directly through the Drawn Menu module.
+// Listens to "command".
 // - A line the mark rules forbid stays, greyed with its reason (setup_entries.js, ADR 0020).
 // - Exit and Back go from a Profile's menu to the list only when drawn: natively, they close.
 // - The active Profile clearing its own Admin mark closes the menus: it no longer has access.
@@ -19,6 +20,7 @@ const SCRIPT_NAME = "ManageProfiles";
 const LIST_MENU_ID = "manageProfilesList";
 const PROFILE_MENU_ID = "manageProfilesProfile";
 const MARKS_FAILED_MENU_ID = "manageProfilesMarksFailed";
+const BECOME_ADMIN_MENU_ID = "manageProfilesBecomeAdmin";
 const SEPARATOR = { cmd: -1 };
 
 // menus: what shows the menus (common/drawn_menu/drawn_menu.js).
@@ -29,6 +31,7 @@ export function createManageProfilesMenu(host, profileStore, menus = createNativ
     const adminCommand = host.allocateCommand("manageProfilesAdmin");
     const childCommand = host.allocateCommand("manageProfilesChild");
     const resetCommand = host.allocateCommand("manageProfilesReset");
+    const becomeAdminCommand = host.allocateCommand("manageProfilesBecomeAdmin");
     const menuReturnCommand = host.getBuiltInCommand("MenuReturn");
     // One command per line of the list, by position, allocated on demand:
     // the household can grow while PinballY runs.
@@ -51,7 +54,21 @@ export function createManageProfilesMenu(host, profileStore, menus = createNativ
     // set on the items so that a native menu opens on it too.
     const withCursorOn = (items, selectedCmd) => items.map(item => (selectedCmd !== null && item.cmd === selectedCmd ? { ...item, selected: true } : item));
 
-    function open(selectedCmd = null) {
+    // While the household has no Admin Profile, only "Become admin" is offered.
+    function open() {
+        if (profileStore.hasAdminProfile()) openList();
+        else openBecomeAdmin();
+    }
+
+    function openBecomeAdmin() {
+        menus.show(BECOME_ADMIN_MENU_ID, [
+            { title: TEXT.becomeAdmin, cmd: becomeAdminCommand },
+            SEPARATOR,
+            { title: TEXT.cancel, cmd: menuReturnCommand },
+        ]);
+    }
+
+    function openList(selectedCmd = null) {
         listedProfiles = profileStore.listProfiles();
         shownProfile = null;
         menus.show(LIST_MENU_ID, withCursorOn([
@@ -66,7 +83,7 @@ export function createManageProfilesMenu(host, profileStore, menus = createNativ
     }
 
     // The list again, the cursor on the Profile it was left from.
-    const backToList = profile => open(getProfileCommand(listedProfiles.findIndex(listed => listed.name === profile.name)));
+    const backToList = profile => openList(getProfileCommand(listedProfiles.findIndex(listed => listed.name === profile.name)));
 
     const isActive = profile => profile.name === profileStore.getActiveProfile().name;
     // The active Profile clearing its own Admin mark loses access to these menus.
@@ -95,32 +112,48 @@ export function createManageProfilesMenu(host, profileStore, menus = createNativ
         ], selectedCmd), { onBack: () => backToList(profile) });
     }
 
-    // Flips the mark and shows the Profile's menu again on its line, unless
-    // the active Profile just lost access to it. A failure is caught here,
-    // not by safeHandler, for the player to see it; its cause goes to the
-    // log, and OK goes back to the Profile's menu.
-    function flipMark(profile, markName, lineCommand) {
-        let marks;
+    // Runs the mark change; a failure is caught here, not by safeHandler, for
+    // the player to see it: its cause goes to the log, and OK runs onBack.
+    // Returns whether the mark changed.
+    function tryMarking(profile, change, onBack) {
         try {
-            marks = profileStore.getMarksOf(profile.name);
-            profileStore.setMark(profile.name, markName, !marks[markName]);
+            change();
+            return true;
         } catch (error) {
             logHandlerError(SCRIPT_NAME, error);
             menus.show(MARKS_FAILED_MENU_ID, [
                 { title: TEXT.marksFailed(displayNameOf(profile)), cmd: -1 },
                 SEPARATOR,
                 { title: TEXT.ok, cmd: menuReturnCommand, selected: true },
-            ], { dialogStyle: true, onBack: () => openProfile(profile, lineCommand) });
-            return;
+            ], { dialogStyle: true, onBack });
+            return false;
         }
-        if (!losesAccess(profile, marks, markName)) openProfile(profile, lineCommand);
+    }
+
+    // Flips the mark and shows the Profile's menu again on its line, unless
+    // the active Profile just lost access to it.
+    function flipMark(profile, markName, lineCommand) {
+        let marks;
+        const changed = tryMarking(profile, () => {
+            marks = profileStore.getMarksOf(profile.name);
+            profileStore.setMark(profile.name, markName, !marks[markName]);
+        }, () => openProfile(profile, lineCommand));
+        if (changed && !losesAccess(profile, marks, markName)) openProfile(profile, lineCommand);
+    }
+
+    // The active Profile becomes the first Admin Profile, and gets the full list.
+    function becomeAdmin() {
+        const profile = profileStore.getActiveProfile();
+        if (tryMarking(profile, () => profileStore.setMark(profile.name, "isAdmin", true), openBecomeAdmin)) openList();
     }
 
     // Fires on every command: a Profile of the list opens its menu, "Every
-    // profile" and "Reset" ask to confirm the Profile Reset, a mark line flips its mark.
+    // profile" and "Reset" ask to confirm the Profile Reset, a mark line flips
+    // its mark, "Become admin" marks the active Profile while no other is.
     host.on("command", safeHandler(SCRIPT_NAME, ev => {
         const index = profileCommands.indexOf(ev.id);
         if (index >= 0 && index < listedProfiles.length) openProfile(listedProfiles[index]);
+        else if (ev.id === becomeAdminCommand && !profileStore.hasAdminProfile()) becomeAdmin();
         else if (ev.id === everyProfileCommand && offersEveryProfile()) profileReset.confirm(listedProfiles);
         else if (ev.id === adminCommand && shownProfile) flipMark(shownProfile, "isAdmin", adminCommand);
         else if (ev.id === childCommand && shownProfile) flipMark(shownProfile, "isChild", childCommand);

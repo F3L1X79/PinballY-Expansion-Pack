@@ -54,7 +54,9 @@ La progression de chaque Profil est enregistrée dans `Scripts\ExpansionPack\pro
 
 ## Profil admin
 
-Pour garder les entrées de configuration pour vous seul, ajoutez `"isAdmin": true` au premier niveau du `Scripts\ExpansionPack\profiles\<nom>\profile.json` de votre Profil, PinballY fermé. Ce Profil marque ensuite les autres depuis la borne : ouvrez **Gérer les profils** dans le menu de sortie, choisissez un Profil puis « Admin : non », qui passe aussitôt à « Admin : oui ». Choisissez-le de nouveau pour retirer la marque.
+Pour garder les entrées de configuration pour vous seul, faites de votre Profil le premier Profil admin : tant qu'aucun Profil n'est marqué, ouvrez **Gérer les profils** dans le menu de sortie (Échap) et choisissez **Devenir admin**, sa seule ligne. Votre Profil est marqué aussitôt et le menu complet s'ouvre. Invité et les Profils enfants ne voient pas l'entrée, puisqu'ils ne peuvent jamais être Profils admin. Vous pouvez aussi ajouter `"isAdmin": true` au premier niveau du `Scripts\ExpansionPack\profiles\<nom>\profile.json` de votre Profil, PinballY fermé ; modifier ce fichier reste le moyen de retirer la marque tant que c'est le seul Profil admin.
+
+Ce Profil marque ensuite les autres depuis la borne : ouvrez **Gérer les profils** dans le menu de sortie, choisissez un Profil puis « Admin : non », qui passe aussitôt à « Admin : oui ». Choisissez-le de nouveau pour retirer la marque.
 
 - Vous pouvez retirer votre propre marque de la même façon tant qu'il reste un autre Profil admin : les menus se ferment alors, puisque vous n'y avez plus accès.
 - La ligne Admin du dernier Profil admin est grisée (« Dernier admin ») : seule une modification à la main de son `profile.json` ramène la maison à « tout le monde voit tout ».

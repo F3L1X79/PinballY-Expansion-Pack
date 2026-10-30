@@ -1,7 +1,6 @@
 // ============================================================
-// "Every Profile" in the Profile Reset list: absent with Guest alone; with
-// two or more, one confirmation, then every Profile starts over with its
-// dated copy and marks. A failing Profile is named and does not stop others.
+// "Every Profile" in the Profile Reset list: one confirmation, then every
+// Profile starts over with its dated copy and marks. A failing Profile is named and does not stop others.
 // ============================================================
 
 import { test } from "node:test";
@@ -44,15 +43,6 @@ test("Every Profile resets them all, and a failing one does not stop the others"
             dialogStyle: menu.options.dialogStyle,
         };
     };
-
-    // The Exit menu offers Manage profiles only once an Admin Profile
-    // exists, so never with Guest alone: its list is opened directly.
-    const { createPinballYHost } = await import("../../common/core/pinbally_host.js");
-    const { createManageProfilesMenu } = await import("../../common/menus/manage_profiles_menu.js");
-    createManageProfilesMenu(createPinballYHost(), getProfileStore()).open();
-    assert.deepEqual(fake.currentMenu().items.map(item => item.title ?? ""),
-        [TEXT.listTitle, "", GUEST, "", TEXT.cancel], "with Guest alone, no Every Profile line");
-    fake.selectMenuItem(TEXT.cancel);
 
     const guestFile = JSON.stringify({ version: 1, randomGames: 1 });
     const aliceFile = JSON.stringify({ version: 1, isAdmin: true, randomGames: 4 });

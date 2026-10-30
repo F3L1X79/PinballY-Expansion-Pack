@@ -1,8 +1,8 @@
 // ============================================================
-// Profile Reset from Manage profiles in the Exit menu through main.js: shown
-// to an active Admin only, lists every Profile, then "Reset" in a Profile's
-// menu asks once on "No". "Yes" keeps a dated copy,
-// saves empty data with the marks kept, renames its Play Log year files;
+// Profile Reset from Manage profiles in the Exit menu through main.js: for
+// an active Admin only (none marked: "Become admin" alone), lists every
+// Profile, then "Reset" in a Profile's menu asks once on "No". "Yes" keeps a
+// dated copy, saves empty data with the marks kept, renames its Play Log files;
 // the other Profiles' Play Logs are untouched.
 // ============================================================
 
@@ -98,7 +98,11 @@ test("an Admin Profile resets another Profile from the Exit menu, after one conf
     };
 
     store.switchTo("Alice");
-    assert.ok(!exitMenuTitles().includes(TEXT.menuEntry), "no Admin Profile: nobody can reset a Profile");
+    fake.openExitMenu();
+    fake.selectMenuItem(TEXT.menuEntry);
+    assert.deepEqual(fake.currentMenu().items.map(item => item.title ?? ""), [TEXT.becomeAdmin, "", TEXT.cancel],
+        "no Admin Profile: only Become admin, nobody can reset a Profile");
+    fake.selectMenuItem(TEXT.cancel);
 
     fake.addFile(profileFile("Alice"), JSON.stringify({ version: 1, isAdmin: true }));
     store.switchTo("Bob");

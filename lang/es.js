@@ -596,6 +596,7 @@ export default {
         childLine: isChild => `Niño: ${isChild ? "sí" : "no"}`,
         reset: "Reiniciar",
         back: "Volver",
+        becomeAdmin: "Hacerse admin",
         // Why a mark line is greyed out, by the mark rules' refusal.
         refusals: {
             guestNeverMarked: "Invitado nunca se marca",

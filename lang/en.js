@@ -488,6 +488,8 @@ export default {
         childLine: isChild => `Child: ${isChild ? "yes" : "no"}`,
         reset: "Reset",
         back: "Back",
+        // The only line while the household has no Admin Profile.
+        becomeAdmin: "Become admin",
         // Why a mark line is greyed out, by the mark rules' refusal.
         refusals: {
             guestNeverMarked: "Guest is never marked",

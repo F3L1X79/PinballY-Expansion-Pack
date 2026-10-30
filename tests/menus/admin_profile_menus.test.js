@@ -1,6 +1,7 @@
 ﻿// ============================================================
 // Admin Profile menus through main.js: with no isAdmin mark, everyone sees
-// "Table Setup" and "Operator Menu"; once one is marked, only Admins do.
+// "Table Setup" and "Operator Menu", and "Manage profiles" to become the
+// first admin; once one is marked, only Admins do.
 // - A mark on Guest or a non-boolean mark is logged and ignored.
 // ============================================================
 
@@ -17,7 +18,6 @@ const profileFile = name => `${PROFILES}\\${name}\\profile.json`;
 const markFile = (fake, name, isAdmin) => fake.addFile(profileFile(name), JSON.stringify({ version: 1, isAdmin }));
 
 // PinballY's own separators are titled "".
-const EXIT_MENU = ["Exit PinballY", "Shut Down", "", "Operator Menu", "", "Help", "About PinballY", "", "Cancel"];
 const ADMIN_EXIT_MENU = ["Exit PinballY", "Shut Down", "", "Operator Menu", "Manage profiles", "", "Help", "About PinballY", "", "Cancel"];
 const EXIT_MENU_WITHOUT_OPERATOR_MENU = ["Exit PinballY", "Shut Down", "", "Help", "About PinballY", "", "Cancel"];
 
@@ -55,12 +55,12 @@ test("only the Admin Profiles keep the setup entries, once the household has one
 
     store.switchTo("Alice");
     assert.ok(mainMenuTitles().includes(TABLE_SETUP), "no Admin Profile: everything shows");
-    assert.deepEqual(exitMenuTitles(), EXIT_MENU);
+    assert.deepEqual(exitMenuTitles(), ADMIN_EXIT_MENU, "and Manage profiles, to become the first admin");
 
     markFile(fake, "guest", true);
     markFile(fake, "Bob", "true");
     assert.ok(mainMenuTitles().includes(TABLE_SETUP), "a mark on Guest or not a boolean counts for nothing");
-    assert.deepEqual(exitMenuTitles(), EXIT_MENU);
+    assert.deepEqual(exitMenuTitles(), ADMIN_EXIT_MENU);
     assert.ok(fake.logLines().some(line => line.includes("Bob\\profile.json") && line.includes("isAdmin")));
 
     markFile(fake, "Bob", true);
