@@ -256,7 +256,6 @@
         <div class="ax row">Faible</div>
         <div class="cell">
           <a class="chip tr-play" href="#easter-eggs"><b></b>Easter eggs</a>
-          <a class="chip tr-play" href="#clock"><b></b>Backglass Clock</a>
           <a class="chip tr-play" href="#feld"><b></b>Feld</a>
         </div>
         <div class="cell">
@@ -298,31 +297,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-play" id="clock" data-track="play" data-rank="bronze">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>Backglass Clock : l'heure pendant une partie</h3>
-            <div class="tags"><span class="tag track">Jeu et succès</span><span class="tag">petit</span><span class="tag">UI</span></div>
-          </div>
-          <p>L'horloge de la roue disparaît quand une table tourne. La Backglass Clock prend le relais sur l'écran du backglass, devant celui de VPX : une petite fenêtre noire au cadre doré, en haut à gauche. Grillé le 29/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">prototype</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : <code>/implement-spec</code> (une chaîne, un seul implémenteur) ou <code>/implement</code> dans l'ordre <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/370">#370</a> → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/371">#371</a>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/369">Spec #369</a>, complétée par ses commentaires sur le prototype (branche <code>prototype/backglass-clock</code>, jamais fusionnée) ; nouvel Add-on <code>addons/backglass_clock.js</code> ; pages Interface et Réglages du guide</div>
-          <details>
-            <summary>Décisions</summary>
-            <ul>
-              <li>L'horloge de la roue (<code>addons/clock.js</code>) ne change pas. La Backglass Clock ne s'affiche que pendant une partie, de <code>gamestarted</code> à <code>gameover</code>, et jamais pendant une capture de média.</li>
-              <li>Le dessin du backglass de PinballY ne convient pas, puisque <code>force_backglass.js</code> le masque pendant la partie. On utilise une fenêtre personnalisée (<code>createMediaWindow</code>, <code>showMediaWhenRunningFlag = true</code>), mise au premier plan (<code>HWND.TOPMOST</code>), qui ne prend jamais le focus.</li>
-              <li>Elle s'ouvre en haut à gauche de l'écran du backglass. PinballY retient sa place et sa taille, que le propriétaire règle à la main. Aucun nouveau réglage de place.</li>
-              <li>Elle a un fond noir opaque et un fin cadre doré, sans ornement Steamball. L'heure, en blanc doux, utilise le format et le texte de l'horloge de la roue (<code>lang.clock.time</code>), sans date. Le texte change une fois par minute et sa taille suit la hauteur de la fenêtre.</li>
-              <li>C'est un Add-on à part, <code>ADD_ON_BACKGLASS_CLOCK=false</code> par défaut, qui figure dans le catalogue des Add-ons. Il ne fait rien sur une borne à un seul écran. Pas d'heure dans le menu de pause : le bouton y est inaccessible sur la borne.</li>
-            </ul>
-            <p class="ctx">Le prototype doit répondre à deux questions. La fenêtre reste-t-elle devant le B2S (son option « Form to front ») si on la remet au premier plan une seconde fois, quelques secondes après <code>gamestarted</code> ? Son dessin s'affiche-t-il pendant une partie ? Idée de Félix du 25/10/2026.</p>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-share" id="vpxtool-update" data-track="share" data-rank="silver">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -658,8 +632,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>30/10 <span class="count">(3)</span></summary>
+          <summary>30/10 <span class="count">(4)</span></summary>
           <ol>
+            <li><strong>Backglass Clock livrée : spec #369 close</strong>
+              <span>Dernier ticket #371 : à la première partie, la fenêtre quitte l'écran de jeu pour le coin haut gauche de l'écran du backglass, lu au <code>prelaunch</code> ; une place choisie par le propriétaire sur cet écran n'est plus jamais touchée. Le chantier sort de la file et de la matrice ; vpxtool passe 1ᵉʳ. Restent les vérifications sur la borne.</span></li>
             <li><strong>« Admin et enfant en jeu » livré : spec #364 close</strong>
               <span>Dernier ticket #368 : tant qu'aucun Profile n'est admin, le Profile actif (sauf Guest et un Child Profile) devient le premier par « Devenir admin » dans « Gérer les profils ». Le chantier sort de la file et de la matrice ; la Backglass Clock passe 1ʳᵉ.</span></li>
             <li><strong>Discord Rich Presence grillé et spécifié (#379)</strong>
