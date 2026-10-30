@@ -55,7 +55,13 @@ const PROJECT_FOLDER_NAME = "ExpansionPack";
 // size, and never takes the focus from the running game.
 export const SWP_NOSIZE = 0x1;
 export const SWP_NOMOVE = 0x2;
+const SWP_NOZORDER = 0x4;
 const SWP_NOACTIVATE = 0x10;
+
+// Shared with the fake host, which passes its own raw backglass window.
+export function backglassRectOf(window) {
+    return window.hwndFrame ? { ...window.hwndFrame.getWindowPos().windowRect } : null;
+}
 
 // A custom window (CustomWindow.html) as the pack acts on it; hwnd: the
 // HWND class, whose TOPMOST and NOTOPMOST place it in the z-order.
@@ -72,6 +78,12 @@ export function mediaWindowOf(window, hwnd) {
         },
         // The frame's place on the desktop, { left, top, right, bottom }.
         getWindowRect: () => ({ ...window.hwndFrame.getWindowPos().windowRect }),
+        // Moves and sizes it without touching its z-order; PinballY saves the
+        // new place under its configVarPrefix. Taken in getWindowRect()'s
+        // units, not checked on the cabinet (pinbally-help.md §2.1).
+        moveTo: ({ left, top, width, height }) => {
+            window.setWindowPos(hwnd.TOP, left, top, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
+        },
         // Not in the visible window's units (pinbally-help.md §2.1, "Seen on
         // the cabinet"): only its aspect ratio can be trusted.
         getClientSize: () => {
@@ -494,6 +506,9 @@ export function createPinballYHost() {
             return user32.GetSystemMetrics(SM_CMONITORS);
         },
         showBackglass: (visible) => { backglassWindow.showWindow(visible); },
+        // The backglass window's frame on the desktop, { left, top, right,
+        // bottom }, the backglass screen on a cabinet; null without a frame.
+        getBackglassWindowRect: () => backglassRectOf(backglassWindow),
         // desc: createMediaWindow's (MainWindowObject.html); see mediaWindowOf().
         createMediaWindow: (desc) => mediaWindowOf(mainWindow.createMediaWindow(desc), HWND),
         // Through the Windows Media Player COM component, like the launch

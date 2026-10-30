@@ -16,9 +16,14 @@ const TABLE = { id: 1, configId: "Medieval Madness", title: "Medieval Madness", 
 const KEEP_PLACE_NO_FOCUS = 0x1 | 0x2 | 0x10;
 const BLACK = 0xFF000000;
 const SOFT_WHITE = 0xFFDCDCDC;
+const OWNER_PLACE = { left: 2600, top: 40, right: 3000, bottom: 340 };
 
 test("during a game the Backglass Clock shows the time in front, raised on a schedule, and goes at the end", async () => {
-    const fake = createFakePinballYHost({ now: new Date(2026, 9, 30, 21, 47, 30), tables: [TABLE], monitorCount: 2 });
+    const fake = createFakePinballYHost({
+        now: new Date(2026, 9, 30, 21, 47, 30), tables: [TABLE], monitorCount: 2,
+        // Where the owner left it, 400x300 on the backglass screen.
+        savedMediaWindowRects: { BackglassClock: OWNER_PLACE },
+    });
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key === "backglassClock";
@@ -57,7 +62,7 @@ test("during a game the Backglass Clock shows the time in front, raised on a sch
     assert.equal(layer.strokes().find(stroke => "text" in stroke).color, SOFT_WHITE);
     const canvas = layer.canvasSize();
     assert.ok(canvas.height < 400, "its own fixed-height canvas, stretched over the window");
-    assert.ok(Math.abs(canvas.width / canvas.height - 810 / 1375) < 0.02, "as wide as the window's aspect ratio");
+    assert.ok(Math.abs(canvas.width / canvas.height - 400 / 300) < 0.02, "as wide as the window's aspect ratio");
 
     // The owner resizing the box: the canvas follows its ratio, never its size.
     clock.resize({ width: 640, height: 220 });

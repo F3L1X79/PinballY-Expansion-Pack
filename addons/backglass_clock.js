@@ -5,6 +5,7 @@
 // during a media capture or on a single screen. Off by default.
 // - Every raise keeps the window's place and never takes VPX's focus.
 // - clientRect isn't in the visible window's units: only its ratio is read.
+// - Moved onto the backglass screen only from outside it: the owner's place sticks.
 // ============================================================
 
 import lang from "../common/core/i18n.js";
@@ -20,6 +21,8 @@ const CONFIG_VAR_PREFIX = "BackglassClock";
 // VPX's B2S loads after "gamestarted" and may come in front: raised again
 // on this schedule, then at each minute (as held on the cabinet, spec #369).
 const RAISE_DELAYS_MS = [2000, 5000, 10000, 20000, 40000];
+// Its size at the backglass screen's top left, until the owner places it.
+const DEFAULT_SIZE = Object.freeze({ width: 320, height: 110 });
 const LAYER_Z_INDEX = 100;
 // PinballY stretches this canvas over the whole window; its width follows
 // the window's aspect ratio, so the text keeps its proportions.
@@ -29,6 +32,9 @@ const FRAME_THICKNESS = 2;
 const TEXT_MARGIN = 3 * FRAME_THICKNESS;
 const TIME_TEXT = Object.freeze({ size: 44, minSize: 8, weight: 600, font: "Segoe UI" });
 const BLACK = 0xFF000000;
+
+const isInside = (inner, outer) => inner.left >= outer.left && inner.top >= outer.top
+    && inner.right <= outer.right && inner.bottom <= outer.bottom;
 
 export default function init() {
     const host = createPinballYHost();
@@ -43,6 +49,9 @@ export default function init() {
     const layer = clockWindow.createDrawingLayer(LAYER_Z_INDEX);
     let raiseTimers = [];
     let shown = false;
+    // The backglass screen read at the last "prelaunch", or why it couldn't be.
+    let backglassRect = null;
+    let backglassRectProblem = "not read before the game";
 
     function draw() {
         const { width, height } = clockWindow.getClientSize();
@@ -70,10 +79,33 @@ export default function init() {
         raiseTimers = [];
     }
 
+    // A window outside the backglass screen was never placed by the owner:
+    // PinballY opens a new one on the playfield screen.
+    function placeOnBackglassScreen() {
+        if (!backglassRect) {
+            host.log(`[${SCRIPT_NAME}] Backglass screen unknown (${backglassRectProblem}): the clock stays where it is.`);
+            return;
+        }
+        if (!isInside(clockWindow.getWindowRect(), backglassRect)) clockWindow.moveTo({ left: backglassRect.left, top: backglassRect.top, ...DEFAULT_SIZE });
+    }
+
+    // Read before the game: Force Backglass hides the backglass on "gamestarted".
+    host.on("prelaunch", safeHandler(SCRIPT_NAME, () => {
+        backglassRect = null;
+        try {
+            backglassRect = host.getBackglassWindowRect();
+            if (!backglassRect) backglassRectProblem = "the backglass window has no frame";
+        } catch (error) {
+            backglassRectProblem = `unreadable: ${error.message}`;
+        }
+    }));
+
     // Monitors are counted at each game, since a screen can be plugged in or out.
     host.on("gamestarted", safeHandler(SCRIPT_NAME, () => {
         clearTimers();
         if (host.countMonitors() <= 1 || host.getFullUIMode().capture) return;
+        // Placed before it shows, so it never flashes on the playfield first.
+        placeOnBackglassScreen();
         clockWindow.showWindow(true);
         shown = true;
         minuteTick.start();

@@ -9,7 +9,7 @@
 // - settle() waits on a real timer for deferred work to run.
 // ============================================================
 
-import { projectFolderOf, mediaWindowOf, SWP_NOSIZE, SWP_NOMOVE } from "../../common/core/pinbally_host.js";
+import { projectFolderOf, mediaWindowOf, backglassRectOf, SWP_NOSIZE, SWP_NOMOVE } from "../../common/core/pinbally_host.js";
 
 // PinballY's HWND z-order constants (WindowObjects.html), as names a test reads.
 const FAKE_HWND = Object.freeze({ TOP: "TOP", BOTTOM: "BOTTOM", TOPMOST: "TOPMOST", NOTOPMOST: "NOTOPMOST" });
@@ -204,6 +204,12 @@ export function createFakePinballYHost({
     lowerStatusLineMessages = [],
     // The monitors Windows reports: a cabinet has one per screen.
     monitorCount = 2,
+    // backglassWindow.hwndFrame's windowRect, the backglass screen on a
+    // cabinet; null: a backglass window with no frame to read.
+    backglassWindowRect = { left: 2560, top: 0, right: 4480, bottom: 1080 },
+    // Each custom window's place restored from its configVarPrefix's
+    // settings, where the owner left it: { [configVarPrefix]: windowRect }.
+    savedMediaWindowRects = {},
     // How long each layer draw takes on the clock: a draw blocks PinballY
     // while it runs (docs/adr/0005); 0 leaves the clock still.
     drawMs = 0,
@@ -390,6 +396,8 @@ export function createFakePinballYHost({
     const backglassShowCalls = [];
     // Every custom window created, in order, as mediaWindows() shows them.
     const mediaWindowList = [];
+    // backglassWindow.hwndFrame, absent without a rect.
+    const backglassFrame = backglassWindowRect ? { getWindowPos: () => ({ windowRect: { ...backglassWindowRect } }) } : undefined;
 
     function readSetting(key, defaultValue, convert) {
         return storedSettings.has(key) ? convert(storedSettings.get(key)) : defaultValue;
@@ -646,12 +654,12 @@ export function createFakePinballYHost({
     }
 
     // A custom window as mainWindow.createMediaWindow() returns it: opened
-    // where the cabinet showed it, visible, with a title bar until
-    // borderlessMode is set. setWindowPos moves and sizes it unless its
+    // where its settings put it, else where the cabinet showed a new one,
+    // visible, with a title bar until borderlessMode is set. setWindowPos moves and sizes it unless its
     // flags say not to; its client size is the frame's, in other units.
     // Each showWindow and setWindowPos call is recorded in order.
     function createRawMediaWindow(desc) {
-        let rect = { ...NEW_MEDIA_WINDOW_RECT };
+        let rect = { ...(savedMediaWindowRects[desc.configVarPrefix] ?? NEW_MEDIA_WINDOW_RECT) };
         let visible = true;
         const calls = [];
         const ownLayers = [];
@@ -1376,6 +1384,7 @@ export function createFakePinballYHost({
         getPinballYVersion: () => pinballYVersion,
         countMonitors: () => monitorCount,
         showBackglass: (visible) => { backglassShowCalls.push(visible); },
+        getBackglassWindowRect: () => backglassRectOf({ hwndFrame: backglassFrame }),
         createMediaWindow: (desc) => mediaWindowOf(createRawMediaWindow(desc), FAKE_HWND),
         playSound,
         createSoundRotation,
@@ -1845,7 +1854,10 @@ export function createFakePinballYHost({
                 HttpRequest: FakeHttpRequest,
                 HWND: FAKE_HWND,
                 systemInfo: { programDir: programFolder, version: pinballYVersion },
-                backglassWindow: { showWindow: (visible) => { backglassShowCalls.push(visible); } },
+                backglassWindow: {
+                    showWindow: (visible) => { backglassShowCalls.push(visible); },
+                    hwndFrame: backglassFrame,
+                },
                 // Only User32's GetSystemMetrics, for the monitor count
                 // (SM_CMONITORS), and Shell32's ShellExecuteW, for cmd.exe
                 // and the restart helper run hidden, and Kernel32's file
