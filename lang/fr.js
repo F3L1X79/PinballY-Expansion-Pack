@@ -933,6 +933,7 @@ export default {
         dialog: "vpxtool lit le script de chaque table pour que sa ROM se renseigne toute seule. Écrit par Francis De Brabandere, sous licence Apache-2.0, téléchargé depuis github.com/francisdb/vpxtool.",
         install: "Installer",
         noThanks: "Non merci",
+        later: "Vous pourrez aussi l'installer plus tard depuis les Réglages du pack, ou à la main.",
         downloading: "Téléchargement en cours…",
         ok: "OK",
         installedTitle: "vpxtool installé",
@@ -944,7 +945,6 @@ export default {
         header: "Problème",
         playNotSaved: "Cette partie n'a pas pu être enregistrée : elle ne comptera pas dans vos statistiques.",
         playNotInPlayLog: "Cette partie a été comptée, mais elle manque à votre historique de parties.",
-        vpxtoolMissing: "vpxtool.exe manque dans le dossier tools de l'Expansion Pack : les ROM des tables ne sont pas renseignées.",
         packUpdateFailed: (version, logPath) => `La mise à jour en v${version} a échoué : la version précédente reste en place. Détails dans ${logPath}`,
     },
     releaseHighlights: {

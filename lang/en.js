@@ -856,6 +856,8 @@ export default {
         dialog: "vpxtool reads each table's script so that its ROM fills in by itself. Written by Francis De Brabandere, under the Apache-2.0 licence, downloaded from github.com/francisdb/vpxtool.",
         install: "Install",
         noThanks: "No thanks",
+        // After what vpxtool is, before the owner answers.
+        later: "You can also install it later from the Expansion Pack Settings, or by hand.",
         // Under the Loader while the install helper works.
         downloading: "Downloading…",
         ok: "OK",
@@ -869,8 +871,6 @@ export default {
         header: "Problem",
         playNotSaved: "This game could not be saved: it won't count in your stats.",
         playNotInPlayLog: "This game was counted, but it is missing from your play history.",
-        // Under the Table ROMs Add-on's name.
-        vpxtoolMissing: "vpxtool.exe is missing from the Expansion Pack's tools folder: the tables' ROMs are not filled.",
         // Under packUpdates.toastTitle; logPath: the Pack Update helper's log.
         packUpdateFailed: (version, logPath) => `The update to v${version} failed: the previous version is still in place. Details in ${logPath}`,
     },

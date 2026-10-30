@@ -18,20 +18,21 @@
    ```
    Your own scripts keep running: nothing else in `Scripts` is touched, and they still run if the pack folder is missing or the pack fails to load (the error goes to `PinballY.log`).
 4. **Optional: create `ExpansionPack\.env.local`**, only if you want to change a setting the Expansion Pack Settings don't cover (see [Settings](settings.md)): copy `ExpansionPack\.env.example` and keep the lines you change, one `KEY=value` per line (UTF-8). Without it, the pack runs with its defaults.
-5. **Optional: install vpxtool** (see below).
-6. **Optional: update PINemHi to 3.6.8** (see below).
-7. **Restart PinballY** and check `PinballY.log` (see [First start](#first-start)).
-8. **Choose your Add-ons** from **Expansion Pack Settings** in the Operator Menu: turn each one on or off, pick the startup screen and the language, then restart PinballY in one press.
+5. **Optional: update PINemHi to 3.6.8** (see below).
+6. **Restart PinballY** and check `PinballY.log` (see [First start](#first-start)). The pack then offers to install vpxtool (see below).
+7. **Choose your Add-ons** from **Expansion Pack Settings** in the Operator Menu: turn each one on or off, pick the startup screen and the language, then restart PinballY in one press.
 
 ## vpxtool
 
-With vpxtool, each table's ROM is filled in by itself (the Table ROMs Add-on). vpxtool is written by Francis De Brabandere, under the Apache-2.0 licence (https://github.com/francisdb/vpxtool); the pack does not include it.
+With vpxtool, each table's ROM is filled in by itself (the Table ROMs Add-on). vpxtool is written by Francis De Brabandere, under the Apache-2.0 licence (https://github.com/francisdb/vpxtool); the pack does not include it, and you have nothing to download yourself.
 
-While it is missing and the Table ROMs Add-on is on, **Expansion Pack Settings** shows **Install vpxtool v0.38.0**. It opens a message saying what vpxtool is for, who wrote it, its licence and its site; **Install** downloads it from its author's releases, checks it and puts `vpxtool.exe` in `ExpansionPack\tools`, with the comet and "Downloading…" on screen; PinballY stays open. A message then says whether it worked, and the table scripts are read at once.
+While it is missing and the Table ROMs Add-on is on, a message opens at startup, after the Update Prompt and before the startup screen, for an Admin Profile (or anyone while no Profile is marked). It says what vpxtool is for, who wrote it, its licence and its site, and that you can still install it later. **Install** downloads it from its author's releases, checks it and puts `vpxtool.exe` in `ExpansionPack\tools`, with the comet and "Downloading…" on screen; PinballY stays open. A message then says whether it worked, and the table scripts are read at once.
 
-You can also install it by hand: download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools`, next to the restart helper already there.
+**No thanks** saves `OFFER_VPXTOOL=false` in `.env.local`: the pack never asks again, and **Offer vpxtool** reads Off in the Offline Mode group of the Expansion Pack Settings (see [Settings](settings.md#expansion-pack-settings)). Exit closes the message without an answer: it comes back at the next start. Until an Admin Profile starts PinballY, the message waits.
 
-Without it, a table's ROM is still found, after its first Play, and a "Problem" toast says at each start that `vpxtool.exe` is missing (to Admin Profiles only, or to everyone if none is marked): install it, or turn the Table ROMs Add-on off in the Expansion Pack Settings.
+Later on, **Expansion Pack Settings** shows **Install vpxtool v0.38.0** while it is missing and the Table ROMs Add-on is on, whatever you answered; it opens the same message. You can also install it by hand: download `vpxtool` for Windows from its releases page (https://github.com/francisdb/vpxtool/releases) and put `vpxtool.exe` in `ExpansionPack\tools`, next to the restart helper already there.
+
+Without it, a table's ROM is still found, after its first Play.
 
 ## PINemHi 3.6.8
 

@@ -49,7 +49,7 @@ The version of the Script Reader that each Pack Version names as the one to inst
 _Avoid_: latest vpxtool (the pack never follows its author's latest release by itself)
 
 **Script Reader Prompt**:
-The Dialog, shown at startup to whoever sees the setup entries, that offers to install the Script Reader when it is missing, or to update it when it is older than the Script Reader Version, saying what it is for, who wrote it, under which licence and where it comes from. The owner may say no; it is then never asked again, and the install stays available from the Expansion Pack Settings or by hand. The Expansion Pack Settings' install line opens the same Dialog, whose "No thanks" there changes nothing. The Expansion Pack Settings' install line opens the same Dialog, whose "No thanks" there changes nothing.
+The Dialog, shown at startup to whoever sees the setup entries, that offers to install the Script Reader when it is missing, or to update it when it is older than the Script Reader Version, saying what it is for, who wrote it, under which licence and where it comes from. The owner may say no; it is then never asked again, and the install stays available from the Expansion Pack Settings or by hand. The Expansion Pack Settings' install line opens the same Dialog, whose "No thanks" there changes nothing.
 _Avoid_: vpxtool toast, install popup
 
 ### Errors

@@ -10,7 +10,6 @@ When something fails that you would not see otherwise, and that will not mend it
 |---|---|---|
 | "This game could not be saved: it won't count in your stats." | The Profile that played, after that game's other toasts. | Look in the Error Log for the cause. |
 | "This game was counted, but it is missing from your play history." | The Profile that played, after that game's other toasts. | Look in the Error Log for the cause. |
-| "vpxtool.exe is missing from the Expansion Pack's tools folder: the tables' ROMs are not filled." | An Admin Profile (or anyone while no Profile is marked), at each start while it lasts. | Install vpxtool (see [Install](install.md#vpxtool)), or turn the Table ROMs Add-on off in **Expansion Pack Settings**. |
 | "The update to vX.Y.Z failed: the previous version is still in place. Details in …" | An Admin Profile (or anyone while no Profile is marked), once, waiting for one to be active. | Read the update helper's log it names, `%TEMP%\PinballYExpansionPack\pack-update.log` (see [Updates](updates.md)). |
 
 A failure that answers a choice you have just made (a Profile Reset, a Pack Update download, a vpxtool install) shows its own message on that screen instead of a toast.

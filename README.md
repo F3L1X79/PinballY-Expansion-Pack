@@ -40,9 +40,8 @@ Requires **Windows** and **PinballY 1.1.0 Beta 10** or later (plus the *Windows 
    ```js
    import("./ExpansionPack/main.js").catch(e => logfile.log("ExpansionPack: " + e.message));
    ```
-4. **Optional: put `vpxtool.exe`** (https://github.com/francisdb/vpxtool/releases) **in `ExpansionPack\tools`**, so each table's ROM is filled in by itself. Without it, a "Problem" toast reminds you at each start; turning the Table ROMs Add-on off silences it.
-5. **Restart PinballY.** `PinballY.log` shows one "initialized" line per Add-on; errors are also kept in `Scripts\ExpansionPack\errors.log`.
-6. **Choose your Add-ons**, the startup screen and the language in **Expansion Pack Settings**, in the Operator Menu, then restart PinballY in one press.
+4. **Restart PinballY.** `PinballY.log` shows one "initialized" line per Add-on; errors are also kept in `Scripts\ExpansionPack\errors.log`.
+5. **Choose your Add-ons**, the startup screen and the language in **Expansion Pack Settings**, in the Operator Menu, then restart PinballY in one press.
 
 Everything the pack keeps (settings and Profiles) stays in `Scripts\ExpansionPack`: copy it to back up, delete it and the import line to uninstall. PINemHi 3.6.8, `.env.local` and installing with git: see the [install page](docs/guide/en/install.md).
 
@@ -58,5 +57,5 @@ MIT. See [LICENSE](LICENSE).
 
 - **[PinballY](http://mjrnet.org/pinscape/PinballY.php)** by Michael J Roberts (GPL v3 or later): the frontend the whole pack runs on, through its JavaScript API. Without it, none of this crazy project would be possible.
 - **[vpin-studio](https://github.com/syd711/vpin-studio)** by Matthias Faust / syd711 (MIT): the High Score reading rules are ported from its score parsers.
-- **[vpxtool](https://github.com/francisdb/vpxtool)** by Francis De Brabandere (Apache-2.0): fills in each table's ROM. Not included in the pack.
+- **[vpxtool](https://github.com/francisdb/vpxtool)** by Francis De Brabandere (Apache-2.0): fills in each table's ROM. Downloaded by the cabinet from its author's releases, once the owner agrees.
 - **[PINemHi](https://www.pinemhi.com/)** by Dna Disturber: supplied with PinballY by permission of its author. Not included in the pack.

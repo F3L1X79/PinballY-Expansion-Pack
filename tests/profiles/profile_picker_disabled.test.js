@@ -22,6 +22,8 @@ test("turning the Profile picker off removes its main-menu entry and Welcome Scr
     // cabinet.json at startup, for Guest too. Nor the Drawn Menus, so the
     // main menu is read natively.
     for (const key of Object.keys(config.addOns)) config.addOns[key] = !["profilePicker", "challenges", "drawnMenus"].includes(key);
+    // Without vpxtool, the Script Reader Prompt would open first.
+    config.offerVpxtool = false;
     config.language = "en";
 
     const { default: lang } = await import("../../common/core/i18n.js");

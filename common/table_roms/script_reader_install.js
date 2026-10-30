@@ -25,10 +25,11 @@ const POLL_MS = 500;
 const VEIL_Z_INDEX = DRAWN_MENU_Z_INDEX.backdrop - 2;
 const LOADER_Z_INDEX = DRAWN_MENU_Z_INDEX.backdrop - 1;
 
-// The Script Reader Prompt's words: { title, message, install, noThanks }.
+// The Script Reader Prompt's words, the Settings' install line's too:
+// { title, message, install, noThanks }.
 export function scriptReaderDialogText(release = SCRIPT_READER_VERSION) {
     const { scriptReader: TEXT } = lang;
-    return { title: TEXT.dialogTitle(release.version), message: TEXT.dialog, install: TEXT.install, noThanks: TEXT.noThanks };
+    return { title: TEXT.dialogTitle(release.version), message: `${TEXT.dialog} ${TEXT.later}`, install: TEXT.install, noThanks: TEXT.noThanks };
 }
 
 // dialogs: the wheel dialog queue (common/core/wheel_dialog.js); release:

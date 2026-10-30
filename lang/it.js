@@ -928,6 +928,7 @@ export default {
         dialog: "vpxtool legge lo script di ogni tavolo perché la sua ROM venga compilata da sola. Scritto da Francis De Brabandere, con licenza Apache-2.0, scaricato da github.com/francisdb/vpxtool.",
         install: "Installa",
         noThanks: "No, grazie",
+        later: "Puoi anche installarlo più tardi dalle Impostazioni del pack, o a mano.",
         downloading: "Download in corso…",
         ok: "OK",
         installedTitle: "vpxtool installato",
@@ -939,7 +940,6 @@ export default {
         header: "Problema",
         playNotSaved: "Impossibile salvare questa partita: non conterà nelle tue statistiche.",
         playNotInPlayLog: "Questa partita è stata contata, ma manca dalla tua cronologia delle partite.",
-        vpxtoolMissing: "Manca vpxtool.exe nella cartella tools dell'Expansion Pack: le ROM dei tavoli non vengono compilate.",
         packUpdateFailed: (version, logPath) => `L'aggiornamento alla v${version} non è riuscito: la versione precedente resta al suo posto. Dettagli in ${logPath}`,
     },
     releaseHighlights: {

@@ -70,7 +70,7 @@ From then on, that Profile marks the others from the cabinet: open **Manage prof
 - Once at least one Profile is marked, the other Profiles (Guest included) no longer see "Set Up Table" in the main menu nor "Operator Menu" in the Exit menu; the Admin Profiles still see both, and the coin door service button still opens the Operator Menu for anyone.
 - Several Profiles can be marked.
 - Guest is never an Admin Profile, and a mark that is not `true` or `false`, or whose key is misspelt (`"isAdmin "`, `"IsAdmin"`), is ignored and logged in `PinballY.log`.
-- The Update Prompt and the "Problem" toasts meant for the owner show to Admin Profiles only, or to anyone while no Profile is marked (see [Updates](updates.md) and [Troubleshooting](troubleshooting.md)).
+- The Update Prompt, the vpxtool offer (see [Install](install.md#vpxtool)) and the "Problem" toasts meant for the owner show to Admin Profiles only, or to anyone while no Profile is marked (see [Updates](updates.md) and [Troubleshooting](troubleshooting.md)).
 
 ## Profile Reset
 

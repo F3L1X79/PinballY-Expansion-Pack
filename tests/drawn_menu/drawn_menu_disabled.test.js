@@ -19,6 +19,8 @@ test("setup", async () => {
     // Never uninstalled: node --test runs each test file in its own process.
     fake.installGlobals();
     for (const key of Object.keys(config.addOns)) config.addOns[key] = key !== "drawnMenus";
+    // Without vpxtool, the Script Reader Prompt would open first.
+    config.offerVpxtool = false;
     config.language = "en";
     ({ default: lang } = await import("../../common/core/i18n.js"));
     await import("../../main.js");

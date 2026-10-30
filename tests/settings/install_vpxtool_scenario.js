@@ -1,14 +1,15 @@
 // ============================================================
 // The "Install vpxtool" line's start: main.js on the fake host with Drawn
 // Menus and Table ROMs on (or off), vpxtool missing, one VPX table to read
-// and the Script Reader install helper in tools\; then the Expansion Pack
-// Settings opened from the Operator Menu. Never loaded by PinballY.
+// and the Script Reader install helper in tools\; then, past the Script
+// Reader Prompt's Exit, the Expansion Pack Settings opened from the Operator
+// Menu. Never loaded by PinballY.
 // ============================================================
 
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
 import config from "../../common/core/config.js";
-import { drawnMenuLines, chooseEntry, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
+import { drawnMenuLines, chooseEntry, press, OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
 import { errorLines } from "../support/error_log.js";
 
 export const VPXTOOL = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe";
@@ -21,7 +22,7 @@ export const SCRIPT_READER = {
 };
 export const DIALOG = {
     title: "vpxtool v0.38.0",
-    message: "vpxtool reads each table's script so that its ROM fills in by itself. Written by Francis De Brabandere, under the Apache-2.0 licence, downloaded from github.com/francisdb/vpxtool.",
+    message: "vpxtool reads each table's script so that its ROM fills in by itself. Written by Francis De Brabandere, under the Apache-2.0 licence, downloaded from github.com/francisdb/vpxtool. You can also install it later from the Expansion Pack Settings, or by hand.",
     lines: ["Install", "No thanks"],
 };
 // What the Table ROMs Add-on logs at init without vpxtool: not this scenario's doing.
@@ -66,6 +67,12 @@ export async function startOnSettings({ tableRoms = true, vpxtool = false } = {}
     config.language = "en";
     await import("../../main.js");
     await settle();
+    if (tableRoms && !vpxtool) {
+        // The Script Reader Prompt at startup, left for a later start.
+        fake.advanceTime(OPEN_OVER_MS);
+        press(fake, "Exit");
+        await settle();
+    }
     openSettings(fake);
     return { fake, lines: drawnMenuLines(fake) };
 }

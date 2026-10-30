@@ -19,15 +19,16 @@ import { getWindowLayout, ALWAYS_LAID_OUT } from "./window_layout.js";
 const SCRIPT_NAME = "WheelDialog";
 
 // Lower is shown first.
-// The update messages come before the Startup Screen, so launching a table
-// from it can't skip them (docs/adr/0018).
+// The update messages and the Script Reader Prompt come before the Startup
+// Screen, so launching a table from it can't skip them (docs/adr/0018).
 export const DIALOG_PRIORITY = Object.freeze({
     UPDATE_RESULT: 0,
     UPDATE_PROMPT: 1,
-    STARTUP_PROMPT: 2,
-    REWARD_PROMPT: 3,
-    RATING_PROMPT: 4,
-    RESTART_FAILED: 5,
+    SCRIPT_READER_PROMPT: 2,
+    STARTUP_PROMPT: 3,
+    REWARD_PROMPT: 4,
+    RATING_PROMPT: 5,
+    RESTART_FAILED: 6,
 });
 
 // menus: what shows a native-style dialog (common/drawn_menu/drawn_menu.js);

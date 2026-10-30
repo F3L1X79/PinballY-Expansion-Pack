@@ -70,7 +70,7 @@ Ce Profil marque ensuite les autres depuis la borne : ouvrez **Gérer les profil
 - Dès qu'au moins un Profil est marqué, les autres Profils (Invité compris) ne voient plus « Configurer la table » dans le menu principal ni « Menu opérateur » dans le menu de sortie ; les Profils admin voient toujours les deux, et le bouton de service de la porte du monnayeur ouvre toujours le Menu opérateur pour tout le monde.
 - Plusieurs Profils peuvent être marqués.
 - Invité n'est jamais un Profil admin, et une marque qui n'est ni `true` ni `false`, ou dont la clé est mal écrite (`"isAdmin "`, `"IsAdmin"`), est ignorée et signalée dans `PinballY.log`.
-- L'invite de mise à jour et les toasts « Problème » destinés au propriétaire ne s'affichent qu'aux Profils admin, ou à tous tant qu'aucun Profil n'est marqué (voir [Mises à jour](updates.md) et [Dépannage](troubleshooting.md)).
+- L'invite de mise à jour, la proposition de vpxtool (voir [Installation](install.md#vpxtool)) et les toasts « Problème » destinés au propriétaire ne s'affichent qu'aux Profils admin, ou à tous tant qu'aucun Profil n'est marqué (voir [Mises à jour](updates.md) et [Dépannage](troubleshooting.md)).
 
 ## Réinitialiser un profil
 

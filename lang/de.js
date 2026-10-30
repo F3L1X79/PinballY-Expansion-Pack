@@ -929,6 +929,7 @@ export default {
         dialog: "vpxtool liest das Skript jedes Tisches, damit seine ROM von selbst eingetragen wird. Geschrieben von Francis De Brabandere, unter der Lizenz Apache-2.0, heruntergeladen von github.com/francisdb/vpxtool.",
         install: "Installieren",
         noThanks: "Nein danke",
+        later: "Sie können es auch später in den Expansion-Pack-Einstellungen oder von Hand installieren.",
         downloading: "Wird heruntergeladen…",
         ok: "OK",
         installedTitle: "vpxtool installiert",
@@ -940,7 +941,6 @@ export default {
         header: "Problem",
         playNotSaved: "Dieses Spiel konnte nicht gespeichert werden: Es zählt nicht in Ihrer Statistik.",
         playNotInPlayLog: "Dieses Spiel wurde gezählt, fehlt aber in Ihrem Spielverlauf.",
-        vpxtoolMissing: "vpxtool.exe fehlt im Ordner tools des Expansion Pack: Die ROMs der Tische werden nicht eingetragen.",
         packUpdateFailed: (version, logPath) => `Die Aktualisierung auf v${version} ist fehlgeschlagen: Die vorherige Version bleibt erhalten. Details in ${logPath}`,
     },
     releaseHighlights: {

@@ -1,8 +1,8 @@
 // ============================================================
-// Table ROMs tests' start without vpxtool: main.js on the fake host with the
-// Profile picker as the Startup Screen, over a Household whose Admin
+// Table ROMs tests' start with a hurried pick: main.js on the fake host with
+// the Profile picker as the Startup Screen, over a Household whose Admin
 // Profiles the test names. A hurried player picks as soon as the carousel
-// shows and closes the Welcome Screen; reads when the Error Toast arrives.
+// shows and closes the Welcome Screen; reads whether an Error Toast arrives.
 // Never loaded by PinballY.
 // ============================================================
 

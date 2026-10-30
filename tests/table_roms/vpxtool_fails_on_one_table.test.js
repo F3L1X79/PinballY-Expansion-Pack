@@ -8,7 +8,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { errorLines } from "../support/error_log.js";
 import { table, vpxFile } from "./table_roms_scenario.js";
-import { pickAtStartup } from "./vpxtool_missing_scenario.js";
+import { pickAtStartup } from "./startup_pick_scenario.js";
 
 const AFM = "Attack from Mars (Bally 1995)";
 const BROKEN = "Broken Table (Williams 1992)";

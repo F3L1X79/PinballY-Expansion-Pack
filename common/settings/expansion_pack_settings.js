@@ -6,7 +6,7 @@
 // Listens to "menuopen", "command" and "commandbuttondown"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
-// - Nothing applies before PinballY restarts: "on restart" marks a saved value that differs from the running one.
+// - Nothing applies before PinballY restarts but the Script Reader Prompt's No thanks: "on restart" marks a saved value that differs from the running one.
 // - Leaving the list with such a value asks Restart now (host.restartPinballY) or Later; attract mode never asks.
 // ============================================================
 

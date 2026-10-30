@@ -930,6 +930,7 @@ export default {
         dialog: "vpxtool lee el script de cada mesa para que su ROM se rellene sola. Escrito por Francis De Brabandere, con licencia Apache-2.0, descargado de github.com/francisdb/vpxtool.",
         install: "Instalar",
         noThanks: "No, gracias",
+        later: "También puedes instalarlo más tarde desde los Ajustes del pack, o a mano.",
         downloading: "Descargando…",
         ok: "OK",
         installedTitle: "vpxtool instalado",
@@ -941,7 +942,6 @@ export default {
         header: "Problema",
         playNotSaved: "No se pudo guardar esta partida: no contará en tus estadísticas.",
         playNotInPlayLog: "Esta partida se contó, pero falta en tu historial de partidas.",
-        vpxtoolMissing: "Falta vpxtool.exe en la carpeta tools del Expansion Pack: las ROM de las mesas no se rellenan.",
         packUpdateFailed: (version, logPath) => `La actualización a v${version} ha fallado: la versión anterior sigue en su sitio. Detalles en ${logPath}`,
     },
     releaseHighlights: {
