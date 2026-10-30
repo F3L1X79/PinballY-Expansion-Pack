@@ -505,9 +505,11 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
             shown.onBack = onBack;
             shown.keepNative = keepNative;
             // The native menu's openings not closed yet; the panel hidden
-            // once a command ran, the cover left until the last one closes.
+            // once a command ran, the cover left until the last one closes;
+            // whether a background press was logged.
             shown.nativeOpenings = 1;
             shown.panelHidden = false;
+            shown.backgroundPressLogged = false;
             return true;
         } catch (error) {
             takeDown();
@@ -668,9 +670,12 @@ export function createDrawnMenus(host, { drawingAhead, nativeMenus = createNativ
 
     // Fires on a press PinballY hears in the background: another window
     // took the focus from the native menu kept open, and ours hears nothing.
+    // Logged once per opening: a pause PinballY opened on its own may stay
+    // open behind the game until "postlaunch", every flipper press heard.
     host.on("commandbuttonbgdown", safeHandler(SCRIPT_NAME, ev => {
-        if (!shown || !shown.keepNative) return;
-        host.log(`[${SCRIPT_NAME}] "${ev.command}" pressed in the background while the "${shown.id}" menu is open: another window has the focus.`);
+        if (!shown || !shown.keepNative || shown.backgroundPressLogged) return;
+        shown.backgroundPressLogged = true;
+        host.log(`[${SCRIPT_NAME}] "${ev.command}" pressed in the background while the "${shown.id}" menu is open: another window has the focus. Further background presses are not logged until it closes.`);
     }));
 
     // Fires when the cabinet sits idle: the menu closes without choosing.
