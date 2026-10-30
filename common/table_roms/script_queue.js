@@ -1,7 +1,7 @@
 // ============================================================
 // Script reading queue of the Table ROMs Add-on: runs tools\vpxtool.exe
-// hidden on each VPX table whose script needs reading, one at a time,
-// polling for the answer so PinballY never waits.
+// hidden, first for its --version, then on each VPX table whose script needs
+// reading, one at a time, polling for the answer so PinballY never waits.
 // - A failure is logged, not recorded: the table is read again next startup.
 // - No run starts from "prelaunch" until back on the wheel, nor while a Script Reader install holds it.
 // ============================================================
@@ -25,8 +25,10 @@ export function readRomOutput(output) {
     return ROM_NAME.test(lastLine) ? { rom: lastLine } : { unreadable: lastLine };
 }
 
-// isHeld: true while no run may start (a Script Reader install swapping vpxtool).
-export function createScriptQueue(host, record, { isHeld = () => false } = {}) {
+// isHeld: true while no run may start (a Script Reader install swapping
+// vpxtool); version: what hears the --version run's answer
+// (common/table_roms/script_reader_state.js).
+export function createScriptQueue(host, record, { isHeld = () => false, version = null } = {}) {
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
     const vpxtoolPath = `${host.getProjectFolder()}\\tools\\vpxtool.exe`;
     // vpxtool reads the script from the .vbs beside the .vpx when there is one.
@@ -61,6 +63,15 @@ export function createScriptQueue(host, record, { isHeld = () => false } = {}) {
         record.applyScriptRead(table.configId, table.state, answer.rom);
     }
 
+    // Each run of the queue: vpxtool's arguments, what its answer does, and
+    // what a run with no answer in time does.
+    const tableRun = table => ({
+        args: ["romname", table.path], apply: result => applyAnswer(table, result), fail: reason => logFailure(table, reason),
+    });
+    const versionRuns = version
+        ? [{ args: ["--version"], apply: version.applyVersionAnswer, fail: version.versionUnreadable }]
+        : [];
+
     // True from a table's launch until PinballY is back on the wheel.
     let gameUnderWay = false;
     // The tables left when the next one waits for the game to end or the hold to lift.
@@ -75,11 +86,11 @@ export function createScriptQueue(host, record, { isHeld = () => false } = {}) {
             waitingTables = queue;
             return;
         }
-        const table = queue.shift();
-        if (!table) return;
+        const job = queue.shift();
+        if (!job) return;
         // A run that cannot even start would fail for every table: the
         // queue stops, to start over at the next startup.
-        const run = host.runHiddenProgram(vpxtoolPath, ["romname", table.path]);
+        const run = host.runHiddenProgram(vpxtoolPath, job.args);
         const thisRun = { startMs: host.now().getTime() };
         currentRun = thisRun;
 
@@ -94,8 +105,8 @@ export function createScriptQueue(host, record, { isHeld = () => false } = {}) {
                     host.setTimeout(poll, POLL_MS);
                     return;
                 }
-                if (result === null) logFailure(table, `no answer from vpxtool within ${SCRIPT_READ_TIMEOUT_MS / 1000} s`);
-                else applyAnswer(table, result);
+                if (result === null) job.fail(`no answer from vpxtool within ${SCRIPT_READ_TIMEOUT_MS / 1000} s`);
+                else job.apply(result);
             } catch (error) {
                 logHandlerError(SCRIPT_NAME, error);
             }
@@ -146,9 +157,11 @@ export function createScriptQueue(host, record, { isHeld = () => false } = {}) {
         start: () => {
             if (started) return;
             started = true;
-            readNext(tablesToRead());
+            readNext([...versionRuns, ...tablesToRead().map(tableRun)]);
         },
         // Goes on with the tables left once the hold has lifted.
         resume,
+        // True while a vpxtool run waits for its answer.
+        isBusy: () => currentRun !== null,
     };
 }

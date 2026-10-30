@@ -2,7 +2,7 @@
 // Expansion Pack Settings: their entry in the Operator Menu, after PinballY's Options, for whoever
 // sees the setup entries, opens the list of Add-on categories (their Add-ons as saved in .env.local,
 // read again on each opening, one page per Add-on whose Save rewrites its one line), the Startup screen and
-// Language pages, the Offline Mode group's switches, saving at once, and "Update to vX.Y.Z" or "Install vpxtool" while possible.
+// Language pages, the Offline Mode group's switches, saving at once, and "Update to vX.Y.Z" and the vpxtool line while possible.
 // Listens to "menuopen", "command" and "commandbuttondown"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
@@ -12,7 +12,7 @@
 
 import lang from "../core/i18n.js";
 import config, { DEFAULTS } from "../core/config.js";
-import { applyEnvOverrides, envKeyOf } from "../core/env_overrides.js";
+import { applyEnvOverrides } from "../core/env_overrides.js";
 import { logHandlerError, safeHandler } from "../core/safe_handler.js";
 import { logError } from "../core/error_log.js";
 import { createPinballYHost } from "../core/pinbally_host.js";
@@ -28,8 +28,9 @@ import { getUpdateState } from "../updates/update_state.js";
 import { getPackUpdater } from "../updates/pack_update.js";
 import { SCRIPT_READER_VERSION } from "../table_roms/script_reader_version.js";
 import { getScriptReaderInstaller, scriptReaderDialogText } from "../table_roms/script_reader_install.js";
+import { getScriptReaderState } from "../table_roms/script_reader_state.js";
 import { ADD_ON_GROUPS } from "./add_on_catalogue.js";
-import { rewriteEnvLine } from "./env_local_rewrite.js";
+import { saveEnvSetting } from "./env_local_rewrite.js";
 
 const SCRIPT_NAME = "ExpansionPackSettings";
 const OPERATOR_MENU_ID = "operator";
@@ -97,7 +98,6 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const scriptReaderLineCommand = host.allocateCommand("expansionPackSettings_installVpxtool");
     const scriptReaderInstallCommand = host.allocateCommand("expansionPackSettings_scriptReaderInstall");
     const envLocalPath = `${host.getProjectFolder()}\\.env.local`;
-    const vpxtoolPath = `${host.getProjectFolder()}\\tools\\vpxtool.exe`;
     // The page on screen: its Add-on, the choice saved when it opened, and the switch.
     let page = null;
 
@@ -120,7 +120,18 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const releaseToInstall = () => installableRelease(host, getUpdateState());
 
     // Only while the running Table ROMs Add-on would read the scripts with it.
-    const offersScriptReader = () => running.addOns.tableRoms && !host.files.fileExists(vpxtoolPath);
+    const scriptReaderOffer = () => (running.addOns.tableRoms ? getScriptReaderState().offer() : null);
+
+    // Install while vpxtool is missing, update while older, greyed while up
+    // to date; none while its version is unknown.
+    function scriptReaderLines() {
+        const offer = scriptReaderOffer();
+        const { version } = SCRIPT_READER_VERSION;
+        if (!offer) return [];
+        if (offer.kind === "install") return [{ title: TEXT.installVpxtool(version), cmd: scriptReaderLineCommand }];
+        if (offer.kind === "update") return [{ title: TEXT.updateVpxtool(offer.installed, version), cmd: scriptReaderLineCommand }];
+        return [{ title: TEXT.vpxtoolUpToDateLine, cmd: scriptReaderLineCommand, disabled: true, reason: TEXT.vpxtoolUpToDate(offer.installed) }];
+    }
 
     // The categories, each opening its page, then the settings picked on a
     // page of choices and the Offline Mode group, then the Pack Update and
@@ -131,7 +142,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         const release = releaseToInstall();
         const installs = [
             ...(release ? [{ title: TEXT.updateTo(release.packVersion), cmd: updateCommand }] : []),
-            ...(offersScriptReader() ? [{ title: TEXT.installVpxtool(SCRIPT_READER_VERSION.version), cmd: scriptReaderLineCommand }] : []),
+            ...scriptReaderLines(),
         ];
         getMenus().show(LIST_MENU_ID, [
             ...ADD_ON_GROUPS.map(({ group }) => ({ title: TEXT.groups[group], cmd: groupCommands.get(group), hasSubmenu: true })),
@@ -148,7 +159,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     // No thanks and Exit return to its line.
     function openScriptReaderDialog() {
         page = null;
-        const { title, message, install, noThanks } = scriptReaderDialogText();
+        const { title, message, install, noThanks } = scriptReaderDialogText(scriptReaderOffer());
         getMenus().show(SCRIPT_READER_MENU_ID, [
             { title, cmd: -1 },
             { title: message, cmd: -1 },
@@ -294,7 +305,7 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     // owner to see it; reopen then shows the page on the choice saved before.
     function save(keyPath, value, { onSaved, reopen }) {
         try {
-            host.files.writeText(envLocalPath, rewriteEnvLine(readEnvLocal(), keyPath, value));
+            saveEnvSetting(host, keyPath, value, SCRIPT_NAME);
         } catch (error) {
             logHandlerError(SCRIPT_NAME, error);
             getMenus().show(NOT_SAVED_MENU_ID, [
@@ -304,7 +315,6 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
             ], { dialogStyle: true, onBack: reopen });
             return;
         }
-        host.log(`[${SCRIPT_NAME}] Saved ${envKeyOf(keyPath)}=${value} in .env.local.`);
         onSaved();
     }
 

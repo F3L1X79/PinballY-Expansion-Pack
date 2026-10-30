@@ -745,6 +745,9 @@ export default {
         offerVpxtoolLine: (state) => `Proponi vpxtool: ${state}`,
         updateTo: (version) => `Aggiorna alla v${version}`,
         installVpxtool: (version) => `Installa vpxtool v${version}`,
+        updateVpxtool: (installed, version) => `Aggiorna vpxtool (v${installed} → v${version})`,
+        vpxtoolUpToDateLine: "Aggiorna vpxtool",
+        vpxtoolUpToDate: (installed) => `vpxtool v${installed} è aggiornato`,
         back: "Indietro",
         groups: {
             playersAndProgress: "Giocatori e progressi",
@@ -935,6 +938,13 @@ export default {
         installed: (version) => `vpxtool v${version} è installato: la ROM di ogni tavolo ora viene compilata da sola.`,
         failedTitle: "Installazione impossibile",
         failed: "Non è stato possibile installare vpxtool; non è cambiato nulla. Puoi riprovare dalle Impostazioni del pack.",
+        updateTitle: (installed, version) => `vpxtool v${installed} → v${version}`,
+        update: "Aggiorna",
+        updateLater: "Puoi anche aggiornarlo più tardi dalle Impostazioni del pack, o a mano.",
+        updatedTitle: "vpxtool aggiornato",
+        updated: (version) => `vpxtool è aggiornato alla v${version}.`,
+        updateFailedTitle: "Aggiornamento impossibile",
+        updateFailed: "Non è stato possibile aggiornare vpxtool; non è cambiato nulla. Puoi riprovare dalle Impostazioni del pack.",
     },
     errorToast: {
         header: "Problema",

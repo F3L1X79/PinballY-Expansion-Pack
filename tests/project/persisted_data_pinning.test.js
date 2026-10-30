@@ -22,6 +22,7 @@ import { createProfileRewards } from "../../common/avatar_frames/profile_rewards
 import { createTableRomRecord } from "../../common/table_roms/table_rom_record.js";
 import { createScriptQueue } from "../../common/table_roms/script_queue.js";
 import { createNvConfirmation } from "../../common/table_roms/nv_confirmation.js";
+import { createScriptReaderState } from "../../common/table_roms/script_reader_state.js";
 import { createHighScoreStore } from "../../common/high_scores/high_score_store.js";
 import { buildHighScoreAchievements } from "../../achievements/high_scores.js";
 import { WELCOME_SCREEN_FADE_IN_MS, choose, openFromMainMenu } from "../welcome_screen/welcome_screen_reader.js";
@@ -534,6 +535,16 @@ test("the Table ROM record keeps its file name and keys", () => {
             },
         },
     });
+});
+
+test("the Script Reader state keeps its file name and keys, and reads them back", () => {
+    const path = "C:\\PinballY\\Scripts\\ExpansionPack\\script_reader.json";
+    const fake = createFakePinballYHost({ now: NOW });
+    fake.addProgram("C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe", () => ({ output: "" }));
+
+    createScriptReaderState(fake).rememberVersion("0.37.1");
+    assert.deepEqual(JSON.parse(fake.readFile(path)), { vpxtoolVersion: "0.37.1", version: 1 });
+    assert.deepEqual(createScriptReaderState(fake).offer({ version: "0.38.0" }), { kind: "update", installed: "0.37.1" });
 });
 
 test("the Table ROM record keeps the source of a ROM a .nv confirmed", () => {

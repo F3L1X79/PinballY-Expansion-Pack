@@ -750,6 +750,9 @@ export default {
         offerVpxtoolLine: (state) => `Proposer vpxtool : ${state}`,
         updateTo: (version) => `Mettre à jour en v${version}`,
         installVpxtool: (version) => `Installer vpxtool v${version}`,
+        updateVpxtool: (installed, version) => `Mettre à jour vpxtool (v${installed} → v${version})`,
+        vpxtoolUpToDateLine: "Mettre à jour vpxtool",
+        vpxtoolUpToDate: (installed) => `vpxtool v${installed} est à jour`,
         back: "Retour",
         groups: {
             playersAndProgress: "Joueurs et progression",
@@ -940,6 +943,13 @@ export default {
         installed: (version) => `vpxtool v${version} est installé : la ROM de chaque table se renseigne désormais toute seule.`,
         failedTitle: "Installation impossible",
         failed: "vpxtool n'a pas pu être installé ; rien n'a changé. Vous pouvez réessayer depuis les Réglages du pack.",
+        updateTitle: (installed, version) => `vpxtool v${installed} → v${version}`,
+        update: "Mettre à jour",
+        updateLater: "Vous pourrez aussi le mettre à jour plus tard depuis les Réglages du pack, ou à la main.",
+        updatedTitle: "vpxtool mis à jour",
+        updated: (version) => `vpxtool est mis à jour en v${version}.`,
+        updateFailedTitle: "Mise à jour impossible",
+        updateFailed: "vpxtool n'a pas pu être mis à jour ; rien n'a changé. Vous pouvez réessayer depuis les Réglages du pack.",
     },
     errorToast: {
         header: "Problème",

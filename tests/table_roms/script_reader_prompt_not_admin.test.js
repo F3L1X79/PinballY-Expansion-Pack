@@ -7,10 +7,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { errorLines } from "../support/error_log.js";
-import { startWithoutVpxtool, pickHurriedly, ENV_LOCAL, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
+import { startForScriptReader, pickHurriedly, ENV_LOCAL, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
 
 test("vpxtool missing: a last active Profile without the setup entries gets no Script Reader Prompt", async () => {
-    const start = await startWithoutVpxtool({ adminProfiles: ["Alice"], activeProfile: "Bob" });
+    const start = await startForScriptReader({ adminProfiles: ["Alice"], activeProfile: "Bob" });
     const { fake } = start;
 
     assert.equal(start.dialog, null);

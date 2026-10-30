@@ -14,7 +14,13 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 
 ## Réglages du pack
 
-**Réglages du pack**, dans le menu opérateur, règle les Add-ons, l'écran de démarrage, la langue et le mode hors ligne sans éditer aucun fichier, puis redémarre PinballY d'une pression. On y trouve aussi « Mettre à jour en vX.Y.Z » après avoir répondu « Plus tard » à l'invite de mise à jour (voir [Mises à jour](updates.md)), et « Installer vpxtool v0.38.0 » tant que vpxtool manque et que l'Add-on « ROM des tables » est activé (voir [Installation](install.md#vpxtool)).
+**Réglages du pack**, dans le menu opérateur, règle les Add-ons, l'écran de démarrage, la langue et le mode hors ligne sans éditer aucun fichier, puis redémarre PinballY d'une pression. On y trouve aussi « Mettre à jour en vX.Y.Z » après avoir répondu « Plus tard » à l'invite de mise à jour (voir [Mises à jour](updates.md)), et, tant que l'Add-on « ROM des tables » est activé, une ligne vpxtool (voir [Installation](install.md#vpxtool) et [Mises à jour](updates.md#garder-vpxtool-à-jour)) :
+
+- « Installer vpxtool v0.38.0 » tant que vpxtool manque ;
+- « Mettre à jour vpxtool (v0.37.1 → v0.38.0) » tant que le vôtre est plus ancien que la version que nomme le pack ;
+- « Mettre à jour vpxtool », grisée avec « vpxtool v0.38.0 est à jour » en dessous, quand le vôtre est à cette version ou plus récent.
+
+Tant que le pack n'a pas lu une fois la version de votre vpxtool (une dizaine de secondes après le premier démarrage qui le trouve), ou si cette version est illisible, il n'y a pas de ligne vpxtool.
 
 Le groupe **Mode hors ligne** réunit ce qui contacte internet, ou propose de le faire, un interrupteur chacun :
 

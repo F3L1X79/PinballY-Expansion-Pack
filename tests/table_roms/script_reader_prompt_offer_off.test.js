@@ -7,10 +7,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { errorLines } from "../support/error_log.js";
-import { startWithoutVpxtool, pickHurriedly, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
+import { startForScriptReader, pickHurriedly, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
 
 test("vpxtool missing with Offer vpxtool off: no Script Reader Prompt", async () => {
-    const start = await startWithoutVpxtool({ adminProfiles: ["Alice"], activeProfile: "Alice", settings: { offerVpxtool: false } });
+    const start = await startForScriptReader({ adminProfiles: ["Alice"], activeProfile: "Alice", settings: { offerVpxtool: false } });
 
     assert.equal(start.dialog, null);
     const { carouselOpen, errorCards } = await pickHurriedly(start);

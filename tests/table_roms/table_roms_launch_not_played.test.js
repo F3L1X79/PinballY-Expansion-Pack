@@ -15,6 +15,8 @@ const MEDIEVAL = "Medieval Madness (Williams 1997)";
 const TMNT = "Teenage Mutant Ninja Turtles (Data East 1991)";
 const TABLES = [table(AFM), table(MEDIEVAL), table(TMNT)];
 const STARTUP_DELAY_MS = 10 * 1000;
+// The --version run and its poll, before the first table.
+const VERSION_READ_MS = 500;
 // Long enough for a 100 ms run and its next poll.
 const ONE_READ_MS = 1000;
 
@@ -27,7 +29,7 @@ test("a cancelled launch and a failed launch do not leave the script reading pau
     const played = fake.getAllTables().find(game => game.configId === AFM);
 
     // Another script cancels the launch: PinballY stays on the wheel.
-    fake.advanceTime(STARTUP_DELAY_MS + 200);
+    fake.advanceTime(STARTUP_DELAY_MS + VERSION_READ_MS + 200);
     fake.one("prelaunch", ev => ev.preventDefault());
     fake.playGame(played);
     assert.equal(fake.launches().length, 0, "nothing launched");

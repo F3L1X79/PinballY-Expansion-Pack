@@ -29,6 +29,10 @@ Sont conservés :
 
 « Plus tard » n'est plus demandé pour cette version : « Mettre à jour en vX.Y.Z » reste dans **Réglages du pack** jusqu'à la mise à jour.
 
+## Garder vpxtool à jour
+
+Chaque version du pack nomme la version de vpxtool avec laquelle elle a été essayée. À chaque démarrage, le pack demande sa version au `vpxtool.exe` installé, en arrière-plan, et la retient dans `script_reader.json` (conservé par les mises à jour). Quand cette version est plus ancienne, le démarrage suivant (ou le premier démarrage après une mise à jour du pack qui en nomme une plus récente) ouvre la même proposition que pour un vpxtool absent, en parlant de mise à jour avec les deux versions : « Mettre à jour » télécharge la nouvelle, la comète dorée tournant sur la roue assombrie avec « Téléchargement en cours… » en dessous, et « Non merci » arrête les propositions, comme pour l'installation (voir [Installation](install.md#vpxtool)). Un vpxtool égal ou plus récent n'est jamais touché ; un vpxtool dont la version est illisible est laissé tel quel, le problème écrit dans le journal des erreurs.
+
 ## Couper la recherche
 
 Réglez « Recherche de mises à jour du pack » sur « Désactivé » dans le groupe Mode hors ligne des **Réglages du pack**, ou écrivez `UPDATE_CHECK=false` dans `.env.local` : la borne ne contacte alors jamais GitHub.

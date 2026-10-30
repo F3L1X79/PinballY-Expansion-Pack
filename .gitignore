@@ -36,6 +36,9 @@ quiet_wheel_pending.json
 # The Pack Update's state: the newest known release (see docs/adr/0018)
 pack_update.json
 
+# The Script Reader's state: the installed vpxtool's version, read at an earlier start
+script_reader.json
+
 # The Error Log: every error the pack logged, kept across launches
 errors.log
 errors.old.log

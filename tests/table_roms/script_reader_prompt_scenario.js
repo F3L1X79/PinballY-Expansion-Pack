@@ -1,9 +1,9 @@
 // ============================================================
 // Script Reader Prompt tests' start: main.js on the fake host with Drawn
 // Menus, the Profile picker as the Startup Screen and Table ROMs (or not),
-// vpxtool missing, over a Household whose Admin Profiles the test names;
-// reads the prompt as it opens, then a hurried player answers, picks and
-// closes the Welcome Screen. Never loaded by PinballY.
+// vpxtool missing or installed with a remembered version, over a Household
+// whose Admin Profiles the test names; reads the prompt as it opens, then a
+// hurried player answers, picks and closes the Welcome Screen. Never loaded by PinballY.
 // ============================================================
 
 import { execFileSync } from "node:child_process";
@@ -37,12 +37,23 @@ export function shownDialog(fake) {
     return { title, message, lines: drawnMenuLines(fake) };
 }
 
+// The vpxtool version a start remembers from an earlier one, as the state file holds it.
+export const SCRIPT_READER_STATE_FILE = "C:\\PinballY\\Scripts\\ExpansionPack\\script_reader.json";
+export const rememberedVersionFile = version => JSON.stringify({ vpxtoolVersion: version, version: 1 });
+// What the Table ROMs Add-on's queue reads the version with, past its 10 s startup delay.
+export const VERSION_READ_MS = 11 * 1000;
+// A vpxtool answering "--version" with versionAnswer ({ output, exitCode,
+// durationMs }), any other run with a script that loads no ROM.
+export const vpxtoolAnswering = versionAnswer => args => (args[0] === "--version" ? versionAnswer : { output: "" });
+
 // adminProfiles: the Household's Admin Profiles; activeProfile: the last
 // active one; tableRoms: whether the Add-on is on; settings: the other
-// config values; seed(fake): anything else on disk. Returns the start,
-// with the dialog shown once its opening is over.
-export async function startWithoutVpxtool({
-    adminProfiles = [], activeProfile = "Alice", tableRoms = true, settings = {}, seed = () => {},
+// config values; vpxtool: the installed vpxtool's run (vpxtoolAnswering),
+// none when missing; rememberedVersion: the state file's version, or its
+// text when not a version; seed(fake): anything else on disk. Returns the
+// start, with the dialog shown once its opening is over.
+export async function startForScriptReader({
+    adminProfiles = [], activeProfile = "Alice", tableRoms = true, settings = {}, vpxtool = null, rememberedVersion = null, seed = () => {},
 } = {}) {
     const addOns = ["startupChoicePrompt", "profilePicker", "drawnMenus", ...(tableRoms ? ["tableRoms"] : [])];
     const start = await startOnProfilePicker({
@@ -52,6 +63,10 @@ export async function startWithoutVpxtool({
                 f.addFile(`${PROFILES_FOLDER}\\${name}\\profile.json`, JSON.stringify({ version: 1, plays: {}, notified: [], isAdmin: true }));
             }
             f.addFile(SCRIPT_READER_HELPER, "helper");
+            if (vpxtool) f.addProgram(VPXTOOL, vpxtool);
+            if (rememberedVersion !== null) {
+                f.addFile(SCRIPT_READER_STATE_FILE, /^\d/.test(rememberedVersion) ? rememberedVersionFile(rememberedVersion) : rememberedVersion);
+            }
             seed(f);
         },
     });
@@ -74,14 +89,14 @@ export async function answer({ fake, settle }, choice) {
 // Offline Mode group's), and the next start.
 export async function answerThenRestart(choice) {
     const firstRun = JSON.parse(execFileSync(process.execPath, ["--input-type=module", "-e", `
-import { startWithoutVpxtool, answer, openSettingsLines, ENV_LOCAL } from ${JSON.stringify(import.meta.url)};
-const start = await startWithoutVpxtool();
+import { startForScriptReader, answer, openSettingsLines, ENV_LOCAL } from ${JSON.stringify(import.meta.url)};
+const start = await startForScriptReader();
 await answer(start, ${JSON.stringify(choice)});
 const settingsLines = openSettingsLines(start.fake);
 process.stdout.write(JSON.stringify({ dialog: start.dialog, envLocal: start.fake.readFile(ENV_LOCAL) ?? null, settingsLines }));
 `], { encoding: "utf8" }));
     const { config: saved } = applyEnvOverrides(DEFAULTS, firstRun.envLocal);
-    const next = await startWithoutVpxtool({
+    const next = await startForScriptReader({
         settings: { offerVpxtool: saved.offerVpxtool },
         seed: f => { if (firstRun.envLocal !== null) f.addFile(ENV_LOCAL, firstRun.envLocal); },
     });

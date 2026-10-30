@@ -10,10 +10,10 @@ import assert from "node:assert/strict";
 import { errorLines } from "../support/error_log.js";
 import { isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 import { readLoader, readLoaderCaption } from "../support/loader_reader.js";
-import { startWithoutVpxtool, answer, PROMPT, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
+import { startForScriptReader, answer, PROMPT, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
 
 test("vpxtool missing: an Admin Profile last active gets the Script Reader Prompt before the Startup Screen", async () => {
-    const start = await startWithoutVpxtool({ adminProfiles: ["Alice"], activeProfile: "Alice" });
+    const start = await startForScriptReader({ adminProfiles: ["Alice"], activeProfile: "Alice" });
     const { fake, lang } = start;
 
     assert.deepEqual(start.dialog, PROMPT);

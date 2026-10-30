@@ -662,6 +662,11 @@ export default {
         updateTo: (version) => `Update to v${version}`,
         // Shown while vpxtool is missing; opens the Script Reader Prompt.
         installVpxtool: (version) => `Install vpxtool v${version}`,
+        // Shown while the installed vpxtool is older; opens the same prompt.
+        updateVpxtool: (installed, version) => `Update vpxtool (v${installed} → v${version})`,
+        // Greyed while it is equal or newer, the reason under it.
+        vpxtoolUpToDateLine: "Update vpxtool",
+        vpxtoolUpToDate: (installed) => `vpxtool v${installed} is up to date`,
         back: "Back",
         // The categories of the list, each heading its own page, grouped as in .env.example.
         groups: {
@@ -865,6 +870,14 @@ export default {
         installed: (version) => `vpxtool v${version} is installed: each table's ROM now fills in by itself.`,
         failedTitle: "Install not possible",
         failed: "vpxtool could not be installed; nothing has changed. You can try again from the Expansion Pack Settings.",
+        // The same Dialog, wait and result for an older vpxtool.
+        updateTitle: (installed, version) => `vpxtool v${installed} → v${version}`,
+        update: "Update",
+        updateLater: "You can also update it later from the Expansion Pack Settings, or by hand.",
+        updatedTitle: "vpxtool updated",
+        updated: (version) => `vpxtool is updated to v${version}.`,
+        updateFailedTitle: "Update not possible",
+        updateFailed: "vpxtool could not be updated; nothing has changed. You can try again from the Expansion Pack Settings.",
     },
     // The Error Toast: a failure the player would not see otherwise, under the table's name.
     errorToast: {

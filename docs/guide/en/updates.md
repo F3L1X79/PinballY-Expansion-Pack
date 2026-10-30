@@ -29,6 +29,10 @@ These are kept:
 
 "Later" is not asked again for that version: "Update to vX.Y.Z" stays in **Expansion Pack Settings** until you update.
 
+## Keeping vpxtool up to date
+
+Each version of the pack names the vpxtool version it was tried with. At each start, the pack asks the installed `vpxtool.exe` its version, in the background, and remembers it in `script_reader.json` (kept through updates). When that version is older, the next start (or the first start after an update of the pack that names a newer one) opens the same offer as for a missing vpxtool, saying "update" with both versions: "Update" downloads the new one, the gold comet turning over the dimmed wheel with "Downloading…" beneath it, and "No thanks" stops the offers, as for the install (see [Install](install.md#vpxtool)). A vpxtool equal to or newer than that version is never touched; one whose version cannot be read is left alone, the problem written to the Error Log.
+
 ## Turning the check off
 
 Set "Pack update check" to "Off" in the Offline Mode group of **Expansion Pack Settings**, or write `UPDATE_CHECK=false` in `.env.local`: the cabinet then never contacts GitHub.

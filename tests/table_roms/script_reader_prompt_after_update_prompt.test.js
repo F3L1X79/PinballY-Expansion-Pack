@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { errorLines } from "../support/error_log.js";
 import { isCarouselOpen, CAROUSEL_OPEN_MS } from "../core/startup_picker_scenario.js";
 import { OPEN_OVER_MS } from "../drawn_menu/drawn_menu_reader.js";
-import { startWithoutVpxtool, answer, pickHurriedly, shownDialog, PROMPT, UPDATE_STATE_FILE, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
+import { startForScriptReader, answer, pickHurriedly, shownDialog, PROMPT, UPDATE_STATE_FILE, MISSING_LOGGED } from "./script_reader_prompt_scenario.js";
 
 const RELEASE = {
     packVersion: "9.0.0",
@@ -19,7 +19,7 @@ const RELEASE = {
 };
 
 test("the Script Reader Prompt comes after the Update Prompt and before the Startup Screen", async () => {
-    const start = await startWithoutVpxtool({
+    const start = await startForScriptReader({
         seed: f => f.addFile(UPDATE_STATE_FILE, JSON.stringify({ version: 1, latestRelease: RELEASE })),
     });
     const { fake, lang } = start;

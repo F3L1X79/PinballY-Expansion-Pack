@@ -1,10 +1,20 @@
 // ============================================================
 // Rewrites one key of a .env.local text: every active KEY=value line of that
-// key takes the new value, else one line is appended. Pure: no file access.
+// key takes the new value, else one line is appended. saveEnvSetting writes
+// it to the pack's .env.local and logs it.
 // - Comments, blank lines, other keys, BOM and each line's ending stay byte for byte.
+// - saveEnvSetting throws on a failed read or write: each caller tells the owner its own way.
 // ============================================================
 
 import { envKeyOf, splitEnvLine } from "../core/env_overrides.js";
+
+// keyPath: the config key ("offerVpxtool", "addOns.tableRoms"); scriptName: the log line's prefix.
+export function saveEnvSetting(host, keyPath, value, scriptName) {
+    const envLocalPath = `${host.getProjectFolder()}\\.env.local`;
+    const text = host.files.fileExists(envLocalPath) ? host.files.readText(envLocalPath) : null;
+    host.files.writeText(envLocalPath, rewriteEnvLine(text, keyPath, value));
+    host.log(`[${scriptName}] Saved ${envKeyOf(keyPath)}=${value} in .env.local.`);
+}
 
 // A missing file (text null) gives that one line, with Windows line endings.
 export function rewriteEnvLine(text, keyPath, value) {

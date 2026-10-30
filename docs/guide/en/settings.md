@@ -14,7 +14,13 @@ Everything stays in one folder, with no change to PinballY itself.
 
 ## Expansion Pack Settings
 
-**Expansion Pack Settings**, in the Operator Menu, sets the Add-ons, the startup screen, the language and the Offline Mode without editing any file, then restarts PinballY in one press. It also offers "Update to vX.Y.Z" once you answered "Later" to the Update Prompt (see [Updates](updates.md)), and "Install vpxtool v0.38.0" while vpxtool is missing and the Table ROMs Add-on is on (see [Install](install.md#vpxtool)).
+**Expansion Pack Settings**, in the Operator Menu, sets the Add-ons, the startup screen, the language and the Offline Mode without editing any file, then restarts PinballY in one press. It also offers "Update to vX.Y.Z" once you answered "Later" to the Update Prompt (see [Updates](updates.md)), and, while the Table ROMs Add-on is on, a vpxtool line (see [Install](install.md#vpxtool) and [Updates](updates.md#keeping-vpxtool-up-to-date)):
+
+- "Install vpxtool v0.38.0" while vpxtool is missing;
+- "Update vpxtool (v0.37.1 → v0.38.0)" while yours is older than the version the pack names;
+- "Update vpxtool", greyed with "vpxtool v0.38.0 is up to date" under it, while yours is that version or newer.
+
+Until the pack has read your vpxtool's version once (about ten seconds into the first start that finds it), or while that version cannot be read, there is no vpxtool line.
 
 The **Offline Mode** group holds what reaches, or offers to reach, the internet, one switch each:
 

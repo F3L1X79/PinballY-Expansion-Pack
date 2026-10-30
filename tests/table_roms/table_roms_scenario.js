@@ -36,8 +36,10 @@ export function table(configId, { rom, gameFile = vpxFile(configId), isHidden = 
 // vpxtool's answer to "romname <table file>", by table file: a ROM name,
 // null when the script loads no ROM, or the run itself ({ output,
 // errorOutput, exitCode, durationMs }). A file it has no answer for is
-// unreadable: exit code 1.
+// unreadable: exit code 1. The "--version" key gives the run of its --version.
 export const fakeVpxtool = answers => (args) => {
+    // At the Script Reader Version unless the test says otherwise.
+    if (args[0] === "--version") return answers["--version"] ?? { output: "vpxtool git:v0.38.0\n" };
     const answer = answers[args[1]];
     if (answer === undefined) return { exitCode: 1, output: "" };
     if (answer === null) return { output: "" };
@@ -88,6 +90,6 @@ export async function startTableRoms({ tables, files = {}, vpxtool, enabled = tr
             fake.gameOver(game);
         },
         // The table files vpxtool was asked to read, in order.
-        scriptsRead: () => fake.programRuns().map(run => run.args[1]),
+        scriptsRead: () => fake.programRuns().filter(run => run.args[0] === "romname").map(run => run.args[1]),
     };
 }
