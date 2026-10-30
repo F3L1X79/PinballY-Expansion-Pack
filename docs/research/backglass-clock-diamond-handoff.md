@@ -11,6 +11,16 @@ To answer on the cabinet:
 2. Does the cut hold through the raises (`setWindowPos` TOPMOST with `SWP_NOACTIVATE`), each minute's redraw, and a move by the owner?
 3. Does setting the region activate PinballY, which opens the pause menu during a game? Read the `TEMP #372` log lines (`menuopen "pause game"`).
 
+## Verdict (prototype on the cabinet, 2026-10-30): no diamond, the fallback
+
+Prototype and its evidence: branch `prototype/backglass-clock-diamond` (local; each commit message holds one cabinet run). Facts kept in `docs/pinbally/pinbally-help.md` §2.1.
+
+1. Edges: never judged; the cut never held well enough to look at it from the playing position.
+2. The cut holds through raises and redraws in a game without clicks, but PinballY drops it: after a click and a drag, once with no known cause, and in the last run the window got its title bar back and showed in the wheel.
+3. Setting the region never activated PinballY. A click on the clock during a game does, cut or not (pause menu).
+
+Félix's decision: the fallback, the wheel's Clock look on plain black with no frame, and the grilling now looks at making the existing window nicer and as small as possible. Constraint found: the window is never less than 200 px tall (asked 320x128, got 320x200), so the window itself can't go below 200 px tall; only the drawing inside it can look smaller, the rest of the window staying black.
+
 ## Decisions already taken in the grilling (2026-10-30)
 
 - Look: a small Steamball plaque in the shape of a diamond if the cut works; otherwise the wheel's Clock look (soft white time, drop shadow, gold underline) on plain black, with no frame.
