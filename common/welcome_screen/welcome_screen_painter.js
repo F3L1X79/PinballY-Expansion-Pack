@@ -29,7 +29,7 @@ const LOOK = Object.freeze({
     greetingSize: 34, greetingGap: 36, greetingBottom: 44, headerBottom: 22,
     // The Daily Streak line, when there is one, between the greeting and
     // Collection Mastery, a size above the cards' grey lines.
-    dailyStreakGap: 14, dailyStreakH: 40, dailyStreakTile: 34, dailyStreakSize: 22,
+    dailyStreakGap: 32,dailyStreakH: 40, dailyStreakTile: 34, dailyStreakSize: 22,
     // The Lost Records line, when there is one, under the greeting and the
     // Daily Streak line.
     lostRecordsGap: 4, lostRecordsSize: 20, minLostRecordsSize: 15,
