@@ -10,6 +10,10 @@ Unofficial add-ons for the PinballY virtual pinball front end, built on its Java
 A self-contained feature that `main.js` starts at launch and that the player can turn off in the configuration.
 _Avoid_: plugin, script (a script is just a `.js` file)
 
+**Discord Rich Presence**:
+What the Discord account signed in on the cabinet's PC shows publicly while PinballY runs: the table being played and for how long, or that a table is being chosen on the wheel; nothing during attract mode, and never a Profile's name. Off until the owner turns it on and accepts, each time, a Dialog saying what becomes public. The pack never starts Discord itself. Discord's own name for it, kept in every language.
+_Avoid_: Discord status, Discord activity, presence
+
 ### Distribution
 
 **Pack Version**:
@@ -25,7 +29,7 @@ The question the pack asks GitHub in the background at each start: is there a ne
 _Avoid_: update notification, version check
 
 **Offline Mode**:
-The group of the Expansion Pack Settings where the owner turns off, one by one, what the pack would fetch from the internet or offer to fetch: the Update Check, and the Script Reader Prompt. Turning one off never removes the matching install or update line from the Expansion Pack Settings. Shown as "Mode hors ligne" in French.
+The group of the Expansion Pack Settings where the owner turns off, one by one, what the pack would fetch from the internet or offer to fetch, or would send there: the Update Check, the Script Reader Prompt, and Discord Rich Presence (the same switch as its Add-on's). Turning one off never removes the matching install or update line from the Expansion Pack Settings. Shown as "Mode hors ligne" in French.
 _Avoid_: network settings, airplane mode
 
 **Update Prompt**:
@@ -53,6 +57,10 @@ _Avoid_: vpxtool toast, install popup
 **Error Toast**:
 A toast like the Achievement Toast, but with its own colour and a warning sign instead of a trophy, that says in one sentence what a failure has cost and, for an Admin Profile, what to do about it; it stays longer than the other toasts. It is shown only for a failure the player would not see otherwise and that does not mend itself at the next start: a Play that could not be saved, or not kept in the Play Log, shown to the Profile that played it after that Play's other toasts; a Pack Update that failed, shown once to an Admin Profile, waiting for one to be active. A failure that answers a choice the player has just made keeps its own message on that screen. Shown as "Problème" in French.
 _Avoid_: error popup, error dialog (a toast never waits for the player), alert
+
+**Warning Toast**:
+A toast like the Error Toast, but amber, that says in one sentence that something the owner turned on will not work for the rest of the session, and what to do about it: Discord Rich Presence when Discord cannot be reached. Shown once per session to the active Profile, whoever it is, once the wheel is reached like the other toasts. Not an error of the pack, so it is never written to the Error Log as one. Shown as "Avertissement" in French.
+_Avoid_: Error Toast (for a failure of the pack), alert
 
 **Error Log**:
 The file, kept in the pack's folder and through every Pack Update, where every error the pack meets is written down with its date and Pack Version, so that it can still be read after PinballY has restarted; PinballY's own log starts afresh at each launch. It belongs to the pack itself and can never be turned off. The Error Toast never refers the player to it.

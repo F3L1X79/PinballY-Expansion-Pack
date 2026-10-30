@@ -267,6 +267,7 @@
           <a class="chip tr-share" href="#stats-api"><b></b>API des stats</a>
           <a class="chip tr-share" href="#theme-editor"><b></b>Éditeur de palette</a>
           <a class="chip tr-share" href="#discord"><b></b>Discord</a>
+          <a class="chip tr-share" href="#discord-table-image"><b></b>Image de table Discord</a>
         </div>
       </div>
       <div class="legend">
@@ -383,18 +384,41 @@
             <h3>Discord Rich Presence : la table jouée dans le statut Discord</h3>
             <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
           </div>
-          <p>Quand Discord tourne sur le PC de la borne, le statut montre la table en cours (et peut-être la roue, le Challenge ou la Table of the Day).</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="here">grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
-          <div class="links">Recherche : <code>docs/research/discord-rich-presence.md</code> (faisable sans bibliothèque ; les Developer Terms §2(d) interdisent un client ID dans un projet open source : chaque propriétaire crée son application Discord). Flow Matt : <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Avant l'<a href="#stats-api">API des statistiques (n° <span data-ref="stats-api"></span>)</a> : il lit les données du pack de l'intérieur, sans l'attendre</div>
+          <p>Quand Discord a été lancé avant PinballY, le compte Discord de la borne montre « Virtual Pinball », la table jouée et le temps écoulé (et « Table du jour » ou « Table de la semaine »), « Choisit une table » sur la roue, rien en mode attract ; jamais de nom de Profile. Désactivé par défaut, un Dialog de consentement à chaque activation. Grillé le 30/10/2026.</p>
+          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">research</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="here">tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/to-tickets</code> → <code>/implement</code>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/379">Spec #379</a> ; sa ligne du Mode hors ligne attend le ticket #374 · Research : <code>docs/research/discord-rich-presence.md</code> (faisable sans bibliothèque ; une seule application, celle de Félix, dont l'ID est dans le dépôt comme chez Dolphin, risque §2(d) accepté). Avant l'<a href="#stats-api">API des statistiques (n° <span data-ref="stats-api"></span>)</a> : il lit les données du pack de l'intérieur, sans l'attendre</div>
           <details>
-            <summary>Questions ouvertes (4)</summary>
+            <summary>Décisions du grill (4)</summary>
             <ul>
-              <li>Discord tourne-t-il sur la borne, ou l'idée sert-elle surtout aux autres utilisateurs ?</li>
-              <li>Faisable sans bibliothèque : le tube nommé <code>\\.\pipe\discord-ipc-0</code> ouvert avec <code>dllImport</code> (kernel32), sans lecture qui bloque PinballY ? À vérifier en <code>/research</code>, avec le piège du <code>CParser.js</code>.</li>
-              <li>Vie privée : jamais le nom d'un Child Profile ; le nom du Profile du tout, ou seulement la table ?</li>
-              <li>Décidé le 29/10/2026 : une seule application Discord, celle de Félix, dont l'ID est dans le dépôt, comme le fait Dolphin. Les Developer Terms §2(d) l'interdisent, mais le risque est accepté pour un projet open source peu utilisé. Reste à décider au grill s'il faut un réglage pour remplacer l'ID, au cas où Discord désactiverait l'application.</li>
+              <li>3 essais à 15 s d'intervalle au démarrage ; ensuite, Discord introuvable, fermé ou qui refuse : un Warning Toast ambre (nouveau terme), une fois, après le Startup Screen, puis plus aucun essai jusqu'au redémarrage. Le pack ne lance jamais Discord.</li>
+              <li>Le nom des Adult Tables n'est pas masqué ; jamais de nom de Profile ni d'autre donnée personnelle.</li>
+              <li>Un seul interrupteur, montré dans « Lancer et jouer » et dans le Mode hors ligne ; le Dialog de consentement a son curseur sur Annuler.</li>
+              <li>Le logo du pack par une URL GitHub brute ; l'image par table devient une idée à part. Clé <code>discordApplicationId</code> pour remplacer l'ID, décrite seulement dans la config. Un ticket humain d'abord : créer l'application « Virtual Pinball », donner son ID, fournir le logo.</li>
             </ul>
             <p class="ctx">Idée de Félix du 25/10/2026.</p>
+          </details>
+        </div>
+      </li>
+
+      <li draggable="true" tabindex="0" class="item tr-share" id="discord-table-image" data-track="share" data-rank="gold">
+        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
+        <div class="emblem"></div>
+        <div class="content">
+          <div class="item-head">
+            <h3>Image de la table dans Discord Rich Presence</h3>
+            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen-gros</span></div>
+          </div>
+          <p>Pendant une partie, la grande image du statut Discord montre la table jouée au lieu du logo du pack, comme Dolphin montre la jaquette du jeu.</p>
+          <div class="stepper"><span class="here">idée</span><i>›</i><span>research</span><i>›</i><span>grill</span><i>›</i><span>spec</span><i>›</i><span>tickets</span><i>›</i><span>implement</span></div>
+          <div class="links">Flow Matt : <code>/research</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code>. Après <a href="#discord">Discord Rich Presence (n° <span data-ref="discord"></span>)</a>, qu'elle complète</div>
+          <details>
+            <summary>Questions ouvertes (3)</summary>
+            <ul>
+              <li>Discord n'affiche qu'une image publique par URL : les images de la roue sont locales. Dolphin héberge son propre serveur de jaquettes, indexé par l'ID universel du jeu ; nos tables n'ont qu'un <code>ipdbId</code> parfois rempli.</li>
+              <li>Quelle source : les photos d'IPDB (URL imprévisible depuis l'ID, accord à demander), le Virtual Pinball Spreadsheet (une image par table, rapprochement par nom, fabricant et année, téléchargement), ou un hébergement à nous ? À établir en <code>/research</code>.</li>
+              <li>Une table sans image trouvée garde le logo du pack.</li>
+            </ul>
+            <p class="ctx">Reportée du grill de Discord Rich Presence du 30/10/2026.</p>
           </details>
         </div>
       </li>
@@ -660,6 +684,15 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
+          <summary>30/10 <span class="count">(2)</span></summary>
+          <ol>
+            <li><strong>Discord Rich Presence grillé et spécifié (#379)</strong>
+              <span>Désactivé par défaut, un Dialog de consentement à chaque activation, le même interrupteur dans le Mode hors ligne. En partie, « Virtual Pinball », la table (Adult Tables comprises) et le temps écoulé ; « Choisit une table » sur la roue ; rien en mode attract ; jamais de nom de Profile. 3 essais au démarrage, puis un Warning Toast ambre et l'arrêt pour la session ; le pack ne lance jamais Discord. Un ticket humain d'abord pour l'application et le logo.</span></li>
+            <li><strong>Image de la table dans Discord Rich Presence, juste après Discord</strong>
+              <span>Reportée du grill : Dolphin montre ses jaquettes par son propre serveur, nos images de roue sont locales. Placée juste après Discord, qu'elle complète, avec une <code>/research</code> d'abord (IPDB, Virtual Pinball Spreadsheet, autorisations). Effort moyen-gros, impact faible.</span></li>
+          </ol>
+        </details>
+        <details>
           <summary>29/10 <span class="count">(20)</span></summary>
           <ol>
             <li><strong>vpxtool a ses tickets #374 à #378</strong>
