@@ -203,12 +203,13 @@ test("a background press while it is open writes one log line naming the menu an
 test("a whole game of background flipper presses writes one line per opening of the pause menu", () => {
     openPauseMenu(fake);
     const linesBefore = fake.logLines().length;
+    const backgroundLineCount = () => fake.logLines().slice(linesBefore).filter(line => line.includes("pressed in the background")).length;
     for (let i = 0; i < 200; i++) fake.fire("commandbuttonbgdown", { command: i % 2 === 0 ? "Next" : "Prev", repeat: false });
-    assert.equal(fake.logLines().slice(linesBefore).length, 1);
+    assert.equal(backgroundLineCount(), 1);
 
     fake.openMenu(PAUSE_MENU_ID, fake.currentMenu().items);
     fake.fire("commandbuttonbgdown", { command: "Next", repeat: false });
-    assert.equal(fake.logLines().slice(linesBefore).length, 1, "PinballY opening it again over itself is the same opening");
+    assert.equal(backgroundLineCount(), 1, "PinballY opening it again over itself is the same opening");
     fake.closeMenu();
     fake.fire("menuclose", { id: PAUSE_MENU_ID });
     assert.ok(!anythingDrawn());
@@ -216,7 +217,7 @@ test("a whole game of background flipper presses writes one line per opening of 
     openPauseMenu(fake);
     fake.fire("commandbuttonbgdown", { command: "Prev", repeat: false });
     fake.fire("commandbuttonbgdown", { command: "Next", repeat: false });
-    assert.equal(fake.logLines().slice(linesBefore).length, 2, "a new opening logs again");
+    assert.equal(backgroundLineCount(), 2, "a new opening logs again");
     fake.closeMenu();
 });
 

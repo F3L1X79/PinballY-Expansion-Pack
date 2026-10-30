@@ -106,11 +106,19 @@ export default function init() {
         if (host.countMonitors() <= 1 || host.getFullUIMode().capture) return;
         // Placed before it shows, so it never flashes on the playfield first.
         placeOnBackglassScreen();
+        // TEMP #372: does showing the clock activate PinballY, opening the
+        // pause menu? Each line timed against the Drawn Menus' TEMP lines.
+        const tempLog = text => host.log(`[TEMP #372 ${SCRIPT_NAME}] ${host.now().toTimeString().slice(0, 8)}.${String(host.now().getMilliseconds()).padStart(3, "0")} ${text} (mode ${host.getFullUIMode().mode}, menuID ${host.getFullUIMode().menuID})`);
+        tempLog("before showWindow(true)");
         clockWindow.showWindow(true);
+        tempLog("after showWindow(true)");
         shown = true;
         minuteTick.start();
         raiseTimers = RAISE_DELAYS_MS.map(delay =>
-            host.setTimeout(safeHandler(SCRIPT_NAME, () => clockWindow.setTopmost(true)), delay));
+            host.setTimeout(safeHandler(SCRIPT_NAME, () => {
+                clockWindow.setTopmost(true);
+                tempLog(`raised after ${delay} ms`);
+            }), delay));
     }));
     // Also fires after Exit Game.
     host.on("gameover", safeHandler(SCRIPT_NAME, () => {
