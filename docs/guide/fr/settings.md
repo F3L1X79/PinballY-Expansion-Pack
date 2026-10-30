@@ -14,7 +14,7 @@ Tout tient dans un seul dossier, sans modifier PinballY.
 
 ## Réglages du pack
 
-**Réglages du pack**, dans le menu opérateur, règle les Add-ons, l'écran de démarrage, la langue et le mode hors ligne sans éditer aucun fichier, puis redémarre PinballY d'une pression. On y trouve aussi « Mettre à jour en vX.Y.Z » après avoir répondu « Plus tard » à l'invite de mise à jour (voir [Mises à jour](updates.md)).
+**Réglages du pack**, dans le menu opérateur, règle les Add-ons, l'écran de démarrage, la langue et le mode hors ligne sans éditer aucun fichier, puis redémarre PinballY d'une pression. On y trouve aussi « Mettre à jour en vX.Y.Z » après avoir répondu « Plus tard » à l'invite de mise à jour (voir [Mises à jour](updates.md)), et « Installer vpxtool v0.38.0 » tant que vpxtool manque et que l'Add-on « ROM des tables » est activé (voir [Installation](install.md#vpxtool)).
 
 Le groupe **Mode hors ligne** réunit ce qui contacte internet, ou propose de le faire, un interrupteur chacun :
 

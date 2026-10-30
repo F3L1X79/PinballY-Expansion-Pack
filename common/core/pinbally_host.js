@@ -37,8 +37,12 @@ const RESTART_READY_TIMEOUT_MS = 15000;
 const PACK_UPDATE_READY_TIMEOUT_MS = 120000;
 // The Pack Update helper's ready file and log, in the pack's temporary folder.
 const PACK_UPDATE_FILE_BASE_NAME = "pack-update";
-// The Pack Update helper's log as the owner types it in Explorer's address bar.
+const SCRIPT_READER_INSTALL_HELPER_NAME = "script_reader_install.ps1";
+// The Script Reader install helper's log, output and exit code files, in the pack's temporary folder.
+const SCRIPT_READER_INSTALL_FILE_BASE_NAME = "script-reader-install";
+// The helpers' logs as the owner types them in Explorer's address bar.
 export const PACK_UPDATE_LOG_HINT = `%TEMP%\\${PACK_TEMPORARY_FOLDER_NAME}\\${PACK_UPDATE_FILE_BASE_NAME}.log`;
+export const SCRIPT_READER_INSTALL_LOG_HINT = `%TEMP%\\${PACK_TEMPORARY_FOLDER_NAME}\\${SCRIPT_READER_INSTALL_FILE_BASE_NAME}.log`;
 // Given "<output file>" "<exit code file>" "<program>" "<args>"..., runs the
 // program with its standard output in the first file and its standard error
 // dropped, then writes its exit code to the second, through a .tmp file
@@ -313,20 +317,51 @@ function createProgramRunner(files, startHidden) {
         startHidden("cmd.exe", `/d /c "${quoted}"`, `cmd.exe for ${programPath}`);
 
         let result = null;
-        return {
-            // null while the program runs, then { exitCode, output }.
-            result: () => {
-                if (result) return result;
-                if (!files.fileExists(codePath)) return null;
-                const code = files.readText(codePath).trim();
-                if (!/^-?\d+$/.test(code)) throw new Error(`Not an exit code in ${codePath}: "${code}"`);
-                const output = files.fileExists(outputPath) ? files.readText(outputPath) : "";
-                result = { exitCode: Number(code), output };
-                files.deleteFile(codePath);
-                if (files.fileExists(outputPath)) files.deleteFile(outputPath);
-                return result;
-            },
-        };
+        return { result: runResultReader(files, codePath, outputPath) };
+    };
+}
+
+// Reads a hidden run's exit code file, written last, then its output file:
+// null while the run goes on, then { exitCode, output }, the files deleted.
+function runResultReader(files, codePath, outputPath) {
+    let result = null;
+    return () => {
+        if (result) return result;
+        if (!files.fileExists(codePath)) return null;
+        const code = files.readText(codePath).trim();
+        if (!/^-?\d+$/.test(code)) throw new Error(`Not an exit code in ${codePath}: "${code}"`);
+        const output = files.fileExists(outputPath) ? files.readText(outputPath) : "";
+        result = { exitCode: Number(code), output };
+        files.deleteFile(codePath);
+        if (files.fileExists(outputPath)) files.deleteFile(outputPath);
+        return result;
+    };
+}
+
+// The powershell.exe parameters that run a helper of tools\ hidden, with
+// its arguments ({ name: value }).
+function helperParameters(helperName, helperArgs, errorLabel) {
+    const helperPath = `${projectFolderOf(systemInfo.programDir)}\\tools\\${helperName}`;
+    // A quote would end the argument early and pass the rest as others.
+    const quoted = Object.entries(helperArgs).find(([, value]) => String(value).includes("\""));
+    if (quoted) throw new Error(`A quote in the ${errorLabel}'s -${quoted[0]} argument.`);
+    const args = Object.entries(helperArgs).map(([name, value]) => ` -${name} ${typeof value === "number" ? value : `"${value}"`}`).join("");
+    return `-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "${helperPath}"${args}`;
+}
+
+// Runs the Script Reader install helper hidden while PinballY goes on; it
+// writes its output, then its exit code, as a hidden program run does.
+function createScriptReaderInstaller(files, startHidden) {
+    return ({ zipUrl, sha256, version }) => {
+        const folder = preparePackTemporaryFolder(files);
+        const basePath = `${folder}\\${SCRIPT_READER_INSTALL_FILE_BASE_NAME}-${RUN_SESSION}-${nextRunNumber++}`;
+        const outputPath = `${basePath}.out`;
+        const codePath = `${basePath}.code`;
+        startHidden("powershell.exe", helperParameters(SCRIPT_READER_INSTALL_HELPER_NAME, {
+            LogFile: `${folder}\\${SCRIPT_READER_INSTALL_FILE_BASE_NAME}.log`, OutputFile: outputPath, CodeFile: codePath,
+            ZipUrl: zipUrl, Sha256: sha256, Version: version, ToolsFolder: `${projectFolderOf(systemInfo.programDir)}\\tools`,
+        }, "Script Reader install helper"), "the Script Reader install helper");
+        return { result: runResultReader(files, codePath, outputPath) };
     };
 }
 
@@ -345,13 +380,9 @@ function createHelperQuitter(files, startHidden, { helperName, fileBaseName, rea
         // Left by an earlier start that never quit.
         if (files.fileExists(readyPath)) files.deleteFile(readyPath);
         if (!kernel32) kernel32 = dllImport.bind("Kernel32.dll", "DWORD WINAPI GetCurrentProcessId();");
-        const helperPath = `${projectFolderOf(systemInfo.programDir)}\\tools\\${helperName}`;
-        // A quote would end the argument early and pass the rest as others.
-        const quoted = Object.entries(helperArgs).find(([, value]) => String(value).includes("\""));
-        if (quoted) throw new Error(`A quote in the ${errorLabel}'s -${quoted[0]} argument.`);
-        const ownArgs = Object.entries(helperArgs).map(([name, value]) => ` -${name} "${value}"`).join("");
-        startHidden("powershell.exe", `-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "${helperPath}"`
-            + ` -ParentPid ${Number(kernel32.GetCurrentProcessId())} -ReadyFile "${readyPath}" -LogFile "${folder}\\${fileBaseName}.log"${ownArgs}`);
+        startHidden("powershell.exe", helperParameters(helperName, {
+            ParentPid: Number(kernel32.GetCurrentProcessId()), ReadyFile: readyPath, LogFile: `${folder}\\${fileBaseName}.log`, ...helperArgs,
+        }, errorLabel));
         let waitedMs = 0;
         const poll = setInterval(() => {
             waitedMs += HELPER_POLL_MS;
@@ -573,6 +604,11 @@ export function createPinballYHost() {
                 ZipUrl: zipUrl, Sha256: sha256, PackVersion: packVersion, PackFolder: projectFolderOf(systemInfo.programDir),
             });
         })(),
+        // Starts the Script Reader install helper hidden, PinballY staying
+        // open: it downloads zipUrl, checks its sha256 and swaps vpxtool.exe
+        // of version into tools\. Returns { result() } as runHiddenProgram
+        // does: exit code 0 once installed, the old vpxtool.exe kept otherwise.
+        installScriptReader: createScriptReaderInstaller(files, startHidden),
         // A GET through PinballY's HttpRequest (MSXML), always asynchronous:
         // a synchronous one freezes PinballY. A Promise of the reply text,
         // rejected for any status but 200.

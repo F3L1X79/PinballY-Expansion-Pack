@@ -20,7 +20,7 @@ $ErrorActionPreference = 'Stop'
 $KeptFiles = @('.env.local', 'quiet_wheel_pending.json', 'pack_update.json', 'errors.log', 'errors.old.log')
 $KeptFolders = @('profiles', 'assets\sounds\local', 'assets\images\default_scores\local')
 # tools\ is kept but for these, which the release ships.
-$ShippedTools = @('restart_pinbally.ps1', 'pack_update.ps1')
+$ShippedTools = @('restart_pinbally.ps1', 'pack_update.ps1', 'script_reader_install.ps1')
 
 function Log([string]$Text) {
     Add-Content -Path $LogFile -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff') + ' ' + $Text)

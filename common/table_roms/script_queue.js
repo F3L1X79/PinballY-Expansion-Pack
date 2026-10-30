@@ -3,7 +3,7 @@
 // hidden on each VPX table whose script needs reading, one at a time,
 // polling for the answer so PinballY never waits.
 // - A failure is logged, not recorded: the table is read again next startup.
-// - No run starts from "prelaunch" until back on the wheel.
+// - No run starts from "prelaunch" until back on the wheel, nor while a Script Reader install holds it.
 // ============================================================
 
 import { safeHandler, logHandlerError } from "../core/safe_handler.js";
@@ -25,7 +25,8 @@ export function readRomOutput(output) {
     return ROM_NAME.test(lastLine) ? { rom: lastLine } : { unreadable: lastLine };
 }
 
-export function createScriptQueue(host, record) {
+// isHeld: true while no run may start (a Script Reader install swapping vpxtool).
+export function createScriptQueue(host, record, { isHeld = () => false } = {}) {
     const log = text => host.log(`[${SCRIPT_NAME}] ${text}`);
     const vpxtoolPath = `${host.getProjectFolder()}\\tools\\vpxtool.exe`;
     // vpxtool reads the script from the .vbs beside the .vpx when there is one.
@@ -62,14 +63,15 @@ export function createScriptQueue(host, record) {
 
     // True from a table's launch until PinballY is back on the wheel.
     let gameUnderWay = false;
-    // The tables left when the next one waits for the game to end.
+    // The tables left when the next one waits for the game to end or the hold to lift.
     let waitingTables = null;
     // The run in progress: { startMs }, its time limit counted from startMs.
     let currentRun = null;
+    let started = false;
 
     function readNext(queue) {
         currentRun = null;
-        if (gameUnderWay) {
+        if (gameUnderWay || isHeld()) {
             waitingTables = queue;
             return;
         }
@@ -102,14 +104,18 @@ export function createScriptQueue(host, record) {
         host.setTimeout(poll, POLL_MS);
     }
 
+    function resume() {
+        const queue = waitingTables;
+        waitingTables = null;
+        if (queue) readNext(queue);
+    }
+
     function endGame() {
         if (!gameUnderWay) return;
         gameUnderWay = false;
         // The game slowed the run in progress: it gets its full time again.
         if (currentRun) currentRun.startMs = host.now().getTime();
-        const queue = waitingTables;
-        waitingTables = null;
-        if (queue) readNext(queue);
+        resume();
     }
 
     host.on("prelaunch", safeHandler(SCRIPT_NAME, () => {
@@ -136,6 +142,13 @@ export function createScriptQueue(host, record) {
             logError(SCRIPT_NAME, `ERROR vpxtool not found at ${vpxtoolPath}; the table scripts are not read.`, host);
             return false;
         },
-        start: () => readNext(tablesToRead()),
+        // Once per start of PinballY: a second call does nothing.
+        start: () => {
+            if (started) return;
+            started = true;
+            readNext(tablesToRead());
+        },
+        // Goes on with the tables left once the hold has lifted.
+        resume,
     };
 }

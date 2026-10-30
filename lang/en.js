@@ -660,6 +660,8 @@ export default {
         offerVpxtoolLine: (state) => `Offer vpxtool: ${state}`,
         // Shown while a newer Pack Version is known; starts the Pack Update.
         updateTo: (version) => `Update to v${version}`,
+        // Shown while vpxtool is missing; opens the Script Reader Prompt.
+        installVpxtool: (version) => `Install vpxtool v${version}`,
         back: "Back",
         // The categories of the list, each heading its own page, grouped as in .env.example.
         groups: {
@@ -846,6 +848,21 @@ export default {
         updated: (version) => `Expansion Pack updated to v${version}`,
         // The title of the Error Toast of an update that failed.
         toastTitle: "Expansion Pack",
+    },
+    // The Script Reader (vpxtool): its Dialog, its install's wait and result (see common/table_roms/).
+    scriptReader: {
+        dialogTitle: (version) => `vpxtool v${version}`,
+        // What vpxtool is for, who wrote it, its licence and where it comes from.
+        dialog: "vpxtool reads each table's script so that its ROM fills in by itself. Written by Francis De Brabandere, under the Apache-2.0 licence, downloaded from github.com/francisdb/vpxtool.",
+        install: "Install",
+        noThanks: "No thanks",
+        // Under the Loader while the install helper works.
+        downloading: "Downloading…",
+        ok: "OK",
+        installedTitle: "vpxtool installed",
+        installed: (version) => `vpxtool v${version} is installed: each table's ROM now fills in by itself.`,
+        failedTitle: "Install not possible",
+        failed: "vpxtool could not be installed; nothing has changed. You can try again from the Expansion Pack Settings.",
     },
     // The Error Toast: a failure the player would not see otherwise, under the table's name.
     errorToast: {

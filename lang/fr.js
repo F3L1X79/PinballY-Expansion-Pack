@@ -749,6 +749,7 @@ export default {
         updateCheckLine: (state) => `Recherche de mises à jour du pack : ${state}`,
         offerVpxtoolLine: (state) => `Proposer vpxtool : ${state}`,
         updateTo: (version) => `Mettre à jour en v${version}`,
+        installVpxtool: (version) => `Installer vpxtool v${version}`,
         back: "Retour",
         groups: {
             playersAndProgress: "Joueurs et progression",
@@ -926,6 +927,18 @@ export default {
         updatedTitle: "Mise à jour terminée",
         updated: (version) => `Expansion Pack mis à jour en v${version}`,
         toastTitle: "Expansion Pack",
+    },
+    scriptReader: {
+        dialogTitle: (version) => `vpxtool v${version}`,
+        dialog: "vpxtool lit le script de chaque table pour que sa ROM se renseigne toute seule. Écrit par Francis De Brabandere, sous licence Apache-2.0, téléchargé depuis github.com/francisdb/vpxtool.",
+        install: "Installer",
+        noThanks: "Non merci",
+        downloading: "Téléchargement en cours…",
+        ok: "OK",
+        installedTitle: "vpxtool installé",
+        installed: (version) => `vpxtool v${version} est installé : la ROM de chaque table se renseigne désormais toute seule.`,
+        failedTitle: "Installation impossible",
+        failed: "vpxtool n'a pas pu être installé ; rien n'a changé. Vous pouvez réessayer depuis les Réglages du pack.",
     },
     errorToast: {
         header: "Problème",

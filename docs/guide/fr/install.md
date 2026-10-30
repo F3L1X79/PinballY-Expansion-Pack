@@ -25,7 +25,11 @@
 
 ## vpxtool
 
-Avec vpxtool, la ROM de chaque table est remplie toute seule (l'Add-on « ROM des tables »). Téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools`, à côté du programme de redémarrage déjà présent.
+Avec vpxtool, la ROM de chaque table est remplie toute seule (l'Add-on « ROM des tables »). vpxtool est écrit par Francis De Brabandere, sous licence Apache-2.0 (https://github.com/francisdb/vpxtool) ; le pack ne l'inclut pas.
+
+Tant qu'il manque et que l'Add-on « ROM des tables » est activé, **Réglages du pack** affiche **Installer vpxtool v0.38.0**. Cette ligne ouvre un message qui dit à quoi sert vpxtool, qui l'a écrit, sa licence et son site ; **Installer** le télécharge depuis les versions de son auteur, le vérifie et place `vpxtool.exe` dans `ExpansionPack\tools`, avec la comète et « Téléchargement en cours… » à l'écran ; PinballY reste ouvert. Un message dit ensuite si cela a marché, et les scripts des tables sont lus aussitôt.
+
+Vous pouvez aussi l'installer à la main : téléchargez `vpxtool` pour Windows sur sa page de versions (https://github.com/francisdb/vpxtool/releases) et placez `vpxtool.exe` dans `ExpansionPack\tools`, à côté du programme de redémarrage déjà présent.
 
 Sans lui, la ROM d'une table est quand même trouvée, après sa première partie, et un toast « Problème » rappelle à chaque démarrage que `vpxtool.exe` manque (aux seuls Profils admin, ou à tous s'il n'y en a aucun) : installez-le, ou désactivez l'Add-on « ROM des tables » dans **Réglages du pack**.
 

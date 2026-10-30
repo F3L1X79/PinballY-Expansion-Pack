@@ -13,7 +13,11 @@ Quand quelque chose échoue que vous ne verriez pas autrement, et qui ne se rép
 | « vpxtool.exe manque dans le dossier tools de l'Expansion Pack : les ROM des tables ne sont pas renseignées. » | Un Profil admin (ou tout le monde tant qu'aucun Profil n'est marqué), à chaque démarrage tant que ça dure. | Installer vpxtool (voir [Installation](install.md#vpxtool)), ou désactiver l'Add-on « ROM des tables » dans **Réglages du pack**. |
 | « La mise à jour en vX.Y.Z a échoué : la version précédente reste en place. Détails dans … » | Un Profil admin (ou tout le monde tant qu'aucun Profil n'est marqué), une seule fois, en attendant qu'il soit actif. | Lire le journal du programme de mise à jour qu'il nomme, `%TEMP%\PinballYExpansionPack\pack-update.log` (voir [Mises à jour](updates.md)). |
 
-Un échec qui répond à un choix que vous venez de faire (une réinitialisation de profil, le téléchargement d'une mise à jour) garde son propre message sur cet écran, au lieu d'un toast.
+Un échec qui répond à un choix que vous venez de faire (une réinitialisation de profil, le téléchargement d'une mise à jour, l'installation de vpxtool) garde son propre message sur cet écran, au lieu d'un toast.
+
+| Le message dit | Que faire |
+|---|---|
+| « vpxtool n'a pas pu être installé ; rien n'a changé. Vous pouvez réessayer depuis les Réglages du pack. » | La borne est peut-être hors ligne, le téléchargement a pu être coupé ou bloqué par l'antivirus, ou `vpxtool.exe` est en cours d'utilisation. Votre ancien `vpxtool.exe`, s'il y en avait un, est toujours en place. Lisez `%TEMP%\PinballYExpansionPack\script-reader-install.log`, puis réessayez, ou installez vpxtool à la main (voir [Installation](install.md#vpxtool)). |
 
 ## Le journal des erreurs (`errors.log`)
 

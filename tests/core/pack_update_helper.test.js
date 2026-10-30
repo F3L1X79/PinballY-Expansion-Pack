@@ -23,7 +23,7 @@ test("takes the arguments the host passes it", () => {
     const params = /^param\((.*)\)$/m.exec(HELPER)[1];
     for (const name of ["ParentPid", "ReadyFile", "LogFile"]) {
         assert.ok(params.includes(`$${name}`), `the helper takes -${name}`);
-        assert.ok(HOST.includes(`-${name} `), `the host passes -${name}`);
+        assert.ok(HOST.includes(`${name}: `), `the host passes -${name}`);
     }
     for (const name of ["ZipUrl", "Sha256", "PackVersion", "PackFolder"]) {
         assert.ok(params.includes(`$${name}`), `the helper takes -${name}`);
@@ -59,7 +59,7 @@ test("waits for PinballY after the ready file, then copies each keep-list entry 
     ]) {
         assert.ok(HELPER.includes(entry), `keeps ${entry}`);
     }
-    assert.ok(HELPER.includes("$ShippedTools = @('restart_pinbally.ps1', 'pack_update.ps1')"), "tools\\ but the shipped helpers");
+    assert.ok(HELPER.includes("$ShippedTools = @('restart_pinbally.ps1', 'pack_update.ps1', 'script_reader_install.ps1')"), "tools\\ but the shipped helpers");
 });
 
 test("renames old before new, renames back on failure, keeps one old copy and starts PinballY again", () => {

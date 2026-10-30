@@ -13,7 +13,11 @@ When something fails that you would not see otherwise, and that will not mend it
 | "vpxtool.exe is missing from the Expansion Pack's tools folder: the tables' ROMs are not filled." | An Admin Profile (or anyone while no Profile is marked), at each start while it lasts. | Install vpxtool (see [Install](install.md#vpxtool)), or turn the Table ROMs Add-on off in **Expansion Pack Settings**. |
 | "The update to vX.Y.Z failed: the previous version is still in place. Details in …" | An Admin Profile (or anyone while no Profile is marked), once, waiting for one to be active. | Read the update helper's log it names, `%TEMP%\PinballYExpansionPack\pack-update.log` (see [Updates](updates.md)). |
 
-A failure that answers a choice you have just made (a Profile Reset, a Pack Update download) shows its own message on that screen instead of a toast.
+A failure that answers a choice you have just made (a Profile Reset, a Pack Update download, a vpxtool install) shows its own message on that screen instead of a toast.
+
+| The message says | What to do |
+|---|---|
+| "vpxtool could not be installed; nothing has changed. You can try again from the Expansion Pack Settings." | The cabinet may be offline, the download may have been cut or blocked by the antivirus, or `vpxtool.exe` may be in use. Your previous `vpxtool.exe`, if any, is still in place. Read `%TEMP%\PinballYExpansionPack\script-reader-install.log`, then try again, or install vpxtool by hand (see [Install](install.md#vpxtool)). |
 
 ## The Error Log (`errors.log`)
 

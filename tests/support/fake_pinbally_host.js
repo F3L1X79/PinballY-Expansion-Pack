@@ -113,6 +113,12 @@ const RESTART_READY_TIMEOUT_MS = 15000;
 const PACK_UPDATE_HELPER_READY_MS = 5000;
 const PACK_UPDATE_READY_TIMEOUT_MS = 120000;
 const PACK_UPDATE_HELPER_NAME = "pack_update.ps1";
+// The Script Reader install helper downloads, checks and swaps in a made-up 3 s by default.
+const SCRIPT_READER_INSTALL_MS = 3000;
+const SCRIPT_READER_INSTALL_HELPER_NAME = "script_reader_install.ps1";
+// The vpxtool a Script Reader install swaps in: it answers --version as the
+// author's release build does, and reads a script that loads no ROM.
+const installedVpxtool = version => args => ({ output: args[0] === "--version" ? `vpxtool git:v${version}\n` : "" });
 // PinballY 1.1.0 Beta 10's systemInfo.version (the build number is made up).
 export const BETA_10_VERSION = {
     basic: "1.1.0", build: 10086, buildDate: new RealDate(Date.UTC(2024, 8, 24)),
@@ -265,6 +271,10 @@ export function createFakePinballYHost({
     // and how many of the next ones never get ready.
     const packUpdateList = [];
     let failingPackUpdateCount = 0;
+    // Every Script Reader install asked, in order: { zipUrl, sha256, version },
+    // and how the next ones end: { exitCode, output, durationMs, hangs, vpxtool }.
+    const scriptReaderInstallList = [];
+    const scriptReaderInstallAnswers = [];
     // The replies to the next HTTP requests, in order: { status, statusText, text }.
     const httpReplies = [];
     // Every HTTP request sent, in order: { method, url, headers }.
@@ -967,13 +977,37 @@ export function createFakePinballYHost({
         return false;
     }
 
-    // The restart or Pack Update helper as the production host starts it,
-    // recorded as a run of powershell.exe with its arguments, never run: it
-    // writes its ready file once ready, unless made to fail or missing.
+    // Records a Script Reader install asked; onEnd({ exitCode, output }) runs
+    // once it ends as the test chose, after vpxtool.exe was swapped into
+    // toolsFolder on success; never for one that hangs.
+    function installScriptReaderInto(toolsFolder, { zipUrl, sha256, version }, onEnd) {
+        scriptReaderInstallList.push({ zipUrl, sha256, version });
+        const {
+            exitCode = 0, output = `vpxtool git:v${version}\r\n`, durationMs = SCRIPT_READER_INSTALL_MS, hangs = false, vpxtool = installedVpxtool(version),
+        } = scriptReaderInstallAnswers.shift() || {};
+        if (hangs) return;
+        addTimer(() => {
+            if (exitCode === 0) host.addProgram(`${toolsFolder}\\vpxtool.exe`, vpxtool);
+            onEnd({ exitCode, output });
+        }, durationMs);
+    }
+
+    // The restart, Pack Update or Script Reader install helper as the
+    // production host starts it, recorded as a run of powershell.exe with its
+    // arguments, never run: it writes its ready file once ready, unless made
+    // to fail or missing; the install writes its output and exit code files.
     function startHelper(parameters) {
         const args = [...parameters.matchAll(/"([^"]*)"|(\S+)/g)].map(match => match[1] ?? match[2]);
         programRunList.push({ program: "powershell.exe", args });
         const valueOf = name => args[args.indexOf(name) + 1];
+        if (valueOf("-File").endsWith(`\\${SCRIPT_READER_INSTALL_HELPER_NAME}`)) {
+            if (!files.has(valueOf("-File"))) return;
+            installScriptReaderInto(valueOf("-ToolsFolder"), { zipUrl: valueOf("-ZipUrl"), sha256: valueOf("-Sha256"), version: valueOf("-Version") }, ({ exitCode, output }) => {
+                fileSystem.writeText(valueOf("-OutputFile"), output);
+                fileSystem.writeText(valueOf("-CodeFile"), `${exitCode}\r\n`);
+            });
+            return;
+        }
         const isPackUpdate = valueOf("-File").endsWith(`\\${PACK_UPDATE_HELPER_NAME}`);
         const isAsked = isPackUpdate
             ? askPackUpdate({ zipUrl: valueOf("-ZipUrl"), sha256: valueOf("-Sha256"), packVersion: valueOf("-PackVersion") })
@@ -1019,6 +1053,13 @@ export function createFakePinballYHost({
             onQuitting();
             host.doCommand(BUILT_IN_COMMANDS.Quit);
         }, PACK_UPDATE_HELPER_READY_MS);
+    }
+
+    // Like the production host, without a helper.
+    function installScriptReader(release) {
+        let result = null;
+        installScriptReaderInto(`${projectFolderOf(programFolder)}\\tools`, release, (ended) => { result = ended; });
+        return { result: () => result };
     }
 
     // Like PinballY's HttpRequest.send() (docs/pinbally/pinbally-help.md:
@@ -1391,6 +1432,7 @@ export function createFakePinballYHost({
         runHiddenProgram,
         restartPinballY,
         startPackUpdate,
+        installScriptReader,
         httpGet: (url, headers = {}) => sendHttp("GET", url, headers),
         readRegistryValue: (path) => (registryValues.has(path) ? registryValues.get(path) : null),
         files: fileSystem,
@@ -1404,6 +1446,13 @@ export function createFakePinballYHost({
         packUpdatesAsked: () => packUpdateList.map(update => ({ ...update })),
         // The next Pack Update asked never gets ready.
         failNextPackUpdate() { failingPackUpdateCount++; },
+        // Every Script Reader install asked, through either host: { zipUrl, sha256, version }.
+        scriptReaderInstallsAsked: () => scriptReaderInstallList.map(install => ({ ...install })),
+        // How the next Script Reader install ends, through either host:
+        // { exitCode (0), output, durationMs, hangs, vpxtool (what the
+        // swapped-in vpxtool.exe answers, as addProgram describes it) };
+        // by default it succeeds after 3 s.
+        answerNextScriptReaderInstall(answer) { scriptReaderInstallAnswers.push({ ...answer }); },
         // Queues the reply to the next HTTP request, through either host:
         // { status (200), statusText, text }.
         replyToHttp(reply) { httpReplies.push({ ...reply }); },

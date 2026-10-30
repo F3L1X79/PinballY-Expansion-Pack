@@ -23,6 +23,14 @@ const PACK_UPDATE = {
     packVersion: "9.0.0",
 };
 
+const SCRIPT_READER_HELPER = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\script_reader_install.ps1";
+const SCRIPT_READER = {
+    zipUrl: "https://github.com/francisdb/vpxtool/releases/download/v0.38.0/vpxtool-windows-x86_64-v0.38.0.zip",
+    sha256: "ea".repeat(32),
+    version: "0.38.0",
+};
+const VPXTOOL = "C:\\PinballY\\Scripts\\ExpansionPack\\tools\\vpxtool.exe";
+
 const TABLES = [
     { id: 1, configId: "Medieval Madness (Williams 1997)", title: "Medieval Madness", isHidden: false, wheelImage: MEDIEVAL_LOGO },
     { id: 2, configId: "Attack from Mars (Bally 1995)", title: "Attack from Mars", isHidden: false },
@@ -589,6 +597,34 @@ for (const { name, createHost, usesGlobals } of ADAPTERS) {
             assert.deepEqual(fake.executedCommands(), [], "no Quit");
         });
 
+        test("installs the Script Reader hidden without waiting, the helper's exit code and output read once it ends", () => {
+            fake.addFile(SCRIPT_READER_HELPER);
+            fake.answerNextScriptReaderInstall({ exitCode: 0, output: "vpxtool git:v0.38.0\r\n", durationMs: 3000 });
+
+            const install = host.installScriptReader(SCRIPT_READER);
+            assert.equal(install.result(), null, "still running");
+            fake.advanceTime(2999);
+            assert.equal(install.result(), null, "still running");
+            assert.equal(fake.files.fileExists(VPXTOOL), false, "not swapped in yet");
+            fake.advanceTime(1);
+
+            assert.deepEqual(install.result(), { exitCode: 0, output: "vpxtool git:v0.38.0\r\n" });
+            assert.deepEqual(install.result(), { exitCode: 0, output: "vpxtool git:v0.38.0\r\n" }, "the same result when asked again");
+            assert.deepEqual(fake.scriptReaderInstallsAsked(), [SCRIPT_READER]);
+            assert.equal(fake.files.fileExists(VPXTOOL), true, "swapped in");
+        });
+
+        test("a failed Script Reader install gives the helper's exit code and leaves vpxtool as it was", () => {
+            fake.addFile(SCRIPT_READER_HELPER);
+            fake.answerNextScriptReaderInstall({ exitCode: 1, output: "SHA-256 mismatch\r\n" });
+
+            const install = host.installScriptReader(SCRIPT_READER);
+            fake.advanceTime(60000);
+
+            assert.deepEqual(install.result(), { exitCode: 1, output: "SHA-256 mismatch\r\n" });
+            assert.equal(fake.files.fileExists(VPXTOOL), false);
+        });
+
         test("writing into a missing folder fails", () => {
             assert.throws(() => host.files.writeText("C:\\PinballY\\Scripts\\missing\\file.json", "{}"), /not found/);
         });
@@ -722,6 +758,54 @@ describe("production host restart", () => {
                 ...PACK_UPDATE, zipUrl: "https://example.com/a\" -Evil \"b.zip", onQuitting: () => {}, onFailed: () => {},
             }), /quote in the Pack Update helper's -ZipUrl argument/);
             assert.deepEqual(fake.programRuns(), []);
+        } finally {
+            uninstallGlobals();
+        }
+    });
+
+    test("starts the Script Reader install helper hidden with what it installs, where, and the files it answers through", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            fake.addFile(SCRIPT_READER_HELPER);
+            createPinballYHost().installScriptReader(SCRIPT_READER);
+
+            const [{ program, args }] = fake.programRuns();
+            assert.equal(program, "powershell.exe");
+            const valueOf = name => args[args.indexOf(name) + 1];
+            assert.deepEqual(args.slice(0, 7), ["-NoProfile", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", SCRIPT_READER_HELPER]);
+            assert.equal(valueOf("-LogFile"), `${TEMPORARY_FOLDER}\\script-reader-install.log`);
+            assert.match(valueOf("-OutputFile"), /^C:\\Users\\Cabinet\\AppData\\Local\\Temp\\PinballYExpansionPack\\script-reader-install-\d+-\d+\.out$/);
+            assert.equal(valueOf("-CodeFile"), valueOf("-OutputFile").replace(/\.out$/, ".code"));
+            assert.equal(valueOf("-ZipUrl"), SCRIPT_READER.zipUrl);
+            assert.equal(valueOf("-Sha256"), SCRIPT_READER.sha256);
+            assert.equal(valueOf("-Version"), "0.38.0");
+            assert.equal(valueOf("-ToolsFolder"), "C:\\PinballY\\Scripts\\ExpansionPack\\tools");
+        } finally {
+            uninstallGlobals();
+        }
+    });
+
+    test("a quote in a Script Reader install argument throws before any helper starts", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            fake.addFile(SCRIPT_READER_HELPER);
+            assert.throws(() => createPinballYHost().installScriptReader({ ...SCRIPT_READER, version: "0.38.0\" -Evil \"" }),
+                /quote in the Script Reader install helper's -Version argument/);
+            assert.deepEqual(fake.programRuns(), []);
+        } finally {
+            uninstallGlobals();
+        }
+    });
+
+    test("a missing Script Reader install helper never answers", () => {
+        const fake = createFakePinballYHost({ now: NOW });
+        const uninstallGlobals = fake.installGlobals();
+        try {
+            const install = createPinballYHost().installScriptReader(SCRIPT_READER);
+            fake.advanceTime(120000);
+            assert.equal(install.result(), null);
         } finally {
             uninstallGlobals();
         }

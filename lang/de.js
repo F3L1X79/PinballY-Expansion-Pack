@@ -745,6 +745,7 @@ export default {
         updateCheckLine: (state) => `Update-Prüfung des Packs: ${state}`,
         offerVpxtoolLine: (state) => `vpxtool anbieten: ${state}`,
         updateTo: (version) => `Auf v${version} aktualisieren`,
+        installVpxtool: (version) => `vpxtool v${version} installieren`,
         back: "Zurück",
         groups: {
             playersAndProgress: "Spieler und Fortschritt",
@@ -922,6 +923,18 @@ export default {
         updatedTitle: "Aktualisierung abgeschlossen",
         updated: (version) => `Expansion Pack auf v${version} aktualisiert`,
         toastTitle: "Expansion Pack",
+    },
+    scriptReader: {
+        dialogTitle: (version) => `vpxtool v${version}`,
+        dialog: "vpxtool liest das Skript jedes Tisches, damit seine ROM von selbst eingetragen wird. Geschrieben von Francis De Brabandere, unter der Lizenz Apache-2.0, heruntergeladen von github.com/francisdb/vpxtool.",
+        install: "Installieren",
+        noThanks: "Nein danke",
+        downloading: "Wird heruntergeladen…",
+        ok: "OK",
+        installedTitle: "vpxtool installiert",
+        installed: (version) => `vpxtool v${version} ist installiert: Die ROM jedes Tisches wird jetzt von selbst eingetragen.`,
+        failedTitle: "Installation nicht möglich",
+        failed: "vpxtool konnte nicht installiert werden; nichts wurde geändert. Sie können es in den Expansion-Pack-Einstellungen erneut versuchen.",
     },
     errorToast: {
         header: "Problem",

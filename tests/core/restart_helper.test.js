@@ -15,7 +15,7 @@ test("takes the arguments the host passes it", () => {
     const params = /^param\((.*)\)$/m.exec(HELPER)[1];
     for (const name of ["ParentPid", "ReadyFile", "LogFile"]) {
         assert.ok(params.includes(`$${name}`), `the helper takes -${name}`);
-        assert.ok(HOST.includes(`-${name} `), `the host passes -${name}`);
+        assert.ok(HOST.includes(`${name}: `), `the host passes -${name}`);
     }
 });
 

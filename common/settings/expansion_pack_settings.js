@@ -2,7 +2,7 @@
 // Expansion Pack Settings: their entry in the Operator Menu, after PinballY's Options, for whoever
 // sees the setup entries, opens the list of Add-on categories (their Add-ons as saved in .env.local,
 // read again on each opening, one page per Add-on whose Save rewrites its one line), the Startup screen and
-// Language pages, the Offline Mode group's switches, saving at once, and "Update to vX.Y.Z" while one is known.
+// Language pages, the Offline Mode group's switches, saving at once, and "Update to vX.Y.Z" or "Install vpxtool" while possible.
 // Listens to "menuopen", "command" and "commandbuttondown"; writes .env.local.
 // - Started by main.js whatever config.addOns says, its "menuopen" listener before the Drawn Menus Add-on's.
 // - Always drawn (getPackMenus), even with the Drawn Menus Add-on off.
@@ -26,6 +26,8 @@ import { DIALOG_PRIORITY, getWheelDialogs } from "../core/wheel_dialog.js";
 import { installableRelease } from "../updates/update_check.js";
 import { getUpdateState } from "../updates/update_state.js";
 import { getPackUpdater } from "../updates/pack_update.js";
+import { SCRIPT_READER_VERSION } from "../table_roms/script_reader_version.js";
+import { getScriptReaderInstaller, scriptReaderDialogText } from "../table_roms/script_reader_install.js";
 import { ADD_ON_GROUPS } from "./add_on_catalogue.js";
 import { rewriteEnvLine } from "./env_local_rewrite.js";
 
@@ -39,6 +41,7 @@ const STARTUP_SCREEN_MENU_ID = "expansionPackSettingsStartupScreen";
 const OFFLINE_MODE_MENU_ID = "expansionPackSettingsOfflineMode";
 const UPDATE_CHECK_MENU_ID = "expansionPackSettingsUpdateCheck";
 const OFFER_VPXTOOL_MENU_ID = "expansionPackSettingsOfferVpxtool";
+const SCRIPT_READER_MENU_ID = "expansionPackSettingsScriptReader";
 const NOT_SAVED_MENU_ID = "expansionPackSettingsNotSaved";
 const RESTART_MENU_ID = "expansionPackSettingsRestart";
 const RESTART_FAILED_MENU_ID = "expansionPackSettingsRestartFailed";
@@ -91,7 +94,10 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
     const saveCommand = host.allocateCommand("expansionPackSettings_save");
     const restartCommand = host.allocateCommand("expansionPackSettings_restart");
     const updateCommand = host.allocateCommand("expansionPackSettings_update");
+    const scriptReaderLineCommand = host.allocateCommand("expansionPackSettings_installVpxtool");
+    const scriptReaderInstallCommand = host.allocateCommand("expansionPackSettings_scriptReaderInstall");
     const envLocalPath = `${host.getProjectFolder()}\\.env.local`;
+    const vpxtoolPath = `${host.getProjectFolder()}\\tools\\vpxtool.exe`;
     // The page on screen: its Add-on, the choice saved when it opened, and the switch.
     let page = null;
 
@@ -113,22 +119,43 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
 
     const releaseToInstall = () => installableRelease(host, getUpdateState());
 
+    // Only while the running Table ROMs Add-on would read the scripts with it.
+    const offersScriptReader = () => running.addOns.tableRoms && !host.files.fileExists(vpxtoolPath);
+
     // The categories, each opening its page, then the settings picked on a
-    // page of choices and the Offline Mode group, then the Pack Update while
-    // one is possible.
+    // page of choices and the Offline Mode group, then the Pack Update and
+    // the Script Reader install while each is possible.
     function openList(selectedCmd = null) {
         page = null;
         const saved = readSaved();
         const release = releaseToInstall();
+        const installs = [
+            ...(release ? [{ title: TEXT.updateTo(release.packVersion), cmd: updateCommand }] : []),
+            ...(offersScriptReader() ? [{ title: TEXT.installVpxtool(SCRIPT_READER_VERSION.version), cmd: scriptReaderLineCommand }] : []),
+        ];
         getMenus().show(LIST_MENU_ID, [
             ...ADD_ON_GROUPS.map(({ group }) => ({ title: TEXT.groups[group], cmd: groupCommands.get(group), hasSubmenu: true })),
             SEPARATOR,
             ...choiceSettings.filter(setting => !setting.offline).map(setting => choiceLineOf(saved, setting)),
             { title: TEXT.offlineMode, cmd: offlineModeCommand, hasSubmenu: true },
             SEPARATOR,
-            ...(release ? [{ title: TEXT.updateTo(release.packVersion), cmd: updateCommand }, SEPARATOR] : []),
+            ...(installs.length > 0 ? [...installs, SEPARATOR] : []),
             { title: TEXT.back, cmd: menuReturnCommand },
         ], { selectedCmd, onBack: leaveList });
+    }
+
+    // The Script Reader Prompt's Dialog, as the wheel dialog queue lays one out;
+    // No thanks and Exit return to its line.
+    function openScriptReaderDialog() {
+        page = null;
+        const { title, message, install, noThanks } = scriptReaderDialogText();
+        getMenus().show(SCRIPT_READER_MENU_ID, [
+            { title, cmd: -1 },
+            { title: message, cmd: -1 },
+            SEPARATOR,
+            { title: install, cmd: scriptReaderInstallCommand },
+            { title: noThanks, cmd: menuReturnCommand },
+        ], { dialogStyle: true, onBack: () => openList(scriptReaderLineCommand) });
     }
 
     // A category's Add-ons, each On / Off as saved, under its heading.
@@ -326,6 +353,10 @@ export function createExpansionPackSettings(host, profileStore, getMenus, runnin
         } else if (ev.id === updateCommand) {
             const release = releaseToInstall();
             if (release) getPackUpdater().start(release);
+        } else if (ev.id === scriptReaderLineCommand) {
+            openScriptReaderDialog();
+        } else if (ev.id === scriptReaderInstallCommand) {
+            getScriptReaderInstaller().start();
         }
     }));
 }
