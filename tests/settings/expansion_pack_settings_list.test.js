@@ -18,7 +18,7 @@ const fake = createFakePinballYHost({ now: new Date(2026, 9, 22, 20, 0, 0) });
 
 const CATEGORIES = ["Players and progress", "Wheel screen", "Menus and filters", "Launching and playing a table", "Debugging"];
 
-const listLines = (language = "English") => [...CATEGORIES, "---", "Startup screen: Profile picker", `Language: ${language}`, "Update check: On", "---", "Back"];
+const listLines = (language = "English") => [...CATEGORIES, "---", "Startup screen: Profile picker", `Language: ${language}`, "Offline Mode", "---", "Back"];
 
 // Every Add-on but Drawn Menus runs off here: a saved On shows "on restart".
 const ON = "On (on restart)";
@@ -78,7 +78,7 @@ test("the list shows the categories, each opening its Add-ons, as saved by defau
 
     assert.equal(fake.currentMenu(), null, "no native menu");
     assert.deepEqual(drawnMenuLines(fake), listLines());
-    assert.deepEqual(markedEntries(fake, "submenu"), CATEGORIES);
+    assert.deepEqual(markedEntries(fake, "submenu"), [...CATEGORIES, "Offline Mode"]);
     assert.equal(highlightedEntry(fake), "Players and progress");
     assert.deepEqual(readCategoryPages(), categoryPages());
 });

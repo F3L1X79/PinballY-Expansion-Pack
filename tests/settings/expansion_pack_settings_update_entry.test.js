@@ -40,7 +40,7 @@ test("the entry shows before Back while a newer Pack Version is remembered", () 
     chooseEntry(fake, "Expansion Pack Settings");
     fake.advanceTime(OPEN_OVER_MS);
 
-    assert.deepEqual(drawnMenuLines(fake).slice(-5), ["Update check: On", "---", "Update to v9.0.0", "---", "Back"]);
+    assert.deepEqual(drawnMenuLines(fake).slice(-5), ["Offline Mode", "---", "Update to v9.0.0", "---", "Back"]);
 });
 
 test("choosing it records the version, shows the Loader and starts the Pack Update", async () => {

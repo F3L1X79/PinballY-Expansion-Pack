@@ -1,8 +1,8 @@
 // ============================================================
 // The Expansion Pack Settings in French through main.js: "Réglages du pack"
 // in the Operator Menu, the list's headings, Add-ons and states, the
-// language line in the saved language's own name, the restart question on
-// leaving, an Add-on's page and the Language page.
+// language line in the saved language's own name, the Offline Mode group,
+// the restart question on leaving, an Add-on's page and the Language page.
 // ============================================================
 
 import { test } from "node:test";
@@ -39,7 +39,15 @@ test("the list speaks French", async () => {
     press(fake, "Exit");
     fake.advanceTime(OPEN_OVER_MS);
     chooseEntry(fake, "Langue : Español au redémarrage", "Next");
-    assert.equal(highlightedEntry(fake), "Recherche de mises à jour : Activé", "the language line comes before the update check");
+    assert.equal(highlightedEntry(fake), "Mode hors ligne", "the language line comes before the Offline Mode group");
+    press(fake, "Select");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.deepEqual(drawnMenuLines(fake), [
+        "[MODE HORS LIGNE]", "Recherche de mises à jour du pack : Activé", "Proposer vpxtool : Activé", "---", "Retour",
+    ]);
+    chooseEntry(fake, "Retour");
+    fake.advanceTime(OPEN_OVER_MS);
+    assert.equal(highlightedEntry(fake), "Mode hors ligne");
     press(fake, "Next");
     assert.equal(highlightedEntry(fake), "Retour", "then Retour");
     press(fake, "Select");

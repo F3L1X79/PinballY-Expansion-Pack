@@ -654,7 +654,10 @@ export default {
         languageLine: (languageName) => `Language: ${languageName}`,
         startupScreenLine: (screenName) => `Startup screen: ${screenName}`,
         startupScreenNames: { welcome: "Welcome Screen", profilePicker: "Profile picker", wheel: "Wheel" },
-        updateCheckLine: (state) => `Update check: ${state}`,
+        // The Offline Mode group, heading its own page, and its switches.
+        offlineMode: "Offline Mode",
+        updateCheckLine: (state) => `Pack update check: ${state}`,
+        offerVpxtoolLine: (state) => `Offer vpxtool: ${state}`,
         // Shown while a newer Pack Version is known; starts the Pack Update.
         updateTo: (version) => `Update to v${version}`,
         back: "Back",

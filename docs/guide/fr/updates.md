@@ -31,7 +31,7 @@ Sont conservés :
 
 ## Couper la recherche
 
-Réglez « Recherche de mises à jour » sur « Désactivé » dans **Réglages du pack**, ou écrivez `UPDATE_CHECK=false` dans `.env.local` : la borne ne contacte alors jamais GitHub.
+Réglez « Recherche de mises à jour du pack » sur « Désactivé » dans le groupe Mode hors ligne des **Réglages du pack**, ou écrivez `UPDATE_CHECK=false` dans `.env.local` : la borne ne contacte alors jamais GitHub.
 
 Un pack installé avec git n'est jamais vérifié ni mis à jour : lancez `git pull` dans `Scripts\ExpansionPack`.
 

@@ -31,7 +31,7 @@ These are kept:
 
 ## Turning the check off
 
-Set "Update check" to "Off" in **Expansion Pack Settings**, or write `UPDATE_CHECK=false` in `.env.local`: the cabinet then never contacts GitHub.
+Set "Pack update check" to "Off" in the Offline Mode group of **Expansion Pack Settings**, or write `UPDATE_CHECK=false` in `.env.local`: the cabinet then never contacts GitHub.
 
 A pack installed with git is never checked nor offered updates: run `git pull` in `Scripts\ExpansionPack`.
 

@@ -14,7 +14,12 @@ Everything stays in one folder, with no change to PinballY itself.
 
 ## Expansion Pack Settings
 
-**Expansion Pack Settings**, in the Operator Menu, sets the Add-ons, the startup screen, the language and the update check without editing any file, then restarts PinballY in one press. It also offers "Update to vX.Y.Z" once you answered "Later" to the Update Prompt (see [Updates](updates.md)).
+**Expansion Pack Settings**, in the Operator Menu, sets the Add-ons, the startup screen, the language and the Offline Mode without editing any file, then restarts PinballY in one press. It also offers "Update to vX.Y.Z" once you answered "Later" to the Update Prompt (see [Updates](updates.md)).
+
+The **Offline Mode** group holds what reaches, or offers to reach, the internet, one switch each:
+
+- **Pack update check**: PinballY asks GitHub for a newer version of the pack at each start (`UPDATE_CHECK`).
+- **Offer vpxtool**: the pack may offer to install or update vpxtool (`OFFER_VPXTOOL`).
 
 ## `.env.local`
 
@@ -43,6 +48,7 @@ ADD_ON_CLOCK=false
 | `CONFETTI` | `true` | `false` turns off the Confetti Shower that falls with the toast of a completed Challenge, a Platinum Achievement, Mastery Level 10 on a table or a new Collection Tier, if your PC struggles with it. |
 | `FIREWORKS` | `true` | `false` turns off the Fireworks that come with the toast of a new Player Level, if your PC struggles with them. Independent of `CONFETTI`. |
 | `UPDATE_CHECK` | `true` | `false` stops PinballY from asking GitHub for a newer version of the pack at each start, and from offering to update it (see [Updates](updates.md)). |
+| `OFFER_VPXTOOL` | `true` | `false` stops the pack from ever offering to install or update vpxtool; you can still install it yourself. |
 | `SKIP_RANDOM_GAME_ANIMATION` | `false` | `true` skips the wheel of fortune and launches the Random Game at once. |
 | `ASK_TO_RATE_AFTER_MINUTES_PLAYED` | `60` | Minutes played on a table before you are asked to rate it. |
 | `LOG_UNTRANSLATED_MENU_TITLES` | `false` | `true` writes each untranslated PinballY menu title to `PinballY.log`. |

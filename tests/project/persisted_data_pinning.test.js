@@ -1,7 +1,7 @@
 ﻿// ============================================================
 // Pinning test: plays a scripted session through main.js and locks every
 // persisted key and Achievement ID (profile.json, cabinet.json, Challenges,
-// Play Log, World Tour, Avatar Frame, Table ROMs, High Scores).
+// Play Log, World Tour, Avatar Frame, Table ROMs, High Scores, .env.local's OFFER_VPXTOOL).
 // - These strings are players' saved progress: this test must keep passing unchanged.
 // - The Surprises part's keys are in persisted_data_pinning_surprises.test.js.
 // ============================================================
@@ -9,7 +9,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js";
-import config from "../../common/core/config.js";
+import config, { DEFAULTS } from "../../common/core/config.js";
+import { applyEnvOverrides } from "../../common/core/env_overrides.js";
 import { createProfileStore } from "../../common/profiles/profile_store.js";
 import { createPeriodTable, formatDateKey, TABLE_OF_THE_DAY, TABLE_OF_THE_WEEK } from "../../common/tables/period_table.js";
 import { createRandomGame } from "../../common/tables/random_game.js";
@@ -617,4 +618,9 @@ test("the High Scores Achievement IDs stay byte-identical", () => {
         "tableRecordTables:3",
         "tableRecordTaken",
     ]);
+});
+
+test(".env.local keeps the OFFER_VPXTOOL key", () => {
+    assert.equal(DEFAULTS.offerVpxtool, true);
+    assert.equal(applyEnvOverrides(DEFAULTS, "OFFER_VPXTOOL=false\n").config.offerVpxtool, false);
 });

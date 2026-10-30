@@ -745,7 +745,9 @@ export default {
         languageLine: (languageName) => `Langue : ${languageName}`,
         startupScreenLine: (screenName) => `Écran de démarrage : ${screenName}`,
         startupScreenNames: { welcome: "Écran d'accueil", profilePicker: "Choix du joueur", wheel: "Roue" },
-        updateCheckLine: (state) => `Recherche de mises à jour : ${state}`,
+        offlineMode: "Mode hors ligne",
+        updateCheckLine: (state) => `Recherche de mises à jour du pack : ${state}`,
+        offerVpxtoolLine: (state) => `Proposer vpxtool : ${state}`,
         updateTo: (version) => `Mettre à jour en v${version}`,
         back: "Retour",
         groups: {

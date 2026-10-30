@@ -76,8 +76,11 @@ export const DEFAULTS = {
     fireworks: true,
     // false = PinballY never asks GitHub for a newer Pack Version at its
     // start, and never offers to update the pack. A git checkout is never
-    // checked either way.
+    // checked either way. In the Settings' Offline Mode group.
     updateCheck: true,
+    // false = the pack never offers to install or update vpxtool; the
+    // install line stays in the Settings. In the Settings' Offline Mode group.
+    offerVpxtool: true,
     // true = every PinballY menu title shown without a translation is written
     // to the PinballY log (for a new PinballY version or a new language).
     logUntranslatedMenuTitles: false,

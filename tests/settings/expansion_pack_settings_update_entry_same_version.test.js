@@ -33,6 +33,6 @@ test("the running Pack Version remembered shows no Update entry", () => {
     chooseEntry(fake, "Expansion Pack Settings");
     fake.advanceTime(OPEN_OVER_MS);
 
-    assert.deepEqual(drawnMenuLines(fake).slice(-3), ["Update check: On", "---", "Back"]);
+    assert.deepEqual(drawnMenuLines(fake).slice(-3), ["Offline Mode", "---", "Back"]);
     assertNoErrorLogged(fake);
 });

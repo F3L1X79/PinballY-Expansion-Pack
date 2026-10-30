@@ -741,7 +741,9 @@ export default {
         languageLine: (languageName) => `Idioma: ${languageName}`,
         startupScreenLine: (screenName) => `Tela inicial: ${screenName}`,
         startupScreenNames: { welcome: "Boas-vindas", profilePicker: "Escolha do perfil", wheel: "Roleta" },
-        updateCheckLine: (state) => `Procurar atualizações: ${state}`,
+        offlineMode: "Modo offline",
+        updateCheckLine: (state) => `Procurar atualizações do pack: ${state}`,
+        offerVpxtoolLine: (state) => `Oferecer vpxtool: ${state}`,
         updateTo: (version) => `Atualizar para v${version}`,
         back: "Voltar",
         groups: {
