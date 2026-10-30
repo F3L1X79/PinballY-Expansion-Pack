@@ -244,7 +244,6 @@
         </div>
         <div class="cell">
           <a class="chip tr-play" href="#challenge-adaptive"><b></b>Challenges adaptés</a>
-          <a class="chip tr-share" href="#vpxtool-update"><b></b>vpxtool installé et à jour</a>
         </div>
         <div class="cell">
           <a class="chip tr-profiles" href="#ratings"><b></b>Notes, favoris, masquées</a>
@@ -297,32 +296,6 @@
     </div>
 
     <ol class="queue">
-
-      <li draggable="true" tabindex="0" class="item tr-share" id="vpxtool-update" data-track="share" data-rank="silver">
-        <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
-        <div class="emblem"></div>
-        <div class="content">
-          <div class="item-head">
-            <h3>vpxtool installé et à jour : le Script Reader Prompt</h3>
-            <div class="tags"><span class="tag track">Diffusion</span><span class="tag">moyen</span></div>
-          </div>
-          <p>Chaque Pack Version fige une Script Reader Version (v0.38.0 au départ). Quand vpxtool manque ou est plus ancien, un dialogue au démarrage propose de l'installer depuis les releases de son auteur, en disant qui l'a fait, sa licence et son site ; l'owner peut refuser. Un nouveau groupe « Mode hors ligne » des Réglages du pack peut couper cette proposition et la recherche de mises à jour. Grillé le 29/10/2026.</p>
-          <div class="stepper"><span class="done">idée</span><i>›</i><span class="done">grill</span><i>›</i><span class="done">spec</span><i>›</i><span class="done">tickets</span><i>›</i><span class="here">implement</span></div>
-          <div class="links">Flow Matt : <code>/implement-spec</code> ou <code>/implement</code> : <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/374">#374</a> et <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/375">#375</a> en parallèle, puis <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/376">#376</a> (après #375) → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/377">#377</a> (après #374) → <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/378">#378</a>. <a href="https://github.com/F3L1X79/PinballY-Expansion-Pack/issues/373">Spec #373</a> ; ADR 0021 ; reprend le helper et le Loader de la Pack Update (spec #331, livrée) · Research : <code>docs/research/high-scores-tools/vpxtool.md</code></div>
-          <details>
-            <summary>Décisions du grilling (6)</summary>
-            <ul>
-              <li>vpxtool n'est jamais livré dans le zip, pas sans la bénédiction de son auteur : la borne le télécharge depuis ses releases, à la version figée, vérifiée par SHA-256 (ADR 0021). Jamais la dernière release toute seule.</li>
-              <li>Le Script Reader Prompt remplace l'Error Toast « vpxtool introuvable », pour qui voit les setup entries, après l'Update Prompt. Il s'ouvre si vpxtool manque ou si <code>vpxtool --version</code> donne une version plus ancienne ; jamais pour une version égale ou plus récente. Il dit qu'on peut l'installer plus tard depuis les Réglages ou à la main.</li>
-              <li>Un refus est définitif : ni question ni Error Toast ensuite.</li>
-              <li>« Installer » : la comète sur la roue assombrie avec « Téléchargement en cours… », boutons bloqués ; un helper caché télécharge, vérifie et remplace, l'ancien remis en cas d'échec, sans redémarrage. Puis un Dialog de résultat ; en cas de succès, la lecture des scripts démarre aussitôt. La Pack Update reçoit le même texte sous sa comète.</li>
-              <li>Réglages du pack : « Installer vpxtool v0.38.0 » ou « Mettre à jour vpxtool (vA → vB) » à la racine, à côté de « Mettre à jour en v… », grisée « à jour » sinon, absente si « ROM des tables » est éteint. Groupe « Mode hors ligne » : « Recherche de mises à jour du pack » (clé <code>updateCheck</code>) et « Proposer vpxtool », indépendants de git.</li>
-              <li>README (étape 4, crédits « téléchargé depuis ses releases »), pages Installation, Mises à jour, Réglages et Dépannage du guide, dans les deux langues.</li>
-            </ul>
-            <p class="ctx">Idée de Félix du 27/10/2026. Risque : vpxtool est en 0.x, avec 49 releases en 2026 et des changements « breaking » ; le pack n'en utilise que <code>romname</code>, qu'une ancienne version fait déjà bien. vpxtool n'est jamais lancé pendant une partie, donc le remplacer hors partie est sûr ; le zip Windows ne contient que <code>vpxtool.exe</code>.</p>
-          </details>
-        </div>
-      </li>
 
       <li draggable="true" tabindex="0" class="item tr-share" id="discord" data-track="share" data-rank="gold">
         <div class="handle"><div class="num"></div><div class="move"><button type="button" data-move="-1" aria-label="Monter">▲</button><button type="button" data-move="1" aria-label="Descendre">▼</button></div></div>
@@ -632,8 +605,10 @@
       <p class="eyebrow">Décisions <span class="count">(la plus récente dépliée)</span></p>
       <div class="panel decisions">
         <details open>
-          <summary>30/10 <span class="count">(4)</span></summary>
+          <summary>30/10 <span class="count">(5)</span></summary>
           <ol>
+            <li><strong>vpxtool installé et à jour livré : spec #373 close</strong>
+              <span>Dernier ticket #378 : la version de vpxtool, lue par <code>--version</code> à chaque démarrage et retenue dans <code>script_reader.json</code>, fait proposer la mise à jour au démarrage suivant ; une version égale ou plus récente grise la ligne des Réglages, « à jour ». L'attente bloquante de la Pack Update et de l'installation devient un seul module. Le chantier sort de la file et de la matrice ; Discord passe 1ᵉʳ. Restent les vérifications sur la borne.</span></li>
             <li><strong>Backglass Clock livrée : spec #369 close</strong>
               <span>Dernier ticket #371 : à la première partie, la fenêtre quitte l'écran de jeu pour le coin haut gauche de l'écran du backglass, lu au <code>prelaunch</code> ; une place choisie par le propriétaire sur cet écran n'est plus jamais touchée. Le chantier sort de la file et de la matrice ; vpxtool passe 1ᵉʳ. Restent les vérifications sur la borne.</span></li>
             <li><strong>« Admin et enfant en jeu » livré : spec #364 close</strong>
