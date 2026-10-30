@@ -374,10 +374,11 @@ export function drawBackdrop(dc, covering = false) {
 }
 
 // The selection's outline image with its glow margin, in window pixels,
-// taller than drawn by what the selected row adds to an entry's height (a
-// disabled entry's reason).
+// stretched for a row taller than an entry (a disabled entry's reason):
+// the glow margin grows with it, so the whole image grows as the row does
+// for the frame inside it to cover the row.
 export function selectionSize(geometry, rowHeight) {
     const { selection } = DRAWN_MENU_IMAGES;
-    const height = selection.height * geometry.k + rowHeight - LOOK.rowHeights.entry * geometry.k;
+    const height = selection.height * geometry.k * rowHeight / (LOOK.rowHeights.entry * geometry.k);
     return { width: selection.width * geometry.k, height, margin: DRAWN_MENU_SELECTION_MARGIN * geometry.k };
 }

@@ -11,7 +11,6 @@ import { createFakePinballYHost, settle } from "../support/fake_pinbally_host.js
 import config from "../../common/core/config.js";
 import { assertNoErrorLogged } from "../support/error_log.js";
 import { computeGeometry, DRAWN_MENU_LOOK, DRAWN_MENU_Z_INDEX, ROW_KIND } from "../../common/drawn_menu/drawn_menu_painter.js";
-import { DRAWN_MENU_IMAGES } from "../../common/drawn_menu/drawn_menu_images.js";
 import { readDrawnMenu, drawnRowBoxes, highlightedEntry, isDrawnMenuShown, press } from "./drawn_menu_reader.js";
 
 const MENU_ID = "expansionPack.disabledLine";
@@ -100,8 +99,10 @@ test("on the disabled line, the outline is as tall as the label and its reason",
     press(fake, "Prev");
     assert.equal(outlineHeight(), lockedHeight);
 
-    const { selection } = DRAWN_MENU_IMAGES;
-    const expectedRatio = (selection.height + DRAWN_MENU_LOOK.reason.height) / selection.height;
+    // Stretched, the glow margin grows too: the frame inside it, an entry's
+    // height on an ordinary line, must grow as the row does.
+    const entryHeight = DRAWN_MENU_LOOK.rowHeights.entry;
+    const expectedRatio = (entryHeight + DRAWN_MENU_LOOK.reason.height) / entryHeight;
     assert.ok(Math.abs(lockedHeight / afterHeight - expectedRatio) < 1e-6, `${lockedHeight / afterHeight} vs ${expectedRatio}`);
 });
 
